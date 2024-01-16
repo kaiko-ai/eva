@@ -6,7 +6,7 @@ import nox
 PACKAGE = "eva"
 """The name of the library."""
 
-PYTHON_VERSIONS = ["3.11"]
+PYTHON_VERSIONS = ["3.10.13"]
 """The python versions to test on."""
 
 LOCATIONS = "src", "tests", "noxfile.py"
