@@ -1,6 +1,7 @@
 <div align="center">
-EVA
-<br />
+
+<img src="./docs/static/images/eva-logo.png" width="400">
+
 <br />
 
 _Oncology FM Evaluation Framework by KAIKO.ai_
