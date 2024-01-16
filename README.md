@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="./docs/static/images/eva-logo.png" width="400">
+<img src="./assets/images/eva-logo.png" width="400">
 
 <br />
 
@@ -41,11 +41,11 @@ TBD
 
 ## Contributing
 
-EVA is an open source project and welcomes contributions of all kinds. Please checkout the [developer](./docs/DEVELOPER_GUIDE.md) and [contributing guide](./docs/CONTRIBUTING.md) for help on how to do so.
+EVA is an open source project and welcomes contributions of all kinds. Please checkout the [developer](./assets/DEVELOPER_GUIDE.md) and [contributing guide](./assets/CONTRIBUTING.md) for help on how to do so.
 
-All contributors must follow the [code of conduct](./docs/CODE_OF_CONDUCT.md).
+All contributors must follow the [code of conduct](./assets/CODE_OF_CONDUCT.md).
 
 ---
 <div align="center">
-  <img src="./docs/static/images/kaiko-logo.png" width="200">
+  <img src="./assets/images/kaiko-logo.png" width="200">
 </div>
