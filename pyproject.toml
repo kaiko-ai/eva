@@ -41,17 +41,17 @@ dev = ["eva[lint, test]"]
 [tool.isort]
 atomic = true
 profile = "black"
-line_length = 79
+line_length = 100
 skip_gitignore = true
 
 [tool.black]
 target-version = ["py310"]
-line-length = 79
+line-length = 100
 
 [tool.ruff]
 select = ["A", "B", "C", "D", "E", "F"]
 ignore = ["D401"]
-line-length = 79
+line-length = 100
 target-version = "py310"
 
 [tool.ruff.pydocstyle]
