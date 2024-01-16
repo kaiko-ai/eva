@@ -19,7 +19,9 @@ maintainers = [
     {name = "Roman Moser", email = "roman@kaiko.ai"},
 ]
 requires-python = ">=3.10"
-dependencies = []
+dependencies = [
+    "pytorch-lightning>=2.1.3",
+]
 
 [project.optional-dependencies]
 lint = [
