@@ -5,8 +5,8 @@ from eva.data import datasets as datasets_lib
 from eva.data.datamodules import schemas
 
 
-def call_method(datasets: schemas.DatasetsSchema, method: str) -> None:
-    """Calls dataset `method` from the datasets which have implemented it.
+def call_method_if_exists(datasets: schemas.DatasetsSchema, method: str) -> None:
+    """Calls dataset `method` from the datasets if exists.
 
     Args:
         datasets: The datasets schema to call the method.
@@ -19,7 +19,7 @@ def call_method(datasets: schemas.DatasetsSchema, method: str) -> None:
 
 
 def _datasets_iterator(datasets: schemas.DatasetsSchema) -> Iterable[datasets_lib.Dataset]:
-    """Iterates thought the datasets.
+    """Iterates thought the defined datasets in a schema.
 
     Args:
         datasets: The datasets to iterate from.

@@ -41,15 +41,15 @@ class DataModule(pl.LightningDataModule):
 
     @override
     def prepare_data(self) -> None:
-        call.call_method(self.datasets, "prepare_data")
+        call.call_method_if_exists(self.datasets, "prepare_data")
 
     @override
     def setup(self, stage: str) -> None:
-        call.call_method(self.datasets, "setup")
+        call.call_method_if_exists(self.datasets, "setup")
 
     @override
     def teardown(self, stage: str) -> None:
-        call.call_method(self.datasets, "teardown")
+        call.call_method_if_exists(self.datasets, "teardown")
 
     @override
     def train_dataloader(self) -> TRAIN_DATALOADERS:

@@ -5,7 +5,7 @@ from typing import List
 from eva.data import dataloaders, datasets
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True)
 class DatasetsSchema:
     """Datasets schema used in DataModule."""
 
@@ -22,7 +22,7 @@ class DatasetsSchema:
     """Predict dataset."""
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True)
 class DataloadersSchema:
     """Dataloaders schema used in DataModule."""
 
