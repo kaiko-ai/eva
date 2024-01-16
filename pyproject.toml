@@ -18,7 +18,7 @@ maintainers = [
     {name = "Nicolas Känzig", email = "nicolas@kaiko.ai"},
     {name = "Roman Moser", email = "roman@kaiko.ai"},
 ]
-requires-python = ">=3.11"
+requires-python = ">=3.10"
 dependencies = []
 
 [project.optional-dependencies]
