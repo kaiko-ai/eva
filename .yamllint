@@ -1,0 +1,45 @@
+---
+yaml-files:
+  - "*.yml"
+  - "*.yaml"
+  - ".yamllint"
+
+ignore: |
+  **/lightning_logs/**
+  **/*.py
+
+rules:
+  braces:
+    forbid: false
+    min-spaces-inside: 0
+    max-spaces-inside: 2
+    min-spaces-inside-empty: -1
+    max-spaces-inside-empty: -1
+  brackets: enable
+  colons: enable
+  commas: enable
+  comments:
+    level: warning
+  comments-indentation:
+    level: warning
+  document-end: disable
+  document-start:
+    level: warning
+  empty-lines: enable
+  empty-values: disable
+  float-values: disable
+  hyphens: enable
+  indentation:
+    spaces: consistent
+    indent-sequences: true
+    check-multi-line-strings: false
+  key-duplicates: enable
+  key-ordering: disable
+  line-length: disable
+  new-line-at-end-of-file: enable
+  new-lines: enable
+  octal-values: disable
+  quoted-strings: disable
+  trailing-spaces: enable
+  truthy:
+    level: warning

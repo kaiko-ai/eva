@@ -7,7 +7,7 @@ _Oncology FM Evaluation Framework by KAIKO.ai_
 
 
 <a href="https://www.python.org/">
-  <img src="https://img.shields.io/badge/-Python_3.9_%7C_3.10-blue?logo=python&logoColor=white" />
+  <img src="https://img.shields.io/badge/-Python_3.11-blue?logo=python&logoColor=white" />
 </a>
 <a href="https://www.apache.org/licenses/LICENSE-2.0">
   <img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg" />

@@ -18,7 +18,7 @@ maintainers = [
     {name = "Nicolas Känzig", email = "nicolas@kaiko.ai"},
     {name = "Roman Moser", email = "roman@kaiko.ai"},
 ]
-requires-python = ">=3.9"
+requires-python = ">=3.11"
 dependencies = []
 
 [project.optional-dependencies]
@@ -27,10 +27,10 @@ lint = [
     "black>=23.1.0",
     "ruff>=0.0.254",
     "pyright>=1.1.295",
+    "yamllint>=1.29.0",
     "nox>=2022.11.21",
 ]
 test = [
-    "xdoctest>=1.1.1",
     "pygments>=2.14.0",
     "pytest>=7.2.2",
     "pytest-cov>=4.0.0",
@@ -45,22 +45,23 @@ line_length = 79
 skip_gitignore = true
 
 [tool.black]
-target-version = ["py39"]
+target-version = ["py311"]
 line-length = 79
 
 [tool.ruff]
 select = ["A", "B", "C", "D", "E", "F"]
 ignore = ["D401"]
 line-length = 79
-target-version = "py39"
+target-version = "py311"
 
 [tool.ruff.pydocstyle]
 convention = "google"
 
 [tool.ruff.flake8-quotes]
 docstring-quotes = "double"
+
 [tool.pyright]
-pythonVersion = "3.9"
+pythonVersion = "3.11"
 reportInvalidStringEscapeSequence = false
 exclude = [
     "__pypackages__",
