@@ -45,14 +45,14 @@ line_length = 79
 skip_gitignore = true
 
 [tool.black]
-target-version = ["py311"]
+target-version = ["py310"]
 line-length = 79
 
 [tool.ruff]
 select = ["A", "B", "C", "D", "E", "F"]
 ignore = ["D401"]
 line-length = 79
-target-version = "py311"
+target-version = "py310"
 
 [tool.ruff.pydocstyle]
 convention = "google"
@@ -61,7 +61,7 @@ convention = "google"
 docstring-quotes = "double"
 
 [tool.pyright]
-pythonVersion = "3.11"
+pythonVersion = "3.10"
 reportInvalidStringEscapeSequence = false
 exclude = [
     "__pypackages__",
