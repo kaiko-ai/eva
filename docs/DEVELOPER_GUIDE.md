@@ -9,13 +9,23 @@ To contribute any feature to EVA, you must install from source.
 2. Run `pdm run python` to run a Python script or start an interactive Python shell within the context of the PDM-managed project environment.
 
 PDM quick guide:
-- `pdm lock` to generate or update the pdm.lock file.
-- `pdm install`	to install all groups locked in the lockfile.
-- `pdm update` to update all dependencies in the lock file.
+- `pdm lock -G:all` to generate or update the pdm.lock file including all groups.
+- `pdm install -G:all`	to install all groups locked in the lockfile.
+- `pdm update -G:all` to update all dependencies in the lock file.
 - `pdm add <package-name>` to add a package.
 - `pdm remove <package-name>` to remove a package.
 For more information about managing dependencies please look [here](https://pdm-project.org/latest/usage/dependency/#manage-dependencies).
 
+## Continuous Integration (CI)
+
+For testing automation, we use [`nox`](https://nox.thea.codes/en/stable/index.html).
+
+Commands:
+- `nox` to run all the automation tests. 
+- `nox -s fmt` to run the code formatting tests.
+- `nox -s lint` to run the code lining tests.
+- `nox -s check` to run the type-annotation tests.
+- `nox -s test` to run the unit tests.
 
 ## General coding principles
 
