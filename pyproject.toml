@@ -1,0 +1,97 @@
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
+
+[project]
+name = "eva"
+version = "0.0.1"
+description = "Evaluation Framework for oncology foundation models."
+license = {file = "LICENSE"}
+readme = "README.md"
+authors = [
+    {name = "Ioannis Gatopoulos", email = "ioannis@kaiko.ai"},
+    {name = "Nicolas Känzig", email = "nicolas@kaiko.ai"},
+    {name = "Roman Moser", email = "roman@kaiko.ai"},
+]
+maintainers = [
+    {name = "Ioannis Gatopoulos", email = "ioannis@kaiko.ai"},
+    {name = "Nicolas Känzig", email = "nicolas@kaiko.ai"},
+    {name = "Roman Moser", email = "roman@kaiko.ai"},
+]
+requires-python = ">=3.9"
+dependencies = []
+
+[project.optional-dependencies]
+lint = [
+    "isort>=5.12.0",
+    "black>=23.1.0",
+    "ruff>=0.0.254",
+    "pyright>=1.1.295",
+    "nox>=2022.11.21",
+]
+test = [
+    "xdoctest>=1.1.1",
+    "pygments>=2.14.0",
+    "pytest>=7.2.2",
+    "pytest-cov>=4.0.0",
+    "nox>=2022.11.21",
+]
+dev = ["eva[lint, test]"]
+
+[tool.isort]
+atomic = true
+profile = "black"
+line_length = 79
+skip_gitignore = true
+
+[tool.black]
+target-version = ["py39"]
+line-length = 79
+
+[tool.ruff]
+select = ["A", "B", "C", "D", "E", "F"]
+ignore = ["D401"]
+line-length = 79
+target-version = "py39"
+
+[tool.ruff.pydocstyle]
+convention = "google"
+
+[tool.ruff.flake8-quotes]
+docstring-quotes = "double"
+[tool.pyright]
+pythonVersion = "3.9"
+reportInvalidStringEscapeSequence = false
+exclude = [
+    "__pypackages__",
+    ".nox",
+]
+
+[tool.pytest.ini_options]
+addopts = [
+    "--color=yes",
+    "--durations=0",
+    "--strict-markers",
+]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::UserWarning",
+]
+markers = [
+    "slow: slow tests",
+]
+minversion = "6.0"
+testpaths = "tests/"
+
+[tool.coverage]
+precision = 2
+range = [95, 100]
+
+[tool.coverage.run]
+omit = [
+    "__pypackages__/*",
+    "/private/*",
+]
+
+[tool.coverage.comment]
+layout = "header, diff, flags, files, footer"
