@@ -5,7 +5,7 @@
 To contribute any feature to EVA, you must install from source.
 
 1. Install package and dependency manager PDM following the instructions [here](https://pdm-project.org/latest/#other-installation-methods).
-2. Run `pdm install -G "eval[dev]"` to install the development dependencies.
+2. Run `pdm install -G "eva[dev]"` to install the development dependencies.
 2. Run `pdm run python` to run a Python script or start an interactive Python shell within the context of the PDM-managed project environment.
 
 PDM quick guide:
