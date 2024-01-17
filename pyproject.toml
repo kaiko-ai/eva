@@ -63,6 +63,10 @@ convention = "google"
 [tool.ruff.flake8-quotes]
 docstring-quotes = "double"
 
+[tool.bandit]
+exclude_dirs = [".venv", "**/tests/**"]
+skips = ["B101"]
+
 [tool.pyright]
 pythonVersion = "3.10"
 reportInvalidStringEscapeSequence = false

@@ -47,7 +47,7 @@ def lint(session: nox.Session) -> None:
     session.run("black", "--check", *args)
     session.run("ruff", *args)
     session.run("yamllint", *args)
-    session.run("pdm", "run", "bandit", "-q", "-r", *args, external=True)
+    session.run("bandit", "-q", "-c", "pyproject.toml", "-r", *args, external=True)
 
 
 @nox.session(python=PYTHON_VERSIONS[-1], tags=["check"])
