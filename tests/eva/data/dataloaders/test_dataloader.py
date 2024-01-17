@@ -11,6 +11,7 @@ from eva.data import dataloaders, datasets
     [
         (16, True, 4, True),
         (4, False, 8, False),
+        (None, True, 1, False),
     ],
 )
 def test_dataloader(
