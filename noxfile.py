@@ -35,7 +35,7 @@ def fmt(session: nox.Session) -> None:
     session.run("pdm", "install", "--group", "lint", external=True)
     session.run("black", *args)
     session.run("isort", *args)
-    session.run("ruff", "--fix", *args)
+    session.run("ruff", "--fix-only", *args)
 
 
 @nox.session(python=PYTHON_VERSIONS[-1], tags=["lint"])

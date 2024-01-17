@@ -11,7 +11,7 @@ The EVA contribution process generally starts with filing a
 
 EVA defines four categories of issues: feature requests, bug reports,
 documentation fixes, and installation issues. In general, we recommend
-waiting for feedback from a FiftyOne maintainer or community member before
+waiting for feedback from a EVA maintainer or community member before
 proceeding to implement a feature or patch.
 
 ### Pull Requests
