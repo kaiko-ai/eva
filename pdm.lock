@@ -1073,7 +1073,7 @@ files = [
 
 [[package]]
 name = "torchmetrics"
-version = "1.3.0"
+version = "1.3.0.post0"
 requires_python = ">=3.8"
 summary = "PyTorch native Metrics"
 dependencies = [
@@ -1083,8 +1083,8 @@ dependencies = [
     "torch>=1.10.0",
 ]
 files = [
-    {file = "torchmetrics-1.3.0-py3-none-any.whl", hash = "sha256:1ba8c0702143f59646dac4f45829ccf15d495c596ee63e63e66b9a2b972b310e"},
-    {file = "torchmetrics-1.3.0.tar.gz", hash = "sha256:e8ac3adcc61e7a847d0504b0a0e0a3b7f57796178b239c6fafb5d20c0c9460ac"},
+    {file = "torchmetrics-1.3.0.post0-py3-none-any.whl", hash = "sha256:9e691ff8e8b752ad191c896f98e4a6dea81fe91dda5b6916e5b7aeaed4c7e1ad"},
+    {file = "torchmetrics-1.3.0.post0.tar.gz", hash = "sha256:6d31aeabee964ff539425800164790b8670293f2fade9fcfee6fabbe3f45dd7e"},
 ]
 
 [[package]]
