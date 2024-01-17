@@ -1,5 +1,5 @@
-"""Datasets module."""
+"""Core Dataset module."""
 from torch.utils import data
 
 Dataset = data.Dataset
-"""An abstract class representing a dataset."""
+"""Core abstract dataset class."""

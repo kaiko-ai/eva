@@ -1,4 +1,4 @@
-"""DataModule."""
+"""Core DataModule."""
 from typing import List
 
 import pytorch_lightning as pl
@@ -11,7 +11,13 @@ from eva.data.datamodules import call, schemas
 
 
 class DataModule(pl.LightningDataModule):
-    """DataModule."""
+    """DataModule encapsulates all the steps needed to process data.
+
+    It will initialize and create the mapping between dataloaders and
+    datasets. During the `prepare_data`, `setup` and `teardown`, the
+    datamodule will call the respectively methods from all the datasets,
+    if they define.
+    """
 
     def __init__(
         self,

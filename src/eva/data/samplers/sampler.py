@@ -1,5 +1,5 @@
-"""Data samplers API."""
+"""Core data sampler."""
 from torch.utils import data
 
 Sampler = data.Sampler
-"""Data sampler class."""
+"""Core abstract data sampler class."""
