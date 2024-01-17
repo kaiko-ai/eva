@@ -19,7 +19,10 @@ maintainers = [
     {name = "Roman Moser", email = "roman@kaiko.ai"},
 ]
 requires-python = ">=3.10"
-dependencies = []
+dependencies = [
+    "absl-py>=2.1.0",
+    "ml_collections>=0.1.1",
+]
 
 [project.optional-dependencies]
 lint = [
