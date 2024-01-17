@@ -1,11 +1,2 @@
 ---
 exclude_dirs: [".venv", "**/tests/**"]
-# - Skipping B101: doesn't like 'assert' to check for condition.
-#   Reasoning: we do not perform code optimisation and thus this should not apply.
-#   See https://bandit.readthedocs.io/en/1.7.5/plugins/b101_assert_used.html
-# - Skipping B404: doesn't like 'subprocess' module.
-#   We use it to run shell commands. We should emphasize to developpers its weakness.
-#   See https://bandit.readthedocs.io/en/1.7.5/blacklists/blacklist_imports.html#b404-import-subprocess
-# - Skipping B113: request_without_timeout
-#   This rule adds a lot of noise to the results, is not a security issue and not something we want to improve upon ATM.
-skips: ["B101", "B311", "B404", "B113"]
