@@ -24,7 +24,7 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     - name: Setting up NOX
-      uses: wntrblm/nox@2022.8.7
+      uses: wntrblm/nox@2022.11.21
       with:
         python-versions: ${{ matrix.python-version }}
     - name: "Linting tests"
