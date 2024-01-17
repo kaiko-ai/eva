@@ -2,4 +2,4 @@
 import torchmetrics
 
 Metric = torchmetrics.Metric
-"""Base class of metrics."""
+"""Abstract metric class."""

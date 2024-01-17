@@ -1,4 +1,4 @@
-"""Metric collection objects."""
+"""Metric collection aggregator."""
 import torchmetrics
 
 MetricCollection = torchmetrics.MetricCollection

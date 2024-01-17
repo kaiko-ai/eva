@@ -1,4 +1,4 @@
-"""Metrics related schemas."""
+"""Metrics related helper schemas."""
 import dataclasses
 
 from eva.metrics.core.typings import MetricModuleType
@@ -12,10 +12,10 @@ class MetricsSchema:
     """Holds the common train and evaluation metrics."""
 
     train: MetricModuleType | None = None
-    """The training metrics."""
+    """The exclusive training metrics."""
 
     evaluation: MetricModuleType | None = None
-    """The evaluation metrics."""
+    """The exclusive evaluation metrics."""
 
     @property
     def training_metrics(self) -> MetricModuleType | None:
@@ -38,7 +38,7 @@ class MetricsSchema:
             metrics: The metrics to join.
 
         Returns:
-            The resulted metrics after joining with common with no duplicates.
+            The resulted metrics after joining with the common ones.
         """
         if metrics is None or self.common is None:
             return self.common or metrics
