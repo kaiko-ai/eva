@@ -1,4 +1,4 @@
 """EVA core API."""
-from eva import data, metrics
+from eva import data, metrics, utils
 
-__all__ = ["data", "metrics"]
+__all__ = ["data", "metrics", "utils"]
