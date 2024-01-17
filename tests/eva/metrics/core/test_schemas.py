@@ -9,9 +9,27 @@ from eva.metrics.core.typings import MetricModuleType
 @pytest.mark.parametrize(
     "common, train, evaluation, expected_train, expected_evaluation",
     [
-        (torchmetrics.Accuracy("binary"), None, None, "BinaryAccuracy()", "BinaryAccuracy()"),
-        (None, torchmetrics.Accuracy("binary"), None, "BinaryAccuracy()", "None"),
-        (None, None, torchmetrics.Accuracy("binary"), "None", "BinaryAccuracy()"),
+        (
+            torchmetrics.Accuracy("binary"),
+            None,
+            None,
+            "BinaryAccuracy()",
+            "BinaryAccuracy()",
+        ),
+        (
+            None,
+            torchmetrics.Accuracy("binary"),
+            None,
+            "BinaryAccuracy()",
+            "None",
+        ),
+        (
+            None,
+            None,
+            torchmetrics.Accuracy("binary"),
+            "None",
+            "BinaryAccuracy()",
+        ),
         (
             torchmetrics.Accuracy("binary"),
             torchmetrics.Dice(),

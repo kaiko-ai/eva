@@ -22,9 +22,9 @@ class MetricModule(nn.Module):
         """Initializes the metrics for the Trainer.
 
         Args:
-            train: The training metric collection to be tracked.
-            val: The validation metric collection to be tracked.
-            test: The test metric collection to be tracked.
+            train: The training metric collection.
+            val: The validation metric collection.
+            test: The test metric collection.
         """
         super().__init__()
 
@@ -49,9 +49,9 @@ class MetricModule(nn.Module):
         """Initializes a metric module from a list of metrics.
 
         Args:
-            train: A list of metrics for the training process.
-            val: A list of metrics for the val process.
-            test: A list of metrics for the test process.
+            train: Metrics for the training stage.
+            val: Metrics for the validation stage.
+            test: Metrics for the test stage.
             separator: The separator between the group name of the metric
                 and the metric itself. Defaults to `"/"`.
         """
@@ -89,7 +89,7 @@ class MetricModule(nn.Module):
 
     @property
     def validation_metrics(self) -> collection.MetricCollection:
-        """Returns the metrics of the val dataset."""
+        """Returns the metrics of the validation dataset."""
         return self._val
 
     @property
@@ -104,7 +104,7 @@ def _create_collection_from_metrics(
     """Create a unique collection from metrics.
 
     Args:
-        metrics: A list of metrics.
+        metrics: The desired metrics.
         prefix: A prefix to added to the collection. Defaults to `None`.
 
     Returns:
