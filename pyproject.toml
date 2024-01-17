@@ -64,8 +64,7 @@ convention = "google"
 docstring-quotes = "double"
 
 [tool.bandit]
-exclude_dirs = [".venv", "**/tests/**"]
-skips = ["B101"]
+exclude_dirs = [".venv", "tests/**"]
 
 [tool.pyright]
 pythonVersion = "3.10"
