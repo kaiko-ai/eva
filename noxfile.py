@@ -40,13 +40,14 @@ def fmt(session: nox.Session) -> None:
 
 @nox.session(python=PYTHON_VERSIONS[-1], tags=["lint"])
 def lint(session: nox.Session) -> None:
-    """Checks the source code for programmatic and stylistic errors."""
+    """Checks the source code for programmatic, stylistic and security violations."""
     args = session.posargs or LOCATIONS
     session.run("pdm", "install", "--group", "lint", external=True)
     session.run("isort", "--check-only", *args)
     session.run("black", "--check", *args)
     session.run("ruff", *args)
     session.run("yamllint", *args)
+    session.run("pdm", "run", "bandit", "-r", *args)
 
 
 @nox.session(python=PYTHON_VERSIONS[-1], tags=["check"])
