@@ -26,7 +26,6 @@ dependencies = [
 
 [project.optional-dependencies]
 vision = [
-    "eva",
 ]
 all = ["eva[vision]"]
 lint = [
