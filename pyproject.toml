@@ -70,6 +70,7 @@ exclude_dirs = [".venv", "tests/**"]
 [tool.pyright]
 pythonVersion = "3.10"
 reportInvalidStringEscapeSequence = false
+reportIncompatibleMethodOverride = false
 exclude = [
     "__pypackages__",
     ".nox",

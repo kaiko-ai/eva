@@ -64,8 +64,8 @@ class NNHead(module.ModelModule[INPUT_BATCH]):
         return {"optimizer": optimizer, "lr_scheduler": lr_scheduler}
 
     @override
-    def forward(self, *args, tensor: torch.Tensor, **kwargs) -> torch.Tensor:
-        features = tensor if self.backbone is None else self.model.forward(tensor)
+    def forward(self, tensor: torch.Tensor, *args: Any, **kwargs: Any) -> torch.Tensor:
+        features = tensor if self.backbone is None else self.backbone(tensor)
         return self.head(features.flatten(start_dim=1))
 
     @override
@@ -74,15 +74,15 @@ class NNHead(module.ModelModule[INPUT_BATCH]):
             _utils.deactivate_requires_grad(self.backbone)
 
     @override
-    def training_step(self, *args, batch: INPUT_BATCH, **kwargs) -> STEP_OUTPUT:
+    def training_step(self, batch: INPUT_BATCH, *args: Any, **kwargs: Any) -> STEP_OUTPUT:
         return self._batch_step(batch)
 
     @override
-    def validation_step(self, *args, batch: INPUT_BATCH, **kwargs) -> STEP_OUTPUT:
+    def validation_step(self, batch: INPUT_BATCH, *args: Any, **kwargs: Any) -> STEP_OUTPUT:
         return self._batch_step(batch)
 
     @override
-    def test_step(self, *args, batch: INPUT_BATCH, **kwargs) -> STEP_OUTPUT:
+    def test_step(self, batch: INPUT_BATCH, *args: Any, **kwargs: Any) -> STEP_OUTPUT:
         return self._batch_step(batch)
 
     @override
