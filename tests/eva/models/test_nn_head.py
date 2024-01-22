@@ -11,7 +11,7 @@ from eva import metrics, models, trainers
 from eva.data import dataloaders, datamodules, datasets
 
 
-def test_nnhead_fit(
+def test_nn_head_fit(
     model: models.NNHead,
     datamodule: datamodules.DataModule,
     trainer: trainers.Trainer,
