@@ -1,5 +1,6 @@
 from torch import nn
 
+
 def deactivate_requires_grad(model: nn.Module) -> None:
     """Deactivates the requires_grad flag for all parameters of a model.
 
@@ -27,4 +28,3 @@ def activate_requires_grad(model: nn.Module) -> None:
     """
     for param in model.parameters():
         param.requires_grad = True
-
