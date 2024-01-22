@@ -16,11 +16,13 @@ def test_nnhead_fit(
     datamodule: datamodules.DataModule,
     trainer: trainers.Trainer,
 ) -> None:
-    """Tests the nnhead fit pipeline."""
+    """Tests the NNHead fit pipeline."""
     initial_head_weights = model.head.weight.clone()
     trainer.fit(model, datamodule=datamodule)
+    # verify that the metrics were updated
     assert trainer.logged_metrics["train/AverageLoss"] > 0
     assert trainer.logged_metrics["val/AverageLoss"] > 0
+    # verify that head weights were updated
     assert not torch.all(torch.eq(initial_head_weights, model.head.weight))
 
 
