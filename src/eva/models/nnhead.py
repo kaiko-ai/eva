@@ -12,7 +12,7 @@ from eva.metrics import core as metrics_lib
 from eva.models import _utils, module
 from eva.models.typings import MODEL_TYPE, TUPLE_INPUT_BATCH
 
-# TODO this will be expanded to support dict
+# TODO this will be expanded to support dict as well
 INPUT_BATCH = TUPLE_INPUT_BATCH
 """The input batch annotation."""
 
@@ -71,7 +71,7 @@ class NNHead(module.ModelModule[INPUT_BATCH]):
     @override
     def on_fit_start(self) -> None:
         if self.backbone is not None:
-            _utils.deactivate_requires_grad(model=self.backbone)
+            _utils.deactivate_requires_grad(self.backbone)
 
     @override
     def training_step(self, *args, batch: INPUT_BATCH, **kwargs) -> STEP_OUTPUT:
@@ -88,7 +88,7 @@ class NNHead(module.ModelModule[INPUT_BATCH]):
     @override
     def on_fit_end(self) -> None:
         if self.backbone is not None:
-            _utils.activate_requires_grad(model=self.backbone)
+            _utils.activate_requires_grad(self.backbone)
 
     def _batch_step(self, batch: INPUT_BATCH) -> STEP_OUTPUT:
         """Performs a model forward step and calculates the loss.
