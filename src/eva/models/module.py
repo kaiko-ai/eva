@@ -124,7 +124,7 @@ class ModelModule(pl.LightningModule, Generic[INPUT_BATCH]):
     ) -> None:
         """Updates the metrics tracker with new data.
 
-        Here the `batch_outputs` keyword values will filtered based
+        Here the `batch_outputs` keyword values will be filtered based
         on the signature of all individual metrics and passed only
         to the compatible ones.
 
@@ -154,8 +154,8 @@ class ModelModule(pl.LightningModule, Generic[INPUT_BATCH]):
         """Parses the arguments for the metrics.
 
         When pass to a metrics collection object, the keyword values
-        will filtered based on the signature of all individual metrics
-        and passed only to the compatible ones.
+        will be filtered based on the signature of all individual
+        metrics and passed only to the compatible ones.
 
         Args:
             batch_outputs: The outputs of the batch processing step.
