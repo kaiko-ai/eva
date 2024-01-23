@@ -6,14 +6,14 @@ import numpy as np
 import pandas as pd
 from typing_extensions import override
 
-from eva.data.datasets.base import BaseDataset
+from eva.vision.data.datasets.vision import VisionDataset
 from eva.data.preprocessors import DatasetPreprocessor
 from eva.vision.file_io import image_io
 
 DataSample = TypeVar("DataSample")
 
 
-class ImageDataset(BaseDataset[np.ndarray]):
+class ImageDataset(VisionDataset[np.ndarray]):
     """Image dataset."""
 
     def __init__(

@@ -4,11 +4,11 @@ from typing import Optional, Type
 import pandas as pd
 import torch
 
-from eva.data.datasets.base import BaseDataset
+from eva.vision.data.datasets.vision import VisionDataset
 from eva.data.preprocessors import DatasetPreprocessor
 
 
-class EmbeddingDataset(BaseDataset[torch.Tensor]):
+class EmbeddingDataset(VisionDataset[torch.Tensor]):
     """Embedding dataset."""
 
     def __init__(

@@ -9,8 +9,8 @@ from eva.data.preprocessors import DatasetPreprocessor
 DataSample = TypeVar("DataSample")
 
 
-class BaseDataset(Dataset):
-    """Base dataset class.
+class VisionDataset(Dataset):
+    """Vision base dataset class.
 
     For all benchmark datasets that use eva's standardized parquet format
     for storing labels, splits and metadata.
