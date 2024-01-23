@@ -40,13 +40,10 @@ class HeadModule(module.ModelModule[INPUT_BATCH]):
             criterion: The loss function to use.
             backbone: The feature extractor. If `None`, it will be expected
                 that the input batch returns the features directly.
-                Defaults to `None`.
             optimizer: The optimizer to use.
-                Defaults to :class:`torch.optim.Adam`.
             lr_scheduler: The learning rate scheduler to use.
-                Defaults to :class:`torch.optim.lr_scheduler.ConstantLR`.
             metrics: The list of metrics to track. If `None`, it uses
-                the :meth:`self.default_metrics`. Defaults to `None`.
+                the :meth:`self.default_metrics`.
         """
         super().__init__(metrics=metrics)
 

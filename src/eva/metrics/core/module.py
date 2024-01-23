@@ -53,7 +53,7 @@ class MetricModule(nn.Module):
             val: Metrics for the validation stage.
             test: Metrics for the test stage.
             separator: The separator between the group name of the metric
-                and the metric itself. Defaults to `"/"`.
+                and the metric itself.
         """
         return cls(
             train=_create_collection_from_metrics(train, prefix="train" + separator),
@@ -73,7 +73,7 @@ class MetricModule(nn.Module):
         Args:
             schema: The dataclass metric schema.
             separator: The separator between the group name of the metric
-                and the metric itself. Defaults to `"/"`.
+                and the metric itself.
         """
         return cls.from_metrics(
             train=schema.training_metrics,
@@ -105,7 +105,7 @@ def _create_collection_from_metrics(
 
     Args:
         metrics: The desired metrics.
-        prefix: A prefix to added to the collection. Defaults to `None`.
+        prefix: A prefix to added to the collection.
 
     Returns:
         The resulted metrics collection.
