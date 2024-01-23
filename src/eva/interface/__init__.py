@@ -1,4 +1,4 @@
 """Interface API."""
-from eva.interface import Interface
+from eva.interface.interface import Interface
 
 __all__ = ["Interface"]
