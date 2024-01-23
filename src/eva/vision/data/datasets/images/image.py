@@ -8,7 +8,7 @@ from typing_extensions import override
 
 from eva.data.datasets.base import BaseDataset
 from eva.data.preprocessors import DatasetPreprocessor
-from eva.vision.image_utils import image_io
+from eva.vision.file_io import image_io
 
 DataSample = TypeVar("DataSample")
 

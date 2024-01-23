@@ -1,5 +1,4 @@
 """Image IO utils."""
-
 import os
 
 import cv2
