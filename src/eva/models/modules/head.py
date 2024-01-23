@@ -1,4 +1,4 @@
-""""Neural Network Head module."""
+""""Neural Network Head Module."""
 from typing import Any, Callable
 
 import torch
@@ -9,15 +9,15 @@ from torch.optim import lr_scheduler
 from typing_extensions import override
 
 from eva.metrics import core as metrics_lib
-from eva.models import _utils, module
-from eva.models.typings import MODEL_TYPE, TUPLE_INPUT_BATCH
+from eva.models.modules import _utils, module
+from eva.models.modules.typings import MODEL_TYPE, TUPLE_INPUT_BATCH
 
 # TODO this will be expanded to support dict as well
 INPUT_BATCH = TUPLE_INPUT_BATCH
 """The input batch annotation."""
 
 
-class NNHead(module.ModelModule[INPUT_BATCH]):
+class HeadModule(module.ModelModule[INPUT_BATCH]):
     """Neural Net Head Module for training on features.
 
     It can be used for supervised (mini-batch) stochastic gradient descent

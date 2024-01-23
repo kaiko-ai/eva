@@ -1,4 +1,4 @@
-"""Tests the NNHead module."""
+"""Tests the HeadModule module."""
 import math
 from typing import Tuple
 
@@ -7,16 +7,17 @@ import torch
 from torch import nn
 from torch.utils import data as torch_data
 
-from eva import metrics, models, trainers
+from eva import metrics, trainers
 from eva.data import dataloaders, datamodules, datasets
+from eva.models import modules
 
 
-def test_nn_head_fit(
-    model: models.NNHead,
+def test_head_module_fit(
+    model: modules.HeadModule,
     datamodule: datamodules.DataModule,
     trainer: trainers.Trainer,
 ) -> None:
-    """Tests the NNHead fit pipeline."""
+    """Tests the HeadModule fit pipeline."""
     initial_head_weights = model.head.weight.clone()
     trainer.fit(model, datamodule=datamodule)
     # verify that the metrics were updated
@@ -27,9 +28,9 @@ def test_nn_head_fit(
 
 
 @pytest.fixture(scope="function")
-def model(input_shape: Tuple[int, ...] = (3, 8, 8), n_classes: int = 4) -> models.NNHead:
-    """Returns a NNHead model fixture."""
-    return models.NNHead(
+def model(input_shape: Tuple[int, ...] = (3, 8, 8), n_classes: int = 4) -> modules.HeadModule:
+    """Returns a HeadModule model fixture."""
+    return modules.HeadModule(
         head=nn.Linear(math.prod(input_shape), n_classes),
         criterion=nn.CrossEntropyLoss(),
         backbone=nn.Flatten(),

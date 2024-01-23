@@ -1,5 +1,4 @@
 """Models API."""
-from eva.models.module import ModelModule
-from eva.models.nn_head import NNHead
+from eva.models import modules
 
-__all__ = ["ModelModule", "NNHead"]
+__all__ = ["modules"]
