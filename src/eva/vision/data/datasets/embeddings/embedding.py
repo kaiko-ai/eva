@@ -17,6 +17,7 @@ class EmbeddingDataset(VisionDataset[torch.Tensor]):
         preprocessor: Type[DatasetPreprocessor],
         processed_dir: str,
         path_mappings_file: str | None,
+        split: str | None,
     ):
         """Initialize dataset.
 
@@ -28,8 +29,9 @@ class EmbeddingDataset(VisionDataset[torch.Tensor]):
             path_mappings_file: Path to the file containing the mappings between the original
                 image paths and the corresponding embedding paths. If not specified, the
                 paths will not be mapped.
+            split: Dataset split to use. If None, the entire dataset is used.
         """
-        super().__init__(dataset_dir, preprocessor, processed_dir)
+        super().__init__(dataset_dir, preprocessor, processed_dir, split)
 
         self._path_mappings_file = path_mappings_file
         self._preprocessor = preprocessor(dataset_dir, processed_dir)

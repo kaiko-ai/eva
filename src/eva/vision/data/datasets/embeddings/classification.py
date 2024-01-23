@@ -1,13 +1,11 @@
 """Core Dataset module."""
-from typing import Tuple, Type, TypeVar
+from typing import Tuple, Type
 
 import numpy as np
 import pandas as pd
 
 from eva.data.preprocessors import DatasetPreprocessor
 from eva.vision.data.datasets.embeddings.embedding import EmbeddingDataset
-
-DataSample = TypeVar("DataSample")
 
 
 class EmbeddingClassificationDataset(EmbeddingDataset[Tuple[np.ndarray, np.ndarray]]):
@@ -19,6 +17,7 @@ class EmbeddingClassificationDataset(EmbeddingDataset[Tuple[np.ndarray, np.ndarr
         preprocessor: Type[DatasetPreprocessor],
         processed_dir: str,
         path_mappings_file: str | None,
+        split: str | None,
     ):
         """Initialize dataset.
 
@@ -30,8 +29,9 @@ class EmbeddingClassificationDataset(EmbeddingDataset[Tuple[np.ndarray, np.ndarr
             path_mappings_file: Path to the file containing the mappings between the original
                 image paths and the corresponding embedding paths. If not specified, the
                 paths will not be mapped.
+            split: Dataset split to use. If None, the entire dataset is used.
         """
-        super().__init__(dataset_dir, preprocessor, processed_dir, path_mappings_file)
+        super().__init__(dataset_dir, preprocessor, processed_dir, path_mappings_file, split)
 
         self._preprocessor = preprocessor(dataset_dir, processed_dir)
 

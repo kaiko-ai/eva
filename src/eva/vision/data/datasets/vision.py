@@ -1,5 +1,5 @@
 """Core Dataset module."""
-from typing import Dict, Type, TypeVar
+from typing import Dict, Generic, Type, TypeVar
 
 import pandas as pd
 
@@ -9,7 +9,7 @@ from eva.data.preprocessors import DatasetPreprocessor
 DataSample = TypeVar("DataSample")
 
 
-class VisionDataset(Dataset):
+class VisionDataset(Dataset, Generic[DataSample]):
     """Vision base dataset class.
 
     For all benchmark datasets that use eva's standardized parquet format
@@ -26,6 +26,7 @@ class VisionDataset(Dataset):
         dataset_dir: str,
         preprocessor: Type[DatasetPreprocessor],
         processed_dir: str,
+        split: str | None,
         column_mapping: Dict[str, str] = default_column_mapping,
     ):
         """Initialize dataset.
@@ -35,6 +36,7 @@ class VisionDataset(Dataset):
             preprocessor: Dataset preprocessor.
             processed_dir: Path to the output directory where the processed dataset files
                 are be stored by the preprocessor.
+            split: Dataset split to use. If None, the entire dataset is used.
             column_mapping: Mapping between the standardized column names and the actual
                 column names in the dataset parquet files.
         """
@@ -43,6 +45,7 @@ class VisionDataset(Dataset):
         self._dataset_dir = dataset_dir
         self._processed_dir = processed_dir
         self._preprocessor = preprocessor(dataset_dir, processed_dir)
+        self._split = split
         self._column_mapping = column_mapping
 
         self._data: pd.DataFrame

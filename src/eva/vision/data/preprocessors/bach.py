@@ -11,9 +11,9 @@ class BachPreprocessor(DatasetPreprocessor):
         """Dataset preprocessor for Bach dataset.
 
         Args:
-            dataset_dir: Path to the dataset directory.
+            dataset_dir: Path to the raw dataset directory.
             processed_dir: Path to the output directory where the processed dataset files
-                will be stored.
+                are be stored by the preprocessor.
         """
         super().__init__(dataset_dir, processed_dir)
 

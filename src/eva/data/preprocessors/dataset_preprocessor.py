@@ -1,9 +1,19 @@
+"""Dataset preprocessor base class."""
 import abc
 import os
 
 
 class DatasetPreprocessor:
+    """Base class for dataset preprocessors."""
+
     def __init__(self, dataset_dir: str, processed_dir: str) -> None:
+        """Initialize the dataset preprocessor.
+
+        Args:
+            dataset_dir: Path to the raw dataset directory.
+            processed_dir: Path to the output directory where the processed dataset files
+                are be stored by the preprocessor.
+        """
         self._dataset_dir = dataset_dir
         self._processed_dir = processed_dir
 
@@ -27,15 +37,15 @@ class DatasetPreprocessor:
 
     @abc.abstractmethod
     def _generate_labels_file(self):
-        """Generates the labels .parquet file with columns: path, label"""
+        """Generates the labels .parquet file with columns: path, label."""
         raise NotImplementedError
 
     @abc.abstractmethod
     def _generate_splits_file(self):
-        """Generates the splits .parquet file with columns: path, split"""
+        """Generates the splits .parquet file with columns: path, split."""
         raise NotImplementedError
 
     @abc.abstractmethod
     def _generate_metadata_file(self):
-        """Generates the metadata .parquet file with columns: path, ... (other metadata columns)"""
+        """Generates the metadata .parquet file with columns: path, ... (other metadata)."""
         raise NotImplementedError
