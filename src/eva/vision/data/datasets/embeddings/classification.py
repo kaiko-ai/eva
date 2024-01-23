@@ -33,7 +33,9 @@ class EmbeddingClassificationDataset(EmbeddingDataset[Tuple[np.ndarray, np.ndarr
                 paths will not be mapped.
         """
         super().__init__(dataset_dir, preprocessor, processed_dir, path_mappings_file, **kwargs)
+
         self._preprocessor = preprocessor(dataset_dir, processed_dir)
+
         self._data: pd.DataFrame
 
     def _load_target(self, index) -> np.ndarray:

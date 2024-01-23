@@ -31,8 +31,10 @@ class EmbeddingDataset(BaseDataset[torch.Tensor]):
                 paths will not be mapped.
         """
         super().__init__(dataset_dir, preprocessor, processed_dir, **kwargs)
+
         self._path_mappings_file = path_mappings_file
         self._preprocessor = preprocessor(dataset_dir, processed_dir)
+
         self._data: pd.DataFrame
 
     def _load_embedding(self, index) -> torch.Tensor:

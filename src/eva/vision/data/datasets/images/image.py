@@ -33,7 +33,9 @@ class ImageDataset(BaseDataset[np.ndarray]):
             **kwargs: Additional keyword arguments.
         """
         super().__init__(dataset_dir, preprocessor, processed_dir, **kwargs)
+
         self._preprocessor = preprocessor(dataset_dir, processed_dir)
+
         self._data: pd.DataFrame
 
     def _load_image(self, index) -> np.ndarray:

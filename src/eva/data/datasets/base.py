@@ -38,9 +38,19 @@ class BaseDataset(Dataset):
             column_mapping: Mapping between the standardized column names and the actual
                 column names in the dataset parquet files.
         """
+        super().__init__()
+
+        self._dataset_dir = dataset_dir
+        self._processed_dir = processed_dir
         self._preprocessor = preprocessor(dataset_dir, processed_dir)
-        self._data: pd.DataFrame
         self._column_mapping = column_mapping
+
+        self._data: pd.DataFrame
+
+    def setup(self):
+        """Setup dataset."""
+        self._preprocessor.apply()
+        self._data = self._load_data()
 
     def _load_data(self) -> pd.DataFrame:
         """Loads the labels, splits and metadata files and merges them into a single dataframe."""
@@ -59,8 +69,3 @@ class BaseDataset(Dataset):
             data = data[data["split"] == self._split]
 
         return data
-
-    def setup(self):
-        """Setup dataset."""
-        self._preprocessor.apply()
-        self._data = self._load_data()

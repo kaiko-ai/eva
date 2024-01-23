@@ -29,7 +29,9 @@ class ImageClassificationDataset(ImageDataset[Tuple[np.ndarray, np.ndarray]]):
                 are be stored by the preprocessor.
         """
         super().__init__(dataset_dir, preprocessor, processed_dir, **kwargs)
+
         self._preprocessor = preprocessor(dataset_dir, processed_dir)
+
         self._data: pd.DataFrame
 
     def _load_target(self, index) -> np.ndarray:
