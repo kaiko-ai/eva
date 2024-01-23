@@ -72,7 +72,7 @@ exclude_dirs = [".venv", "tests/**"]
 
 [tool.pyright]
 pythonVersion = "3.10"
-reportInvalidStringEscapeSequence = false
+# Skip due to https://github.com/microsoft/pyright/issues/7095
 reportIncompatibleMethodOverride = false
 exclude = [
     "__pypackages__",
