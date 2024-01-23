@@ -17,7 +17,6 @@ class EmbeddingDataset(VisionDataset[torch.Tensor]):
         preprocessor: Type[DatasetPreprocessor],
         processed_dir: str,
         path_mappings_file: str | None,
-        **kwargs,
     ):
         """Initialize dataset.
 
@@ -30,7 +29,7 @@ class EmbeddingDataset(VisionDataset[torch.Tensor]):
                 image paths and the corresponding embedding paths. If not specified, the
                 paths will not be mapped.
         """
-        super().__init__(dataset_dir, preprocessor, processed_dir, **kwargs)
+        super().__init__(dataset_dir, preprocessor, processed_dir)
 
         self._path_mappings_file = path_mappings_file
         self._preprocessor = preprocessor(dataset_dir, processed_dir)

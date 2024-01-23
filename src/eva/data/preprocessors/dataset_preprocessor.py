@@ -6,6 +6,7 @@ class DatasetPreprocessor:
     def __init__(self, dataset_dir: str, processed_dir: str) -> None:
         self._dataset_dir = dataset_dir
         self._processed_dir = processed_dir
+
         self._labels_file = os.path.join(processed_dir, "labels.parquet")
         self._splits_file = os.path.join(processed_dir, "splits.parquet")
         self._metadata_file = os.path.join(processed_dir, "metadata.parquet")

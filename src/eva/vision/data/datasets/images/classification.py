@@ -18,7 +18,6 @@ class ImageClassificationDataset(ImageDataset[Tuple[np.ndarray, np.ndarray]]):
         dataset_dir: str,
         preprocessor: Type[DatasetPreprocessor],
         processed_dir: str,
-        **kwargs,
     ):
         """Initialize dataset.
 
@@ -28,7 +27,7 @@ class ImageClassificationDataset(ImageDataset[Tuple[np.ndarray, np.ndarray]]):
             processed_dir: Path to the output directory where the processed dataset files
                 are be stored by the preprocessor.
         """
-        super().__init__(dataset_dir, preprocessor, processed_dir, **kwargs)
+        super().__init__(dataset_dir, preprocessor, processed_dir)
 
         self._preprocessor = preprocessor(dataset_dir, processed_dir)
 

@@ -19,7 +19,6 @@ class EmbeddingClassificationDataset(EmbeddingDataset[Tuple[np.ndarray, np.ndarr
         preprocessor: Type[DatasetPreprocessor],
         processed_dir: str,
         path_mappings_file: str | None,
-        **kwargs,
     ):
         """Initialize dataset.
 
@@ -32,7 +31,7 @@ class EmbeddingClassificationDataset(EmbeddingDataset[Tuple[np.ndarray, np.ndarr
                 image paths and the corresponding embedding paths. If not specified, the
                 paths will not be mapped.
         """
-        super().__init__(dataset_dir, preprocessor, processed_dir, path_mappings_file, **kwargs)
+        super().__init__(dataset_dir, preprocessor, processed_dir, path_mappings_file)
 
         self._preprocessor = preprocessor(dataset_dir, processed_dir)
 

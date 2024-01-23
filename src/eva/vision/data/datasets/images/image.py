@@ -21,7 +21,6 @@ class ImageDataset(VisionDataset[np.ndarray]):
         dataset_dir: str,
         preprocessor: Type[DatasetPreprocessor],
         processed_dir: str,
-        **kwargs,
     ):
         """Initialize dataset.
 
@@ -30,9 +29,8 @@ class ImageDataset(VisionDataset[np.ndarray]):
             preprocessor: Dataset preprocessor.
             processed_dir: Path to the output directory where the processed dataset files
                 are be stored by the preprocessor.
-            **kwargs: Additional keyword arguments.
         """
-        super().__init__(dataset_dir, preprocessor, processed_dir, **kwargs)
+        super().__init__(dataset_dir, preprocessor, processed_dir)
 
         self._preprocessor = preprocessor(dataset_dir, processed_dir)
 
