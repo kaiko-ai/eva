@@ -1,11 +1,11 @@
 """Core Dataset module."""
-from typing import Optional, Type
+from typing import Type
 
 import pandas as pd
 import torch
 
-from eva.vision.data.datasets.vision import VisionDataset
 from eva.data.preprocessors import DatasetPreprocessor
+from eva.vision.data.datasets.vision import VisionDataset
 
 
 class EmbeddingDataset(VisionDataset[torch.Tensor]):
@@ -16,7 +16,7 @@ class EmbeddingDataset(VisionDataset[torch.Tensor]):
         dataset_dir: str,
         preprocessor: Type[DatasetPreprocessor],
         processed_dir: str,
-        path_mappings_file: Optional[str],
+        path_mappings_file: str | None,
         **kwargs,
     ):
         """Initialize dataset.

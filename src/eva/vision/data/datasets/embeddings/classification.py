@@ -1,5 +1,5 @@
 """Core Dataset module."""
-from typing import Optional, Tuple, Type, TypeVar
+from typing import Tuple, Type, TypeVar
 
 import numpy as np
 import pandas as pd
@@ -18,7 +18,7 @@ class EmbeddingClassificationDataset(EmbeddingDataset[Tuple[np.ndarray, np.ndarr
         dataset_dir: str,
         preprocessor: Type[DatasetPreprocessor],
         processed_dir: str,
-        path_mappings_file: Optional[str],
+        path_mappings_file: str | None,
         **kwargs,
     ):
         """Initialize dataset.
