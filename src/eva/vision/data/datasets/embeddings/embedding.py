@@ -3,12 +3,13 @@ from typing import Type
 
 import pandas as pd
 import torch
+from typing_extensions import override
 
 from eva.data.preprocessors import DatasetPreprocessor
 from eva.vision.data.datasets.vision import VisionDataset
 
 
-class EmbeddingDataset(VisionDataset[torch.Tensor]):
+class EmbeddingDataset(VisionDataset):
     """Embedding dataset."""
 
     def __init__(
@@ -41,6 +42,7 @@ class EmbeddingDataset(VisionDataset[torch.Tensor]):
     def _load_embedding(self, index) -> torch.Tensor:
         return torch.load(self._data.at[index][self._column_mapping["path"]], map_location="cpu")
 
+    @override
     def __getitem__(self, index) -> torch.Tensor:
         """Get a sample from the dataset."""
         return self._load_embedding(index)

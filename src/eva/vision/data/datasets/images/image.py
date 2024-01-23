@@ -11,7 +11,7 @@ from eva.vision.data.datasets.vision import VisionDataset
 from eva.vision.file_io import image_io
 
 
-class ImageDataset(VisionDataset[np.ndarray]):
+class ImageDataset(VisionDataset):
     """Image dataset."""
 
     def __init__(

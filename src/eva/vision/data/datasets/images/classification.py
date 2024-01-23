@@ -3,12 +3,13 @@ from typing import Tuple, Type
 
 import numpy as np
 import pandas as pd
+from typing_extensions import override
 
 from eva.data.preprocessors import DatasetPreprocessor
 from eva.vision.data.datasets.images.image import ImageDataset
 
 
-class ImageClassificationDataset(ImageDataset[Tuple[np.ndarray, np.ndarray]]):
+class ImageClassificationDataset(ImageDataset):
     """Image classification dataset."""
 
     def __init__(
@@ -36,7 +37,8 @@ class ImageClassificationDataset(ImageDataset[Tuple[np.ndarray, np.ndarray]]):
     def _load_target(self, index) -> np.ndarray:
         return self._data.at[index][self._column_mapping["target"]]
 
-    def __getitem__(self, index) -> Tuple[np.ndarray, np.ndarray]:
+    @override
+    def __getitem__(self, index) -> Tuple[np.ndarray, np.ndarray]:  # pyright: ignore
         """Get a sample from the dataset."""
         target = np.asarray(self._data.at[index][self._column_mapping["target"]], dtype=np.int64)
         image = self._load_image(index)

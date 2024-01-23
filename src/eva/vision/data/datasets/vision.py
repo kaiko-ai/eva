@@ -1,15 +1,13 @@
 """Core Dataset module."""
-from typing import Dict, Generic, Type, TypeVar
+from typing import Dict, Type
 
 import pandas as pd
 
 from eva.data.datasets.dataset import Dataset
 from eva.data.preprocessors import DatasetPreprocessor
 
-DataSample = TypeVar("DataSample")
 
-
-class VisionDataset(Dataset, Generic[DataSample]):
+class VisionDataset(Dataset):
     """Vision base dataset class.
 
     For all benchmark datasets that use eva's standardized parquet format
@@ -69,6 +67,6 @@ class VisionDataset(Dataset, Generic[DataSample]):
             data = pd.merge(data, df_metadata, on=self._column_mapping["path"])
 
         if self._split:
-            data = data[data["split"] == self._split]
+            data = data.loc[data["split"] == self._split]
 
         return data

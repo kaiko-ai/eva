@@ -1,14 +1,15 @@
 """Core Dataset module."""
 from typing import Tuple, Type
 
-import numpy as np
 import pandas as pd
+import torch
+from typing_extensions import override
 
 from eva.data.preprocessors import DatasetPreprocessor
 from eva.vision.data.datasets.embeddings.embedding import EmbeddingDataset
 
 
-class EmbeddingClassificationDataset(EmbeddingDataset[Tuple[np.ndarray, np.ndarray]]):
+class EmbeddingClassificationDataset(EmbeddingDataset):
     """Embedding classification dataset."""
 
     def __init__(
@@ -37,10 +38,11 @@ class EmbeddingClassificationDataset(EmbeddingDataset[Tuple[np.ndarray, np.ndarr
 
         self._data: pd.DataFrame
 
-    def _load_target(self, index) -> np.ndarray:
-        return self._data.at[index][self._column_mapping["target"]]
+    def _load_target(self, index) -> torch.Tensor:
+        return torch.tensor(self._data.at[index][self._column_mapping["target"]])
 
-    def __getitem__(self, index) -> Tuple[np.ndarray, np.ndarray]:
+    @override
+    def __getitem__(self, index) -> Tuple[torch.Tensor, torch.Tensor]:  # pyright: ignore
         """Get a sample from the dataset."""
         embedding, target = self._load_embedding(index), self._load_target(index)
         return embedding, target
