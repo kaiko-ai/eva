@@ -28,13 +28,22 @@ class BaseDataset(Dataset):
         processed_dir: str,
         column_mapping: Dict[str, str] = default_column_mapping,
     ):
-        """Initialize dataset."""
+        """Initialize dataset.
+
+        Args:
+            dataset_dir: Path to the dataset directory.
+            preprocessor: Dataset preprocessor.
+            processed_dir: Path to the output directory where the processed dataset files
+                are be stored by the preprocessor.
+            column_mapping: Mapping between the standardized column names and the actual
+                column names in the dataset parquet files.
+        """
         self._preprocessor = preprocessor(dataset_dir, processed_dir)
         self._data: pd.DataFrame
         self._column_mapping = column_mapping
 
     def _load_data(self) -> pd.DataFrame:
-        """TODO"""
+        """Loads the labels, splits and metadata files and merges them into a single dataframe."""
         df_labels = pd.read_parquet(self._preprocessor._labels_file)
         df_splits = pd.read_parquet(self._preprocessor._splits_file)
 
@@ -52,6 +61,6 @@ class BaseDataset(Dataset):
         return data
 
     def setup(self):
-        """TODO"""
+        """Setup dataset."""
         self._preprocessor.apply()
         self._data = self._load_data()
