@@ -27,8 +27,8 @@ class DataModule(pl.LightningDataModule):
         """Initializes the datamodule.
 
         Args:
-            datasets: The desired datasets. Defaults to `None`.
-            dataloaders: The desired dataloaders. Defaults to `None`.
+            datasets: The desired datasets.
+            dataloaders: The desired dataloaders.
         """
         super().__init__()
 
