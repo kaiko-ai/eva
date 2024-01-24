@@ -22,6 +22,7 @@ requires-python = ">=3.10"
 dependencies = [
     "pytorch-lightning>=2.1.3",
     "loguru>=0.7.2",
+    "jsonargparse>=4.27.2",
 ]
 
 [project.optional-dependencies]
@@ -44,6 +45,9 @@ test = [
     "nox>=2022.11.21",
 ]
 dev = ["eva[lint, test]"]
+
+[project.scripts]
+eva = "eva.__main__:main"
 
 [tool.isort]
 atomic = true
