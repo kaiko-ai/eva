@@ -23,7 +23,7 @@ class ModelModule(pl.LightningModule, Generic[INPUT_BATCH]):
         """Initializes the basic module.
 
         Args:
-            metrics: The metrics schema. Defaults to `None`.
+            metrics: The metrics schema.
         """
         super().__init__()
 
@@ -131,7 +131,7 @@ class ModelModule(pl.LightningModule, Generic[INPUT_BATCH]):
         Args:
             metrics: The desired metrics tracker to update.
             batch_outputs: The outputs of the batch processing step.
-            dataloader_idx: The dataloader index. Defaults to `0`.
+            dataloader_idx: The dataloader index.
         """
         inputs = self._parse_metrics_inputs(batch_outputs, dataloader_idx)
         metrics.update(**inputs)
@@ -159,7 +159,7 @@ class ModelModule(pl.LightningModule, Generic[INPUT_BATCH]):
 
         Args:
             batch_outputs: The outputs of the batch processing step.
-            dataloader_idx: The dataloader index. Defaults to `0`.
+            dataloader_idx: The dataloader index.
 
         Returns:
             A mapping with the argument name and its value.
