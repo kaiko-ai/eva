@@ -6,7 +6,7 @@ import numpy as np
 import numpy.typing as npt
 
 
-def load_image_file(path: str, flags: int = cv2.IMREAD_UNCHANGED) -> npt.NDArray[np.uint8]:
+def _load_image_file(path: str, flags: int = cv2.IMREAD_UNCHANGED) -> npt.NDArray[np.uint8]:
     """Loads an image file as a RGB or grayscale numpy array.
 
     Args:
@@ -27,20 +27,22 @@ def load_image_file(path: str, flags: int = cv2.IMREAD_UNCHANGED) -> npt.NDArray
     return np.asarray(image).astype(np.uint8)
 
 
-def load_image_file_as_rgb(path: str) -> npt.NDArray[np.uint8]:
+def load_image(path: str, as_rgb: bool = True) -> npt.NDArray[np.uint8]:
     """Reads an image from a file path as a RGB.
 
     Args:
         path: The path to the image file.
+        as_rgb: If True, the image is converted to RGB.
 
     Returns:
         The image as a RGB numpy.ndarray.
     """
-    image = load_image_file(path, flags=cv2.IMREAD_COLOR)
+    image = _load_image_file(path, flags=cv2.IMREAD_COLOR)
 
     if image.ndim == 2:
         image = image[:, :, np.newaxis]
 
-    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    if as_rgb:
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
     return np.asarray(image).astype(np.uint8)
