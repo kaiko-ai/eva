@@ -31,7 +31,6 @@ class VisionDataset(Dataset, abc.ABC, Generic[DataSample]):
 
             - perform dataset splits
             - count number of classes
-            - build vocabulary
             - ...
         """
 
