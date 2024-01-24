@@ -1,4 +1,12 @@
 """Data API."""
-from eva.data import dataloaders, datamodules, datasets, samplers
+from eva.data.dataloaders import DataLoader
+from eva.data.datamodules import DataloadersSchema, DataModule, DatasetsSchema
+from eva.data.datasets import Dataset
 
-__all__ = ["dataloaders", "datamodules", "datasets", "samplers"]
+__all__ = [
+    "DataLoader",
+    "DataloadersSchema",
+    "DataModule",
+    "DatasetsSchema",
+    "Dataset",
+]
