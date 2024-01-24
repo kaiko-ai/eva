@@ -1,6 +1,7 @@
 """Tests for the image_io module."""
 import os
 
+import cv2
 import numpy as np
 import pytest
 
@@ -22,12 +23,12 @@ def image_path_bgr(assets_path: str) -> str:
 
 def test_load_image_file(image_path_gray: str, image_path_bgr: str) -> None:
     """Test the load_image_file function to load grayscale and bgr images."""
-    image = _load_image_file(image_path_gray)
+    image = _load_image_file(image_path_gray, flags=cv2.IMREAD_UNCHANGED)
     assert isinstance(image, np.ndarray), "The function should return a numpy array"
     assert image.dtype == np.uint8, "Data type of the array should be np.uint8"
     assert image.shape == (32, 32), "Shape of the array should be (32, 32)"
 
-    image = _load_image_file(image_path_bgr)
+    image = _load_image_file(image_path_bgr, flags=cv2.IMREAD_UNCHANGED)
     assert isinstance(image, np.ndarray), "The function should return a numpy array"
     assert image.dtype == np.uint8, "Data type of the array should be np.uint8"
     assert image.shape == (32, 32, 3), "Shape of the array should be (32, 32, 3)"

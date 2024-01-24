@@ -6,13 +6,12 @@ import numpy as np
 import numpy.typing as npt
 
 
-def _load_image_file(path: str, flags: int = cv2.IMREAD_UNCHANGED) -> npt.NDArray[np.uint8]:
-    """Loads an image file as a RGB or grayscale numpy array.
+def _load_image_file(path: str, flags: int = cv2.IMREAD_COLOR) -> npt.NDArray[np.uint8]:
+    """Loads an image file as a numpy array.
 
     Args:
         path: The path to the image file.
         flags: Specifies the way in which the image should be read.
-            The default is cv2.IMREAD_UNCHANGED.
 
     Returns:
         The image as a numpy.ndarray.
