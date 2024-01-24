@@ -26,8 +26,10 @@ dependencies = [
 
 [project.optional-dependencies]
 vision = [
+    "opencv-python-headless>=4.9.0.80",
 ]
 all = ["eva[vision]"]
+
 lint = [
     "isort>=5.12.0",
     "black>=23.1.0",
