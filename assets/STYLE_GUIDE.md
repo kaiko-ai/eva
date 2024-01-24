@@ -33,15 +33,13 @@ Our docstring style is derived from
 
 ```py
 def example_function(variable: int, optional: str | None = None) -> str:
-    """An example docstring that uses Sphinx constructs.
+    """An example docstring that explains what this functions do.
 
     Docs sections can be referenced via :ref:`custom text here <anchor-link>`.
 
-    Classes can be referenced via
-    :class:`eva.data.datamodules.DataModule`.
+    Classes can be referenced via :class:`eva.data.datamodules.DataModule`.
 
-    Functions can be referenced via
-    :func:`eva.data.datamodules.call.call_method_if_exists`.
+    Functions can be referenced via :func:`eva.data.datamodules.call.call_method_if_exists`.
 
     Example:
 
@@ -100,7 +98,7 @@ def fake_datamodule(
 ) -> eva.data.datamodules.DataModule:
     """Generates a fake DataModule.
 
-    It build a :class:`eva.data.datamodules.DataModule` by generating
+    It builds a :class:`eva.data.datamodules.DataModule` by generating
     a fake dataset with generated data while fixing the seed. It can
     be useful for debugging purposes.
 
