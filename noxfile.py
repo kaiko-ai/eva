@@ -70,4 +70,5 @@ def test(session: nox.Session) -> None:
 @nox.session(tags=["coverage"])
 def coverage(session: nox.Session) -> None:
     """Runs a code coverage analysis session of the source code."""
+    session.run("pdm", "install", "--group", "test", external=True)
     session.run("coverage", "report", *session.posargs, external=True)
