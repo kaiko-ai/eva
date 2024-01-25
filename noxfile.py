@@ -28,26 +28,26 @@ os.environ.update({"PDM_IGNORE_SAVED_PYTHON": "1"})
 os.environ.pop("PYTHONPATH", None)
 
 
-@nox.session(python=PYTHON_VERSIONS[-1], tags=["fmt", "format"])
+@nox.session(tags=["fmt", "format"])
 def fmt(session: nox.Session) -> None:
     """Fixes the source code format."""
     args = session.posargs or LOCATIONS
-    session.install("isort", "black", "ruff")
+    session.run_always("pdm", "install", "--no-default", "--group", "lint", external=True)
     session.run("isort", *args)
     session.run("black", *args)
     session.run("ruff", "--fix-only", *args)
 
 
-@nox.session(python=PYTHON_VERSIONS[-1], tags=["lint"])
+@nox.session(tags=["lint"])
 def lint(session: nox.Session) -> None:
     """Checks the source code for programmatic, stylistic and security violations."""
     args = session.posargs or LOCATIONS
-    session.install("isort", "black", "ruff", "yamllint", "bandit")
+    session.run_always("pdm", "install", "--no-default", "--group", "lint", external=True)
     session.run("isort", "--check-only", *args)
     session.run("black", "--check", *args)
     session.run("ruff", *args)
     session.run("yamllint", *args)
-    session.run("bandit", "-q", "-c", "pyproject.toml", "-r", *args, external=True)
+    session.run("bandit", "-q", "-c", "pyproject.toml", "-r", *args)
 
 
 @nox.session(python=PYTHON_VERSIONS[-1], tags=["check"])
