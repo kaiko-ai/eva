@@ -21,7 +21,7 @@ _Oncology FM Evaluation Framework by KAIKO.ai_
   <a href="#installation">Installation</a> •
   <a href="#how-to-use">How To Use</a> •
   <a href="#contributing">Contribute</a> •
-  <a href="#datasets">Datasets</a> •
+  <a href="#datasets">Datasets</a>
 </p>
 
 </div>
