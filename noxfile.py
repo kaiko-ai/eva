@@ -15,7 +15,7 @@ LOCATIONS = "src", "tests", "noxfile.py"
 nox.options.sessions = "fmt", "lint", "check", "test"
 """List of all available sessions."""
 
-nox.options.reuse_existing_virtualenvs = True
+nox.options.reuse_existing_virtualenvs = False
 """Whether to re-use the virtualenvs between runs."""
 
 nox.options.stop_on_first_error = True
@@ -60,15 +60,8 @@ def check(session: nox.Session) -> None:
 
 @nox.session(python=PYTHON_VERSIONS[-1], tags=["test"])
 def test(session: nox.Session) -> None:
-    """Runs the unit tests of the source code."""
+    """Runs the tests a code coverage analysis session of the source code."""
     args = session.posargs or ["tests"]
     session.run("pdm", "install", "--group", "test", "--group", "all", external=True)
-    session.run("pdm", "run", "pytest", *args)
-    session.notify("coverage")
-
-
-@nox.session(tags=["coverage"])
-def coverage(session: nox.Session) -> None:
-    """Runs a code coverage analysis session of the source code."""
-    session.install("coverage[toml]")
+    session.run("pytest", *args)
     session.run("coverage", "report", *session.posargs)
