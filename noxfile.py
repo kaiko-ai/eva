@@ -62,7 +62,7 @@ def check(session: nox.Session) -> None:
 def test(session: nox.Session) -> None:
     """Runs the tests and code coverage analysis session of the source code."""
     args = session.posargs or ["--cov"]
-    session.run_always("pdm", "install", "--group", "test", "--group", "all", external=True)
+    session.run_always("pdm", "install", "--group", "dev", "--group", "all", external=True)
     session.run("pytest", *args)
 
 
