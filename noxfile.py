@@ -15,7 +15,7 @@ LOCATIONS = "src", "tests", "noxfile.py"
 nox.options.sessions = "fmt", "lint", "check", "test"
 """List of all available sessions."""
 
-nox.options.reuse_existing_virtualenvs = False
+nox.options.reuse_existing_virtualenvs = True
 """Whether to re-use the virtualenvs between runs."""
 
 nox.options.stop_on_first_error = True
