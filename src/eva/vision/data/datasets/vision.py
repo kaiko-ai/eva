@@ -21,17 +21,21 @@ class VisionDataset(Dataset, abc.ABC, Generic[DataSample]):
             - download the dataset
             - generate manifest files
             - ...
+
+        This method, if implemented, will be called via :class:eva.data.datamodules.DataModule.
         """
 
     def setup(self) -> None:
         """Correspons to the `setup` method from LightningDataModule.
 
-        The setup method is called after prepare_data() and on every worker. Use setup() to do
+        The setup method is invoked after prepare_data() and on every worker. Use setup() to do
         things like:
 
             - perform dataset splits
             - count number of classes
             - ...
+
+        This method, if implemented, will be called via :class:eva.data.datamodules.DataModule.
         """
 
     @abc.abstractmethod
