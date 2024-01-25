@@ -6,7 +6,7 @@ import nox
 PACKAGE = "eva"
 """The name of the library."""
 
-PYTHON_VERSIONS = ["3.10.13"]
+PYTHON_VERSIONS = ["3.10"]
 """The python versions to test on."""
 
 LOCATIONS = "src", "tests", "noxfile.py"
@@ -28,7 +28,7 @@ os.environ.update({"PDM_IGNORE_SAVED_PYTHON": "1"})
 os.environ.pop("PYTHONPATH", None)
 
 
-@nox.session(tags=["fmt", "format"])
+@nox.session(tags=["fmt", "format", "quality"])
 def fmt(session: nox.Session) -> None:
     """Fixes the source code format."""
     args = session.posargs or LOCATIONS
@@ -38,7 +38,7 @@ def fmt(session: nox.Session) -> None:
     session.run("ruff", "--fix-only", *args)
 
 
-@nox.session(tags=["lint"])
+@nox.session(tags=["lint", "quality"])
 def lint(session: nox.Session) -> None:
     """Checks the source code for programmatic, stylistic and security violations."""
     args = session.posargs or LOCATIONS
@@ -50,7 +50,7 @@ def lint(session: nox.Session) -> None:
     session.run("bandit", "-q", "-c", "pyproject.toml", "-r", *args)
 
 
-@nox.session(python=PYTHON_VERSIONS[-1], tags=["check"])
+@nox.session(tags=["check", "quality"])
 def check(session: nox.Session) -> None:
     """Performs statically type checking of the source code."""
     args = session.posargs or LOCATIONS
@@ -58,7 +58,7 @@ def check(session: nox.Session) -> None:
     session.run("pyright", *args)
 
 
-@nox.session(python=PYTHON_VERSIONS[-1], tags=["test"])
+@nox.session(python=PYTHON_VERSIONS, tags=["test"])
 def test(session: nox.Session) -> None:
     """Runs the tests and code coverage analysis session of the source code."""
     args = session.posargs or ["--cov"]
