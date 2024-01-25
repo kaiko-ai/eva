@@ -58,9 +58,17 @@ def check(session: nox.Session) -> None:
     session.run("pyright", *args)
 
 
-@nox.session(python=PYTHON_VERSIONS, tags=["test"])
+@nox.session(python=PYTHON_VERSIONS, tags=["tests"])
 def test(session: nox.Session) -> None:
     """Runs the tests and code coverage analysis session of the source code."""
     args = session.posargs or ["--cov"]
     session.run_always("pdm", "install", "--group", "test", "--group", "all", external=True)
     session.run("pytest", *args)
+
+
+@nox.session(python=PYTHON_VERSIONS, tags=["ci"])
+def ci(session: nox.Session) -> None:
+    """Runs the CI workflow."""
+    session.notify("lint")
+    session.notify("check")
+    session.notify("test")
