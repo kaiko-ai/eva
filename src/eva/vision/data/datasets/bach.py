@@ -1,7 +1,7 @@
 """Bach dataset class."""
 import os
 from pathlib import Path
-from typing import Dict
+from typing import Dict, Tuple
 
 import numpy as np
 import pandas as pd
@@ -90,6 +90,11 @@ class BachDataset(VisionDataset[np.ndarray]):
     @override
     def __len__(self) -> int:
         return len(self._data)
+
+    @override
+    def __getitem__(self, index: int) -> Tuple[np.ndarray, np.ndarray]:
+        # TODO: implement once file_io PR is merged
+        raise NotImplementedError
 
     def _load_manifest(self) -> pd.DataFrame:
         logger.info(f"Load manifest from {self._manifest_path}")
