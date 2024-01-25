@@ -21,9 +21,9 @@ jobs:
       uses: wntrblm/nox@2023.04.22
       with:
         python-versions: "3.10"
-    - name: Lint checks
+    - name: Linting checks
       run: nox -s lint
-    - name: Type checks
+    - name: Typing checks
       run: nox -s check
 
   tests:
