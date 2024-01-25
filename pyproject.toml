@@ -23,10 +23,12 @@ dependencies = [
     "pytorch-lightning>=2.1.3",
     "loguru>=0.7.2",
     "jsonargparse>=4.27.2",
+    "pandas>=2.2.0",
 ]
 
 [project.optional-dependencies]
 vision = [
+    "opencv-python-headless>=4.9.0.80",
 ]
 all = ["eva[vision]"]
 
@@ -43,8 +45,8 @@ lint = [
 test = [
     "pygments>=2.14.0",
     "pytest>=7.2.2",
-    "pytest-cov>=4.0.0",
     "nox>=2022.11.21",
+    "pytest-cov>=4.1.0",
 ]
 dev = ["eva[lint, test]"]
 

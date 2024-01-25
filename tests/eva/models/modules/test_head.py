@@ -34,7 +34,7 @@ def model(input_shape: Tuple[int, ...] = (3, 8, 8), n_classes: int = 4) -> modul
         head=nn.Linear(math.prod(input_shape), n_classes),
         criterion=nn.CrossEntropyLoss(),
         backbone=nn.Flatten(),
-        metrics=metrics.core.MetricsSchema(
+        metrics=metrics.MetricsSchema(
             common=metrics.AverageLoss(),
         ),
     )

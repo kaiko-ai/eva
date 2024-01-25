@@ -15,14 +15,12 @@ jobs:
     name: Python ${{ matrix.python-version }}
     steps:
     - uses: actions/checkout@v4
-    - uses: actions/setup-python@v5
+    - name: Setting up PDM
+      uses: pdm-project/setup-pdm@v4
       with:
         python-version: ${{ matrix.python-version }}
         architecture: x64
-    - name: Setting up PDM
-      uses: pdm-project/setup-pdm@v3
-      with:
-        python-version: ${{ matrix.python-version }}
+        cache: false
     - name: Setting up NOX
       uses: wntrblm/nox@2023.04.22
       with:
