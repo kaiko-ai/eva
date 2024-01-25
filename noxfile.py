@@ -54,7 +54,7 @@ def lint(session: nox.Session) -> None:
 def check(session: nox.Session) -> None:
     """Performs statically type checking of the source code."""
     args = session.posargs or LOCATIONS
-    session.run("pdm", "install", "--group", "lint", "--group", "all", external=True)
+    session.run("pdm", "install", "--group", "dev", "--group", "all", external=True)
     session.run("pyright", *args)
 
 
