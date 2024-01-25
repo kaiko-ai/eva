@@ -61,5 +61,13 @@ def check(session: nox.Session) -> None:
 @nox.session(python=PYTHON_VERSIONS, tags=["test"])
 def test(session: nox.Session) -> None:
     """Runs the unit tests of the source code."""
+    args = session.posargs or ["tests"]
     session.run("pdm", "install", "--group", "dev", external=True)
-    session.run("pdm", "run", "pytest", "--cov")
+    session.run("pdm", "run", "pytest", *args)
+    session.notify("coverage")
+
+
+@nox.session
+def coverage(session: nox.Session) -> None:
+    """Runs a code coverage analysis session of the source code."""
+    session.run("coverage", "report", *session.posargs, external=True)
