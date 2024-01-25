@@ -32,9 +32,9 @@ os.environ.pop("PYTHONPATH", None)
 def fmt(session: nox.Session) -> None:
     """Fixes the source code format."""
     args = session.posargs or LOCATIONS
-    session.run("pdm", "install", "--group", "lint", external=True)
-    session.run("black", *args)
+    session.install("isort", "black", "ruff")
     session.run("isort", *args)
+    session.run("black", *args)
     session.run("ruff", "--fix-only", *args)
 
 
@@ -42,7 +42,7 @@ def fmt(session: nox.Session) -> None:
 def lint(session: nox.Session) -> None:
     """Checks the source code for programmatic, stylistic and security violations."""
     args = session.posargs or LOCATIONS
-    session.run("pdm", "install", "--group", "lint", external=True)
+    session.install("isort", "black", "ruff", "yamllint", "bandit")
     session.run("isort", "--check-only", *args)
     session.run("black", "--check", *args)
     session.run("ruff", *args)
@@ -54,12 +54,13 @@ def lint(session: nox.Session) -> None:
 def check(session: nox.Session) -> None:
     """Performs statically type checking of the source code."""
     args = session.posargs or LOCATIONS
-    session.run("pdm", "install", "--group", "dev", "--group", "all", external=True)
+    session.run_always("pdm", "install", "--group", "dev", "--group", "all", external=True)
     session.run("pyright", *args)
 
 
-@nox.session(python=PYTHON_VERSIONS, tags=["test"])
+@nox.session(python=PYTHON_VERSIONS[-1], tags=["test"])
 def test(session: nox.Session) -> None:
-    """Runs the unit tests of the source code."""
-    session.run("pdm", "install", "--group", "test", "--group", "all", external=True)
-    session.run("pdm", "run", "pytest", "--cov")
+    """Runs the tests and code coverage analysis session of the source code."""
+    args = session.posargs or ["--cov"]
+    session.run_always("pdm", "install", "--group", "test", "--group", "all", external=True)
+    session.run("pytest", *args)

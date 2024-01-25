@@ -20,7 +20,7 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
         architecture: x64
-        cache: true
+        cache: false
     - name: Setting up NOX
       uses: wntrblm/nox@2023.04.22
       with:
