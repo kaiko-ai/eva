@@ -21,10 +21,8 @@ jobs:
       uses: wntrblm/nox@2023.04.22
       with:
         python-versions: "3.10"
-    - name: Linting checks
-      run: nox -s lint
-    - name: Typing checks
-      run: nox -s check
+    - name: Quality checks
+      run: nox -t quality
 
   tests:
     strategy:
@@ -47,4 +45,4 @@ jobs:
       with:
         python-versions: ${{ matrix.python-version }}
     - name: Unit Tests
-      run: nox -s test
+      run: nox -t tests

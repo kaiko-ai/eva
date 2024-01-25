@@ -58,7 +58,7 @@ def check(session: nox.Session) -> None:
     session.run("pyright", *args)
 
 
-@nox.session(python=PYTHON_VERSIONS, tags=["tests"])
+@nox.session(python=PYTHON_VERSIONS, tags=["unit-tests", "tests"])
 def test(session: nox.Session) -> None:
     """Runs the tests and code coverage analysis session of the source code."""
     args = session.posargs or ["--cov"]
