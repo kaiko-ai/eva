@@ -54,7 +54,7 @@ def lint(session: nox.Session) -> None:
 def check(session: nox.Session) -> None:
     """Performs statically type checking of the source code."""
     args = session.posargs or LOCATIONS
-    session.run("pdm", "install", "--group", "dev", external=True)
+    session.run("pdm", "install", "--group", "dev", "--group", "all", external=True)
     session.run("pyright", *args)
 
 
@@ -62,7 +62,7 @@ def check(session: nox.Session) -> None:
 def test(session: nox.Session) -> None:
     """Runs the unit tests of the source code."""
     args = session.posargs or ["tests"]
-    session.run("pdm", "install", "--group", "dev", external=True)
+    session.run("pdm", "install", "--group", "test", "--group", "all", external=True)
     session.run("pdm", "run", "pytest", *args)
     session.notify("coverage")
 
