@@ -78,7 +78,7 @@ class BachDataset(VisionDataset[np.ndarray]):
         if not self._exists():
             self._download()
 
-        self._save_manifest()
+        self._create_manifest()
 
     @override
     def _setup(self) -> None:
@@ -95,7 +95,7 @@ class BachDataset(VisionDataset[np.ndarray]):
         logger.info(f"Load manifest from {self._manifest_path}")
         return pd.read_parquet(self._manifest_path)
 
-    def _save_manifest(self) -> pd.DataFrame:
+    def _create_manifest(self) -> pd.DataFrame:
         # load image paths & labels
         df_manifest = pd.DataFrame(Path(self._root_dir).glob("**/*.tif"), columns=["path"])
         df_manifest["label"] = df_manifest["path"].apply(lambda p: Path(p).parent.name)
