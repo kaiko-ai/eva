@@ -28,6 +28,7 @@ dependencies = [
 
 [project.optional-dependencies]
 vision = [
+    "torchvision>=0.16.2",
 ]
 all = ["eva[vision]"]
 lint = [
