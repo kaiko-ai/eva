@@ -1,5 +1,56 @@
-"""Core Dataset module."""
-from torch.utils import data
+"""Vision Dataset base class."""
+import abc
+from typing import Generic, TypeVar
 
-VisionDataset = data.Dataset
-"""Core abstract dataset class for vision."""
+from eva.data.datasets.dataset import Dataset
+
+DataSample = TypeVar("DataSample")
+"""The data sample type."""
+
+
+class VisionDataset(Dataset, abc.ABC, Generic[DataSample]):
+    """Base dataset class for vision tasks."""
+
+    def prepare_data(self) -> None:
+        """Correspons to the `prepare_data` method from LightningDataModule.
+
+        Lightning ensures the prepare_data() is called only within a single process on CPU and there
+        is a barrier in between which ensures that all the processes proceed to setup(). So this is
+        the place where you can do things like:
+
+            - download the dataset
+            - generate manifest files
+            - ...
+
+        This method, if implemented, will be called via :class:eva.data.datamodules.DataModule.
+        """
+
+    def setup(self) -> None:
+        """Correspons to the `setup` method from LightningDataModule.
+
+        The setup method is invoked after prepare_data() and on every worker. Use setup() to do
+        things like:
+
+            - perform dataset splits
+            - count number of classes
+            - ...
+
+        This method, if implemented, will be called via :class:eva.data.datamodules.DataModule.
+        """
+
+    @abc.abstractmethod
+    def __getitem__(self, index: int) -> DataSample:
+        """Returns the `index`'th data sample.
+
+        Args:
+            index: The index of the data-sample to select.
+
+        Returns:
+            A data sample and its target.
+        """
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def __len__(self) -> int:
+        """Returns the total length of the data."""
+        raise NotImplementedError
