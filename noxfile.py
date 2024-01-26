@@ -6,7 +6,7 @@ import nox
 PACKAGE = "eva"
 """The name of the library."""
 
-PYTHON_VERSIONS = ["3.10.13"]
+PYTHON_VERSIONS = ["3.10"]
 """The python versions to test on."""
 
 LOCATIONS = "src", "tests", "noxfile.py"
@@ -28,29 +28,29 @@ os.environ.update({"PDM_IGNORE_SAVED_PYTHON": "1"})
 os.environ.pop("PYTHONPATH", None)
 
 
-@nox.session(python=PYTHON_VERSIONS[-1], tags=["fmt", "format"])
+@nox.session(tags=["fmt", "format", "quality"])
 def fmt(session: nox.Session) -> None:
     """Fixes the source code format."""
     args = session.posargs or LOCATIONS
-    session.install("isort", "black", "ruff")
+    session.run_always("pdm", "install", "--no-default", "--group", "lint", external=True)
     session.run("isort", *args)
     session.run("black", *args)
     session.run("ruff", "--fix-only", *args)
 
 
-@nox.session(python=PYTHON_VERSIONS[-1], tags=["lint"])
+@nox.session(tags=["lint", "quality"])
 def lint(session: nox.Session) -> None:
     """Checks the source code for programmatic, stylistic and security violations."""
     args = session.posargs or LOCATIONS
-    session.install("isort", "black", "ruff", "yamllint", "bandit")
+    session.run_always("pdm", "install", "--no-default", "--group", "lint", external=True)
     session.run("isort", "--check-only", *args)
     session.run("black", "--check", *args)
     session.run("ruff", *args)
     session.run("yamllint", *args)
-    session.run("bandit", "-q", "-c", "pyproject.toml", "-r", *args, external=True)
+    session.run("bandit", "-q", "-c", "pyproject.toml", "-r", *args)
 
 
-@nox.session(python=PYTHON_VERSIONS[-1], tags=["check"])
+@nox.session(tags=["check", "quality"])
 def check(session: nox.Session) -> None:
     """Performs statically type checking of the source code."""
     args = session.posargs or LOCATIONS
@@ -58,9 +58,17 @@ def check(session: nox.Session) -> None:
     session.run("pyright", *args)
 
 
-@nox.session(python=PYTHON_VERSIONS[-1], tags=["test"])
+@nox.session(python=PYTHON_VERSIONS, tags=["unit-tests", "tests"])
 def test(session: nox.Session) -> None:
     """Runs the tests and code coverage analysis session of the source code."""
     args = session.posargs or ["--cov"]
-    session.run_always("pdm", "install", "--group", "test", "--group", "all", external=True)
+    session.run_always("pdm", "install", "--group", "dev", "--group", "all", external=True)
     session.run("pytest", *args)
+
+
+@nox.session(python=PYTHON_VERSIONS, tags=["ci"])
+def ci(session: nox.Session) -> None:
+    """Runs the CI workflow."""
+    session.notify("lint")
+    session.notify("check")
+    session.notify("test")
