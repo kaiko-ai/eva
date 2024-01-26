@@ -20,8 +20,8 @@ _Oncology FM Evaluation Framework by KAIKO.ai_
 <p align="center">
   <a href="#installation">Installation</a> •
   <a href="#how-to-use">How To Use</a> •
-  <a href="#contributing">Contribute</a> •
-  <a href="#datasets">Datasets</a>
+  <a href="#datasets">Datasets</a> •
+  <a href="#contributing">Contribute</a>
 </p>
 
 </div>
@@ -40,18 +40,18 @@ TBD
 
 TBD
 
-## Contributing
-
-EVA is an open source project and welcomes contributions of all kinds. Please checkout the [developer](./assets/DEVELOPER_GUIDE.md) and [contributing guide](./assets/CONTRIBUTING.md) for help on how to do so.
-
-All contributors must follow the [code of conduct](./assets/CODE_OF_CONDUCT.md).
-
 ## Datasets
 
 The following datasets are supported
 
 ### Vision
 - [BACH](./assets/datasets/bach/README.md)
+
+## Contributing
+
+EVA is an open source project and welcomes contributions of all kinds. Please checkout the [developer](./assets/DEVELOPER_GUIDE.md) and [contributing guide](./assets/CONTRIBUTING.md) for help on how to do so.
+
+All contributors must follow the [code of conduct](./assets/CODE_OF_CONDUCT.md).
 
 ---
 <div align="center">
