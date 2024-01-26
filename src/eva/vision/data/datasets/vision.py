@@ -25,10 +25,9 @@ class VisionDataset(Dataset, abc.ABC, Generic[DataSample]):
 
         This method is preferred for creating datasets or performing
         train/val/test splits. If implemented, it will be called via
-        :class:`eva.data.datamodules.DataModule` at the beginning of
-        fit (train + validate), validate, test, or predict and it is
-        called from every process (i.e. GPU) across all the nodes in
-        DDP.
+        :class:`eva.data.datamodules.DataModule` at the beginning of fit
+        (train + validate), validate, test, or predict and it is called
+        from every process (i.e. GPU) across all the nodes in DDP.
         """
 
     def teardown(self) -> None:
