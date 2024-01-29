@@ -1,4 +1,5 @@
 """Tests the HeadModule module."""
+
 import math
 from typing import Tuple
 

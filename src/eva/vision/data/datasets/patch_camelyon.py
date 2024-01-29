@@ -34,7 +34,10 @@ class PatchCamelyon(vision.VisionDataset[Tuple[np.ndarray, np.ndarray]]):
             root: The path to the dataset root. This path should contain
                 the raw compressed h5 files of the data (`.h5.gz`) and
                 the metadata (`.csv`).
+<<<<<<< HEAD
             split: The dataset split for training, validation, or testing.
+=======
+>>>>>>> main
             download: Whether to download the selected dataset split.
             column_mapping: Defines the map between the variables and the CSV
                 columns. It will overwrite the `default_column_mapping` with

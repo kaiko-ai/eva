@@ -1,4 +1,5 @@
 """Base model module."""
+
 from typing import Any, Generic, Mapping, TypeVar
 
 import pytorch_lightning as pl

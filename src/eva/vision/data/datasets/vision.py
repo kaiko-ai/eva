@@ -1,4 +1,5 @@
 """Vision Dataset base class."""
+
 import abc
 from typing import Generic, TypeVar
 
@@ -12,30 +13,31 @@ class VisionDataset(Dataset, abc.ABC, Generic[DataSample]):
     """Base dataset class for vision tasks."""
 
     def prepare_data(self) -> None:
-        """Correspons to the `prepare_data` method from LightningDataModule.
+        """Encapsulates all disk related tasks.
 
-        Lightning ensures the prepare_data() is called only within a single process on CPU and there
-        is a barrier in between which ensures that all the processes proceed to setup(). So this is
-        the place where you can do things like:
-
-            - download the dataset
-            - generate manifest files
-            - ...
-
-        This method, if implemented, will be called via :class:eva.data.datamodules.DataModule.
+        This method is preferred for downloading and preparing the data, for
+        example generate manifest files. If implemented, it will be called via
+        :class:`eva.data.datamodules.DataModule`, which ensures that is called
+        only within a single process, making it multi-processes safe.
         """
 
     def setup(self) -> None:
-        """Correspons to the `setup` method from LightningDataModule.
+        """Setups the dataset.
 
-        The setup method is invoked after prepare_data() and on every worker. Use setup() to do
-        things like:
+        This method is preferred for creating datasets or performing
+        train/val/test splits. If implemented, it will be called via
+        :class:`eva.data.datamodules.DataModule` at the beginning of fit
+        (train + validate), validate, test, or predict and it is called
+        from every process (i.e. GPU) across all the nodes in DDP.
+        """
 
-            - perform dataset splits
-            - count number of classes
-            - ...
+    def teardown(self) -> None:
+        """Cleans up the data artifacts.
 
-        This method, if implemented, will be called via :class:eva.data.datamodules.DataModule.
+        Used to clean-up when the run is finished. If implemented, it will
+        be called via :class:`eva.data.datamodules.DataModule` at the end
+        of fit (train + validate), validate, test, or predict and it is
+        called from every process (i.e. GPU) across all the nodes in DDP.
         """
 
     @abc.abstractmethod

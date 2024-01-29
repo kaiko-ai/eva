@@ -1,4 +1,5 @@
 """Tests for the image_io module."""
+
 import os
 
 import cv2

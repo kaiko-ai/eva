@@ -1,4 +1,5 @@
 """Core data sampler."""
+
 from torch.utils import data
 
 Sampler = data.Sampler

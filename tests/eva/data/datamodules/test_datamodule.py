@@ -1,4 +1,5 @@
 """Tests for the core datamodule."""
+
 from typing import List
 
 import pytest
