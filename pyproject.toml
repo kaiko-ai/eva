@@ -28,8 +28,11 @@ dependencies = [
 
 [project.optional-dependencies]
 vision = [
+    "opencv-python-headless>=4.9.0.80",
 ]
 all = ["eva[vision]"]
+
+[tool.pdm.dev-dependencies]
 lint = [
     "isort>=5.12.0",
     "black>=23.1.0",
@@ -42,8 +45,8 @@ lint = [
 test = [
     "pygments>=2.14.0",
     "pytest>=7.2.2",
-    "pytest-cov>=4.0.0",
     "nox>=2022.11.21",
+    "pytest-cov>=4.1.0",
 ]
 dev = ["eva[lint, test]"]
 
