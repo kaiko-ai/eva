@@ -1,15 +1,24 @@
 """Bach dataset class."""
 import os
 from pathlib import Path
-from typing import Dict, Tuple
+from typing import Dict, Tuple ,List
 
 import numpy as np
 import pandas as pd
 from loguru import logger
-from torchvision.datasets.utils import download_and_extract_archive
+from torchvision.datasets.utils import download_and_extract_archive, download_url
 from typing_extensions import override
+import dataclasses
 
 from eva.vision.data.datasets.vision import VisionDataset
+from eva.vision.file_io import image_io
+
+
+@dataclasses.dataclass
+class DownloadResource:
+    filename: str
+    url: str
+    md5: str | None = None
 
 
 class BachDataset(VisionDataset[np.ndarray]):
@@ -21,16 +30,14 @@ class BachDataset(VisionDataset[np.ndarray]):
         "split": "split",
     }
 
-    classes = [
+    classes: str = [
         "Normal",
         "Benign",
         "InSitu",
         "Invasive",
     ]
 
-    resources = {
-        "ICIAR2018_BACH_Challenge.zip": "https://zenodo.org/records/3632035/files/ICIAR2018_BACH_Challenge.zip",
-    }
+    resources: List[DownloadResource] = DownloadResource(filename="ICIAR2018_BACH_Challenge.zip", url="https://zenodo.org/records/3632035/files/ICIAR2018_BACH_Challenge.zip", md5="8ae1801334aa943c44627c1eef3631b2")
 
     def __init__(
         self,
@@ -58,20 +65,15 @@ class BachDataset(VisionDataset[np.ndarray]):
 
         self._data: pd.DataFrame
 
-    @property
-    def class_to_idx(self) -> Dict[str, int]:
-        return {_class: i for i, _class in enumerate(self.classes)}
+    @override
+    def __len__(self) -> int:
+        return len(self._data)
 
-    def _exists(self) -> bool:
-        return all(
-            os.path.join(self._root_dir, p) for p in self._data[self._column_mapping["path"]]
-        )
-
-    def _download(self) -> None:
-        os.makedirs(self._root_dir, exist_ok=True)
-
-        for filename, url in self.resources.items():
-            download_and_extract_archive(url, download_root=self._root_dir, filename=filename)
+    @override
+    def __getitem__(self, index: int) -> Tuple[np.ndarray, np.ndarray]:
+        image = image_io.load_image(self._data.at[index, self._column_mapping["path"]])
+        target = self._data.at[index, self._column_mapping["target"]]
+        raise image, target
 
     @override
     def _prepare_data(self) -> None:
@@ -87,14 +89,20 @@ class BachDataset(VisionDataset[np.ndarray]):
         if self._split:
             self._data = self._data[self._data[self._column_mapping["split"]] == self._split]
 
-    @override
-    def __len__(self) -> int:
-        return len(self._data)
+    @property
+    def class_to_idx(self) -> Dict[str, int]:
+        return {_class: i for i, _class in enumerate(self.classes)}
 
-    @override
-    def __getitem__(self, index: int) -> Tuple[np.ndarray, np.ndarray]:
-        # TODO: implement once file_io PR is merged
-        raise NotImplementedError
+    def _exists(self) -> bool:
+        return all(
+            os.path.join(self._root_dir, p) for p in self._data[self._column_mapping["path"]]
+        )
+
+    def _download(self) -> None:
+        os.makedirs(self._root_dir, exist_ok=True)
+
+        for r in self.resources:
+            download_and_extract_archive(r.url, download_root=self._root_dir, filename=r.filename, md5=r.md5)
 
     def _load_manifest(self) -> pd.DataFrame:
         logger.info(f"Load manifest from {self._manifest_path}")
@@ -109,6 +117,7 @@ class BachDataset(VisionDataset[np.ndarray]):
             raise ValueError(f"Unexpected classes: {df_manifest['label'].unique()}")
 
         # create splits
+        # TODO: refactor this into a shared split module: https://github.com/kaiko-ai/eva/issues/75
         train_fraction, val_fraction = 0.7, 0.15
         df_manifest["split"] = ""
         dfs = []
