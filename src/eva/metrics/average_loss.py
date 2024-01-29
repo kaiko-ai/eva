@@ -1,4 +1,5 @@
 """Implementation of the average loss metric."""
+
 import torch
 from loguru import logger
 from typing_extensions import override

@@ -1,4 +1,5 @@
 """Tests the datamodule schemas."""
+
 import pytest
 
 from eva.data.datamodules import schemas

@@ -1,4 +1,5 @@
 """NOX lint and test automation API."""
+
 import os
 
 import nox

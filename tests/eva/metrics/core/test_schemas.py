@@ -1,4 +1,5 @@
 """MetricsSchema tests."""
+
 import pytest
 import torchmetrics
 
