@@ -1,4 +1,4 @@
-site_name: eva docs
+site_name: EVA documentation
 
 theme:
   name: "material"
@@ -29,8 +29,3 @@ nav:
       - Modules: reference/models/modules.md
     - Trainers: reference/trainers.md
     - Vision: reference/vision.md
-# - tutorials.md
-# - how-to-guides.md
-# - reference.md
-# - reference
-# - explanation.md
