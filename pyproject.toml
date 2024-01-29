@@ -24,6 +24,7 @@ dependencies = [
     "loguru>=0.7.2",
     "jsonargparse>=4.27.2",
     "pandas>=2.2.0",
+    "pyarrow>=15.0.0",
 ]
 
 [project.optional-dependencies]
