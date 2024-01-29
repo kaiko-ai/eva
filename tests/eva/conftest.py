@@ -1,4 +1,5 @@
 """Shared configuration and fixtures for unit tests."""
+
 import os
 
 import pytest

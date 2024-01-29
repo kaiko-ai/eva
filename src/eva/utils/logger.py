@@ -5,6 +5,7 @@ This customizable logger can be used by just importing
 >>> from loguru import logger
 >>> logger.info(...)
 """
+
 import sys
 
 from loguru import logger

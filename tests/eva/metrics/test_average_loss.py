@@ -1,4 +1,5 @@
 """AverageLoss metric tests."""
+
 import pytest
 import torch
 

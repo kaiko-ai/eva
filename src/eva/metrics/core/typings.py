@@ -1,4 +1,5 @@
 """Metric typings."""
+
 from typing import Dict, Sequence, Union
 
 from eva.metrics.core import collection, metric
