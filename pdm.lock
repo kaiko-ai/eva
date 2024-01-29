@@ -483,7 +483,7 @@ name = "h5py"
 version = "3.10.0"
 requires_python = ">=3.8"
 summary = "Read and write HDF5 files from Python"
-groups = ["vision"]
+groups = ["all", "vision"]
 dependencies = [
     "numpy>=1.17.3",
 ]

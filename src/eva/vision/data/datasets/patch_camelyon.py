@@ -1,32 +1,30 @@
 """PatchCamelyon dataset."""
+
 import os
-from typing import Dict, Literal, Tuple
+from typing import Callable, Dict, Literal, Tuple
 
 import h5py
 import numpy as np
 from typing_extensions import override
 
-from eva.data import Transform
 from eva.vision.data.datasets import vision
 
 
 class PatchCamelyon(vision.VisionDataset[Tuple[np.ndarray, np.ndarray]]):
     """Dataset class for PatchCamelyon images and corresponding targets."""
 
-    default_column_mapping: Dict[str, str] = {
+    column_mapping: Dict[str, Literal["x", "y"]] = {
         "data": "x",
         "targets": "y",
     }
-    """The default column mapping of the variables to the H5 columns."""
+    """The column mapping of the variables to the H5 columns."""
 
     def __init__(
         self,
         root: str,
         split: Literal["train", "valid", "test"],
-        column_mapping: Dict[str, str] = default_column_mapping,
-        image_transforms: Transform | None = None,
-        target_transforms: Transform | None = None,
-        image_target_transforms: Transform | None = None,
+        image_transforms: Callable | None = None,
+        target_transforms: Callable | None = None,
     ) -> None:
         """Initializes the dataset.
 
@@ -34,32 +32,18 @@ class PatchCamelyon(vision.VisionDataset[Tuple[np.ndarray, np.ndarray]]):
             root: The path to the dataset root. This path should contain
                 the raw compressed h5 files of the data (`.h5.gz`) and
                 the metadata (`.csv`).
-<<<<<<< HEAD
             split: The dataset split for training, validation, or testing.
-=======
->>>>>>> main
-            download: Whether to download the selected dataset split.
-            column_mapping: Defines the map between the variables and the CSV
-                columns. It will overwrite the `default_column_mapping` with
-                the values of `column_mapping`, so that `column_mapping` can
-                contain only the values which are altered or missing.
             image_transforms: A function/transform that takes in an image
                 and returns a transformed version.
             target_transforms: A function/transform that takes in the target
                 and transforms it.
-            image_target_transforms: A function/transforms that takes in an
-                image and a label and returns the transformed versions of both.
-                This transform happens after the `image_transforms` and
-                `target_transforms`.
         """
         super().__init__()
 
         self._root = root
         self._split = split
-        self._column_mapping = self.default_column_mapping | column_mapping
         self._image_transforms = image_transforms
         self._target_transforms = target_transforms
-        self._image_target_transforms = image_target_transforms
 
     @override
     def __getitem__(self, index: int) -> Tuple[np.ndarray, np.ndarray]:
@@ -69,9 +53,7 @@ class PatchCamelyon(vision.VisionDataset[Tuple[np.ndarray, np.ndarray]]):
 
     @override
     def __len__(self) -> int:
-        with h5py.File(self._h5_data_file, "r") as file:
-            data = file[self._column_mapping["data"]]
-            return len(data)
+        return self._load_from_h5("targets").shape[0]
 
     def _load_image(self, index: int) -> np.ndarray:
         """Returns the `index`'th image sample.
@@ -82,9 +64,7 @@ class PatchCamelyon(vision.VisionDataset[Tuple[np.ndarray, np.ndarray]]):
         Returns:
             The image as a numpy array.
         """
-        with h5py.File(self._h5_data_file, "r") as file:
-            data = file.get(self._column_mapping["data"])
-            return data[index]
+        return self._load_from_h5("data", index)
 
     def _load_target(self, index: int) -> np.ndarray:
         """Returns the `index`'th target sample.
@@ -95,9 +75,7 @@ class PatchCamelyon(vision.VisionDataset[Tuple[np.ndarray, np.ndarray]]):
         Returns:
             The sample target.
         """
-        with h5py.File(self._h5_target_file, "r") as file:
-            data = file.get(self._column_mapping["targets"])
-            return data[index].squeeze()
+        return self._load_from_h5("targets", index).squeeze()
 
     def _apply_transforms(
         self, image: np.ndarray, target: np.ndarray
@@ -117,30 +95,36 @@ class PatchCamelyon(vision.VisionDataset[Tuple[np.ndarray, np.ndarray]]):
         if self._target_transforms is not None:
             target = self._target_transforms(target)
 
-        if self._image_target_transforms is not None:
-            image, target = self._image_target_transforms(image, target)
-
         return image, target
 
-    @property
-    def _h5_data_file(self) -> str:
-        """Returns the filename for the data H5 file based on the specified data split."""
-        return self._h5_file("x")
+    def _load_from_h5(
+        self, datatype: Literal["data", "targets"], index: int | None = None
+    ) -> np.ndarray:
+        """Load data or targets from an HDF5 file.
 
-    @property
-    def _h5_target_file(self) -> str:
-        """Returns the filename for the target H5 file based on the specified data split."""
-        return self._h5_file("y")
+        Args:
+            datatype: Specify whether to load 'data' or 'targets'.
+            index: Optional parameter to load data/targets at a specific index.
+                If `None`, the entire data/targets array is returned.
 
-    def _h5_file(self, data: Literal["x", "y"]) -> str:
+        Returns:
+            A array containing the specified data.
+        """
+        data_key = self.column_mapping[datatype]
+        h5_file = self._h5_file(data_key)
+        with h5py.File(h5_file, "r") as file:
+            data = file[data_key]
+            return data if index is None else data[index]  # type: ignore
+
+    def _h5_file(self, datatype: Literal["x", "y"]) -> str:
         """Generates the filename for the H5 file based on the specified data type and split.
 
         Args:
-            data: The type of data, where "x" and "y" represent the input and target
-                datasets respectively.
+            datatype: The type of data, where "x" and "y" represent the input
+                and target datasets respectively.
 
         Returns:
             The relative file path for the H5 file based on the provided data type and split.
         """
-        filename = f"camelyonpatch_level_2_split_{self._split}_{data}.h5"
+        filename = f"camelyonpatch_level_2_split_{self._split}_{datatype}.h5"
         return os.path.join(self._root, filename)

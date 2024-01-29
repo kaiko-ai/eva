@@ -3,7 +3,6 @@
 from eva.data.dataloaders import DataLoader
 from eva.data.datamodules import DataloadersSchema, DataModule, DatasetsSchema
 from eva.data.datasets import Dataset
-from eva.data.transforms import Transform
 
 __all__ = [
     "DataLoader",
@@ -11,5 +10,4 @@ __all__ = [
     "DataModule",
     "DatasetsSchema",
     "Dataset",
-    "Transform",
 ]
