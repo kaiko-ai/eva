@@ -1,1 +1,1 @@
-"""Embedding datasets API."""
+"""Embedding Datasets API."""

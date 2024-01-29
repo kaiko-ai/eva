@@ -1,4 +1,5 @@
 """Embedding dataset for classification tasks."""
+
 from typing import Dict, Tuple
 
 import pandas as pd
