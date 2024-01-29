@@ -1,4 +1,5 @@
 """Core metrics modules API."""
+
 from eva.metrics.core.collection import MetricCollection
 from eva.metrics.core.metric import Metric
 from eva.metrics.core.module import MetricModule
