@@ -6,11 +6,18 @@ import pandas as pd
 import torch
 from typing_extensions import override
 
-from eva.vision.data.datasets.embeddings.embedding import EmbeddingDataset, default_column_mapping
+from eva.vision.data.datasets.embeddings.embedding import EmbeddingDataset
 
 
 class EmbeddingClassificationDataset(EmbeddingDataset):
     """Embedding classification dataset."""
+
+    default_column_mapping: Dict[str, str] = {
+        "path": "path",
+        "target": "target",
+        "slide_id": "slide_id",
+        "mask": "mask",
+    }
 
     def __init__(
         self,
@@ -38,9 +45,11 @@ class EmbeddingClassificationDataset(EmbeddingDataset):
 
         self._data: pd.DataFrame
 
-    @override
-    def __getitem__(self, index) -> Tuple[torch.Tensor, torch.Tensor]:  # pyright: ignore
-        return self._data.at[index, self._embedding_column], self._load_target(index)
+        self._target_column = self._column_mapping["target"]
 
-    def _load_target(self, index) -> torch.Tensor:
-        return torch.tensor(self._data.at[index][self._column_mapping["target"]])
+    @override
+    def __getitem__(self, index) -> Tuple[torch.Tensor, torch.Tensor]:
+        return (
+            self._data.at[index, self._embedding_column],
+            self._data.at[index][self._target_column],
+        )
