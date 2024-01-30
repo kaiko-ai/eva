@@ -2,7 +2,7 @@
 
 | Dataset | #Classes | #Patches | Patch Size | FoV (μm/px) | Task | Cancer Type |
 |---|---|---|---|---| ---| ---|
-| PCam | 2 | 327,680 | 96x96 | 10x (1.0) \* | Classification | Breast |
+| PatchCamelyon | 2 | 327,680 | 96x96 | 10x (1.0) \* | Classification | Breast |
 
 \* The slides were acquired and digitized at 2 different centres using a 40x objective but under-sampled to 10x to increase the field of view. Some papers do categorize it as 10x. Basically artificial 10x patches.
 
@@ -14,7 +14,7 @@ The PatchCamelyon benchmark is a new and challenging image classification datase
 
 | Splits | Train | Validation | Test |
 |---|---|---|---|
-| PCam | 262,144 | 32,768 | 32,768 |
+| #Samples | 262,144 | 32,768 | 32,768 |
 
 
 ### Usage

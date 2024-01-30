@@ -1,3 +1,3 @@
-tests/eva/assets/vision/datasets/pcam/*.h5 filter=lfs diff=lfs merge=lfs -text
+tests/eva/assets/vision/datasets/patch_camelyon/*.h5 filter=lfs diff=lfs merge=lfs -text
 tests/eva/assets/**/*.png filter=lfs diff=lfs merge=lfs -text
 tests/eva/assets/**/*.jpg filter=lfs diff=lfs merge=lfs -text
