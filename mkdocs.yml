@@ -10,6 +10,7 @@ plugins:
     handlers:
       python:
         options:
+          docstring_section_style: table
           filters:
           - '!^_'
 
