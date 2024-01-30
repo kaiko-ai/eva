@@ -32,16 +32,8 @@ class EmbeddingClassificationDataset(EmbeddingDataset):
     ):
         """Initialize dataset.
 
-        Args:
-            manifest_path: Path to the manifest file.
-            root_dir: Root directory of the dataset. If specified, the paths in the manifest
-                file are expected to be relative to this directory.
-            split: Dataset split to use. If None, the entire dataset is used.
-            column_mapping: Mapping between the standardized column names and the actual
-                column names in the provided manifest file.
-            dataset_type: DatasetType = DatasetType.PATCH,
-            n_patches_per_slide: int = 1000,
-            seed: Seed used for sampling patches when dataset_type is DatasetType.SLIDE.
+        See docstring of EmbeddingDataset for more details. The only difference is that
+        this dataset returns a tuple of (embedding, target) instead of just the embedding.
         """
         super().__init__(
             manifest_path=manifest_path,
@@ -59,6 +51,7 @@ class EmbeddingClassificationDataset(EmbeddingDataset):
 
     @override
     def __getitem__(self, index) -> Tuple[torch.Tensor, torch.Tensor]:
+        # TODO: return mask
         return (
             self._data.at[index, self._embedding_column],
             self._data.at[index, self._target_column],

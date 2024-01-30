@@ -35,10 +35,10 @@ class EmbeddingDataset(VisionDataset):
         """Initialize dataset.
 
         Expects a manifest file listing the paths of .pt files that contain the embeddings.
-        There are two supported shapes for the embedding tensors & files:
-        a. Patch Tasks: A single .pt file per patch containing a tensor of shape [embedding_dim]
-            or [1, embedding_dim]
-        b. Slide Tasks: Each slide can have either one or multiple .pt files, each containing
+        There are two supported shapes for the .pt files:
+        a. Patch Level Tasks: A single .pt file per patch containing a tensor of shape
+            [embedding_dim] or [1, embedding_dim]
+        b. Slide Level Tasks: Each slide can have either one or multiple .pt files, each containing
             a sequence of patch embeddings of shape [k, embedding_dim].
 
         Args:
@@ -72,6 +72,7 @@ class EmbeddingDataset(VisionDataset):
 
     @override
     def __getitem__(self, index) -> torch.Tensor:
+        # TODO: return mask
         return self._data.at[index, self._embedding_column]
 
     @override
