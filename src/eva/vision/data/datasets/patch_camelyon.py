@@ -34,7 +34,7 @@ class PatchCamelyon(vision.VisionDataset[Tuple[np.ndarray, np.ndarray]]):
     def __init__(
         self,
         root: str,
-        split: Literal["train", "valid", "test"] = "train",
+        split: Literal["train", "valid", "test"],
         download: bool = False,
         image_transforms: Callable | None = None,
         target_transforms: Callable | None = None,

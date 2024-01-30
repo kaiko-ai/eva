@@ -26,7 +26,7 @@ The dataset class supports download the data no runtime with the initialized arg
 However, optionally, we do provide a script to download and extract the data and metadata.
 To do so, from the library root path execute the following:
 ```sh
-./assets/datasets/pcam/download.sh
+./assets/datasets/patch_camelyon/download.sh
 ```
 
 ### Citation

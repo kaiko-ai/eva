@@ -4,7 +4,7 @@
 # ----------------------------------------------
 
 # The local path to download the data
-OUTPUT_DIR="${OUTPUT_DIR:-data/pcam}" 
+OUTPUT_DIR="${OUTPUT_DIR:-data/patch_camelyon}" 
 
 declare -a FILENAMES=(
     "camelyonpatch_level_2_split_train_x.h5.gz"
