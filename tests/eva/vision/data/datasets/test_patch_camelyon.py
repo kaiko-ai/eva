@@ -20,7 +20,7 @@ def test_length(pcam_dataset: datasets.PatchCamelyon, expected_length: int) -> N
 
 @pytest.mark.parametrize(
     "split",
-    ["train"],
+    ["train", "valid", "test"],
 )
 def test_sample(pcam_dataset: datasets.PatchCamelyon) -> None:
     """Tests the format of a dataset sample."""
