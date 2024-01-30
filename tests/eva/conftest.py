@@ -15,7 +15,7 @@ seed.seed_everything(seed=42)
 """Sets the random seed."""
 
 
-@pytest.fixture()
+@pytest.fixture
 def assets_path() -> str:
     """Provides the full path to test assets."""
     return os.path.join(TESTS_ROOT, "assets")

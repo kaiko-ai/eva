@@ -5,8 +5,10 @@ from typing import Callable, Dict, Literal, Tuple
 
 import h5py
 import numpy as np
+from loguru import logger
 from typing_extensions import override
 
+from eva.utils import file_io
 from eva.vision.data.datasets import vision
 
 
@@ -19,10 +21,21 @@ class PatchCamelyon(vision.VisionDataset[Tuple[np.ndarray, np.ndarray]]):
     }
     """The column mapping of the variables to the H5 columns."""
 
+    file_list = [
+        ("camelyonpatch_level_2_split_train_x.h5", 7248299800),
+        ("camelyonpatch_level_2_split_train_y.h5", 264192),
+        ("camelyonpatch_level_2_split_valid_x.h5", 906040528),
+        ("camelyonpatch_level_2_split_valid_y.h5", 34816),
+        ("camelyonpatch_level_2_split_test_x.h5", 906040528),
+        ("camelyonpatch_level_2_split_test_y.h5", 34816),
+    ]
+    """PatchCamelyon dataset file lists."""
+
     def __init__(
         self,
         root: str,
-        split: Literal["train", "valid", "test"],
+        split: Literal["train", "valid", "test"] = "train",
+        download: bool = False,
         image_transforms: Callable | None = None,
         target_transforms: Callable | None = None,
     ) -> None:
@@ -30,9 +43,11 @@ class PatchCamelyon(vision.VisionDataset[Tuple[np.ndarray, np.ndarray]]):
 
         Args:
             root: The path to the dataset root. This path should contain
-                the raw compressed h5 files of the data (`.h5.gz`) and
-                the metadata (`.csv`).
+                the uncompressed h5 files and the metadata.
             split: The dataset split for training, validation, or testing.
+            download: Whether to download the data for the specified split.
+                Note that the download will be executed only by additionally
+                calling the :meth:`prepare_data` method.
             image_transforms: A function/transform that takes in an image
                 and returns a transformed version.
             target_transforms: A function/transform that takes in the target
@@ -42,8 +57,27 @@ class PatchCamelyon(vision.VisionDataset[Tuple[np.ndarray, np.ndarray]]):
 
         self._root = root
         self._split = split
+        self._download = download
         self._image_transforms = image_transforms
         self._target_transforms = target_transforms
+
+    @override
+    def prepare_data(self) -> None:
+        if self._download:
+            self._download_dataset()
+
+    def _download_dataset(self) -> None:
+        """Downloads the PatchCamelyon dataset."""
+        for file, expected_bytes in self.file_list:
+            filename = os.path.join(self._root, file)
+            if file_io.verify_file(filename, expected_bytes):
+                logger.info(f"File '{filename}' already exists. Skipping downloading.")
+                continue
+
+            logger.info(f"Downloading file '{filename}' has started.")
+            url = self._filename_to_url(file)
+            file_io.download_and_extract_archive(url, output_dir=self._root)
+            logger.info(f"Downloading file '{filename}' finished successfully.")
 
     @override
     def __getitem__(self, index: int) -> Tuple[np.ndarray, np.ndarray]:
@@ -53,7 +87,7 @@ class PatchCamelyon(vision.VisionDataset[Tuple[np.ndarray, np.ndarray]]):
 
     @override
     def __len__(self) -> int:
-        return self._load_from_h5("targets").shape[0]
+        return self._fetch_dataset_length()
 
     def _load_image(self, index: int) -> np.ndarray:
         """Returns the `index`'th image sample.
@@ -75,7 +109,8 @@ class PatchCamelyon(vision.VisionDataset[Tuple[np.ndarray, np.ndarray]]):
         Returns:
             The sample target.
         """
-        return self._load_from_h5("targets", index).squeeze()
+        target = self._load_from_h5("targets", index).squeeze()
+        return np.asarray(target, dtype=np.int64)
 
     def _apply_transforms(
         self, image: np.ndarray, target: np.ndarray
@@ -97,6 +132,14 @@ class PatchCamelyon(vision.VisionDataset[Tuple[np.ndarray, np.ndarray]]):
 
         return image, target
 
+    def _fetch_dataset_length(self) -> int:
+        """Fetches the dataset split length from its HDF5 file."""
+        data_key = self.column_mapping["targets"]
+        h5_file = self._h5_file(data_key)
+        with h5py.File(h5_file, "r") as file:
+            data = file[data_key]
+            return len(data)  # type: ignore
+
     def _load_from_h5(
         self, datatype: Literal["data", "targets"], index: int | None = None
     ) -> np.ndarray:
@@ -114,7 +157,7 @@ class PatchCamelyon(vision.VisionDataset[Tuple[np.ndarray, np.ndarray]]):
         h5_file = self._h5_file(data_key)
         with h5py.File(h5_file, "r") as file:
             data = file[data_key]
-            return data if index is None else data[index]  # type: ignore
+            return data[:] if index is None else data[index]  # type: ignore
 
     def _h5_file(self, datatype: Literal["x", "y"]) -> str:
         """Generates the filename for the H5 file based on the specified data type and split.
@@ -128,3 +171,8 @@ class PatchCamelyon(vision.VisionDataset[Tuple[np.ndarray, np.ndarray]]):
         """
         filename = f"camelyonpatch_level_2_split_{self._split}_{datatype}.h5"
         return os.path.join(self._root, filename)
+
+    @staticmethod
+    def _filename_to_url(filename: str) -> str:
+        """Convert a filename to its corresponding download URL."""
+        return f"https://zenodo.org/records/2546921/files/{filename}.gz?download=1"

@@ -3,8 +3,8 @@
 # Downloads and unzips the PatchCamelyon dataset
 # ----------------------------------------------
 
-# The destination local directory of the data
-OUTPUT_DIR="data/patch_camelyon"
+# The local path to download the data
+OUTPUT_DIR="${OUTPUT_DIR:-data/patch_camelyon}" 
 
 declare -a FILENAMES=(
     "camelyonpatch_level_2_split_train_x.h5.gz"
@@ -23,7 +23,7 @@ do
     if [ -f ${OUTPUT_FILE%%.gz} ] ; then
         continue
     fi
-    mkdir -p ${OUTPUT_DIR}
+    mkdir -m 777 -p ${OUTPUT_DIR}
     wget --show-progress -nc -q https://zenodo.org/records/2546921/files/${FILE}?download=1 -O ${OUTPUT_FILE}
     yes n | gzip -d ${OUTPUT_FILE}
 done
