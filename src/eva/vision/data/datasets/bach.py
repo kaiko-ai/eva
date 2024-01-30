@@ -3,7 +3,7 @@
 import dataclasses
 import os
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Dict, List, Literal, Tuple
 
 import numpy as np
 import pandas as pd
@@ -52,7 +52,8 @@ class BachDataset(VisionDataset[np.ndarray]):
         self,
         root_dir: str,
         manifest_path: str,
-        split: str | None,
+        split: Literal["train", "val", "test"] | None,
+        download: bool = False,
         column_mapping: Dict[str, str] = default_column_mapping,
     ):
         """Initialize dataset.
@@ -62,6 +63,9 @@ class BachDataset(VisionDataset[np.ndarray]):
                 and extracted here, if it does not already exist.
             manifest_path: Path to the dataset manifest file.
             split: Dataset split to use. If None, the entire dataset is used.
+            download: Whether to download the data for the specified split.
+                Note that the download will be executed only by additionally
+                calling the :meth:`prepare_data` method and if the data does not exist yet on disk.
             column_mapping: Mapping between the standardized column names and the actual
                 column names in the provided manifest file.
         """
@@ -70,6 +74,7 @@ class BachDataset(VisionDataset[np.ndarray]):
         self._root_dir = root_dir
         self._manifest_path = manifest_path
         self._split = split
+        self._download = download
         self._column_mapping = column_mapping
 
         self._data: pd.DataFrame
@@ -90,8 +95,9 @@ class BachDataset(VisionDataset[np.ndarray]):
 
     @override
     def prepare_data(self) -> None:
-        if not self._exists():
-            self._download()
+        if self._download:
+            self._download_dataset()
+        if not os.path.exists(self._manifest_path):
             self._create_manifest()
 
     @override
@@ -106,12 +112,7 @@ class BachDataset(VisionDataset[np.ndarray]):
     def _class_to_idx(self) -> Dict[str, int]:
         return {_class: i for i, _class in enumerate(self.classes)}
 
-    def _exists(self) -> bool:
-        return os.path.exists(self._manifest_path) and os.path.isdir(
-            os.path.join(self._root_dir, "ICIAR2018_BACH_Challenge")
-        )
-
-    def _download(self) -> None:
+    def _download_dataset(self) -> None:
         os.makedirs(self._root_dir, exist_ok=True)
 
         for r in self.resources:
