@@ -42,7 +42,6 @@ def pcam_dataset(
 ) -> datasets.PatchCamelyon:
     """PatchCamelyon dataset fixture."""
     return datasets.PatchCamelyon(
-        # root=os.path.join("data", "pcam"),
         root=os.path.join(assets_path, "vision", "datasets", "pcam"),
         split=split,
     )
