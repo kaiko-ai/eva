@@ -168,6 +168,7 @@ class BachDataset(VisionDataset[np.ndarray]):
 
         # save manifest
         df_manifest = pd.concat(dfs).reset_index(drop=True)
+        self._verify_manifest(df_manifest)
         df_manifest.to_parquet(self._manifest_path)
         logger.info(f"Saved manifest to {self._manifest_path}")
 
