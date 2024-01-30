@@ -124,7 +124,16 @@ class BachDataset(VisionDataset[np.ndarray]):
 
     def _load_manifest(self) -> pd.DataFrame:
         logger.info(f"Load manifest from {self._manifest_path}")
-        return pd.read_parquet(self._manifest_path)
+        df_manifest = pd.read_parquet(self._manifest_path)
+        self._verify_manifest(df_manifest)
+        return df_manifest
+
+    def _verify_manifest(self, df_manifest: pd.DataFrame) -> None:
+        if len(df_manifest) != 400:
+            raise ValueError(f"Expected 400 samples but manifest lists {len(df_manifest)}.")
+
+        if (df_manifest["target"].value_counts() == 100).all():
+            raise ValueError("Expected 100 samples per class.")
 
     def _create_manifest(self) -> pd.DataFrame:
         # load image paths & targets
