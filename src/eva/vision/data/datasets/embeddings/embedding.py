@@ -34,8 +34,15 @@ class EmbeddingDataset(VisionDataset):
     ):
         """Initialize dataset.
 
+        Expects a manifest file listing the paths of .pt files that contain the embeddings.
+        There are two supported shapes for the embedding tensors & files:
+        a. Patch Tasks: A single .pt file per patch containing a tensor of shape [embedding_dim]
+            or [1, embedding_dim]
+        b. Slide Tasks: Each slide can have either one or multiple .pt files, each containing
+            a sequence of patch embeddings of shape [k, embedding_dim].
+
         Args:
-            manifest_path: Path to the manifest file.
+            manifest_path: Path to the manifest file. Can be either a .csv or .parquet file.
             root_dir: Root directory of the dataset. If specified, the paths in the manifest
                 file are expected to be relative to this directory.
             split: Dataset split to use. If None, the entire dataset is used.
@@ -59,33 +66,54 @@ class EmbeddingDataset(VisionDataset):
         self._data: pd.DataFrame
 
         self._path_column = self._column_mapping["path"]
-        self._embedding_column = self._column_mapping["embedding"]
         self._slide_id_column = self._column_mapping["slide_id"]
         self._mask_column = self._column_mapping["mask"]
+        self._embedding_column = "embedding"
 
     @override
     def __getitem__(self, index) -> torch.Tensor:
         return self._data.at[index, self._embedding_column]
 
     @override
+    def __len__(self) -> int:
+        return len(self._data)
+
+    @override
     def setup(self):
         self._data = self._load_manifest()
         self._data[self._embedding_column] = None
 
-        for index, _ in tqdm.tqdm(self._data):
+        for index in tqdm.tqdm(self._data.index):
             self._data.at[index, self._embedding_column] = self._load_embedding_file(index)
 
         if self._dataset_type == DatasetType.SLIDE:
             self._data = self._sample_n_patches_per_slide(self._data)
 
+        self._data = self._data.reset_index(drop=True)
+
     def _load_embedding_file(self, index) -> torch.Tensor:
-        return torch.load(self._get_embedding_path(index), map_location="cpu")
+        path = self._get_embedding_path(index)
+        tensor = torch.load(path, map_location="cpu")
+        orig_shape = tensor.shape
+        if self._dataset_type == DatasetType.PATCH:
+            tensor = tensor.squeeze(0)
+            if tensor.ndim != 1:
+                raise ValueError(f"Unexpected tensor shape {orig_shape} for {path}")
+        elif self._dataset_type == DatasetType.SLIDE:
+            if tensor.ndim != 2:
+                raise ValueError(f"Unexpected tensor shape {orig_shape} for {path}")
+        return tensor
 
     def _get_embedding_path(self, index: int) -> str:
         return os.path.join(self._root_dir, self._data.at[index, self._path_column])
 
     def _load_manifest(self) -> pd.DataFrame:
-        return pd.read_parquet(self._manifest_path)
+        if self._manifest_path.endswith(".csv"):
+            return pd.read_csv(self._manifest_path)
+        elif self._manifest_path.endswith(".parquet"):
+            return pd.read_parquet(self._manifest_path)
+        else:
+            raise ValueError(f"Unsupported file format for manifest file {self._manifest_path}")
 
     def _sample_n_patches_per_slide(self, df: pd.DataFrame) -> pd.DataFrame:
         if self._embedding_column not in df.columns:
@@ -94,12 +122,14 @@ class EmbeddingDataset(VisionDataset):
             raise ValueError(f"Column {self._slide_id_column} not found in dataframe.")
 
         def try_sample(df: pd.DataFrame, n_samples: int, seed: int) -> pd.DataFrame:
+            """Samples n_samples from the dataframe if it contains at least n_samples entries."""
             if len(df) < n_samples:
                 return df
             else:
                 return df.sample(n=n_samples, random_state=seed)
 
         def stack_and_pad(df: pd.DataFrame, pad_size: int) -> pd.Series:
+            """Stacks the embeddings of the patches of a slide and pads the resulting tensor."""
             stacked_embeddings = torch.cat(df[self._embedding_column].tolist(), dim=0)
 
             dim0 = stacked_embeddings.shape[0]

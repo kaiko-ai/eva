@@ -1,0 +1,6 @@
+path,target
+embeddings/single_dim/tensor_1_shape_8.pt,1
+embeddings/single_dim/tensor_4_shape_1x8.pt,0
+embeddings/single_dim/tensor_3_shape_1x8.pt,2
+embeddings/single_dim/tensor_2_shape_8.pt,0
+embeddings/single_dim/tensor_0_shape_8.pt,1
