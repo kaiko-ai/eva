@@ -1,4 +1,4 @@
-"""Patch Camelyon dataset tests."""
+"""PatchCamelyon dataset tests."""
 
 import os
 from typing import Literal
