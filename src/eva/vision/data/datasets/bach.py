@@ -32,11 +32,6 @@ class SplitRatios:
     val: float = 0.1
     test: float = 0.3
 
-    def __post_init__(self):
-        """Verify that the split ratios sum to 1.0."""
-        if self.train + self.val + self.test != 1.0:
-            raise ValueError("Split ratios must sum to 1.0")
-
 
 class BachDataset(VisionDataset[np.ndarray]):
     """Bach dataset class."""
