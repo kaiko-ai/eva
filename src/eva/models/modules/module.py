@@ -174,6 +174,7 @@ class ModelModule(pl.LightningModule, Generic[INPUT_BATCH]):
         additional_metric_inputs = {
             "preds": batch_outputs.get("predictions"),
             "target": batch_outputs.get("targets"),
+            "metadata": batch_outputs.get("metadata"),
             "dataloader_idx": dataloader_idx,
         }
         return {**additional_metric_inputs, **batch_outputs}

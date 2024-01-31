@@ -11,11 +11,7 @@ from typing_extensions import override
 
 from eva.metrics import core as metrics_lib
 from eva.models.modules import _utils, module
-from eva.models.modules.typings import MODEL_TYPE, TUPLE_INPUT_BATCH
-
-# TODO this will be expanded to support dict as well
-INPUT_BATCH = TUPLE_INPUT_BATCH
-"""The input batch annotation."""
+from eva.models.modules.typings import INPUT_BATCH, MODEL_TYPE
 
 
 class HeadModule(module.ModelModule[INPUT_BATCH]):
@@ -97,11 +93,13 @@ class HeadModule(module.ModelModule[INPUT_BATCH]):
         Returns:
             The batch step output.
         """
-        data, targets = batch[0], batch[1]
+        if isinstance(batch, (tuple, list)):
+            data, targets = batch[:2]
+            metadata = batch[2] if len(batch) == 3 else None
+        elif isinstance(batch, dict):
+            data, targets, metadata = batch["data"], batch.get("targets"), batch.get("metadata")
+        else:
+            raise ValueError(f"Unsupported batch type: {type(batch)}")
         predictions = self(data)
         loss = self.criterion(predictions, targets)
-        return {
-            "loss": loss,
-            "targets": targets,
-            "predictions": predictions,
-        }
+        return {"loss": loss, "targets": targets, "predictions": predictions, "metadata": metadata}

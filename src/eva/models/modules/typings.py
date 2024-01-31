@@ -33,7 +33,7 @@ class DICT_INPUT_BATCH(TypedDict):
     targets: NotRequired[torch.Tensor]
     """The target batch."""
 
-    metadata: NotRequired[torch.Tensor]
+    metadata: NotRequired[Dict[str, Any]]
     """The associated metadata."""
 
 

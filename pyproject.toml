@@ -29,6 +29,7 @@ dependencies = [
 [project.optional-dependencies]
 vision = [
     "opencv-python-headless>=4.9.0.80",
+    "torchvision>=0.17.0",
 ]
 all = ["eva[vision]"]
 

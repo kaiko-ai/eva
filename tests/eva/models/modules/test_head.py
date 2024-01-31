@@ -13,12 +13,32 @@ from eva.data import dataloaders, datamodules, datasets
 from eva.models import modules
 
 
-def test_head_module_fit(
+def test_head_module_fit_with_tuple_dataset(
     model: modules.HeadModule,
-    datamodule: datamodules.DataModule,
+    tuple_classification_dataset: datasets.Dataset,
+    dataloader: dataloaders.DataLoader,
     trainer: trainers.Trainer,
 ) -> None:
-    """Tests the HeadModule fit pipeline."""
+    """Tests the HeadModule fit pipeline using tuple batches."""
+    datamodule = create_datamodule(tuple_classification_dataset, dataloader)
+    fit_and_verify(model, trainer, datamodule)
+
+
+def test_head_module_fit_with_dict_dataset(
+    model: modules.HeadModule,
+    dict_classification_dataset: datasets.Dataset,
+    dataloader: dataloaders.DataLoader,
+    trainer: trainers.Trainer,
+) -> None:
+    """Tests the HeadModule fit pipeline using dict batches."""
+    datamodule = create_datamodule(dict_classification_dataset, dataloader)
+    fit_and_verify(model, trainer, datamodule)
+
+
+def fit_and_verify(
+    model: modules.HeadModule, trainer: trainers.Trainer, datamodule: datamodules.DataModule
+) -> None:
+    """Fits a model and verifies that the metrics were updated."""
     initial_head_weights = model.head.weight.clone()
     trainer.fit(model, datamodule=datamodule)
     # verify that the metrics were updated
@@ -41,16 +61,15 @@ def model(input_shape: Tuple[int, ...] = (3, 8, 8), n_classes: int = 4) -> modul
     )
 
 
-@pytest.fixture(scope="function")
-def datamodule(
-    classification_dataset: datasets.Dataset,
+def create_datamodule(
+    dataset: datasets.Dataset,
     dataloader: dataloaders.DataLoader,
 ) -> datamodules.DataModule:
     """Returns a dummy classification datamodule fixture."""
     return datamodules.DataModule(
         datasets=datamodules.DatasetsSchema(
-            train=classification_dataset,
-            val=classification_dataset,
+            train=dataset,
+            val=dataset,
         ),
         dataloaders=datamodules.DataloadersSchema(
             train=dataloader,
@@ -66,13 +85,24 @@ def trainer(max_epochs: int = 1) -> trainers.Trainer:
 
 
 @pytest.fixture(scope="function")
-def classification_dataset(
+def dict_classification_dataset(
     n_samples: int = 4,
     input_shape: Tuple[int, ...] = (3, 8, 8),
     target_shape: Tuple[int, ...] = (),
     n_classes: int = 4,
 ) -> datasets.Dataset:
-    """Dummy classification dataset fixture."""
+    """Dummy classification dataset fixture using dicts."""
+    return datasets.FakeDictDataset(n_samples, input_shape, target_shape, n_classes)
+
+
+@pytest.fixture(scope="function")
+def tuple_classification_dataset(
+    n_samples: int = 4,
+    input_shape: Tuple[int, ...] = (3, 8, 8),
+    target_shape: Tuple[int, ...] = (),
+    n_classes: int = 4,
+) -> datasets.Dataset:
+    """Dummy classification dataset fixture using tuples."""
     return torch_data.TensorDataset(
         torch.randn((n_samples,) + input_shape),
         torch.randint(n_classes, (n_samples,) + target_shape, dtype=torch.long),
