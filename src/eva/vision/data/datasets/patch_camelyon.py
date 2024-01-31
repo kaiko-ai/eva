@@ -1,14 +1,13 @@
 """PatchCamelyon dataset."""
 
 import os
-from typing import Callable, Dict, Literal, Tuple
+from typing import Callable, Dict, List, Literal, Tuple
 
 import h5py
 import numpy as np
-from loguru import logger
+from torchvision.datasets import utils
 from typing_extensions import override
 
-from eva.utils import file_io
 from eva.vision.data.datasets import vision
 
 
@@ -21,15 +20,19 @@ class PatchCamelyon(vision.VisionDataset[Tuple[np.ndarray, np.ndarray]]):
     }
     """The column mapping of the variables to the H5 columns."""
 
-    file_list = [
-        ("camelyonpatch_level_2_split_train_x.h5", 7248299800),
-        ("camelyonpatch_level_2_split_train_y.h5", 264192),
-        ("camelyonpatch_level_2_split_valid_x.h5", 906040528),
-        ("camelyonpatch_level_2_split_valid_y.h5", 34816),
-        ("camelyonpatch_level_2_split_test_x.h5", 906040528),
-        ("camelyonpatch_level_2_split_test_y.h5", 34816),
+    train_list = [
+        ("camelyonpatch_level_2_split_train_x.h5", "01844da899645b4d6f84946d417ba453"),
+        ("camelyonpatch_level_2_split_train_y.h5", "0781386bf6c2fb62d58ff18891466aca"),
     ]
-    """PatchCamelyon dataset file lists."""
+    valid_list = [
+        ("camelyonpatch_level_2_split_valid_x.h5", "81cf9680f1724c40673f10dc88e909b1"),
+        ("camelyonpatch_level_2_split_valid_y.h5", "94d8aacc249253159ce2a2e78a86e658"),
+    ]
+    test_list = [
+        ("camelyonpatch_level_2_split_test_x.h5", "2614b2e6717d6356be141d9d6dbfcb7e"),
+        ("camelyonpatch_level_2_split_test_y.h5", "11ed647efe9fe457a4eb45df1dba19ba"),
+    ]
+    """PatchCamelyon dataset split file lists."""
 
     def __init__(
         self,
@@ -65,19 +68,6 @@ class PatchCamelyon(vision.VisionDataset[Tuple[np.ndarray, np.ndarray]]):
     def prepare_data(self) -> None:
         if self._download:
             self._download_dataset()
-
-    def _download_dataset(self) -> None:
-        """Downloads the PatchCamelyon dataset."""
-        for file, expected_bytes in self.file_list:
-            filename = os.path.join(self._root, file)
-            if file_io.verify_file(filename, expected_bytes):
-                logger.info(f"File '{filename}' already exists. Skipping downloading.")
-                continue
-
-            logger.info(f"Downloading file '{filename}' has started.")
-            url = self._filename_to_url(file)
-            file_io.download_and_extract_archive(url, output_dir=self._root)
-            logger.info(f"Downloading file '{filename}' finished successfully.")
 
     @override
     def __getitem__(self, index: int) -> Tuple[np.ndarray, np.ndarray]:
@@ -171,6 +161,34 @@ class PatchCamelyon(vision.VisionDataset[Tuple[np.ndarray, np.ndarray]]):
         """
         filename = f"camelyonpatch_level_2_split_{self._split}_{datatype}.h5"
         return os.path.join(self._root, filename)
+
+    @property
+    def _download_list(self) -> List[Tuple[str, str]]:
+        """Returns the appropriate download list based on the current data split."""
+        match self._split:
+            case "train":
+                return self.train_list
+            case "valid":
+                return self.valid_list
+            case "test":
+                return self.test_list
+            case _:
+                raise ValueError("Invalid data split. Use 'train', 'valid', or 'test'.")
+
+    def _download_dataset(self) -> None:
+        """Downloads the PatchCamelyon dataset."""
+        for filename, md5 in self._download_list:
+            file_path = os.path.join(self._root, filename)
+            if utils.check_integrity(file_path, md5):
+                continue
+
+            url = self._filename_to_url(filename)
+            utils.download_and_extract_archive(
+                url,
+                download_root=self._root,
+                filename=filename + ".gz",
+                remove_finished=True,
+            )
 
     @staticmethod
     def _filename_to_url(filename: str) -> str:

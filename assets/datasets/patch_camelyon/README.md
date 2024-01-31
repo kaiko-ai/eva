@@ -23,12 +23,6 @@ The PatchCamelyon benchmark is a new and challenging image classification datase
 The dataset class supports download the data no runtime with the initialized argument
 `download: bool = True`.
 
-However, optionally, we do provide a script to download and extract the data and metadata.
-To do so, from the library root path execute the following:
-```sh
-./assets/datasets/patch_camelyon/download.sh
-```
-
 ### Citation
 ```
 @misc{b_s_veeling_j_linmans_j_winkens_t_cohen_2018_2546921,
