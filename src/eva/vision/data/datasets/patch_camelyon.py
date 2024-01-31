@@ -124,10 +124,9 @@ class PatchCamelyon(vision.VisionDataset[Tuple[np.ndarray, np.ndarray]]):
 
     def _fetch_dataset_length(self) -> int:
         """Fetches the dataset split length from its HDF5 file."""
-        data_key = self.column_mapping["targets"]
-        h5_file = self._h5_file(data_key)
+        h5_file = self._h5_file(self.column_mapping["targets"])
         with h5py.File(h5_file, "r") as file:
-            data = file[data_key]
+            data = file[self.column_mapping["targets"]]
             return len(data)  # type: ignore
 
     def _load_from_h5(
