@@ -85,7 +85,7 @@ class EmbeddingDataset(VisionDataset):
         self._data = self._load_manifest()
         self._data[self._embedding_column] = None
 
-        for index in tqdm.tqdm(self._data.index):
+        for index in tqdm.tqdm(self._data.index, desc="Loading embeddings"):
             self._data.at[index, self._embedding_column] = self._load_embedding_file(index)
 
         if self._dataset_type == DatasetType.SLIDE:
