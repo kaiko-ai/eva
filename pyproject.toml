@@ -50,7 +50,12 @@ test = [
     "nox>=2022.11.21",
     "pytest-cov>=4.1.0",
 ]
-dev = ["eva[lint, test]"]
+docs = [
+    "mkdocs>=1.5.3",
+    "mkdocstrings[python]>=0.24.0",
+    "mkdocs-material>=9.5.6",
+]
+dev = ["eva[lint, test, docs]"]
 
 [project.scripts]
 eva = "eva.__main__:main"
