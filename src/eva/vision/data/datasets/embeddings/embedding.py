@@ -39,7 +39,8 @@ class EmbeddingDataset(VisionDataset):
         a. Patch Level Tasks: A single .pt file per patch containing a tensor of shape
             [embedding_dim] or [1, embedding_dim]
         b. Slide Level Tasks: Each slide can have either one or multiple .pt files, each containing
-            a sequence of patch embeddings of shape [k, embedding_dim].
+            a sequence of patch embeddings of shape [k, embedding_dim]. Note that for slide level
+            tasks, the manifest file needs to provide a column with the slide id.
 
         Args:
             manifest_path: Path to the manifest file. Can be either a .csv or .parquet file.
@@ -72,7 +73,7 @@ class EmbeddingDataset(VisionDataset):
 
     @override
     def __getitem__(self, index) -> torch.Tensor:
-        # TODO: return mask
+        # TODO: return mask. https://github.com/kaiko-ai/eva/issues/82
         return self._data.at[index, self._embedding_column]
 
     @override
@@ -117,6 +118,13 @@ class EmbeddingDataset(VisionDataset):
             raise ValueError(f"Unsupported file format for manifest file {self._manifest_path}")
 
     def _sample_n_patches_per_slide(self, df: pd.DataFrame) -> pd.DataFrame:
+        """This function randomly selects n_patches_per_slide patch embeddings per slide.
+
+        After sampling, the patch embeddings of each slide are stacked as tensors of shape
+        [n_patches_per_slide, embedding_dim]. For slides that have less than n_patches_per_slide
+        patches, the resulting tensor is padded with zeros and a mask that flags the padded entries
+        is generated.
+        """
         if self._embedding_column not in df.columns:
             raise ValueError(f"Column {self._embedding_column} not found in dataframe.")
         if self._slide_id_column not in df.columns:

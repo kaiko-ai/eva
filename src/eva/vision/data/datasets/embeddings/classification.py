@@ -51,7 +51,7 @@ class EmbeddingClassificationDataset(EmbeddingDataset):
 
     @override
     def __getitem__(self, index) -> Tuple[torch.Tensor, torch.Tensor]:
-        # TODO: return mask
+        # TODO: return mask. https://github.com/kaiko-ai/eva/issues/82
         return (
             self._data.at[index, self._embedding_column],
             self._data.at[index, self._target_column],
