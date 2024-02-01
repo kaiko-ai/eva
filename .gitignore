@@ -168,3 +168,6 @@ cython_debug/
 
 # local lightning logs
 /lightning_logs/
+
+# ignore local data
+/data/
