@@ -30,7 +30,7 @@ class SplitRatios:
     """Contains split ratios for train, val and test."""
 
     train: float = 0.6
-    val: float = 0.1
+    valid: float = 0.1
     test: float = 0.3
 
 
@@ -55,9 +55,9 @@ class BachDataset(VisionDataset[np.ndarray]):
     def __init__(
         self,
         root_dir: str,
-        split: Literal["train", "val", "test"],
+        split: Literal["train", "valid", "test"],
         split_ratios: SplitRatios | None = None,
-        download: bool = True,
+        download: bool = False,
     ):
         """Initialize dataset.
 
@@ -65,7 +65,7 @@ class BachDataset(VisionDataset[np.ndarray]):
             root_dir: Path to the root directory of the dataset. The dataset will be downloaded
                 and extracted here, if it does not already exist.
             split: Dataset split to use. If None, the entire dataset is used.
-            split_ratios: Ratios for the train, val and test splits.
+            split_ratios: Ratios for the train, valid and test splits.
             download: Whether to download the data for the specified split.
                 Note that the download will be executed only by additionally
                 calling the :meth:`prepare_data` method and if the data does not exist yet on disk.
@@ -80,7 +80,7 @@ class BachDataset(VisionDataset[np.ndarray]):
         self._path_key, self._split_key, self._target_key = "path", "split", "target"
 
         if split_ratios is None:
-            self._split_ratios = SplitRatios(train=0.7, val=0.15, test=0.15)
+            self._split_ratios = SplitRatios(train=0.7, valid=0.15, test=0.15)
 
     @override
     def __len__(self) -> int:
@@ -89,7 +89,7 @@ class BachDataset(VisionDataset[np.ndarray]):
     @override
     def __getitem__(self, index: int) -> Tuple[np.ndarray, np.ndarray]:
         image = image_io.load_image(self._get_image_path(index))
-        target = self._data.at[index, self._target_key]
+        target = np.asarray(self._data.at[index, self._target_key], dtype=np.int64)
         return image, target
 
     @override
@@ -144,10 +144,10 @@ class BachDataset(VisionDataset[np.ndarray]):
         for _, df_target in df.groupby(self._target_key):
             df_target = df_target.sort_values(by=self._path_key).reset_index(drop=True)
             n_train, n_val = round(df_target.shape[0] * self._split_ratios.train), round(
-                df_target.shape[0] * self._split_ratios.val
+                df_target.shape[0] * self._split_ratios.valid
             )
             df_target.loc[:n_train, self._split_key] = "train"
-            df_target.loc[n_train : n_train + n_val, self._split_key] = "val"
+            df_target.loc[n_train : n_train + n_val, self._split_key] = "valid"
             df_target.loc[n_train + n_val :, self._split_key] = "test"
             dfs.append(df_target)
 
@@ -165,6 +165,6 @@ class BachDataset(VisionDataset[np.ndarray]):
         split_ratios = df["split"].value_counts(normalize=True)
         if not all(
             math.isclose(split_ratios[split], getattr(self._split_ratios, split), abs_tol=1e-5)
-            for split in ["train", "val", "test"]
+            for split in ["train", "valid", "test"]
         ):
             raise ValueError(f"Unexpected split ratios: {split_ratios}.")
