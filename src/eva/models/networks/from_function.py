@@ -9,7 +9,10 @@ from typing_extensions import override
 
 
 class ModelFromFunction(nn.Module):
-    """Loads a model from a function and turns it into an object."""
+    """Wrapper class for models which are initialized from functions.
+
+    This is helpful for initializing models in a `.yaml` configuration file.
+    """
 
     def __init__(
         self,

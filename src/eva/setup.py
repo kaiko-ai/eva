@@ -1,6 +1,15 @@
 """Operations which are executed with the package import."""
 
 import os
+import sys
+import warnings
+
+
+def _suppress_warnings() -> None:
+    """Suppress all warnings from all subprocesses."""
+    if not sys.warnoptions:
+        warnings.simplefilter("ignore")
+        os.environ["PYTHONWARNINGS"] = "ignore"
 
 
 def _enable_mps_fallback() -> None:
@@ -14,6 +23,7 @@ def _enable_mps_fallback() -> None:
 
 def setup() -> None:
     """Sets up the environment before the module is imported."""
+    _suppress_warnings()
     _enable_mps_fallback()
 
 

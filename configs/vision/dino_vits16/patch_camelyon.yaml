@@ -4,6 +4,10 @@ trainer:
   init_args:
     default_root_dir: &OUTPUT_DIR ${oc.env:OUTPUT_DIR, logs/dino_vits16/patch_camelyon}
     max_epochs: &MAX_EPOCHS 20
+    callbacks:
+      - class_path: pytorch_lightning.callbacks.LearningRateMonitor
+        init_args:
+          logging_interval: epoch
     logger:
       - class_path: pytorch_lightning.loggers.CSVLogger
         init_args:
@@ -29,7 +33,7 @@ model:
     head:
       class_path: torch.nn.Linear
       init_args:
-        in_features: 384
+        in_features: 27648
         out_features: &NUM_CLASSES 2
     criterion: torch.nn.CrossEntropyLoss
     optimizer:
@@ -63,11 +67,11 @@ data:
             class_path: torchvision.transforms.v2.Compose
             init_args:
               transforms:
-                - class_path: torchvision.transforms.v2.PILToTensor
+                - class_path: torchvision.transforms.v2.ToImage
                 - class_path: torchvision.transforms.v2.Resize
                   init_args:
                     size: 224
-                - class_path: torchvision.transforms.ToTensor
+                - class_path: torchvision.transforms.v2.ConvertImageDtype
                 - class_path: torchvision.transforms.v2.Normalize
                   init_args:
                     mean: &NORMALIZE_MEAN [0.485, 0.456, 0.406]
@@ -82,11 +86,11 @@ data:
             class_path: torchvision.transforms.v2.Compose
             init_args:
               transforms:
-                - class_path: torchvision.transforms.v2.PILToTensor
+                - class_path: torchvision.transforms.v2.ToImage
                 - class_path: torchvision.transforms.v2.Resize
                   init_args:
                     size: 224
-                - class_path: torchvision.transforms.ToTensor
+                - class_path: torchvision.transforms.v2.ConvertImageDtype
                 - class_path: torchvision.transforms.v2.Normalize
                   init_args:
                     mean: *NORMALIZE_MEAN
