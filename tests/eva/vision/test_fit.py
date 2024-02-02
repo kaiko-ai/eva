@@ -1,4 +1,4 @@
-"""Tests regarding the MLF fit command."""
+"""Tests regarding the EVA fit command on vision datasets."""
 
 import os
 
