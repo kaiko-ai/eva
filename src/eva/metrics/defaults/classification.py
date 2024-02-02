@@ -64,7 +64,9 @@ class MulticlassClassificationMetrics(core.MetricCollection):
                     "MulticlassPrecision",
                     "MulticlassRecall",
                     "MulticlassF1Score",
+                ],
+                [
                     "MulticlassAUROC",
-                ]
+                ],
             ],
         )
