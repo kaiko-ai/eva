@@ -24,6 +24,7 @@ dependencies = [
     "loguru>=0.7.2",
     "jsonargparse[signature]>=4.27.4",
     "pandas>=2.2.0",
+    "tensorboard>=2.15.1",
 ]
 
 [project.optional-dependencies]

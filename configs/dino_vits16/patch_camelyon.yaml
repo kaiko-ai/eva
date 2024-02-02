@@ -2,12 +2,19 @@
 trainer:
   class_path: eva.Trainer
   init_args:
+    default_root_dir: &OUTPUT_DIR ${oc.env:OUTPUT_DIR, logs/dino_vits16/patch_camelyon}
     max_epochs: &MAX_EPOCHS 20
     logger:
       - class_path: pytorch_lightning.loggers.CSVLogger
         init_args:
-          save_dir: logs
-          name: dino_vits16/patch_camelyon
+          save_dir: *OUTPUT_DIR
+          name: ""
+          version: ""
+      - class_path: pytorch_lightning.loggers.TensorBoardLogger
+        init_args:
+          save_dir: *OUTPUT_DIR
+          name: ""
+          version: ""
 model:
   class_path: eva.HeadModule
   init_args:
