@@ -39,7 +39,7 @@ class ModelFromFunction(nn.Module):
         self._path = path
         self._arguments = arguments
 
-        self.net = self.build_model()
+        self._network = self.build_model()
 
     def build_model(self) -> nn.Module:
         """Builds and returns the model."""
@@ -48,4 +48,4 @@ class ModelFromFunction(nn.Module):
 
     @override
     def forward(self, tensor: torch.Tensor) -> torch.Tensor:
-        return self.net(tensor)
+        return self._network(tensor)
