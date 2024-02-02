@@ -3,6 +3,7 @@
 import os
 
 import cv2
+import nibabel as nib
 import numpy as np
 import numpy.typing as npt
 
@@ -46,3 +47,34 @@ def load_image(path: str, as_rgb: bool = True) -> npt.NDArray[np.uint8]:
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
     return np.asarray(image).astype(np.uint8)
+
+
+def load_nifti_image(path: str) -> npt.NDArray[np.uint8]:
+    """Reads a NIfTI image from a file path.
+
+    Args:
+        path: The path to the NIfTI file.
+
+    Returns:
+        The image as a numpy.ndarray.
+    """
+    image = nib.load(path).get_fdata()
+    return np.asarray(image).astype(np.uint8)
+
+
+def load_nifti_image_slice(path: str, slice: int) -> npt.NDArray[np.uint8]:
+    """Reads a NIfTI image slice from a file path.
+
+    Args:
+        path: The path to the NIfTI file.
+        slice: The slice to extract from the image.
+
+    Returns:
+        The image as a numpy.ndarray.
+    """
+    image = load_nifti_image(path)
+
+    if slice < 0 or slice >= image.shape[-1]:
+        raise ValueError(f"Invalid slice index. The image has {image.shape[2]} slices.")
+
+    return image[:, :, slice]
