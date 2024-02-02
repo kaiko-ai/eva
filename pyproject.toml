@@ -73,15 +73,15 @@ target-version = ["py310"]
 line-length = 100
 
 [tool.ruff]
-select = ["A", "B", "C", "D", "E", "F"]
-ignore = ["D401"]
+lint.select = ["A", "B", "C", "D", "E", "F"]
+lint.ignore = ["D401"]
 line-length = 100
 target-version = "py310"
 
-[tool.ruff.pydocstyle]
+[tool.ruff.lint.pydocstyle]
 convention = "google"
 
-[tool.ruff.flake8-quotes]
+[tool.ruff.lint.flake8-quotes]
 docstring-quotes = "double"
 
 [tool.bandit]
