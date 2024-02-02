@@ -31,6 +31,8 @@ dependencies = [
 vision = [
     "torchvision>=0.16.2",
     "opencv-python-headless>=4.9.0.80",
+    "torchvision>=0.17.0",
+    "h5py>=3.10.0",
 ]
 all = ["eva[vision]"]
 
