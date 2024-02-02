@@ -14,7 +14,7 @@ from eva.vision.data import datasets
     "split, expected_length",
     [("train", 16), ("valid", 4), ("test", 4)],
 )
-def test_length(bach_dataset: datasets.BachDataset, expected_length: int) -> None:
+def test_length(bach_dataset: datasets.Bach, expected_length: int) -> None:
     """Tests the length of the dataset."""
     assert len(bach_dataset) == expected_length
 
@@ -23,7 +23,7 @@ def test_length(bach_dataset: datasets.BachDataset, expected_length: int) -> Non
     "split",
     ["train", "valid", "test"],
 )
-def test_sample(bach_dataset: datasets.BachDataset) -> None:
+def test_sample(bach_dataset: datasets.Bach) -> None:
     """Tests the format of a dataset sample."""
     # assert data sample is a tuple
     sample = bach_dataset[0]
@@ -38,12 +38,10 @@ def test_sample(bach_dataset: datasets.BachDataset) -> None:
 
 
 @pytest.fixture(scope="function")
-def bach_dataset(
-    split: Literal["train", "valid", "test"], assets_path: str
-) -> datasets.BachDataset:
+def bach_dataset(split: Literal["train", "valid", "test"], assets_path: str) -> datasets.Bach:
     """BACH dataset fixture."""
-    with patch("eva.vision.data.datasets.BachDataset._verify_dataset") as _:
-        ds = datasets.BachDataset(
+    with patch("eva.vision.data.datasets.Bach._verify_dataset") as _:
+        ds = datasets.Bach(
             root_dir=os.path.join(assets_path, "vision", "datasets", "bach"),
             split=split,
         )

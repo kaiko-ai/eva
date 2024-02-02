@@ -34,7 +34,7 @@ class SplitRatios:
     test: float = 0.3
 
 
-class BachDataset(VisionDataset[np.ndarray]):
+class Bach(VisionDataset[np.ndarray]):
     """Bach dataset class."""
 
     classes: List[str] = [
