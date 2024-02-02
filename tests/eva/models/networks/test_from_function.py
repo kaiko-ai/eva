@@ -8,39 +8,28 @@ from torch import nn
 
 from eva.models import networks
 
-INPUT_TENSOR = torch.Tensor(4, 10)
-
-PATH_A = torch.nn.Flatten
-ARGS_A = None
-
-PATH_B = torch.nn.Linear
-ARGS_B = {
-    "in_features": 10,
-    "out_features": 2,
-}
-"""Test features."""
-
 
 @pytest.mark.parametrize(
     "path, arguments",
     [
-        (PATH_A, ARGS_A),
-        (PATH_B, ARGS_B),
+        (torch.nn.Flatten, None),
+        (torch.nn.Linear, {"in_features": 10, "out_features": 2}),
     ],
 )
 def test_model_from_function(
     model_from_function: networks.ModelFromFunction,
 ) -> None:
     """Tests the model_from_function network."""
-    output = model_from_function(INPUT_TENSOR)
+    input_tensor = torch.Tensor(4, 10)
+    output = model_from_function(input_tensor)
     assert isinstance(output, torch.Tensor)
 
 
 @pytest.mark.parametrize(
     "path, arguments",
     [
-        (PATH_A, {"invalid_arg": 1}),
-        (PATH_B, {"invalid_arg": "2"}),
+        (torch.nn.Flatten, {"invalid_arg": 1}),
+        (torch.nn.Linear, {"invalid_arg": 12}),
     ],
 )
 def test_error_model_from_function(
