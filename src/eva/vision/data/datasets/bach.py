@@ -16,7 +16,7 @@ from eva.vision.data.datasets.vision import VisionDataset
 from eva.vision.file_io import image_io
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True)
 class DownloadResource:
     """Contains download information for a specific resource."""
 
@@ -25,7 +25,7 @@ class DownloadResource:
     md5: str | None = None
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True)
 class SplitRatios:
     """Contains split ratios for train, val and test."""
 
@@ -78,9 +78,7 @@ class BachDataset(VisionDataset[np.ndarray]):
 
         self._data: pd.DataFrame
         self._path_key, self._split_key, self._target_key = "path", "split", "target"
-
-        if split_ratios is None:
-            self._split_ratios = SplitRatios(train=0.7, valid=0.15, test=0.15)
+        self._split_ratios = split_ratios or self.default_split_ratios
 
     @override
     def __len__(self) -> int:
@@ -106,10 +104,15 @@ class BachDataset(VisionDataset[np.ndarray]):
     @override
     def setup(self) -> None:
         df = self._load_dataset()
-        df = self._generate_splits(df)
+        df = self._generate_ordered_stratified_splits(df)
         self._verify_dataset(df)
 
         self._data = df.loc[df[self._split_key] == self._split].reset_index(drop=True)
+
+    @property
+    def default_split_ratios(self) -> SplitRatios:
+        """Returns the defaults split ratios."""
+        return SplitRatios(train=0.6, valid=0.1, test=0.3)
 
     @property
     def _class_to_idx(self) -> Dict[str, int]:
@@ -137,7 +140,8 @@ class BachDataset(VisionDataset[np.ndarray]):
 
         return df
 
-    def _generate_splits(self, df: pd.DataFrame) -> pd.DataFrame:
+    def _generate_ordered_stratified_splits(self, df: pd.DataFrame) -> pd.DataFrame:
+        """Orders each class by path and then splits it into train, valid and test sets."""
         # TODO: refactor this into a shared spliting module: https://github.com/kaiko-ai/eva/issues/75
         df[self._split_key] = ""
         dfs = []
