@@ -1,0 +1,32 @@
+site_name: EVA documentation
+
+theme:
+  name: "material"
+  features:
+    - navigation.tabs
+
+plugins:
+  mkdocstrings:
+    handlers:
+      python:
+        options:
+          docstring_section_style: table
+          filters:
+          - '!^_'
+
+nav:
+  - eva: index.md
+  - Getting Started: getting-started.md
+  - User Guide: user-guide.md
+  - Reference API:
+    - reference/index.md
+    - Interface: reference/interface.md
+    - Data:
+      - reference/data/dataloaders.md
+      - reference/data/datamodules.md
+      - reference/data/datasets.md
+    - Metrics: reference/metrics.md
+    - Models: 
+      - Modules: reference/models/modules.md
+    - Trainers: reference/trainers.md
+    - Vision: reference/vision.md

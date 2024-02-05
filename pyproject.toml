@@ -24,11 +24,15 @@ dependencies = [
     "loguru>=0.7.2",
     "jsonargparse>=4.27.2",
     "pandas>=2.2.0",
+    "pyarrow>=15.0.0",
 ]
 
 [project.optional-dependencies]
 vision = [
+    "torchvision>=0.16.2",
     "opencv-python-headless>=4.9.0.80",
+    "torchvision>=0.17.0",
+    "h5py>=3.10.0",
 ]
 all = ["eva[vision]"]
 
@@ -48,7 +52,12 @@ test = [
     "nox>=2022.11.21",
     "pytest-cov>=4.1.0",
 ]
-dev = ["eva[lint, test]"]
+docs = [
+    "mkdocs>=1.5.3",
+    "mkdocstrings[python]>=0.24.0",
+    "mkdocs-material>=9.5.6",
+]
+dev = ["eva[lint, test, docs]"]
 
 [project.scripts]
 eva = "eva.__main__:main"
