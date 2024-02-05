@@ -33,7 +33,7 @@ model:
     head:
       class_path: torch.nn.Linear
       init_args:
-        in_features: 27648
+        in_features: 384
         out_features: &NUM_CLASSES 2
     criterion: torch.nn.CrossEntropyLoss
     optimizer:
