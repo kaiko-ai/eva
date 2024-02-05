@@ -6,8 +6,7 @@ import numpy as np
 import pytest
 import torch
 
-from eva.vision.data.datasets.embeddings import EmbeddingClassificationDataset, EmbeddingDataset
-from eva.vision.data.datasets.typings import DatasetType
+from eva.vision.data.datasets.embeddings import PatchEmbeddingDataset, SlideEmbeddingDataset
 
 
 @pytest.fixture()
@@ -22,30 +21,12 @@ def slide_level_manifest_path(assets_path: str) -> str:
     return os.path.join(assets_path, "manifests", "embeddings", "slide_level.csv")
 
 
-def test_patch_level_dataset(patch_level_manifest_path: str, assets_path: str):
+def test_patch_embedding_dataset(patch_level_manifest_path: str, assets_path: str):
     """Test that the patch level dataset has the correct length and item shapes/types."""
-    ds = EmbeddingDataset(
+    ds = PatchEmbeddingDataset(
         manifest_path=patch_level_manifest_path,
         root_dir=assets_path,
-        dataset_type=DatasetType.PATCH,
-        split=None,
-    )
-    ds.setup()
-
-    expected_shape = (8,)
-    assert len(ds) == 5
-    for i in range(len(ds)):
-        assert isinstance(ds[i], torch.Tensor)
-        assert ds[i].shape == expected_shape
-
-
-def test_patch_level_classification_dataset(patch_level_manifest_path: str, assets_path: str):
-    """Test that the patch level dataset has the correct length and item shapes/types."""
-    ds = EmbeddingClassificationDataset(
-        manifest_path=patch_level_manifest_path,
-        root_dir=assets_path,
-        dataset_type=DatasetType.PATCH,
-        split=None,
+        split="train",
     )
     ds.setup()
 
@@ -59,34 +40,12 @@ def test_patch_level_classification_dataset(patch_level_manifest_path: str, asse
         assert np.issubdtype(type(target), int)
 
 
-def test_slide_level_dataset_length_and_embedding_shape(
-    slide_level_manifest_path: str, assets_path: str
-):
-    """Test that the slide level dataset has the correct length and item shapes/types."""
-    ds = EmbeddingDataset(
-        manifest_path=slide_level_manifest_path,
-        root_dir=assets_path,
-        dataset_type=DatasetType.SLIDE,
-        split=None,
-        n_patches_per_slide=10,
-    )
-    ds.setup()
-
-    expected_shape = (10, 8)
-    assert len(ds) == 3
-    for i in range(len(ds)):
-        assert ds[i].shape == expected_shape
-
-
-def test_slide_level_classification_dataset_length_and_embedding_shape(
-    slide_level_manifest_path: str, assets_path: str
-):
+def test_slide_embedding_dataset(slide_level_manifest_path: str, assets_path: str):
     """Test that the slide level dataset has the correct length and embedding tensor shapes."""
-    ds = EmbeddingClassificationDataset(
+    ds = SlideEmbeddingDataset(
         manifest_path=slide_level_manifest_path,
         root_dir=assets_path,
-        dataset_type=DatasetType.SLIDE,
-        split=None,
+        split="train",
         n_patches_per_slide=10,
     )
     ds.setup()
@@ -95,7 +54,11 @@ def test_slide_level_classification_dataset_length_and_embedding_shape(
     assert len(ds) == 3
     for i in range(len(ds)):
         assert isinstance(ds[i], tuple)
-        assert len(ds[i]) == 2
-        embedding, target = ds[i]
+        assert len(ds[i]) == 3
+        embedding, target, metadata = ds[i]
         assert embedding.shape == expected_shape
         assert np.issubdtype(type(target), int)
+        assert isinstance(metadata, dict)
+        assert "mask" in metadata.keys()
+        assert isinstance(metadata["mask"], torch.Tensor)
+        assert metadata["mask"].shape == (expected_shape[0], 1)

@@ -1,6 +1,3 @@
-path,target
-embeddings/single_dim/tensor_1_shape_8.pt,1
-embeddings/single_dim/tensor_4_shape_1x8.pt,0
-embeddings/single_dim/tensor_3_shape_1x8.pt,2
-embeddings/single_dim/tensor_2_shape_8.pt,0
-embeddings/single_dim/tensor_0_shape_8.pt,1
+version https://git-lfs.github.com/spec/v1
+oid sha256:5cd4175994221973d34bed9552b3afb47f8a43e70f883b7d7da6106266d48b98
+size 272
