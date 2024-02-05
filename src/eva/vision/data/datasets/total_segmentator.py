@@ -30,9 +30,9 @@ class DownloadResource:
 class SplitRatios:
     """Contains split ratios for train, val and test."""
 
-    train: float = 0.7
-    val: float = 0.15
-    test: float = 0.15
+    train: float = 0.33
+    val: float = 0.33
+    test: float = 0.34
 
 
 class TotalSegmentator(VisionDataset[np.ndarray]):
