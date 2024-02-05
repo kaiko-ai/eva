@@ -13,4 +13,4 @@ model:
     head:
       class_path: torch.nn.Linear
       init_args:
-        in_features: 384
+        in_features: ${oc.env:OUT_FEATURES, 384}
