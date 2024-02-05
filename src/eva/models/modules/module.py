@@ -9,6 +9,7 @@ from pytorch_lightning.utilities.types import STEP_OUTPUT
 from typing_extensions import override
 
 from eva.metrics import core as metrics_lib
+from eva.models.modules.typings import TUPLE_INPUT_BATCH
 
 INPUT_BATCH = TypeVar("INPUT_BATCH")
 """The input batch type."""
@@ -87,6 +88,17 @@ class ModelModule(pl.LightningModule, Generic[INPUT_BATCH]):
     @override
     def on_test_epoch_end(self) -> None:
         self._compute_and_log_metrics(self.metrics.test_metrics)
+
+    def _unpack_batch(self, batch: INPUT_BATCH) -> TUPLE_INPUT_BATCH:
+        if isinstance(batch, (tuple, list)):
+            data, targets = batch[:2]
+            metadata = batch[2] if len(batch) == 3 else None
+        elif isinstance(batch, dict):
+            data, targets, metadata = batch["data"], batch.get("targets"), batch.get("metadata")
+        else:
+            raise ValueError(f"Unsupported batch type: {type(batch)}")
+
+        return data, targets, metadata  # type: ignore
 
     def _common_batch_end(self, outputs: STEP_OUTPUT) -> STEP_OUTPUT:
         """Common end step of training, validation and test.

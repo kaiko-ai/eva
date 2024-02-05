@@ -93,13 +93,7 @@ class HeadModule(module.ModelModule[INPUT_BATCH]):
         Returns:
             The batch step output.
         """
-        if isinstance(batch, (tuple, list)):
-            data, targets = batch[:2]
-            metadata = batch[2] if len(batch) == 3 else None
-        elif isinstance(batch, dict):
-            data, targets, metadata = batch["data"], batch.get("targets"), batch.get("metadata")
-        else:
-            raise ValueError(f"Unsupported batch type: {type(batch)}")
+        data, targets, metadata = self._unpack_batch(batch)
         predictions = self(data)
         loss = self.criterion(predictions, targets)
         return {"loss": loss, "targets": targets, "predictions": predictions, "metadata": metadata}
