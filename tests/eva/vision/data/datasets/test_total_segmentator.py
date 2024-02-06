@@ -32,13 +32,19 @@ def test_sample(total_segmentator_dataset: datasets.TotalSegmentator) -> None:
 @pytest.fixture(scope="function")
 def total_segmentator_dataset(
     split: Literal["train", "val", "test"], assets_path: str
-) -> datasets.Bach:
+) -> datasets.TotalSegmentator:
     """TotalSegmentator dataset fixture."""
+
+    class SplitRatios:
+        train: float = 0.33
+        val: float = 0.33
+        test: float = 0.33
+
     with patch("eva.vision.data.datasets.TotalSegmentator._verify_dataset") as _:
         ds = datasets.TotalSegmentator(
             root_dir=os.path.join(assets_path, "vision", "datasets", "total_segmentator"),
             split=split,
-            split_ratios=datasets.total_segmentator.SplitRatios(0.33, 0.33, 0.33),
+            split_ratios=SplitRatios(),
             sample_every_n_slice=1,
         )
         ds.prepare_data()
