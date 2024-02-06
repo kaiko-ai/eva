@@ -84,7 +84,7 @@ class ABMIL(torch.nn.Module):
             output_size=output_size,
             hidden_layer_sizes=hidden_sizes_mlp,
             dropout=dropout_mlp,
-            activation_fn=nn.ReLU,
+            hidden_activation_fn=nn.ReLU,
         )
 
     def forward(self, input_tensor: torch.Tensor, mask: Optional[torch.BoolTensor] = None):

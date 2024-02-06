@@ -22,11 +22,12 @@ def test_mlp_initialization(
         output_size=output_size,
         hidden_layer_sizes=hidden_layer_sizes,
         dropout=dropout,
-        activation_fn=torch.nn.ReLU,
+        hidden_activation_fn=torch.nn.ReLU,
     )
 
-    expected_num_layers = 3 * len(hidden_layer_sizes) + 1  # (linear, activation & dropout)
-    assert len(list(mlp.modules())) == expected_num_layers + 1  # + 1 for the MLP itself
+    k = 3 if dropout > 0 else 2  # Linear, Activation, (Dropout)
+    expected_n_layers = k * len(hidden_layer_sizes) + 1  # + 1 for the output layer
+    assert len(list(mlp._network.modules())) == expected_n_layers + 1  # + 1 for the MLP itself
 
 
 @pytest.mark.parametrize(
@@ -46,7 +47,7 @@ def test_mlp_forward_pass(
         output_size=output_size,
         hidden_layer_sizes=hidden_layer_sizes,
         dropout=dropout,
-        activation_fn=torch.nn.ReLU,
+        hidden_activation_fn=torch.nn.ReLU,
     )
 
     # Create a dummy input tensor
