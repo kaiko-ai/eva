@@ -16,14 +16,14 @@ from eva.models import modules
 @pytest.mark.parametrize(
     "dataset_fixture", ["tuple_classification_dataset", "dict_classification_dataset"]
 )
-def test_head_module_fit_with_dataset(
+def test_head_module_fit(
     request,
     model: modules.HeadModule,
     dataloader: dataloaders.DataLoader,
     trainer: trainers.Trainer,
     dataset_fixture: datasets.Dataset,
 ) -> None:
-    """Tests the HeadModule fit pipeline with different dataset types."""
+    """Tests the HeadModule fit call."""
     dataset = request.getfixturevalue(dataset_fixture)
     datamodule = create_datamodule(dataset, dataloader)
     initial_head_weights = model.head.weight.clone()
