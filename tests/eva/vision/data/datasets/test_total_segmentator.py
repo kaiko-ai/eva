@@ -41,5 +41,6 @@ def total_segmentator_dataset(split: Literal["train", "val", "test"], assets_pat
             split_ratios=datasets.total_segmentator.SplitRatios(0.33, 0.33, 0.33),
             sample_every_n_slice=1,
         )
+        ds.prepare_data()
         ds.setup()
         return ds

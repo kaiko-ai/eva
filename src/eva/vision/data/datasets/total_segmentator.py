@@ -175,7 +175,6 @@ class TotalSegmentator(VisionDataset[np.ndarray]):
                     data_dict[cl].append(label)
 
             df = pd.DataFrame(data_dict)
-            # print(df)
 
         return df
     
