@@ -74,7 +74,7 @@ def load_nifti_image_slice(path: str, slice_: int) -> npt.NDArray[np.uint8]:
     """
     image = load_nifti_image(path)
 
-    if slice < 0 or slice_ >= image.shape[-1]:
+    if slice_ < 0 or slice_ >= image.shape[-1]:
         raise ValueError(f"Invalid slice index. The image has {image.shape[2]} slices.")
 
     return image[:, :, slice_]
