@@ -19,8 +19,6 @@ class ABMIL(torch.nn.Module):
     https://github.com/AMLab-Amsterdam/AttentionDeepMIL/blob/master/model.py
 
     Notes:
-        - The reference implementation uses different variable names than the paper. In this
-        implementation, M and L follow the paper notation.
         - use_bias: The paper didn't use bias in their formalism, but their published
         example code inadvertently does.
         - To prevent dot product similarities near-equal due to concentration of measure
@@ -56,31 +54,28 @@ class ABMIL(torch.nn.Module):
             dropout_input_embeddings: dropout rate for the input embeddings
             dropout_attention: dropout rate for the attention network and classifier
             dropout_mlp: dropout rate for the final MLP network
-
         """
         super().__init__()
 
         if projected_input_size:
-            M = projected_input_size  # noqa: N806
             self.projector = nn.Sequential(
-                nn.Linear(input_size, M, bias=True), nn.Dropout(p=dropout_input_embeddings)
+                nn.Linear(input_size, projected_input_size, bias=True),
+                nn.Dropout(p=dropout_input_embeddings),
             )
+            input_size = projected_input_size
         else:
-            M = input_size  # noqa: N806
             self.projector = nn.Dropout(p=dropout_input_embeddings)
 
-        L = hidden_size_attention  # noqa: N806
-
         self.gated_attention = GatedAttention(
-            input_dim=M,
-            hidden_dim=L,
+            input_dim=input_size,
+            hidden_dim=hidden_size_attention,
             dropout=dropout_attention,
             n_classes=1,
             use_bias=use_bias,
         )
 
         self.classifier = MLP(
-            input_size=M,
+            input_size=input_size,
             output_size=output_size,
             hidden_layer_sizes=hidden_sizes_mlp,
             dropout=dropout_mlp,
@@ -95,7 +90,7 @@ class ABMIL(torch.nn.Module):
             mask: mask tensor where true values correspond to entries in the input tensor that
                 should be ignored. expected shape is (batch_size, n_instances, 1).
         """
-        # Project input to lower dimensionality (batch_size, n_instances, M)
+        # Project input to lower dimensionality (batch_size, n_instances, projected_input_size)
         input_tensor = self.projector(input_tensor)
 
         # Gated attention & masking
@@ -108,9 +103,9 @@ class ABMIL(torch.nn.Module):
         # (batch_size, n_instances, 1)
 
         attention_result = torch.matmul(torch.transpose(attention_weights, 1, 2), input_tensor)
-        # (batch_size, 1, L)
+        # (batch_size, 1, hidden_size_attention)
 
-        attention_result = torch.squeeze(attention_result, 1)  # (batch_size, L)
+        attention_result = torch.squeeze(attention_result, 1)  # (batch_size, hidden_size_attention)
 
         # Final MLP classifier network
         return self.classifier(attention_result)  # (batch_size, output_size)
