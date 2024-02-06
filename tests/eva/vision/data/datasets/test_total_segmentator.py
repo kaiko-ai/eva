@@ -16,7 +16,6 @@ from eva.vision.data import datasets
 )
 def test_sample(total_segmentator_dataset: datasets.TotalSegmentator) -> None:
     """Tests the format of a dataset sample."""
-    
     # assert data sample is a tuple
     sample = total_segmentator_dataset[0]
     assert isinstance(sample, tuple)
@@ -31,9 +30,10 @@ def test_sample(total_segmentator_dataset: datasets.TotalSegmentator) -> None:
 
 
 @pytest.fixture(scope="function")
-def total_segmentator_dataset(split: Literal["train", "val", "test"], assets_path: str) -> datasets.Bach:
+def total_segmentator_dataset(
+    split: Literal["train", "val", "test"], assets_path: str
+) -> datasets.Bach:
     """TotalSegmentator dataset fixture."""
-
     with patch("eva.vision.data.datasets.TotalSegmentator._verify_dataset") as _:
         ds = datasets.TotalSegmentator(
             root_dir=os.path.join(assets_path, "vision", "datasets", "total_segmentator"),

@@ -62,19 +62,19 @@ def load_nifti_image(path: str) -> npt.NDArray[np.uint8]:
     return np.asarray(image).astype(np.uint8)
 
 
-def load_nifti_image_slice(path: str, slice: int) -> npt.NDArray[np.uint8]:
+def load_nifti_image_slice(path: str, slice_: int) -> npt.NDArray[np.uint8]:
     """Reads a NIfTI image slice from a file path.
 
     Args:
         path: The path to the NIfTI file.
-        slice: The slice to extract from the image.
+        slice_: The slice to extract from the image.
 
     Returns:
         The image as a numpy.ndarray.
     """
     image = load_nifti_image(path)
 
-    if slice < 0 or slice >= image.shape[-1]:
+    if slice < 0 or slice_ >= image.shape[-1]:
         raise ValueError(f"Invalid slice index. The image has {image.shape[2]} slices.")
 
-    return image[:, :, slice]
+    return image[:, :, slice_]

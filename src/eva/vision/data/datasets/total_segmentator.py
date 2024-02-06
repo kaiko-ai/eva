@@ -37,7 +37,7 @@ class SplitRatios:
 
 class TotalSegmentator(VisionDataset[np.ndarray]):
     """TotalSegmentator dataset class.
-    
+
     Create the multilabel classification dataset for the TotalSegmentator data.
     """
 
@@ -91,8 +91,8 @@ class TotalSegmentator(VisionDataset[np.ndarray]):
 
     @override
     def __getitem__(self, index: int) -> Tuple[np.ndarray, np.ndarray]:
-        image_path, slice = self._get_image_path_and_slice(index)
-        image = image_io.load_nifti_image_slice(image_path, slice)
+        image_path, slice_ = self._get_image_path_and_slice(index)
+        image = image_io.load_nifti_image_slice(image_path, slice_)
         targets = np.asarray(self._data[self._classes].loc[index], dtype=np.int64)
         return image, targets
 
@@ -104,7 +104,7 @@ class TotalSegmentator(VisionDataset[np.ndarray]):
             logger.info("Extracting archive ...")
             extract_archive(
                 from_path=os.path.join(self._root_dir, "Totalsegmentator_dataset_v201.zip"),
-                to_path=os.path.join(self._root_dir, "Totalsegmentator_dataset_v201")
+                to_path=os.path.join(self._root_dir, "Totalsegmentator_dataset_v201"),
             )
         self._classes = self._get_classes()
 
@@ -149,10 +149,9 @@ class TotalSegmentator(VisionDataset[np.ndarray]):
 
     def _load_dataset(self) -> pd.DataFrame:
         """Loads the dataset manifest from a CSV file or creates the dataframe it does not exist."""
-
         if os.path.isfile(self._manifest_path):
             return pd.read_csv(self._manifest_path)
-        
+
         data_dict = defaultdict(list)
         for i, path in enumerate(Path(self._root_dir).glob("**/*ct.nii.gz")):
             img_data = image_io.load_nifti_image(path)
@@ -177,16 +176,14 @@ class TotalSegmentator(VisionDataset[np.ndarray]):
             df = pd.DataFrame(data_dict)
 
         return df
-    
+
     def _save_manifest(self, df: pd.DataFrame) -> None:
         """Saves the dataset manifest to a CSV file."""
-
         manifest_path = os.path.join(self._root_dir, "manifest.csv")
         df.to_csv(manifest_path, index=False)
 
     def _generate_ordered_splits(self, df: pd.DataFrame) -> pd.DataFrame:
         """Orders each class by path and then splits it into train, val and test sets."""
-
         paths = sorted(df[self._path_key].unique())
         n_train_paths, n_val_paths = (
             round(len(paths) * self._split_ratios.train),
@@ -209,8 +206,8 @@ class TotalSegmentator(VisionDataset[np.ndarray]):
     def _verify_dataset(self, df: pd.DataFrame) -> None:
         if len(df) != 1454:
             raise ValueError(f"Expected 3633 samples but manifest lists {len(df)}.")
-        
-        if df.shape[1]-3 != len(self._classes) or len(self._classes) != 117:
+
+        if df.shape[1] - 3 != len(self._classes) or len(self._classes) != 117:
             raise ValueError(f"Expected 117 classes but manifest lists {df.shape[1]-3}.")
 
         split_ratios = df["split"].value_counts(normalize=True)
