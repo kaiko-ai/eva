@@ -18,7 +18,7 @@ class Interface:
         data: datamodules.DataModule,
         trainer: trainers.Trainer,
     ) -> None:
-        """Perform model training in place.
+        """Perform model training and evaluation in place.
 
         This method uses the specified trainer to fit the model using the provided data.
 
@@ -28,3 +28,4 @@ class Interface:
             trainer: The trainer which processes the model and data.
         """
         trainer.fit(model=model, datamodule=data)
+        trainer.test(datamodule=data)
