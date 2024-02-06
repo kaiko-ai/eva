@@ -19,7 +19,7 @@ The PatchCamelyon benchmark is a image classification dataset with 327,680 color
 | **Number of images** | 327,680 (50% of each class) |
 
 
-\* The slides were acquired and digitized at 2 different centres using a 40x objective but under-sampled to 10x to increase the field of view. Some papers do categorize it as 10x. Basically artificial 10x patches.
+\* The slides were acquired and digitized at 2 different medical centers using a 40x objective but under-sampled to 10x to increase the field of view. Some papers do categorize it as 10x.
 
 ### Splits
 

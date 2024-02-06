@@ -1,22 +1,22 @@
 # BACH
 
-The BACH dataset consists of 408 labelled patches from 4 classes ("Normal", "Benign", "Invasive", "InSitu"). It was used for the "BACH Grand Challenge on Breast Cancer Histology images".
+The BACH dataset consists of microscopy and WSI images, of which we use only the microscopy images. These are 408 labelled images from 4 classes ("Normal", "Benign", "Invasive", "InSitu"). This dataset was used for the "BACH Grand Challenge on Breast Cancer Histology images".
 
 
 ## Raw data
 
 ### Key stats
 
-|                      |                                                          |
-|----------------------|----------------------------------------------------------|
-| **Modality**         | Vision (patches from WSIs)                               |
-| **Task**             | Multiclass classification (4 classes)                    |
-| **Cancer type**      | Breast                                                   |
+|                      |                                                         |
+|----------------------|---------------------------------------------------------|
+| **Modality**         | Vision (microscopy images)                             |
+| **Task**             | Multiclass classification (4 classes)                   |
+| **Cancer type**      | Breast                                                  |
 | **Data size**        | total: 10.4GB / data in use: 7.37 GB (18.9 MB per image) |
-| **Image dimension**  | 1536 x 2048 x 3                                          |
-| **Files format**     | `.tif` images                                            |
-| **Number of images** | 408 (102 from each class)                                |
-| **Splits in use**    | one labelled split                                       |
+| **Image dimension**  | 1536 x 2048 x 3                                         |
+| **Files format**     | `.tif` images                                           |
+| **Number of images** | 408 (102 from each class)                               |
+| **Splits in use**    | one labelled split                                      |
 
 
 ### Organization
