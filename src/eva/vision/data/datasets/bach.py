@@ -30,7 +30,7 @@ class SplitRatios:
     """Contains split ratios for train, val and test."""
 
     train: float = 0.6
-    valid: float = 0.1
+    val: float = 0.1
     test: float = 0.3
 
 
@@ -55,7 +55,7 @@ class Bach(VisionDataset[np.ndarray]):
     def __init__(
         self,
         root_dir: str,
-        split: Literal["train", "valid", "test"],
+        split: Literal["train", "val", "test"],
         split_ratios: SplitRatios | None = None,
         download: bool = False,
     ):
@@ -65,7 +65,7 @@ class Bach(VisionDataset[np.ndarray]):
             root_dir: Path to the root directory of the dataset. The dataset will be downloaded
                 and extracted here, if it does not already exist.
             split: Dataset split to use. If None, the entire dataset is used.
-            split_ratios: Ratios for the train, valid and test splits.
+            split_ratios: Ratios for the train, val and test splits.
             download: Whether to download the data for the specified split.
                 Note that the download will be executed only by additionally
                 calling the :meth:`prepare_data` method and if the data does not exist yet on disk.
@@ -112,7 +112,7 @@ class Bach(VisionDataset[np.ndarray]):
     @property
     def default_split_ratios(self) -> SplitRatios:
         """Returns the defaults split ratios."""
-        return SplitRatios(train=0.6, valid=0.1, test=0.3)
+        return SplitRatios(train=0.6, val=0.1, test=0.3)
 
     @property
     def _class_to_idx(self) -> Dict[str, int]:
@@ -141,17 +141,17 @@ class Bach(VisionDataset[np.ndarray]):
         return df
 
     def _generate_ordered_stratified_splits(self, df: pd.DataFrame) -> pd.DataFrame:
-        """Orders each class by path and then splits it into train, valid and test sets."""
+        """Orders each class by path and then splits it into train, val and test sets."""
         # TODO: refactor this into a shared spliting module: https://github.com/kaiko-ai/eva/issues/75
         df[self._split_key] = ""
         dfs = []
         for _, df_target in df.groupby(self._target_key):
             df_target = df_target.sort_values(by=self._path_key).reset_index(drop=True)
             n_train, n_val = round(df_target.shape[0] * self._split_ratios.train), round(
-                df_target.shape[0] * self._split_ratios.valid
+                df_target.shape[0] * self._split_ratios.val
             )
             df_target.loc[:n_train, self._split_key] = "train"
-            df_target.loc[n_train : n_train + n_val, self._split_key] = "valid"
+            df_target.loc[n_train : n_train + n_val, self._split_key] = "val"
             df_target.loc[n_train + n_val :, self._split_key] = "test"
             dfs.append(df_target)
 
@@ -169,6 +169,6 @@ class Bach(VisionDataset[np.ndarray]):
         split_ratios = df["split"].value_counts(normalize=True)
         if not all(
             math.isclose(split_ratios[split], getattr(self._split_ratios, split), abs_tol=1e-5)
-            for split in ["train", "valid", "test"]
+            for split in ["train", "val", "test"]
         ):
             raise ValueError(f"Unexpected split ratios: {split_ratios}.")
