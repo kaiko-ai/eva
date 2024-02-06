@@ -13,34 +13,22 @@ from eva.data import dataloaders, datamodules, datasets
 from eva.models import modules
 
 
-def test_head_module_fit_with_tuple_dataset(
+@pytest.mark.parametrize(
+    "dataset_fixture", ["tuple_classification_dataset", "dict_classification_dataset"]
+)
+def test_head_module_fit_with_dataset(
+    request,
     model: modules.HeadModule,
-    tuple_classification_dataset: datasets.Dataset,
     dataloader: dataloaders.DataLoader,
     trainer: trainers.Trainer,
+    dataset_fixture: datasets.Dataset,
 ) -> None:
-    """Tests the HeadModule fit pipeline using tuple batches."""
-    datamodule = create_datamodule(tuple_classification_dataset, dataloader)
-    fit_and_verify(model, trainer, datamodule)
-
-
-def test_head_module_fit_with_dict_dataset(
-    model: modules.HeadModule,
-    dict_classification_dataset: datasets.Dataset,
-    dataloader: dataloaders.DataLoader,
-    trainer: trainers.Trainer,
-) -> None:
-    """Tests the HeadModule fit pipeline using dict batches."""
-    datamodule = create_datamodule(dict_classification_dataset, dataloader)
-    fit_and_verify(model, trainer, datamodule)
-
-
-def fit_and_verify(
-    model: modules.HeadModule, trainer: trainers.Trainer, datamodule: datamodules.DataModule
-) -> None:
-    """Fits a model and verifies that the metrics were updated."""
+    """Tests the HeadModule fit pipeline with different dataset types."""
+    dataset = request.getfixturevalue(dataset_fixture)
+    datamodule = create_datamodule(dataset, dataloader)
     initial_head_weights = model.head.weight.clone()
     trainer.fit(model, datamodule=datamodule)
+
     # verify that the metrics were updated
     assert trainer.logged_metrics["train/AverageLoss"] > 0
     assert trainer.logged_metrics["val/AverageLoss"] > 0
