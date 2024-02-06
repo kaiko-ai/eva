@@ -46,6 +46,7 @@ The following datasets are supported
 
 ### Vision
 - [BACH](./assets/datasets/bach/README.md)
+- [PatchCamelyon](./assets/datasets/patch_camelyon/README.md)
 
 ## Contributing
 

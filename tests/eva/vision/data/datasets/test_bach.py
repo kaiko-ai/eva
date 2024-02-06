@@ -12,7 +12,7 @@ from eva.vision.data import datasets
 
 @pytest.mark.parametrize(
     "split, expected_length",
-    [("train", 16), ("valid", 4), ("test", 4)],
+    [("train", 16), ("val", 4), ("test", 4)],
 )
 def test_length(bach_dataset: datasets.Bach, expected_length: int) -> None:
     """Tests the length of the dataset."""
@@ -21,7 +21,7 @@ def test_length(bach_dataset: datasets.Bach, expected_length: int) -> None:
 
 @pytest.mark.parametrize(
     "split",
-    ["train", "valid", "test"],
+    ["train", "val", "test"],
 )
 def test_sample(bach_dataset: datasets.Bach) -> None:
     """Tests the format of a dataset sample."""
@@ -38,7 +38,7 @@ def test_sample(bach_dataset: datasets.Bach) -> None:
 
 
 @pytest.fixture(scope="function")
-def bach_dataset(split: Literal["train", "valid", "test"], assets_path: str) -> datasets.Bach:
+def bach_dataset(split: Literal["train", "val", "test"], assets_path: str) -> datasets.Bach:
     """BACH dataset fixture."""
     with patch("eva.vision.data.datasets.Bach._verify_dataset") as _:
         ds = datasets.Bach(
