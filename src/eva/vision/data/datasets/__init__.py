@@ -1,7 +1,15 @@
-"""Vision datasets API."""
+"""Vision Datasets API."""
 
 from eva.vision.data.datasets.bach import Bach
+from eva.vision.data.datasets.embeddings import PatchEmbeddingDataset, SlideEmbeddingDataset
 from eva.vision.data.datasets.patch_camelyon import PatchCamelyon
 from eva.vision.data.datasets.vision import VisionDataset
 
-__all__ = ["VisionDataset", "Bach", "PatchCamelyon"]
+__all__ = [
+    "VisionDataset",
+    "DatasetType",
+    "Bach",
+    "PatchCamelyon",
+    "PatchEmbeddingDataset",
+    "SlideEmbeddingDataset",
+]
