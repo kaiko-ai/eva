@@ -1,5 +1,5 @@
 """Vision data API."""
 
-from eva.vision.data.datasets import VisionDataset
+from eva.vision.data import datasets
 
-__all__ = ["VisionDataset"]
+__all__ = ["datasets"]
