@@ -24,7 +24,7 @@ class PatchEmbeddingDataset(VisionDataset):
         self,
         manifest_path: str,
         root: str,
-        split: Literal["train", "valid", "test"],
+        split: Literal["train", "val", "test"],
         column_mapping: Dict[str, str] = default_column_mapping,
     ):
         """Initialize dataset.
