@@ -45,18 +45,11 @@ data:
           split: train
           download: false
           image_transforms:
-            class_path: torchvision.transforms.v2.Compose
+            class_path: eva.vision.transforms.common.ResizeAndNormalize
             init_args:
-              transforms:
-                - class_path: torchvision.transforms.v2.ToImage
-                - class_path: torchvision.transforms.v2.Resize
-                  init_args:
-                    size: 224
-                - class_path: torchvision.transforms.v2.ConvertImageDtype
-                - class_path: torchvision.transforms.v2.Normalize
-                  init_args:
-                    mean: &NORMALIZE_MEAN [0.485, 0.456, 0.406]
-                    std: &NORMALIZE_STD [0.229, 0.224, 0.225]
+              normalize:
+                mean: &NORMALIZE_MEAN [0.485, 0.456, 0.406]
+                std: &NORMALIZE_STD [0.229, 0.224, 0.225]
       val:
         class_path: eva.vision.datasets.PatchCamelyon
         init_args:
@@ -64,18 +57,11 @@ data:
           split: val
           download: false
           image_transforms:
-            class_path: torchvision.transforms.v2.Compose
+            class_path: eva.vision.transforms.common.ResizeAndNormalize
             init_args:
-              transforms:
-                - class_path: torchvision.transforms.v2.ToImage
-                - class_path: torchvision.transforms.v2.Resize
-                  init_args:
-                    size: 224
-                - class_path: torchvision.transforms.v2.ConvertImageDtype
-                - class_path: torchvision.transforms.v2.Normalize
-                  init_args:
-                    mean: *NORMALIZE_MEAN
-                    std: *NORMALIZE_STD
+              normalize:
+                mean: *NORMALIZE_MEAN
+                std: *NORMALIZE_STD
       test:
         class_path: eva.vision.datasets.PatchCamelyon
         init_args:
@@ -83,18 +69,11 @@ data:
           split: test
           download: false
           image_transforms:
-            class_path: torchvision.transforms.v2.Compose
+            class_path: eva.vision.transforms.common.ResizeAndNormalize
             init_args:
-              transforms:
-                - class_path: torchvision.transforms.v2.ToImage
-                - class_path: torchvision.transforms.v2.Resize
-                  init_args:
-                    size: 224
-                - class_path: torchvision.transforms.v2.ConvertImageDtype
-                - class_path: torchvision.transforms.v2.Normalize
-                  init_args:
-                    mean: *NORMALIZE_MEAN
-                    std: *NORMALIZE_STD
+              normalize:
+                mean: *NORMALIZE_MEAN
+                std: *NORMALIZE_STD
     dataloaders:
       train:
         batch_size: &BATCH_SIZE 2
