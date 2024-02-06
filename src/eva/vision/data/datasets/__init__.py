@@ -6,10 +6,9 @@ from eva.vision.data.datasets.patch_camelyon import PatchCamelyon
 from eva.vision.data.datasets.vision import VisionDataset
 
 __all__ = [
-    "VisionDataset",
-    "DatasetType",
     "Bach",
-    "PatchCamelyon",
     "PatchEmbeddingDataset",
     "SlideEmbeddingDataset",
+    "PatchCamelyon",
+    "VisionDataset",
 ]
