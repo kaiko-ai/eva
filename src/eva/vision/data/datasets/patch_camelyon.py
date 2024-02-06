@@ -24,7 +24,7 @@ class PatchCamelyon(vision.VisionDataset[Tuple[np.ndarray, np.ndarray]]):
         ("camelyonpatch_level_2_split_train_x.h5", "01844da899645b4d6f84946d417ba453"),
         ("camelyonpatch_level_2_split_train_y.h5", "0781386bf6c2fb62d58ff18891466aca"),
     ]
-    valid_list = [
+    val_list = [
         ("camelyonpatch_level_2_split_valid_x.h5", "81cf9680f1724c40673f10dc88e909b1"),
         ("camelyonpatch_level_2_split_valid_y.h5", "94d8aacc249253159ce2a2e78a86e658"),
     ]
@@ -37,7 +37,7 @@ class PatchCamelyon(vision.VisionDataset[Tuple[np.ndarray, np.ndarray]]):
     def __init__(
         self,
         root: str,
-        split: Literal["train", "valid", "test"],
+        split: Literal["train", "val", "test"],
         download: bool = False,
         image_transforms: Callable | None = None,
         target_transforms: Callable | None = None,
@@ -158,7 +158,8 @@ class PatchCamelyon(vision.VisionDataset[Tuple[np.ndarray, np.ndarray]]):
         Returns:
             The relative file path for the H5 file based on the provided data type and split.
         """
-        filename = f"camelyonpatch_level_2_split_{self._split}_{datatype}.h5"
+        split_name = self._split if self._split != "val" else "valid"
+        filename = f"camelyonpatch_level_2_split_{split_name}_{datatype}.h5"
         return os.path.join(self._root, filename)
 
     @property
@@ -167,12 +168,12 @@ class PatchCamelyon(vision.VisionDataset[Tuple[np.ndarray, np.ndarray]]):
         match self._split:
             case "train":
                 return self.train_list
-            case "valid":
-                return self.valid_list
+            case "val":
+                return self.val_list
             case "test":
                 return self.test_list
             case _:
-                raise ValueError("Invalid data split. Use 'train', 'valid', or 'test'.")
+                raise ValueError("Invalid data split. Use 'train', 'val', or 'test'.")
 
     def _download_dataset(self) -> None:
         """Downloads the PatchCamelyon dataset."""
