@@ -9,7 +9,8 @@ trainer:
 model:
   class_path: eva.HeadModule
   init_args:
-    backbone: torch.nn.Flatten
+    backbone:
+      class_path: torch.nn.Flatten
     head:
       class_path: torch.nn.Linear
       init_args:
