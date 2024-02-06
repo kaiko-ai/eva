@@ -51,6 +51,7 @@ def test_slide_embedding_dataset(slide_level_manifest_path: str, root_dir: str):
         assert isinstance(metadata["mask"], torch.Tensor)
         assert metadata["mask"].shape == (expected_shape[0], 1)
 
+
 @pytest.fixture()
 def patch_level_manifest_path(assets_path: str) -> str:
     """Path to a fake patch level manifest."""
@@ -62,6 +63,8 @@ def slide_level_manifest_path(assets_path: str) -> str:
     """Path to a fake patch level manifest."""
     return os.path.join(assets_path, "vision/manifests/embeddings/slide_level.csv")
 
+
 @pytest.fixture()
 def root_dir(assets_path: str) -> str:
+    """Root directory for the fake embeddings."""
     return os.path.join(assets_path, "vision/datasets/embeddings")

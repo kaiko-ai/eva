@@ -64,7 +64,7 @@ class HeadModule(module.ModelModule[INPUT_BATCH]):
     @override
     def forward(self, tensor: torch.Tensor, *args: Any, **kwargs: Any) -> torch.Tensor:
         features = tensor if self.backbone is None else self.backbone(tensor)
-        return self.head(features.flatten(start_dim=1))
+        return self.head(features)
 
     @override
     def on_fit_start(self) -> None:
@@ -98,7 +98,7 @@ class HeadModule(module.ModelModule[INPUT_BATCH]):
             The batch step output.
         """
         data, targets = batch[0], batch[1]
-        predictions = self(data)
+        predictions = self(data) # TODO: mask
         loss = self.criterion(predictions, targets)
         return {
             "loss": loss,

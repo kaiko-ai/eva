@@ -44,7 +44,7 @@ class SlideEmbeddingDataset(PatchEmbeddingDataset):
             manifest_path: Path to the manifest file. Can be either a .csv or .parquet file, with
                 the required columns: path, target, split, slide_id (names can be adjusted
                 using the column_mapping parameter).
-            root_dir: Root directory of the dataset. If specified, the paths in the manifest
+            root: Root directory of the dataset. If specified, the paths in the manifest
                 file are expected to be relative to this directory.
             split: Dataset split to use.
             column_mapping: Mapping between the standardized column names and the actual
