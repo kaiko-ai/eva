@@ -62,6 +62,12 @@ data:
           root: ${oc.env:TESTS_ROOT, tests/eva}/assets/vision/datasets/embeddings
           manifest_path: ${oc.env:TESTS_ROOT, tests/eva}/assets/vision/manifests/embeddings/patch_level.csv
           split: val
+      test:
+        class_path: eva.vision.data.datasets.embeddings.PatchEmbeddingDataset
+        init_args:
+          root: ${oc.env:TESTS_ROOT, tests/eva}/assets/vision/datasets/embeddings
+          manifest_path: ${oc.env:TESTS_ROOT, tests/eva}/assets/vision/manifests/embeddings/patch_level.csv
+          split: test
     dataloaders:
       train:
         batch_size: &BATCH_SIZE 2

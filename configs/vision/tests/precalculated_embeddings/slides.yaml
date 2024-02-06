@@ -67,6 +67,13 @@ data:
           manifest_path: ${oc.env:TESTS_ROOT, tests/eva}/assets/vision/manifests/embeddings/slide_level.csv
           split: val
           n_patches_per_slide: 10
+      test:
+        class_path: eva.vision.data.datasets.embeddings.SlideEmbeddingDataset
+        init_args:
+          root: ${oc.env:TESTS_ROOT, tests/eva}/assets/vision/datasets/embeddings
+          manifest_path: ${oc.env:TESTS_ROOT, tests/eva}/assets/vision/manifests/embeddings/slide_level.csv
+          split: test
+          n_patches_per_slide: 10
     dataloaders:
       train:
         batch_size: &BATCH_SIZE 2
