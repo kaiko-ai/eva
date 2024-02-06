@@ -8,7 +8,7 @@ from eva.vision.data.datasets.vision import VisionDataset
 __all__ = [
     "Bach",
     "PatchEmbeddingDataset",
-    "SlideEmbeddingDataset",    
+    "SlideEmbeddingDataset",
     "PatchCamelyon",
     "VisionDataset",
 ]
