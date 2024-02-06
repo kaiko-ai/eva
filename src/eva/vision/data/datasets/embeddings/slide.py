@@ -24,7 +24,7 @@ class SlideEmbeddingDataset(PatchEmbeddingDataset):
     def __init__(
         self,
         manifest_path: str,
-        root_dir: str,
+        root: str,
         split: Literal["train", "valid", "test"],
         column_mapping: Dict[str, str] = default_column_mapping,
         n_patches_per_slide: int = 1000,
@@ -54,7 +54,7 @@ class SlideEmbeddingDataset(PatchEmbeddingDataset):
         """
         super().__init__(
             manifest_path=manifest_path,
-            root_dir=root_dir,
+            root=root,
             split=split,
             column_mapping=column_mapping,
         )

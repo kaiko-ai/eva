@@ -23,7 +23,7 @@ class PatchEmbeddingDataset(VisionDataset):
     def __init__(
         self,
         manifest_path: str,
-        root_dir: str,
+        root: str,
         split: Literal["train", "valid", "test"],
         column_mapping: Dict[str, str] = default_column_mapping,
     ):
@@ -36,7 +36,7 @@ class PatchEmbeddingDataset(VisionDataset):
             manifest_path: Path to the manifest file. Can be either a .csv or .parquet file, with
                 the required columns: path, target, split (names can be adjusted using the
                 column_mapping parameter).
-            root_dir: Root directory of the dataset. If specified, the paths in the manifest
+            root: Root directory of the dataset. If specified, the paths in the manifest
                 file are expected to be relative to this directory.
             split: Dataset split to use.
             column_mapping: Mapping between the standardized column names and the actual
@@ -45,7 +45,7 @@ class PatchEmbeddingDataset(VisionDataset):
         super().__init__()
 
         self._manifest_path = manifest_path
-        self._root_dir = root_dir
+        self._root = root
         self._split = split
         self._column_mapping = column_mapping
 
@@ -86,7 +86,7 @@ class PatchEmbeddingDataset(VisionDataset):
         return tensor
 
     def _get_embedding_path(self, index: int) -> str:
-        return os.path.join(self._root_dir, self._data.at[index, self._path_column])
+        return os.path.join(self._root, self._data.at[index, self._path_column])
 
     def _load_manifest(self) -> pd.DataFrame:
         if self._manifest_path.endswith(".csv"):

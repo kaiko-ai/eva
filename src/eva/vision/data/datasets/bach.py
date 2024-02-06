@@ -54,7 +54,7 @@ class Bach(VisionDataset[np.ndarray]):
 
     def __init__(
         self,
-        root_dir: str,
+        root: str,
         split: Literal["train", "val", "test"],
         split_ratios: SplitRatios | None = None,
         download: bool = False,
@@ -62,7 +62,7 @@ class Bach(VisionDataset[np.ndarray]):
         """Initialize dataset.
 
         Args:
-            root_dir: Path to the root directory of the dataset. The dataset will be downloaded
+            root: Path to the root directory of the dataset. The dataset will be downloaded
                 and extracted here, if it does not already exist.
             split: Dataset split to use. If None, the entire dataset is used.
             split_ratios: Ratios for the train, val and test splits.
@@ -72,7 +72,7 @@ class Bach(VisionDataset[np.ndarray]):
         """
         super().__init__()
 
-        self._root_dir = root_dir
+        self._root = root
         self._split = split
         self._download = download
 
@@ -94,11 +94,11 @@ class Bach(VisionDataset[np.ndarray]):
     def prepare_data(self) -> None:
         if self._download:
             self._download_dataset()
-        if not os.path.isdir(os.path.join(self._root_dir, "ICIAR2018_BACH_Challenge")):
+        if not os.path.isdir(os.path.join(self._root, "ICIAR2018_BACH_Challenge")):
             logger.info("Extracting archive ...")
             extract_archive(
-                from_path=os.path.join(self._root_dir, "ICIAR2018_BACH_Challenge.zip"),
-                to_path=self._root_dir,
+                from_path=os.path.join(self._root, "ICIAR2018_BACH_Challenge.zip"),
+                to_path=self._root,
             )
 
     @override
@@ -119,15 +119,15 @@ class Bach(VisionDataset[np.ndarray]):
         return {_class: i for i, _class in enumerate(self.classes)}
 
     def _download_dataset(self) -> None:
-        os.makedirs(self._root_dir, exist_ok=True)
+        os.makedirs(self._root, exist_ok=True)
         for r in self.resources:
-            download_url(r.url, root=self._root_dir, filename=r.filename, md5=r.md5)
+            download_url(r.url, root=self._root, filename=r.filename, md5=r.md5)
 
     def _get_image_path(self, index: int) -> str:
-        return os.path.join(self._root_dir, self._data.at[index, self._path_key])
+        return os.path.join(self._root, self._data.at[index, self._path_key])
 
     def _load_dataset(self) -> pd.DataFrame:
-        df = pd.DataFrame({self._path_key: Path(self._root_dir).glob("**/*.tif")})
+        df = pd.DataFrame({self._path_key: Path(self._root).glob("**/*.tif")})
         df[self._target_key] = df[self._path_key].apply(lambda p: Path(p).parent.name)
 
         if not all(df[self._target_key].isin(self.classes)):
@@ -135,7 +135,7 @@ class Bach(VisionDataset[np.ndarray]):
 
         df[self._target_key] = df[self._target_key].map(self._class_to_idx)  # type: ignore
         df[self._path_key] = df[self._path_key].apply(
-            lambda x: Path(x).relative_to(self._root_dir).as_posix()
+            lambda x: Path(x).relative_to(self._root).as_posix()
         )
 
         return df
