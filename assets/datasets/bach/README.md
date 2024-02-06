@@ -7,16 +7,17 @@ The BACH dataset consists of microscopy and WSI images, of which we use only the
 
 ### Key stats
 
-|                      |                                                         |
-|----------------------|---------------------------------------------------------|
-| **Modality**         | Vision (microscopy images)                             |
-| **Task**             | Multiclass classification (4 classes)                   |
-| **Cancer type**      | Breast                                                  |
+|                      |                                                          |
+|----------------------|----------------------------------------------------------|
+| **Modality**         | Vision (microscopy images)                               |
+| **Task**             | Multiclass classification (4 classes)                    |
+| **Cancer type**      | Breast                                                   |
 | **Data size**        | total: 10.4GB / data in use: 7.37 GB (18.9 MB per image) |
-| **Image dimension**  | 1536 x 2048 x 3                                         |
-| **Files format**     | `.tif` images                                           |
-| **Number of images** | 408 (102 from each class)                               |
-| **Splits in use**    | one labelled split                                      |
+| **Image dimension**  | 1536 x 2048 x 3                                          |
+| **FoV (μm/px)**      | 20x (0.5)                                                |
+| **Files format**     | `.tif` images                                            |
+| **Number of images** | 408 (102 from each class)                                |
+| **Splits in use**    | one labelled split                                       |
 
 
 ### Organization
