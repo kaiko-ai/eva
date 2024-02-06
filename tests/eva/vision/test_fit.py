@@ -1,4 +1,4 @@
-"""Tests regarding the EVA fit command on vision datasets."""
+"""Tests regarding the EVA `fit` CLI command on vision datasets."""
 
 import os
 
@@ -20,7 +20,5 @@ def test_fit_from_configuration(configuration_file: str, lib_path: str) -> None:
             "fit",
             "--config",
             os.path.join(lib_path, configuration_file),
-            "--trainer.fast_dev_run",
-            "True",
         ]
     )
