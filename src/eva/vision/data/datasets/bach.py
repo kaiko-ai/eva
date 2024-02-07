@@ -7,11 +7,11 @@ from typing import Dict, List, Literal, Tuple
 
 import numpy as np
 import pandas as pd
-from typing_extensions import override
 from torchvision.datasets import utils
+from typing_extensions import override
 
-from eva.vision.data.datasets.vision import VisionDataset
 from eva.vision.data.datasets.typings import DownloadResource, SplitRatios
+from eva.vision.data.datasets.vision import VisionDataset
 from eva.vision.file_io import image_io
 
 
