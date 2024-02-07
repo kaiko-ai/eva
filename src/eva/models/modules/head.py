@@ -98,7 +98,7 @@ class HeadModule(module.ModelModule[INPUT_BATCH]):
             The batch step output.
         """
         data, targets = batch[0], batch[1]
-        predictions = self(data)  # TODO: pass mask for models that need it
+        predictions = self(data)
         loss = self.criterion(predictions, targets)
         return {
             "loss": loss,
