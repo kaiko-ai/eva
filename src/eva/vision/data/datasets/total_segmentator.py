@@ -35,7 +35,7 @@ class SplitRatios:
     test: float = 0.2
 
 
-class TotalSegmentator(VisionDataset[np.ndarray]):
+class TotalSegmentatorClassification(VisionDataset[np.ndarray]):
     """TotalSegmentator dataset class.
 
     Create the multilabel classification dataset for the TotalSegmentator data.
@@ -54,7 +54,7 @@ class TotalSegmentator(VisionDataset[np.ndarray]):
 
     def __init__(
         self,
-        root_dir: str,
+        root: str,
         split: Literal["train", "val", "test"],
         split_ratios: SplitRatios | None = None,
         sample_every_n_slice: int = 25,
@@ -63,7 +63,7 @@ class TotalSegmentator(VisionDataset[np.ndarray]):
         """Initialize dataset.
 
         Args:
-            root_dir: Path to the root directory of the dataset. The dataset will be downloaded
+            root: Path to the root directory of the dataset. The dataset will be downloaded
                 and extracted here, if it does not already exist.
             split: Dataset split to use. If None, the entire dataset is used.
             split_ratios: Ratios for the train, val and test splits.
@@ -74,15 +74,15 @@ class TotalSegmentator(VisionDataset[np.ndarray]):
         """
         super().__init__()
 
-        self._root_dir = root_dir
+        self._root = root
         self._split = split
+        self._split_ratios = split_ratios or self.default_split_ratios
+        self._sample_every_n_slice = sample_every_n_slice
         self._download = download
 
         self._data: pd.DataFrame
         self._path_key, self._split_key = "path", "split"
-        self._split_ratios = split_ratios or self.default_split_ratios
-        self._sample_every_n_slice = sample_every_n_slice
-        self._manifest_path = os.path.join(self._root_dir, "manifest.csv")
+        self._manifest_path = os.path.join(self._root, "manifest.csv")
         self._classes = None
 
     @override
@@ -100,11 +100,11 @@ class TotalSegmentator(VisionDataset[np.ndarray]):
     def prepare_data(self) -> None:
         if self._download:
             self._download_dataset()
-        if not os.path.isdir(os.path.join(self._root_dir, "Totalsegmentator_dataset_v201")):
+        if not os.path.isdir(os.path.join(self._root, "Totalsegmentator_dataset_v201")):
             logger.info("Extracting archive ...")
             extract_archive(
-                from_path=os.path.join(self._root_dir, "Totalsegmentator_dataset_v201.zip"),
-                to_path=os.path.join(self._root_dir, "Totalsegmentator_dataset_v201"),
+                from_path=os.path.join(self._root, "Totalsegmentator_dataset_v201.zip"),
+                to_path=os.path.join(self._root, "Totalsegmentator_dataset_v201"),
             )
         self._classes = self._get_classes()
 
@@ -124,13 +124,13 @@ class TotalSegmentator(VisionDataset[np.ndarray]):
         return SplitRatios()
 
     def _download_dataset(self) -> None:
-        os.makedirs(self._root_dir, exist_ok=True)
+        os.makedirs(self._root, exist_ok=True)
         for r in self.resources:
-            download_url(r.url, root=self._root_dir, filename=r.filename, md5=r.md5)
+            download_url(r.url, root=self._root, filename=r.filename, md5=r.md5)
 
     def _get_image_path_and_slice(self, index: int) -> str:
         return (
-            os.path.join(self._root_dir, self._data.at[index, self._path_key]),
+            os.path.join(self._root, self._data.at[index, self._path_key]),
             self._data.at[index, "slice"],
         )
 
@@ -140,7 +140,7 @@ class TotalSegmentator(VisionDataset[np.ndarray]):
             for f in sorted(
                 os.listdir(
                     os.path.join(
-                        self._root_dir, "Totalsegmentator_dataset_v201/s0011/segmentations"
+                        self._root, "Totalsegmentator_dataset_v201/s0011/segmentations"
                     )
                 )
             )
@@ -153,7 +153,7 @@ class TotalSegmentator(VisionDataset[np.ndarray]):
             return pd.read_csv(self._manifest_path)
 
         data_dict = defaultdict(list)
-        for i, path in enumerate(Path(self._root_dir).glob("**/*ct.nii.gz")):
+        for i, path in enumerate(Path(self._root).glob("**/*ct.nii.gz")):
             img_data = image_io.load_nifti_image(path)
             n_slices = img_data.shape[-1]
 
@@ -179,7 +179,7 @@ class TotalSegmentator(VisionDataset[np.ndarray]):
 
     def _save_manifest(self, df: pd.DataFrame) -> None:
         """Saves the dataset manifest to a CSV file."""
-        manifest_path = os.path.join(self._root_dir, "manifest.csv")
+        manifest_path = os.path.join(self._root, "manifest.csv")
         df.to_csv(manifest_path, index=False)
 
     def _generate_ordered_splits(self, df: pd.DataFrame) -> pd.DataFrame:

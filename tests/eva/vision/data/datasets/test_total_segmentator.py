@@ -14,7 +14,7 @@ from eva.vision.data import datasets
     "split",
     ["train", "val", "test"],
 )
-def test_sample(total_segmentator_dataset: datasets.TotalSegmentator) -> None:
+def test_sample(total_segmentator_dataset: datasets.TotalSegmentatorClassification) -> None:
     """Tests the format of a dataset sample."""
     # assert data sample is a tuple
     sample = total_segmentator_dataset[0]
@@ -32,7 +32,7 @@ def test_sample(total_segmentator_dataset: datasets.TotalSegmentator) -> None:
 @pytest.fixture(scope="function")
 def total_segmentator_dataset(
     split: Literal["train", "val", "test"], assets_path: str
-) -> datasets.TotalSegmentator:
+) -> datasets.TotalSegmentatorClassification:
     """TotalSegmentator dataset fixture."""
 
     class SplitRatios:
@@ -40,9 +40,9 @@ def total_segmentator_dataset(
         val: float = 0.33
         test: float = 0.33
 
-    with patch("eva.vision.data.datasets.TotalSegmentator._verify_dataset") as _:
-        ds = datasets.TotalSegmentator(
-            root_dir=os.path.join(assets_path, "vision", "datasets", "total_segmentator"),
+    with patch("eva.vision.data.datasets.TotalSegmentatorClassification._verify_dataset") as _:
+        ds = datasets.TotalSegmentatorClassification(
+            root=os.path.join(assets_path, "vision", "datasets", "total_segmentator"),
             split=split,
             split_ratios=SplitRatios(),
             sample_every_n_slice=1,
