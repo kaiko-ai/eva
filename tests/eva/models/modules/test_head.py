@@ -13,19 +13,12 @@ from eva.data import dataloaders, datamodules, datasets
 from eva.models import modules
 
 
-@pytest.mark.parametrize(
-    "dataset_fixture", ["tuple_classification_dataset", "dict_classification_dataset"]
-)
 def test_head_module_fit(
-    request,
     model: modules.HeadModule,
-    dataloader: dataloaders.DataLoader,
+    datamodule: datamodules.DataModule,
     trainer: trainers.Trainer,
-    dataset_fixture: datasets.Dataset,
 ) -> None:
     """Tests the HeadModule fit call."""
-    dataset = request.getfixturevalue(dataset_fixture)
-    datamodule = create_datamodule(dataset, dataloader)
     initial_head_weights = model.head.weight.clone()
     trainer.fit(model, datamodule=datamodule)
 
@@ -49,7 +42,8 @@ def model(input_shape: Tuple[int, ...] = (3, 8, 8), n_classes: int = 4) -> modul
     )
 
 
-def create_datamodule(
+@pytest.fixture(scope="function")
+def datamodule(
     dataset: datasets.Dataset,
     dataloader: dataloaders.DataLoader,
 ) -> datamodules.DataModule:
@@ -73,18 +67,7 @@ def trainer(max_epochs: int = 1) -> trainers.Trainer:
 
 
 @pytest.fixture(scope="function")
-def dict_classification_dataset(
-    n_samples: int = 4,
-    input_shape: Tuple[int, ...] = (3, 8, 8),
-    target_shape: Tuple[int, ...] = (),
-    n_classes: int = 4,
-) -> datasets.Dataset:
-    """Dummy classification dataset fixture using dicts."""
-    return datasets.FakeDictDataset(n_samples, input_shape, target_shape, n_classes)
-
-
-@pytest.fixture(scope="function")
-def tuple_classification_dataset(
+def dataset(
     n_samples: int = 4,
     input_shape: Tuple[int, ...] = (3, 8, 8),
     target_shape: Tuple[int, ...] = (),

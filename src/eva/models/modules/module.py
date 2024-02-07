@@ -1,6 +1,6 @@
 """Base model module."""
 
-from typing import Any, Generic, Mapping, TypeVar
+from typing import Any, Mapping
 
 import pytorch_lightning as pl
 import torch
@@ -9,13 +9,10 @@ from pytorch_lightning.utilities.types import STEP_OUTPUT
 from typing_extensions import override
 
 from eva.metrics import core as metrics_lib
-from eva.models.modules.typings import TUPLE_INPUT_BATCH
-
-INPUT_BATCH = TypeVar("INPUT_BATCH")
-"""The input batch type."""
+from eva.models.modules.typings import INPUT_BATCH
 
 
-class ModelModule(pl.LightningModule, Generic[INPUT_BATCH]):
+class ModelModule(pl.LightningModule):
     """The base model module."""
 
     def __init__(
@@ -89,14 +86,12 @@ class ModelModule(pl.LightningModule, Generic[INPUT_BATCH]):
     def on_test_epoch_end(self) -> None:
         self._compute_and_log_metrics(self.metrics.test_metrics)
 
-    def _unpack_batch(self, batch: INPUT_BATCH) -> TUPLE_INPUT_BATCH:
+    def _unpack_batch(self, batch: INPUT_BATCH) -> INPUT_BATCH:
         if isinstance(batch, (tuple, list)):
             data, targets = batch[:2]
             metadata = batch[2] if len(batch) == 3 else None
-        elif isinstance(batch, dict):
-            data, targets, metadata = batch["data"], batch.get("targets"), batch.get("metadata")
         else:
-            raise ValueError(f"Unsupported batch type: {type(batch)}")
+            raise ValueError(f"Invalid batch type: {type(batch)}")
 
         return data, targets, metadata  # type: ignore
 

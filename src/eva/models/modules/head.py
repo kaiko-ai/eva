@@ -14,7 +14,7 @@ from eva.models.modules import _utils, module
 from eva.models.modules.typings import INPUT_BATCH, MODEL_TYPE
 
 
-class HeadModule(module.ModelModule[INPUT_BATCH]):
+class HeadModule(module.ModelModule):
     """Neural Net Head Module for training on features.
 
     It can be used for supervised (mini-batch) stochastic gradient descent
