@@ -1,6 +1,5 @@
 """Bach dataset class."""
 
-import dataclasses
 import math
 import os
 from pathlib import Path
@@ -8,30 +7,12 @@ from typing import Dict, List, Literal, Tuple
 
 import numpy as np
 import pandas as pd
-from loguru import logger
-from torchvision.datasets.utils import download_url, extract_archive
 from typing_extensions import override
+from torchvision.datasets import utils
 
 from eva.vision.data.datasets.vision import VisionDataset
+from eva.vision.data.datasets.typings import DownloadResource, SplitRatios
 from eva.vision.file_io import image_io
-
-
-@dataclasses.dataclass(frozen=True)
-class DownloadResource:
-    """Contains download information for a specific resource."""
-
-    filename: str
-    url: str
-    md5: str | None = None
-
-
-@dataclasses.dataclass(frozen=True)
-class SplitRatios:
-    """Contains split ratios for train, val and test."""
-
-    train: float = 0.6
-    val: float = 0.1
-    test: float = 0.3
 
 
 class Bach(VisionDataset[np.ndarray]):
@@ -54,7 +35,7 @@ class Bach(VisionDataset[np.ndarray]):
 
     def __init__(
         self,
-        root_dir: str,
+        root: str,
         split: Literal["train", "val", "test"],
         split_ratios: SplitRatios | None = None,
         download: bool = False,
@@ -72,7 +53,7 @@ class Bach(VisionDataset[np.ndarray]):
         """
         super().__init__()
 
-        self._root_dir = root_dir
+        self._root = root
         self._split = split
         self._download = download
 
@@ -94,12 +75,6 @@ class Bach(VisionDataset[np.ndarray]):
     def prepare_data(self) -> None:
         if self._download:
             self._download_dataset()
-        if not os.path.isdir(os.path.join(self._root_dir, "ICIAR2018_BACH_Challenge")):
-            logger.info("Extracting archive ...")
-            extract_archive(
-                from_path=os.path.join(self._root_dir, "ICIAR2018_BACH_Challenge.zip"),
-                to_path=self._root_dir,
-            )
 
     @override
     def setup(self) -> None:
@@ -119,15 +94,24 @@ class Bach(VisionDataset[np.ndarray]):
         return {_class: i for i, _class in enumerate(self.classes)}
 
     def _download_dataset(self) -> None:
-        os.makedirs(self._root_dir, exist_ok=True)
+        """Downloads the PatchCamelyon dataset."""
         for r in self.resources:
-            download_url(r.url, root=self._root_dir, filename=r.filename, md5=r.md5)
+            file_path = os.path.join(self._root, r.filename)
+            if utils.check_integrity(file_path, r.md5):
+                continue
+
+            utils.download_and_extract_archive(
+                r.url,
+                download_root=self._root,
+                filename=r.filename,
+                remove_finished=True,
+            )
 
     def _get_image_path(self, index: int) -> str:
-        return os.path.join(self._root_dir, self._data.at[index, self._path_key])
+        return os.path.join(self._root, self._data.at[index, self._path_key])
 
     def _load_dataset(self) -> pd.DataFrame:
-        df = pd.DataFrame({self._path_key: Path(self._root_dir).glob("**/*.tif")})
+        df = pd.DataFrame({self._path_key: Path(self._root).glob("**/*.tif")})
         df[self._target_key] = df[self._path_key].apply(lambda p: Path(p).parent.name)
 
         if not all(df[self._target_key].isin(self.classes)):
@@ -135,7 +119,7 @@ class Bach(VisionDataset[np.ndarray]):
 
         df[self._target_key] = df[self._target_key].map(self._class_to_idx)  # type: ignore
         df[self._path_key] = df[self._path_key].apply(
-            lambda x: Path(x).relative_to(self._root_dir).as_posix()
+            lambda x: Path(x).relative_to(self._root).as_posix()
         )
 
         return df
