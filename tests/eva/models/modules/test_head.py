@@ -11,14 +11,20 @@ from torch.utils import data as torch_data
 from eva import metrics, trainers
 from eva.data import dataloaders, datamodules, datasets
 from eva.models import modules
+from eva.models.modules.typings import INPUT_BATCH
 
 
+@pytest.mark.parametrize("dataset_fixture", ["tuple_dataset", "tuple_dataset_with_metadata"])
 def test_head_module_fit(
+    request,
     model: modules.HeadModule,
-    datamodule: datamodules.DataModule,
+    dataloader: dataloaders.DataLoader,
     trainer: trainers.Trainer,
+    dataset_fixture: datasets.Dataset,
 ) -> None:
     """Tests the HeadModule fit call."""
+    dataset = request.getfixturevalue(dataset_fixture)
+    datamodule = create_datamodule(dataset, dataloader)
     initial_head_weights = model.head.weight.clone()
     trainer.fit(model, datamodule=datamodule)
 
@@ -27,6 +33,23 @@ def test_head_module_fit(
     assert trainer.logged_metrics["val/AverageLoss"] > 0
     # verify that head weights were updated
     assert not torch.all(torch.eq(initial_head_weights, model.head.weight))
+
+
+def create_datamodule(
+    dataset: datasets.Dataset,
+    dataloader: dataloaders.DataLoader,
+) -> datamodules.DataModule:
+    """Returns a dummy classification datamodule fixture."""
+    return datamodules.DataModule(
+        datasets=datamodules.DatasetsSchema(
+            train=dataset,
+            val=dataset,
+        ),
+        dataloaders=datamodules.DataloadersSchema(
+            train=dataloader,
+            val=dataloader,
+        ),
+    )
 
 
 @pytest.fixture(scope="function")
@@ -67,7 +90,7 @@ def trainer(max_epochs: int = 1) -> trainers.Trainer:
 
 
 @pytest.fixture(scope="function")
-def dataset(
+def tuple_dataset(
     n_samples: int = 4,
     input_shape: Tuple[int, ...] = (3, 8, 8),
     target_shape: Tuple[int, ...] = (),
@@ -81,7 +104,21 @@ def dataset(
 
 
 @pytest.fixture(scope="function")
-def dataloader(batch_size: int = 1) -> dataloaders.DataLoader:
+def tuple_dataset_with_metadata(
+    n_samples: int = 4,
+    input_shape: Tuple[int, ...] = (3, 8, 8),
+    target_shape: Tuple[int, ...] = (),
+    n_classes: int = 4,
+) -> datasets.Dataset:
+    """Dummy classification dataset fixture using tuples."""
+    return TensorDatasetWithMetdata(
+        torch.randn((n_samples,) + input_shape),
+        torch.randint(n_classes, (n_samples,) + target_shape, dtype=torch.long),
+    )
+
+
+@pytest.fixture(scope="function")
+def dataloader(batch_size: int = 2) -> dataloaders.DataLoader:
     """Test dataloader fixture."""
     return dataloaders.DataLoader(
         batch_size=batch_size,
@@ -90,3 +127,13 @@ def dataloader(batch_size: int = 1) -> dataloaders.DataLoader:
         persistent_workers=False,
         prefetch_factor=None,
     )
+
+
+class TensorDatasetWithMetdata(torch_data.TensorDataset):
+    """Dummy classification dataset returning ."""
+
+    def __getitem__(self, index: int) -> INPUT_BATCH:
+        """Returns the sample and metadata."""
+        data, target = super().__getitem__(index)
+        metadata = {"int_metadata": 0, "str_metadata": "content", "list_metadata": [0, 1, 2]}
+        return data, target, metadata  # type: ignore
