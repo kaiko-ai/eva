@@ -49,19 +49,19 @@ data:
         class_path: eva.vision.data.datasets.embeddings.PatchEmbeddingDataset
         init_args:
           root: ${oc.env:TESTS_ROOT, tests/eva}/assets/vision/datasets/embeddings
-          manifest_path: ${oc.env:TESTS_ROOT, tests/eva}/assets/vision/manifests/embeddings/patch_level.csv
+          manifest_path: ${oc.env:TESTS_ROOT, tests/eva}/assets/vision/manifests/embeddings/patches.csv
           split: train
       val:
         class_path: eva.vision.data.datasets.embeddings.PatchEmbeddingDataset
         init_args:
           root: ${oc.env:TESTS_ROOT, tests/eva}/assets/vision/datasets/embeddings
-          manifest_path: ${oc.env:TESTS_ROOT, tests/eva}/assets/vision/manifests/embeddings/patch_level.csv
+          manifest_path: ${oc.env:TESTS_ROOT, tests/eva}/assets/vision/manifests/embeddings/patches.csv
           split: val
       test:
         class_path: eva.vision.data.datasets.embeddings.PatchEmbeddingDataset
         init_args:
           root: ${oc.env:TESTS_ROOT, tests/eva}/assets/vision/datasets/embeddings
-          manifest_path: ${oc.env:TESTS_ROOT, tests/eva}/assets/vision/manifests/embeddings/patch_level.csv
+          manifest_path: ${oc.env:TESTS_ROOT, tests/eva}/assets/vision/manifests/embeddings/patches.csv
           split: test
     dataloaders:
       train:

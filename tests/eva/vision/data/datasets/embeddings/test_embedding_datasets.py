@@ -9,10 +9,10 @@ import torch
 from eva.vision.data.datasets.embeddings import PatchEmbeddingDataset, SlideEmbeddingDataset
 
 
-def test_patch_embedding_dataset(patch_level_manifest_path: str, root_dir: str):
+def test_patch_embedding_dataset(patches_manifest_path: str, root_dir: str):
     """Test that the patch level dataset has the correct length and item shapes/types."""
     ds = PatchEmbeddingDataset(
-        manifest_path=patch_level_manifest_path,
+        manifest_path=patches_manifest_path,
         root=root_dir,
         split="train",
     )
@@ -28,10 +28,10 @@ def test_patch_embedding_dataset(patch_level_manifest_path: str, root_dir: str):
         assert np.issubdtype(type(target), int)
 
 
-def test_slide_embedding_dataset(slide_level_manifest_path: str, root_dir: str):
+def test_slide_embedding_dataset(slides_manifest_path: str, root_dir: str):
     """Test that the slide level dataset has the correct length and embedding tensor shapes."""
     ds = SlideEmbeddingDataset(
-        manifest_path=slide_level_manifest_path,
+        manifest_path=slides_manifest_path,
         root=root_dir,
         split="train",
         n_patches_per_slide=10,
@@ -53,15 +53,15 @@ def test_slide_embedding_dataset(slide_level_manifest_path: str, root_dir: str):
 
 
 @pytest.fixture()
-def patch_level_manifest_path(assets_path: str) -> str:
+def patches_manifest_path(assets_path: str) -> str:
     """Path to a fake patch level manifest."""
-    return os.path.join(assets_path, "vision/manifests/embeddings/patch_level.csv")
+    return os.path.join(assets_path, "vision/manifests/embeddings/patches.csv")
 
 
 @pytest.fixture()
-def slide_level_manifest_path(assets_path: str) -> str:
+def slides_manifest_path(assets_path: str) -> str:
     """Path to a fake patch level manifest."""
-    return os.path.join(assets_path, "vision/manifests/embeddings/slide_level.csv")
+    return os.path.join(assets_path, "vision/manifests/embeddings/slides.csv")
 
 
 @pytest.fixture()
