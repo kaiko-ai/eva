@@ -31,12 +31,12 @@ def test_masked_abmil(
     )
 
     n_masked = int(n_instances * masked_fraction)
+    pad_value = float("-inf")
 
     x = torch.randn(batch_size, n_instances, input_size)
-    mask = torch.zeros(batch_size, n_instances, 1).bool()
-    mask[:, n_masked:, :] = True
+    x[:, n_masked:, :] = pad_value
 
-    y = model(x[:, :n_masked, :], mask=None)
-    y_masked = model(x, mask=mask)
+    y = model(x[:, :n_masked, :])
+    y_masked = model(x, pad_value=pad_value)
 
     assert torch.allclose(y, y_masked, atol=1e-6)
