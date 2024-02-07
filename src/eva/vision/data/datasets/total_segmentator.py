@@ -89,7 +89,6 @@ class TotalSegmentatorClassification(VisionDataset[np.ndarray]):
                 to_path=os.path.join(self._root, "Totalsegmentator_dataset_v201"),
             )
         self._classes = self._get_classes()
-
         df = self._load_dataset()
         df = self._generate_ordered_splits(df)
         self._verify_dataset(df)
@@ -99,7 +98,6 @@ class TotalSegmentatorClassification(VisionDataset[np.ndarray]):
     @override
     def setup(self) -> None:
         df = self._get_manifest()
-
         self._data = df.loc[df[self._split_key] == self._split].reset_index(drop=True)
 
     @property
