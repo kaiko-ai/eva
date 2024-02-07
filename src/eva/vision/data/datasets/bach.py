@@ -43,7 +43,7 @@ class Bach(VisionDataset[np.ndarray]):
         """Initialize dataset.
 
         Args:
-            root_dir: Path to the root directory of the dataset. The dataset will be downloaded
+            root: Path to the root directory of the dataset. The dataset will be downloaded
                 and extracted here, if it does not already exist.
             split: Dataset split to use. If None, the entire dataset is used.
             split_ratios: Ratios for the train, val and test splits.
