@@ -1,6 +1,5 @@
 """TotalSegmentator dataset class."""
 
-import dataclasses
 import math
 import os
 from collections import defaultdict
@@ -13,26 +12,9 @@ from loguru import logger
 from torchvision.datasets.utils import download_url, extract_archive
 from typing_extensions import override
 
+from eva.vision.data.datasets.typings import DownloadResource, SplitRatios
 from eva.vision.data.datasets.vision import VisionDataset
 from eva.vision.file_io import image_io
-
-
-@dataclasses.dataclass(frozen=True)
-class DownloadResource:
-    """Contains download information for a specific resource."""
-
-    filename: str
-    url: str
-    md5: str | None = None
-
-
-@dataclasses.dataclass(frozen=True)
-class SplitRatios:
-    """Contains split ratios for train, val and test."""
-
-    train: float = 0.6
-    val: float = 0.2
-    test: float = 0.2
 
 
 class TotalSegmentatorClassification(VisionDataset[np.ndarray]):
@@ -108,20 +90,22 @@ class TotalSegmentatorClassification(VisionDataset[np.ndarray]):
             )
         self._classes = self._get_classes()
 
-    @override
-    def setup(self) -> None:
         df = self._load_dataset()
-        if not os.path.isfile(self._manifest_path):
-            self._save_manifest(df)
         df = self._generate_ordered_splits(df)
         self._verify_dataset(df)
+        if not os.path.isfile(self._manifest_path):
+            self._save_manifest(df)
+
+    @override
+    def setup(self) -> None:
+        df = self._get_manifest()
 
         self._data = df.loc[df[self._split_key] == self._split].reset_index(drop=True)
 
     @property
     def default_split_ratios(self) -> SplitRatios:
         """Returns the default split ratios."""
-        return SplitRatios()
+        return SplitRatios(train=0.6, val=0.2, test=0.2)
 
     def _download_dataset(self) -> None:
         os.makedirs(self._root, exist_ok=True)
@@ -139,9 +123,7 @@ class TotalSegmentatorClassification(VisionDataset[np.ndarray]):
             f.split(".")[0]
             for f in sorted(
                 os.listdir(
-                    os.path.join(
-                        self._root, "Totalsegmentator_dataset_v201/s0011/segmentations"
-                    )
+                    os.path.join(self._root, "Totalsegmentator_dataset_v201/s0011/segmentations")
                 )
             )
         ]
@@ -181,6 +163,11 @@ class TotalSegmentatorClassification(VisionDataset[np.ndarray]):
         """Saves the dataset manifest to a CSV file."""
         manifest_path = os.path.join(self._root, "manifest.csv")
         df.to_csv(manifest_path, index=False)
+
+    def _get_manifest(self) -> pd.DataFrame:
+        """Loads the dataset manifest from a CSV file."""
+        manifest_path = os.path.join(self._root, "manifest.csv")
+        return pd.read_csv(manifest_path)
 
     def _generate_ordered_splits(self, df: pd.DataFrame) -> pd.DataFrame:
         """Orders each class by path and then splits it into train, val and test sets."""
