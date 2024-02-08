@@ -21,7 +21,6 @@ def test_sample(total_segmentator_dataset: datasets.TotalSegmentatorClassificati
     sample = total_segmentator_dataset[0]
     assert isinstance(sample, tuple)
     assert len(sample) == 2
-
     # assert the format of the `image` and `target`
     image, target = sample
     assert isinstance(image, np.ndarray)
@@ -32,16 +31,17 @@ def test_sample(total_segmentator_dataset: datasets.TotalSegmentatorClassificati
 
 @pytest.fixture(scope="function")
 def total_segmentator_dataset(
-    split: Literal["train", "val", "test"], assets_path: str
+    split: Literal["train", "val", "test"],
+    assets_path: str,
 ) -> datasets.TotalSegmentatorClassification:
     """TotalSegmentator dataset fixture."""
     with patch("eva.vision.data.datasets.TotalSegmentatorClassification._verify_dataset") as _:
-        ds = datasets.TotalSegmentatorClassification(
+        dataset = datasets.TotalSegmentatorClassification(
             root=os.path.join(assets_path, "vision", "datasets", "total_segmentator"),
             split=split,
             split_ratios=SplitRatios(train=0.33, val=0.33, test=0.33),
-            sample_every_n_slice=1,
+            sample_every_n_slices=1,
         )
-        ds.prepare_data()
-        ds.setup()
-        return ds
+        dataset.prepare_data()
+        dataset.setup()
+        return dataset
