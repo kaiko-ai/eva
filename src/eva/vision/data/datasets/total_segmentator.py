@@ -20,7 +20,7 @@ from eva.vision.utils import io
 class TotalSegmentatorClassification(VisionDataset[np.ndarray]):
     """TotalSegmentator dataset class.
 
-    Create the multilabel classification dataset for the TotalSegmentator data.
+    Create the multi-label classification dataset for the TotalSegmentator data.
     """
 
     resources: List[DownloadResource] = [
