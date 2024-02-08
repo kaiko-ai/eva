@@ -93,7 +93,7 @@ class HeadModule(module.ModelModule):
         Returns:
             The batch step output.
         """
-        data, targets, metadata = self._unpack_batch(batch)
+        data, targets, metadata = INPUT_BATCH(*batch)
         predictions = self(data)
         loss = self.criterion(predictions, targets)
         return {"loss": loss, "targets": targets, "predictions": predictions, "metadata": metadata}
