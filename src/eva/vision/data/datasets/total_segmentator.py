@@ -73,8 +73,8 @@ class TotalSegmentatorClassification(VisionDataset[np.ndarray]):
 
     @override
     def __getitem__(self, index: int) -> Tuple[np.ndarray, np.ndarray]:
-        image_path, slice_ = self._get_image_path_and_channel(index)
-        image = io.read_nifti(image_path, slice_)
+        image_path, channel = self._get_image_path_and_channel(index)
+        image = io.read_nifti(image_path, channel)
         targets = np.asarray(self._data[self._classes].loc[index], dtype=np.int64)
         return image, targets
 
