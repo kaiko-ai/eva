@@ -27,6 +27,7 @@ class ResizeAndNormalize(torch_transforms.Compose):
         self._size = size
         self._mean = mean
         self._std = std
+
         super().__init__(transforms=self._build_transforms())
 
     def _build_transforms(self) -> Sequence[Callable]:
