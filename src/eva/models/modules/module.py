@@ -169,6 +169,7 @@ class ModelModule(pl.LightningModule):
         additional_metric_inputs = {
             "preds": outputs.get("predictions"),
             "target": outputs.get("targets"),
+            "metadata": outputs.get("metadata"),
             "dataloader_idx": dataloader_idx,
         }
         return {**additional_metric_inputs, **outputs}
