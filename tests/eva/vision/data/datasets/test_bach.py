@@ -42,7 +42,7 @@ def bach_dataset(split: Literal["train", "val", "test"], assets_path: str) -> da
     """BACH dataset fixture."""
     with patch("eva.vision.data.datasets.Bach._verify_dataset") as _:
         ds = datasets.Bach(
-            root_dir=os.path.join(assets_path, "vision", "datasets", "bach"),
+            root=os.path.join(assets_path, "vision", "datasets", "bach"),
             split=split,
         )
         ds.setup()
