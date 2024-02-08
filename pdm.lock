@@ -5,7 +5,7 @@
 groups = ["default", "all", "dev", "lint", "test", "vision"]
 strategy = ["cross_platform", "inherit_metadata"]
 lock_version = "4.4.1"
-content_hash = "sha256:5b564d01eda4645c24ed59cf80b74a0475e8a6cbc3db4f7f3c8020af27d92202"
+content_hash = "sha256:722af207a6b85ecc053b59adbc1411958e535225c81622c6c0f3d12ad29cc211"
 
 [[package]]
 name = "aiohttp"
@@ -959,6 +959,21 @@ groups = ["all", "default", "dev", "vision"]
 files = [
     {file = "networkx-3.2.1-py3-none-any.whl", hash = "sha256:f18c69adc97877c42332c170849c96cefa91881c99a7cb3e95b7c659ebdc1ec2"},
     {file = "networkx-3.2.1.tar.gz", hash = "sha256:9f1bb5cf3409bf324e0a722c20bdb4c20ee39bf1c30ce8ae499c8502b0b5e0c6"},
+]
+
+[[package]]
+name = "nibabel"
+version = "5.2.0"
+requires_python = ">=3.8"
+summary = "Access a multitude of neuroimaging data formats"
+groups = ["all", "default", "dev"]
+dependencies = [
+    "numpy>=1.20",
+    "packaging>=17",
+]
+files = [
+    {file = "nibabel-5.2.0-py3-none-any.whl", hash = "sha256:77724af6e29fd9c4173702e4d031e7d8c45b5963887905a0f90edab880381b7f"},
+    {file = "nibabel-5.2.0.tar.gz", hash = "sha256:3df8f1ab981d1bd92f4331d565528d126ab9717fdbd4cfe68f43fcd1c2bf3f52"},
 ]
 
 [[package]]
