@@ -156,9 +156,9 @@ class TotalSegmentatorClassification(VisionDataset[np.ndarray]):
                     label = int(masks[cl][:, :, i].max())
                     data_dict[cl].append(label)
 
-            df = pd.DataFrame(data_dict)  # type: ignore
+            df = pd.DataFrame(data_dict)
 
-        return df
+        return df  # type: ignore
 
     def _save_manifest(self, df: pd.DataFrame) -> None:
         """Saves the dataset manifest to a CSV file."""
