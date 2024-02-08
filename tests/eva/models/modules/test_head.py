@@ -13,6 +13,13 @@ from eva.data import dataloaders, datamodules, datasets
 from eva.models import modules
 
 
+@pytest.mark.parametrize(
+    "dataset_fixture",
+    [
+        "classification_dataset",
+        "classification_dataset_with_metadata",
+    ],
+)
 def test_head_module_fit(
     model: modules.HeadModule,
     datamodule: datamodules.DataModule,
@@ -43,14 +50,16 @@ def model(input_shape: Tuple[int, ...] = (3, 8, 8), n_classes: int = 4) -> modul
 
 @pytest.fixture(scope="function")
 def datamodule(
-    classification_dataset: datasets.Dataset,
+    request: pytest.FixtureRequest,
+    dataset_fixture: str,
     dataloader: dataloaders.DataLoader,
 ) -> datamodules.DataModule:
     """Returns a dummy classification datamodule fixture."""
+    dataset = request.getfixturevalue(dataset_fixture)
     return datamodules.DataModule(
         datasets=datamodules.DatasetsSchema(
-            train=classification_dataset,
-            val=classification_dataset,
+            train=dataset,
+            val=dataset,
         ),
         dataloaders=datamodules.DataloadersSchema(
             train=dataloader,
@@ -80,7 +89,22 @@ def classification_dataset(
 
 
 @pytest.fixture(scope="function")
-def dataloader(batch_size: int = 1) -> dataloaders.DataLoader:
+def classification_dataset_with_metadata(
+    n_samples: int = 4,
+    input_shape: Tuple[int, ...] = (3, 8, 8),
+    target_shape: Tuple[int, ...] = (),
+    n_classes: int = 4,
+) -> datasets.Dataset:
+    """Dummy classification dataset fixture with metadata."""
+    return torch_data.TensorDataset(
+        torch.randn((n_samples,) + input_shape),
+        torch.randint(n_classes, (n_samples,) + target_shape, dtype=torch.long),
+        torch.randint(2, (n_samples,) + target_shape, dtype=torch.long),
+    )
+
+
+@pytest.fixture(scope="function")
+def dataloader(batch_size: int = 2) -> dataloaders.DataLoader:
     """Test dataloader fixture."""
     return dataloaders.DataLoader(
         batch_size=batch_size,
