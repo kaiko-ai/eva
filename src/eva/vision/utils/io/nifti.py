@@ -7,12 +7,12 @@ import numpy.typing as npt
 from eva.vision.utils.io import _utils
 
 
-def read_nifti(path: str, channel: int | None = None) -> npt.NDArray[np.uint8]:
+def read_nifti(path: str, ct_slice: int | None = None) -> npt.NDArray[np.uint8]:
     """Reads a NIfTI image from a file path.
 
     Args:
         path: The path to the NIfTI file.
-        channel: Whether to return a specific image channel (slice).
+        ct_slice: Whether to return a specific CT slice.
 
     Returns:
         The image as a numpy array.
@@ -24,8 +24,8 @@ def read_nifti(path: str, channel: int | None = None) -> npt.NDArray[np.uint8]:
     _utils.check_file(path)
     image = nib.load(path).get_fdata()  # type: ignore
     image_array = np.asarray(image).astype(np.uint8)
-    if channel is not None:
-        if 0 < channel or channel > image_array.shape[2]:
-            raise ValueError("Invalid channel index.")
-        image_array = image_array[:, :, channel]
+    if ct_slice is not None:
+        if 0 < ct_slice or ct_slice > image_array.shape[2]:
+            raise ValueError("Invalid CT slice index.")
+        image_array = image_array[:, :, ct_slice]
     return image_array

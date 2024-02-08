@@ -40,7 +40,7 @@ def total_segmentator_dataset(
             root=os.path.join(assets_path, "vision", "datasets", "total_segmentator"),
             split=split,
             split_ratios=SplitRatios(train=0.33, val=0.33, test=0.33),
-            sample_every_n_channel=1,
+            sample_every_n_slices=1,
         )
         dataset.prepare_data()
         dataset.setup()

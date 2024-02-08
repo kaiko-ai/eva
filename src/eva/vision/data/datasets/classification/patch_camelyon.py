@@ -1,7 +1,7 @@
 """PatchCamelyon dataset."""
 
 import os
-from typing import Callable, Dict, List, Literal, Tuple
+from typing import Callable, Literal
 
 import h5py
 import numpy as np
@@ -13,12 +13,6 @@ from eva.vision.data.datasets.classification import base
 
 class PatchCamelyon(base.ImageClassification):
     """Dataset class for PatchCamelyon images and corresponding targets."""
-
-    column_mapping: Dict[str, Literal["x", "y"]] = {
-        "data": "x",
-        "targets": "y",
-    }
-    """The column mapping of the variables to the H5 columns."""
 
     train_list = [
         ("camelyonpatch_level_2_split_train_x.h5", "01844da899645b4d6f84946d417ba453"),
@@ -56,7 +50,10 @@ class PatchCamelyon(base.ImageClassification):
             target_transforms: A function/transform that takes in the target
                 and transforms it.
         """
-        super().__init__(image_transforms=image_transforms, target_transforms=target_transforms)
+        super().__init__(
+            image_transforms=image_transforms,
+            target_transforms=target_transforms,
+        )
 
         self._root = root
         self._split = split
@@ -71,42 +68,68 @@ class PatchCamelyon(base.ImageClassification):
 
     @override
     def load_image(self, index: int) -> np.ndarray:
-        return self._load_from_h5("data", index)
+        return self._load_from_h5("x", index)
 
     @override
     def load_target(self, index: int) -> np.ndarray:
-        target = self._load_from_h5("targets", index).squeeze()
+        target = self._load_from_h5("y", index).squeeze()
         return np.asarray(target, dtype=np.int64)
 
     @override
     def __len__(self) -> int:
         return self._fetch_dataset_length()
 
-    def _fetch_dataset_length(self) -> int:
-        """Fetches the dataset split length from its HDF5 file."""
-        h5_file = self._h5_file(self.column_mapping["targets"])
-        with h5py.File(h5_file, "r") as file:
-            data = file[self.column_mapping["targets"]]
-            return len(data)  # type: ignore
+    def _download_dataset(self) -> None:
+        """Downloads the PatchCamelyon dataset."""
 
-    def _load_from_h5(
-        self, datatype: Literal["data", "targets"], index: int | None = None
-    ) -> np.ndarray:
+        def filename_to_url(filename: str) -> str:
+            """Convert a filename to its corresponding download URL."""
+            return f"https://zenodo.org/records/2546921/files/{filename}.gz?download=1"
+
+        download_files = {
+            "train": self.train_list,
+            "valid": self.valid_list,
+            "test": self.test_list,
+        }
+        download_list = download_files.get(self._split)
+        if download_list is None:
+            raise ValueError("Invalid data split. Use 'train', 'valid', or 'test'.")
+
+        for filename, md5 in download_list:
+            file_path = os.path.join(self._root, filename)
+            if utils.check_integrity(file_path, md5):
+                continue
+
+            url = filename_to_url(filename)
+            utils.download_and_extract_archive(
+                url,
+                download_root=self._root,
+                filename=filename + ".gz",
+                remove_finished=True,
+            )
+
+    def _load_from_h5(self, data_key: Literal["x", "y"], index: int | None = None) -> np.ndarray:
         """Load data or targets from an HDF5 file.
 
         Args:
-            datatype: Specify whether to load 'data' or 'targets'.
+            data_key: Specify whether to load 'x' or 'y'.
             index: Optional parameter to load data/targets at a specific index.
                 If `None`, the entire data/targets array is returned.
 
         Returns:
             A array containing the specified data.
         """
-        data_key = self.column_mapping[datatype]
         h5_file = self._h5_file(data_key)
         with h5py.File(h5_file, "r") as file:
             data = file[data_key]
             return data[:] if index is None else data[index]  # type: ignore
+
+    def _fetch_dataset_length(self) -> int:
+        """Fetches the dataset split length from its HDF5 file."""
+        h5_file = self._h5_file("y")
+        with h5py.File(h5_file, "r") as file:
+            data = file["y"]
+            return len(data)  # type: ignore
 
     def _h5_file(self, datatype: Literal["x", "y"]) -> str:
         """Generates the filename for the H5 file based on the specified data type and split.
@@ -120,36 +143,3 @@ class PatchCamelyon(base.ImageClassification):
         """
         filename = f"camelyonpatch_level_2_split_{self._split}_{datatype}.h5"
         return os.path.join(self._root, filename)
-
-    @property
-    def _download_list(self) -> List[Tuple[str, str]]:
-        """Returns the appropriate download list based on the current data split."""
-        match self._split:
-            case "train":
-                return self.train_list
-            case "valid":
-                return self.valid_list
-            case "test":
-                return self.test_list
-            case _:
-                raise ValueError("Invalid data split. Use 'train', 'val', or 'test'.")
-
-    def _download_dataset(self) -> None:
-        """Downloads the PatchCamelyon dataset."""
-        for filename, md5 in self._download_list:
-            file_path = os.path.join(self._root, filename)
-            if utils.check_integrity(file_path, md5):
-                continue
-
-            url = self._filename_to_url(filename)
-            utils.download_and_extract_archive(
-                url,
-                download_root=self._root,
-                filename=filename + ".gz",
-                remove_finished=True,
-            )
-
-    @staticmethod
-    def _filename_to_url(filename: str) -> str:
-        """Convert a filename to its corresponding download URL."""
-        return f"https://zenodo.org/records/2546921/files/{filename}.gz?download=1"
