@@ -12,7 +12,7 @@ from typing_extensions import override
 
 from eva.vision.data.datasets.typings import DownloadResource, SplitRatios
 from eva.vision.data.datasets.vision import VisionDataset
-from eva.vision.file_io import image_io
+from eva.vision.utils import io
 
 
 class Bach(VisionDataset[np.ndarray]):
@@ -67,7 +67,7 @@ class Bach(VisionDataset[np.ndarray]):
 
     @override
     def __getitem__(self, index: int) -> Tuple[np.ndarray, np.ndarray]:
-        image = image_io.load_image(self._get_image_path(index))
+        image = io.read_image(self._get_image_path(index))
         target = np.asarray(self._data.at[index, self._target_key], dtype=np.int64)
         return image, target
 
