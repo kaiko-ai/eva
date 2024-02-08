@@ -39,27 +39,29 @@ class TotalSegmentatorClassification(VisionDataset[np.ndarray]):
         root: str,
         split: Literal["train", "val", "test"],
         split_ratios: SplitRatios | None = None,
-        sample_every_n_slice: int = 25,
+        sample_every_n_channel: int = 25,
         download: bool = False,
     ):
         """Initialize dataset.
 
         Args:
-            root: Path to the root directory of the dataset. The dataset will be downloaded
-                and extracted here, if it does not already exist.
+            root: Path to the root directory of the dataset. The dataset will
+                be downloaded and extracted here, if it does not already exist.
             split: Dataset split to use. If None, the entire dataset is used.
             split_ratios: Ratios for the train, val and test splits.
-            sample_every_n_slice: Number of slices to skip when sampling slices from the 3D images.
+            sample_every_n_channel: Number of slices to skip when sampling slices
+                from the 3D images.
             download: Whether to download the data for the specified split.
                 Note that the download will be executed only by additionally
-                calling the :meth:`prepare_data` method and if the data does not exist yet on disk.
+                calling the :meth:`prepare_data` method and if the data does not
+                exist yet on disk.
         """
         super().__init__()
 
         self._root = root
         self._split = split
         self._split_ratios = split_ratios or self.default_split_ratios
-        self._sample_every_n_slice = sample_every_n_slice
+        self._sample_every_n_channel = sample_every_n_channel
         self._download = download
 
         self._data: pd.DataFrame
@@ -148,8 +150,8 @@ class TotalSegmentatorClassification(VisionDataset[np.ndarray]):
 
             # sample slices and extract label for each class:
             np.random.seed(i)
-            start_slice = np.random.choice(min(self._sample_every_n_slice, n_slices))
-            for i in range(start_slice, n_slices, self._sample_every_n_slice):
+            start_slice = np.random.choice(min(self._sample_every_n_channel, n_slices))
+            for i in range(start_slice, n_slices, self._sample_every_n_channel):
                 data_dict["path"].append(path)
                 data_dict["slice"].append(i)
                 for cl in self._classes:
