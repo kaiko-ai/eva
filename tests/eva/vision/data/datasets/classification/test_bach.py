@@ -41,9 +41,10 @@ def test_sample(bach_dataset: datasets.Bach) -> None:
 def bach_dataset(split: Literal["train", "val", "test"], assets_path: str) -> datasets.Bach:
     """BACH dataset fixture."""
     with patch("eva.vision.data.datasets.Bach._verify_dataset") as _:
-        ds = datasets.Bach(
+        dataset = datasets.Bach(
             root=os.path.join(assets_path, "vision", "datasets", "bach"),
             split=split,
         )
-        ds.setup()
-        return ds
+        dataset.setup()
+        dataset.setup()
+        return dataset

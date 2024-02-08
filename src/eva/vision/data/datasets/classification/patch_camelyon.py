@@ -8,10 +8,10 @@ import numpy as np
 from torchvision.datasets import utils
 from typing_extensions import override
 
-from eva.vision.data.datasets import vision
+from eva.vision.data.datasets.classification import base
 
 
-class PatchCamelyon(vision.VisionDataset[Tuple[np.ndarray, np.ndarray]]):
+class PatchCamelyon(base.ImageClassification):
     """Dataset class for PatchCamelyon images and corresponding targets."""
 
     column_mapping: Dict[str, Literal["x", "y"]] = {
@@ -24,7 +24,7 @@ class PatchCamelyon(vision.VisionDataset[Tuple[np.ndarray, np.ndarray]]):
         ("camelyonpatch_level_2_split_train_x.h5", "01844da899645b4d6f84946d417ba453"),
         ("camelyonpatch_level_2_split_train_y.h5", "0781386bf6c2fb62d58ff18891466aca"),
     ]
-    val_list = [
+    valid_list = [
         ("camelyonpatch_level_2_split_valid_x.h5", "81cf9680f1724c40673f10dc88e909b1"),
         ("camelyonpatch_level_2_split_valid_y.h5", "94d8aacc249253159ce2a2e78a86e658"),
     ]
@@ -37,7 +37,7 @@ class PatchCamelyon(vision.VisionDataset[Tuple[np.ndarray, np.ndarray]]):
     def __init__(
         self,
         root: str,
-        split: Literal["train", "val", "test"],
+        split: Literal["train", "valid", "test"],
         download: bool = False,
         image_transforms: Callable | None = None,
         target_transforms: Callable | None = None,
@@ -56,7 +56,7 @@ class PatchCamelyon(vision.VisionDataset[Tuple[np.ndarray, np.ndarray]]):
             target_transforms: A function/transform that takes in the target
                 and transforms it.
         """
-        super().__init__()
+        super().__init__(image_transforms=image_transforms, target_transforms=target_transforms)
 
         self._root = root
         self._split = split
@@ -70,57 +70,17 @@ class PatchCamelyon(vision.VisionDataset[Tuple[np.ndarray, np.ndarray]]):
             self._download_dataset()
 
     @override
-    def __getitem__(self, index: int) -> Tuple[np.ndarray, np.ndarray]:
-        image = self._load_image(index)
-        target = self._load_target(index)
-        return self._apply_transforms(image, target)
+    def load_image(self, index: int) -> np.ndarray:
+        return self._load_from_h5("data", index)
+
+    @override
+    def load_target(self, index: int) -> np.ndarray:
+        target = self._load_from_h5("targets", index).squeeze()
+        return np.asarray(target, dtype=np.int64)
 
     @override
     def __len__(self) -> int:
         return self._fetch_dataset_length()
-
-    def _load_image(self, index: int) -> np.ndarray:
-        """Returns the `index`'th image sample.
-
-        Args:
-            index: The index of the data-sample to load.
-
-        Returns:
-            The image as a numpy array.
-        """
-        return self._load_from_h5("data", index)
-
-    def _load_target(self, index: int) -> np.ndarray:
-        """Returns the `index`'th target sample.
-
-        Args:
-            index: The index of the data-sample to load.
-
-        Returns:
-            The sample target.
-        """
-        target = self._load_from_h5("targets", index).squeeze()
-        return np.asarray(target, dtype=np.int64)
-
-    def _apply_transforms(
-        self, image: np.ndarray, target: np.ndarray
-    ) -> Tuple[np.ndarray, np.ndarray]:
-        """Applies the transforms to the provided data and returns them.
-
-        Args:
-            image: The desired image.
-            target: The target of the image.
-
-        Returns:
-            A tuple with the image and the target transformed.
-        """
-        if self._image_transforms is not None:
-            image = self._image_transforms(image)
-
-        if self._target_transforms is not None:
-            target = self._target_transforms(target)
-
-        return image, target
 
     def _fetch_dataset_length(self) -> int:
         """Fetches the dataset split length from its HDF5 file."""
@@ -158,8 +118,7 @@ class PatchCamelyon(vision.VisionDataset[Tuple[np.ndarray, np.ndarray]]):
         Returns:
             The relative file path for the H5 file based on the provided data type and split.
         """
-        split_name = self._split if self._split != "val" else "valid"
-        filename = f"camelyonpatch_level_2_split_{split_name}_{datatype}.h5"
+        filename = f"camelyonpatch_level_2_split_{self._split}_{datatype}.h5"
         return os.path.join(self._root, filename)
 
     @property
@@ -168,8 +127,8 @@ class PatchCamelyon(vision.VisionDataset[Tuple[np.ndarray, np.ndarray]]):
         match self._split:
             case "train":
                 return self.train_list
-            case "val":
-                return self.val_list
+            case "valid":
+                return self.valid_list
             case "test":
                 return self.test_list
             case _:

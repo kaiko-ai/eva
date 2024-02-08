@@ -74,7 +74,7 @@ data:
         class_path: eva.vision.datasets.PatchCamelyon
         init_args:
           root: ${oc.env:DATA_ROOT, ./data}/patch_camelyon
-          split: val
+          split: valid
           download: *DOWNLOAD_DATA
           image_transforms:
             class_path: eva.vision.data.transforms.common.ResizeAndCrop

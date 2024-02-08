@@ -9,4 +9,8 @@ from eva.cli import _logo
 def cli() -> object:
     """Main CLI factory."""
     _logo.print_cli_logo()
-    return jsonargparse.CLI(interface.Interface, parser_mode="omegaconf", fail_untyped=False)
+    return jsonargparse.CLI(
+        interface.Interface,
+        parser_mode="omegaconf",
+        fail_untyped=False,
+    )

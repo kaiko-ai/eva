@@ -3,19 +3,19 @@
 import math
 import os
 from pathlib import Path
-from typing import Dict, List, Literal, Tuple
+from typing import Callable, Dict, List, Literal
 
 import numpy as np
 import pandas as pd
 from torchvision.datasets import utils
 from typing_extensions import override
 
+from eva.vision.data.datasets.classification import base
 from eva.vision.data.datasets.typings import DownloadResource, SplitRatios
-from eva.vision.data.datasets.vision import VisionDataset
 from eva.vision.utils import io
 
 
-class Bach(VisionDataset[np.ndarray]):
+class Bach(base.ImageClassification):
     """Bach dataset class."""
 
     classes: List[str] = [
@@ -39,6 +39,8 @@ class Bach(VisionDataset[np.ndarray]):
         split: Literal["train", "val", "test"],
         split_ratios: SplitRatios | None = None,
         download: bool = False,
+        image_transforms: Callable | None = None,
+        target_transforms: Callable | None = None,
     ):
         """Initialize dataset.
 
@@ -50,8 +52,12 @@ class Bach(VisionDataset[np.ndarray]):
             download: Whether to download the data for the specified split.
                 Note that the download will be executed only by additionally
                 calling the :meth:`prepare_data` method and if the data does not exist yet on disk.
+            image_transforms: A function/transform that takes in an image
+                and returns a transformed version.
+            target_transforms: A function/transform that takes in the target
+                and transforms it.
         """
-        super().__init__()
+        super().__init__(image_transforms=image_transforms, target_transforms=target_transforms)
 
         self._root = root
         self._split = split
@@ -62,14 +68,18 @@ class Bach(VisionDataset[np.ndarray]):
         self._split_ratios = split_ratios or self.default_split_ratios
 
     @override
-    def __len__(self) -> int:
-        return len(self._data)
+    def load_image(self, index: int) -> np.ndarray:
+        filename = self._get_image_path(index)
+        return io.read_image(filename)
 
     @override
-    def __getitem__(self, index: int) -> Tuple[np.ndarray, np.ndarray]:
-        image = io.read_image(self._get_image_path(index))
-        target = np.asarray(self._data.at[index, self._target_key], dtype=np.int64)
-        return image, target
+    def load_target(self, index: int) -> np.ndarray:
+        target = self._data.at[index, self._target_key]
+        return np.asarray(target, dtype=np.int64)
+
+    @override
+    def __len__(self) -> int:
+        return len(self._data)
 
     @override
     def prepare_data(self) -> None:
