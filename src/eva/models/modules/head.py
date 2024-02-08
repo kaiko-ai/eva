@@ -96,4 +96,9 @@ class HeadModule(module.ModelModule):
         data, targets, metadata = INPUT_BATCH(*batch)
         predictions = self(data)
         loss = self.criterion(predictions, targets)
-        return {"loss": loss, "targets": targets, "predictions": predictions, "metadata": metadata}
+        return {
+            "loss": loss,
+            "targets": targets,
+            "predictions": predictions,
+            "metadata": metadata,
+        }
