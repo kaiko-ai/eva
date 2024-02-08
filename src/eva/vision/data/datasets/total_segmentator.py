@@ -156,7 +156,7 @@ class TotalSegmentatorClassification(VisionDataset[np.ndarray]):
                     label = int(masks[cl][:, :, i].max())
                     data_dict[cl].append(label)
 
-            df = pd.DataFrame(data_dict)
+            df = pd.DataFrame(data_dict)  # pyright: ignore
 
         return df
 
