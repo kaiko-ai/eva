@@ -1,6 +1,7 @@
 """Image IO utils."""
 
 import os
+from pathlib import Path
 
 import cv2
 import nibabel as nib
@@ -49,7 +50,7 @@ def load_image(path: str, as_rgb: bool = True) -> npt.NDArray[np.uint8]:
     return np.asarray(image).astype(np.uint8)
 
 
-def load_nifti_image(path: str) -> npt.NDArray[np.uint8]:
+def load_nifti_image(path: str | Path) -> npt.NDArray[np.uint8]:
     """Reads a NIfTI image from a file path.
 
     Args:
@@ -58,7 +59,7 @@ def load_nifti_image(path: str) -> npt.NDArray[np.uint8]:
     Returns:
         The image as a numpy.ndarray.
     """
-    image = nib.load(path).get_fdata()
+    image = nib.load(path).get_fdata()  # type: ignore
     return np.asarray(image).astype(np.uint8)
 
 

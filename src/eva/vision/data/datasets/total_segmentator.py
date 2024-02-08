@@ -65,7 +65,7 @@ class TotalSegmentatorClassification(VisionDataset[np.ndarray]):
         self._data: pd.DataFrame
         self._path_key, self._split_key = "path", "split"
         self._manifest_path = os.path.join(self._root, "manifest.csv")
-        self._classes = None
+        self._classes = []
 
     @override
     def __len__(self) -> int:
@@ -110,7 +110,7 @@ class TotalSegmentatorClassification(VisionDataset[np.ndarray]):
         for r in self.resources:
             download_url(r.url, root=self._root, filename=r.filename, md5=r.md5)
 
-    def _get_image_path_and_slice(self, index: int) -> str:
+    def _get_image_path_and_slice(self, index: int) -> Tuple[str, int]:
         return (
             os.path.join(self._root, self._data.at[index, self._path_key]),
             self._data.at[index, "slice"],
@@ -125,6 +125,9 @@ class TotalSegmentatorClassification(VisionDataset[np.ndarray]):
                 )
             )
         ]
+        if len(classes) == 0:
+            raise ValueError("No classes found in the dataset.")
+
         return classes
 
     def _load_dataset(self) -> pd.DataFrame:
