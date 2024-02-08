@@ -39,7 +39,7 @@ class TotalSegmentatorClassification(VisionDataset[np.ndarray]):
         root: str,
         split: Literal["train", "val", "test"],
         split_ratios: SplitRatios | None = None,
-        sample_every_n_channel: int = 25,
+        sample_every_n_slice: int = 25,
         download: bool = False,
     ):
         """Initialize dataset.
@@ -49,7 +49,7 @@ class TotalSegmentatorClassification(VisionDataset[np.ndarray]):
                 be downloaded and extracted here, if it does not already exist.
             split: Dataset split to use. If None, the entire dataset is used.
             split_ratios: Ratios for the train, val and test splits.
-            sample_every_n_channel: Number of slices to skip when sampling slices
+            sample_every_n_slice: Number of slices to skip when sampling slices
                 from the 3D images.
             download: Whether to download the data for the specified split.
                 Note that the download will be executed only by additionally
@@ -61,7 +61,7 @@ class TotalSegmentatorClassification(VisionDataset[np.ndarray]):
         self._root = root
         self._split = split
         self._split_ratios = split_ratios or self.default_split_ratios
-        self._sample_every_n_channel = sample_every_n_channel
+        self._sample_every_n_slice = sample_every_n_slice
         self._download = download
 
         self._data: pd.DataFrame
@@ -75,8 +75,8 @@ class TotalSegmentatorClassification(VisionDataset[np.ndarray]):
 
     @override
     def __getitem__(self, index: int) -> Tuple[np.ndarray, np.ndarray]:
-        image_path, channel = self._get_image_path_and_channel(index)
-        image = io.read_nifti(image_path, channel)
+        image_path, ct_slice = self._get_image_path_and_slice(index)
+        image = io.read_nifti(image_path, ct_slice)
         targets = np.asarray(self._data[self._classes].loc[index], dtype=np.int64)
         return image, targets
 
@@ -112,7 +112,7 @@ class TotalSegmentatorClassification(VisionDataset[np.ndarray]):
         for r in self.resources:
             download_url(r.url, root=self._root, filename=r.filename, md5=r.md5)
 
-    def _get_image_path_and_channel(self, index: int) -> Tuple[str, int]:
+    def _get_image_path_and_slice(self, index: int) -> Tuple[str, int]:
         return (
             os.path.join(self._root, self._data.at[index, self._path_key]),
             self._data.at[index, "slice"],
@@ -150,8 +150,8 @@ class TotalSegmentatorClassification(VisionDataset[np.ndarray]):
 
             # sample slices and extract label for each class:
             np.random.seed(i)
-            start_slice = np.random.choice(min(self._sample_every_n_channel, n_slices))
-            for i in range(start_slice, n_slices, self._sample_every_n_channel):
+            start_slice = np.random.choice(min(self._sample_every_n_slice, n_slices))
+            for i in range(start_slice, n_slices, self._sample_every_n_slice):
                 data_dict["path"].append(path)
                 data_dict["slice"].append(i)
                 for cl in self._classes:
