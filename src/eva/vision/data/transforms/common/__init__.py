@@ -1,5 +1,5 @@
 """Common vision transforms."""
 
-from eva.vision.data.transforms.common.resize_and_normalize import ResizeAndNormalize
+from src.eva.vision.data.transforms.common.resize_and_crop import ResizeAndCrop
 
-__all__ = ["ResizeAndNormalize"]
+__all__ = ["ResizeAndCrop"]

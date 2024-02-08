@@ -1,4 +1,4 @@
-"""Test the ResizeAndNormalize augmentation."""
+"""Test the ResizeAndCrop augmentation."""
 
 from typing import Tuple
 
@@ -23,22 +23,22 @@ from eva.vision.data.transforms import common
         ((97, 97, 3), 224, (3, 224, 224), -0.00392),
     ],
 )
-def test_resize_and_normalize(
+def test_resize_and_crop(
     image_array: npt.NDArray,
-    resize_and_normalize: common.ResizeAndNormalize,
+    resize_and_crop: common.ResizeAndCrop,
     expected_size: Tuple[int, int, int],
     expected_mean: float,
 ) -> None:
-    """Tests the ResizeAndNormalize transform."""
-    output = resize_and_normalize(image_array)
+    """Tests the ResizeAndCrop transform."""
+    output = resize_and_crop(image_array)
     assert output.shape == expected_size
     testing.assert_close(output.mean(), torch.tensor(expected_mean))
 
 
 @pytest.fixture(scope="function")
-def resize_and_normalize(target_size: Tuple[int, int, int]) -> common.ResizeAndNormalize:
-    """Transform ResizeAndNormalize fixture."""
-    return common.ResizeAndNormalize(size=target_size)
+def resize_and_crop(target_size: Tuple[int, int, int]) -> common.ResizeAndCrop:
+    """Transform ResizeAndCrop fixture."""
+    return common.ResizeAndCrop(size=target_size)
 
 
 @pytest.fixture(scope="function")

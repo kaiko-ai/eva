@@ -6,7 +6,7 @@ import torch
 import torchvision.transforms.v2 as torch_transforms
 
 
-class ResizeAndNormalize(torch_transforms.Compose):
+class ResizeAndCrop(torch_transforms.Compose):
     """Resizes, crops and normalizes an input image while preserving its aspect ratio."""
 
     def __init__(
