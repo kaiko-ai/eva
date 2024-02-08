@@ -97,7 +97,7 @@ class TotalSegmentatorClassification(VisionDataset[np.ndarray]):
 
     @override
     def setup(self) -> None:
-        df = self._get_manifest()
+        df = self._load_manifest()
         self._data = df.loc[df[self._split_key] == self._split].reset_index(drop=True)
 
     @property
@@ -156,7 +156,7 @@ class TotalSegmentatorClassification(VisionDataset[np.ndarray]):
                     label = int(masks[cl][:, :, i].max())
                     data_dict[cl].append(label)
 
-            df = pd.DataFrame(data_dict)  # pyright: ignore
+            df = pd.DataFrame(data_dict)  # type: ignore
 
         return df
 
@@ -165,7 +165,7 @@ class TotalSegmentatorClassification(VisionDataset[np.ndarray]):
         manifest_path = os.path.join(self._root, "manifest.csv")
         df.to_csv(manifest_path, index=False)
 
-    def _get_manifest(self) -> pd.DataFrame:
+    def _load_manifest(self) -> pd.DataFrame:
         """Loads the dataset manifest from a CSV file."""
         manifest_path = os.path.join(self._root, "manifest.csv")
         return pd.read_csv(manifest_path)
