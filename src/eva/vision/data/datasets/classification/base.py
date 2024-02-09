@@ -1,4 +1,4 @@
-"""Base for CSV vision datasets."""
+"""Base for image classification datasets."""
 
 import abc
 from typing import Callable, Tuple
