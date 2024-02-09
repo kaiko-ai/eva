@@ -2,6 +2,7 @@
 
 import math
 import os
+from glob import glob
 from pathlib import Path
 from typing import Callable, Dict, List, Literal
 
@@ -29,15 +30,13 @@ class Bach(base.ImageClassification):
         structs.DownloadResource(
             filename="ICIAR2018_BACH_Challenge.zip",
             url="https://zenodo.org/records/3632035/files/ICIAR2018_BACH_Challenge.zip",
-            md5="8ae1801334aa943c44627c1eef3631b2",
         ),
     ]
 
     def __init__(
         self,
         root: str,
-        split: Literal["train", "val", "test"],
-        split_ratios: structs.SplitRatios | None = None,
+        split: Literal["train", "val", "test"] | None = None,
         download: bool = False,
         image_transforms: Callable | None = None,
         target_transforms: Callable | None = None,
@@ -48,7 +47,6 @@ class Bach(base.ImageClassification):
             root: Path to the root directory of the dataset. The dataset will
                 be downloaded and extracted here, if it does not already exist.
             split: Dataset split to use. If None, the entire dataset is used.
-            split_ratios: Ratios for the train, val and test splits.
             download: Whether to download the data for the specified split.
                 Note that the download will be executed only by additionally
                 calling the :meth:`prepare_data` method and if the data does not
@@ -67,14 +65,23 @@ class Bach(base.ImageClassification):
         self._split = split
         self._download = download
 
-        self._data: pd.DataFrame
-        self._path_key, self._split_key, self._target_key = "path", "split", "target"
-        self._split_ratios = split_ratios or self.default_split_ratios
+        self._image_filenames: List[str] = []
+        self._indices: List[int] = []
+        # self._data: pd.DataFrame
+        # self._path_key, self._split_key, self._target_key = "path", "split", "target"
+        # self._split_ratios = split_ratios or self.default_split_ratios
 
     @property
-    def default_split_ratios(self) -> structs.SplitRatios:
-        """Returns the defaults split ratios."""
-        return structs.SplitRatios(train=0.6, val=0.1, test=0.3)
+    def images_path(self) -> str:
+        """Returns the path of the image data of the dataset."""
+        return os.path.join(self._root, "ICIAR2018_BACH_Challenge", "Photos")
+
+    def image_filenames(self) -> List[str]:
+        filenames = [
+            os.path.relpath(image_path, self.images_path)
+            for image_path in glob(os.path.join(self.images_path, "**/*.tif"))
+        ]
+        return sorted(filenames)
 
     @override
     def prepare_data(self) -> None:
@@ -83,11 +90,22 @@ class Bach(base.ImageClassification):
 
     @override
     def setup(self) -> None:
-        df = self._load_dataset()
-        df = self._generate_ordered_stratified_splits(df)
-        self._verify_dataset(df)
+        filenames = self.image_filenames()
+        # self._image_filenames =
+        # print(filenames)
+        quit()
 
-        self._data = df.loc[df[self._split_key] == self._split].reset_index(drop=True)
+        # files = []
+        # for image_path in glob(os.path.join(self.images_path, "**/*.tif")):
+        #     filename = os.path.relpath(image_path, self.images_path)
+        #     files.append(filename)
+        # return sorted(filename)
+
+        # df = self._load_dataset()
+        # df = self._generate_ordered_stratified_splits(df)
+        # self._verify_dataset(df)
+
+        # self._data = df.loc[df[self._split_key] == self._split].reset_index(drop=True)
 
     @override
     def load_image(self, index: int) -> np.ndarray:
@@ -110,7 +128,7 @@ class Bach(base.ImageClassification):
                 resource.url,
                 download_root=self._root,
                 filename=resource.filename,
-                remove_finished=False,
+                remove_finished=True,
             )
 
     def _load_dataset(self) -> pd.DataFrame:
@@ -162,3 +180,16 @@ class Bach(base.ImageClassification):
             for split in ["train", "val", "test"]
         ):
             raise ValueError(f"Unexpected split ratios: {split_ratios}.")
+
+
+# def _subdirectories(root: str) -> List[str]:
+#     def isdir(path: str) -> bool:
+#         return os.path.isdir(os.path.join(root, path))
+
+#     return sorted(filter(isdir, os.listdir(root)))
+
+
+# def _ordered_split(array: list, /, ratios: SplitRatios) -> List[str]:
+#     last_train_index = math.ceil(len(array) * ratios.train)
+#     last_val_index = last_train_index + round(len(array) * ratios.val)
+#     return np.split(array, [last_train_index, last_val_index])
