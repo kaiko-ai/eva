@@ -12,8 +12,8 @@ from loguru import logger
 from torchvision.datasets.utils import download_url, extract_archive
 from typing_extensions import override
 
+from eva.vision.data.datasets import structs
 from eva.vision.data.datasets.classification import base
-from eva.vision.data.datasets.typings import DownloadResource, SplitRatios
 from eva.vision.utils import io
 
 
@@ -23,8 +23,8 @@ class TotalSegmentatorClassification(base.ImageClassification):
     Create the multi-label classification dataset for the TotalSegmentator data.
     """
 
-    resources: List[DownloadResource] = [
-        DownloadResource(
+    resources: List[structs.DownloadResource] = [
+        structs.DownloadResource(
             filename="Totalsegmentator_dataset_v201.zip",
             url="https://zenodo.org/records/10047263/files/Totalsegmentator_dataset_small_v201.zip",
             md5="6b5524af4b15e6ba06ef2d700c0c73e0",
@@ -38,7 +38,7 @@ class TotalSegmentatorClassification(base.ImageClassification):
         self,
         root: str,
         split: Literal["train", "val", "test"],
-        split_ratios: SplitRatios | None = None,
+        split_ratios: structs.SplitRatios | None = None,
         sample_every_n_slices: int = 25,
         download: bool = False,
         image_transforms: Callable | None = None,
@@ -79,9 +79,9 @@ class TotalSegmentatorClassification(base.ImageClassification):
         self._classes = []
 
     @property
-    def default_split_ratios(self) -> SplitRatios:
+    def default_split_ratios(self) -> structs.SplitRatios:
         """Returns the default split ratios."""
-        return SplitRatios(train=0.6, val=0.2, test=0.2)
+        return structs.SplitRatios(train=0.6, val=0.2, test=0.2)
 
     @override
     def prepare_data(self) -> None:

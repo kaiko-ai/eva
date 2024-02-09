@@ -8,7 +8,7 @@ import numpy as np
 import pytest
 
 from eva.vision.data import datasets
-from eva.vision.data.datasets.typings import SplitRatios
+from eva.vision.data.datasets import structs
 
 
 @pytest.mark.parametrize(
@@ -39,7 +39,7 @@ def total_segmentator_dataset(
         dataset = datasets.TotalSegmentatorClassification(
             root=os.path.join(assets_path, "vision", "datasets", "total_segmentator"),
             split=split,
-            split_ratios=SplitRatios(train=0.33, val=0.33, test=0.33),
+            split_ratios=structs.SplitRatios(train=0.33, val=0.33, test=0.33),
             sample_every_n_slices=1,
         )
         dataset.prepare_data()
