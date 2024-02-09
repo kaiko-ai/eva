@@ -132,7 +132,11 @@ class PatchCamelyon(base.ImageClassification):
                 remove_finished=True,
             )
 
-    def _load_from_h5(self, data_key: Literal["x", "y"], index: int | None = None) -> np.ndarray:
+    def _load_from_h5(
+        self,
+        data_key: Literal["x", "y"],
+        index: int | None = None,
+    ) -> np.ndarray:
         """Load data or targets from an HDF5 file.
 
         Args:

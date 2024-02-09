@@ -1,7 +1,7 @@
 """Base for CSV vision datasets."""
 
 import abc
-from typing import Callable, Tuple
+from typing import Any, Callable, Dict, Tuple
 
 import numpy as np
 from typing_extensions import override
@@ -35,7 +35,7 @@ class ImageClassification(vision.VisionDataset[Tuple[np.ndarray, np.ndarray]], a
         """Returns the `index`'th image sample.
 
         Args:
-            index: The index of the data-sample to load.
+            index: The index of the data sample to load.
 
         Returns:
             The image as a numpy array.
@@ -47,10 +47,21 @@ class ImageClassification(vision.VisionDataset[Tuple[np.ndarray, np.ndarray]], a
         """Returns the `index`'th target sample.
 
         Args:
+            index: The index of the data sample to load.
+
+        Returns:
+            The sample target as an array.
+        """
+        raise NotImplementedError
+
+    def load_metadata(self, index: int) -> Dict[str, Any]:
+        """Returns the `index`'th metadata.
+
+        Args:
             index: The index of the data-sample to load.
 
         Returns:
-            The sample target.
+            The sample metadata.
         """
         raise NotImplementedError
 
