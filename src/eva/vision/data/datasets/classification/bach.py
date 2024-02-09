@@ -42,22 +42,26 @@ class Bach(base.ImageClassification):
         image_transforms: Callable | None = None,
         target_transforms: Callable | None = None,
     ):
-        """Initialize dataset.
+        """Initialize the dataset.
 
         Args:
-            root: Path to the root directory of the dataset. The dataset will be downloaded
-                and extracted here, if it does not already exist.
+            root: Path to the root directory of the dataset. The dataset will
+                be downloaded and extracted here, if it does not already exist.
             split: Dataset split to use. If None, the entire dataset is used.
             split_ratios: Ratios for the train, val and test splits.
             download: Whether to download the data for the specified split.
                 Note that the download will be executed only by additionally
-                calling the :meth:`prepare_data` method and if the data does not exist yet on disk.
+                calling the :meth:`prepare_data` method and if the data does not
+                exist yet on disk.
             image_transforms: A function/transform that takes in an image
                 and returns a transformed version.
             target_transforms: A function/transform that takes in the target
                 and transforms it.
         """
-        super().__init__(image_transforms=image_transforms, target_transforms=target_transforms)
+        super().__init__(
+            image_transforms=image_transforms,
+            target_transforms=target_transforms,
+        )
 
         self._root = root
         self._split = split
@@ -67,19 +71,10 @@ class Bach(base.ImageClassification):
         self._path_key, self._split_key, self._target_key = "path", "split", "target"
         self._split_ratios = split_ratios or self.default_split_ratios
 
-    @override
-    def load_image(self, index: int) -> np.ndarray:
-        filename = self._get_image_path(index)
-        return io.read_image(filename)
-
-    @override
-    def load_target(self, index: int) -> np.ndarray:
-        target = self._data.at[index, self._target_key]
-        return np.asarray(target, dtype=np.int64)
-
-    @override
-    def __len__(self) -> int:
-        return len(self._data)
+    @property
+    def default_split_ratios(self) -> SplitRatios:
+        """Returns the defaults split ratios."""
+        return SplitRatios(train=0.6, val=0.1, test=0.3)
 
     @override
     def prepare_data(self) -> None:
@@ -94,31 +89,29 @@ class Bach(base.ImageClassification):
 
         self._data = df.loc[df[self._split_key] == self._split].reset_index(drop=True)
 
-    @property
-    def default_split_ratios(self) -> SplitRatios:
-        """Returns the defaults split ratios."""
-        return SplitRatios(train=0.6, val=0.1, test=0.3)
+    @override
+    def load_image(self, index: int) -> np.ndarray:
+        filename = os.path.join(self._root, self._data.at[index, self._path_key])
+        return io.read_image(filename)
 
-    @property
-    def _class_to_idx(self) -> Dict[str, int]:
-        return {_class: i for i, _class in enumerate(self.classes)}
+    @override
+    def load_target(self, index: int) -> np.ndarray:
+        target = self._data.at[index, self._target_key]
+        return np.asarray(target, dtype=np.int64)
+
+    @override
+    def __len__(self) -> int:
+        return len(self._data)
 
     def _download_dataset(self) -> None:
-        """Downloads the PatchCamelyon dataset."""
-        for r in self.resources:
-            file_path = os.path.join(self._root, r.filename)
-            if utils.check_integrity(file_path, r.md5):
-                continue
-
+        """Downloads the dataset."""
+        for resource in self.resources:
             utils.download_and_extract_archive(
-                r.url,
+                resource.url,
                 download_root=self._root,
-                filename=r.filename,
-                remove_finished=True,
+                filename=resource.filename,
+                remove_finished=False,
             )
-
-    def _get_image_path(self, index: int) -> str:
-        return os.path.join(self._root, self._data.at[index, self._path_key])
 
     def _load_dataset(self) -> pd.DataFrame:
         df = pd.DataFrame({self._path_key: Path(self._root).glob("**/*.tif")})
@@ -131,8 +124,11 @@ class Bach(base.ImageClassification):
         df[self._path_key] = df[self._path_key].apply(
             lambda x: Path(x).relative_to(self._root).as_posix()
         )
-
         return df
+
+    @property
+    def _class_to_idx(self) -> Dict[str, int]:
+        return {_class: i for i, _class in enumerate(self.classes)}
 
     def _generate_ordered_stratified_splits(self, df: pd.DataFrame) -> pd.DataFrame:
         """Orders each class by path and then splits it into train, val and test sets."""

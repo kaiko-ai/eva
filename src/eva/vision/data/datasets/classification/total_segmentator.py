@@ -4,7 +4,7 @@ import math
 import os
 from collections import defaultdict
 from pathlib import Path
-from typing import List, Literal, Tuple
+from typing import Callable, List, Literal, Tuple
 
 import numpy as np
 import pandas as pd
@@ -12,12 +12,12 @@ from loguru import logger
 from torchvision.datasets.utils import download_url, extract_archive
 from typing_extensions import override
 
+from eva.vision.data.datasets.classification import base
 from eva.vision.data.datasets.typings import DownloadResource, SplitRatios
-from eva.vision.data.datasets.vision import VisionDataset
 from eva.vision.utils import io
 
 
-class TotalSegmentatorClassification(VisionDataset[np.ndarray]):
+class TotalSegmentatorClassification(base.ImageClassification):
     """TotalSegmentator dataset class.
 
     Create the multi-label classification dataset for the TotalSegmentator data.
@@ -41,7 +41,9 @@ class TotalSegmentatorClassification(VisionDataset[np.ndarray]):
         split_ratios: SplitRatios | None = None,
         sample_every_n_slices: int = 25,
         download: bool = False,
-    ):
+        image_transforms: Callable | None = None,
+        target_transforms: Callable | None = None,
+    ) -> None:
         """Initialize dataset.
 
         Args:
@@ -55,8 +57,15 @@ class TotalSegmentatorClassification(VisionDataset[np.ndarray]):
                 Note that the download will be executed only by additionally
                 calling the :meth:`prepare_data` method and if the data does not
                 exist yet on disk.
+            image_transforms: A function/transform that takes in an image
+                and returns a transformed version.
+            target_transforms: A function/transform that takes in the target
+                and transforms it.
         """
-        super().__init__()
+        super().__init__(
+            image_transforms=image_transforms,
+            target_transforms=target_transforms,
+        )
 
         self._root = root
         self._split = split
@@ -69,16 +78,10 @@ class TotalSegmentatorClassification(VisionDataset[np.ndarray]):
         self._manifest_path = os.path.join(self._root, "manifest.csv")
         self._classes = []
 
-    @override
-    def __len__(self) -> int:
-        return len(self._data)
-
-    @override
-    def __getitem__(self, index: int) -> Tuple[np.ndarray, np.ndarray]:
-        image_path, ct_slice = self._get_image_path_and_slice(index)
-        image = io.read_nifti(image_path, ct_slice)
-        targets = np.asarray(self._data[self._classes].loc[index], dtype=np.int64)
-        return image, targets
+    @property
+    def default_split_ratios(self) -> SplitRatios:
+        """Returns the default split ratios."""
+        return SplitRatios(train=0.6, val=0.2, test=0.2)
 
     @override
     def prepare_data(self) -> None:
@@ -102,15 +105,29 @@ class TotalSegmentatorClassification(VisionDataset[np.ndarray]):
         df = self._load_manifest()
         self._data = df.loc[df[self._split_key] == self._split].reset_index(drop=True)
 
-    @property
-    def default_split_ratios(self) -> SplitRatios:
-        """Returns the default split ratios."""
-        return SplitRatios(train=0.6, val=0.2, test=0.2)
+    @override
+    def load_image(self, index: int) -> np.ndarray:
+        image_path, ct_slice = self._get_image_path_and_slice(index)
+        return io.read_nifti(image_path, ct_slice)
+
+    @override
+    def load_target(self, index: int) -> np.ndarray:
+        targets = self._data[self._classes].loc[index]
+        return np.asarray(targets, dtype=np.int64)
+
+    @override
+    def __len__(self) -> int:
+        return len(self._data)
 
     def _download_dataset(self) -> None:
         os.makedirs(self._root, exist_ok=True)
-        for r in self.resources:
-            download_url(r.url, root=self._root, filename=r.filename, md5=r.md5)
+        for resource in self.resources:
+            download_url(
+                resource.url,
+                root=self._root,
+                filename=resource.filename,
+                md5=resource.md5,
+            )
 
     def _get_image_path_and_slice(self, index: int) -> Tuple[str, int]:
         return (
