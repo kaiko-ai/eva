@@ -1,4 +1,4 @@
-"""Typings for datasets."""
+"""Data classes and structures for datasets."""
 
 import dataclasses
 

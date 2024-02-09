@@ -45,6 +45,6 @@ def bach_dataset(split: Literal["train", "val", "test"], assets_path: str) -> da
             root=os.path.join(assets_path, "vision", "datasets", "bach"),
             split=split,
         )
-        dataset.setup()
+        dataset.prepare_data()
         dataset.setup()
         return dataset

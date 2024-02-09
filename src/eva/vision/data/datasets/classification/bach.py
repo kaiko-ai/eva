@@ -10,8 +10,8 @@ import pandas as pd
 from torchvision.datasets import utils
 from typing_extensions import override
 
+from eva.vision.data.datasets import structs
 from eva.vision.data.datasets.classification import base
-from eva.vision.data.datasets.typings import DownloadResource, SplitRatios
 from eva.vision.utils import io
 
 
@@ -25,8 +25,8 @@ class Bach(base.ImageClassification):
         "Invasive",
     ]
 
-    resources: List[DownloadResource] = [
-        DownloadResource(
+    resources: List[structs.DownloadResource] = [
+        structs.DownloadResource(
             filename="ICIAR2018_BACH_Challenge.zip",
             url="https://zenodo.org/records/3632035/files/ICIAR2018_BACH_Challenge.zip",
             md5="8ae1801334aa943c44627c1eef3631b2",
@@ -36,8 +36,8 @@ class Bach(base.ImageClassification):
     def __init__(
         self,
         root: str,
-        split: Literal["train", "val", "test"],
-        split_ratios: SplitRatios | None = None,
+        split: Literal["train", "val", "test"] | None,
+        split_ratios: structs.SplitRatios | None = None,
         download: bool = False,
         image_transforms: Callable | None = None,
         target_transforms: Callable | None = None,
@@ -72,9 +72,9 @@ class Bach(base.ImageClassification):
         self._split_ratios = split_ratios or self.default_split_ratios
 
     @property
-    def default_split_ratios(self) -> SplitRatios:
+    def default_split_ratios(self) -> structs.SplitRatios:
         """Returns the defaults split ratios."""
-        return SplitRatios(train=0.6, val=0.1, test=0.3)
+        return structs.SplitRatios(train=0.6, val=0.1, test=0.3)
 
     @override
     def prepare_data(self) -> None:
@@ -106,6 +106,10 @@ class Bach(base.ImageClassification):
     def _download_dataset(self) -> None:
         """Downloads the dataset."""
         for resource in self.resources:
+            file_path = os.path.join(self._root, resource.filename)
+            if utils.check_integrity(file_path, resource.md5):
+                continue
+
             utils.download_and_extract_archive(
                 resource.url,
                 download_root=self._root,
