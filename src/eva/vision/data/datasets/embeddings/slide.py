@@ -64,7 +64,6 @@ class SlideEmbeddingDataset(PatchEmbeddingDataset):
         self._n_patches_per_slide = n_patches_per_slide
         self._seed = seed
         self._pad_value = pad_value
-
         self._slide_id_column = self._column_mapping["slide_id"]
 
     @override
