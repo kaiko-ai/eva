@@ -2,7 +2,6 @@
 
 import os
 from typing import Literal
-from unittest.mock import patch
 
 import numpy as np
 import pytest
@@ -12,7 +11,7 @@ from eva.vision.data import datasets
 
 @pytest.mark.parametrize(
     "split, expected_length",
-    [("train", 16), ("val", 4), ("test", 4)],
+    [("train", 268), ("val", 132), (None, 10)],
 )
 def test_length(bach_dataset: datasets.Bach, expected_length: int) -> None:
     """Tests the length of the dataset."""
@@ -20,13 +19,18 @@ def test_length(bach_dataset: datasets.Bach, expected_length: int) -> None:
 
 
 @pytest.mark.parametrize(
-    "split",
-    ["train", "val", "test"],
+    "split, index",
+    [
+        (None, 0),
+        (None, 9),
+        ("train", 0),
+        ("train", 2),
+    ],
 )
-def test_sample(bach_dataset: datasets.Bach) -> None:
+def test_sample(bach_dataset: datasets.Bach, index: int) -> None:
     """Tests the format of a dataset sample."""
     # assert data sample is a tuple
-    sample = bach_dataset[0]
+    sample = bach_dataset[index]
     assert isinstance(sample, tuple)
     assert len(sample) == 2
     # assert the format of the `image` and `target`
@@ -38,13 +42,12 @@ def test_sample(bach_dataset: datasets.Bach) -> None:
 
 
 @pytest.fixture(scope="function")
-def bach_dataset(split: Literal["train", "val", "test"], assets_path: str) -> datasets.Bach:
+def bach_dataset(split: Literal["train", "val"], assets_path: str) -> datasets.Bach:
     """BACH dataset fixture."""
-    with patch("eva.vision.data.datasets.Bach._verify_dataset") as _:
-        dataset = datasets.Bach(
-            root=os.path.join(assets_path, "vision", "datasets", "bach"),
-            split=split,
-        )
-        dataset.prepare_data()
-        dataset.setup()
-        return dataset
+    dataset = datasets.Bach(
+        root=os.path.join(assets_path, "vision", "datasets", "bach"),
+        split=split,
+    )
+    dataset.prepare_data()
+    dataset.setup()
+    return dataset

@@ -1,7 +1,7 @@
 """Base for image classification datasets."""
 
 import abc
-from typing import Any, Callable, Dict, Tuple
+from typing import Any, Callable, Dict, List, Tuple
 
 import numpy as np
 from typing_extensions import override
@@ -30,6 +30,14 @@ class ImageClassification(vision.VisionDataset[Tuple[np.ndarray, np.ndarray]], a
         self._image_transforms = image_transforms
         self._target_transforms = target_transforms
 
+    @property
+    def classes(self) -> List[str] | None:
+        """Returns the list with names of the dataset names."""
+
+    @property
+    def class_to_idx(self) -> Dict[str, int] | None:
+        """Returns a mapping of the class name to its target index."""
+
     @abc.abstractmethod
     def load_image(self, index: int) -> np.ndarray:
         """Returns the `index`'th image sample.
@@ -54,16 +62,15 @@ class ImageClassification(vision.VisionDataset[Tuple[np.ndarray, np.ndarray]], a
         """
         raise NotImplementedError
 
-    def load_metadata(self, index: int) -> Dict[str, Any]:
+    def load_metadata(self, index: int) -> Dict[str, Any] | None:
         """Returns the `index`'th metadata.
 
         Args:
-            index: The index of the data-sample to load.
+            index: The index of the data sample to load.
 
         Returns:
             The sample metadata.
         """
-        raise NotImplementedError
 
     @abc.abstractmethod
     @override

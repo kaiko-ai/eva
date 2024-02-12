@@ -1,7 +1,7 @@
 """PatchCamelyon dataset."""
 
 import os
-from typing import Callable, List, Literal
+from typing import Any, Callable, Dict, List, Literal
 
 import h5py
 import numpy as np
@@ -90,6 +90,16 @@ class PatchCamelyon(base.ImageClassification):
         self._root = root
         self._split = split
         self._download = download
+
+    @property
+    @override
+    def classes(self) -> List[str]:
+        return ["no_tumor", "tumor"]
+
+    @property
+    @override
+    def class_to_idx(self) -> Dict[str, int]:
+        return {"no_tumor": 0, "tumor": 1}
 
     @override
     def prepare_data(self) -> None:
