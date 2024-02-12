@@ -1,4 +1,4 @@
-"""Bach dataset class."""
+"""BACH dataset class."""
 
 import os
 from typing import Callable, Dict, List, Literal, Tuple
@@ -12,8 +12,8 @@ from eva.vision.data.datasets.classification import base
 from eva.vision.utils import io
 
 
-class Bach(base.ImageClassification):
-    """Bach dataset class."""
+class BACH(base.ImageClassification):
+    """BACH dataset class."""
 
     train_index_ranges: List[Tuple[int, int]] = [
         (0, 41),
@@ -63,8 +63,8 @@ class Bach(base.ImageClassification):
             split: Dataset split to use. If None, the entire dataset is used.
             download: Whether to download the data for the specified split.
                 Note that the download will be executed only by additionally
-                calling the :meth:`prepare_data` method and if the data does not
-                exist yet on disk.
+                calling the :meth:`prepare_data` method and if the data does
+                not exist yet on disk.
             image_transforms: A function/transform that takes in an image
                 and returns a transformed version.
             target_transforms: A function/transform that takes in the target
@@ -109,7 +109,7 @@ class Bach(base.ImageClassification):
             class_to_idx=self.class_to_idx,
             extensions=(".tif"),
         )
-        self._indices = self._indices or self._make_indices(len(self._samples))
+        self._indices = self._make_indices()
 
     @override
     def load_image(self, index: int) -> np.ndarray:
@@ -128,6 +128,9 @@ class Bach(base.ImageClassification):
     def _download_dataset(self) -> None:
         """Downloads the dataset."""
         for resource in self.resources:
+            if os.path.isdir(self.dataset_path):
+                continue
+
             utils.download_and_extract_archive(
                 resource.url,
                 download_root=self._root,
@@ -135,12 +138,12 @@ class Bach(base.ImageClassification):
                 remove_finished=True,
             )
 
-    def _make_indices(self, total_samples: int = 400) -> List[int]:
+    def _make_indices(self) -> List[int]:
         """Builds the dataset indices for the specified split."""
         split_index_ranges = {
             "train": self.train_index_ranges,
             "val": self.val_index_ranges,
-            None: [(0, total_samples)],
+            None: [(0, 400)],
         }
         index_ranges = split_index_ranges.get(self._split)
         if index_ranges is None:

@@ -86,14 +86,14 @@ class TotalSegmentatorClassification(base.ImageClassification):
 
     @override
     def prepare_data(self) -> None:
-        # if self._download:
-        #     self._download_dataset()
-        # if not os.path.isdir(os.path.join(self._root, "Totalsegmentator_dataset_v201")):
-        #     logger.info("Extracting archive ...")
-        #     extract_archive(
-        #         from_path=os.path.join(self._root, "Totalsegmentator_dataset_v201.zip"),
-        #         to_path=os.path.join(self._root, "Totalsegmentator_dataset_v201"),
-        #     )
+        if self._download:
+            self._download_dataset()
+        if not os.path.isdir(os.path.join(self._root, "Totalsegmentator_dataset_v201")):
+            logger.info("Extracting archive ...")
+            extract_archive(
+                from_path=os.path.join(self._root, "Totalsegmentator_dataset_v201.zip"),
+                to_path=os.path.join(self._root, "Totalsegmentator_dataset_v201"),
+            )
         self._classes = self._get_classes()
         df = self._load_dataset()
         df = self._generate_ordered_splits(df)
@@ -141,8 +141,7 @@ class TotalSegmentatorClassification(base.ImageClassification):
             f.split(".")[0]
             for f in sorted(
                 os.listdir(
-                    os.path.join(self._root, "s0011/segmentations")
-                    # os.path.join(self._root, "Totalsegmentator_dataset_v201/s0011/segmentations")
+                    os.path.join(self._root, "Totalsegmentator_dataset_v201/s0011/segmentations")
                 )
             )
         ]

@@ -1,7 +1,7 @@
 """PatchCamelyon dataset."""
 
 import os
-from typing import Any, Callable, Dict, List, Literal
+from typing import Callable, Dict, List, Literal
 
 import h5py
 import numpy as np
