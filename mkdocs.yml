@@ -1,9 +1,10 @@
-site_name: EVA documentation
+site_name: eva
 
 theme:
   name: "material"
   features:
     - navigation.tabs
+    - navigation.indexes
 
 plugins:
   mkdocstrings:
@@ -12,8 +13,8 @@ plugins:
         options:
           docstring_section_style: table
           filters:
-          - '!^_'
-
+          - '!^(?!__init__)_'
+          
 nav:
   - eva: index.md
   - Getting Started: getting-started.md
@@ -29,4 +30,13 @@ nav:
     - Models: 
       - Modules: reference/models/modules.md
     - Trainers: reference/trainers.md
-    - Vision: reference/vision.md
+    - Vision:
+      - reference/vision/index.md
+      - reference/vision/data.md
+      - reference/vision/models.md
+      - reference/vision/utils.md
+  - Datasets: 
+    - datasets/index.md
+    - PatchCamelyon: datasets/patch_camelyon.md
+    - BACH: datasets/bach.md
+    - TotalSegmentator: datasets/total_segmentator.md

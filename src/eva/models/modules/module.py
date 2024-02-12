@@ -1,6 +1,6 @@
 """Base model module."""
 
-from typing import Any, Generic, Mapping, TypeVar
+from typing import Any, Mapping
 
 import pytorch_lightning as pl
 import torch
@@ -9,12 +9,10 @@ from pytorch_lightning.utilities.types import STEP_OUTPUT
 from typing_extensions import override
 
 from eva.metrics import core as metrics_lib
-
-INPUT_BATCH = TypeVar("INPUT_BATCH")
-"""The input batch type."""
+from eva.models.modules.typings import INPUT_BATCH
 
 
-class ModelModule(pl.LightningModule, Generic[INPUT_BATCH]):
+class ModelModule(pl.LightningModule):
     """The base model module."""
 
     def __init__(
@@ -61,7 +59,7 @@ class ModelModule(pl.LightningModule, Generic[INPUT_BATCH]):
         outputs = self._common_batch_end(outputs)
         self._update_metrics(
             self.metrics.validation_metrics,
-            batch_outputs=outputs,
+            outputs=outputs,
             dataloader_idx=dataloader_idx,
         )
 
@@ -80,7 +78,7 @@ class ModelModule(pl.LightningModule, Generic[INPUT_BATCH]):
         outputs = self._common_batch_end(outputs)
         self._update_metrics(
             self.metrics.test_metrics,
-            batch_outputs=outputs,
+            outputs=outputs,
             dataloader_idx=dataloader_idx,
         )
 
@@ -97,10 +95,7 @@ class ModelModule(pl.LightningModule, Generic[INPUT_BATCH]):
         Returns:
             The updated outputs.
         """
-        return memory.recursive_detach(
-            outputs,
-            to_cpu=self.device.type == "cpu",
-        )
+        return memory.recursive_detach(outputs, to_cpu=self.device.type == "cpu")
 
     def _forward_and_log_metrics(
         self,
@@ -120,21 +115,21 @@ class ModelModule(pl.LightningModule, Generic[INPUT_BATCH]):
     def _update_metrics(
         self,
         metrics: metrics_lib.MetricCollection,
-        batch_outputs: STEP_OUTPUT,
+        outputs: STEP_OUTPUT,
         dataloader_idx: int = 0,
     ) -> None:
         """Updates the metrics tracker with new data.
 
-        Here the `batch_outputs` keyword values will be filtered based
+        Here the `outputs` keyword values will be filtered based
         on the signature of all individual metrics and passed only
         to the compatible ones.
 
         Args:
             metrics: The desired metrics tracker to update.
-            batch_outputs: The outputs of the batch processing step.
+            outputs: The outputs of the batch processing step.
             dataloader_idx: The dataloader index.
         """
-        inputs = self._parse_metrics_inputs(batch_outputs, dataloader_idx)
+        inputs = self._parse_metrics_inputs(outputs, dataloader_idx)
         metrics.update(**inputs)
 
     def _compute_and_log_metrics(self, metrics: metrics_lib.MetricCollection) -> None:
@@ -149,7 +144,7 @@ class ModelModule(pl.LightningModule, Generic[INPUT_BATCH]):
 
     def _parse_metrics_inputs(
         self,
-        batch_outputs: STEP_OUTPUT,
+        outputs: STEP_OUTPUT,
         dataloader_idx: int = 0,
     ) -> Mapping[str, Any]:
         """Parses the arguments for the metrics.
@@ -159,21 +154,22 @@ class ModelModule(pl.LightningModule, Generic[INPUT_BATCH]):
         metrics and passed only to the compatible ones.
 
         Args:
-            batch_outputs: The outputs of the batch processing step.
+            outputs: The outputs of the batch processing step.
             dataloader_idx: The dataloader index.
 
         Returns:
             A mapping with the argument name and its value.
         """
-        if batch_outputs is None:
+        if outputs is None:
             return {}
 
-        if isinstance(batch_outputs, torch.Tensor):
-            batch_outputs = {"loss": batch_outputs}
+        if isinstance(outputs, torch.Tensor):
+            outputs = {"loss": outputs}
 
         additional_metric_inputs = {
-            "preds": batch_outputs.get("predictions"),
-            "target": batch_outputs.get("targets"),
+            "preds": outputs.get("predictions"),
+            "target": outputs.get("targets"),
+            "metadata": outputs.get("metadata"),
             "dataloader_idx": dataloader_idx,
         }
-        return {**additional_metric_inputs, **batch_outputs}
+        return {**additional_metric_inputs, **outputs}

@@ -11,14 +11,10 @@ from typing_extensions import override
 
 from eva.metrics import core as metrics_lib
 from eva.models.modules import _utils, module
-from eva.models.modules.typings import MODEL_TYPE, TUPLE_INPUT_BATCH
-
-# TODO this will be expanded to support dict as well
-INPUT_BATCH = TUPLE_INPUT_BATCH
-"""The input batch annotation."""
+from eva.models.modules.typings import INPUT_BATCH, MODEL_TYPE
 
 
-class HeadModule(module.ModelModule[INPUT_BATCH]):
+class HeadModule(module.ModelModule):
     """Neural Net Head Module for training on features.
 
     It can be used for supervised (mini-batch) stochastic gradient descent
@@ -97,11 +93,12 @@ class HeadModule(module.ModelModule[INPUT_BATCH]):
         Returns:
             The batch step output.
         """
-        data, targets = batch[0], batch[1]
+        data, targets, metadata = INPUT_BATCH(*batch)
         predictions = self(data)
         loss = self.criterion(predictions, targets)
         return {
             "loss": loss,
             "targets": targets,
             "predictions": predictions,
+            "metadata": metadata,
         }
