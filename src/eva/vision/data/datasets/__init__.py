@@ -1,11 +1,11 @@
 """Vision Datasets API."""
 
-from eva.vision.data.datasets.embeddings import PatchEmbeddingDataset, SlideEmbeddingDataset
-from src.eva.vision.data.datasets.classification import (
+from eva.vision.data.datasets.classification import (
     Bach,
     PatchCamelyon,
     TotalSegmentatorClassification,
 )
+from eva.vision.data.datasets.embeddings import PatchEmbeddingDataset, SlideEmbeddingDataset
 
 __all__ = [
     "Bach",
