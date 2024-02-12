@@ -8,8 +8,8 @@ import numpy as np
 from torchvision.datasets import utils
 from typing_extensions import override
 
+from eva.vision.data.datasets import structs
 from eva.vision.data.datasets.classification import base
-from src.eva.vision.data.datasets import structs
 
 URL_TEMPLATE = "https://zenodo.org/records/2546921/files/{filename}.gz?download=1"
 """PatchCamelyon URL files templates."""
