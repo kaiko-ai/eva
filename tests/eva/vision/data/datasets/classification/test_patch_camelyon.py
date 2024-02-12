@@ -11,7 +11,7 @@ from eva.vision.data import datasets
 
 @pytest.mark.parametrize(
     "split, expected_length",
-    [("train", 4), ("val", 2), ("test", 1)],
+    [("train", 4), ("valid", 2), ("test", 1)],
 )
 def test_length(patch_camelyon_dataset: datasets.PatchCamelyon, expected_length: int) -> None:
     """Tests the length of the dataset."""
@@ -20,7 +20,7 @@ def test_length(patch_camelyon_dataset: datasets.PatchCamelyon, expected_length:
 
 @pytest.mark.parametrize(
     "split",
-    ["train", "val", "test"],
+    ["train", "valid", "test"],
 )
 def test_sample(patch_camelyon_dataset: datasets.PatchCamelyon) -> None:
     """Tests the format of a dataset sample."""
@@ -38,7 +38,7 @@ def test_sample(patch_camelyon_dataset: datasets.PatchCamelyon) -> None:
 
 @pytest.fixture(scope="function")
 def patch_camelyon_dataset(
-    split: Literal["train", "val", "test"], assets_path: str
+    split: Literal["train", "valid", "test"], assets_path: str
 ) -> datasets.PatchCamelyon:
     """PatchCamelyon dataset fixture."""
     return datasets.PatchCamelyon(
