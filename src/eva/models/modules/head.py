@@ -60,7 +60,7 @@ class HeadModule(module.ModelModule):
     @override
     def forward(self, tensor: torch.Tensor, *args: Any, **kwargs: Any) -> torch.Tensor:
         features = tensor if self.backbone is None else self.backbone(tensor)
-        return self.head(features.flatten(start_dim=1))
+        return self.head(features)
 
     @override
     def on_fit_start(self) -> None:

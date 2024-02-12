@@ -1,6 +1,6 @@
 """ABMIL Network."""
 
-from typing import Optional, Type
+from typing import Type
 
 import torch
 import torch.nn as nn
@@ -41,6 +41,7 @@ class ABMIL(torch.nn.Module):
         dropout_input_embeddings: float = 0.0,
         dropout_attention: float = 0.0,
         dropout_mlp: float = 0.0,
+        pad_value: int | float | None = float("-inf"),
     ) -> None:
         """Initializes the ABMIL network.
 
@@ -54,8 +55,12 @@ class ABMIL(torch.nn.Module):
             dropout_input_embeddings: dropout rate for the input embeddings
             dropout_attention: dropout rate for the attention network and classifier
             dropout_mlp: dropout rate for the final MLP network
+            pad_value: Value indicating padding in the input tensor. If specified, entries with
+                this value in the will be masked. If set to None, no masking will be is applied.
         """
         super().__init__()
+
+        self._pad_value = pad_value
 
         if projected_input_size:
             self.projector = nn.Sequential(
@@ -82,18 +87,18 @@ class ABMIL(torch.nn.Module):
             hidden_activation_fn=nn.ReLU,
         )
 
-    def forward(self, input_tensor: torch.Tensor, mask: Optional[torch.BoolTensor] = None):
+    def forward(self, input_tensor: torch.Tensor) -> torch.Tensor:
         """Forward pass.
 
         Args:
-            input_tensor: tensor with expected shape of (batch_size, n_instances, input_size).
-            mask: mask tensor where true values correspond to entries in the input tensor that
-                should be ignored. expected shape is (batch_size, n_instances, 1).
+            input_tensor: Tensor with expected shape of (batch_size, n_instances, input_size).
+            pad_value: Value indicating padding in the input tensor. If None no masking is applied.
         """
-        # Project input to lower dimensionality (batch_size, n_instances, projected_input_size)
+        input_tensor, mask = self._mask_values(input_tensor, self._pad_value)
+
+        # (batch_size, n_instances, input_size) -> (batch_size, n_instances, projected_input_size)
         input_tensor = self.projector(input_tensor)
 
-        # Gated attention & masking
         attention_logits = self.gated_attention(input_tensor)  # (batch_size, n_instances, 1)
         if mask is not None:
             # fill masked values with -inf, which will yield 0s after softmax
@@ -107,8 +112,23 @@ class ABMIL(torch.nn.Module):
 
         attention_result = torch.squeeze(attention_result, 1)  # (batch_size, hidden_size_attention)
 
-        # Final MLP classifier network
         return self.classifier(attention_result)  # (batch_size, output_size)
+
+    def _mask_values(self, input_tensor: torch.Tensor, pad_value: float | None):
+        """Masks the padded values in the input tensor."""
+        if pad_value is None:
+            return input_tensor, None
+        else:
+            # (batch_size, n_instances, input_size)
+            mask = input_tensor == pad_value
+
+            # (batch_size, n_instances, input_size) -> (batch_size, n_instances, 1)
+            mask = mask.all(dim=-1, keepdim=True)
+
+            # Fill masked values with 0, so that they don't contribute to dense layers
+            input_tensor = input_tensor.masked_fill(mask, 0)
+
+            return input_tensor, mask
 
 
 class GatedAttention(nn.Module):
@@ -146,7 +166,7 @@ class GatedAttention(nn.Module):
         self.attention_b = make_attention(activation_b())
         self.attention_c = nn.Linear(hidden_dim, n_classes)
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         """Forward pass."""
         a = self.attention_a(x)  # [..., hidden_dim]
         b = self.attention_b(x)  # [..., hidden_dim]
