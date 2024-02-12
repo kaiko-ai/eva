@@ -87,7 +87,7 @@ class ABMIL(torch.nn.Module):
             hidden_activation_fn=nn.ReLU,
         )
 
-    def forward(self, input_tensor: torch.Tensor):
+    def forward(self, input_tensor: torch.Tensor) -> torch.Tensor:
         """Forward pass.
 
         Args:
@@ -166,7 +166,7 @@ class GatedAttention(nn.Module):
         self.attention_b = make_attention(activation_b())
         self.attention_c = nn.Linear(hidden_dim, n_classes)
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         """Forward pass."""
         a = self.attention_a(x)  # [..., hidden_dim]
         b = self.attention_b(x)  # [..., hidden_dim]
