@@ -71,7 +71,7 @@ class ModelFromFunction(nn.Module):
         """
         logger.info(f"Loading {model.__class__.__name__} from checkpoint {self.checkpoint_path}")
 
-        with open(self.checkpoint_path, "rb") as f:
+        with open(self.checkpoint_path, "rb") as f:  # type: ignore
             checkpoint = torch.load(f, map_location="cpu")  # type: ignore[arg-type]
             if "state_dict" in checkpoint:
                 checkpoint = checkpoint["state_dict"]
