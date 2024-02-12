@@ -1,0 +1,1 @@
+"""Vision related IO tests."""

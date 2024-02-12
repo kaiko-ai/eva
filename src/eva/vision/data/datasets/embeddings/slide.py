@@ -18,7 +18,6 @@ class SlideEmbeddingDataset(PatchEmbeddingDataset):
         "target": "target",
         "split": "split",
         "slide_id": "slide_id",
-        "mask": "mask",
     }
 
     def __init__(
@@ -28,6 +27,7 @@ class SlideEmbeddingDataset(PatchEmbeddingDataset):
         split: Literal["train", "val", "test"],
         column_mapping: Dict[str, str] = default_column_mapping,
         n_patches_per_slide: int = 1000,
+        pad_value: int | float = float("-inf"),
         seed: int = 42,
     ):
         """Initialize dataset.
@@ -36,9 +36,9 @@ class SlideEmbeddingDataset(PatchEmbeddingDataset):
         one or multiple .pt files, each containing a sequence of patch embeddings of shape
         [k, embedding_dim]. This dataset class will then stack the patch embeddings for each
         slide, sample n_patches_per_slide patch embeddings (or pad with zeros if there are less
-        patches) and finally return tensors of shape [n_patches_per_slide, embedding_dim] together
-        with binary masks of shape [n_patches_per_slide, 1], suitable to train multi-instance
-        learning (MIL) heads.
+        patches) and finally return tensors of shape [n_patches_per_slide, embedding_dim] suitable
+        to train multi-instance learning (MIL) heads. For slides with less than n_patches_per_slide
+        patches, the resulting tensor is padded.
 
         Args:
             manifest_path: Path to the manifest file. Can be either a .csv or .parquet file, with
@@ -50,6 +50,8 @@ class SlideEmbeddingDataset(PatchEmbeddingDataset):
             column_mapping: Mapping between the standardized column names and the actual
                 column names in the provided manifest file.
             n_patches_per_slide: Number of patches to sample per slide.
+            pad_value: Value used for padding the embeddings of slides with less than
+                n_patches_per_slide patches.
             seed: Seed used for sampling patches per slide.
         """
         super().__init__(
@@ -61,16 +63,13 @@ class SlideEmbeddingDataset(PatchEmbeddingDataset):
 
         self._n_patches_per_slide = n_patches_per_slide
         self._seed = seed
+        self._pad_value = pad_value
 
         self._slide_id_column = self._column_mapping["slide_id"]
-        self._mask_column = self._column_mapping["mask"]
 
     @override
     def __getitem__(self, index) -> Tuple[torch.Tensor, torch.Tensor, Dict[str, Any]]:
-        metadata = {
-            "mask": self._data.at[index, self._mask_column],
-            "slide_id": self._data.at[index, self._slide_id_column],
-        }
+        metadata = {"slide_id": self._data.at[index, self._slide_id_column]}
         return (
             self._data.at[index, self._embedding_column],
             self._data.at[index, self._target_column],
@@ -98,8 +97,7 @@ class SlideEmbeddingDataset(PatchEmbeddingDataset):
 
         After sampling, the patch embeddings of each slide are stacked as tensors of shape
         [n_patches_per_slide, embedding_dim]. For slides that have less than n_patches_per_slide
-        patches, the resulting tensor is padded with zeros and a mask that flags the padded entries
-        is generated.
+        patches, the resulting tensor is padded with self._pad_value.
         """
         if self._embedding_column not in df.columns:
             raise ValueError(f"Column {self._embedding_column} not found in dataframe.")
@@ -118,20 +116,17 @@ class SlideEmbeddingDataset(PatchEmbeddingDataset):
             stacked_embeddings = torch.cat(df[self._embedding_column].tolist(), dim=0)
 
             dim0 = stacked_embeddings.shape[0]
-            n_masked = 0
             if pad_size and dim0 < pad_size:
-                n_masked = pad_size - dim0
                 stacked_embeddings = F.pad(
-                    stacked_embeddings, pad=(0, 0, 0, n_masked), mode="constant", value=0
+                    stacked_embeddings,
+                    pad=(0, 0, 0, pad_size - dim0),
+                    mode="constant",
+                    value=self._pad_value,
                 )
-                mask = torch.zeros(pad_size, 1).bool()
-                mask[-n_masked:, :] = True
-            else:
-                mask = torch.zeros(stacked_embeddings.shape[0], 1).bool()
 
-            result = {self._embedding_column: stacked_embeddings, self._mask_column: mask}
-            metadata_columns = set(df.columns) - set(result.keys())
-            for col in metadata_columns:
+            result = {self._embedding_column: stacked_embeddings}
+            remaining_columns = set(df.columns) - set(result.keys())
+            for col in remaining_columns:
                 # metadata is the same for patches of the same slide, so just take the first entry
                 result[col] = df[col].iloc[0]
 

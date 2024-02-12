@@ -1,7 +1,8 @@
 """EVA vision API."""
 
 try:
-    from eva.vision.data import datasets
+    from eva.vision import utils
+    from eva.vision.data import datasets, transforms
 except ImportError as e:
     msg = (
         "EVA vision requirements are not installed.\n\n"
@@ -10,4 +11,4 @@ except ImportError as e:
     )
     raise ImportError(str(e) + "\n\n" + msg) from e
 
-__all__ = ["datasets"]
+__all__ = ["utils", "datasets", "transforms"]

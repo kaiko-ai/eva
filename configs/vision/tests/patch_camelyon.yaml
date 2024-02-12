@@ -43,58 +43,34 @@ data:
         init_args:
           root: ${oc.env:TESTS_ROOT, tests/eva}/assets/vision/datasets/patch_camelyon
           split: train
-          download: false
+          download: &DOWNLOAD_DATA false
           image_transforms:
-            class_path: torchvision.transforms.v2.Compose
+            class_path: eva.vision.data.transforms.common.ResizeAndCrop
             init_args:
-              transforms:
-                - class_path: torchvision.transforms.v2.ToImage
-                - class_path: torchvision.transforms.v2.Resize
-                  init_args:
-                    size: 224
-                - class_path: torchvision.transforms.v2.ConvertImageDtype
-                - class_path: torchvision.transforms.v2.Normalize
-                  init_args:
-                    mean: &NORMALIZE_MEAN [0.485, 0.456, 0.406]
-                    std: &NORMALIZE_STD [0.229, 0.224, 0.225]
+              mean: &NORMALIZE_MEAN [0.485, 0.456, 0.406]
+              std: &NORMALIZE_STD [0.229, 0.224, 0.225]
       val:
         class_path: eva.vision.datasets.PatchCamelyon
         init_args:
           root: ${oc.env:TESTS_ROOT, tests/eva}/assets/vision/datasets/patch_camelyon
-          split: val
-          download: false
+          split: valid
+          download: *DOWNLOAD_DATA
           image_transforms:
-            class_path: torchvision.transforms.v2.Compose
+            class_path: eva.vision.data.transforms.common.ResizeAndCrop
             init_args:
-              transforms:
-                - class_path: torchvision.transforms.v2.ToImage
-                - class_path: torchvision.transforms.v2.Resize
-                  init_args:
-                    size: 224
-                - class_path: torchvision.transforms.v2.ConvertImageDtype
-                - class_path: torchvision.transforms.v2.Normalize
-                  init_args:
-                    mean: *NORMALIZE_MEAN
-                    std: *NORMALIZE_STD
+              mean: *NORMALIZE_MEAN
+              std: *NORMALIZE_STD
       test:
         class_path: eva.vision.datasets.PatchCamelyon
         init_args:
           root: ${oc.env:TESTS_ROOT, tests/eva}/assets/vision/datasets/patch_camelyon
           split: test
-          download: false
+          download: *DOWNLOAD_DATA
           image_transforms:
-            class_path: torchvision.transforms.v2.Compose
+            class_path: eva.vision.data.transforms.common.ResizeAndCrop
             init_args:
-              transforms:
-                - class_path: torchvision.transforms.v2.ToImage
-                - class_path: torchvision.transforms.v2.Resize
-                  init_args:
-                    size: 224
-                - class_path: torchvision.transforms.v2.ConvertImageDtype
-                - class_path: torchvision.transforms.v2.Normalize
-                  init_args:
-                    mean: *NORMALIZE_MEAN
-                    std: *NORMALIZE_STD
+              mean: *NORMALIZE_MEAN
+              std: *NORMALIZE_STD
     dataloaders:
       train:
         batch_size: &BATCH_SIZE 2
