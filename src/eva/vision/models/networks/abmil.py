@@ -41,6 +41,7 @@ class ABMIL(torch.nn.Module):
         dropout_input_embeddings: float = 0.0,
         dropout_attention: float = 0.0,
         dropout_mlp: float = 0.0,
+        pad_value: int | float | None = float("-inf"),
     ) -> None:
         """Initializes the ABMIL network.
 
@@ -54,8 +55,12 @@ class ABMIL(torch.nn.Module):
             dropout_input_embeddings: dropout rate for the input embeddings
             dropout_attention: dropout rate for the attention network and classifier
             dropout_mlp: dropout rate for the final MLP network
+            pad_value: Value indicating padding in the input tensor. If specified, entries with
+                this value in the will be masked. If set to None, no masking will be is applied.
         """
         super().__init__()
+
+        self._pad_value = pad_value
 
         if projected_input_size:
             self.projector = nn.Sequential(
@@ -82,14 +87,14 @@ class ABMIL(torch.nn.Module):
             hidden_activation_fn=nn.ReLU,
         )
 
-    def forward(self, input_tensor: torch.Tensor, pad_value: int | float | None = None):
+    def forward(self, input_tensor: torch.Tensor) -> torch.Tensor:
         """Forward pass.
 
         Args:
             input_tensor: Tensor with expected shape of (batch_size, n_instances, input_size).
             pad_value: Value indicating padding in the input tensor. If None no masking is applied.
         """
-        input_tensor, mask = self._mask_values(input_tensor, pad_value)
+        input_tensor, mask = self._mask_values(input_tensor, self._pad_value)
 
         # (batch_size, n_instances, input_size) -> (batch_size, n_instances, projected_input_size)
         input_tensor = self.projector(input_tensor)
@@ -109,7 +114,7 @@ class ABMIL(torch.nn.Module):
 
         return self.classifier(attention_result)  # (batch_size, output_size)
 
-    def _mask_values(self, input_tensor: torch.Tensor, pad_value: int | float | None):
+    def _mask_values(self, input_tensor: torch.Tensor, pad_value: float | None):
         """Masks the padded values in the input tensor."""
         if pad_value is None:
             return input_tensor, None
@@ -161,7 +166,7 @@ class GatedAttention(nn.Module):
         self.attention_b = make_attention(activation_b())
         self.attention_c = nn.Linear(hidden_dim, n_classes)
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         """Forward pass."""
         a = self.attention_a(x)  # [..., hidden_dim]
         b = self.attention_b(x)  # [..., hidden_dim]

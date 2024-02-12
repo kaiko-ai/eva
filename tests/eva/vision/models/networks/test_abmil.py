@@ -21,6 +21,7 @@ def test_masked_abmil(
     masked_fraction: float,
 ) -> None:
     """Test if abmil model yields same output in masked and unmasked case."""
+    pad_value = float("-inf")
     model = ABMIL(
         input_size=input_size,
         output_size=output_size,
@@ -28,15 +29,19 @@ def test_masked_abmil(
         hidden_size_attention=128,
         hidden_sizes_mlp=hidden_sizes_mlp,
         use_bias=True,
+        pad_value=None,
     )
 
     n_masked = int(n_instances * masked_fraction)
-    pad_value = float("-inf")
 
     x = torch.randn(batch_size, n_instances, input_size)
     x[:, n_masked:, :] = pad_value
 
+    # without padding
     y = model(x[:, :n_masked, :])
-    y_masked = model(x, pad_value=pad_value)
+
+    # with padding
+    model._pad_value = pad_value
+    y_masked = model(x)
 
     assert torch.allclose(y, y_masked, atol=1e-6)

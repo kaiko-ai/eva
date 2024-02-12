@@ -23,8 +23,8 @@ class SlideEmbeddingDataset(PatchEmbeddingDataset):
     def __init__(
         self,
         manifest_path: str,
-        root_dir: str,
-        split: Literal["train", "valid", "test"],
+        root: str,
+        split: Literal["train", "val", "test"],
         column_mapping: Dict[str, str] = default_column_mapping,
         n_patches_per_slide: int = 1000,
         pad_value: int | float = float("-inf"),
@@ -44,7 +44,7 @@ class SlideEmbeddingDataset(PatchEmbeddingDataset):
             manifest_path: Path to the manifest file. Can be either a .csv or .parquet file, with
                 the required columns: path, target, split, slide_id (names can be adjusted
                 using the column_mapping parameter).
-            root_dir: Root directory of the dataset. If specified, the paths in the manifest
+            root: Root directory of the dataset. If specified, the paths in the manifest
                 file are expected to be relative to this directory.
             split: Dataset split to use.
             column_mapping: Mapping between the standardized column names and the actual
@@ -56,7 +56,7 @@ class SlideEmbeddingDataset(PatchEmbeddingDataset):
         """
         super().__init__(
             manifest_path=manifest_path,
-            root_dir=root_dir,
+            root=root,
             split=split,
             column_mapping=column_mapping,
         )
@@ -64,7 +64,6 @@ class SlideEmbeddingDataset(PatchEmbeddingDataset):
         self._n_patches_per_slide = n_patches_per_slide
         self._seed = seed
         self._pad_value = pad_value
-
         self._slide_id_column = self._column_mapping["slide_id"]
 
     @override
