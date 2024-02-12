@@ -30,6 +30,7 @@ class TotalSegmentatorClassification(base.ImageClassification):
             md5="6b5524af4b15e6ba06ef2d700c0c73e0",
         ),
     ]
+
     # TODO: switch to use complete instead of small dataset:
     #  - url="https://zenodo.org/records/10047292/files/Totalsegmentator_dataset_v201.zip"
     #  - md5="fe250e5718e0a3b5df4c4ea9d58a62fe"

@@ -11,9 +11,9 @@ import pandas as pd
 from torchvision.datasets import utils
 from typing_extensions import override
 
+from eva.vision.data.datasets import structs
 from eva.vision.data.datasets.classification import base
 from eva.vision.utils import io
-from src.eva.vision.data.datasets import structs
 
 
 class Bach(base.ImageClassification):
