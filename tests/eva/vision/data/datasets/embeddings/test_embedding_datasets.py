@@ -4,7 +4,6 @@ import os
 
 import numpy as np
 import pytest
-import torch
 
 from eva.vision.data.datasets.embeddings import PatchEmbeddingDataset, SlideEmbeddingDataset
 
@@ -59,6 +58,3 @@ def test_slide_embedding_dataset(slide_level_manifest_path: str, assets_path: st
         assert embedding.shape == expected_shape
         assert np.issubdtype(type(target), int)
         assert isinstance(metadata, dict)
-        assert "mask" in metadata.keys()
-        assert isinstance(metadata["mask"], torch.Tensor)
-        assert metadata["mask"].shape == (expected_shape[0], 1)

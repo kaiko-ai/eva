@@ -1,6 +1,6 @@
 """ABMIL Network."""
 
-from typing import Optional, Type
+from typing import Type
 
 import torch
 import torch.nn as nn
@@ -82,18 +82,18 @@ class ABMIL(torch.nn.Module):
             hidden_activation_fn=nn.ReLU,
         )
 
-    def forward(self, input_tensor: torch.Tensor, mask: Optional[torch.BoolTensor] = None):
+    def forward(self, input_tensor: torch.Tensor, pad_value: int | float | None = None):
         """Forward pass.
 
         Args:
-            input_tensor: tensor with expected shape of (batch_size, n_instances, input_size).
-            mask: mask tensor where true values correspond to entries in the input tensor that
-                should be ignored. expected shape is (batch_size, n_instances, 1).
+            input_tensor: Tensor with expected shape of (batch_size, n_instances, input_size).
+            pad_value: Value indicating padding in the input tensor. If None no masking is applied.
         """
-        # Project input to lower dimensionality (batch_size, n_instances, projected_input_size)
+        input_tensor, mask = self._mask_values(input_tensor, pad_value)
+
+        # (batch_size, n_instances, input_size) -> (batch_size, n_instances, projected_input_size)
         input_tensor = self.projector(input_tensor)
 
-        # Gated attention & masking
         attention_logits = self.gated_attention(input_tensor)  # (batch_size, n_instances, 1)
         if mask is not None:
             # fill masked values with -inf, which will yield 0s after softmax
@@ -107,8 +107,23 @@ class ABMIL(torch.nn.Module):
 
         attention_result = torch.squeeze(attention_result, 1)  # (batch_size, hidden_size_attention)
 
-        # Final MLP classifier network
         return self.classifier(attention_result)  # (batch_size, output_size)
+
+    def _mask_values(self, input_tensor: torch.Tensor, pad_value: int | float | None):
+        """Masks the padded values in the input tensor."""
+        if pad_value is None:
+            return input_tensor, None
+        else:
+            # (batch_size, n_instances, input_size)
+            mask = input_tensor == pad_value
+
+            # (batch_size, n_instances, input_size) -> (batch_size, n_instances, 1)
+            mask = mask.all(dim=-1, keepdim=True)
+
+            # Fill masked values with 0, so that they don't contribute to dense layers
+            input_tensor = input_tensor.masked_fill(mask, 0)
+
+            return input_tensor, mask
 
 
 class GatedAttention(nn.Module):
