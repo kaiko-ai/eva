@@ -27,6 +27,7 @@ dependencies = [
     "pyarrow>=15.0.0",
     "tensorboardX>=2.6.2.2",
     "nibabel>=5.2.0",
+    "timm>=0.9.12",
 ]
 
 [project.optional-dependencies]
