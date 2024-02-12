@@ -80,13 +80,13 @@ class ModelFromFunction(nn.Module):
             keys = model.state_dict().keys()
             if len(missing):
                 logger.warning(
-                    f"{len(missing)}/{len(keys)} modules are missing in the checkpoint and will not be "
-                    f"initialized: {missing}"
+                    f"{len(missing)}/{len(keys)} modules are missing in the checkpoint and "
+                    f"will not be initialized: {missing}"
                 )
             if len(unexpected):
                 logger.warning(
-                    f"The checkpoint also contains {len(unexpected)} modules ignored by the model: "
-                    f"{unexpected}"
+                    f"The checkpoint also contains {len(unexpected)} modules ignored by the "
+                    f"model: {unexpected}"
                 )
             logger.info(
                 f"Loaded {len(set(keys) - set(missing))}/{len(keys)} modules for "
