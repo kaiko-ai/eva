@@ -56,15 +56,11 @@ class ModelFromFunction(nn.Module):
     def load_model_checkpoint(
         self,
         model: torch.nn.Module,
-        strict: bool = False,
     ) -> torch.nn.Module:
         """Initializes the model with the weights.
 
         Args:
             model: model to initialize.
-            strict: if `True`, it loads the weights only if the dictionary matches the
-                architecture exactly. if `False`, it loads the weights even if the weights
-                of some layers are missing.
 
         Returns:
             the model initialized with the checkpoint.
@@ -75,19 +71,6 @@ class ModelFromFunction(nn.Module):
             checkpoint = torch.load(f, map_location="cpu")  # type: ignore[arg-type]
             if "state_dict" in checkpoint:
                 checkpoint = checkpoint["state_dict"]
-            out = model.load_state_dict(checkpoint, strict=strict)
-            missing, unexpected = out.missing_keys, out.unexpected_keys
-            keys = model.state_dict().keys()
-            if len(missing):
-                raise ValueError(
-                    f"{len(missing)}/{len(keys)} modules are missing in the checkpoint and "
-                    f"will not be initialized: {missing}"
-                )
-            if len(unexpected):
-                raise ValueError(
-                    f"The checkpoint also contains {len(unexpected)} modules ignored by the "
-                    f"model: {unexpected}"
-                )
             logger.info(
                 f"Loaded modules for {model.__class__.__name__} from checkpoint "
                 f"{self._checkpoint_path}"
