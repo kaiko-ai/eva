@@ -68,6 +68,10 @@ class PatchEmbeddingDataset(VisionDataset):
         return len(self._data)
 
     @override
+    def filename(self, index: int) -> str:
+        return self._data.at[index, self._path_column]
+
+    @override
     def setup(self):
         self._data = self._load_manifest()
         self._data[self._embedding_column] = None
@@ -86,7 +90,7 @@ class PatchEmbeddingDataset(VisionDataset):
         return tensor
 
     def _get_embedding_path(self, index: int) -> str:
-        return os.path.join(self._root, self._data.at[index, self._path_column])
+        return os.path.join(self._root, self.filename(index))
 
     def _load_manifest(self) -> pd.DataFrame:
         if self._manifest_path.endswith(".csv"):
