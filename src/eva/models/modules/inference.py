@@ -34,5 +34,4 @@ class InferenceModule(module.ModelModule):
     ) -> STEP_OUTPUT:
         data, targets, metadata = INPUT_BATCH(*batch)
         predictions = self(data)
-
         return predictions
