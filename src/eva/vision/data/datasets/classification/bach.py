@@ -87,7 +87,10 @@ class Bach(base.ImageClassification):
         df = self._generate_ordered_stratified_splits(df)
         self._verify_dataset(df)
 
-        self._data = df.loc[df[self._split_key] == self._split].reset_index(drop=True)
+        if self._split:
+            df = df.loc[df[self._split_key] == self._split]
+
+        self._data = df.reset_index(drop=True)
 
     @override
     def load_image(self, index: int) -> np.ndarray:
@@ -102,6 +105,10 @@ class Bach(base.ImageClassification):
     @override
     def __len__(self) -> int:
         return len(self._data)
+
+    @override
+    def filename(self, index: int) -> str:
+        return self._data.at[index, self._path_key]
 
     def _download_dataset(self) -> None:
         """Downloads the dataset."""
