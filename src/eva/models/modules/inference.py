@@ -11,19 +11,19 @@ from eva.models.modules.typings import INPUT_BATCH, MODEL_TYPE
 class InferenceModule(module.ModelModule):
     """An lightweight model module to perform inference."""
 
-    def __init__(self, model: MODEL_TYPE) -> None:
+    def __init__(self, backbone: MODEL_TYPE) -> None:
         """Initializes the module.
 
         Args:
-            model: The network to be used for inference.
+            backbone: The network to be used for inference.
         """
         super().__init__(metrics=None)
 
-        self.model = model
+        self.backbone = backbone
 
     @override
     def forward(self, tensor: torch.Tensor) -> torch.Tensor:
-        return self.model(tensor)
+        return self.backbone(tensor)
 
     @override
     def predict_step(

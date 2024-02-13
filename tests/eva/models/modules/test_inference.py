@@ -12,6 +12,7 @@ from eva.data import datamodules
 from eva.models import modules
 
 N_CLASSES = 4
+"""The number of classes in the dataset."""
 
 
 @pytest.mark.parametrize(
@@ -33,10 +34,10 @@ def test_inference_module_predict(
     assert isinstance(datamodule.dataloaders.predict.batch_size, int)
     assert isinstance(predictions, list)
     n_batches = math.ceil(dataset_size / datamodule.dataloaders.predict.batch_size)
-    for p in predictions:
-        assert isinstance(p, torch.Tensor)
-        assert p.shape[0] == n_batches
-        assert p.shape[1] == N_CLASSES
+    for prediction in predictions:
+        assert isinstance(prediction, torch.Tensor)
+        assert prediction.shape[0] == n_batches
+        assert prediction.shape[1] == N_CLASSES
 
 
 @pytest.fixture(scope="function")
@@ -45,5 +46,5 @@ def model(
 ) -> modules.InferenceModule:
     """Returns a HeadModule model fixture."""
     return modules.InferenceModule(
-        model=nn.Sequential(nn.Flatten(), nn.Linear(math.prod(input_shape), n_classes))
+        backbone=nn.Sequential(nn.Flatten(), nn.Linear(math.prod(input_shape), n_classes))
     )
