@@ -1,6 +1,7 @@
 """Batch prediction writer."""
 
 import csv
+import os
 from pathlib import Path
 from typing import Any, Sequence
 
@@ -31,7 +32,7 @@ class BatchPredictionWriter(callbacks.BasePredictionWriter):
 
         self._group_key = group_key
 
-        Path(self.output_dir).mkdir(parents=True, exist_ok=True)
+        os.makedirs(self.output_dir, exist_ok=True)
         self._manifest_file = open(Path(self.output_dir, "manifest.csv"), "w", newline="")
         self._manifest_writer = csv.writer(self._manifest_file)
 
@@ -50,24 +51,25 @@ class BatchPredictionWriter(callbacks.BasePredictionWriter):
     ) -> None:
         dataset = trainer.predict_dataloaders[dataloader_idx].dataset  # type: ignore
 
-        for local_idx, global_idx in enumerate(batch_indices):
-            if local_idx >= len(prediction):
-                break
-
-            save_dir = (
-                Path(self.output_dir, batch["metadata"][self._group_key][local_idx])  # type: ignore
-                if self._group_key
-                else self.output_dir
-            )
-            filename = dataset.filename(global_idx)
-            save_name = Path(filename).with_suffix(".pt")
-            save_path = Path(save_dir, save_name)
-            save_path.parent.mkdir(parents=True, exist_ok=True)
-
-            torch.save(prediction[local_idx], save_path)
-            self._manifest_writer.writerow([filename, save_name])
+        for local_idx, global_idx in enumerate(batch_indices[: len(prediction)]):
+            save_dir = self._get_save_dir(batch, local_idx)
+            self._save_prediction(prediction[local_idx], dataset.filename(global_idx), save_dir)
 
     @override
     def on_predict_end(self, trainer: pl.Trainer, pl_module: pl.LightningModule) -> None:
         self._manifest_file.close()
         logger.info(f"Predictions saved to {self.output_dir}")
+
+    def _get_save_dir(self, batch: INPUT_BATCH, idx: int) -> str:
+        save_dir = (
+            os.path.join(self.output_dir, batch["metadata"][self._group_key][idx])  # type: ignore
+            if self._group_key
+            else self.output_dir
+        )
+        os.makedirs(save_dir, exist_ok=True)
+        return save_dir
+
+    def _save_prediction(self, prediction: torch.Tensor, file_name: str, save_dir: str):
+        save_name = Path(file_name).with_suffix(".pt")
+        torch.save(prediction, os.path.join(save_dir, save_name))
+        self._manifest_writer.writerow([file_name, save_name])
