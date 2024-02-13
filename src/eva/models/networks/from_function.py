@@ -71,6 +71,7 @@ class ModelFromFunction(nn.Module):
             checkpoint = torch.load(f, map_location="cpu")  # type: ignore[arg-type]
             if "state_dict" in checkpoint:
                 checkpoint = checkpoint["state_dict"]
+            model.load_state_dict(checkpoint, strict=True)
             logger.info(
                 f"Loaded modules for {model.__class__.__name__} from checkpoint "
                 f"{self._checkpoint_path}"
