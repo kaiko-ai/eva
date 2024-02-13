@@ -41,7 +41,7 @@ class ModelFromFunction(nn.Module):
 
         self._path = path
         self._arguments = arguments
-        self.checkpoint_path = checkpoint_path
+        self._checkpoint_path = checkpoint_path
 
         self._network = self.build_model()
 
@@ -49,7 +49,7 @@ class ModelFromFunction(nn.Module):
         """Builds and returns the model."""
         class_path = jsonargparse.class_from_function(self._path, func_return=nn.Module)
         model = class_path(**self._arguments or {})
-        if self.checkpoint_path is not None:
+        if self._checkpoint_path is not None:
             model = self.load_model_checkpoint(model)
         return model
 
@@ -69,9 +69,9 @@ class ModelFromFunction(nn.Module):
         Returns:
             the model initialized with the checkpoint.
         """
-        logger.info(f"Loading {model.__class__.__name__} from checkpoint {self.checkpoint_path}")
+        logger.info(f"Loading {model.__class__.__name__} from checkpoint {self._checkpoint_path}")
 
-        with open(self.checkpoint_path, "rb") as f:  # type: ignore
+        with open(self._checkpoint_path, "rb") as f:  # type: ignore
             checkpoint = torch.load(f, map_location="cpu")  # type: ignore[arg-type]
             if "state_dict" in checkpoint:
                 checkpoint = checkpoint["state_dict"]
@@ -79,18 +79,18 @@ class ModelFromFunction(nn.Module):
             missing, unexpected = out.missing_keys, out.unexpected_keys
             keys = model.state_dict().keys()
             if len(missing):
-                logger.warning(
+                raise ValueError(
                     f"{len(missing)}/{len(keys)} modules are missing in the checkpoint and "
                     f"will not be initialized: {missing}"
                 )
             if len(unexpected):
-                logger.warning(
+                raise ValueError(
                     f"The checkpoint also contains {len(unexpected)} modules ignored by the "
                     f"model: {unexpected}"
                 )
             logger.info(
-                f"Loaded {len(set(keys) - set(missing))}/{len(keys)} modules for "
-                f"{model.__class__.__name__} from checkpoint {self.checkpoint_path}"
+                f"Loaded modules for {model.__class__.__name__} from checkpoint "
+                f"{self._checkpoint_path}"
             )
         return model
 
