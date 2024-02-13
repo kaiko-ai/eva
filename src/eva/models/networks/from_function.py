@@ -50,31 +50,33 @@ class ModelFromFunction(nn.Module):
         class_path = jsonargparse.class_from_function(self._path, func_return=nn.Module)
         model = class_path(**self._arguments or {})
         if self._checkpoint_path is not None:
-            model = self.load_model_checkpoint(model)
+            model = self.load_model_checkpoint(model, self._checkpoint_path)
         return model
 
     def load_model_checkpoint(
         self,
         model: torch.nn.Module,
+        checkpoint_path: str,
     ) -> torch.nn.Module:
         """Initializes the model with the weights.
 
         Args:
             model: model to initialize.
+            checkpoint_path: The path to the checkpoint to load the model weights from.
 
         Returns:
             the model initialized with the checkpoint.
         """
-        logger.info(f"Loading {model.__class__.__name__} from checkpoint {self._checkpoint_path}")
+        logger.info(f"Loading {model.__class__.__name__} from checkpoint {checkpoint_path}")
 
-        with open(self._checkpoint_path, "rb") as f:  # type: ignore
+        with open(checkpoint_path, "rb") as f:
             checkpoint = torch.load(f, map_location="cpu")  # type: ignore[arg-type]
             if "state_dict" in checkpoint:
                 checkpoint = checkpoint["state_dict"]
             model.load_state_dict(checkpoint, strict=True)
             logger.info(
                 f"Loaded modules for {model.__class__.__name__} from checkpoint "
-                f"{self._checkpoint_path}"
+                f"{checkpoint_path}"
             )
         return model
 
