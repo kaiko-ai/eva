@@ -43,7 +43,7 @@ class BatchPredictionWriter(callbacks.BasePredictionWriter):
         trainer: pl.Trainer,
         pl_module: pl.LightningModule,
         prediction: Any,
-        batch_indices: Sequence[int] | None,
+        batch_indices: Sequence[int],
         batch: INPUT_BATCH,
         batch_idx: int,
         dataloader_idx: int,
