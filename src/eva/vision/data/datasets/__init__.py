@@ -6,6 +6,7 @@ from eva.vision.data.datasets.classification import (
     TotalSegmentatorClassification,
 )
 from eva.vision.data.datasets.embeddings import PatchEmbeddingDataset, SlideEmbeddingDataset
+from eva.vision.data.datasets.vision import VisionDataset
 
 __all__ = [
     "Bach",
@@ -13,4 +14,5 @@ __all__ = [
     "SlideEmbeddingDataset",
     "PatchCamelyon",
     "TotalSegmentatorClassification",
+    "VisionDataset",
 ]
