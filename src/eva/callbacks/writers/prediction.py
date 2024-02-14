@@ -66,10 +66,11 @@ class BatchPredictionWriter(callbacks.BasePredictionWriter):
             if self._group_key
             else self.output_dir
         )
-        os.makedirs(save_dir, exist_ok=True)
         return save_dir
 
     def _save_prediction(self, prediction: torch.Tensor, file_name: str, save_dir: str):
         save_name = Path(file_name).with_suffix(".pt")
-        torch.save(prediction, os.path.join(save_dir, save_name))
+        save_path = os.path.join(save_dir, save_name)
+        os.makedirs(os.path.dirname(save_path), exist_ok=True)
+        torch.save(prediction, save_path)
         self._manifest_writer.writerow([file_name, save_name])
