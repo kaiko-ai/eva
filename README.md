@@ -45,8 +45,9 @@ TBD
 The following datasets are supported
 
 ### Vision
-- [BACH](./docs/datasets/bach/README.md)
-- [PatchCamelyon](./docs/datasets/patch_camelyon/README.md)
+- [BACH](./docs/datasets/bach.md)
+- [PatchCamelyon](./docs/datasets/patch_camelyon.md)
+- [TotalSegmentator](./docs/datasets/total_segmentator.md)
 
 ## Contributing
 
