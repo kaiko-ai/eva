@@ -2,7 +2,6 @@
 
 import csv
 import os
-from pathlib import Path
 from typing import Any, Sequence
 
 import pytorch_lightning as pl
@@ -33,7 +32,7 @@ class BatchPredictionWriter(callbacks.BasePredictionWriter):
         self._group_key = group_key
 
         os.makedirs(self.output_dir, exist_ok=True)
-        self._manifest_file = open(Path(self.output_dir, "manifest.csv"), "w", newline="")
+        self._manifest_file = open(os.path.join(self.output_dir, "manifest.csv"), "w", newline="")
         self._manifest_writer = csv.writer(self._manifest_file)
 
         self._manifest_writer.writerow(["filename", "prediction"])
@@ -69,7 +68,7 @@ class BatchPredictionWriter(callbacks.BasePredictionWriter):
         return save_dir
 
     def _save_prediction(self, prediction: torch.Tensor, file_name: str, save_dir: str):
-        save_name = Path(file_name).with_suffix(".pt")
+        save_name = os.path.splitext(file_name)[0] + ".pt"
         save_path = os.path.join(save_dir, save_name)
         os.makedirs(os.path.dirname(save_path), exist_ok=True)
         torch.save(prediction, save_path)
