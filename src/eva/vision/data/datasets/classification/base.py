@@ -38,6 +38,17 @@ class ImageClassification(vision.VisionDataset[Tuple[np.ndarray, np.ndarray]], a
     def class_to_idx(self) -> Dict[str, int] | None:
         """Returns a mapping of the class name to its target index."""
 
+    def load_metadata(self, index: int | None) -> Dict[str, Any] | List[Dict[str, Any]] | None:
+        """Returns the dataset metadata.
+
+        Args:
+            index: The index of the data sample to return the metadata of.
+                If `None`, it will return the metadata of the current dataset.
+
+        Returns:
+            The sample metadata.
+        """
+
     @abc.abstractmethod
     def load_image(self, index: int) -> np.ndarray:
         """Returns the `index`'th image sample.
@@ -58,17 +69,6 @@ class ImageClassification(vision.VisionDataset[Tuple[np.ndarray, np.ndarray]], a
 
         Returns:
             The sample target as an array.
-        """
-
-    def load_metadata(self, index: int | None) -> Dict[str, Any] | List[Dict[str, Any]] | None:
-        """Returns the dataset metadata.
-
-        Args:
-            index: The index of the data sample to return the metadata of.
-                If `None`, it will return the metadata of the current dataset.
-
-        Returns:
-            The sample metadata.
         """
 
     @abc.abstractmethod

@@ -102,6 +102,10 @@ class PatchCamelyon(base.ImageClassification):
         return {"no_tumor": 0, "tumor": 1}
 
     @override
+    def filename(self, index: int) -> str:
+        return f"camelyonpatch_level_2_split_{self._split}_x_{index}"
+
+    @override
     def prepare_data(self) -> None:
         if self._download:
             self._download_dataset()
@@ -118,10 +122,6 @@ class PatchCamelyon(base.ImageClassification):
     @override
     def __len__(self) -> int:
         return self._fetch_dataset_length()
-
-    @override
-    def filename(self, index: int) -> str:
-        return f"camelyonpatch_level_2_split_{self._split}_x_{index}"
 
     def _download_dataset(self) -> None:
         """Downloads the PatchCamelyon dataset."""
