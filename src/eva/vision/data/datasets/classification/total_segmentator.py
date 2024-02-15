@@ -120,6 +120,10 @@ class TotalSegmentatorClassification(base.ImageClassification):
     def __len__(self) -> int:
         return len(self._data)
 
+    @override
+    def filename(self, index: int) -> str:
+        return self._data.at[index, self._path_key]
+
     def _download_dataset(self) -> None:
         os.makedirs(self._root, exist_ok=True)
         for resource in self.resources:
