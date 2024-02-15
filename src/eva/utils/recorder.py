@@ -1,4 +1,4 @@
-"""Helper functions to record the evaluation run config and results"""
+"""Helper functions to record the evaluation run config and results."""
 
 import hashlib
 import json
@@ -74,10 +74,12 @@ def _save_result(results: dict, results_dir: str) -> None:
 
 
 def get_run_id(start_time: datetime, max_hash_len: int = 8) -> str:
-    """Generates and returns a unique ID for the evaluation. The ID is composed of a
-        timestamp and a hash.
+    """Generates and returns a unique ID for the evaluation. 
+    
+    The ID is composed of a timestamp and a hash.
 
     Args:
+        start_time: The start time of the evaluation.
         max_hash_len: Maximum length of the returned hash.
 
     Returns:
