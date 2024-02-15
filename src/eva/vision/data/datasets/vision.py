@@ -41,6 +41,19 @@ class VisionDataset(Dataset, abc.ABC, Generic[DataSample]):
         """
 
     @abc.abstractmethod
+    def filename(self, index: int) -> str:
+        """Returns the filename of the `index`'th data sample.
+
+        Note that this is the relative file path to the root.
+
+        Args:
+            index: The index of the data-sample to select.
+
+        Returns:
+            The filename of the `index`'th data sample.
+        """
+
+    @abc.abstractmethod
     def __getitem__(self, index: int) -> DataSample:
         """Returns the `index`'th data sample.
 

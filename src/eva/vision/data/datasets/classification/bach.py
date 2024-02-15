@@ -54,8 +54,8 @@ class BACH(base.ImageClassification):
     ) -> None:
         """Initialize the dataset.
 
-        In the dataset split we take into consideration the patient ids, so they
-        wont be any data leakage.
+        The dataset is splitted into train and validation by taking into account
+        the patient ids, in order to avoid any data leakage.
 
         Args:
             root: Path to the root directory of the dataset. The dataset will
@@ -96,6 +96,11 @@ class BACH(base.ImageClassification):
     def dataset_path(self) -> str:
         """Returns the path of the image data of the dataset."""
         return os.path.join(self._root, "ICIAR2018_BACH_Challenge", "Photos")
+
+    @override
+    def filename(self, index: int) -> str:
+        image_path, _ = self._samples[self._indices[index]]
+        return os.path.relpath(image_path, self.dataset_path)
 
     @override
     def prepare_data(self) -> None:
@@ -148,4 +153,5 @@ class BACH(base.ImageClassification):
         index_ranges = split_index_ranges.get(self._split)
         if index_ranges is None:
             raise ValueError("Invalid data split. Use 'train', 'val' or `None`.")
+
         return _utils.ranges_to_indices(index_ranges)

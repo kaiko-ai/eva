@@ -48,7 +48,6 @@ class ImageClassification(vision.VisionDataset[Tuple[np.ndarray, np.ndarray]], a
         Returns:
             The image as a numpy array.
         """
-        raise NotImplementedError
 
     @abc.abstractmethod
     def load_target(self, index: int) -> np.ndarray:
@@ -60,13 +59,13 @@ class ImageClassification(vision.VisionDataset[Tuple[np.ndarray, np.ndarray]], a
         Returns:
             The sample target as an array.
         """
-        raise NotImplementedError
 
-    def load_metadata(self, index: int) -> Dict[str, Any] | None:
-        """Returns the `index`'th metadata.
+    def load_metadata(self, index: int | None) -> Dict[str, Any] | List[Dict[str, Any]] | None:
+        """Returns the dataset metadata.
 
         Args:
-            index: The index of the data sample to load.
+            index: The index of the data sample to return the metadata of.
+                If `None`, it will return the metadata of the current dataset.
 
         Returns:
             The sample metadata.

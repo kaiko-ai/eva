@@ -119,6 +119,10 @@ class PatchCamelyon(base.ImageClassification):
     def __len__(self) -> int:
         return self._fetch_dataset_length()
 
+    @override
+    def filename(self, index: int) -> str:
+        return f"camelyonpatch_level_2_split_{self._split}_x_{index}"
+
     def _download_dataset(self) -> None:
         """Downloads the PatchCamelyon dataset."""
         dataset_resources = {
