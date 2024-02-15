@@ -27,7 +27,7 @@ def test_batch_prediction_writer(
     with tempfile.TemporaryDirectory() as output_dir:
         trainer = pl.Trainer(
             logger=False,
-            callbacks=writers.BatchPredictionWriter(
+            callbacks=writers.EmbeddingsWriter(
                 output_dir=output_dir, dataloader_idx_map={0: "train", 1: "val", 2: "test"}
             ),
         )

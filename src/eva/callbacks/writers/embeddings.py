@@ -1,4 +1,4 @@
-"""Batch prediction writer."""
+"""Embeddings writer."""
 
 import csv
 import os
@@ -14,13 +14,13 @@ from typing_extensions import override
 from eva.models.modules.typings import INPUT_BATCH
 
 
-class BatchPredictionWriter(callbacks.BasePredictionWriter):
+class EmbeddingsWriter(callbacks.BasePredictionWriter):
     """Callback for writing predictions to disk."""
 
     def __init__(
         self, output_dir: str, dataloader_idx_map: dict | None, group_key: str | None = None
     ):
-        """Initializes a new BatchPredictionWriter instance.
+        """Initializes a new EmbeddingsWriter instance.
 
         Args:
             output_dir: The directory where the predictions will be saved.
