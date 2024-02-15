@@ -162,7 +162,7 @@ class Bach(base.ImageClassification):
 
     def _verify_dataset(self, df: pd.DataFrame) -> None:
         if len(df) != 400:
-            raise ValueError(f"Expected 400 samples but manifest lists {len(df)}.")
+            raise ValueError(f"Expected 400 samples but received {len(df)}.")
 
         if not (df["target"].value_counts() == 100).all():
             raise ValueError("Expected 100 samples per class.")

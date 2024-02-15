@@ -22,10 +22,10 @@ class PatchEmbeddingDataset(VisionDataset):
 
     def __init__(
         self,
-        manifest_path: str,
         root: str,
+        manifest_path: str | None,
         split: Literal["train", "val", "test"],
-        column_mapping: Dict[str, str] = default_column_mapping,
+        column_mapping: Dict[str, str] | None = None,
     ):
         """Initialize dataset.
 
@@ -33,28 +33,30 @@ class PatchEmbeddingDataset(VisionDataset):
         of shape [embedding_dim] or [1, embedding_dim].
 
         Args:
-            manifest_path: Path to the manifest file. Can be either a .csv or .parquet file, with
-                the required columns: path, target, split (names can be adjusted using the
-                column_mapping parameter).
             root: Root directory of the dataset. If specified, the paths in the manifest
                 file are expected to be relative to this directory.
+            manifest_path: Path to the manifest file. Can be either a .csv or .parquet file, with
+                the required columns: path, target, split (names can be adjusted using the
+                column_mapping parameter). If None, will default to `<root>/manifest.csv`.
             split: Dataset split to use.
             column_mapping: Mapping between the standardized column names and the actual
                 column names in the provided manifest file.
         """
         super().__init__()
 
-        self._manifest_path = manifest_path
         self._root = root
         self._split = split
-        self._column_mapping = column_mapping
+        self._manifest_path = manifest_path if manifest_path else os.path.join(root, "manifest.csv")
 
         self._data: pd.DataFrame
 
+        self._column_mapping = self.default_column_mapping
+        if column_mapping:
+            self._column_mapping.update(column_mapping)
         self._path_column = self._column_mapping["path"]
         self._target_column = self._column_mapping["target"]
         self._split_column = self._column_mapping["split"]
-        self._embedding_column = "embedding"
+        self._embedding_column = "embedding_tensor"
 
     @override
     def __getitem__(self, index) -> Tuple[torch.Tensor, torch.Tensor]:
@@ -98,4 +100,4 @@ class PatchEmbeddingDataset(VisionDataset):
         elif self._manifest_path.endswith(".parquet"):
             return pd.read_parquet(self._manifest_path)
         else:
-            raise ValueError(f"Unsupported file format for manifest file {self._manifest_path}")
+            raise ValueError(f"Failed to load manifest file {self._manifest_path}")
