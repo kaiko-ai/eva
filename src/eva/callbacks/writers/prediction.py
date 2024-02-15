@@ -16,11 +16,15 @@ from eva.models.modules.typings import INPUT_BATCH
 class BatchPredictionWriter(callbacks.BasePredictionWriter):
     """Callback for writing predictions to disk."""
 
-    def __init__(self, output_dir: str, group_key: str | None = None):
+    def __init__(
+        self, output_dir: str, dataloader_idx_map: dict | None, group_key: str | None = None
+    ):
         """Initializes a new BatchPredictionWriter instance.
 
         Args:
             output_dir: The directory where the predictions will be saved.
+            dataloader_idx_map: A dictionary mapping dataloader indices to their respective
+                names (train, val, test).
             group_key: The metadata key to group the predictions by. If specified, the
                 predictions will be saved in subdirectories named after the group key.
                 If specified, the key must be present in the metadata of the input batch.
@@ -30,12 +34,13 @@ class BatchPredictionWriter(callbacks.BasePredictionWriter):
         self.output_dir = output_dir
 
         self._group_key = group_key
+        self._dataloader_idx_map = dataloader_idx_map if dataloader_idx_map else {}
 
         os.makedirs(self.output_dir, exist_ok=True)
         self._manifest_file = open(os.path.join(self.output_dir, "manifest.csv"), "w", newline="")
         self._manifest_writer = csv.writer(self._manifest_file)
 
-        self._manifest_writer.writerow(["filename", "prediction"])
+        self._manifest_writer.writerow(["filename", "prediction", "target", "split"])
 
     @override
     def write_on_batch_end(
@@ -49,27 +54,31 @@ class BatchPredictionWriter(callbacks.BasePredictionWriter):
         dataloader_idx: int,
     ) -> None:
         dataset = trainer.predict_dataloaders[dataloader_idx].dataset  # type: ignore
+        _, targets, metadata = INPUT_BATCH(*batch)
 
         for local_idx, global_idx in enumerate(batch_indices[: len(prediction)]):
-            save_dir = self._get_save_dir(batch, local_idx)
-            self._save_prediction(prediction[local_idx], dataset.filename(global_idx), save_dir)
+            input_name = dataset.filename(global_idx)
+            group_name = metadata[self._group_key][local_idx] if self._group_key else None  # type: ignore
+            save_name = self._save_prediction(prediction[local_idx], input_name, group_name)
+            target = targets[local_idx].item() if isinstance(targets, torch.Tensor) else None
+            split = self._dataloader_idx_map.get(dataloader_idx)
+            self._update_manifest(input_name, save_name, target, split)
 
     @override
     def on_predict_end(self, trainer: pl.Trainer, pl_module: pl.LightningModule) -> None:
         self._manifest_file.close()
         logger.info(f"Predictions saved to {self.output_dir}")
 
-    def _get_save_dir(self, batch: INPUT_BATCH, idx: int) -> str:
-        save_dir = (
-            os.path.join(self.output_dir, batch["metadata"][self._group_key][idx])  # type: ignore
-            if self._group_key
-            else self.output_dir
-        )
-        return save_dir
-
-    def _save_prediction(self, prediction: torch.Tensor, file_name: str, save_dir: str):
-        save_name = os.path.splitext(file_name)[0] + ".pt"
-        save_path = os.path.join(save_dir, save_name)
+    def _save_prediction(self, prediction: Any, input_filename: str, group_name: str | None) -> str:
+        save_name = os.path.splitext(input_filename)[0] + ".pt"
+        if group_name:
+            save_name = os.path.join(group_name, save_name)
+        save_path = os.path.join(self.output_dir, save_name)
         os.makedirs(os.path.dirname(save_path), exist_ok=True)
         torch.save(prediction, save_path)
-        self._manifest_writer.writerow([file_name, save_name])
+        return save_name
+
+    def _update_manifest(
+        self, input_name: str, prediction_name: str, target: int | float | None, split: str | None
+    ) -> None:
+        self._manifest_writer.writerow([input_name, prediction_name, target, split])
