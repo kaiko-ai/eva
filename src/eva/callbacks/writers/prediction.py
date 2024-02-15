@@ -8,6 +8,7 @@ import pytorch_lightning as pl
 import torch
 from loguru import logger
 from pytorch_lightning import callbacks
+from pytorch_lightning.trainer.states import RunningStage
 from typing_extensions import override
 
 from eva.models.modules.typings import INPUT_BATCH
@@ -24,7 +25,7 @@ class BatchPredictionWriter(callbacks.BasePredictionWriter):
         Args:
             output_dir: The directory where the predictions will be saved.
             dataloader_idx_map: A dictionary mapping dataloader indices to their respective
-                names (train, val, test).
+                names (e.g. train, val, test).
             group_key: The metadata key to group the predictions by. If specified, the
                 predictions will be saved in subdirectories named after the group key.
                 If specified, the key must be present in the metadata of the input batch.
@@ -36,11 +37,16 @@ class BatchPredictionWriter(callbacks.BasePredictionWriter):
         self._group_key = group_key
         self._dataloader_idx_map = dataloader_idx_map if dataloader_idx_map else {}
 
-        os.makedirs(self.output_dir, exist_ok=True)
-        self._manifest_file = open(os.path.join(self.output_dir, "manifest.csv"), "w", newline="")
-        self._manifest_writer = csv.writer(self._manifest_file)
+        self._manifest_file = None
+        self._manifest_writer = None
 
-        self._manifest_writer.writerow(["filename", "prediction", "target", "split"])
+    @override
+    def setup(self, trainer: "pl.Trainer", pl_module: "pl.LightningModule", stage: str) -> None:
+        super().setup(trainer, pl_module, stage)
+        os.makedirs(self.output_dir, exist_ok=True)
+
+        if trainer.state.stage == RunningStage.PREDICTING:
+            self._init_manifest()
 
     @override
     def write_on_batch_end(
@@ -66,8 +72,9 @@ class BatchPredictionWriter(callbacks.BasePredictionWriter):
 
     @override
     def on_predict_end(self, trainer: pl.Trainer, pl_module: pl.LightningModule) -> None:
-        self._manifest_file.close()
-        logger.info(f"Predictions saved to {self.output_dir}")
+        if self._manifest_file:
+            self._manifest_file.close()
+            logger.info(f"Predictions saved to {self.output_dir}")
 
     def _save_prediction(self, prediction: Any, input_filename: str, group_name: str | None) -> str:
         save_name = os.path.splitext(input_filename)[0] + ".pt"
@@ -78,7 +85,17 @@ class BatchPredictionWriter(callbacks.BasePredictionWriter):
         torch.save(prediction, save_path)
         return save_name
 
+    def _init_manifest(self):
+        manifest_path = os.path.join(self.output_dir, "manifest.csv")
+        if os.path.exists(manifest_path):
+            raise FileExistsError(f"Manifest file already exists at {manifest_path}")
+
+        self._manifest_file = open(manifest_path, "w", newline="")
+        self._manifest_writer = csv.writer(self._manifest_file)
+        self._manifest_writer.writerow(["filename", "prediction", "target", "split"])
+
     def _update_manifest(
         self, input_name: str, prediction_name: str, target: int | float | None, split: str | None
     ) -> None:
-        self._manifest_writer.writerow([input_name, prediction_name, target, split])
+        if self._manifest_writer:
+            self._manifest_writer.writerow([input_name, prediction_name, target, split])

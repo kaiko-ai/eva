@@ -41,7 +41,7 @@ def test_batch_prediction_writer(
         assert len(trainer.predict_dataloaders) == 3
         assert isinstance(all_predictions, list)
         assert len(all_predictions) == 3
-        tot_n_predictions = 0
+        total_n_predictions = 0
         for dataloader_idx in range(len(trainer.predict_dataloaders)):
             dataset = trainer.predict_dataloaders[dataloader_idx].dataset
 
@@ -56,7 +56,7 @@ def test_batch_prediction_writer(
                 filename = dataset.filename(idx)
                 assert f"{filename}.pt" in files
 
-            tot_n_predictions += n_predictions
+            total_n_predictions += n_predictions
 
         # Check if the manifest file is in the expected format
         df_manifest = pd.read_csv(os.path.join(output_dir, "manifest.csv"))
@@ -64,7 +64,7 @@ def test_batch_prediction_writer(
         assert "prediction" in df_manifest.columns
         assert "target" in df_manifest.columns
         assert "split" in df_manifest.columns
-        assert len(df_manifest) == tot_n_predictions
+        assert len(df_manifest) == total_n_predictions
 
 
 @pytest.fixture(scope="function")
