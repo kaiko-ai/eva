@@ -24,18 +24,18 @@ def test_batch_prediction_writer(
     datamodule: datamodules.DataModule, model: modules.HeadModule
 ) -> None:
     """Tests the embeddings writer callback."""
-    with tempfile.TemporaryDirectory() as temp_dir:
+    with tempfile.TemporaryDirectory() as output_dir:
         trainer = pl.Trainer(
             logger=False,
             callbacks=writers.BatchPredictionWriter(
-                output_dir=temp_dir, dataloader_idx_map={0: "train", 1: "val", 2: "test"}
+                output_dir=output_dir, dataloader_idx_map={0: "train", 1: "val", 2: "test"}
             ),
         )
         all_predictions = trainer.predict(
             model=model, datamodule=datamodule, return_predictions=True
         )
-        files = Path(temp_dir).glob("*.pt")
-        files = [f.relative_to(temp_dir).as_posix() for f in files]
+        files = Path(output_dir).glob("*.pt")
+        files = [f.relative_to(output_dir).as_posix() for f in files]
 
         assert isinstance(trainer.predict_dataloaders, list)
         assert len(trainer.predict_dataloaders) == 3
@@ -58,16 +58,13 @@ def test_batch_prediction_writer(
 
             tot_n_predictions += n_predictions
 
-        _verify_manifest(temp_dir, tot_n_predictions)
-
-
-def _verify_manifest(output_dir: str, n_predictions: int) -> None:
-    df_manifest = pd.read_csv(os.path.join(output_dir, "manifest.csv"))
-    assert "filename" in df_manifest.columns
-    assert "prediction" in df_manifest.columns
-    assert "target" in df_manifest.columns
-    assert "split" in df_manifest.columns
-    assert len(df_manifest) == n_predictions
+        # Check if the manifest file is in the expected format
+        df_manifest = pd.read_csv(os.path.join(output_dir, "manifest.csv"))
+        assert "filename" in df_manifest.columns
+        assert "prediction" in df_manifest.columns
+        assert "target" in df_manifest.columns
+        assert "split" in df_manifest.columns
+        assert len(df_manifest) == tot_n_predictions
 
 
 @pytest.fixture(scope="function")
