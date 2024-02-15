@@ -3,7 +3,6 @@
 import os
 from datetime import datetime
 
-
 from eva import trainers
 from eva.data import datamodules
 from eva.models import modules
