@@ -61,7 +61,7 @@ def test_batch_prediction_writer(
         # Check if the manifest file is in the expected format
         df_manifest = pd.read_csv(os.path.join(output_dir, "manifest.csv"))
         assert "filename" in df_manifest.columns
-        assert "prediction" in df_manifest.columns
+        assert "embedding" in df_manifest.columns
         assert "target" in df_manifest.columns
         assert "split" in df_manifest.columns
         assert len(df_manifest) == total_n_predictions

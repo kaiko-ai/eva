@@ -15,7 +15,7 @@ from eva.models.modules.typings import INPUT_BATCH
 
 
 class EmbeddingsWriter(callbacks.BasePredictionWriter):
-    """Callback for writing predictions to disk."""
+    """Callback for writing generated embeddings to disk."""
 
     def __init__(
         self, output_dir: str, dataloader_idx_map: dict | None, group_key: str | None = None
@@ -92,7 +92,7 @@ class EmbeddingsWriter(callbacks.BasePredictionWriter):
 
         self._manifest_file = open(manifest_path, "w", newline="")
         self._manifest_writer = csv.writer(self._manifest_file)
-        self._manifest_writer.writerow(["filename", "prediction", "target", "split"])
+        self._manifest_writer.writerow(["filename", "embedding", "target", "split"])
 
     def _update_manifest(
         self, input_name: str, prediction_name: str, target: int | float | None, split: str | None
