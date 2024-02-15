@@ -74,8 +74,8 @@ def _save_result(results: dict, results_dir: str) -> None:
 
 
 def get_run_id(start_time: datetime, max_hash_len: int = 8) -> str:
-    """Generates and returns a unique ID for the evaluation. 
-    
+    """Generates and returns a unique ID for the evaluation.
+
     The ID is composed of a timestamp and a hash.
 
     Args:
