@@ -54,8 +54,8 @@ class BACH(base.ImageClassification):
     ) -> None:
         """Initialize the dataset.
 
-        The dataset is splitted into train and validation by taking into account
-        the patient ids, in order to avoid any data leakage.
+        The dataset is split into train and validation by taking into account
+        the patient ids to avoid any data leakage.
 
         Args:
             root: Path to the root directory of the dataset. The dataset will
@@ -64,7 +64,7 @@ class BACH(base.ImageClassification):
             download: Whether to download the data for the specified split.
                 Note that the download will be executed only by additionally
                 calling the :meth:`prepare_data` method and if the data does
-                not exist yet on disk.
+                not yet exist on disk.
             image_transforms: A function/transform that takes in an image
                 and returns a transformed version.
             target_transforms: A function/transform that takes in the target
