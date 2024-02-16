@@ -54,6 +54,7 @@ Labels are provided by source files, splits are given by file names.
 
 * [PatchCamelyon dataset on zenodo](https://zenodo.org/records/2546921)
 * [GitHub repository](https://github.com/basveeling/pcam)
+* [Reference API PatchCamelyon dataset class](../reference/vision/data/patch_camelyon.md)
 
 ## Citation
 ```
