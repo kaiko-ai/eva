@@ -157,7 +157,7 @@ class TotalSegmentatorClassification(base.ImageClassification):
             raise ValueError("No classes found in the dataset.")
         return classes
 
-    def _load_samples(self) -> List[str]:
+    def _load_samples(self) -> List[Tuple[str, int]]:
         """Loads the paths of the samples in the dataset."""
         samples = []
         for image in Path(self._root).glob("**/*ct.nii.gz"):
