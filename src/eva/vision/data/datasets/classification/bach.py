@@ -54,7 +54,7 @@ class BACH(base.ImageClassification):
     ) -> None:
         """Initialize the dataset.
 
-        The dataset is splitted into train and validation by taking into account
+        The dataset is split into train and validation by taking into account
         the patient ids to avoid any data leakage.
 
         Args:
