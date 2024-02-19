@@ -61,7 +61,7 @@ class TotalSegmentatorClassification(base.ImageClassification):
             image_transforms: A function/transform that takes in an image
                 and returns a transformed version.
             target_transforms: A function/transform that takes in the target
-            and transforms it.
+                and transforms it.
         """
         super().__init__(
             image_transforms=image_transforms,
