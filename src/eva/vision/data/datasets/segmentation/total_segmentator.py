@@ -1,25 +1,29 @@
 """TotalSegmentator 2D segmentation dataset class."""
 
-import math
+import functools
 import os
 import random
-from collections import defaultdict
-from pathlib import Path
-from typing import Callable, List, Literal, Tuple
+from glob import glob
+from typing import Callable, Dict, List, Literal, Tuple
 
 import cv2
-from glob import glob
 import numpy as np
 from torchvision.datasets import utils
 from typing_extensions import override
 
-from eva.vision.data.datasets import structs
+from eva.vision.data.datasets import _utils, structs
 from eva.vision.data.datasets.segmentation import base
 from eva.vision.utils import io
 
 
 class TotalSegmentator2D(base.ImageSegmentation):
     """TotalSegmentator 2D segmentation dataset."""
+
+    train_index_ranges: List[Tuple[int, int]] = [(0, 83)]
+    """Train range indices."""
+
+    val_index_ranges: List[Tuple[int, int]] = [(83, 103)]
+    """Validation range indices."""
 
     resources_full: List[structs.DownloadResource] = [
         structs.DownloadResource(
@@ -28,7 +32,7 @@ class TotalSegmentator2D(base.ImageSegmentation):
             md5="fe250e5718e0a3b5df4c4ea9d58a62fe",
         ),
     ]
-    """Complete dataset resources."""
+    """Resources for the full dataset version."""
 
     resources_small: List[structs.DownloadResource] = [
         structs.DownloadResource(
@@ -42,7 +46,7 @@ class TotalSegmentator2D(base.ImageSegmentation):
     def __init__(
         self,
         root: str,
-        split: Literal["train", "val", "test"] | None,
+        split: Literal["train", "val"] | None,
         version: Literal["small", "full"] = "small",
         download: bool = False,
         image_transforms: Callable | None = None,
@@ -55,6 +59,7 @@ class TotalSegmentator2D(base.ImageSegmentation):
             root: Path to the root directory of the dataset. The dataset will
                 be downloaded and extracted here, if it does not already exist.
             split: Dataset split to use. If None, the entire dataset is used.
+            version: The version of the dataset to initialize.
             download: Whether to download the data for the specified split.
                 Note that the download will be executed only by additionally
                 calling the :meth:`prepare_data` method and if the data does not
@@ -79,25 +84,24 @@ class TotalSegmentator2D(base.ImageSegmentation):
         self._version = version
         self._download = download
 
-        self._samples: List[str] = []
+        self._samples_dirs: List[str] = []
         self._indices: List[int] = []
 
-    @property
-    def classes(self) -> List[str] | None:
-        sample_targets = os.path.join(
-            self._root, random.choice(os.listdir(self._root)), "segmentations"
-        )
-        classes = [file.split(".")[0] for file in os.listdir(sample_targets)]
-        return sorted(classes)
+    @functools.cached_property
+    @override
+    def classes(self) -> List[str]:
+        sample_labels = os.path.join(self._root, "s0011", "segmentations", "*.nii.gz")
+        return sorted(os.path.basename(path).split(".")[0] for path in glob(sample_labels))
 
     @property
-    def class_to_idx(self) -> None:
-        return {index: label for index, label in enumerate(self.classes)}
+    @override
+    def class_to_idx(self) -> Dict[str, int]:
+        return {label: index for index, label in enumerate(self.classes)}
 
     @override
     def filename(self, index: int) -> str:
-        sample_name = self._sample_dir(index)
-        return os.path.join(sample_name, "ct.nii.gz")
+        sample_dir = self._samples_dirs[self._indices[index]]
+        return os.path.join(sample_dir, "ct.nii.gz")
 
     @override
     def prepare_data(self) -> None:
@@ -106,8 +110,8 @@ class TotalSegmentator2D(base.ImageSegmentation):
 
     @override
     def setup(self) -> None:
-        self._samples = os.listdir(self._root)
-        self._indices = list(range(len(self._samples)))
+        self._samples_dirs = self._fetch_samples_dirs()
+        self._indices = self._create_indices()
 
     @override
     def load_image_and_mask(self, index: int) -> Tuple[np.ndarray, np.ndarray]:
@@ -120,28 +124,75 @@ class TotalSegmentator2D(base.ImageSegmentation):
     def __len__(self) -> int:
         return len(self._indices)
 
-    def _sample_dir(self, index: int) -> str:
-        return self._samples[self._indices[index]]
-
     def _load_image(self, index: int) -> np.ndarray:
-        sample_dir = self._sample_dir(index)
+        """Loads and returns the `index`'th image sample.
+
+        Args:
+            index: The index of the data sample to load.
+
+        Returns:
+            The image as a numpy array.
+        """
+        sample_dir = self._samples_dirs[self._indices[index]]
         image_path = os.path.join(self._root, sample_dir, "ct.nii.gz")
         return io.read_nifti(image_path)
 
-    def _extract_image_slice(self, image_3D: np.ndarray) -> np.ndarray:
-        slice_idx = random.randrange(image_3D.shape[2])
+    def _extract_image_slice(self, image_3D: np.ndarray) -> Tuple[np.ndarray, int]:
+        """Randomly extracts one 2D image from a 3D along with its slice index.
+
+        Args:
+            image_3D: The grayscale 3D image (height, weight, n_slices).
+
+        Returns:
+            A 2D image along with its corresponding 3D slice index.
+        """
+        slice_idx = random.randrange(image_3D.shape[2])  # nosec
         image_rgb = cv2.cvtColor(image_3D[:, :, slice_idx], cv2.COLOR_GRAY2RGB)
         return image_rgb, slice_idx
 
     def _load_mask(self, index: int, slice_index: int = 0) -> np.ndarray:
-        sample_dir = self._sample_dir(index)
-        masks_dir = os.path.join(self._root, sample_dir, "segmentations", "*.nii.gz")
-        return np.stack([io.read_nifti(path, slice_index) for path in sorted(glob(masks_dir))])
+        """Returns the `index`'th target mask sample.
+
+        Args:
+            index: The index of the data sample target mask to load.
+            slice_index: The slice index to fetch.
+
+        Returns:
+            The sample mask as an array.
+        """
+        sample_dir = self._samples_dirs[self._indices[index]]
+        masks_dir = os.path.join(self._root, sample_dir, "segmentations")
+        mask_paths = (os.path.join(masks_dir, label + ".nii.gz") for label in self.classes)
+        return np.stack([io.read_nifti(path, slice_index) for path in mask_paths])
+
+    def _fetch_samples_dirs(self) -> List[str]:
+        """Returns the name of all the samples of all the splits of the dataset."""
+        sample_filenames = [
+            filename
+            for filename in os.listdir(self._root)
+            if os.path.isdir(os.path.join(self._root, filename))
+        ]
+        return sorted(sample_filenames)
+
+    def _create_indices(self) -> List[int]:
+        """Builds the dataset indices for the specified split."""
+        split_index_ranges = {
+            "train": self.train_index_ranges,
+            "val": self.val_index_ranges,
+            None: [(0, 103)],
+        }
+        index_ranges = split_index_ranges.get(self._split)
+        if index_ranges is None:
+            raise ValueError("Invalid data split. Use 'train', 'val' or `None`.")
+
+        return _utils.ranges_to_indices(index_ranges)
 
     def _download_dataset(self) -> None:
+        """Downloads the dataset."""
         dataset_resources = {
             "small": self.resources_small,
             "full": self.resources_full,
+            None: (0, 103),
         }
         resources = dataset_resources.get(self._split)
         if resources is None:
