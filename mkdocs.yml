@@ -20,11 +20,12 @@ plugins:
           show_symbol_type_heading: true
           show_symbol_type_toc: true
           show_signature: false
+          show_root_heading: true
           filters:
           - '!^_'
 markdown_extensions:
-  - toc:
-      toc_depth: 2
+  toc:
+    toc_depth: 2
 nav:
   - eva: index.md
   - Getting Started: getting-started.md
@@ -42,7 +43,6 @@ nav:
       - reference/metrics/defaults.md
     - Models: 
       - Modules: reference/models/modules.md
-    - Trainers: reference/trainers.md
     - Vision:
       - Data:
         - reference/vision/data/index.md

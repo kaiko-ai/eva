@@ -2,4 +2,4 @@
 
 Reference information for the `Dataloader` classes.
 
-::: src.eva.data.dataloaders.dataloader
+::: src.eva.data.dataloaders.dataloader.DataLoader
