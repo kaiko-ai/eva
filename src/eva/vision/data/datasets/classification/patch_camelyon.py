@@ -11,54 +11,69 @@ from typing_extensions import override
 from eva.vision.data.datasets import structs
 from eva.vision.data.datasets.classification import base
 
-URL_TEMPLATE = "https://zenodo.org/records/2546921/files/{filename}.gz?download=1"
+_URL_TEMPLATE = "https://zenodo.org/records/2546921/files/{filename}.gz?download=1"
 """PatchCamelyon URL files templates."""
 
 
 class PatchCamelyon(base.ImageClassification):
-    """Dataset class for PatchCamelyon images and corresponding targets."""
+    """Dataset class for PatchCamelyon images and corresponding targets.
 
-    train_resources: List[structs.DownloadResource] = [
+    Args:
+        root: The path to the dataset root. This path should contain
+            the uncompressed h5 files and the metadata.
+        split: The dataset split for training, validation, or testing.
+        download: Whether to download the data for the specified split.
+            Note that the download will be executed only by additionally
+            calling the :meth:`prepare_data` method.
+        image_transforms: A function/transform that takes in an image
+            and returns a transformed version.
+        target_transforms: A function/transform that takes in the target
+            and transforms it.
+    """
+
+    _train_resources: List[structs.DownloadResource] = [
         structs.DownloadResource(
             filename="camelyonpatch_level_2_split_train_x.h5",
-            url=URL_TEMPLATE.format(filename="camelyonpatch_level_2_split_train_x.h5"),
+            url=_URL_TEMPLATE.format(filename="camelyonpatch_level_2_split_train_x.h5"),
             md5="01844da899645b4d6f84946d417ba453",
         ),
         structs.DownloadResource(
             filename="camelyonpatch_level_2_split_train_y.h5",
-            url=URL_TEMPLATE.format(filename="camelyonpatch_level_2_split_train_y.h5"),
+            url=_URL_TEMPLATE.format(filename="camelyonpatch_level_2_split_train_y.h5"),
             md5="0781386bf6c2fb62d58ff18891466aca",
         ),
     ]
     """Train resources."""
 
-    valid_resources: List[structs.DownloadResource] = [
+    _valid_resources: List[structs.DownloadResource] = [
         structs.DownloadResource(
             filename="camelyonpatch_level_2_split_valid_x.h5",
-            url=URL_TEMPLATE.format(filename="camelyonpatch_level_2_split_valid_x.h5"),
+            url=_URL_TEMPLATE.format(filename="camelyonpatch_level_2_split_valid_x.h5"),
             md5="81cf9680f1724c40673f10dc88e909b1",
         ),
         structs.DownloadResource(
             filename="camelyonpatch_level_2_split_valid_y.h5",
-            url=URL_TEMPLATE.format(filename="camelyonpatch_level_2_split_valid_y.h5"),
+            url=_URL_TEMPLATE.format(filename="camelyonpatch_level_2_split_valid_y.h5"),
             md5="94d8aacc249253159ce2a2e78a86e658",
         ),
     ]
     """Validation resources."""
 
-    test_resources: List[structs.DownloadResource] = [
+    _test_resources: List[structs.DownloadResource] = [
         structs.DownloadResource(
             filename="camelyonpatch_level_2_split_test_x.h5",
-            url=URL_TEMPLATE.format(filename="camelyonpatch_level_2_split_test_x.h5"),
+            url=_URL_TEMPLATE.format(filename="camelyonpatch_level_2_split_test_x.h5"),
             md5="2614b2e6717d6356be141d9d6dbfcb7e",
         ),
         structs.DownloadResource(
             filename="camelyonpatch_level_2_split_test_y.h5",
-            url=URL_TEMPLATE.format(filename="camelyonpatch_level_2_split_test_y.h5"),
+            url=_URL_TEMPLATE.format(filename="camelyonpatch_level_2_split_test_y.h5"),
             md5="11ed647efe9fe457a4eb45df1dba19ba",
         ),
     ]
     """Test resources."""
+
+    from torch.nn import Conv1d
 
     def __init__(
         self,
@@ -68,20 +83,6 @@ class PatchCamelyon(base.ImageClassification):
         image_transforms: Callable | None = None,
         target_transforms: Callable | None = None,
     ) -> None:
-        """Initializes the dataset.
-
-        Args:
-            root: The path to the dataset root. This path should contain
-                the uncompressed h5 files and the metadata.
-            split: The dataset split for training, validation, or testing.
-            download: Whether to download the data for the specified split.
-                Note that the download will be executed only by additionally
-                calling the :meth:`prepare_data` method.
-            image_transforms: A function/transform that takes in an image
-                and returns a transformed version.
-            target_transforms: A function/transform that takes in the target
-                and transforms it.
-        """
         super().__init__(
             image_transforms=image_transforms,
             target_transforms=target_transforms,
@@ -126,9 +127,9 @@ class PatchCamelyon(base.ImageClassification):
     def _download_dataset(self) -> None:
         """Downloads the PatchCamelyon dataset."""
         dataset_resources = {
-            "train": self.train_resources,
-            "valid": self.valid_resources,
-            "test": self.test_resources,
+            "train": self._train_resources,
+            "valid": self._valid_resources,
+            "test": self._test_resources,
         }
         resources = dataset_resources.get(self._split)
         if resources is None:

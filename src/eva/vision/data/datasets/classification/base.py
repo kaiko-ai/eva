@@ -10,21 +10,20 @@ from eva.vision.data.datasets import vision
 
 
 class ImageClassification(vision.VisionDataset[Tuple[np.ndarray, np.ndarray]], abc.ABC):
-    """Image classification abstract dataset."""
+    """Image classification abstract dataset.
+
+    Args:
+        image_transforms: A function/transform that takes in an image
+            and returns a transformed version.
+        target_transforms: A function/transform that takes in the target
+            and transforms it.
+    """
 
     def __init__(
         self,
         image_transforms: Callable | None = None,
         target_transforms: Callable | None = None,
     ) -> None:
-        """Initializes the CSV based image dataset.
-
-        Args:
-            image_transforms: A function/transform that takes in an image
-                and returns a transformed version.
-            target_transforms: A function/transform that takes in the target
-                and transforms it.
-        """
         super().__init__()
 
         self._image_transforms = image_transforms

@@ -12,6 +12,11 @@ class MetricModule(nn.Module):
     """The metrics module.
 
     Allows to store and keep track of `train`, `val` and `test` metrics.
+
+    Args:
+        train: The training metric collection.
+        val: The validation metric collection.
+        test: The test metric collection.
     """
 
     def __init__(
@@ -20,13 +25,6 @@ class MetricModule(nn.Module):
         val: collection.MetricCollection | None,
         test: collection.MetricCollection | None,
     ) -> None:
-        """Initializes the metrics for the Trainer.
-
-        Args:
-            train: The training metric collection.
-            val: The validation metric collection.
-            test: The test metric collection.
-        """
         super().__init__()
 
         self._train = train or self.default_metric_collection

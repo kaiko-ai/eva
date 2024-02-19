@@ -13,17 +13,17 @@ from eva.models.modules.typings import INPUT_BATCH
 
 
 class ModelModule(pl.LightningModule):
-    """The base model module."""
+    """The base model module.
+
+    Args:
+        metrics: The metrics schema.
+    """
 
     def __init__(
         self,
         metrics: metrics_lib.MetricsSchema | None = None,
     ) -> None:
-        """Initializes the basic module.
-
-        Args:
-            metrics: The metrics schema.
-        """
+        """Initializes the basic module."""
         super().__init__()
 
         self._metrics = metrics or self.default_metrics

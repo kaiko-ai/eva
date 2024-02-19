@@ -18,9 +18,25 @@ from eva.vision.utils import io
 
 
 class TotalSegmentatorClassification(base.ImageClassification):
-    """TotalSegmentator dataset class.
+    """Dataset class for TotalSegmentator images and classification targets.
 
     Create the multi-label classification dataset for the TotalSegmentator data.
+
+    Args:
+        root: Path to the root directory of the dataset. The dataset will
+            be downloaded and extracted here, if it does not already exist.
+        split: Dataset split to use. If None, the entire dataset is used.
+        split_ratios: Ratios for the train, val and test splits.
+        sample_every_n_slices: Number of slices to skip when sampling slices
+            from the 3D images.
+        download: Whether to download the data for the specified split.
+            Note that the download will be executed only by additionally
+            calling the :meth:`prepare_data` method and if the data does not
+            exist yet on disk.
+        image_transforms: A function/transform that takes in an image
+            and returns a transformed version.
+        target_transforms: A function/transform that takes in the target
+            and transforms it.
     """
 
     resources: List[structs.DownloadResource] = [
@@ -45,24 +61,6 @@ class TotalSegmentatorClassification(base.ImageClassification):
         image_transforms: Callable | None = None,
         target_transforms: Callable | None = None,
     ) -> None:
-        """Initialize dataset.
-
-        Args:
-            root: Path to the root directory of the dataset. The dataset will
-                be downloaded and extracted here, if it does not already exist.
-            split: Dataset split to use. If None, the entire dataset is used.
-            split_ratios: Ratios for the train, val and test splits.
-            sample_every_n_slices: Number of slices to skip when sampling slices
-                from the 3D images.
-            download: Whether to download the data for the specified split.
-                Note that the download will be executed only by additionally
-                calling the :meth:`prepare_data` method and if the data does not
-                exist yet on disk.
-            image_transforms: A function/transform that takes in an image
-                and returns a transformed version.
-            target_transforms: A function/transform that takes in the target
-                and transforms it.
-        """
         super().__init__(
             image_transforms=image_transforms,
             target_transforms=target_transforms,

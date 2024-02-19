@@ -13,9 +13,26 @@ from eva.vision.utils import io
 
 
 class BACH(base.ImageClassification):
-    """BACH dataset class."""
+    """Dataset class for BACH images and corresponding targets.
 
-    train_index_ranges: List[Tuple[int, int]] = [
+    The dataset is split into train and validation by taking into account
+    the patient ids to avoid any data leakage.
+
+    Args:
+        root: Path to the root directory of the dataset. The dataset will
+            be downloaded and extracted here, if it does not already exist.
+        split: Dataset split to use. If None, the entire dataset is used.
+        download: Whether to download the data for the specified split.
+            Note that the download will be executed only by additionally
+            calling the :meth:`prepare_data` method and if the data does
+            not yet exist on disk.
+        image_transforms: A function/transform that takes in an image
+            and returns a transformed version.
+        target_transforms: A function/transform that takes in the target
+            and transforms it.
+    """
+
+    _train_index_ranges: List[Tuple[int, int]] = [
         (0, 41),
         (59, 60),
         (90, 139),
@@ -26,7 +43,7 @@ class BACH(base.ImageClassification):
     ]
     """Train range indices."""
 
-    val_index_ranges: List[Tuple[int, int]] = [
+    _val_index_ranges: List[Tuple[int, int]] = [
         (41, 59),
         (60, 90),
         (139, 169),
@@ -36,7 +53,7 @@ class BACH(base.ImageClassification):
     ]
     """Validation range indices."""
 
-    resources: List[structs.DownloadResource] = [
+    _resources: List[structs.DownloadResource] = [
         structs.DownloadResource(
             filename="ICIAR2018_BACH_Challenge.zip",
             url="https://zenodo.org/records/3632035/files/ICIAR2018_BACH_Challenge.zip",
@@ -52,24 +69,6 @@ class BACH(base.ImageClassification):
         image_transforms: Callable | None = None,
         target_transforms: Callable | None = None,
     ) -> None:
-        """Initialize the dataset.
-
-        The dataset is split into train and validation by taking into account
-        the patient ids to avoid any data leakage.
-
-        Args:
-            root: Path to the root directory of the dataset. The dataset will
-                be downloaded and extracted here, if it does not already exist.
-            split: Dataset split to use. If None, the entire dataset is used.
-            download: Whether to download the data for the specified split.
-                Note that the download will be executed only by additionally
-                calling the :meth:`prepare_data` method and if the data does
-                not yet exist on disk.
-            image_transforms: A function/transform that takes in an image
-                and returns a transformed version.
-            target_transforms: A function/transform that takes in the target
-                and transforms it.
-        """
         super().__init__(
             image_transforms=image_transforms,
             target_transforms=target_transforms,
@@ -132,7 +131,7 @@ class BACH(base.ImageClassification):
 
     def _download_dataset(self) -> None:
         """Downloads the dataset."""
-        for resource in self.resources:
+        for resource in self._resources:
             if os.path.isdir(self.dataset_path):
                 continue
 
@@ -146,8 +145,8 @@ class BACH(base.ImageClassification):
     def _make_indices(self) -> List[int]:
         """Builds the dataset indices for the specified split."""
         split_index_ranges = {
-            "train": self.train_index_ranges,
-            "val": self.val_index_ranges,
+            "train": self._train_index_ranges,
+            "val": self._val_index_ranges,
             None: [(0, 400)],
         }
         index_ranges = split_index_ranges.get(self._split)
