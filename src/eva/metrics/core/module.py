@@ -21,7 +21,7 @@ class MetricModule(nn.Module):
         test: collection.MetricCollection | None,
     ) -> None:
         """Initializes the metrics for the Trainer.
-        
+
         Args:
             train: The training metric collection.
             val: The validation metric collection.

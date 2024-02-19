@@ -31,7 +31,7 @@ class HeadModule(module.ModelModule):
         metrics: metrics_lib.MetricsSchema | None = None,
     ) -> None:
         """Initializes the neural net head module.
-        
+
         Args:
             head: The neural network that would be trained on the features.
             criterion: The loss function to use.

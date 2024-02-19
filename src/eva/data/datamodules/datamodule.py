@@ -26,7 +26,7 @@ class DataModule(pl.LightningDataModule):
         dataloaders: schemas.DataloadersSchema | None = None,
     ) -> None:
         """Initializes the datamodule.
-        
+
         Args:
             datasets: The desired datasets.
             dataloaders: The desired dataloaders.

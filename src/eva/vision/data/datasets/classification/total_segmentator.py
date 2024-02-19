@@ -46,7 +46,7 @@ class TotalSegmentatorClassification(base.ImageClassification):
         target_transforms: Callable | None = None,
     ) -> None:
         """Initializes the dataset.
-        
+
         Args:
             root: Path to the root directory of the dataset. The dataset will
                 be downloaded and extracted here, if it does not already exist.

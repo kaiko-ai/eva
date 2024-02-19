@@ -19,7 +19,7 @@ class MulticlassClassificationMetrics(core.MetricCollection):
         postfix: str | None = None,
     ) -> None:
         """Initializes the multi-class classification metrics.
-        
+
         Args:
             num_classes: Integer specifying the number of classes.
             average: Defines the reduction that is applied over labels.

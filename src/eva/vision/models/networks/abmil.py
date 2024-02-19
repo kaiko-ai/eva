@@ -44,7 +44,7 @@ class ABMIL(torch.nn.Module):
         pad_value: int | float | None = float("-inf"),
     ) -> None:
         """Initializes the ABMIL network.
-        
+
         Args:
             input_size: input embedding dimension
             output_size: number of classes

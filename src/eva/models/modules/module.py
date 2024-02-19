@@ -20,7 +20,7 @@ class ModelModule(pl.LightningModule):
         metrics: metrics_lib.MetricsSchema | None = None,
     ) -> None:
         """Initializes the basic module.
-        
+
         Args:
             metrics: The metrics schema.
         """

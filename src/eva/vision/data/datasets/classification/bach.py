@@ -56,7 +56,7 @@ class BACH(base.ImageClassification):
 
         The dataset is split into train and validation by taking into account
         the patient ids to avoid any data leakage.
-    
+
         Args:
             root: Path to the root directory of the dataset. The dataset will
                 be downloaded and extracted here, if it does not already exist.
