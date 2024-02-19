@@ -1,5 +1,5 @@
 """Callbacks API."""
 
-from eva.callbacks.writers import BatchPredictionWriter
+from eva.callbacks.writers import EmbeddingsWriter
 
-__all__ = ["BatchPredictionWriter"]
+__all__ = ["EmbeddingsWriter"]
