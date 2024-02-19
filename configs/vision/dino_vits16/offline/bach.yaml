@@ -11,7 +11,6 @@ trainer:
           dataloader_idx_map:
             0: train
             1: val
-            2: test
       - class_path: pytorch_lightning.callbacks.LearningRateMonitor
         init_args:
           logging_interval: epoch
