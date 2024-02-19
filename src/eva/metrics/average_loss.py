@@ -15,6 +15,7 @@ class AverageLoss(core.Metric):
     full_state_update = False
 
     def __init__(self) -> None:
+        """Initializes the metric."""
         super().__init__()
 
         self.add_state("value", default=torch.tensor(0), dist_reduce_fx="sum")

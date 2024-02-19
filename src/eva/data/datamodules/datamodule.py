@@ -18,10 +18,6 @@ class DataModule(pl.LightningDataModule):
     datasets. During the `prepare_data`, `setup` and `teardown`, the
     datamodule will call the respectively methods from all the datasets,
     given that they are defined.
-
-    Args:
-        datasets: The desired datasets.
-        dataloaders: The desired dataloaders.
     """
 
     def __init__(
@@ -29,7 +25,12 @@ class DataModule(pl.LightningDataModule):
         datasets: schemas.DatasetsSchema | None = None,
         dataloaders: schemas.DataloadersSchema | None = None,
     ) -> None:
-        """Initializes the datamodule."""
+        """Initializes the datamodule.
+        
+        Args:
+            datasets: The desired datasets.
+            dataloaders: The desired dataloaders.
+        """
         super().__init__()
 
         self.datasets = datasets or self.default_datasets

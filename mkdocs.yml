@@ -13,6 +13,8 @@ plugins:
       python:
         options:
           docstring_section_style: table
+          docstring_options:
+            ignore_init_summary: true
           merge_init_into_class: true
           members_order: source
           show_symbol_type_heading: true

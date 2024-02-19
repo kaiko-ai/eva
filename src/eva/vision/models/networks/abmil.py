@@ -28,19 +28,6 @@ class ABMIL(torch.nn.Module):
     [1] Maximilian Ilse, Jakub M. Tomczak, Max Welling, "Attention-based Deep Multiple
         Instance Learning", 2018
         https://arxiv.org/abs/1802.04712
-
-    Args:
-        input_size: input embedding dimension
-        output_size: number of classes
-        projected_input_size: size of the projected input. if None, no projection is performed.
-        hidden_size_attention: hidden dimension in attention network
-        hidden_sizes_mlp: dimensions for hidden layers in last mlp
-        use_bias: whether to use bias in the attention network
-        dropout_input_embeddings: dropout rate for the input embeddings
-        dropout_attention: dropout rate for the attention network and classifier
-        dropout_mlp: dropout rate for the final MLP network
-        pad_value: Value indicating padding in the input tensor. If specified, entries with
-            this value in the will be masked. If set to None, no masking will be is applied.
     """
 
     def __init__(
@@ -56,6 +43,21 @@ class ABMIL(torch.nn.Module):
         dropout_mlp: float = 0.0,
         pad_value: int | float | None = float("-inf"),
     ) -> None:
+        """Initializes the ABMIL network.
+        
+        Args:
+            input_size: input embedding dimension
+            output_size: number of classes
+            projected_input_size: size of the projected input. if None, no projection is performed.
+            hidden_size_attention: hidden dimension in attention network
+            hidden_sizes_mlp: dimensions for hidden layers in last mlp
+            use_bias: whether to use bias in the attention network
+            dropout_input_embeddings: dropout rate for the input embeddings
+            dropout_attention: dropout rate for the attention network and classifier
+            dropout_mlp: dropout rate for the final MLP network
+            pad_value: Value indicating padding in the input tensor. If specified, entries with
+                this value in the will be masked. If set to None, no masking is applied.
+        """
         super().__init__()
 
         self._pad_value = pad_value

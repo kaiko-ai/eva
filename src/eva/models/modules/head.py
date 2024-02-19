@@ -19,16 +19,6 @@ class HeadModule(module.ModelModule):
 
     It can be used for supervised (mini-batch) stochastic gradient descent
     downstream tasks such as classification, regression and segmentation.
-
-    Args:
-        head: The neural network that would be trained on the features.
-        criterion: The loss function to use.
-        backbone: The feature extractor. If `None`, it will be expected
-            that the input batch returns the features directly.
-        optimizer: The optimizer to use.
-        lr_scheduler: The learning rate scheduler to use.
-        metrics: The list of metrics to track. If `None`, it uses
-            the :meth:`self.default_metrics`.
     """
 
     def __init__(
@@ -40,7 +30,18 @@ class HeadModule(module.ModelModule):
         lr_scheduler: LRSchedulerCallable = lr_scheduler.ConstantLR,
         metrics: metrics_lib.MetricsSchema | None = None,
     ) -> None:
-        """Initializes the neural net head module."""
+        """Initializes the neural net head module.
+        
+        Args:
+            head: The neural network that would be trained on the features.
+            criterion: The loss function to use.
+            backbone: The feature extractor. If `None`, it will be expected
+                that the input batch returns the features directly.
+            optimizer: The optimizer to use.
+            lr_scheduler: The learning rate scheduler to use.
+            metrics: The list of metrics to track. If `None`, it uses
+                the :meth:`self.default_metrics`.
+        """
         super().__init__(metrics=metrics)
 
         self.head = head

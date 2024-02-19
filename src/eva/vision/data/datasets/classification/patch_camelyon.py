@@ -16,20 +16,7 @@ _URL_TEMPLATE = "https://zenodo.org/records/2546921/files/{filename}.gz?download
 
 
 class PatchCamelyon(base.ImageClassification):
-    """Dataset class for PatchCamelyon images and corresponding targets.
-
-    Args:
-        root: The path to the dataset root. This path should contain
-            the uncompressed h5 files and the metadata.
-        split: The dataset split for training, validation, or testing.
-        download: Whether to download the data for the specified split.
-            Note that the download will be executed only by additionally
-            calling the :meth:`prepare_data` method.
-        image_transforms: A function/transform that takes in an image
-            and returns a transformed version.
-        target_transforms: A function/transform that takes in the target
-            and transforms it.
-    """
+    """Dataset class for PatchCamelyon images and corresponding targets."""
 
     _train_resources: List[structs.DownloadResource] = [
         structs.DownloadResource(
@@ -83,6 +70,20 @@ class PatchCamelyon(base.ImageClassification):
         image_transforms: Callable | None = None,
         target_transforms: Callable | None = None,
     ) -> None:
+        """Initializes the dataset.
+
+        Args:
+            root: The path to the dataset root. This path should contain
+                the uncompressed h5 files and the metadata.
+            split: The dataset split for training, validation, or testing.
+            download: Whether to download the data for the specified split.
+                Note that the download will be executed only by additionally
+                calling the :meth:`prepare_data` method.
+            image_transforms: A function/transform that takes in an image
+                and returns a transformed version.
+            target_transforms: A function/transform that takes in the target
+                and transforms it.
+        """
         super().__init__(
             image_transforms=image_transforms,
             target_transforms=target_transforms,
