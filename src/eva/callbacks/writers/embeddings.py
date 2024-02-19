@@ -26,8 +26,8 @@ class EmbeddingsWriter(callbacks.BasePredictionWriter):
             output_dir: The directory where the embeddings will be saved.
             dataloader_idx_map: A dictionary mapping dataloader indices to their respective
                 names (e.g. train, val, test).
-            group_key: The metadata key to group the predictions by. If specified, the
-                embeddings will be saved in subdirectories named after the group_key.
+            group_key: The metadata key to group the embeddings by. If specified, the
+                embedding files will be saved in subdirectories named after the group_key.
                 If specified, the key must be present in the metadata of the input batch.
         """
         super().__init__(write_interval="batch")
@@ -88,7 +88,11 @@ class EmbeddingsWriter(callbacks.BasePredictionWriter):
     def _init_manifest(self):
         manifest_path = os.path.join(self.output_dir, "manifest.csv")
         if os.path.exists(manifest_path):
-            raise FileExistsError(f"Manifest file already exists at {manifest_path}")
+            raise FileExistsError(
+                f"Manifest file already exists at {manifest_path}. This likely means that the "
+                "embeddings have been computed before. Consider using `eva fit` instead "
+                "of `eva predict_fit` or `eva predict`."
+            )
 
         self._manifest_file = open(manifest_path, "w", newline="")
         self._manifest_writer = csv.writer(self._manifest_file)
