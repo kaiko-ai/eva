@@ -20,9 +20,7 @@ from eva.models import modules
 
 
 @pytest.mark.parametrize("batch_size, n_samples", list(itertools.product([5, 8], [7, 16])))
-def test_batch_prediction_writer(
-    datamodule: datamodules.DataModule, model: modules.HeadModule
-) -> None:
+def test_embeddings_writer(datamodule: datamodules.DataModule, model: modules.HeadModule) -> None:
     """Tests the embeddings writer callback."""
     with tempfile.TemporaryDirectory() as output_dir:
         trainer = pl.Trainer(

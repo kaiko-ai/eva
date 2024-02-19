@@ -1,7 +1,7 @@
 """PatchCamelyon dataset."""
 
 import os
-from typing import Callable, List, Literal
+from typing import Callable, Dict, List, Literal
 
 import h5py
 import numpy as np
@@ -91,6 +91,20 @@ class PatchCamelyon(base.ImageClassification):
         self._split = split
         self._download = download
 
+    @property
+    @override
+    def classes(self) -> List[str]:
+        return ["no_tumor", "tumor"]
+
+    @property
+    @override
+    def class_to_idx(self) -> Dict[str, int]:
+        return {"no_tumor": 0, "tumor": 1}
+
+    @override
+    def filename(self, index: int) -> str:
+        return f"camelyonpatch_level_2_split_{self._split}_x_{index}"
+
     @override
     def prepare_data(self) -> None:
         if self._download:
@@ -108,10 +122,6 @@ class PatchCamelyon(base.ImageClassification):
     @override
     def __len__(self) -> int:
         return self._fetch_dataset_length()
-
-    @override
-    def filename(self, index: int) -> str:
-        return f"camelyonpatch_level_2_split_{self._split}_x_{index}"
 
     def _download_dataset(self) -> None:
         """Downloads the PatchCamelyon dataset."""
