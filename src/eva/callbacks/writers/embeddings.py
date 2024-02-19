@@ -23,11 +23,11 @@ class EmbeddingsWriter(callbacks.BasePredictionWriter):
         """Initializes a new EmbeddingsWriter instance.
 
         Args:
-            output_dir: The directory where the predictions will be saved.
+            output_dir: The directory where the embeddings will be saved.
             dataloader_idx_map: A dictionary mapping dataloader indices to their respective
                 names (e.g. train, val, test).
             group_key: The metadata key to group the predictions by. If specified, the
-                predictions will be saved in subdirectories named after the group key.
+                embeddings will be saved in subdirectories named after the group_key.
                 If specified, the key must be present in the metadata of the input batch.
         """
         super().__init__(write_interval="batch")
