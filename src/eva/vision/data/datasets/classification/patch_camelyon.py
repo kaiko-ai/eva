@@ -32,7 +32,7 @@ class PatchCamelyon(base.ImageClassification):
     ]
     """Train resources."""
 
-    valid_resources: List[structs.DownloadResource] = [
+    val_resources: List[structs.DownloadResource] = [
         structs.DownloadResource(
             filename="camelyonpatch_level_2_split_valid_x.h5",
             url=URL_TEMPLATE.format(filename="camelyonpatch_level_2_split_valid_x.h5"),
@@ -63,7 +63,7 @@ class PatchCamelyon(base.ImageClassification):
     def __init__(
         self,
         root: str,
-        split: Literal["train", "valid", "test"],
+        split: Literal["train", "val", "test"],
         download: bool = False,
         image_transforms: Callable | None = None,
         target_transforms: Callable | None = None,
@@ -127,12 +127,12 @@ class PatchCamelyon(base.ImageClassification):
         """Downloads the PatchCamelyon dataset."""
         dataset_resources = {
             "train": self.train_resources,
-            "valid": self.valid_resources,
+            "val": self.val_resources,
             "test": self.test_resources,
         }
         resources = dataset_resources.get(self._split)
         if resources is None:
-            raise ValueError("Invalid data split. Use 'train', 'valid', or 'test'.")
+            raise ValueError("Invalid data split. Use 'train', 'val', or 'test'.")
 
         for resource in resources:
             file_path = os.path.join(self._root, resource.filename)
@@ -183,5 +183,6 @@ class PatchCamelyon(base.ImageClassification):
         Returns:
             The relative file path for the H5 file based on the provided data type and split.
         """
-        filename = f"camelyonpatch_level_2_split_{self._split}_{datatype}.h5"
+        split_suffix = "valid" if self._split == "val" else self._split
+        filename = f"camelyonpatch_level_2_split_{split_suffix}_{datatype}.h5"
         return os.path.join(self._root, filename)

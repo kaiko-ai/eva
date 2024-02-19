@@ -12,8 +12,10 @@ plugins:
       python:
         options:
           docstring_section_style: table
+          merge_init_into_class: true
+          members_order: source
           filters:
-          - '!^(?!__init__)_'
+          - '!^_'
           
 nav:
   - eva: index.md
@@ -31,8 +33,12 @@ nav:
       - Modules: reference/models/modules.md
     - Trainers: reference/trainers.md
     - Vision:
+      - Data:
+        - reference/vision/data/index.md
+        - reference/vision/data/bach.md
+        - reference/vision/data/patch_camelyon.md
+        - reference/vision/data/total_segmentator.md
       - reference/vision/index.md
-      - reference/vision/data.md
       - reference/vision/models.md
       - reference/vision/utils.md
   - Datasets: 

@@ -80,6 +80,11 @@ class HeadModule(module.ModelModule):
         return self._batch_step(batch)
 
     @override
+    def predict_step(self, batch: INPUT_BATCH, *args: Any, **kwargs: Any) -> torch.Tensor:
+        tensor = INPUT_BATCH(*batch).data
+        return tensor if self.backbone is None else self.backbone(tensor)
+
+    @override
     def on_fit_end(self) -> None:
         if self.backbone is not None:
             _utils.activate_requires_grad(self.backbone)
