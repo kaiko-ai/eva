@@ -40,7 +40,7 @@ def test_fit_and_predict_from_configuration(configuration_file: str, lib_path: s
         with patch.dict(os.environ, {"EMBEDDINGS_ROOT": output_dir}):
             _cli.run_cli_from_main(
                 cli_args=[
-                    "predict_and_fit",
+                    "predict_fit",
                     "--config",
                     os.path.join(lib_path, configuration_file),
                 ]

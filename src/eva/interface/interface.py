@@ -69,7 +69,7 @@ class Interface:
 
         trainer.predict(model=model, datamodule=predict_datamodule)
 
-    def predict_and_fit(
+    def predict_fit(
         self,
         model: modules.ModelModule,
         data: datamodules.DataModule,
