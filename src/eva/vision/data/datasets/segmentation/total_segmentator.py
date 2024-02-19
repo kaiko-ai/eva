@@ -90,7 +90,8 @@ class TotalSegmentator2D(base.ImageSegmentation):
     @functools.cached_property
     @override
     def classes(self) -> List[str]:
-        sample_labels = os.path.join(self._root, "s0011", "segmentations", "*.nii.gz")
+        random_sample_dir = random.choice(self._samples_dirs)  # nosec
+        sample_labels = os.path.join(self._root, random_sample_dir, "segmentations", "*.nii.gz")
         return sorted(os.path.basename(path).split(".")[0] for path in glob(sample_labels))
 
     @property
@@ -131,7 +132,7 @@ class TotalSegmentator2D(base.ImageSegmentation):
             index: The index of the data sample to load.
 
         Returns:
-            The image as a numpy array.
+            The 3D grayscale image (height, width, slices) as a numpy array.
         """
         sample_dir = self._samples_dirs[self._indices[index]]
         image_path = os.path.join(self._root, sample_dir, "ct.nii.gz")
@@ -144,7 +145,7 @@ class TotalSegmentator2D(base.ImageSegmentation):
             image_3D: The grayscale 3D image (height, weight, n_slices).
 
         Returns:
-            A 2D image along with its corresponding 3D slice index.
+            A 2D RGB image (height, width, 3) along with its corresponding 3D slice index.
         """
         slice_idx = random.randrange(image_3D.shape[2])  # nosec
         image_rgb = cv2.cvtColor(image_3D[:, :, slice_idx], cv2.COLOR_GRAY2RGB)
@@ -158,7 +159,7 @@ class TotalSegmentator2D(base.ImageSegmentation):
             slice_index: The slice index to fetch.
 
         Returns:
-            The sample mask as an array.
+            The sample mask as a stack of binary mask arrays (label, height, width).
         """
         sample_dir = self._samples_dirs[self._indices[index]]
         masks_dir = os.path.join(self._root, sample_dir, "segmentations")
