@@ -36,11 +36,7 @@ class Interface:
             data: The data module.
             trainer: The trainer which processes the model and data.
         """
-        if isinstance(data.datasets.train, datasets.PatchEmbeddingDataset) and isinstance(
-            model, modules.HeadModule
-        ):
-            model.backbone = None  # disable backbone when using pre-computed embeddings
-
+        model = _adapt_model_module(model, data)
         trainer.fit(model=model, datamodule=data)
 
         trainer.validate(datamodule=data)
@@ -88,3 +84,14 @@ class Interface:
         """
         self.predict(model=model, data=data, trainer=trainer)
         self.fit(model=model, data=data, trainer=trainer)
+
+
+def _adapt_model_module(
+    model: modules.ModelModule, data: datamodules.DataModule
+) -> modules.ModelModule:
+    """Adapts the model module based on the specified data module."""
+    if isinstance(data.datasets.train, datasets.PatchEmbeddingDataset) and isinstance(
+        model, modules.HeadModule
+    ):
+        model.backbone = None  # disable backbone when using pre-computed embeddings
+    return model
