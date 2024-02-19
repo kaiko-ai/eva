@@ -23,6 +23,13 @@ class Interface:
 
         This method uses the specified trainer to fit the model using the provided data.
 
+        Example usecases:
+        - Using a model consisting of a frozen backbone and a head, the backbone will generate
+          the embeddings on the fly which are then used as input features to train the head on
+          the downstream task specified by the given dataset.
+        - Fitting only the head network using a dataset that loads pre-computed embeddings.
+
+
         Args:
             model: The model module.
             data: The data module.
@@ -39,7 +46,7 @@ class Interface:
     ) -> None:
         """Perform model prediction in place.
 
-        This method uses the specified trainer to generate predictions with the provided data.
+        This method performs inference with a pre-trained foundation model to compute embeddings.
 
         Args:
             model: The model module.
@@ -59,9 +66,11 @@ class Interface:
         data: datamodules.DataModule,
         trainer: trainers.Trainer,
     ) -> None:
-        """Perform model prediction followed by training and evaluation.
+        """Combines the predict and fit commands in one method.
 
-        This method uses the specified trainer to generate predictions with the provided data.
+        This method performs the following two steps:
+        1. predict: perform inference with a pre-trained foundation model to compute embeddings.
+        2. fit: training the head network using the embeddings generated in step 1.
 
         Args:
             model: The model module.
