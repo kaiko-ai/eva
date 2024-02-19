@@ -11,6 +11,48 @@ from typing_extensions import override
 from eva.metrics import core as metrics_lib
 from eva.models.modules.typings import INPUT_BATCH
 
+from typing import Callable, List
+import functools
+import dataclasses
+import torch
+
+Transform = Callable[[torch.Tensor], torch.Tensor]
+
+@dataclasses.dataclass(frozen=True)
+class PostProcessesSchema:
+    """Post-processes schema."""
+
+    targets: List[Transform] | None = None
+    """Holds the common train and evaluation metrics."""
+
+    predictions: List[Transform] | None = None
+    """Holds the common train and evaluation metrics."""
+
+    def apply(self, tensor: torch.Tensor, transforms: List[Transform]) -> torch.Tensor:
+        """Applies a list of transforms a specific group.
+
+        Args:
+            tensor: The desired tensor to process.
+            transforms:
+
+        Returns:
+            The processed tensor.
+        """
+        return functools.reduce(
+            lambda tensor, transform: transform(tensor), transforms, tensor
+        )
+
+    def __call__(self, outputs: STEP_OUTPUT) -> None:
+        if not isinstance(outputs, dict):
+            raise ValueError("")
+
+        if "predictions" in outputs:
+            outputs["predictions"] = self.apply(outputs["predictions"], self.predictions)
+
+        if "targets" in outputs:
+            outputs["targets"] = self.apply(outputs["targets"], self.targets)
+
+
 
 class ModelModule(pl.LightningModule):
     """The base model module."""
@@ -18,6 +60,7 @@ class ModelModule(pl.LightningModule):
     def __init__(
         self,
         metrics: metrics_lib.MetricsSchema | None = None,
+        postprocesses: PostProcessesSchema | None = None,
     ) -> None:
         """Initializes the basic module.
 
@@ -27,8 +70,10 @@ class ModelModule(pl.LightningModule):
         super().__init__()
 
         self._metrics = metrics or self.default_metrics
+        self._postprocesses = postprocesses
 
         self.metrics = metrics_lib.MetricModule.from_schema(self._metrics)
+        self.postprocesses
 
     @property
     def default_metrics(self) -> metrics_lib.MetricsSchema:
