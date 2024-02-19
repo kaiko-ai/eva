@@ -51,6 +51,7 @@ Totalsegmentator_dataset_v201
 
 * [TotalSegmentator dataset on zenodo](https://zenodo.org/records/10047292)
 * [TotalSegmentator small subset (102 images) on zenodo](https://zenodo.org/records/10047263)
+* [Reference API TotalSegmentator dataset class](../reference/vision/data/total_segmentator.md)
 
 ## License
 
