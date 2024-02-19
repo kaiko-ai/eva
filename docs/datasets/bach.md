@@ -49,7 +49,7 @@ The `BACH` dataset class supports download the data no runtime with the initiali
 The splits are created from the indices specified in te BACH dataset class. These indices were picked to prevent data 
 leakage due to images belonging to the same patient. Because the small dataset in combination with the patient ID constraint 
 does not allow to split the data three-ways with sufficient amount of data in each split, we only create a train and val 
-split and leave it to the user to submit predictions on the official test split to the Challenge Leaderboard.
+split and leave it to the user to submit predictions on the official test split to the [BACH Challenge Leaderboard](https://iciar2018-challenge.grand-challenge.org/evaluation/challenge/leaderboard/).
 
 | Splits | Train     | Validation | 
 |---|-----------|------------|
@@ -59,8 +59,8 @@ split and leave it to the user to submit predictions on the official test split 
 ## Relevant links
 
 * [BACH dataset on zenodo](https://zenodo.org/records/3632035)
-* [BACH challenge website](https://iciar2018-challenge.grand-challenge.org/)
-* [BACH challenge leaderboard](https://iciar2018-challenge.grand-challenge.org/evaluation/challenge/leaderboard/)
+* [BACH Challenge website](https://iciar2018-challenge.grand-challenge.org/)
+* [BACH Challenge Leaderboard](https://iciar2018-challenge.grand-challenge.org/evaluation/challenge/leaderboard/)
 * [Patient ID information](https://www.dropbox.com/sh/sc7yg21bcs3wr0z/AACiavY0BQPF6GYna9Fkjzola?e=1&dl=0) (Link provided on BACH challenge website)
 * [Reference API BACH dataset class](../reference/vision/data/bach.md)
 
