@@ -79,7 +79,7 @@ class EmbeddingsWriter(callbacks.BasePredictionWriter):
         split = self._dataloader_idx_map.get(dataloader_idx)
 
         for local_idx, global_idx in enumerate(batch_indices[: len(prediction)]):
-            input_name, save_name = self._construct_save_path(
+            input_name, save_name = self._construct_save_name(
                 dataset.filename(global_idx), metadata, local_idx
             )
 
@@ -97,7 +97,7 @@ class EmbeddingsWriter(callbacks.BasePredictionWriter):
         self._write_process.join()
         logger.info(f"Predictions and manifest saved to {self.output_dir}")
 
-    def _construct_save_path(self, input_name, metadata, local_idx):
+    def _construct_save_name(self, input_name, metadata, local_idx):
         group_name = metadata[self._group_key][local_idx] if self._group_key else None
         save_name = os.path.splitext(input_name)[0] + ".pt"
         if group_name:
