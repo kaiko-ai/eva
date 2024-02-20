@@ -1,3 +1,3 @@
-# VisionDataset 
+# Vision Data
 
-::: src.eva.vision.data.datasets.vision
+Reference information for the `Vision Data` API.
