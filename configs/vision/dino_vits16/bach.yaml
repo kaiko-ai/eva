@@ -2,20 +2,42 @@
 trainer:
   class_path: eva.Trainer
   init_args:
-    default_root_dir: &OUTPUT_DIR ${oc.env:OUTPUT_DIR, logs/dino_vits16/patch_camelyon}
-    max_epochs: &MAX_EPOCHS 1
-    limit_train_batches: 2
-    limit_val_batches: 2
+    default_root_dir: &OUTPUT_DIR ${oc.env:OUTPUT_DIR, logs/dino_vits16/bach}
+    max_epochs: &MAX_EPOCHS 20
+    callbacks:
+      - class_path: pytorch_lightning.callbacks.LearningRateMonitor
+        init_args:
+          logging_interval: epoch
+      - class_path: pytorch_lightning.callbacks.ModelCheckpoint
+        init_args:
+          filename: best
+          save_last: true
+          save_top_k: 1
+          monitor: &MONITOR_METRIC val/MulticlassAccuracy
+          mode: &MONITOR_METRIC_MODE max
+    logger:
+      - class_path: pytorch_lightning.loggers.TensorBoardLogger
+        init_args:
+          save_dir: *OUTPUT_DIR
+          name: ""
+          version: ""
 model:
   class_path: eva.HeadModule
   init_args:
     backbone:
-      class_path: torch.nn.Flatten
+      class_path: eva.models.ModelFromFunction
+      init_args:
+        path: torch.hub.load
+        arguments:
+          repo_or_dir: facebookresearch/dino:main
+          model: dino_vits16
+          pretrained: true
+        checkpoint_path: &CHECKPOINT_PATH ${oc.env:CHECKPOINT_PATH, null}
     head:
       class_path: torch.nn.Linear
       init_args:
-        in_features: 150528
-        out_features: &NUM_CLASSES 2
+        in_features: 384
+        out_features: &NUM_CLASSES 4
     criterion: torch.nn.CrossEntropyLoss
     optimizer:
       class_path: torch.optim.SGD
@@ -39,20 +61,20 @@ data:
   init_args:
     datasets:
       train:
-        class_path: eva.vision.datasets.PatchCamelyon
+        class_path: eva.vision.datasets.BACH
         init_args:
-          root: ${oc.env:TESTS_ROOT, tests/eva}/assets/vision/datasets/patch_camelyon
+          root: ${oc.env:DATA_ROOT, ./data}/bach
           split: train
-          download: &DOWNLOAD_DATA false
+          download: &DOWNLOAD_DATA ${oc.env:DOWNLOAD_DATA, true}
           image_transforms:
             class_path: eva.vision.data.transforms.common.ResizeAndCrop
             init_args:
               mean: &NORMALIZE_MEAN [0.485, 0.456, 0.406]
               std: &NORMALIZE_STD [0.229, 0.224, 0.225]
       val:
-        class_path: eva.vision.datasets.PatchCamelyon
+        class_path: eva.vision.datasets.BACH
         init_args:
-          root: ${oc.env:TESTS_ROOT, tests/eva}/assets/vision/datasets/patch_camelyon
+          root: ${oc.env:DATA_ROOT, ./data}/bach
           split: val
           download: *DOWNLOAD_DATA
           image_transforms:
@@ -61,10 +83,10 @@ data:
               mean: *NORMALIZE_MEAN
               std: *NORMALIZE_STD
       test:
-        class_path: eva.vision.datasets.PatchCamelyon
+        class_path: eva.vision.datasets.BACH
         init_args:
-          root: ${oc.env:TESTS_ROOT, tests/eva}/assets/vision/datasets/patch_camelyon
-          split: test
+          root: ${oc.env:DATA_ROOT, ./data}/bach
+          split: val
           download: *DOWNLOAD_DATA
           image_transforms:
             class_path: eva.vision.data.transforms.common.ResizeAndCrop
@@ -73,20 +95,9 @@ data:
               std: *NORMALIZE_STD
     dataloaders:
       train:
-        batch_size: &BATCH_SIZE 2
-        num_workers: 0
-        pin_memory: false
-        persistent_workers: false
-        prefetch_factor: null
+        batch_size: &BATCH_SIZE 256
+        shuffle: true
       val:
         batch_size: *BATCH_SIZE
-        num_workers: 0
-        pin_memory: false
-        persistent_workers: false
-        prefetch_factor: null
       test:
         batch_size: *BATCH_SIZE
-        num_workers: 0
-        pin_memory: false
-        persistent_workers: false
-        prefetch_factor: null

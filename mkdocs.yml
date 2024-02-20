@@ -1,20 +1,31 @@
 site_name: eva
-
 theme:
   name: "material"
   features:
     - navigation.tabs
     - navigation.indexes
-
+    - search.suggest
+    - search.highlight
 plugins:
+  search: null
   mkdocstrings:
     handlers:
       python:
         options:
           docstring_section_style: table
+          docstring_options:
+            ignore_init_summary: true
+          merge_init_into_class: true
+          members_order: source
+          show_symbol_type_heading: true
+          show_symbol_type_toc: true
+          show_signature: false
+          show_root_heading: true
           filters:
-          - '!^(?!__init__)_'
-          
+          - '!^_'
+markdown_extensions:
+  toc:
+    toc_depth: 2
 nav:
   - eva: index.md
   - Getting Started: getting-started.md
@@ -22,17 +33,23 @@ nav:
   - Reference API:
     - reference/index.md
     - Interface: reference/interface.md
+    - Callbacks: reference/callbacks.md
     - Data:
       - reference/data/dataloaders.md
       - reference/data/datamodules.md
       - reference/data/datasets.md
-    - Metrics: reference/metrics.md
+    - Metrics: 
+      - reference/metrics/index.md
+      - reference/metrics/core.md
+      - reference/metrics/defaults.md
     - Models: 
       - Modules: reference/models/modules.md
-    - Trainers: reference/trainers.md
     - Vision:
+      - Data:
+        - reference/vision/data/index.md
+        - reference/vision/data/datasets.md
+        - reference/vision/data/transforms.md
       - reference/vision/index.md
-      - reference/vision/data.md
       - reference/vision/models.md
       - reference/vision/utils.md
   - Datasets: 

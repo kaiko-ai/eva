@@ -38,7 +38,7 @@ def test_sample(patch_camelyon_dataset: datasets.PatchCamelyon) -> None:
 
 @pytest.fixture(scope="function")
 def patch_camelyon_dataset(
-    split: Literal["train", "valid", "test"], assets_path: str
+    split: Literal["train", "val", "test"], assets_path: str
 ) -> datasets.PatchCamelyon:
     """PatchCamelyon dataset fixture."""
     return datasets.PatchCamelyon(

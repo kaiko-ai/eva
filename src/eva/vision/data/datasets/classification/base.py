@@ -1,7 +1,7 @@
 """Base for image classification datasets."""
 
 import abc
-from typing import Callable, Tuple
+from typing import Any, Callable, Dict, List, Tuple
 
 import numpy as np
 from typing_extensions import override
@@ -17,7 +17,7 @@ class ImageClassification(vision.VisionDataset[Tuple[np.ndarray, np.ndarray]], a
         image_transforms: Callable | None = None,
         target_transforms: Callable | None = None,
     ) -> None:
-        """Initializes the CSV based image dataset.
+        """Initializes the image classification dataset.
 
         Args:
             image_transforms: A function/transform that takes in an image
@@ -30,29 +30,46 @@ class ImageClassification(vision.VisionDataset[Tuple[np.ndarray, np.ndarray]], a
         self._image_transforms = image_transforms
         self._target_transforms = target_transforms
 
+    @property
+    def classes(self) -> List[str] | None:
+        """Returns the list with names of the dataset names."""
+
+    @property
+    def class_to_idx(self) -> Dict[str, int] | None:
+        """Returns a mapping of the class name to its target index."""
+
+    def load_metadata(self, index: int | None) -> Dict[str, Any] | List[Dict[str, Any]] | None:
+        """Returns the dataset metadata.
+
+        Args:
+            index: The index of the data sample to return the metadata of.
+                If `None`, it will return the metadata of the current dataset.
+
+        Returns:
+            The sample metadata.
+        """
+
     @abc.abstractmethod
     def load_image(self, index: int) -> np.ndarray:
         """Returns the `index`'th image sample.
 
         Args:
-            index: The index of the data-sample to load.
+            index: The index of the data sample to load.
 
         Returns:
             The image as a numpy array.
         """
-        raise NotImplementedError
 
     @abc.abstractmethod
     def load_target(self, index: int) -> np.ndarray:
         """Returns the `index`'th target sample.
 
         Args:
-            index: The index of the data-sample to load.
+            index: The index of the data sample to load.
 
         Returns:
-            The sample target.
+            The sample target as an array.
         """
-        raise NotImplementedError
 
     @abc.abstractmethod
     @override

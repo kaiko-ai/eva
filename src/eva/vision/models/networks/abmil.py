@@ -56,7 +56,7 @@ class ABMIL(torch.nn.Module):
             dropout_attention: dropout rate for the attention network and classifier
             dropout_mlp: dropout rate for the final MLP network
             pad_value: Value indicating padding in the input tensor. If specified, entries with
-                this value in the will be masked. If set to None, no masking will be is applied.
+                this value in the will be masked. If set to None, no masking is applied.
         """
         super().__init__()
 
