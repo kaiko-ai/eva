@@ -7,8 +7,8 @@ from eva import trainers
 from eva.data import datamodules
 from eva.data.datamodules import schemas
 from eva.models import modules
-from eva.vision.data import datasets
 from eva.utils.recorder import get_run_id, record_results
+from eva.vision.data import datasets
 
 
 class Interface:
