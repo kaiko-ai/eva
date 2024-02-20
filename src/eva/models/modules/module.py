@@ -10,48 +10,7 @@ from typing_extensions import override
 
 from eva.metrics import core as metrics_lib
 from eva.models.modules.typings import INPUT_BATCH
-
-from typing import Callable, List
-import functools
-import dataclasses
-import torch
-
-Transform = Callable[[torch.Tensor], torch.Tensor]
-
-@dataclasses.dataclass(frozen=True)
-class PostProcessesSchema:
-    """Post-processes schema."""
-
-    targets: List[Transform] | None = None
-    """Holds the common train and evaluation metrics."""
-
-    predictions: List[Transform] | None = None
-    """Holds the common train and evaluation metrics."""
-
-    def apply(self, tensor: torch.Tensor, transforms: List[Transform]) -> torch.Tensor:
-        """Applies a list of transforms a specific group.
-
-        Args:
-            tensor: The desired tensor to process.
-            transforms:
-
-        Returns:
-            The processed tensor.
-        """
-        return functools.reduce(
-            lambda tensor, transform: transform(tensor), transforms, tensor
-        )
-
-    def __call__(self, outputs: STEP_OUTPUT) -> None:
-        if not isinstance(outputs, dict):
-            raise ValueError("")
-
-        if "predictions" in outputs:
-            outputs["predictions"] = self.apply(outputs["predictions"], self.predictions)
-
-        if "targets" in outputs:
-            outputs["targets"] = self.apply(outputs["targets"], self.targets)
-
+from eva.models.modules.utils import batch_postprocess
 
 
 class ModelModule(pl.LightningModule):
@@ -60,25 +19,32 @@ class ModelModule(pl.LightningModule):
     def __init__(
         self,
         metrics: metrics_lib.MetricsSchema | None = None,
-        postprocesses: PostProcessesSchema | None = None,
+        postprocess: batch_postprocess.BatchPostProcess | None = None,
     ) -> None:
         """Initializes the basic module.
 
         Args:
-            metrics: The metrics schema.
+            metrics: The metric groups to track.
+            postprocess: A list of helper functions to apply after the
+                loss and before the metrics calculation to the model
+                predictions and targets.
         """
         super().__init__()
 
         self._metrics = metrics or self.default_metrics
-        self._postprocesses = postprocesses
+        self._postprocess = postprocess or self.default_postprocess
 
         self.metrics = metrics_lib.MetricModule.from_schema(self._metrics)
-        self.postprocesses
 
     @property
     def default_metrics(self) -> metrics_lib.MetricsSchema:
         """The default metrics."""
         return metrics_lib.MetricsSchema()
+
+    @property
+    def default_postprocess(self) -> batch_postprocess.BatchPostProcess:
+        """The default post-processes."""
+        return batch_postprocess.BatchPostProcess()
 
     @override
     def on_train_batch_end(
@@ -134,12 +100,16 @@ class ModelModule(pl.LightningModule):
     def _common_batch_end(self, outputs: STEP_OUTPUT) -> STEP_OUTPUT:
         """Common end step of training, validation and test.
 
+        It will apply the post-processes to the batch output and move
+        them to the appropriate device.
+
         Args:
             outputs: The batch step outputs.
 
         Returns:
             The updated outputs.
         """
+        self._postprocess(outputs)
         return memory.recursive_detach(outputs, to_cpu=self.device.type == "cpu")
 
     def _forward_and_log_metrics(
