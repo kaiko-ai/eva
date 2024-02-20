@@ -36,6 +36,8 @@ class DataModule(pl.LightningDataModule):
         self.datasets = datasets or self.default_datasets
         self.dataloaders = dataloaders or self.default_dataloaders
 
+        self._prepare_data_called = False
+
     @property
     def default_datasets(self) -> schemas.DatasetsSchema:
         """Returns the default datasets."""
@@ -48,15 +50,17 @@ class DataModule(pl.LightningDataModule):
 
     @override
     def prepare_data(self) -> None:
-        call.call_method_if_exists(self.datasets, "prepare_data")
+        if not self._prepare_data_called:
+            call.call_method_if_exists(self.datasets, "prepare_data", None)
+            self._prepare_data_called = True
 
     @override
     def setup(self, stage: str) -> None:
-        call.call_method_if_exists(self.datasets, "setup")
+        call.call_method_if_exists(self.datasets, "setup", stage)
 
     @override
     def teardown(self, stage: str) -> None:
-        call.call_method_if_exists(self.datasets, "teardown")
+        call.call_method_if_exists(self.datasets, "teardown", stage)
 
     @override
     def train_dataloader(self) -> TRAIN_DATALOADERS:
