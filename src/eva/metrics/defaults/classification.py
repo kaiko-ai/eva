@@ -18,7 +18,7 @@ class MulticlassClassificationMetrics(core.MetricCollection):
         prefix: str | None = None,
         postfix: str | None = None,
     ) -> None:
-        """Initializes the metrics.
+        """Initializes the multi-class classification metrics.
 
         Args:
             num_classes: Integer specifying the number of classes.

@@ -18,7 +18,7 @@ from eva.vision.utils import io
 
 
 class TotalSegmentatorClassification(base.ImageClassification):
-    """TotalSegmentator dataset class.
+    """Dataset class for TotalSegmentator images and classification targets.
 
     Create the multi-label classification dataset for the TotalSegmentator data.
     """
@@ -45,7 +45,7 @@ class TotalSegmentatorClassification(base.ImageClassification):
         image_transforms: Callable | None = None,
         target_transforms: Callable | None = None,
     ) -> None:
-        """Initialize dataset.
+        """Initializes the dataset.
 
         Args:
             root: Path to the root directory of the dataset. The dataset will
