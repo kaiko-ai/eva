@@ -29,7 +29,7 @@ class EmbeddingsWriter(callbacks.BasePredictionWriter):
     ):
         """Initializes a new EmbeddingsWriter instance.
 
-        This callbacks writes the embedding files in a seperate process to avoid blocking the
+        This callback writes the embedding files in a seperate process to avoid blocking the
         main process where the model forward pass is executed.
 
         Args:
