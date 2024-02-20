@@ -17,7 +17,7 @@ class ImageClassification(vision.VisionDataset[Tuple[np.ndarray, np.ndarray]], a
         image_transforms: Callable | None = None,
         target_transforms: Callable | None = None,
     ) -> None:
-        """Initializes the CSV based image dataset.
+        """Initializes the image classification dataset.
 
         Args:
             image_transforms: A function/transform that takes in an image

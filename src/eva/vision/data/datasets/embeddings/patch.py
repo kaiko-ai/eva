@@ -78,11 +78,11 @@ class PatchEmbeddingDataset(VisionDataset):
         self._data = self._load_manifest()
         self._data[self._embedding_column] = None
 
-        for index in tqdm.tqdm(self._data.index, desc="Loading embeddings"):
-            self._data.at[index, self._embedding_column] = self._load_embedding_file(index)
-
         self._data = self._data.loc[self._data[self._split_column] == self._split]
         self._data = self._data.reset_index(drop=True)
+
+        for index in tqdm.tqdm(self._data.index, desc="Loading embeddings"):
+            self._data.at[index, self._embedding_column] = self._load_embedding_file(index)
 
     def _load_embedding_file(self, index) -> torch.Tensor:
         path = self._get_embedding_path(index)
