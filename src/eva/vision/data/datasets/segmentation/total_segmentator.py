@@ -19,13 +19,13 @@ from eva.vision.utils import io
 class TotalSegmentator2D(base.ImageSegmentation):
     """TotalSegmentator 2D segmentation dataset."""
 
-    train_index_ranges: List[Tuple[int, int]] = [(0, 83)]
+    _train_index_ranges: List[Tuple[int, int]] = [(0, 83)]
     """Train range indices."""
 
-    val_index_ranges: List[Tuple[int, int]] = [(83, 103)]
+    _val_index_ranges: List[Tuple[int, int]] = [(83, 103)]
     """Validation range indices."""
 
-    resources_full: List[structs.DownloadResource] = [
+    _resources_full: List[structs.DownloadResource] = [
         structs.DownloadResource(
             filename="Totalsegmentator_dataset_v201.zip",
             url="https://zenodo.org/records/10047292/files/Totalsegmentator_dataset_v201.zip",
@@ -34,7 +34,7 @@ class TotalSegmentator2D(base.ImageSegmentation):
     ]
     """Resources for the full dataset version."""
 
-    resources_small: List[structs.DownloadResource] = [
+    _resources_small: List[structs.DownloadResource] = [
         structs.DownloadResource(
             filename="Totalsegmentator_dataset_small_v201.zip",
             url="https://zenodo.org/records/10047263/files/Totalsegmentator_dataset_small_v201.zip",
@@ -90,9 +90,10 @@ class TotalSegmentator2D(base.ImageSegmentation):
     @functools.cached_property
     @override
     def classes(self) -> List[str]:
-        random_sample_dir = random.choice(self._samples_dirs)  # nosec
-        sample_labels = os.path.join(self._root, random_sample_dir, "segmentations", "*.nii.gz")
-        return sorted(os.path.basename(path).split(".")[0] for path in glob(sample_labels))
+        first_sample_labels = os.path.join(
+            self._root, self._samples_dirs[0], "segmentations", "*.nii.gz"
+        )
+        return sorted(os.path.basename(path).split(".")[0] for path in glob(first_sample_labels))
 
     @property
     @override
@@ -178,8 +179,8 @@ class TotalSegmentator2D(base.ImageSegmentation):
     def _create_indices(self) -> List[int]:
         """Builds the dataset indices for the specified split."""
         split_index_ranges = {
-            "train": self.train_index_ranges,
-            "val": self.val_index_ranges,
+            "train": self._train_index_ranges,
+            "val": self._val_index_ranges,
             None: [(0, 103)],
         }
         index_ranges = split_index_ranges.get(self._split)
@@ -191,8 +192,8 @@ class TotalSegmentator2D(base.ImageSegmentation):
     def _download_dataset(self) -> None:
         """Downloads the dataset."""
         dataset_resources = {
-            "small": self.resources_small,
-            "full": self.resources_full,
+            "small": self._resources_small,
+            "full": self._resources_full,
             None: (0, 103),
         }
         resources = dataset_resources.get(self._split)

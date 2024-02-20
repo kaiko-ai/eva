@@ -18,7 +18,7 @@ class ImageSegmentation(vision.VisionDataset[Tuple[np.ndarray, np.ndarray]], abc
         target_transforms: Callable | None = None,
         image_target_transforms: Callable | None = None,
     ) -> None:
-        """Initializes the CSV based image dataset.
+        """Initializes the image segmentation base class.
 
         Args:
             image_transforms: A function/transform that takes in an image
