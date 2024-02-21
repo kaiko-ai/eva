@@ -10,41 +10,34 @@ from eva.data.datamodules import schemas
 from tests.eva.data.datamodules import _utils
 
 
-def test_datamodule_methods_fit(datamodule: datamodules.DataModule) -> None:
-    """Tests if fit stage correctly initializes the train & val datasets."""
+def test_datamodule_methods(datamodule: datamodules.DataModule) -> None:
+    """Tests the core datamodule methods."""
+
+    def assert_dataset(
+        dataset: datasets.Dataset | List[datasets.Dataset] | None, expected_called: bool
+    ):
+        datasets = dataset if isinstance(dataset, list) else [dataset]
+        for ds in datasets:
+            assert isinstance(ds, _utils.DummyDataset)
+            assert ds._prepare_data_called is True
+            assert ds._setup_called is expected_called
+            assert ds._teardown_called is expected_called
+
     datamodule.prepare_data()
     datamodule.setup(stage="fit")
     datamodule.teardown(stage="fit")
+    assert_dataset(datamodule.datasets.train, expected_called=True)
+    assert_dataset(datamodule.datasets.val, expected_called=True)
+    assert_dataset(datamodule.datasets.test, expected_called=False)
+    assert_dataset(datamodule.datasets.predict, expected_called=False)
 
-    _assert_dataset(datamodule.datasets.train)
-    _assert_dataset(datamodule.datasets.val)
-
-
-def test_datamodule_methods_validate(datamodule: datamodules.DataModule) -> None:
-    """Tests if fit stage correctly initializes the val dataset."""
-    datamodule.prepare_data()
-    datamodule.setup(stage="validate")
-    datamodule.teardown(stage="validate")
-
-    _assert_dataset(datamodule.datasets.val)
-
-
-def test_datamodule_methods_test(datamodule: datamodules.DataModule) -> None:
-    """Tests if fit stage correctly initializes the test dataset."""
-    datamodule.prepare_data()
     datamodule.setup(stage="test")
     datamodule.teardown(stage="test")
+    assert_dataset(datamodule.datasets.test, expected_called=True)
 
-    _assert_dataset(datamodule.datasets.test)
-
-
-def test_datamodule_methods_predict(datamodule: datamodules.DataModule) -> None:
-    """Tests if fit stage correctly initializes the predict dataset."""
-    datamodule.prepare_data()
     datamodule.setup(stage="predict")
     datamodule.teardown(stage="predict")
-
-    _assert_dataset(datamodule.datasets.predict)
+    assert_dataset(datamodule.datasets.predict, expected_called=True)
 
 
 def test_datamodule_dataloaders(datamodule: datamodules.DataModule) -> None:
@@ -58,15 +51,6 @@ def test_datamodule_dataloaders(datamodule: datamodules.DataModule) -> None:
     _assert_evaluation_dataloader(datamodule.val_dataloader())
     _assert_evaluation_dataloader(datamodule.test_dataloader())
     _assert_evaluation_dataloader(datamodule.predict_dataloader())
-
-
-def _assert_dataset(dataset: datasets.Dataset | List[datasets.Dataset] | None):
-    datasets = dataset if isinstance(dataset, list) else [dataset]
-    for ds in datasets:
-        assert isinstance(ds, _utils.DummyDataset)
-        assert ds._prepare_data_called is True
-        assert ds._setup_called is True
-        assert ds._teardown_called is True
 
 
 @pytest.fixture(scope="function")
