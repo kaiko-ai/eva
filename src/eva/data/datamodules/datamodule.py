@@ -51,16 +51,16 @@ class DataModule(pl.LightningDataModule):
     @override
     def prepare_data(self) -> None:
         if not self._prepare_data_called:
-            call.call_method_if_exists(self.datasets, "prepare_data", None)
+            call.call_method_if_exists(self.datasets, "prepare_data")
             self._prepare_data_called = True
 
     @override
     def setup(self, stage: str) -> None:
-        call.call_method_if_exists(self.datasets, "setup", stage)
+        call.call_method_if_exists(self._filter_datasets(self.datasets, stage), "setup")
 
     @override
     def teardown(self, stage: str) -> None:
-        call.call_method_if_exists(self.datasets, "teardown", stage)
+        call.call_method_if_exists(self._filter_datasets(self.datasets, stage), "teardown")
 
     @override
     def train_dataloader(self) -> TRAIN_DATALOADERS:
@@ -110,3 +110,18 @@ class DataModule(pl.LightningDataModule):
         """
         datasets = datasets if isinstance(datasets, list) else [datasets]
         return list(map(dataloader, datasets))
+
+    def _filter_datasets(self, datasets: schemas.DatasetsSchema, stage: str | None):
+        match stage:
+            case None:
+                return datasets
+            case "fit":
+                return schemas.DatasetsSchema(train=datasets.train, val=datasets.val)
+            case "validate":
+                return schemas.DatasetsSchema(val=datasets.val)
+            case "test":
+                return schemas.DatasetsSchema(test=datasets.test)
+            case "predict":
+                return schemas.DatasetsSchema(predict=datasets.predict)
+            case other:
+                raise ValueError(f"Unexpected stage `{other}`.")
