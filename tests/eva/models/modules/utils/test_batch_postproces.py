@@ -32,7 +32,7 @@ EXPECTED_14 = {
 
 
 @pytest.mark.parametrize(
-    "targets, predictions, outputs, expected",
+    "targets_transforms, predictions_transforms, outputs, expected",
     [
         (None, [nn.Sigmoid()], BATCH_OUTPUTS_1, EXPECTED_11),
         (None, [nn.Sigmoid(), nn.Sigmoid()], BATCH_OUTPUTS_1, EXPECTED_12),
@@ -53,11 +53,11 @@ def test_batch_postprocess_call(
 
 @pytest.fixture(scope="function")
 def processes(
-    targets: List[batch_postprocess.Transform] | None,
-    predictions: List[batch_postprocess.Transform] | None,
+    targets_transforms: List[batch_postprocess.Transform] | None,
+    predictions_transforms: List[batch_postprocess.Transform] | None,
 ) -> batch_postprocess.BatchPostProcess:
     """Returns a BatchPostProcess fixture."""
     return batch_postprocess.BatchPostProcess(
-        predictions=predictions,
-        targets=targets,
+        predictions_transforms=predictions_transforms,
+        targets_transforms=targets_transforms,
     )

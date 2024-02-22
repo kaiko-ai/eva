@@ -15,10 +15,10 @@ Transform = Callable[[torch.Tensor], torch.Tensor]
 class BatchPostProcess:
     """Batch post-processes transform schema."""
 
-    targets: List[Transform] | None = None
+    targets_transforms: List[Transform] | None = None
     """Holds the common train and evaluation metrics."""
 
-    predictions: List[Transform] | None = None
+    predictions_transforms: List[Transform] | None = None
     """Holds the common train and evaluation metrics."""
 
     def __call__(self, outputs: STEP_OUTPUT) -> None:
@@ -33,11 +33,15 @@ class BatchPostProcess:
         if not isinstance(outputs, dict):
             return
 
-        if "targets" in outputs and self.targets is not None:
-            outputs["targets"] = _apply_transforms(outputs["targets"], self.targets)
+        if "targets" in outputs and self.targets_transforms is not None:
+            outputs["targets"] = _apply_transforms(
+                outputs["targets"], transforms=self.targets_transforms
+            )
 
-        if "predictions" in outputs and self.predictions is not None:
-            outputs["predictions"] = _apply_transforms(outputs["predictions"], self.predictions)
+        if "predictions" in outputs and self.predictions_transforms is not None:
+            outputs["predictions"] = _apply_transforms(
+                outputs["predictions"], transforms=self.predictions_transforms
+            )
 
 
 def _apply_transforms(tensor: torch.Tensor, transforms: List[Transform]) -> torch.Tensor:
