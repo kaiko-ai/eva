@@ -1,4 +1,4 @@
-"""Model modules utilities and helper functions."""
+"""Gradient related utilities and helper functions."""
 
 from torch import nn
 
