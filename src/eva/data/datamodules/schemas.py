@@ -5,22 +5,44 @@ from typing import List
 
 from eva.data import dataloaders, datasets
 
+TRAIN_DATASET = datasets.Dataset | None
+"""Train dataset."""
+
+EVAL_DATASET = datasets.Dataset | List[datasets.Dataset] | None
+"""Evaluation dataset."""
+
 
 @dataclasses.dataclass(frozen=True)
 class DatasetsSchema:
     """Datasets schema used in DataModule."""
 
-    train: datasets.Dataset | None = None
+    train: TRAIN_DATASET = None
     """Train dataset."""
 
-    val: datasets.Dataset | List[datasets.Dataset] | None = None
+    val: EVAL_DATASET = None
     """Validation dataset."""
 
-    test: datasets.Dataset | List[datasets.Dataset] | None = None
+    test: EVAL_DATASET = None
     """Test dataset."""
 
-    predict: datasets.Dataset | List[datasets.Dataset] | None = None
+    predict: EVAL_DATASET = None
     """Predict dataset."""
+
+    def tolist(self, stage: str | None = None) -> List[EVAL_DATASET]:
+        """Returns the dataclass as a list and optionally filters it given the stage."""
+        match stage:
+            case "fit":
+                return [self.train, self.val]
+            case "validate":
+                return [self.val]
+            case "test":
+                return [self.test]
+            case "predict":
+                return [self.predict]
+            case None:
+                return [self.train, self.val, self.test, self.predict]
+            case _:
+                raise ValueError(f"Invalid stage `{stage}`.")
 
 
 @dataclasses.dataclass(frozen=True)
