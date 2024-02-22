@@ -2,7 +2,7 @@
 trainer:
   class_path: eva.Trainer
   init_args:
-    default_root_dir: &LIGHTNING_ROOT ${oc.env:LIGHTNING_ROOT, logs/patch_camelyon}
+    default_root_dir: &LIGHTNING_ROOT ${oc.env:LIGHTNING_ROOT, logs/dino_vits16/offline/patch_camelyon}
     max_epochs: &MAX_EPOCHS 20
     callbacks:
       - class_path: eva.callbacks.EmbeddingsWriter
@@ -26,8 +26,6 @@ trainer:
       - class_path: pytorch_lightning.loggers.TensorBoardLogger
         init_args:
           save_dir: *LIGHTNING_ROOT
-          name: ""
-          version: ""
 model:
   class_path: eva.HeadModule
   init_args:
@@ -44,19 +42,19 @@ model:
       class_path: torch.nn.Linear
       init_args:
         in_features: 384
-        out_features: &NUM_CLASSES 4
+        out_features: &NUM_CLASSES 2
     criterion: torch.nn.CrossEntropyLoss
     optimizer:
       class_path: torch.optim.SGD
       init_args:
-        lr: 0.1
+        lr: 0.0125
         momentum: 0.9
         weight_decay: 0.0
     lr_scheduler:
       class_path: torch.optim.lr_scheduler.CosineAnnealingLR
       init_args:
         T_max: *MAX_EPOCHS
-        eta_min: 0.01
+        eta_min: 0.0001
     metrics:
       common:
         - class_path: eva.metrics.AverageLoss
@@ -97,8 +95,9 @@ data:
             image_transforms:
               class_path: eva.vision.data.transforms.common.ResizeAndCrop
               init_args:
-                mean: &NORMALIZE_MEAN [0.485, 0.456, 0.406]
-                std: &NORMALIZE_STD [0.229, 0.224, 0.225]
+                size: &RESIZE_DIM ${oc.env:RESIZE_DIM, 224}  
+                mean: &NORMALIZE_MEAN ${oc.env:NORMALIZE_MEAN, [0.485, 0.456, 0.406]} 
+                std: &NORMALIZE_STD ${oc.env:NORMALIZE_STD, [0.229, 0.224, 0.225]}
         - class_path: eva.vision.datasets.PatchCamelyon
           init_args:
             root: ${oc.env:DATA_ROOT, ./data}/patch_camelyon
@@ -128,4 +127,4 @@ data:
       test:
         batch_size: *BATCH_SIZE
       predict:
-        batch_size: &PREDICT_BATCH_SIZE 32
+        batch_size: &PREDICT_BATCH_SIZE 128

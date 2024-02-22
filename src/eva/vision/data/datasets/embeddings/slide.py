@@ -5,6 +5,7 @@ from typing import Any, Dict, Literal, Tuple
 import pandas as pd
 import torch
 import torch.nn.functional as F
+import tqdm
 from typing_extensions import override
 
 from eva.vision.data.datasets.embeddings.patch import PatchEmbeddingDataset
@@ -65,6 +66,7 @@ class SlideEmbeddingDataset(PatchEmbeddingDataset):
         self._seed = seed
         self._pad_value = pad_value
         self._slide_id_column = self._column_mapping["slide_id"]
+        self._embedding_column = "embedding_tensor"
 
     @override
     def __getitem__(self, index) -> Tuple[torch.Tensor, torch.Tensor, Dict[str, Any]]:
@@ -78,6 +80,11 @@ class SlideEmbeddingDataset(PatchEmbeddingDataset):
     @override
     def setup(self):
         super().setup()
+
+        self._data[self._embedding_column] = None
+        for index in tqdm.tqdm(self._data.index, desc="Loading embeddings"):
+            self._data.at[index, self._embedding_column] = self._load_embedding_file(index)
+
         self._data = self._sample_n_patches_per_slide(self._data)
 
     @override
