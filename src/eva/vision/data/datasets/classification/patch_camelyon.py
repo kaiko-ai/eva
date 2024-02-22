@@ -107,7 +107,6 @@ class PatchCamelyon(base.ImageClassification):
 
     @override
     def prepare_data(self) -> None:
-        print(f"xxxxxxxx download: {self._download}")
         if self._download:
             self._download_dataset()
 
@@ -137,10 +136,8 @@ class PatchCamelyon(base.ImageClassification):
 
         for resource in resources:
             file_path = os.path.join(self._root, resource.filename)
-            print(f"wwwwwwww, {utils.check_integrity(file_path, resource.md5)}")
             if utils.check_integrity(file_path, resource.md5):
                 continue
-            print("yyyyyyyyyyyyy")
 
             utils.download_and_extract_archive(
                 resource.url,
