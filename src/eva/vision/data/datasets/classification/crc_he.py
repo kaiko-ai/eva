@@ -7,7 +7,7 @@ import numpy as np
 from torchvision.datasets import folder, utils
 from typing_extensions import override
 
-from eva.vision.data.datasets import _utils, structs
+from eva.vision.data.datasets import structs
 from eva.vision.data.datasets.classification import base
 from eva.vision.utils import io
 
@@ -17,66 +17,36 @@ _URL_TEMPLATE = "https://zenodo.org/records/1214456/files/{filename}.zip?downloa
 class CRC_HE(base.ImageClassification):
     """Dataset class for CRC-HE images and corresponding targets."""
 
-    _train_index_ranges: List[Tuple[int, int]] = [
-        (0, 8326),
-        (10407, 18860),
-        (20973, 30183),
-        (32485, 41731),
-        (44042, 51159),
-        (52938, 63767),
-        (66474, 73485),
-        (75237, 83594),
-        (85683, 97137),
-    ]
-    """Train range indices."""
+    _n_train_samples = 100000
 
-    _val_index_ranges: List[Tuple[int, int]] = [
-        (8326, 10407),
-        (18860, 20973),
-        (30183, 32485),
-        (41731, 44042),
-        (51159, 52938),
-        (63767, 66474),
-        (73485, 75237),
-        (83594, 85683),
-        (97137, 100000),
-    ]
-    """Validation range indices."""
-
-    _test_index_ranges: List[Tuple[int, int]] = [
-        (100000, 107180),
-    ]
-    """Test range indices."""
-
-    _train_val_resource: structs.DownloadResource = structs.DownloadResource(
+    _train_resource: structs.DownloadResource = structs.DownloadResource(
         filename="NCT-CRC-HE-100K-NONORM.zip",
         url=_URL_TEMPLATE.format(filename="NCT-CRC-HE-100K-NONORM"),
         md5="md5:035777cf327776a71a05c95da6d6325f",
     )
-    """Train / Validation resources."""
+    """Train resource."""
 
-    _test_resource: structs.DownloadResource = structs.DownloadResource(
+    _val_resource: structs.DownloadResource = structs.DownloadResource(
         filename="CRC-VAL-HE-7K.zip",
         url=_URL_TEMPLATE.format(filename="CRC-VAL-HE-7K"),
         md5="md5:2fd1651b4f94ebd818ebf90ad2b6ce06",
     )
-    """Test resources."""
+    """Val resource."""
 
     def __init__(
         self,
         root: str,
-        split: Literal["train", "val", "test"] | None = None,
+        split: Literal["train", "val"] | None = None,
         download: bool = False,
         image_transforms: Callable | None = None,
         target_transforms: Callable | None = None,
     ) -> None:
         """Initialize the dataset.
 
-        The CRC-HE dataset is split into a train, validation and test set:
+        The CRC-HE dataset is split into a train and validation set:
 
-        - train: 80% of NCT-CRC-HE-100K-NONORM (stratifed by class)
-        - val: 20% of NCT-CRC-HE-100K-NONORM (stratifed by class)
-        - test: 100% of CRC-VAL-HE-7K
+        - train: 100,000 patches of NCT-CRC-HE-100K-NONORM
+        - val: 7,180 patches of CRC-VAL-HE-7K
 
         Args:
             root: Path to the root directory of the dataset. The dataset will
@@ -101,12 +71,11 @@ class CRC_HE(base.ImageClassification):
         self._download = download
 
         self._samples: List[Tuple[str, int]] = []
-        self._indices: List[int] = []
 
     @property
     @override
     def classes(self) -> List[str]:
-        return ["Benign", "InSitu", "Invasive", "Normal"]
+        return ["ADI", "BACK", "DEB", "LYM", "MUC", "MUS", "NORM", "STR", "TUM"]
 
     @property
     @override
@@ -124,51 +93,59 @@ class CRC_HE(base.ImageClassification):
         }
 
     @property
-    def train_val_dataset_path(self) -> str:
-        """Returns the path of train & val image data of the dataset."""
+    def train_dataset_path(self) -> str:
+        """Returns the path of train image dataset."""
         return os.path.join(self._root, "NCT-CRC-HE-100K-NONORM")
 
     @property
-    def test_dataset_path(self) -> str:
-        """Returns the path of test image data of the dataset."""
+    def val_dataset_path(self) -> str:
+        """Returns the path of val image dataset."""
         return os.path.join(self._root, "CRC-VAL-HE-7K")
 
     @override
     def filename(self, index: int) -> str:
-        image_path, _ = self._samples[self._indices[index]]
-        if self.train_val_dataset_path in image_path:
-            return os.path.relpath(image_path, self.train_val_dataset_path)
+        if self._split is None:
+            dataset_path = (
+                self.train_dataset_path if index < self._n_train_samples else self.val_dataset_path
+            )
+        elif self._split == "train":
+            dataset_path = self.train_dataset_path
         else:
-            return os.path.relpath(image_path, self.test_dataset_path)
+            dataset_path = self.val_dataset_path
+        image_path, _ = self._samples[index]
+        return os.path.relpath(image_path, dataset_path)
 
     @override
     def prepare_data(self) -> None:
-        if self._download:
-            if not os.path.isdir(self.train_val_dataset_path):
-                self._download_dataset(self._train_val_resource)
-            if not os.path.isdir(self.test_dataset_path):
-                self._download_dataset(self._test_resource)
+        if self._download and self._split in ["train", None]:
+            if not os.path.isdir(self.train_dataset_path):
+                self._download_dataset(self._train_resource)
+        if self._download and self._split in ["val", None]:
+            if not os.path.isdir(self.val_dataset_path):
+                self._download_dataset(self._val_resource)
 
     @override
     def setup(self) -> None:
-        train_val_samples = self._make_dataset(self.train_val_dataset_path)
-        test_samples = self._make_dataset(self.test_dataset_path)
-        self._samples = train_val_samples + test_samples
-        self._indices = self._make_indices()
+        samples = []
+        if self._split in ["train", None]:
+            samples += self._make_dataset(self.train_dataset_path)
+        if self._split in ["val", None]:
+            samples += self._make_dataset(self.val_dataset_path)
+        self._samples = samples
 
     @override
     def load_image(self, index: int) -> np.ndarray:
-        image_path, _ = self._samples[self._indices[index]]
+        image_path, _ = self._samples[index]
         return io.read_image(image_path)
 
     @override
     def load_target(self, index: int) -> np.ndarray:
-        _, target = self._samples[self._indices[index]]
+        _, target = self._samples[index]
         return np.asarray(target, dtype=np.int64)
 
     @override
     def __len__(self) -> int:
-        return len(self._indices)
+        return len(self._samples)
 
     def _make_dataset(self, directory: str) -> List[Tuple[str, int]]:
         """Builds the dataset from the specified directory."""
@@ -186,17 +163,3 @@ class CRC_HE(base.ImageClassification):
             filename=resource.filename,
             remove_finished=True,
         )
-
-    def _make_indices(self) -> List[int]:
-        """Builds the dataset indices for the specified split."""
-        split_index_ranges = {
-            "train": self._train_index_ranges,
-            "val": self._val_index_ranges,
-            "test": self._test_index_ranges,
-            None: [(0, 107180)],
-        }
-        index_ranges = split_index_ranges.get(self._split)
-        if index_ranges is None:
-            raise ValueError("Invalid data split. Use 'train', 'val', 'test' or `None`.")
-
-        return _utils.ranges_to_indices(index_ranges)

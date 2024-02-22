@@ -11,7 +11,6 @@ trainer:
           dataloader_idx_map:
             0: train
             1: val
-            2: test
       - class_path: pytorch_lightning.callbacks.LearningRateMonitor
         init_args:
           logging_interval: epoch
@@ -81,13 +80,6 @@ data:
           split: val
           column_mapping:
             path: embedding
-      test:
-        class_path: eva.vision.data.datasets.embeddings.PatchEmbeddingDataset
-        init_args:
-          root: *EMBEDDINGS_DIR
-          split: test
-          column_mapping:
-            path: embedding
       predict:
         - class_path: eva.vision.datasets.CRC_HE
           init_args:
@@ -109,23 +101,11 @@ data:
               init_args:
                 mean: *NORMALIZE_MEAN
                 std: *NORMALIZE_STD
-        - class_path: eva.vision.datasets.CRC_HE
-          init_args:
-            root: ${oc.env:DATA_ROOT, ./data}/crc_he
-            split: test
-            download: ${oc.env:DOWNLOAD_DATA, true}
-            image_transforms:
-              class_path: eva.vision.data.transforms.common.ResizeAndCrop
-              init_args:
-                mean: *NORMALIZE_MEAN
-                std: *NORMALIZE_STD
     dataloaders:
       train:
         batch_size: &BATCH_SIZE 256
         shuffle: true
       val:
-        batch_size: *BATCH_SIZE
-      test:
         batch_size: *BATCH_SIZE
       predict:
         batch_size: &PREDICT_BATCH_SIZE 32

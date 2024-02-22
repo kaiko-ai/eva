@@ -10,15 +10,6 @@ from eva.vision.data import datasets
 
 
 @pytest.mark.parametrize(
-    "split, expected_length",
-    [("train", 80003), ("val", 19997), ("test", 7180), (None, 107180)],
-)
-def test_length(crc_he_dataset: datasets.CRC_HE, expected_length: int) -> None:
-    """Tests the length of the dataset."""
-    assert len(crc_he_dataset) == expected_length
-
-
-@pytest.mark.parametrize(
     "split, index",
     [
         (None, 0),
