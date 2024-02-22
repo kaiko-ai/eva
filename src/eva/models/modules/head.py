@@ -10,8 +10,9 @@ from torch.optim import lr_scheduler
 from typing_extensions import override
 
 from eva.metrics import core as metrics_lib
-from eva.models.modules import _utils, module
+from eva.models.modules import module
 from eva.models.modules.typings import INPUT_BATCH, MODEL_TYPE
+from eva.models.modules.utils import batch_postprocess, grad
 
 
 class HeadModule(module.ModelModule):
@@ -29,6 +30,7 @@ class HeadModule(module.ModelModule):
         optimizer: OptimizerCallable = optim.Adam,
         lr_scheduler: LRSchedulerCallable = lr_scheduler.ConstantLR,
         metrics: metrics_lib.MetricsSchema | None = None,
+        postprocess: batch_postprocess.BatchPostProcess | None = None,
     ) -> None:
         """Initializes the neural net head module.
 
@@ -39,10 +41,12 @@ class HeadModule(module.ModelModule):
                 that the input batch returns the features directly.
             optimizer: The optimizer to use.
             lr_scheduler: The learning rate scheduler to use.
-            metrics: The list of metrics to track. If `None`, it uses
-                the :meth:`self.default_metrics`.
+            metrics: The metric groups to track.
+            postprocess: A list of helper functions to apply after the
+                loss and before the metrics calculation to the model
+                predictions and targets.
         """
-        super().__init__(metrics=metrics)
+        super().__init__(metrics=metrics, postprocess=postprocess)
 
         self.head = head
         self.criterion = criterion
@@ -65,7 +69,7 @@ class HeadModule(module.ModelModule):
     @override
     def on_fit_start(self) -> None:
         if self.backbone is not None:
-            _utils.deactivate_requires_grad(self.backbone)
+            grad.deactivate_requires_grad(self.backbone)
 
     @override
     def training_step(self, batch: INPUT_BATCH, *args: Any, **kwargs: Any) -> STEP_OUTPUT:
@@ -87,7 +91,7 @@ class HeadModule(module.ModelModule):
     @override
     def on_fit_end(self) -> None:
         if self.backbone is not None:
-            _utils.activate_requires_grad(self.backbone)
+            grad.activate_requires_grad(self.backbone)
 
     def _batch_step(self, batch: INPUT_BATCH) -> STEP_OUTPUT:
         """Performs a model forward step and calculates the loss.
