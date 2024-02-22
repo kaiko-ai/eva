@@ -10,25 +10,40 @@ The tissue classes are: Adipose (ADI), background (BACK), debris (DEB), lymphocy
 
 ### Key stats
 
-|                      |                                                          |
-|----------------------|----------------------------------------------------------|
-| **Modality**         | Vision (WSI patches)                                     |
-| **Task**             | Multiclass classification (9 classes)                    |
-| **Cancer type**      | Colorectal                                               |
-| **Data size**        | total: 11.7GB (train/val), 800MB (test)                  |
-| **Image dimension**  | 224 x 224 x 3                                            |
-| **FoV (μm/px)**      | 20x (0.5)                                                |
-| **Files format**     | `.tif` images                                            |
-| **Number of images** | 107,180 (100k train/val, 7.2k test)                      |
-| **Splits in use**    | NCT-CRC-HE-100K-NONORM (train/val), CRC-VAL-HE-7K (test) |
+|                      |                                                     |
+|----------------------|-----------------------------------------------------|
+| **Modality**         | Vision (WSI patches)                                |
+| **Task**             | Multiclass classification (9 classes)               |
+| **Cancer type**      | Colorectal                                          |
+| **Data size**        | total: 11.7GB (train), 800MB (val)                  |
+| **Image dimension**  | 224 x 224 x 3                                       |
+| **FoV (μm/px)**      | 20x (0.5)                                           |
+| **Files format**     | `.tif` images                                       |
+| **Number of images** | 107,180 (100k train, 7.2k val)                  |
+| **Splits in use**    | NCT-CRC-HE-100K-NONORM (train), CRC-VAL-HE-7K (val) |
 
+
+### Splits
+
+We use the splits according to the data sources:
+
+ - Train split: `NCT-CRC-HE-100K-NONORM`
+ - Validation split: `CRC-VAL-HE-7K`
+
+| Splits | Train           | Validation   | 
+|---|-----------------|--------------|
+| #Samples | 100,000 (93.3%) | 7,180 (6.7%) | 
+
+A test split is not provided. Because the patient information for the training data is not available, dividing the 
+training data in a train/val split (and using the given val split as test split) is not possible without risking data leakage.
+__eva__ therefore reports evaluation results for CRC HE on the validation split.
 
 ### Organization
 
 The data `NCT-CRC-HE-100K-NONORM.zip` and `CRC-VAL-HE-7K.zip` from [zenodo](https://zenodo.org/records/1214456) are organized as follows:
 
 ```
-NCT-CRC-HE-100K-NONORM         # All images used for training and validation
+NCT-CRC-HE-100K-NONORM         # All images used for training
 ├── ADI                        # All labelled patches belonging to the 1st class
 │   ├── ADI-AAAFLCLY.tif
 │   ├── ...
@@ -36,7 +51,7 @@ NCT-CRC-HE-100K-NONORM         # All images used for training and validation
 │   ├── ...
 └── ...
 
-CRC-VAL-HE-7K                  # All images used for testing
+CRC-VAL-HE-7K                  # All images used for validation
 ├── ...                        # identical structure as for NCT-CRC-HE-100K-NONORM
 └── ...
 ```
@@ -45,15 +60,6 @@ CRC-VAL-HE-7K                  # All images used for testing
 
 The `CRC_HE` dataset class supports download the data no runtime with the initialized argument
 `download: bool = True`.
-
-The splits are created from the indices specified in the `CRC_HE` dataset class. The indices were selected to ensure a
-80% / 20% ordered and stratified train/val split from the `NCT-CRC-HE-100K-NONORM` dataset. The test split is the complete
-`CRC-VAL-HE-7K` dataset.
-
-| Splits | Train          | Validation     | Validation   | 
-|---|----------------|----------------|--------------|
-| #Samples | 80,003 (74.6%) | 19,997 (18.7%) | 7,180 (6.7%) |
-
 
 ## Relevant links
 
