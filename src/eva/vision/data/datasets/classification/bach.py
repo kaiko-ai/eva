@@ -13,9 +13,9 @@ from eva.vision.utils import io
 
 
 class BACH(base.ImageClassification):
-    """BACH dataset class."""
+    """Dataset class for BACH images and corresponding targets."""
 
-    train_index_ranges: List[Tuple[int, int]] = [
+    _train_index_ranges: List[Tuple[int, int]] = [
         (0, 41),
         (59, 60),
         (90, 139),
@@ -26,7 +26,7 @@ class BACH(base.ImageClassification):
     ]
     """Train range indices."""
 
-    val_index_ranges: List[Tuple[int, int]] = [
+    _val_index_ranges: List[Tuple[int, int]] = [
         (41, 59),
         (60, 90),
         (139, 169),
@@ -36,7 +36,7 @@ class BACH(base.ImageClassification):
     ]
     """Validation range indices."""
 
-    resources: List[structs.DownloadResource] = [
+    _resources: List[structs.DownloadResource] = [
         structs.DownloadResource(
             filename="ICIAR2018_BACH_Challenge.zip",
             url="https://zenodo.org/records/3632035/files/ICIAR2018_BACH_Challenge.zip",
@@ -132,7 +132,7 @@ class BACH(base.ImageClassification):
 
     def _download_dataset(self) -> None:
         """Downloads the dataset."""
-        for resource in self.resources:
+        for resource in self._resources:
             if os.path.isdir(self.dataset_path):
                 continue
 
@@ -146,8 +146,8 @@ class BACH(base.ImageClassification):
     def _make_indices(self) -> List[int]:
         """Builds the dataset indices for the specified split."""
         split_index_ranges = {
-            "train": self.train_index_ranges,
-            "val": self.val_index_ranges,
+            "train": self._train_index_ranges,
+            "val": self._val_index_ranges,
             None: [(0, 400)],
         }
         index_ranges = split_index_ranges.get(self._split)

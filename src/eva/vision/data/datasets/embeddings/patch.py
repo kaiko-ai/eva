@@ -5,7 +5,6 @@ from typing import Dict, Literal, Tuple
 
 import pandas as pd
 import torch
-import tqdm
 from typing_extensions import override
 
 from eva.vision.data.datasets.vision import VisionDataset
@@ -56,14 +55,12 @@ class PatchEmbeddingDataset(VisionDataset):
         self._path_column = self._column_mapping["path"]
         self._target_column = self._column_mapping["target"]
         self._split_column = self._column_mapping["split"]
-        self._embedding_column = "embedding_tensor"
 
     @override
     def __getitem__(self, index) -> Tuple[torch.Tensor, torch.Tensor]:
-        return (
-            self._data.at[index, self._embedding_column],
-            self._data.at[index, self._target_column],
-        )
+        embedding = self._load_embedding_file(index)
+        target = self._data.at[index, self._target_column]
+        return embedding, target
 
     @override
     def __len__(self) -> int:
@@ -76,11 +73,6 @@ class PatchEmbeddingDataset(VisionDataset):
     @override
     def setup(self):
         self._data = self._load_manifest()
-        self._data[self._embedding_column] = None
-
-        for index in tqdm.tqdm(self._data.index, desc="Loading embeddings"):
-            self._data.at[index, self._embedding_column] = self._load_embedding_file(index)
-
         self._data = self._data.loc[self._data[self._split_column] == self._split]
         self._data = self._data.reset_index(drop=True)
 
