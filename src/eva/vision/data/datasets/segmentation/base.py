@@ -56,14 +56,26 @@ class ImageSegmentation(vision.VisionDataset[Tuple[np.ndarray, np.ndarray]], abc
         """
 
     @abc.abstractmethod
-    def load_image_and_mask(self, index: int) -> Tuple[np.ndarray, np.ndarray]:
-        """Returns the `index`'th image and mask sample.
+    def load_image(self, index: int) -> np.ndarray:
+        """Loads and returns the `index`'th image sample.
 
         Args:
             index: The index of the data sample to load.
 
         Returns:
-            A tuple with the image and mask as a numpy arrays.
+            The image as a numpy array.
+        """
+
+    @abc.abstractmethod
+    def load_mask(self, index: int) -> np.ndarray:
+        """Returns the `index`'th target mask sample.
+
+        Args:
+            index: The index of the data sample target mask to load.
+            slice_index: The slice index to fetch.
+
+        Returns:
+            The sample mask as a stack of binary mask arrays (label, height, width).
         """
 
     @abc.abstractmethod
@@ -73,8 +85,9 @@ class ImageSegmentation(vision.VisionDataset[Tuple[np.ndarray, np.ndarray]], abc
 
     @override
     def __getitem__(self, index: int) -> Tuple[np.ndarray, np.ndarray]:
-        image, target = self.load_image_and_mask(index)
-        return self._apply_transforms(image, target)
+        image = self.load_image(index)
+        mask = self.load_mask(index)
+        return self._apply_transforms(image, mask)
 
     def _apply_transforms(
         self, image: np.ndarray, target: np.ndarray

@@ -2,7 +2,6 @@
 
 import functools
 import os
-import random
 from glob import glob
 from typing import Callable, Dict, List, Literal, Tuple
 
@@ -24,6 +23,9 @@ class TotalSegmentator2D(base.ImageSegmentation):
 
     _val_index_ranges: List[Tuple[int, int]] = [(83, 103)]
     """Validation range indices."""
+
+    _n_slices_per_image: int = 20
+    """The amount of slices to sample per 3D CT scan image."""
 
     _resources_full: List[structs.DownloadResource] = [
         structs.DownloadResource(
@@ -90,10 +92,14 @@ class TotalSegmentator2D(base.ImageSegmentation):
     @functools.cached_property
     @override
     def classes(self) -> List[str]:
+        def get_filename(path: str) -> str:
+            """Returns the filename from the full path."""
+            return os.path.basename(path).split(".")[0]
+
         first_sample_labels = os.path.join(
             self._root, self._samples_dirs[0], "segmentations", "*.nii.gz"
         )
-        return sorted(os.path.basename(path).split(".")[0] for path in glob(first_sample_labels))
+        return sorted(map(get_filename, glob(first_sample_labels)))
 
     @property
     @override
@@ -116,56 +122,44 @@ class TotalSegmentator2D(base.ImageSegmentation):
         self._indices = self._create_indices()
 
     @override
-    def load_image_and_mask(self, index: int) -> Tuple[np.ndarray, np.ndarray]:
-        image_3D = self._load_image(index)
-        image_2D, slice_idx = self._extract_image_slice(image_3D)
-        mask = self._load_mask(index, slice_idx)
-        return image_2D, mask
+    def __len__(self) -> int:
+        return len(self._indices) * self._n_slices_per_image
 
     @override
-    def __len__(self) -> int:
-        return len(self._indices)
+    def load_image(self, index: int) -> np.ndarray:
+        image_path = self._get_image_path(index)
+        slice_index = self._get_sample_slice_index(index)
+        image_array = io.read_nifti(image_path, slice_index)
+        return cv2.cvtColor(image_array, cv2.COLOR_GRAY2RGB)
 
-    def _load_image(self, index: int) -> np.ndarray:
-        """Loads and returns the `index`'th image sample.
-
-        Args:
-            index: The index of the data sample to load.
-
-        Returns:
-            The 3D grayscale image (height, width, slices) as a numpy array.
-        """
-        sample_dir = self._samples_dirs[self._indices[index]]
-        image_path = os.path.join(self._root, sample_dir, "ct.nii.gz")
-        return io.read_nifti(image_path)
-
-    def _extract_image_slice(self, image_3D: np.ndarray) -> Tuple[np.ndarray, int]:
-        """Randomly extracts one 2D image from a 3D along with its slice index.
-
-        Args:
-            image_3D: The grayscale 3D image (height, weight, n_slices).
-
-        Returns:
-            A 2D RGB image (height, width, 3) along with its corresponding 3D slice index.
-        """
-        slice_idx = random.randrange(image_3D.shape[2])  # nosec
-        image_rgb = cv2.cvtColor(image_3D[:, :, slice_idx], cv2.COLOR_GRAY2RGB)
-        return image_rgb, slice_idx
-
-    def _load_mask(self, index: int, slice_index: int = 0) -> np.ndarray:
-        """Returns the `index`'th target mask sample.
-
-        Args:
-            index: The index of the data sample target mask to load.
-            slice_index: The slice index to fetch.
-
-        Returns:
-            The sample mask as a stack of binary mask arrays (label, height, width).
-        """
-        sample_dir = self._samples_dirs[self._indices[index]]
-        masks_dir = os.path.join(self._root, sample_dir, "segmentations")
+    @override
+    def load_mask(self, index: int) -> np.ndarray:
+        masks_dir = self._get_masks_dir(index)
+        slice_index = self._get_sample_slice_index(index)
         mask_paths = (os.path.join(masks_dir, label + ".nii.gz") for label in self.classes)
         return np.stack([io.read_nifti(path, slice_index) for path in mask_paths])
+
+    def _get_masks_dir(self, index: int) -> str:
+        """Returns the directory of the corresponding masks."""
+        sample_dir = self._get_sample_dir(index)
+        return os.path.join(self._root, sample_dir, "segmentations")
+
+    def _get_image_path(self, index: int) -> str:
+        """Returns the corresponding image path."""
+        sample_dir = self._get_sample_dir(index)
+        return os.path.join(self._root, sample_dir, "ct.nii.gz")
+
+    def _get_sample_dir(self, index: int) -> str:
+        """Returns the corresponding sample directory."""
+        sample_index = self._indices[index // self._n_slices_per_image]
+        return self._samples_dirs[sample_index]
+
+    def _get_sample_slice_index(self, index: int) -> int:
+        """Returns the corresponding slice index."""
+        image_path = self._get_image_path(index)
+        total_slices = _fetch_number_of_slices(image_path)
+        slice_indices = np.linspace(0, total_slices - 1, num=self._n_slices_per_image, dtype=int)
+        return slice_indices[index % self._n_slices_per_image]
 
     def _fetch_samples_dirs(self) -> List[str]:
         """Returns the name of all the samples of all the splits of the dataset."""
@@ -207,3 +201,10 @@ class TotalSegmentator2D(base.ImageSegmentation):
                 filename=resource.filename,
                 remove_finished=True,
             )
+
+
+@functools.lru_cache(maxsize=2000)
+def _fetch_number_of_slices(image_path: str) -> int:
+    """Fetches and returns the total number of slices of the image."""
+    image_array = io.read_nifti(image_path)
+    return image_array.shape[-1]
