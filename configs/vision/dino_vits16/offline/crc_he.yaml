@@ -1,0 +1,131 @@
+---
+trainer:
+  class_path: eva.Trainer
+  init_args:
+    default_root_dir: &LIGHTNING_ROOT ${oc.env:LIGHTNING_ROOT, logs/crc_he}
+    max_epochs: &MAX_EPOCHS 5
+    callbacks:
+      - class_path: eva.callbacks.EmbeddingsWriter
+        init_args:
+          output_dir: &EMBEDDINGS_DIR ${oc.env:EMBEDDINGS_ROOT, ./data/embeddings}/crc_he
+          dataloader_idx_map:
+            0: train
+            1: val
+            2: test
+      - class_path: pytorch_lightning.callbacks.LearningRateMonitor
+        init_args:
+          logging_interval: epoch
+      - class_path: pytorch_lightning.callbacks.ModelCheckpoint
+        init_args:
+          filename: best
+          save_last: true
+          save_top_k: 1
+          monitor: &MONITOR_METRIC val/MulticlassAccuracy
+          mode: &MONITOR_METRIC_MODE max
+    logger:
+      - class_path: pytorch_lightning.loggers.TensorBoardLogger
+        init_args:
+          save_dir: *LIGHTNING_ROOT
+          name: ""
+          version: ""
+model:
+  class_path: eva.HeadModule
+  init_args:
+    backbone:
+      class_path: eva.models.ModelFromFunction
+      init_args:
+        path: torch.hub.load
+        arguments:
+          repo_or_dir: facebookresearch/dino:main
+          model: dino_vits16
+          pretrained: true
+        checkpoint_path: &CHECKPOINT_PATH ${oc.env:CHECKPOINT_PATH, null}
+    head:
+      class_path: torch.nn.Linear
+      init_args:
+        in_features: 384
+        out_features: &NUM_CLASSES 9
+    criterion: torch.nn.CrossEntropyLoss
+    optimizer:
+      class_path: torch.optim.SGD
+      init_args:
+        lr: 0.001
+        momentum: 0.9
+        weight_decay: 0.0
+    lr_scheduler:
+      class_path: torch.optim.lr_scheduler.CosineAnnealingLR
+      init_args:
+        T_max: *MAX_EPOCHS
+        eta_min: 0.00001
+    metrics:
+      common:
+        - class_path: eva.metrics.AverageLoss
+        - class_path: eva.metrics.MulticlassClassificationMetrics
+          init_args:
+            num_classes: *NUM_CLASSES
+data:
+  class_path: eva.DataModule
+  init_args:
+    datasets:
+      train:
+        class_path: eva.vision.data.datasets.embeddings.PatchEmbeddingDataset
+        init_args:
+          root: *EMBEDDINGS_DIR
+          split: train
+          column_mapping:
+            path: embedding
+      val:
+        class_path: eva.vision.data.datasets.embeddings.PatchEmbeddingDataset
+        init_args:
+          root: *EMBEDDINGS_DIR
+          split: val
+          column_mapping:
+            path: embedding
+      test:
+        class_path: eva.vision.data.datasets.embeddings.PatchEmbeddingDataset
+        init_args:
+          root: *EMBEDDINGS_DIR
+          split: test
+          column_mapping:
+            path: embedding
+      predict:
+        - class_path: eva.vision.datasets.CRC_HE
+          init_args:
+            root: ${oc.env:DATA_ROOT, ./data}/crc_he
+            split: train
+            download: ${oc.env:DOWNLOAD_DATA, true}
+            image_transforms:
+              class_path: eva.vision.data.transforms.common.ResizeAndCrop
+              init_args:
+                mean: &NORMALIZE_MEAN [0.485, 0.456, 0.406]
+                std: &NORMALIZE_STD [0.229, 0.224, 0.225]
+        - class_path: eva.vision.datasets.CRC_HE
+          init_args:
+            root: ${oc.env:DATA_ROOT, ./data}/crc_he
+            split: val
+            download: ${oc.env:DOWNLOAD_DATA, true}
+            image_transforms:
+              class_path: eva.vision.data.transforms.common.ResizeAndCrop
+              init_args:
+                mean: *NORMALIZE_MEAN
+                std: *NORMALIZE_STD
+        - class_path: eva.vision.datasets.CRC_HE
+          init_args:
+            root: ${oc.env:DATA_ROOT, ./data}/crc_he
+            split: test
+            download: ${oc.env:DOWNLOAD_DATA, true}
+            image_transforms:
+              class_path: eva.vision.data.transforms.common.ResizeAndCrop
+              init_args:
+                mean: *NORMALIZE_MEAN
+                std: *NORMALIZE_STD
+    dataloaders:
+      train:
+        batch_size: &BATCH_SIZE 256
+        shuffle: true
+      val:
+        batch_size: *BATCH_SIZE
+      test:
+        batch_size: *BATCH_SIZE
+      predict:
+        batch_size: &PREDICT_BATCH_SIZE 32
