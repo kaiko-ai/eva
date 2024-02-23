@@ -38,7 +38,6 @@ class Interface:
         """
         model = _adapt_model_module(model, data)
         trainer.fit(model=model, datamodule=data)
-
         trainer.validate(datamodule=data)
         if data.datasets.test is not None:
             trainer.test(datamodule=data)
@@ -62,7 +61,6 @@ class Interface:
             dataloaders=schemas.DataloadersSchema(predict=data.dataloaders.predict),
             datasets=schemas.DatasetsSchema(predict=data.datasets.predict),
         )
-
         trainer.predict(model=model, datamodule=predict_datamodule)
 
     def predict_fit(
