@@ -10,6 +10,7 @@ from typing_extensions import override
 
 from eva.metrics import core as metrics_lib
 from eva.models.modules.typings import INPUT_BATCH
+from eva.models.modules.utils import batch_postprocess
 
 
 class ModelModule(pl.LightningModule):
@@ -18,15 +19,20 @@ class ModelModule(pl.LightningModule):
     def __init__(
         self,
         metrics: metrics_lib.MetricsSchema | None = None,
+        postprocess: batch_postprocess.BatchPostProcess | None = None,
     ) -> None:
         """Initializes the basic module.
 
         Args:
-            metrics: The metrics schema.
+            metrics: The metric groups to track.
+            postprocess: A list of helper functions to apply after the
+                loss and before the metrics calculation to the model
+                predictions and targets.
         """
         super().__init__()
 
         self._metrics = metrics or self.default_metrics
+        self._postprocess = postprocess or self.default_postprocess
 
         self.metrics = metrics_lib.MetricModule.from_schema(self._metrics)
 
@@ -34,6 +40,11 @@ class ModelModule(pl.LightningModule):
     def default_metrics(self) -> metrics_lib.MetricsSchema:
         """The default metrics."""
         return metrics_lib.MetricsSchema()
+
+    @property
+    def default_postprocess(self) -> batch_postprocess.BatchPostProcess:
+        """The default post-processes."""
+        return batch_postprocess.BatchPostProcess()
 
     @override
     def on_train_batch_end(
@@ -89,12 +100,16 @@ class ModelModule(pl.LightningModule):
     def _common_batch_end(self, outputs: STEP_OUTPUT) -> STEP_OUTPUT:
         """Common end step of training, validation and test.
 
+        It will apply the post-processes to the batch output and move
+        them to the appropriate device.
+
         Args:
             outputs: The batch step outputs.
 
         Returns:
             The updated outputs.
         """
+        self._postprocess(outputs)
         return memory.recursive_detach(outputs, to_cpu=self.device.type == "cpu")
 
     def _forward_and_log_metrics(

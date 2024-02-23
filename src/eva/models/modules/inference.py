@@ -32,6 +32,6 @@ class InferenceModule(module.ModelModule):
         batch_idx: int,
         dataloader_idx: int = 0,
     ) -> STEP_OUTPUT:
-        data, targets, metadata = INPUT_BATCH(*batch)
+        data, *_ = INPUT_BATCH(*batch)
         predictions = self(data)
         return predictions

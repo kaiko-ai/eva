@@ -1,41 +1,33 @@
 """Helper dataset calling methods."""
 
-from typing import Iterable
+from typing import Any, Iterable
 
 from eva.data import datasets as datasets_lib
-from eva.data.datamodules import schemas
 
 
-def call_method_if_exists(datasets: schemas.DatasetsSchema, method: str) -> None:
-    """Calls dataset `method` from the datasets if exists.
+def call_method_if_exists(objects: Iterable[Any], /, method: str) -> None:
+    """Calls a desired `method` from the datasets if exists.
 
     Args:
-        datasets: The datasets schema to call the method.
+        objects: An iterable of objects.
         method: The dataset method name to call if exists.
     """
-    for dataset in _datasets_iterator(datasets):
-        if hasattr(dataset, method):
-            fn = getattr(dataset, method)
+    for _object in _recursive_iter(objects):
+        if hasattr(_object, method):
+            fn = getattr(_object, method)
             fn()
 
 
-def _datasets_iterator(datasets: schemas.DatasetsSchema) -> Iterable[datasets_lib.Dataset]:
-    """Iterates thought the defined datasets in a schema.
+def _recursive_iter(objects: Iterable[Any], /) -> Iterable[datasets_lib.Dataset]:
+    """Iterates thought an iterable of objects and their respective iterable values.
 
     Args:
-        datasets: The datasets to iterate from.
+        objects: The objects to iterate from.
 
     Yields:
-        The individual dataset class.
+        The individual object class.
     """
-    data_splits = [
-        datasets.train,
-        datasets.val,
-        datasets.test,
-        datasets.predict,
-    ]
-    data_splits = [dataset for dataset in data_splits if dataset is not None]
-    for dataset in data_splits:
-        if not isinstance(dataset, list):
-            dataset = [dataset]
-        yield from dataset
+    for _object in objects:
+        if not isinstance(_object, list):
+            _object = [_object]
+        yield from _object
