@@ -13,20 +13,31 @@ from tests.eva.data.datamodules import _utils
 def test_datamodule_methods(datamodule: datamodules.DataModule) -> None:
     """Tests the core datamodule methods."""
 
-    def assert_dataset(dataset: datasets.Dataset | List[datasets.Dataset] | None):
-        assert isinstance(dataset, _utils.DummyDataset)
-        assert dataset._prepare_data_called is True
-        assert dataset._setup_called is True
-        assert dataset._teardown_called is True
+    def assert_dataset(
+        dataset: datasets.Dataset | List[datasets.Dataset] | None, expected_called: bool
+    ):
+        datasets = dataset if isinstance(dataset, list) else [dataset]
+        for ds in datasets:
+            assert isinstance(ds, _utils.DummyDataset)
+            assert ds._prepare_data_called is True
+            assert ds._setup_called is expected_called
+            assert ds._teardown_called is expected_called
 
     datamodule.prepare_data()
-    datamodule.setup(stage="train")
-    datamodule.teardown(stage="train")
+    datamodule.setup(stage="fit")
+    datamodule.teardown(stage="fit")
+    assert_dataset(datamodule.datasets.train, expected_called=True)
+    assert_dataset(datamodule.datasets.val, expected_called=True)
+    assert_dataset(datamodule.datasets.test, expected_called=False)
+    assert_dataset(datamodule.datasets.predict, expected_called=False)
 
-    assert_dataset(datamodule.datasets.train)
-    assert_dataset(datamodule.datasets.val)
-    assert_dataset(datamodule.datasets.test)
-    assert_dataset(datamodule.datasets.predict)
+    datamodule.setup(stage="test")
+    datamodule.teardown(stage="test")
+    assert_dataset(datamodule.datasets.test, expected_called=True)
+
+    datamodule.setup(stage="predict")
+    datamodule.teardown(stage="predict")
+    assert_dataset(datamodule.datasets.predict, expected_called=True)
 
 
 def test_datamodule_dataloaders(datamodule: datamodules.DataModule) -> None:
@@ -50,7 +61,7 @@ def datamodule() -> datamodules.DataModule:
             train=_utils.DummyDataset(),
             val=_utils.DummyDataset(),
             test=_utils.DummyDataset(),
-            predict=_utils.DummyDataset(),
+            predict=[_utils.DummyDataset(), _utils.DummyDataset()],
         ),
         dataloaders=schemas.DataloadersSchema(
             train=dataloaders.DataLoader(),
