@@ -125,16 +125,7 @@ class PatchCamelyon(base.ImageClassification):
 
     def _download_dataset(self) -> None:
         """Downloads the PatchCamelyon dataset."""
-        dataset_resources = {
-            "train": self._train_resources,
-            "val": self._val_resources,
-            "test": self._test_resources,
-        }
-        resources = dataset_resources.get(self._split)
-        if resources is None:
-            raise ValueError("Invalid data split. Use 'train', 'val', or 'test'.")
-
-        for resource in resources:
+        for resource in self._train_resources + self._val_resources + self._test_resources:
             file_path = os.path.join(self._root, resource.filename)
             if utils.check_integrity(file_path, resource.md5):
                 continue
