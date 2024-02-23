@@ -126,12 +126,7 @@ class CRC_HE(base.ImageClassification):
 
     @override
     def setup(self) -> None:
-        samples = []
-        if self._split in ["train", None]:
-            samples += self._make_dataset(self.train_dataset_path)
-        if self._split in ["val", None]:
-            samples += self._make_dataset(self.val_dataset_path)
-        self._samples = samples
+        self._samples = self._make_dataset()
 
     @override
     def load_image(self, index: int) -> np.ndarray:
@@ -147,13 +142,25 @@ class CRC_HE(base.ImageClassification):
     def __len__(self) -> int:
         return len(self._samples)
 
-    def _make_dataset(self, directory: str) -> List[Tuple[str, int]]:
-        """Builds the dataset from the specified directory."""
-        return folder.make_dataset(
-            directory=directory,
-            class_to_idx=self.class_to_idx,
-            extensions=(".tif"),
-        )
+    def _make_dataset(self) -> List[Tuple[str, int]]:
+        """Builds the dataset for the specified split."""
+        dataset_dirs = {
+            "train": [self.train_dataset_path],
+            "val": [self.val_dataset_path],
+            None: [self.train_dataset_path, self.val_dataset_path],
+        }
+        directories = dataset_dirs.get(self._split)
+        if directories is None:
+            raise ValueError("Invalid data split. Use 'train', 'val' or `None`.")
+
+        dataset = []
+        for directory in directories:
+            dataset += folder.make_dataset(
+                directory=directory,
+                class_to_idx=self.class_to_idx,
+                extensions=(".tif"),
+            )
+        return dataset
 
     def _download_dataset(self, resource: structs.DownloadResource) -> None:
         """Downloads the CRC HE datasets."""
