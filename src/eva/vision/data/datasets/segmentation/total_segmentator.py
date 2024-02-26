@@ -190,9 +190,9 @@ class TotalSegmentator2D(base.ImageSegmentation):
             "full": self._resources_full,
             None: (0, 103),
         }
-        resources = dataset_resources.get(self._split)
+        resources = dataset_resources.get(self._version)
         if resources is None:
-            raise ValueError("Invalid data split. Use 'small' or 'full'.")
+            raise ValueError("Invalid data version. Use 'small' or 'full'.")
 
         for resource in resources:
             utils.download_and_extract_archive(
