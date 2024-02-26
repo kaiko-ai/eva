@@ -1,9 +1,16 @@
 """Main interface class."""
 
+import copy
+import os
+from datetime import datetime
+
+import pytorch_lightning as pl
+
 from eva import trainers
 from eva.data import datamodules
 from eva.data.datamodules import schemas
 from eva.models import modules
+from eva.utils.recorder import get_evaluation_id, record_results
 from eva.vision.data import datasets
 
 
@@ -19,6 +26,7 @@ class Interface:
         model: modules.ModelModule,
         data: datamodules.DataModule,
         trainer: trainers.Trainer,
+        n_runs: int = 1,
     ) -> None:
         """Perform model training and evaluation in place.
 
@@ -35,13 +43,27 @@ class Interface:
             model: The model module.
             data: The data module.
             trainer: The trainer which processes the model and data.
+            n_runs: The number of runs to perform.
         """
+        evaluation_id = get_evaluation_id()
         model = _adapt_model_module(model, data)
-        trainer.fit(model=model, datamodule=data)
 
-        trainer.validate(datamodule=data)
-        if data.datasets.test is not None:
-            trainer.test(datamodule=data)
+        for run in range(n_runs):
+            trainer_ = copy.deepcopy(trainer)
+            log_dir = os.path.join(trainer_.default_root_dir, evaluation_id, f"run_{run}")
+            _adapt_log_dirs(trainer_, log_dir)
+
+            start_time = datetime.now()
+            pl.seed_everything(run, workers=True)
+
+            trainer_.fit(model=model, datamodule=data)
+            evaluation_results = {"val": trainer_.validate(datamodule=data)}
+            if data.datasets.test is not None:
+                evaluation_results["test"] = trainer_.test(datamodule=data)
+
+            end_time = datetime.now()
+            results_path = os.path.join(log_dir, "results.json")
+            record_results(evaluation_results, results_path, start_time, end_time)
 
     def predict(
         self,
@@ -95,3 +117,19 @@ def _adapt_model_module(
     ):
         model.backbone = None  # disable backbone when using pre-computed embeddings
     return model
+
+
+def _adapt_log_dirs(trainer, log_dir) -> None:
+    """Sets the log directory for the logger, trainer and callbacks."""
+    for logger in trainer.loggers:
+        try:
+            logger.log_dir = log_dir
+        except AttributeError:
+            raise Warning(f"Could not set log_dir for logger {logger}")
+
+    trainer.log_dir = log_dir
+    if len(trainer.callbacks) > 0:
+        if isinstance(trainer.callbacks[0], pl.callbacks.ModelCheckpoint):
+            trainer.callbacks[0].dirpath = log_dir
+        else:
+            raise Warning(f"Could not set log_dir for callback {trainer.callbacks[0]}")

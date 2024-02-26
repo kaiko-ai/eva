@@ -1,4 +1,5 @@
 ---
+n_runs: 2
 trainer:
   class_path: eva.Trainer
   init_args:
@@ -6,6 +7,13 @@ trainer:
     max_epochs: &MAX_EPOCHS 1
     limit_train_batches: 2
     limit_val_batches: 2
+    logger:
+      - class_path: eva.loggers.tensorboard_logger.TensorBoardLogger
+        init_args:
+          save_dir: *OUTPUT_DIR
+      - class_path: eva.loggers.csv_logger.CSVLogger
+        init_args:
+          save_dir: *OUTPUT_DIR
 model:
   class_path: eva.HeadModule
   init_args:
