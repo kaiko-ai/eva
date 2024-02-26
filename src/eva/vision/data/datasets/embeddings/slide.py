@@ -2,6 +2,7 @@
 
 from typing import Any, Dict, Literal, Tuple
 
+import numpy as np
 import pandas as pd
 import torch
 import torch.nn.functional as F
@@ -69,13 +70,12 @@ class SlideEmbeddingDataset(PatchEmbeddingDataset):
         self._embedding_column = "embedding_tensor"
 
     @override
-    def __getitem__(self, index) -> Tuple[torch.Tensor, torch.Tensor, Dict[str, Any]]:
+    def __getitem__(self, index) -> Tuple[torch.Tensor, torch.Tensor | np.ndarray, Dict[str, Any]]:
         metadata = {"slide_id": self._data.at[index, self._slide_id_column]}
-        return (
-            self._data.at[index, self._embedding_column],
-            self._data.at[index, self._target_column],
-            metadata,
+        embedding, target = self._apply_transforms(
+            self._data.at[index, self._embedding_column], self._load_target(index)
         )
+        return (embedding, target, metadata)
 
     @override
     def setup(self):
@@ -83,20 +83,9 @@ class SlideEmbeddingDataset(PatchEmbeddingDataset):
 
         self._data[self._embedding_column] = None
         for index in tqdm.tqdm(self._data.index, desc="Loading embeddings"):
-            self._data.at[index, self._embedding_column] = self._load_embedding_file(index)
+            self._data.at[index, self._embedding_column] = self._load_embedding(index, 2)
 
         self._data = self._sample_n_patches_per_slide(self._data)
-
-    @override
-    def _load_embedding_file(self, index) -> torch.Tensor:
-        path = self._get_embedding_path(index)
-        tensor = torch.load(path, map_location="cpu")
-        if tensor.ndim != 2:
-            import pytest
-
-            pytest.set_trace()
-            raise ValueError(f"Unexpected tensor shape {tensor.shape} for {path}")
-        return tensor
 
     def _sample_n_patches_per_slide(self, df: pd.DataFrame) -> pd.DataFrame:
         """This function randomly selects n_patches_per_slide patch embeddings per slide.

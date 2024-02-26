@@ -24,7 +24,8 @@ def test_patch_embedding_dataset(patches_manifest_path: str, root_dir: str):
         assert len(ds[i]) == 2
         embedding, target = ds[i]
         assert embedding.shape == expected_shape
-        assert np.issubdtype(type(target), int)
+        assert isinstance(target, np.ndarray)
+        assert np.issubdtype(target.dtype, int)
 
 
 def test_slide_embedding_dataset(slides_manifest_path: str, root_dir: str):
@@ -44,7 +45,8 @@ def test_slide_embedding_dataset(slides_manifest_path: str, root_dir: str):
         assert len(ds[i]) == 3
         embedding, target, metadata = ds[i]
         assert embedding.shape == expected_shape
-        assert np.issubdtype(type(target), int)
+        assert isinstance(target, np.ndarray)
+        assert np.issubdtype(target.dtype, int)
         assert isinstance(metadata, dict)
 
 

@@ -1,8 +1,9 @@
 """Dataset class for patch embeddings."""
 
 import os
-from typing import Dict, Literal, Tuple
+from typing import Callable, Dict, Literal, Tuple
 
+import numpy as np
 import pandas as pd
 import torch
 from typing_extensions import override
@@ -25,6 +26,7 @@ class PatchEmbeddingDataset(VisionDataset):
         manifest_path: str | None,
         split: Literal["train", "val", "test"],
         column_mapping: Dict[str, str] | None = None,
+        target_transforms: Callable | None = None,
     ):
         """Initialize dataset.
 
@@ -40,12 +42,15 @@ class PatchEmbeddingDataset(VisionDataset):
             split: Dataset split to use.
             column_mapping: Mapping between the standardized column names and the actual
                 column names in the provided manifest file.
+            target_transforms: A function/transform that takes in the target
+                and transforms it.
         """
         super().__init__()
 
         self._root = root
         self._split = split
         self._manifest_path = manifest_path if manifest_path else os.path.join(root, "manifest.csv")
+        self._target_transforms = target_transforms
 
         self._data: pd.DataFrame
 
@@ -57,10 +62,9 @@ class PatchEmbeddingDataset(VisionDataset):
         self._split_column = self._column_mapping["split"]
 
     @override
-    def __getitem__(self, index) -> Tuple[torch.Tensor, torch.Tensor]:
-        embedding = self._load_embedding_file(index)
-        target = self._data.at[index, self._target_column]
-        return embedding, target
+    def __getitem__(self, index) -> Tuple[torch.Tensor, torch.Tensor | np.ndarray]:
+        embedding, target = self._load_embedding(index, 1, True), self._load_target(index)
+        return self._apply_transforms(embedding, target)
 
     @override
     def __len__(self) -> int:
@@ -76,12 +80,18 @@ class PatchEmbeddingDataset(VisionDataset):
         self._data = self._data.loc[self._data[self._split_column] == self._split]
         self._data = self._data.reset_index(drop=True)
 
-    def _load_embedding_file(self, index) -> torch.Tensor:
+    def _load_embedding(
+        self, index: int, expected_ndim: int, squeeze: bool = False
+    ) -> torch.Tensor:
         path = self._get_embedding_path(index)
-        tensor = torch.load(path, map_location="cpu").squeeze(0)
-        if tensor.ndim != 1:
+        tensor = torch.load(path, map_location="cpu")
+        tensor = tensor.squeeze(0) if squeeze else tensor
+        if tensor.ndim != expected_ndim:
             raise ValueError(f"Unexpected tensor shape {tensor.shape} for {path}")
         return tensor
+
+    def _load_target(self, index: int) -> np.ndarray:
+        return np.asarray(self._data.at[index, self._target_column], dtype=np.int64)
 
     def _get_embedding_path(self, index: int) -> str:
         return os.path.join(self._root, self.filename(index))
@@ -93,3 +103,20 @@ class PatchEmbeddingDataset(VisionDataset):
             return pd.read_parquet(self._manifest_path)
         else:
             raise ValueError(f"Failed to load manifest file {self._manifest_path}")
+
+    def _apply_transforms(
+        self, embedding: torch.Tensor, target: np.ndarray
+    ) -> Tuple[torch.Tensor, torch.Tensor | np.ndarray]:
+        """Applies the transforms to the provided data and returns them.
+
+        Args:
+            embedding: The embedding to be transformed.
+            target: The training target.
+
+        Returns:
+            A tuple with the image and the target transformed.
+        """
+        if self._target_transforms is not None:
+            target = self._target_transforms(target)
+
+        return embedding, target
