@@ -1,4 +1,4 @@
-"""Default metric collections API."""
+"""Default classification metric collections API."""
 
 from eva.metrics.defaults.classification.binary import BinaryClassificationMetrics
 from eva.metrics.defaults.classification.multiclass import MulticlassClassificationMetrics

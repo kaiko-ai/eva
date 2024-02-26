@@ -1,4 +1,4 @@
-"""Default metric collection for classification tasks."""
+"""Default metric collection for multiclass classification tasks."""
 
 from typing import Literal
 
