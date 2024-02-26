@@ -20,7 +20,7 @@ trainer:
           filename: best
           save_last: true
           save_top_k: 1
-          monitor: &MONITOR_METRIC val/MulticlassAccuracy
+          monitor: &MONITOR_METRIC val/BinaryAccuracy
           mode: &MONITOR_METRIC_MODE max
     logger:
       - class_path: pytorch_lightning.loggers.TensorBoardLogger
@@ -42,8 +42,8 @@ model:
       class_path: torch.nn.Linear
       init_args:
         in_features: 384
-        out_features: &NUM_CLASSES 2
-    criterion: torch.nn.CrossEntropyLoss
+        out_features: 1
+    criterion: torch.nn.BCEWithLogitsLoss
     optimizer:
       class_path: torch.optim.SGD
       init_args:
@@ -58,9 +58,7 @@ model:
     metrics:
       common:
         - class_path: eva.metrics.AverageLoss
-        - class_path: eva.metrics.MulticlassClassificationMetrics
-          init_args:
-            num_classes: *NUM_CLASSES
+        - class_path: eva.metrics.BinaryClassificationMetrics
 data:
   class_path: eva.DataModule
   init_args:
@@ -72,6 +70,8 @@ data:
           split: train
           column_mapping:
             path: embedding
+          target_transforms:
+            class_path: eva.vision.data.transforms.common.ArrayToFloatTensor
       val:
         class_path: eva.vision.data.datasets.embeddings.PatchEmbeddingDataset
         init_args:
@@ -79,6 +79,8 @@ data:
           split: val
           column_mapping:
             path: embedding
+          target_transforms:
+            class_path: eva.vision.data.transforms.common.ArrayToFloatTensor
       test:
         class_path: eva.vision.data.datasets.embeddings.PatchEmbeddingDataset
         init_args:
@@ -86,6 +88,8 @@ data:
           split: test
           column_mapping:
             path: embedding
+          target_transforms:
+            class_path: eva.vision.data.transforms.common.ArrayToFloatTensor
       predict:
         - class_path: eva.vision.datasets.PatchCamelyon
           init_args:
