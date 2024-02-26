@@ -38,43 +38,27 @@ data:
     datasets:
       train:
         class_path: eva.vision.datasets.PatchCamelyon
-        init_args:
+        init_args: &DATASET_ARGS
           root: ${oc.env:TESTS_ROOT, tests/eva}/assets/vision/datasets/patch_camelyon
           split: train
           download: &DOWNLOAD_DATA false
           image_transforms:
             class_path: eva.vision.data.transforms.common.ResizeAndCrop
             init_args:
-              mean: &NORMALIZE_MEAN ${oc.env:NORMALIZE_MEAN, [0.485, 0.456, 0.406]} 
-              std: &NORMALIZE_STD ${oc.env:NORMALIZE_STD, [0.229, 0.224, 0.225]}
+              mean: ${oc.env:NORMALIZE_MEAN, [0.485, 0.456, 0.406]} 
+              std: ${oc.env:NORMALIZE_STD, [0.229, 0.224, 0.225]}
           target_transforms:
             class_path: eva.vision.data.transforms.common.ArrayToFloatTensor
       val:
         class_path: eva.vision.datasets.PatchCamelyon
         init_args:
-          root: ${oc.env:TESTS_ROOT, tests/eva}/assets/vision/datasets/patch_camelyon
+          <<: *DATASET_ARGS
           split: val
-          download: *DOWNLOAD_DATA
-          image_transforms:
-            class_path: eva.vision.data.transforms.common.ResizeAndCrop
-            init_args:
-              mean: *NORMALIZE_MEAN
-              std: *NORMALIZE_STD
-          target_transforms:
-            class_path: eva.vision.data.transforms.common.ArrayToFloatTensor
       test:
         class_path: eva.vision.datasets.PatchCamelyon
         init_args:
-          root: ${oc.env:TESTS_ROOT, tests/eva}/assets/vision/datasets/patch_camelyon
+          <<: *DATASET_ARGS
           split: test
-          download: *DOWNLOAD_DATA
-          image_transforms:
-            class_path: eva.vision.data.transforms.common.ResizeAndCrop
-            init_args:
-              mean: *NORMALIZE_MEAN
-              std: *NORMALIZE_STD
-          target_transforms:
-            class_path: eva.vision.data.transforms.common.ArrayToFloatTensor
     dataloaders:
       train:
         batch_size: &BATCH_SIZE 2
