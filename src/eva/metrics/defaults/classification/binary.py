@@ -61,7 +61,7 @@ class BinaryClassificationMetrics(core.MetricCollection):
                     "BinaryF1Score",
                 ],
                 [
-                    "BinaryBalancedAccuracy",  # needs to be seperate, as derived from multiclass
+                    "BinaryBalancedAccuracy",  # needs to be separate, as derived from multiclass
                 ],
                 [
                     "BinaryAUROC",
