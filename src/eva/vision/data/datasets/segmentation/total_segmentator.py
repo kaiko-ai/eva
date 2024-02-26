@@ -137,7 +137,8 @@ class TotalSegmentator2D(base.ImageSegmentation):
         masks_dir = self._get_masks_dir(index)
         slice_index = self._get_sample_slice_index(index)
         mask_paths = (os.path.join(masks_dir, label + ".nii.gz") for label in self.classes)
-        return np.stack([io.read_nifti(path, slice_index) for path in mask_paths])
+        masks = np.stack([io.read_nifti(path, slice_index) for path in mask_paths])
+        return np.transpose(masks, (1, 2, 0))
 
     def _get_masks_dir(self, index: int) -> str:
         """Returns the directory of the corresponding masks."""
