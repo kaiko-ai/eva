@@ -1,0 +1,85 @@
+---
+trainer:
+  class_path: eva.Trainer
+  init_args:
+    default_root_dir: &LIGHTNING_ROOT ${oc.env:LIGHTNING_ROOT, logs/dino_vits16/offline/vef/panda}
+    max_epochs: &MAX_EPOCHS 30
+    callbacks:
+      - class_path: pytorch_lightning.callbacks.LearningRateMonitor
+        init_args:
+          logging_interval: epoch
+      - class_path: pytorch_lightning.callbacks.ModelCheckpoint
+        init_args:
+          filename: best
+          save_last: true
+          save_top_k: 1
+          monitor: &MONITOR_METRIC val/MulticlassAccuracy
+          mode: &MONITOR_METRIC_MODE max
+    logger:
+      - class_path: pytorch_lightning.loggers.TensorBoardLogger
+        init_args:
+          save_dir: *LIGHTNING_ROOT
+model:
+  class_path: eva.HeadModule
+  init_args:
+    backbone: null
+    head:
+      class_path: eva.vision.models.networks.ABMIL
+      init_args:
+        input_size: 384
+        output_size: &NUM_CLASSES 6
+        projected_input_size: 128
+        hidden_size_attention: 128
+        hidden_sizes_mlp: [128, 64]
+        use_bias: true
+    criterion: torch.nn.CrossEntropyLoss
+    optimizer:
+      class_path: torch.optim.AdamW
+      init_args:
+        lr: 0.001
+        betas: [0.9, 0.999]
+    lr_scheduler:
+      class_path: torch.optim.lr_scheduler.CosineAnnealingLR
+      init_args:
+        T_max: *MAX_EPOCHS
+        eta_min: 0.00001
+    metrics:
+      common:
+        - class_path: eva.metrics.AverageLoss
+        - class_path: eva.metrics.MulticlassClassificationMetrics
+          init_args:
+            num_classes: *NUM_CLASSES
+data:
+  class_path: eva.DataModule
+  init_args:
+    datasets:
+      train:
+        class_path: eva.vision.data.datasets.embeddings.SlideEmbeddingDataset
+        init_args: &DATASET_ARGS
+          root: ${oc.env:EMBEDDINGS_ROOT}
+          manifest_path: ${oc.env:EMBEDDINGS_ROOT}/20240209/dino_vits16/manifest.csv
+          n_patches_per_slide: 1000
+          split: train
+      val:
+        class_path: eva.vision.data.datasets.embeddings.SlideEmbeddingDataset
+        init_args:
+          <<: *DATASET_ARGS
+          split: val
+      test:
+        class_path: eva.vision.data.datasets.embeddings.SlideEmbeddingDataset
+        init_args:
+          <<: *DATASET_ARGS
+          split: test
+    dataloaders:
+      train:
+        batch_size: &BATCH_SIZE 32
+        num_workers: 0
+        pin_memory: false
+        persistent_workers: false
+        prefetch_factor: null
+      val:
+        batch_size: *BATCH_SIZE
+        num_workers: 0
+        pin_memory: false
+        persistent_workers: false
+        prefetch_factor: null
