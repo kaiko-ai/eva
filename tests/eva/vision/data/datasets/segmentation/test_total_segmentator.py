@@ -38,7 +38,7 @@ def test_sample(total_segmentator_dataset: datasets.TotalSegmentator2D, index: i
     assert isinstance(image, np.ndarray)
     assert image.shape == (16, 16, 3)
     assert isinstance(mask, np.ndarray)
-    assert mask.shape == (3, 16, 16)
+    assert mask.shape == (16, 16, 3)
 
 
 @pytest.fixture(scope="function")
