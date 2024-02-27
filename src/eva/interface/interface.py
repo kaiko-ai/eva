@@ -4,7 +4,6 @@ from eva import trainers
 from eva.data import datamodules
 from eva.data.datamodules import schemas
 from eva.models import modules
-from eva.vision.data import datasets
 
 
 class Interface:
@@ -61,7 +60,7 @@ class Interface:
             dataloaders=schemas.DataloadersSchema(predict=data.dataloaders.predict),
             datasets=schemas.DatasetsSchema(predict=data.datasets.predict),
         )
-        trainer.predict(model=model, datamodule=predict_datamodule)
+        trainer.predict(model=model, datamodule=predict_datamodule, return_predictions=False)
 
     def predict_fit(
         self,
@@ -82,14 +81,3 @@ class Interface:
         """
         self.predict(model=model, data=data, trainer=trainer)
         self.fit(model=model, data=data, trainer=trainer)
-
-
-def _adapt_model_module(
-    model: modules.ModelModule, data: datamodules.DataModule
-) -> modules.ModelModule:
-    """Adapts the model module based on the specified data module."""
-    if isinstance(data.datasets.train, datasets.PatchEmbeddingDataset) and isinstance(
-        model, modules.HeadModule
-    ):
-        model.backbone = None  # disable backbone when using pre-computed embeddings
-    return model

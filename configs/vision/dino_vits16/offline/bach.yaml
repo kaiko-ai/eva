@@ -65,7 +65,7 @@ data:
     datasets:
       train:
         class_path: eva.vision.data.datasets.embeddings.PatchEmbeddingDataset
-        init_args:
+        init_args: &DATASET_ARGS
           root: *EMBEDDINGS_DIR
           split: train
           column_mapping:
@@ -73,13 +73,11 @@ data:
       val:
         class_path: eva.vision.data.datasets.embeddings.PatchEmbeddingDataset
         init_args:
-          root: *EMBEDDINGS_DIR
+          <<: *DATASET_ARGS
           split: val
-          column_mapping:
-            path: embedding
       predict:
         - class_path: eva.vision.datasets.BACH
-          init_args: &BACH_ARGS
+          init_args: &PREDICT_DATASET_ARGS
             root: ${oc.env:DATA_ROOT, ./data}/bach
             split: train
             download: ${oc.env:DOWNLOAD_DATA, true}
@@ -91,7 +89,7 @@ data:
                 std: ${oc.env:NORMALIZE_STD, [0.229, 0.224, 0.225]}  
         - class_path: eva.vision.datasets.BACH
           init_args:
-            <<: *BACH_ARGS
+            <<: *PREDICT_DATASET_ARGS
             split: val
     dataloaders:
       train:
@@ -99,7 +97,5 @@ data:
         shuffle: true
       val:
         batch_size: &EVAL_BATCH_SIZE ${oc.env:EVAL_BATCH_SIZE, 128}
-      test:
-        batch_size: *EVAL_BATCH_SIZE
       predict:
         batch_size: *EVAL_BATCH_SIZE

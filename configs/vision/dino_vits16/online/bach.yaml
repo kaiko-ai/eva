@@ -60,7 +60,7 @@ data:
     datasets:
       train:
         class_path: eva.vision.datasets.BACH
-        init_args: &BACH_ARGS
+        init_args: &DATASET_ARGS
           root: ${oc.env:DATA_ROOT, ./data}/bach
           split: train
           download: ${oc.env:DOWNLOAD_DATA, true}
@@ -73,12 +73,7 @@ data:
       val:
         class_path: eva.vision.datasets.BACH
         init_args:
-          <<: *BACH_ARGS
-          split: val
-      test:
-        class_path: eva.vision.datasets.BACH
-        init_args:
-          <<: *BACH_ARGS      
+          <<: *DATASET_ARGS
           split: val
     dataloaders:
       train:
