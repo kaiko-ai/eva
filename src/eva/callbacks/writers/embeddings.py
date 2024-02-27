@@ -102,7 +102,7 @@ class EmbeddingsWriter(callbacks.BasePredictionWriter):
     def _initialize_write_process(self) -> None:
         self._write_queue = multiprocessing.Queue()
         self._write_process = eva_multiprocessing.Process(
-            target=_process_write_queue, args=(self._write_queue, self._output_dir)
+            target=_process_write_queue, args=(self._write_queue, self._output_dir, self._overwrite)
         )
 
     def _get_embeddings(self, prediction: torch.Tensor) -> torch.Tensor:
@@ -121,8 +121,8 @@ class EmbeddingsWriter(callbacks.BasePredictionWriter):
         return input_name, save_name
 
 
-def _process_write_queue(write_queue: multiprocessing.Queue, output_dir: str) -> None:
-    manifest_file, manifest_writer = _init_manifest(output_dir)
+def _process_write_queue(write_queue: multiprocessing.Queue, output_dir: str, overwrite: bool = False) -> None:
+    manifest_file, manifest_writer = _init_manifest(output_dir, overwrite)
     while True:
         item = write_queue.get()
         if item is None:
