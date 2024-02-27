@@ -19,6 +19,7 @@ trainer:
       - class_path: pytorch_lightning.loggers.TensorBoardLogger
         init_args:
           save_dir: *LIGHTNING_ROOT
+          name: ""
 model:
   class_path: eva.HeadModule
   init_args:
@@ -77,9 +78,11 @@ data:
           split: val
     dataloaders:
       train:
-        batch_size: &BATCH_SIZE 32
+        batch_size: &TRAIN_BATCH_SIZE ${oc.env:TRAIN_BATCH_SIZE, 32}
         shuffle: true
       val:
-        batch_size: *BATCH_SIZE
+        batch_size: &EVAL_BATCH_SIZE ${oc.env:EVAL_BATCH_SIZE, 32}
       test:
-        batch_size: *BATCH_SIZE
+        batch_size: *EVAL_BATCH_SIZE
+      predict:
+        batch_size: *EVAL_BATCH_SIZE
