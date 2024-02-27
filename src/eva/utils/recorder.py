@@ -5,18 +5,22 @@ import json
 import os
 import sys
 from datetime import datetime
+from loguru import logger
 from pathlib import Path
 
 from loguru import logger
 
 
-def _get_config_path() -> str:
+def _get_config_path() -> str | None:
     """Retrieve the config path from command line arguments.
 
     Returns:
         The path to the configuration file.
     """
     config_paths = [f for f in sys.argv if f.endswith(".yaml")]
+    if len(config_paths) == 0:
+        logger.info("No config file found from command line arguments")
+        return None
     if len(config_paths) != 1:
         raise ValueError("Exactly one config file is allowed")
     return config_paths[0]
@@ -68,7 +72,7 @@ def get_evaluation_id(start_time: datetime = datetime.now(), max_hash_len: int =
         A string containing a timestamp and a hash.
     """
     config_path = _get_config_path()
-    hash_id = _get_hash_from_config(config_path, max_hash_len)
+    hash_id = _get_hash_from_config(config_path, max_hash_len) if config_path else ""
 
     timestamp = start_time.strftime("%Y%m%d-%H%M%S%f")
     return f"{timestamp}_{hash_id}"
@@ -83,10 +87,6 @@ def record_results(evaluation_results: dict, results_path: str, start_time, end_
         start_time: The start time of the evaluation.
         end_time: The end time of the evaluation.
     """
-    # config_path = _get_config_path()
-    # if not os.path.exists(results_dir):
-    #     os.makedirs(results_dir)
-    # _copy_config_file(config_path, os.path.join(results_dir, "run_config.yaml"))
     results_dict = {
         "start_time": start_time.strftime("%Y-%m-%d %H:%M:%S"),
         "end_time": end_time.strftime("%Y-%m-%d %H:%M:%S"),

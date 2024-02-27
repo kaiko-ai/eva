@@ -129,7 +129,8 @@ def _adapt_log_dirs(trainer, log_dir) -> None:
 
     trainer.log_dir = log_dir
     if len(trainer.callbacks) > 0:
-        if isinstance(trainer.callbacks[0], pl.callbacks.ModelCheckpoint):
-            trainer.callbacks[0].dirpath = log_dir
+        model_checkpoint_callbacks = [c for c in trainer.callbacks if isinstance(c, pl.callbacks.ModelCheckpoint)]
+        if len(model_checkpoint_callbacks) > 0:
+            model_checkpoint_callbacks[0].dirpath = log_dir
         else:
-            raise Warning(f"Could not set log_dir for callback {trainer.callbacks[0]}")
+            raise Warning("Could not set log_dir for model checkpoint callback")

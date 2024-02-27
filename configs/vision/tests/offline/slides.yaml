@@ -9,7 +9,7 @@ trainer:
         init_args:
           logging_interval: epoch
     logger:
-      - class_path: pytorch_lightning.loggers.TensorBoardLogger
+      - class_path: eva.loggers.TensorBoardLogger
         init_args:
           save_dir: *OUTPUT_DIR
           name: ""

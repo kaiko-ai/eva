@@ -8,10 +8,10 @@ trainer:
     limit_train_batches: 2
     limit_val_batches: 2
     logger:
-      - class_path: eva.loggers.tensorboard_logger.TensorBoardLogger
+      - class_path: eva.loggers.TensorBoardLogger
         init_args:
           save_dir: *OUTPUT_DIR
-      - class_path: eva.loggers.csv_logger.CSVLogger
+      - class_path: eva.loggers.CSVLogger
         init_args:
           save_dir: *OUTPUT_DIR
 model:
