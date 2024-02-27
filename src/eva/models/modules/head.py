@@ -104,6 +104,8 @@ class HeadModule(module.ModelModule):
         """
         data, targets, metadata = INPUT_BATCH(*batch)
         predictions = self(data)
+        print(predictions.shape)
+        quit()
         loss = self.criterion(predictions, targets)
         return {
             "loss": loss,

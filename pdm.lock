@@ -5,7 +5,7 @@
 groups = ["default", "all", "dev", "docs", "lint", "test", "vision"]
 strategy = ["cross_platform", "inherit_metadata"]
 lock_version = "4.4.1"
-content_hash = "sha256:498b48ff4ca665f4ac491623e6e24c1ea70026b2f7651ab90783a28ef59890e9"
+content_hash = "sha256:960e25ec6eeb7c6fe396b796e964393d90724dadbacebb730e353cfab42ddfcc"
 
 [[package]]
 name = "aiohttp"
@@ -555,7 +555,7 @@ name = "huggingface-hub"
 version = "0.20.3"
 requires_python = ">=3.8.0"
 summary = "Client library to download and publish models, datasets and other repos on the huggingface.co hub"
-groups = ["default"]
+groups = ["all", "default", "dev"]
 dependencies = [
     "filelock",
     "fsspec>=2023.5.0",
@@ -891,6 +891,20 @@ dependencies = [
 files = [
     {file = "mkdocstrings-0.24.0-py3-none-any.whl", hash = "sha256:f4908560c10f587326d8f5165d1908817b2e280bbf707607f601c996366a2264"},
     {file = "mkdocstrings-0.24.0.tar.gz", hash = "sha256:222b1165be41257b494a9d29b14135d2b7ca43f38161d5b10caae03b87bd4f7e"},
+]
+
+[[package]]
+name = "monai"
+version = "1.3.0"
+requires_python = ">=3.8"
+summary = "AI Toolkit for Healthcare Imaging"
+groups = ["vision"]
+dependencies = [
+    "numpy>=1.20",
+    "torch>=1.9",
+]
+files = [
+    {file = "monai-1.3.0-202310121228-py3-none-any.whl", hash = "sha256:6ac93decd6aff4c8272eb095e01c8a734bede07246a952cec3c9e2df5b116267"},
 ]
 
 [[package]]
@@ -1344,7 +1358,7 @@ name = "pillow"
 version = "10.2.0"
 requires_python = ">=3.8"
 summary = "Python Imaging Library (Fork)"
-groups = ["all", "default", "vision"]
+groups = ["all", "default", "dev", "vision"]
 files = [
     {file = "pillow-10.2.0-cp310-cp310-macosx_10_10_x86_64.whl", hash = "sha256:7823bdd049099efa16e4246bdf15e5a13dbb18a51b68fa06d6c1d4d8b99a796e"},
     {file = "pillow-10.2.0-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:83b2021f2ade7d1ed556bc50a399127d7fb245e725aa0113ebd05cfe88aaf588"},
@@ -1753,7 +1767,7 @@ name = "safetensors"
 version = "0.4.2"
 requires_python = ">=3.7"
 summary = ""
-groups = ["default"]
+groups = ["all", "default", "dev"]
 files = [
     {file = "safetensors-0.4.2-cp310-cp310-macosx_10_12_x86_64.whl", hash = "sha256:69d8bb8384dc2cb5b72c36c4d6980771b293d1a1377b378763f5e37b6bb8d133"},
     {file = "safetensors-0.4.2-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:3d420e19fcef96d0067f4de4699682b4bbd85fc8fea0bd45fcd961fdf3e8c82c"},
@@ -1901,7 +1915,7 @@ name = "timm"
 version = "0.9.12"
 requires_python = ">=3.7"
 summary = "PyTorch Image Models"
-groups = ["default"]
+groups = ["all", "default", "dev"]
 dependencies = [
     "huggingface-hub",
     "pyyaml",
@@ -1992,7 +2006,7 @@ name = "torchvision"
 version = "0.17.0"
 requires_python = ">=3.8"
 summary = "image and video datasets and models for torch deep learning"
-groups = ["all", "default", "vision"]
+groups = ["all", "default", "dev", "vision"]
 dependencies = [
     "numpy",
     "pillow!=8.3.*,>=5.3.0",

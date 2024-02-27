@@ -1,0 +1,106 @@
+---
+trainer:
+  class_path: eva.Trainer
+  init_args:
+    default_root_dir: &LIGHTNING_ROOT ${oc.env:LIGHTNING_ROOT, logs/dino_vits16/patch_camelyon}
+    max_epochs: &MAX_EPOCHS 2
+    limit_train_batches: 2
+    limit_val_batches: 2
+    callbacks:
+      - class_path: pytorch_lightning.callbacks.LearningRateMonitor
+        init_args:
+          logging_interval: epoch
+    logger:
+      - class_path: pytorch_lightning.loggers.TensorBoardLogger
+        init_args:
+          save_dir: *LIGHTNING_ROOT
+model:
+  class_path: eva.HeadModule
+  init_args:
+    backbone:
+      class_path: eva.models.ModelFromFunction
+      init_args:
+        path: torch.hub.load
+        arguments:
+          repo_or_dir: facebookresearch/dino:main
+          model: dino_vits16
+          pretrained: true
+        checkpoint_path: &CHECKPOINT_PATH ${oc.env:CHECKPOINT_PATH, null}
+    head:
+      class_path: torch.nn.Conv2d
+      init_args:
+        in_channels: 384
+        out_channels: 224
+        kernel_size: 3
+    # head:
+    #   class_path: monai.networks.nets.flexible_unet.UNetDecoder
+    #   init_args:
+    #     spatial_dims: 
+    #     encoder_channels: [256, 128, 64, 32, 16]
+    #     decoder_channels:
+    #     act: "relu"
+    #     norm:
+    #     dropout:
+    #     bias:
+    #     upsample:
+    #     pre_conv:
+    #     interp_mode:
+    #     align_corners:
+    #     is_pad: true
+    criterion: torch.nn.BCEWithLogitsLoss
+    optimizer:
+      class_path: torch.optim.SGD
+      init_args:
+        lr: 0.0125
+        momentum: 0.9
+        weight_decay: 0.0
+    lr_scheduler:
+      class_path: torch.optim.lr_scheduler.CosineAnnealingLR
+      init_args:
+        T_max: *MAX_EPOCHS
+        eta_min: 0.0001
+    metrics:
+      common:
+        - class_path: eva.metrics.AverageLoss
+        - class_path: eva.metrics.BinaryClassificationMetrics
+data:
+  class_path: eva.DataModule
+  init_args:
+    datasets:
+      train:
+        class_path: eva.vision.datasets.TotalSegmentator2D
+        init_args: &DATASET_ARGS
+          root: ${oc.env:DATA_ROOT, ./data}/total_segmentator_2d
+          split: train
+          version: small
+          download: ${oc.env:DOWNLOAD_DATA, true}
+          image_target_transforms:
+            class_path: torchvision.transforms.v2.Compose
+            init_args:
+              transforms:
+                - class_path: torchvision.transforms.v2.ToImage
+                - class_path: torchvision.transforms.v2.Resize
+                  init_args:
+                    size: [224, 224]
+                - class_path: torchvision.transforms.v2.ToDtype
+                  init_args:
+                    dtype: torch.float32
+                    scale: true
+      val:
+        class_path: eva.vision.datasets.TotalSegmentator2D
+        init_args:
+          <<: *DATASET_ARGS
+          split: val
+      test:
+        class_path: eva.vision.datasets.TotalSegmentator2D
+        init_args:
+          <<: *DATASET_ARGS
+          split: val
+    dataloaders:
+      train:
+        batch_size: &BATCH_SIZE 32
+        shuffle: true
+      val:
+        batch_size: *BATCH_SIZE
+      test:
+        batch_size: *BATCH_SIZE

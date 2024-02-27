@@ -136,8 +136,9 @@ class TotalSegmentator2D(base.ImageSegmentation):
     def load_mask(self, index: int) -> np.ndarray:
         masks_dir = self._get_masks_dir(index)
         slice_index = self._get_sample_slice_index(index)
-        mask_paths = (os.path.join(masks_dir, label + ".nii.gz") for label in self.classes)
-        return np.stack([io.read_nifti(path, slice_index) for path in mask_paths])
+        mask_paths = [os.path.join(masks_dir, label + ".nii.gz") for label in self.classes]
+        masks = np.stack([io.read_nifti(path, slice_index) for path in mask_paths])
+        return np.transpose(masks, (1, 2, 0))
 
     def _get_masks_dir(self, index: int) -> str:
         """Returns the directory of the corresponding masks."""
@@ -190,11 +191,13 @@ class TotalSegmentator2D(base.ImageSegmentation):
             "full": self._resources_full,
             None: (0, 103),
         }
-        resources = dataset_resources.get(self._split)
+        resources = dataset_resources.get(self._version)
         if resources is None:
-            raise ValueError("Invalid data split. Use 'small' or 'full'.")
+            raise ValueError("Invalid data version. Use 'small' or 'full'.")
 
         for resource in resources:
+            if os.path.isdir(self._root):
+                continue
             utils.download_and_extract_archive(
                 resource.url,
                 download_root=self._root,
