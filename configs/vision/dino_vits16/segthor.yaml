@@ -15,9 +15,9 @@ trainer:
         init_args:
           save_dir: *LIGHTNING_ROOT
 model:
-  class_path: eva.HeadModule
+  class_path: eva.DecoderModule
   init_args:
-    backbone:
+    encoder:
       class_path: eva.models.ModelFromFunction
       init_args:
         path: torch.hub.load
@@ -26,28 +26,12 @@ model:
           model: dino_vits16
           pretrained: true
         checkpoint_path: &CHECKPOINT_PATH ${oc.env:CHECKPOINT_PATH, null}
-    head:
+    decoder:
       class_path: torch.nn.Conv2d
       init_args:
         in_channels: 384
-        out_channels: 224
-        kernel_size: 3
-    # head:
-    #   class_path: monai.networks.nets.flexible_unet.UNetDecoder
-    #   init_args:
-    #     spatial_dims: 
-    #     encoder_channels: [256, 128, 64, 32, 16]
-    #     decoder_channels:
-    #     act: "relu"
-    #     norm:
-    #     dropout:
-    #     bias:
-    #     upsample:
-    #     pre_conv:
-    #     interp_mode:
-    #     align_corners:
-    #     is_pad: true
-    criterion: torch.nn.BCEWithLogitsLoss
+        out_channels: 5
+    criterion: torch.nn.CrossEntropyLoss
     optimizer:
       class_path: torch.optim.SGD
       init_args:
@@ -70,7 +54,8 @@ data:
       train:
         class_path: eva.vision.datasets.TotalSegmentator2D
         init_args: &DATASET_ARGS
-          root: ${oc.env:DATA_ROOT, ./data}/total_segmentator_2d
+          root: ${oc.env:DATA_ROOT, ./data}/total_segmentator
+          task: SegTHOR
           split: train
           version: small
           download: ${oc.env:DOWNLOAD_DATA, true}
