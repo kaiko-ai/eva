@@ -86,8 +86,7 @@ class Interface:
             dataloaders=schemas.DataloadersSchema(predict=data.dataloaders.predict),
             datasets=schemas.DatasetsSchema(predict=data.datasets.predict),
         )
-
-        trainer.predict(model=model, datamodule=predict_datamodule)
+        trainer.predict(model=model, datamodule=predict_datamodule, return_predictions=False)
 
     def predict_fit(
         self,
