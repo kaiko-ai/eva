@@ -7,7 +7,7 @@ import tempfile
 from datetime import datetime
 from unittest.mock import patch
 
-from eva.utils.recorder import get_evaluation_id, record_results
+from eva.utils import recorder
 
 
 def test_record_results() -> None:
@@ -20,7 +20,7 @@ def test_record_results() -> None:
 
     with tempfile.TemporaryDirectory() as output_dir:
         results_path = os.path.join(output_dir, "results.json")
-        record_results(results, results_path, start_time, end_time)
+        recorder.record_results(results, results_path, start_time, end_time)
         with open(f"{output_dir}/results.json", "r") as f:
             data = json.load(f)
     assert sorted(data.keys()) == sorted(_expected_keys)
@@ -37,7 +37,7 @@ def test_get_evaluation_id() -> None:
     evaluation_ids = []
     for test_args in _test_args:
         with patch.object(sys, "argv", test_args):
-            evaluation_ids.append(get_evaluation_id())
+            evaluation_ids.append(recorder.get_evaluation_id())
 
     assert len(evaluation_ids[0]) == 30
     assert len(evaluation_ids[1]) == 30
