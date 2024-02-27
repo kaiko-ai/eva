@@ -33,6 +33,7 @@ trainer:
       - class_path: pytorch_lightning.loggers.TensorBoardLogger
         init_args:
           save_dir: *LIGHTNING_ROOT
+          name: ""
 model:
   class_path: eva.HeadModule
   init_args:

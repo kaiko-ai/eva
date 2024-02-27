@@ -34,7 +34,6 @@ trainer:
         init_args:
           save_dir: *LIGHTNING_ROOT
           name: ""
-          version: ""
 model:
   class_path: eva.HeadModule
   init_args:
