@@ -22,7 +22,7 @@ trainer:
           monitor: &MONITOR_METRIC val/MulticlassAccuracy
           mode: &MONITOR_METRIC_MODE max
     logger:
-      - class_path: pytorch_lightning.loggers.TensorBoardLogger
+      - class_path: eva.loggers.TensorBoardLogger
         init_args:
           save_dir: *LIGHTNING_ROOT
           name: ""
