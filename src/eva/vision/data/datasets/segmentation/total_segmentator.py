@@ -198,6 +198,7 @@ class TotalSegmentator2D(base.ImageSegmentation):
         for resource in resources:
             if os.path.isdir(self._root):
                 continue
+
             utils.download_and_extract_archive(
                 resource.url,
                 download_root=self._root,
