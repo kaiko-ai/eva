@@ -56,6 +56,7 @@ nav:
       - reference/vision/utils.md
   - Datasets: 
     - datasets/index.md
-    - PatchCamelyon: datasets/patch_camelyon.md
     - BACH: datasets/bach.md
+    - CRC_HE: datasets/crc_he.md
+    - PatchCamelyon: datasets/patch_camelyon.md
     - TotalSegmentator: datasets/total_segmentator.md
