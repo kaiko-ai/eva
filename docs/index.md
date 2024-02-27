@@ -29,7 +29,9 @@ hide:
 
 _Oncology FM Evaluation Framework by Kaiko_
 
-With the first open-source release, `eva` supports performance evaluation for vision ML models (FMs and supervised ML models) that are evaluated on WSI-patch-level/microscopy image classification- or radiology CT-scans classification & segmentation tasks.
+With the first release, `eva` supports performance evaluation for vision Foundation Models ("FMs") and supervised machine learning ("ML") models on WSI-patch-level image classification- and radiology (CT-scans) segmentation tasks.
+
+The goal of this project is to provide the open-source community with an easy-to-use framework that follows industry practices to provide a robust, reproducible and fair evaluation benchmark across FMs of different sizes and architectures.
 
 Support for additional modalities and tasks will be added in future releases.
 
@@ -37,7 +39,9 @@ Support for additional modalities and tasks will be added in future releases.
 
 ### 1. Evaluate your own FMs on public benchmark datasets
 
-With only your trained foundation model as input, you can run eva on several publicly available datasets. Out-of the box support (including data download and preprocessing) is supported for popular benchmark. An evaluation run will report the mean and standard deviation of the relevant metrics for each task. Supported datasets/tasks include:
+With a trained FM as input, you can run `eva` on several publicly available datasets & tasks for which `eva` provides out-of the box support. One `eva` run will automatically download and preprocess the relevant data, compute embeddings with the trained FM, fit and evaluate a classification head and report the mean and standard deviation of the relevant performance metrics the selected task.
+
+Supported datasets & tasks include:
 
 -	**Patch Camelyon**: binary breast cancer classification
 -	**BACH**: multiclass breast cancer classification
@@ -57,26 +61,28 @@ If you have your own labelled dataset, all that is needed is to implement a data
 
 ## Evaluation setup
 
-For classification tasks, foundation models that produce image embeddings are evaluated with a single linear layer MLP that takes embeddings as inputs and label-predictions as output.
+For WSI-patch-level/microscopy image classification tasks, FMs that produce image embeddings are evaluated with a single linear layer MLP with embeddings as inputs and label-predictions as output.
 
-To standardize evaluations, the default configurations eva uses are based on the evaluation protocol proposed by SimCLR and experimentation results.
+To standardize evaluations, the default configurations `eva`` uses are based on the evaluation protocol proposed by Virchow [1] and dataset/task specific characteristics.
 
-|                     |                                  |
-|---------------------|----------------------------------|
-| **Backbone**          | frozen                           |
-| **Hidden layers**       | none                             |
-| **Dropout**             | 0.0                              |
-| **Activation function** | none                             |
-| **Epochs**              | [90] task specific experiments*  |
-| **Batch size**          | task specific experiments*       |
-| **Optimizer**           | SGD                              |
-| **Base Learning Rate**  | [0.1] task specific experiments* |
-| **Momentum**            | 0.9                              |
-| **Weight Decay**        | 0.0                              |
-| **Nesterov momentum**   | true                             |
-| **LR Schedule**         | Cosine without warmup            |
+|                         |                           |
+|-------------------------|---------------------------|
+| **Backbone**            | frozen                    |
+| **Hidden layers**       | none                      |
+| **Dropout**             | 0.0                       |
+| **Activation function** | none                      |
+| **Epochs**              | dataset/task specific*    |
+| **Batch size**          | dataset/task specific*    |
+| **Optimizer**           | SGD                       |
+| **Base Learning Rate**  | dataset/task specific*    |
+| **Momentum**            | 0.9                       |
+| **Weight Decay**        | 0.0                       |
+| **Nesterov momentum**   | true                      |
+| **LR Schedule**         | Cosine without warmup     |
 
-*We selected the number of epochs, batch size and ran experiments with a pretrained DINO ViT-S16 FM to optimize for convergence with minimal running time, and robust results with repeated runs with different random seeds.
+*The number of epochs, batch size and base learning rate were ran experiments with a pretrained DINO ViT-S16 FM to optimize for convergence with minimal running time, and robust results with repeated runs with different random seeds.
+
+[1]: [Virchow: A Million-Slide Digital Pathology Foundation Model, 2024](https://arxiv.org/pdf/2309.07778.pdf)
 
 ## Next steps
 

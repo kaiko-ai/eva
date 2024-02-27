@@ -44,8 +44,11 @@ nav:
       - reference/metrics/index.md
       - reference/metrics/core.md
       - reference/metrics/defaults.md
+      - reference/metrics/average_loss.md
+      - reference/metrics/binary_balanced_accuracy.md
     - Models: 
       - Modules: reference/models/modules.md
+      - Networks: reference/models/networks.md
     - Vision:
       - Data:
         - reference/vision/data/index.md
