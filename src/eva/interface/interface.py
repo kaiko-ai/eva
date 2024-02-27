@@ -35,7 +35,6 @@ class Interface:
             data: The data module.
             trainer: The trainer which processes the model and data.
         """
-        model = _adapt_model_module(model, data)
         trainer.fit(model=model, datamodule=data)
         trainer.validate(datamodule=data)
         if data.datasets.test is not None:
