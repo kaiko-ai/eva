@@ -13,6 +13,7 @@ class Trainer(trainer.Trainer):
     """Core Trainer class."""
 
     def __init__(self, **kwargs):
+        """Initializes a new Trainer instance."""
         super(Trainer, self).__init__(**kwargs)
         self.evaluation_id = get_evaluation_id()
         self._log_dir = None
