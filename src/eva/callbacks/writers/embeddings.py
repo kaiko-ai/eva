@@ -101,6 +101,12 @@ class EmbeddingsWriter(callbacks.BasePredictionWriter):
         self._write_process.join()
         logger.info(f"Predictions and manifest saved to {self._output_dir}")
 
+    def _initialize_write_process(self) -> None:
+        self._write_queue = multiprocessing.Queue()
+        self._write_process = eva_multiprocessing.Process(
+            target=_process_write_queue, args=(self._write_queue, self._output_dir)
+        )
+
     def _get_embeddings(self, prediction: torch.Tensor) -> torch.Tensor:
         """Returns the embeddings from predictions."""
         if self._backbone is None:
@@ -108,12 +114,6 @@ class EmbeddingsWriter(callbacks.BasePredictionWriter):
 
         with torch.no_grad():
             return self._backbone(prediction)
-
-    def _initialize_write_process(self) -> None:
-        self._write_queue = multiprocessing.Queue()
-        self._write_process = eva_multiprocessing.Process(
-            target=_process_write_queue, args=(self._write_queue, self._output_dir)
-        )
 
     def _construct_save_name(self, input_name, metadata, local_idx):
         group_name = metadata[self._group_key][local_idx] if self._group_key else None
