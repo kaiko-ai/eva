@@ -1,8 +1,8 @@
-"""TotalSegmentator 2D segmentation dataset class."""
+"""TotalSegmentator 2D base segmentation dataset class."""
 
+import abc
 import functools
 import os
-from glob import glob
 from typing import Callable, Dict, List, Literal, Tuple
 
 import cv2
@@ -15,8 +15,8 @@ from eva.vision.data.datasets.segmentation import base
 from eva.vision.utils import io
 
 
-class TotalSegmentator2D(base.ImageSegmentation):
-    """TotalSegmentator 2D segmentation dataset."""
+class TotalSegmentator2DBase(base.ImageSegmentation, abc.ABC):
+    """TotalSegmentator 2D base segmentation dataset."""
 
     _train_index_ranges: List[Tuple[int, int]] = [(0, 83)]
     """Train range indices."""
@@ -89,17 +89,10 @@ class TotalSegmentator2D(base.ImageSegmentation):
         self._samples_dirs: List[str] = []
         self._indices: List[int] = []
 
-    @functools.cached_property
+    @abc.abstractproperty
     @override
     def classes(self) -> List[str]:
-        def get_filename(path: str) -> str:
-            """Returns the filename from the full path."""
-            return os.path.basename(path).split(".")[0]
-
-        first_sample_labels = os.path.join(
-            self._root, self._samples_dirs[0], "segmentations", "*.nii.gz"
-        )
-        return sorted(map(get_filename, glob(first_sample_labels)))
+        raise NotImplementedError
 
     @property
     @override
@@ -136,7 +129,7 @@ class TotalSegmentator2D(base.ImageSegmentation):
     def load_mask(self, index: int) -> np.ndarray:
         masks_dir = self._get_masks_dir(index)
         slice_index = self._get_sample_slice_index(index)
-        mask_paths = (os.path.join(masks_dir, label + ".nii.gz") for label in self.classes)
+        mask_paths = [os.path.join(masks_dir, label + ".nii.gz") for label in self.classes]
         masks = np.stack([io.read_nifti(path, slice_index) for path in mask_paths])
         return np.transpose(masks, (1, 2, 0))
 
