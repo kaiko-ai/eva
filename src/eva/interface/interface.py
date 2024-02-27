@@ -6,6 +6,7 @@ from datetime import datetime
 
 import pytorch_lightning as pl
 from loguru import logger
+from pytorch_lightning.callbacks import ModelCheckpoint
 
 from eva import trainers
 from eva.data import datamodules
@@ -120,6 +121,8 @@ def _adapt_model_module(
     return model
 
 
+
+
 def _adapt_log_dirs(trainer, log_dir) -> None:
     """Sets the log directory for the logger, trainer and callbacks."""
     for train_logger in trainer.loggers:
@@ -131,7 +134,7 @@ def _adapt_log_dirs(trainer, log_dir) -> None:
     trainer.log_dir = log_dir
     if len(trainer.callbacks) > 0:
         model_checkpoint_callbacks = [
-            c for c in trainer.callbacks if isinstance(c, pl.callbacks.ModelCheckpoint)
+            c for c in trainer.callbacks if isinstance(c, ModelCheckpoint)
         ]
         if len(model_checkpoint_callbacks) > 0:
             model_checkpoint_callbacks[0].dirpath = log_dir
