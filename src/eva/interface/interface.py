@@ -104,8 +104,9 @@ class Interface:
             data: The data module.
             trainer: The trainer which processes the model and data.
         """
+        trainer_fit = copy.deepcopy(trainer)
         self.predict(model=model, data=data, trainer=trainer)
-        self.fit(model=model, data=data, trainer=trainer)
+        self.fit(model=model, data=data, trainer=trainer_fit)
 
 
 def _adapt_model_module(
@@ -129,7 +130,9 @@ def _adapt_log_dirs(trainer, log_dir) -> None:
 
     trainer.log_dir = log_dir
     if len(trainer.callbacks) > 0:
-        model_checkpoint_callbacks = [c for c in trainer.callbacks if isinstance(c, pl.callbacks.ModelCheckpoint)]
+        model_checkpoint_callbacks = [
+            c for c in trainer.callbacks if isinstance(c, pl.callbacks.ModelCheckpoint)
+        ]
         if len(model_checkpoint_callbacks) > 0:
             model_checkpoint_callbacks[0].dirpath = log_dir
         else:

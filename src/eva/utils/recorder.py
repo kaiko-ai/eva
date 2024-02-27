@@ -5,7 +5,6 @@ import json
 import os
 import sys
 from datetime import datetime
-from loguru import logger
 from pathlib import Path
 
 from loguru import logger
@@ -51,7 +50,6 @@ def _save_result(results: dict, results_path: str) -> None:
     if not os.path.isdir(Path(results_path).parent):
         os.makedirs(Path(results_path).parent)
 
-    # results_path = os.path.join(results_dir, "results.json")
     try:
         with open(results_path, "w") as f:
             json.dump(results, f, indent=4, sort_keys=False)
@@ -78,7 +76,9 @@ def get_evaluation_id(start_time: datetime = datetime.now(), max_hash_len: int =
     return f"{timestamp}_{hash_id}"
 
 
-def record_results(evaluation_results: dict, results_path: str, start_time, end_time) -> None:
+def record_results(
+    evaluation_results: dict, results_path: str, start_time: datetime, end_time: datetime
+) -> None:
     """Records the evaluation results to a JSON file.
 
     Args:
