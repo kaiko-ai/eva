@@ -3,6 +3,7 @@
 import copy
 import os
 from datetime import datetime
+from loguru import logger
 
 import pytorch_lightning as pl
 
@@ -123,11 +124,11 @@ def _adapt_model_module(
 
 def _adapt_log_dirs(trainer, log_dir) -> None:
     """Sets the log directory for the logger, trainer and callbacks."""
-    for logger in trainer.loggers:
+    for train_logger in trainer.loggers:
         try:
-            logger.log_dir = log_dir
+            train_logger.log_dir = log_dir
         except AttributeError:
-            raise Warning(f"Could not set log_dir for logger {logger}")
+            raise Warning(f"Could not set log_dir for logger {train_logger}")
 
     trainer.log_dir = log_dir
     if len(trainer.callbacks) > 0:
@@ -137,4 +138,4 @@ def _adapt_log_dirs(trainer, log_dir) -> None:
         if len(model_checkpoint_callbacks) > 0:
             model_checkpoint_callbacks[0].dirpath = log_dir
         else:
-            raise Warning("Could not set log_dir for model checkpoint callback")
+            logger.warning("No ModelCheckpoint callback found in trainer.callbacks")
