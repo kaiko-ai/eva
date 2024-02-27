@@ -125,8 +125,8 @@ def _adapt_log_dirs(trainer, log_dir) -> None:
     for train_logger in trainer.loggers:
         try:
             train_logger.log_dir = log_dir
-        except AttributeError:
-            raise Warning(f"Could not set log_dir for logger {train_logger}")
+        except Exception:
+            logger.warning(f"Could not set log_dir for logger {train_logger}")
 
     trainer.log_dir = log_dir
     if len(trainer.callbacks) > 0:
