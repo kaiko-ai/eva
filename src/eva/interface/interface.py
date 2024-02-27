@@ -48,18 +48,19 @@ class Interface:
         evaluation_id = get_evaluation_id()
         model = _adapt_model_module(model, data)
 
-        for run in range(n_runs):
-            trainer_ = copy.deepcopy(trainer)
-            log_dir = os.path.join(trainer_.default_root_dir, evaluation_id, f"run_{run}")
-            _adapt_log_dirs(trainer_, log_dir)
+        for run_id in range(n_runs):
+            trainer_run = copy.deepcopy(trainer)
+            model_run = copy.deepcopy(model)
+            log_dir = os.path.join(trainer_run.default_root_dir, evaluation_id, f"run_{run_id}")
+            _adapt_log_dirs(trainer_run, log_dir)
 
             start_time = datetime.now()
-            pl.seed_everything(run, workers=True)
+            pl.seed_everything(run_id, workers=True)
 
-            trainer_.fit(model=model, datamodule=data)
-            evaluation_results = {"val": trainer_.validate(datamodule=data)}
+            trainer_run.fit(model=model_run, datamodule=data)
+            evaluation_results = {"val": trainer_run.validate(datamodule=data)}
             if data.datasets.test is not None:
-                evaluation_results["test"] = trainer_.test(datamodule=data)
+                evaluation_results["test"] = trainer_run.test(datamodule=data)
 
             end_time = datetime.now()
             results_path = os.path.join(log_dir, "results.json")
@@ -107,6 +108,7 @@ class Interface:
         trainer_fit = copy.deepcopy(trainer)
         self.predict(model=model, data=data, trainer=trainer)
         self.fit(model=model, data=data, trainer=trainer_fit)
+        # self.fit(model=model, data=data, trainer=trainer)
 
 
 def _adapt_model_module(
