@@ -7,7 +7,6 @@ from typing import Any, Dict, Sequence
 
 import pytorch_lightning as pl
 import torch
-from lightning_fabric.utilities import cloud_io
 from loguru import logger
 from pytorch_lightning import callbacks
 from torch import multiprocessing, nn
@@ -55,11 +54,10 @@ class EmbeddingsWriter(callbacks.BasePredictionWriter):
 
         self._write_queue: multiprocessing.Queue
         self._write_process: eva_multiprocessing.Process
-        self._fs = cloud_io.get_filesystem(self._output_dir)
 
     @override
     def on_predict_start(self, trainer: pl.Trainer, pl_module: pl.LightningModule) -> None:
-        self._fs.makedirs(self._output_dir, exist_ok=self._overwrite)
+        os.makedirs(self._output_dir, exist_ok=self._overwrite)
         self._initialize_write_process()
         self._write_process.start()
 
