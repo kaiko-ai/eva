@@ -121,7 +121,9 @@ class EmbeddingsWriter(callbacks.BasePredictionWriter):
         return input_name, save_name
 
 
-def _process_write_queue(write_queue: multiprocessing.Queue, output_dir: str, overwrite: bool = False) -> None:
+def _process_write_queue(
+    write_queue: multiprocessing.Queue, output_dir: str, overwrite: bool = False
+) -> None:
     manifest_file, manifest_writer = _init_manifest(output_dir, overwrite)
     while True:
         item = write_queue.get()
