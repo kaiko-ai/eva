@@ -121,8 +121,6 @@ def _adapt_model_module(
     return model
 
 
-
-
 def _adapt_log_dirs(trainer, log_dir) -> None:
     """Sets the log directory for the logger, trainer and callbacks."""
     for train_logger in trainer.loggers:
