@@ -1,3 +1,5 @@
+"""Overrides the CSVLogger class to add a log_dir setter."""
+
 import os
 
 from pytorch_lightning import loggers
@@ -7,6 +9,7 @@ class CSVLogger(loggers.CSVLogger):
     """Overrides the CSVLogger class to add a log_dir setter."""
 
     def __init__(self, **kwargs):
+        """Initializes a new CSVLogger instance."""
         super(CSVLogger, self).__init__(**kwargs)
         self._log_dir = None
 

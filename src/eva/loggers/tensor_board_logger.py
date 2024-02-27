@@ -1,3 +1,5 @@
+"""Overrides the TensorBoardLogger class to add a log_dir setter."""
+
 import os
 
 from pytorch_lightning import loggers
@@ -7,6 +9,7 @@ class TensorBoardLogger(loggers.TensorBoardLogger):
     """Overrides the TensorBoardLogger class to add a log_dir setter."""
 
     def __init__(self, **kwargs):
+        """Initializes a new TensorBoardLogger instance."""
         super(TensorBoardLogger, self).__init__(**kwargs)
         self._log_dir = None
 

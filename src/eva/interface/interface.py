@@ -108,7 +108,6 @@ class Interface:
         trainer_fit = copy.deepcopy(trainer)
         self.predict(model=model, data=data, trainer=trainer)
         self.fit(model=model, data=data, trainer=trainer_fit)
-        # self.fit(model=model, data=data, trainer=trainer)
 
 
 def _adapt_model_module(

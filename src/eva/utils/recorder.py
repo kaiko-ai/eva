@@ -45,7 +45,7 @@ def _save_result(results: dict, results_path: str) -> None:
 
     Args:
         results: Dictionary containing the results.
-        results_dir: Directory where the results should be saved.
+        results_path: Directory where the results should be saved.
     """
     if not os.path.isdir(Path(results_path).parent):
         os.makedirs(Path(results_path).parent)
@@ -58,8 +58,9 @@ def _save_result(results: dict, results_path: str) -> None:
         logger.error(f"Failed to save job results to {results_path}: {e}")
 
 
-def get_evaluation_id(start_time: datetime = datetime.now(), max_hash_len: int = 8) -> str:
+def get_evaluation_id(start_time: datetime | None = None, max_hash_len: int = 8) -> str:
     """Generates and returns a unique ID for the evaluation.
+
     The ID is composed of a timestamp and a hash.
 
     Args:
@@ -69,6 +70,9 @@ def get_evaluation_id(start_time: datetime = datetime.now(), max_hash_len: int =
     Returns:
         A string containing a timestamp and a hash.
     """
+    if start_time is None:
+        start_time = datetime.now()
+
     config_path = _get_config_path()
     hash_id = _get_hash_from_config(config_path, max_hash_len) if config_path else ""
 
@@ -83,7 +87,7 @@ def record_results(
 
     Args:
         evaluation_results: Dictionary containing the evaluation results.
-        results_dir: Directory where the results should be saved.
+        results_path: Directory where the results should be saved.
         start_time: The start time of the evaluation.
         end_time: The end time of the evaluation.
     """
