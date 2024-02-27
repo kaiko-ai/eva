@@ -1,3 +1,3 @@
 # Transforms
 
-::: src.eva.vision.data.transforms.common.ResizeAndCrop
+::: eva.vision.data.transforms.common.ResizeAndCrop

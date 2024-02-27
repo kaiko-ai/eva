@@ -1,3 +1,3 @@
 # Defaults
 
-::: src.eva.metrics.defaults.classification.MulticlassClassificationMetrics
+::: eva.metrics.MulticlassClassificationMetrics
