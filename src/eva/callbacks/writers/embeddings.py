@@ -96,6 +96,8 @@ class EmbeddingsWriter(callbacks.BasePredictionWriter):
         self._write_queue.put(None)  # Signal to the writing process to terminate
         self._write_process.join()
         logger.info(f"Predictions and manifest saved to {self.output_dir}")
+        self._write_process = None
+        self._write_queue = None
 
     def _construct_save_name(self, input_name, metadata, local_idx):
         group_name = metadata[self._group_key][local_idx] if self._group_key else None

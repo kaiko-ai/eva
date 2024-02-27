@@ -3,9 +3,9 @@
 import copy
 import os
 from datetime import datetime
-from loguru import logger
 
 import pytorch_lightning as pl
+from loguru import logger
 
 from eva import trainers
 from eva.data import datamodules
@@ -106,9 +106,8 @@ class Interface:
             data: The data module.
             trainer: The trainer which processes the model and data.
         """
-        trainer_fit = copy.deepcopy(trainer)
         self.predict(model=model, data=data, trainer=trainer)
-        self.fit(model=model, data=data, trainer=trainer_fit)
+        self.fit(model=model, data=data, trainer=trainer)
 
 
 def _adapt_model_module(
