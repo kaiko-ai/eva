@@ -1,9 +1,9 @@
 """Multiprocessing utilities."""
 
-from typing import Any
 import multiprocessing
 import sys
 import traceback
+from typing import Any
 
 
 class Process(multiprocessing.Process):
