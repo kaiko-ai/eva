@@ -1,1 +1,1 @@
-::: src.eva.vision.models.networks.abmil.ABMIL
+::: eva.vision.models.networks.ABMIL

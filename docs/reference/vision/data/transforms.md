@@ -1,3 +1,5 @@
 # Transforms
 
-::: src.eva.vision.data.transforms.common.ResizeAndCrop
+::: eva.vision.data.transforms.ArrayToTensor
+::: eva.vision.data.transforms.ArrayToFloatTensor
+::: eva.vision.data.transforms.ResizeAndCrop
