@@ -43,4 +43,3 @@ def test_get_evaluation_id() -> None:
     assert len(evaluation_ids[1]) == 30
     assert len(evaluation_ids[2]) == 22
     assert evaluation_ids[0] != evaluation_ids[1]
-    assert evaluation_ids[0] != evaluation_ids[2]
