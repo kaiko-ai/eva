@@ -1,4 +1,4 @@
-"""CRC-HE dataset class."""
+"""CRC-HE-NONORM dataset class."""
 
 import os
 from typing import Callable, Dict, List, Literal, Tuple
@@ -12,11 +12,11 @@ from eva.vision.data.datasets.classification import base
 from eva.vision.utils import io
 
 
-class CRC_HE(base.ImageClassification):
-    """Dataset class for CRC-HE images and corresponding targets."""
+class CRC_HE_NONORM(base.ImageClassification):
+    """Dataset class for CRC-HE-NONORM images and corresponding targets."""
 
     _train_resource: structs.DownloadResource = structs.DownloadResource(
-        filename="NCT-CRC-HE-100K.zip",
+        filename="NCT-CRC-HE-100K-NONORM.zip",
         url="https://zenodo.org/records/1214456/files/NCT-CRC-HE-100K.zip?download=1",
         md5="md5:035777cf327776a71a05c95da6d6325f",
     )
@@ -40,11 +40,13 @@ class CRC_HE(base.ImageClassification):
         """Initializes the dataset.
 
         The dataset is split into a train (train) and validation (val) set:
-          - train: A set of 100,000 non-overlapping image patches from
-            hematoxylin & eosin (H&E) stained histological images of human
-            colorectal cancer (CRC) and normal tissue.
-          - val: A set of 7180 image patches from N=50 patients with colorectal
-            adenocarcinoma (no overlap with patients in NCT-CRC-HE-100K).
+          - train: This is a slightly different version of the "NCT-CRC-HE-100K" image set:
+            This set contains 100,000 images in 9 tissue classes at 0.5 MPP and was created
+            from the same raw data as "NCT-CRC-HE-100K". However, no color normalization was
+            applied to these images. Consequently, staining intensity and color slightly
+            varies between the images.
+          - val: A set of 7180 image patches from N=50 patients with colorectal adenocarcinoma
+            (no overlap with patients in NCT-CRC-HE-100K).
 
         Args:
             root: Path to the root directory of the dataset.
@@ -121,7 +123,7 @@ class CRC_HE(base.ImageClassification):
     def _dataset_dir(self) -> str:
         """Returns the full path of dataset directory."""
         dataset_dirs = {
-            "train": os.path.join(self._root, "NCT-CRC-HE-100K"),
+            "train": os.path.join(self._root, "NCT-CRC-HE-100K-NONORM"),
             "val": os.path.join(self._root, "CRC-VAL-HE-7K"),
         }
         dataset_dir = dataset_dirs.get(self._split)
