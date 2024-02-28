@@ -6,9 +6,10 @@ from typing_extensions import override
 
 class BaseLogger(loggers.Logger):
     """Base logger class."""
+
     def __init__(self, *args, **kwargs):
         """Initializes the BaseLogger instance.
-        
+
         Overwrites the parent class to allow for custom log_dir setting.
         """
         super().__init__(*args, **kwargs)
@@ -29,11 +30,13 @@ class BaseLogger(loggers.Logger):
 
 class TensorBoardLogger(BaseLogger, loggers.TensorBoardLogger):
     """TensorBoard logger class."""
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
 
 class CSVLogger(BaseLogger, loggers.CSVLogger):
     """CSV logger class."""
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
