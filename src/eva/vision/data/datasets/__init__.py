@@ -8,7 +8,7 @@ from eva.vision.data.datasets.classification import (
     TotalSegmentatorClassification,
 )
 from eva.vision.data.datasets.embeddings import PatchEmbeddingDataset, SlideEmbeddingDataset
-from eva.vision.data.datasets.segmentation import TotalSegmentator2D
+from eva.vision.data.datasets.segmentation import ImageSegmentation, TotalSegmentator2D
 from eva.vision.data.datasets.vision import VisionDataset
 
 __all__ = [
@@ -16,6 +16,7 @@ __all__ = [
     "CRC_HE",
     "CRC_HE_NONORM",
     "PatchEmbeddingDataset",
+    "ImageSegmentation",
     "SlideEmbeddingDataset",
     "PatchCamelyon",
     "TotalSegmentatorClassification",
