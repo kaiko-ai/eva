@@ -92,7 +92,7 @@ class CRC_HE(base.ImageClassification):
     @override
     def filename(self, index: int) -> str:
         image_path, *_ = self._samples[index]
-        return os.path.relpath(image_path, dataset_path)
+        return os.path.relpath(image_path, self._dataset_dir)
 
     @override
     def prepare_data(self) -> None:
