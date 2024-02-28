@@ -25,7 +25,6 @@ dependencies = [
     "jsonargparse[omegaconf]>=4.27.4",
     "pandas>=2.2.0",
     "pyarrow>=15.0.0",
-    "tensorboardX>=2.6.2.2",
     "nibabel>=5.2.0",
     "timm>=0.9.12",
     "tensorboard>=2.16.2",

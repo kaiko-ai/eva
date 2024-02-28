@@ -2,8 +2,8 @@
 trainer:
   class_path: eva.Trainer
   init_args:
-    default_root_dir: &LIGHTNING_ROOT ${oc.env:LIGHTNING_ROOT, logs/dino_vits16/bach}
-    max_steps: &MAX_STEPS 200000
+    default_root_dir: &LIGHTNING_ROOT ${oc.env:LIGHTNING_ROOT, logs/dino_vits16/online/bach}
+    max_steps: &MAX_STEPS 12500
     callbacks:
       - class_path: pytorch_lightning.callbacks.LearningRateMonitor
         init_args:
@@ -36,7 +36,7 @@ model:
         arguments:
           repo_or_dir: facebookresearch/dino:main
           model: dino_vits16
-          pretrained: true
+          pretrained: ${oc.env:PRETRAINED, true}
         checkpoint_path: &CHECKPOINT_PATH ${oc.env:CHECKPOINT_PATH, null}
     head:
       class_path: torch.nn.Linear

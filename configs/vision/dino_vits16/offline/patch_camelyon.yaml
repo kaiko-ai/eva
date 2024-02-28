@@ -18,7 +18,7 @@ trainer:
       - class_path: pytorch_lightning.callbacks.EarlyStopping
         init_args:
           min_delta: 0
-          patience: 20
+          patience: 100
           monitor: *MONITOR_METRIC
           mode: *MONITOR_METRIC_MODE
       - class_path: eva.callbacks.EmbeddingsWriter
@@ -35,7 +35,7 @@ trainer:
               arguments:
                 repo_or_dir: facebookresearch/dino:main
                 model: dino_vits16
-                pretrained: true
+                pretrained: ${oc.env:PRETRAINED, true}
     logger:
       - class_path: pytorch_lightning.loggers.TensorBoardLogger
         init_args:
