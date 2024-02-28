@@ -7,7 +7,7 @@ from eva.metrics import core
 
 
 class BinaryClassificationMetrics(core.MetricCollection):
-    """Default metrics for multi-class classification tasks."""
+    """Default metrics for binary classification tasks."""
 
     def __init__(
         self,
@@ -17,6 +17,15 @@ class BinaryClassificationMetrics(core.MetricCollection):
         postfix: str | None = None,
     ) -> None:
         """Initializes the binary classification metrics.
+
+        The metrics instantiated here are:
+
+        - BinaryAccuracy
+        - BinaryBalancedAccuracy
+        - BinaryPrecision
+        - BinaryRecall
+        - BinaryF1Score
+        - BinaryAUROC
 
         Args:
             threshold: Threshold for transforming probability to binary (0,1) predictions
