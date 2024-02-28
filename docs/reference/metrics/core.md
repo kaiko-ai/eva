@@ -1,4 +1,4 @@
 # Core
 
-::: src.eva.metrics.core.module.MetricModule
-::: src.eva.metrics.core.schemas.MetricsSchema
+::: eva.metrics.core.MetricModule
+::: eva.metrics.core.MetricsSchema
