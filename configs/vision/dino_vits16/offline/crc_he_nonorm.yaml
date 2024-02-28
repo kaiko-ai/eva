@@ -58,7 +58,7 @@ model:
     lr_scheduler:
       class_path: torch.optim.lr_scheduler.CosineAnnealingLR
       init_args:
-        T_max: *MAX_EPOCHS
+        T_max: *MAX_STEPS
         eta_min: 0.0
     metrics:
       common:
