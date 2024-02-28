@@ -28,6 +28,7 @@ dependencies = [
     "tensorboardX>=2.6.2.2",
     "nibabel>=5.2.0",
     "timm>=0.9.12",
+    "tensorboard>=2.16.2",
 ]
 
 [project.optional-dependencies]
