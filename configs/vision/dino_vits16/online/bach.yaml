@@ -2,8 +2,8 @@
 trainer:
   class_path: eva.Trainer
   init_args:
-    default_root_dir: &LIGHTNING_ROOT ${oc.env:LIGHTNING_ROOT, logs/dino_vits16/bach}
-    max_epochs: &MAX_EPOCHS 20
+    default_root_dir: &LIGHTNING_ROOT ${oc.env:LIGHTNING_ROOT, logs/dino_vits16/online/bach}
+    max_steps: &MAX_STEPS 12500
     callbacks:
       - class_path: pytorch_lightning.callbacks.LearningRateMonitor
         init_args:
@@ -13,8 +13,14 @@ trainer:
           filename: best
           save_last: true
           save_top_k: 1
-          monitor: &MONITOR_METRIC val/MulticlassAccuracy
-          mode: &MONITOR_METRIC_MODE max
+          monitor: &MONITOR_METRIC ${oc.env:MONITOR_METRIC, val/MulticlassAccuracy}
+          mode: &MONITOR_METRIC_MODE ${oc.env:MONITOR_METRIC_MODE, max}
+      - class_path: pytorch_lightning.callbacks.EarlyStopping
+        init_args:
+          min_delta: 0
+          patience: 500
+          monitor: *MONITOR_METRIC
+          mode: *MONITOR_METRIC_MODE
     logger:
       - class_path: pytorch_lightning.loggers.TensorBoardLogger
         init_args:
@@ -30,7 +36,7 @@ model:
         arguments:
           repo_or_dir: facebookresearch/dino:main
           model: dino_vits16
-          pretrained: true
+          pretrained: ${oc.env:PRETRAINED, true}
         checkpoint_path: &CHECKPOINT_PATH ${oc.env:CHECKPOINT_PATH, null}
     head:
       class_path: torch.nn.Linear
@@ -41,14 +47,14 @@ model:
     optimizer:
       class_path: torch.optim.SGD
       init_args:
-        lr: 0.0125
+        lr: &LR_VALUE 0.00064
         momentum: 0.9
         weight_decay: 0.0
     lr_scheduler:
       class_path: torch.optim.lr_scheduler.CosineAnnealingLR
       init_args:
-        T_max: *MAX_EPOCHS
-        eta_min: 0.0001
+        T_max: *MAX_STEPS
+        eta_min: 0.0
     metrics:
       common:
         - class_path: eva.metrics.AverageLoss
@@ -78,11 +84,7 @@ data:
           split: val
     dataloaders:
       train:
-        batch_size: &TRAIN_BATCH_SIZE ${oc.env:TRAIN_BATCH_SIZE, 32}
+        batch_size: &BATCH_SIZE 256
         shuffle: true
       val:
-        batch_size: &EVAL_BATCH_SIZE ${oc.env:EVAL_BATCH_SIZE, 32}
-      test:
-        batch_size: *EVAL_BATCH_SIZE
-      predict:
-        batch_size: *EVAL_BATCH_SIZE
+        batch_size: *BATCH_SIZE
