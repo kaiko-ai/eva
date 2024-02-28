@@ -6,7 +6,7 @@ from pytorch_lightning import trainer
 from pytorch_lightning.loggers.csv_logs import CSVLogger
 from pytorch_lightning.loggers.tensorboard import TensorBoardLogger
 
-from eva.utils.recorder import get_evaluation_id
+from eva.utils.recording import get_evaluation_id
 
 
 class Trainer(trainer.Trainer):

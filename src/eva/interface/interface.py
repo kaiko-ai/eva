@@ -12,7 +12,7 @@ from eva import trainers
 from eva.data import datamodules
 from eva.data.datamodules import schemas
 from eva.models import modules
-from eva.utils.recorder import get_evaluation_id, record_results
+from eva.utils.recording import get_evaluation_id, record_results
 from eva.vision.data import datasets
 
 
