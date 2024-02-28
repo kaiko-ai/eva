@@ -11,6 +11,14 @@ trainer:
           dataloader_idx_map:
             0: train
             1: val
+          backbone:
+            class_path: eva.models.ModelFromFunction
+            init_args:
+              path: torch.hub.load
+              arguments:
+                repo_or_dir: facebookresearch/dino:main
+                model: dino_vits16
+                pretrained: true
       - class_path: pytorch_lightning.callbacks.LearningRateMonitor
         init_args:
           logging_interval: epoch
@@ -25,18 +33,10 @@ trainer:
       - class_path: eva.loggers.TensorBoardLogger
         init_args:
           save_dir: *LIGHTNING_ROOT
+          name: ""
 model:
   class_path: eva.HeadModule
   init_args:
-    backbone:
-      class_path: eva.models.ModelFromFunction
-      init_args:
-        path: torch.hub.load
-        arguments:
-          repo_or_dir: facebookresearch/dino:main
-          model: dino_vits16
-          pretrained: true
-        checkpoint_path: &CHECKPOINT_PATH ${oc.env:CHECKPOINT_PATH, null}
     head:
       class_path: torch.nn.Linear
       init_args:
@@ -94,11 +94,9 @@ data:
             split: val
     dataloaders:
       train:
-        batch_size: &BATCH_SIZE 256
+        batch_size: &TRAIN_BATCH_SIZE ${oc.env:TRAIN_BATCH_SIZE, 256}
         shuffle: true
       val:
-        batch_size: *BATCH_SIZE
-      test:
-        batch_size: *BATCH_SIZE
+        batch_size: &EVAL_BATCH_SIZE ${oc.env:EVAL_BATCH_SIZE, 128}
       predict:
-        batch_size: &PREDICT_BATCH_SIZE 128
+        batch_size: *EVAL_BATCH_SIZE

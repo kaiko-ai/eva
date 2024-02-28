@@ -12,6 +12,15 @@ trainer:
             0: train
             1: val
             2: test
+          backbone:
+            class_path: eva.models.ModelFromFunction
+            init_args:
+              path: torch.hub.load
+              arguments:
+                repo_or_dir: facebookresearch/dino:main
+                model: dino_vits16
+                pretrained: true
+              checkpoint_path: &CHECKPOINT_PATH ${oc.env:CHECKPOINT_PATH, null}
       - class_path: pytorch_lightning.callbacks.LearningRateMonitor
         init_args:
           logging_interval: epoch
@@ -31,15 +40,6 @@ trainer:
 model:
   class_path: eva.HeadModule
   init_args:
-    backbone:
-      class_path: eva.models.ModelFromFunction
-      init_args:
-        path: torch.hub.load
-        arguments:
-          repo_or_dir: facebookresearch/dino:main
-          model: dino_vits16
-          pretrained: true
-        checkpoint_path: &CHECKPOINT_PATH ${oc.env:CHECKPOINT_PATH, null}
     head:
       class_path: torch.nn.Linear
       init_args:

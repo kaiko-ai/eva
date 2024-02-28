@@ -2,10 +2,8 @@
 trainer:
   class_path: eva.Trainer
   init_args:
-    default_root_dir: &LIGHTNING_ROOT ${oc.env:LIGHTNING_ROOT, logs/dino_vits16/patch_camelyon}
-    max_epochs: &MAX_EPOCHS 2
-    limit_train_batches: 2
-    limit_val_batches: 2
+    default_root_dir: &LIGHTNING_ROOT ${oc.env:LIGHTNING_ROOT, logs/dino_vits16/bach}
+    max_epochs: &MAX_EPOCHS 20
     callbacks:
       - class_path: pytorch_lightning.callbacks.LearningRateMonitor
         init_args:
@@ -15,12 +13,13 @@ trainer:
           filename: best
           save_last: true
           save_top_k: 1
-          monitor: &MONITOR_METRIC val/BinaryAccuracy
+          monitor: &MONITOR_METRIC val/MulticlassAccuracy
           mode: &MONITOR_METRIC_MODE max
     logger:
       - class_path: eva.loggers.TensorBoardLogger
         init_args:
           save_dir: *LIGHTNING_ROOT
+          name: ""
 model:
   class_path: eva.HeadModule
   init_args:
@@ -37,8 +36,8 @@ model:
       class_path: torch.nn.Linear
       init_args:
         in_features: 384
-        out_features: 1
-    criterion: torch.nn.BCEWithLogitsLoss
+        out_features: &NUM_CLASSES 4
+    criterion: torch.nn.CrossEntropyLoss
     optimizer:
       class_path: torch.optim.SGD
       init_args:
@@ -53,40 +52,37 @@ model:
     metrics:
       common:
         - class_path: eva.metrics.AverageLoss
-        - class_path: eva.metrics.BinaryClassificationMetrics
+        - class_path: eva.metrics.MulticlassClassificationMetrics
+          init_args:
+            num_classes: *NUM_CLASSES
 data:
   class_path: eva.DataModule
   init_args:
     datasets:
       train:
-        class_path: eva.vision.datasets.PatchCamelyon
+        class_path: eva.vision.datasets.BACH
         init_args: &DATASET_ARGS
-          root: ${oc.env:DATA_ROOT, ./data}/patch_camelyon
+          root: ${oc.env:DATA_ROOT, ./data}/bach
           split: train
-          download: &DOWNLOAD_DATA ${oc.env:DOWNLOAD_DATA, true}
+          download: ${oc.env:DOWNLOAD_DATA, true}
           image_transforms:
             class_path: eva.vision.data.transforms.common.ResizeAndCrop
             init_args:
               size: ${oc.env:RESIZE_DIM, 224}  
               mean: ${oc.env:NORMALIZE_MEAN, [0.485, 0.456, 0.406]} 
               std: ${oc.env:NORMALIZE_STD, [0.229, 0.224, 0.225]}
-          target_transforms:
-            class_path: eva.vision.data.transforms.common.ArrayToFloatTensor
       val:
-        class_path: eva.vision.datasets.PatchCamelyon
+        class_path: eva.vision.datasets.BACH
         init_args:
           <<: *DATASET_ARGS
           split: val
-      test:
-        class_path: eva.vision.datasets.PatchCamelyon
-        init_args:
-          <<: *DATASET_ARGS
-          split: test
     dataloaders:
       train:
-        batch_size: &BATCH_SIZE 32
+        batch_size: &TRAIN_BATCH_SIZE ${oc.env:TRAIN_BATCH_SIZE, 32}
         shuffle: true
       val:
-        batch_size: *BATCH_SIZE
+        batch_size: &EVAL_BATCH_SIZE ${oc.env:EVAL_BATCH_SIZE, 32}
       test:
-        batch_size: *BATCH_SIZE
+        batch_size: *EVAL_BATCH_SIZE
+      predict:
+        batch_size: *EVAL_BATCH_SIZE

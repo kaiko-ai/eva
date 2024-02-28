@@ -13,7 +13,6 @@ from eva.data import datamodules
 from eva.data.datamodules import schemas
 from eva.models import modules
 from eva.utils.recording import get_evaluation_id, record_results
-from eva.vision.data import datasets
 
 
 class Interface:
@@ -48,7 +47,7 @@ class Interface:
             n_runs: The number of runs to perform.
         """
         evaluation_id = get_evaluation_id()
-        model = _adapt_model_module(model, data)
+        # model = _adapt_model_module(model, data)
 
         for run_id in range(n_runs):
             _trainer = copy.deepcopy(trainer)
@@ -108,17 +107,6 @@ class Interface:
         """
         self.predict(model=model, data=data, trainer=trainer)
         self.fit(model=model, data=data, trainer=trainer)
-
-
-def _adapt_model_module(
-    model: modules.ModelModule, data: datamodules.DataModule
-) -> modules.ModelModule:
-    """Adapts the model module based on the specified data module."""
-    if isinstance(data.datasets.train, datasets.PatchEmbeddingDataset) and isinstance(
-        model, modules.HeadModule
-    ):
-        model.backbone = None  # disable backbone when using pre-computed embeddings
-    return model
 
 
 def _adapt_log_dirs(trainer, log_dir) -> None:
