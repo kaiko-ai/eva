@@ -63,7 +63,7 @@ If you have your own labelled dataset, all that is needed is to implement a data
 
 For WSI-patch-level/microscopy image classification tasks, FMs that produce image embeddings are evaluated with a single linear layer MLP with embeddings as inputs and label-predictions as output.
 
-To standardize evaluations, the default configurations `eva`` uses are based on the evaluation protocol proposed by Virchow [1] and dataset/task specific characteristics.
+To standardize evaluations, the default configurations `eva` uses are based on the evaluation protocol proposed by Virchow [1] and dataset/task specific characteristics.
 
 |                         |                           |
 |-------------------------|---------------------------|
