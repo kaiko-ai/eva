@@ -17,7 +17,7 @@ class CRC_HE_NONORM(base.ImageClassification):
 
     _train_resource: structs.DownloadResource = structs.DownloadResource(
         filename="NCT-CRC-HE-100K-NONORM.zip",
-        url="https://zenodo.org/records/1214456/files/NCT-CRC-HE-100K.zip?download=1",
+        url="https://zenodo.org/records/1214456/files/NCT-CRC-HE-100K-NONORM.zip?download=1",
         md5="md5:035777cf327776a71a05c95da6d6325f",
     )
     """Train resource."""
