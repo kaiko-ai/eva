@@ -47,7 +47,6 @@ class Interface:
             n_runs: The number of runs to perform.
         """
         evaluation_id = get_evaluation_id()
-        # model = _adapt_model_module(model, data)
 
         for run_id in range(n_runs):
             _trainer = copy.deepcopy(trainer)
