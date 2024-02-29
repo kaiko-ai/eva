@@ -32,6 +32,7 @@ class TensorBoardLogger(BaseLogger, loggers.TensorBoardLogger):
     """TensorBoard logger class."""
 
     def __init__(self, *args, **kwargs):
+        """Initializes the TensorBoardLogger instance."""
         super().__init__(*args, **kwargs)
 
 
@@ -39,4 +40,5 @@ class CSVLogger(BaseLogger, loggers.CSVLogger):
     """CSV logger class."""
 
     def __init__(self, *args, **kwargs):
+        """Initializes the CSVLogger instance."""
         super().__init__(*args, **kwargs)

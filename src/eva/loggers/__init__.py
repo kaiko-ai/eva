@@ -1,5 +1,5 @@
 """Loggers API."""
 
-from eva.loggers.lightning_loggers import CSVLogger, TensorBoardLogger
+from eva.loggers.lightning import CSVLogger, TensorBoardLogger
 
 __all__ = ["CSVLogger", "TensorBoardLogger"]
