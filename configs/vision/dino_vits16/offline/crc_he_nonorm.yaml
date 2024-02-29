@@ -1,4 +1,5 @@
 ---
+n_runs: 5
 trainer:
   class_path: eva.Trainer
   init_args:
@@ -18,7 +19,7 @@ trainer:
       - class_path: pytorch_lightning.callbacks.EarlyStopping
         init_args:
           min_delta: 0
-          patience: 100
+          patience: 48
           monitor: *MONITOR_METRIC
           mode: *MONITOR_METRIC_MODE
       - class_path: eva.callbacks.EmbeddingsWriter
@@ -36,7 +37,7 @@ trainer:
                 model: dino_vits16
                 pretrained: ${oc.env:PRETRAINED, true}
     logger:
-      - class_path: pytorch_lightning.loggers.TensorBoardLogger
+      - class_path: eva.loggers.TensorBoardLogger
         init_args:
           save_dir: *LIGHTNING_ROOT
           name: ""

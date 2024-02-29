@@ -21,7 +21,7 @@ class BaseLogger(loggers.Logger):
         if self._log_dir is not None:
             return self._log_dir
         else:
-            return super().log_dir
+            return super().log_dir  # type: ignore
 
     @log_dir.setter
     def log_dir(self, value):

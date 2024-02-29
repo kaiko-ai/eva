@@ -55,12 +55,9 @@ class Interface:
             _adapt_log_dirs(_trainer, log_dir)
 
             start_time = datetime.now()
-            pl.seed_everything(run_id, workers=True)
+            pl.seed_everything(run_id + 3, workers=True)
 
-            _trainer.fit(model=_model, datamodule=data)
-            evaluation_results = {"val": _trainer.validate(datamodule=data)}
-            if data.datasets.test is not None:
-                evaluation_results["test"] = _trainer.test(datamodule=data)
+            evaluation_results = _fit_validate_test(_trainer, _model, data)
 
             end_time = datetime.now()
             results_path = os.path.join(log_dir, "results.json")
@@ -108,8 +105,37 @@ class Interface:
         self.fit(model=model, data=data, trainer=trainer)
 
 
-def _adapt_log_dirs(trainer, log_dir) -> None:
-    """Sets the log directory for the logger, trainer and callbacks."""
+def _fit_validate_test(
+    trainer: trainers.Trainer,
+    model: modules.ModelModule,
+    data: datamodules.DataModule,
+) -> dict:
+    """Combines the fit and validate commands in one method.
+
+    Helper method to perform the following three steps:
+    1. fit: training the model using the provided data.
+    2. validate: evaluating the model using the validation data.
+    3. test: evaluating the model using the test data. (if available)
+
+    Args:
+        model: The model module.
+        data: The data module.
+        trainer: The trainer which processes the model and data.
+    """
+    trainer.fit(model=model, datamodule=data)
+    evaluation_results = {"val": trainer.validate(datamodule=data)}
+    if data.datasets.test is not None:
+        evaluation_results["test"] = trainer.test(datamodule=data)
+    return evaluation_results
+
+
+def _adapt_log_dirs(trainer, log_dir: str) -> None:
+    """Sets the log directory for the logger, trainer and callbacks.
+
+    Args:
+        trainer: The trainer instance.
+        log_dir: The log directory.
+    """
     for train_logger in trainer.loggers:
         try:
             train_logger.log_dir = log_dir
