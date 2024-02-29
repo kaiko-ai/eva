@@ -122,6 +122,6 @@ def _adapt_log_dirs(trainer, log_dir) -> None:
             c for c in trainer.callbacks if isinstance(c, ModelCheckpoint)
         ]
         if len(model_checkpoint_callbacks) > 0:
-            model_checkpoint_callbacks[0].dirpath = log_dir
+            model_checkpoint_callbacks[0].dirpath = os.path.join(log_dir, "checkpoints")
         else:
             logger.warning("No ModelCheckpoint callback found in trainer.callbacks")
