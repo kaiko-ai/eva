@@ -52,8 +52,8 @@ class EmbeddingsWriter(callbacks.BasePredictionWriter):
         self._group_key = group_key
         self._overwrite = overwrite
 
-        self._write_queue: multiprocessing.Queue
-        self._write_process: eva_multiprocessing.Process
+        self._write_queue: multiprocessing.Queue | None
+        self._write_process: eva_multiprocessing.Process | None
 
     @override
     def on_predict_start(self, trainer: pl.Trainer, pl_module: pl.LightningModule) -> None:
