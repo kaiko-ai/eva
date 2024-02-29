@@ -2,7 +2,7 @@
 trainer:
   class_path: eva.Trainer
   init_args:
-    default_root_dir: &LIGHTNING_ROOT ${oc.env:LIGHTNING_ROOT, logs/offline/crc_he}
+    default_root_dir: &LIGHTNING_ROOT ${oc.env:LIGHTNING_ROOT, logs/offline/crc_nonorm}
     max_steps: &MAX_STEPS 12500
     callbacks:
       - class_path: pytorch_lightning.callbacks.LearningRateMonitor
@@ -23,7 +23,7 @@ trainer:
           mode: *MONITOR_METRIC_MODE
       - class_path: eva.callbacks.EmbeddingsWriter
         init_args:
-          output_dir: &EMBEDDINGS_DIR ${oc.env:EMBEDDINGS_ROOT, ./data/embeddings}/crc_he
+          output_dir: &EMBEDDINGS_DIR ${oc.env:EMBEDDINGS_ROOT, ./data/embeddings}/crc_nonorm
           dataloader_idx_map:
             0: train
             1: val
@@ -83,7 +83,7 @@ data:
           <<: *DATASET_ARGS
           split: val
       predict:
-        - class_path: eva.vision.datasets.CRC_HE
+        - class_path: eva.vision.datasets.CRC_NONORM
           init_args: &PREDICT_DATASET_ARGS
             root: ${oc.env:DATA_ROOT, ./data}/crc_he
             split: train
@@ -93,7 +93,7 @@ data:
               init_args:
                 mean: [0.485, 0.456, 0.406]
                 std: [0.229, 0.224, 0.225]
-        - class_path: eva.vision.datasets.CRC_HE
+        - class_path: eva.vision.datasets.CRC_NONORM
           init_args:
             <<: *PREDICT_DATASET_ARGS
             split: val
