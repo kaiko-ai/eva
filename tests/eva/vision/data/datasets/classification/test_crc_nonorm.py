@@ -1,4 +1,4 @@
-"""CRC_HE_NONORM dataset tests."""
+"""CRC_NONORM dataset tests."""
 
 import os
 from typing import Literal
