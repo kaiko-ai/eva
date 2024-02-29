@@ -2,7 +2,7 @@
 trainer:
   class_path: eva.Trainer
   init_args:
-    default_root_dir: &LIGHTNING_ROOT ${oc.env:LIGHTNING_ROOT, logs/dino_vits16/offline/bach}
+    default_root_dir: &LIGHTNING_ROOT ${oc.env:LIGHTNING_ROOT, logs/offline/crc_he_nonorm}
     max_steps: &MAX_STEPS 12500
     callbacks:
       - class_path: pytorch_lightning.callbacks.LearningRateMonitor
@@ -18,12 +18,12 @@ trainer:
       - class_path: pytorch_lightning.callbacks.EarlyStopping
         init_args:
           min_delta: 0
-          patience: 500
+          patience: 100
           monitor: *MONITOR_METRIC
           mode: *MONITOR_METRIC_MODE
       - class_path: eva.callbacks.EmbeddingsWriter
         init_args:
-          output_dir: &EMBEDDINGS_DIR ${oc.env:EMBEDDINGS_ROOT, ./data/embeddings}/bach
+          output_dir: &EMBEDDINGS_DIR ${oc.env:EMBEDDINGS_ROOT, ./data/embeddings}/crc_he_nonorm
           dataloader_idx_map:
             0: train
             1: val
@@ -36,7 +36,7 @@ trainer:
                 model: dino_vits16
                 pretrained: ${oc.env:PRETRAINED, true}
     logger:
-      - class_path: eva.loggers.TensorBoardLogger
+      - class_path: pytorch_lightning.loggers.TensorBoardLogger
         init_args:
           save_dir: *LIGHTNING_ROOT
           name: ""
@@ -47,12 +47,12 @@ model:
       class_path: torch.nn.Linear
       init_args:
         in_features: 384
-        out_features: &NUM_CLASSES 4
+        out_features: &NUM_CLASSES 9
     criterion: torch.nn.CrossEntropyLoss
     optimizer:
       class_path: torch.optim.SGD
       init_args:
-        lr: &LR_VALUE 0.00064
+        lr: &LR_VALUE 0.01
         momentum: 0.9
         weight_decay: 0.0
     lr_scheduler:
@@ -83,26 +83,27 @@ data:
           <<: *DATASET_ARGS
           split: val
       predict:
-        - class_path: eva.vision.datasets.BACH
+        - class_path: eva.vision.datasets.CRC_HE_NONORM
           init_args: &PREDICT_DATASET_ARGS
-            root: ${oc.env:DATA_ROOT, ./data}/bach
+            root: ${oc.env:DATA_ROOT, ./data}/crc_he
             split: train
             download: ${oc.env:DOWNLOAD_DATA, true}
             image_transforms:
               class_path: eva.vision.data.transforms.common.ResizeAndCrop
               init_args:
-                size: ${oc.env:RESIZE_DIM, 224}  
-                mean: ${oc.env:NORMALIZE_MEAN, [0.485, 0.456, 0.406]} 
-                std: ${oc.env:NORMALIZE_STD, [0.229, 0.224, 0.225]}  
-        - class_path: eva.vision.datasets.BACH
+                mean: [0.485, 0.456, 0.406]
+                std: [0.229, 0.224, 0.225]
+        - class_path: eva.vision.datasets.CRC_HE_NONORM
           init_args:
             <<: *PREDICT_DATASET_ARGS
             split: val
     dataloaders:
       train:
-        batch_size: &BATCH_SIZE 256
+        batch_size: &BATCH_SIZE ${oc.env:BATCH_SIZE, 4096}
         shuffle: true
       val:
+        batch_size: *BATCH_SIZE
+      test:
         batch_size: *BATCH_SIZE
       predict:
         batch_size: &PREDICT_BATCH_SIZE ${oc.env:PREDICT_BATCH_SIZE, 128}
