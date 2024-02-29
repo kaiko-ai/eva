@@ -5,10 +5,7 @@ from loguru import logger
 from torch import nn
 
 
-def load_model_weights(
-    model: nn.Module,
-    checkpoint_path: str,
-) -> None:
+def load_model_weights(model: nn.Module, checkpoint_path: str) -> None:
     """Loads (local or remote) weights to the model in-place.
 
     Args:
