@@ -1,0 +1,107 @@
+---
+trainer:
+  class_path: eva.Trainer
+  init_args:
+    default_root_dir: &LIGHTNING_ROOT ${oc.env:LIGHTNING_ROOT, logs/dino_vits16/offline/mhist}
+    max_steps: &MAX_STEPS 12500
+    callbacks:
+      - class_path: pytorch_lightning.callbacks.LearningRateMonitor
+        init_args:
+          logging_interval: epoch
+      - class_path: pytorch_lightning.callbacks.ModelCheckpoint
+        init_args:
+          filename: best
+          save_last: true
+          save_top_k: 1
+          monitor: &MONITOR_METRIC ${oc.env:MONITOR_METRIC, val/BinaryAccuracy}
+          mode: &MONITOR_METRIC_MODE ${oc.env:MONITOR_METRIC_MODE, max}
+      - class_path: pytorch_lightning.callbacks.EarlyStopping
+        init_args:
+          min_delta: 0
+          patience: 100
+          monitor: *MONITOR_METRIC
+          mode: *MONITOR_METRIC_MODE
+      - class_path: eva.callbacks.EmbeddingsWriter
+        init_args:
+          output_dir: &EMBEDDINGS_DIR ${oc.env:EMBEDDINGS_ROOT, ./data/embeddings}/mhist
+          dataloader_idx_map:
+            0: train
+            1: test
+          backbone:
+            class_path: eva.models.ModelFromFunction
+            init_args:
+              path: torch.hub.load
+              arguments:
+                repo_or_dir: facebookresearch/dino:main
+                model: dino_vits16
+                pretrained: ${oc.env:PRETRAINED, true}
+    logger:
+      - class_path: pytorch_lightning.loggers.TensorBoardLogger
+        init_args:
+          save_dir: *LIGHTNING_ROOT
+          name: ""
+model:
+  class_path: eva.HeadModule
+  init_args:
+    head:
+      class_path: torch.nn.Linear
+      init_args:
+        in_features: 384
+        out_features: 1
+    criterion: torch.nn.BCEWithLogitsLoss
+    optimizer:
+      class_path: torch.optim.SGD
+      init_args:
+        lr: &LR_VALUE ${oc.env:LR_VALUE, 0.00064}
+        momentum: 0.9
+        weight_decay: 0.0
+    lr_scheduler:
+      class_path: torch.optim.lr_scheduler.CosineAnnealingLR
+      init_args:
+        T_max: *MAX_STEPS
+        eta_min: 0.0
+    metrics:
+      common:
+        - class_path: eva.metrics.AverageLoss
+        - class_path: eva.metrics.BinaryClassificationMetrics
+data:
+  class_path: eva.DataModule
+  init_args:
+    datasets:
+      train:
+        class_path: eva.vision.data.datasets.embeddings.PatchEmbeddingDataset
+        init_args: &DATASET_ARGS
+          root: *EMBEDDINGS_DIR
+          split: train
+          column_mapping:
+            path: embedding
+          target_transforms:
+            class_path: eva.vision.data.transforms.common.ArrayToFloatTensor
+      val:
+        class_path: eva.vision.data.datasets.embeddings.PatchEmbeddingDataset
+        init_args:
+          <<: *DATASET_ARGS
+          split: test
+      predict:
+        - class_path: eva.vision.datasets.MHIST
+          init_args: &PREDICT_DATASET_ARGS
+            root: ${oc.env:DATA_ROOT, ./data}/mhist
+            split: train
+            image_transforms:
+              class_path: eva.vision.data.transforms.common.ResizeAndCrop
+              init_args:
+                size: ${oc.env:RESIZE_DIM, 224}
+                mean: ${oc.env:NORMALIZE_MEAN, [0.485, 0.456, 0.406]} 
+                std: ${oc.env:NORMALIZE_STD, [0.229, 0.224, 0.225]}
+        - class_path: eva.vision.datasets.MHIST
+          init_args:
+            <<: *PREDICT_DATASET_ARGS
+            split: test
+    dataloaders:
+      train:
+        batch_size: &BATCH_SIZE ${oc.env:BATCH_SIZE, 256}
+        shuffle: true
+      val:
+        batch_size: *BATCH_SIZE
+      predict:
+        batch_size: &PREDICT_BATCH_SIZE ${oc.env:PREDICT_BATCH_SIZE, 128}

@@ -46,6 +46,7 @@ The following datasets are supported
 
 ### Vision
 - [BACH](./docs/datasets/bach.md)
+- [MHIST](./docs/datasets/mhist.md)
 - [CRC-HE](./docs/datasets/crc_he.md)
 - [PatchCamelyon](./docs/datasets/patch_camelyon.md)
 - [TotalSegmentator](./docs/datasets/total_segmentator.md)
