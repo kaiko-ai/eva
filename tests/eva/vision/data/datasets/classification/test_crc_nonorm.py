@@ -1,4 +1,4 @@
-"""CRC_HE dataset tests."""
+"""CRC_NONORM dataset tests."""
 
 import os
 from typing import Literal
@@ -18,10 +18,10 @@ from eva.vision.data import datasets
         ("val", 2),
     ],
 )
-def test_sample(crc_he_dataset: datasets.CRC_HE, index: int) -> None:
+def test_sample(crc_nonorm_dataset: datasets.CRC_NONORM, index: int) -> None:
     """Tests the format of a dataset sample."""
     # assert data sample is a tuple
-    sample = crc_he_dataset[index]
+    sample = crc_nonorm_dataset[index]
     assert isinstance(sample, tuple)
     assert len(sample) == 2
     # assert the format of the `image` and `target`
@@ -33,10 +33,10 @@ def test_sample(crc_he_dataset: datasets.CRC_HE, index: int) -> None:
 
 
 @pytest.fixture(scope="function")
-def crc_he_dataset(split: Literal["train", "val"], assets_path: str) -> datasets.CRC_HE:
-    """CRC_HE dataset fixture."""
-    dataset = datasets.CRC_HE(
-        root=os.path.join(assets_path, "vision", "datasets", "crc_he"),
+def crc_nonorm_dataset(split: Literal["train", "val"], assets_path: str) -> datasets.CRC_NONORM:
+    """CRC_HE_NONORM dataset fixture."""
+    dataset = datasets.CRC_NONORM(
+        root=os.path.join(assets_path, "vision", "datasets", "crc"),
         split=split,
     )
     dataset.prepare_data()
