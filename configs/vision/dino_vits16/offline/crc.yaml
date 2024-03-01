@@ -103,7 +103,5 @@ data:
         shuffle: true
       val:
         batch_size: *BATCH_SIZE
-      test:
-        batch_size: *BATCH_SIZE
       predict:
         batch_size: &PREDICT_BATCH_SIZE ${oc.env:PREDICT_BATCH_SIZE, 128}

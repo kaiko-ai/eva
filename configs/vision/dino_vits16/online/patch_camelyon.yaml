@@ -93,3 +93,5 @@ data:
         shuffle: true
       val:
         batch_size: *BATCH_SIZE
+      test:
+        batch_size: *BATCH_SIZE
