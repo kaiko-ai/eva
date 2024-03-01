@@ -1,6 +1,6 @@
 # Datasets
 
-**eva** provides out-of-the-box support for several public datasets. When possible, the corresponding dataset classes facilitate automatic download to disk, if not possible, this documentation provides download instructions.
+**eva** provides native support for several public datasets. When possible, the corresponding dataset classes facilitate automatic download to disk, if not possible, this documentation provides download instructions.
 
 ## Vision Datasets Overview
 
@@ -9,7 +9,7 @@
 | Dataset                            | #Patches | Patch Size | FoV (μm/px)  | Task                       | Cancer Type      |
 |------------------------------------|----------|------------|--------------|----------------------------|------------------|
 | [BACH](bach.md)                    | 400      | 2048x1536  | 20x (0.5)    | Classification (4 classes) | Breast           |
-| [CRC HE](crc_he.md)                | 107,180  | 224x224    | 20x (0.5)    | Classification (9 classes) | Colorectal       |
+| [CRC](crc.md)                      | 107,180  | 224x224    | 20x (0.5)    | Classification (9 classes) | Colorectal       |
 | [PatchCamelyon](patch_camelyon.md) | 327,680  | 96x96      | 10x (1.0) \* | Classification (2 classes) | Breast           |
 | [MHIST](mhist.md)                  | 3,152    | 224x224    | 40x (0.25)   | Classification (2 classes) | Colorectal Polyp |
 
