@@ -17,7 +17,7 @@ class MLP(nn.Module):
         hidden_activation_fn: Type[torch.nn.Module] | None = nn.ReLU,
         output_activation_fn: Type[torch.nn.Module] | None = None,
         dropout: float = 0.0,
-    ):
+    ) -> None:
         """Initializes the MLP.
 
         Args:
