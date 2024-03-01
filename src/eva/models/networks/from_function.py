@@ -4,9 +4,10 @@ from typing import Any, Callable, Dict
 
 import jsonargparse
 import torch
-from loguru import logger
 from torch import nn
 from typing_extensions import override
+
+from eva.models.networks import _utils
 
 
 class ModelFromFunction(nn.Module):
@@ -27,15 +28,6 @@ class ModelFromFunction(nn.Module):
             path: The path to the callable object (class or function).
             arguments: The extra callable function / class arguments.
             checkpoint_path: The path to the checkpoint to load the model weights from.
-
-        Example:
-            >>> import torchvision
-            >>> network = ModelFromFunction(
-            >>>     path=torchvision.models.resnet18,
-            >>>     arguments={
-            >>>         "weights": torchvision.models.ResNet18_Weights.DEFAULT,
-            >>>     },
-            >>> )
         """
         super().__init__()
 
@@ -50,34 +42,7 @@ class ModelFromFunction(nn.Module):
         class_path = jsonargparse.class_from_function(self._path, func_return=nn.Module)
         model = class_path(**self._arguments or {})
         if self._checkpoint_path is not None:
-            model = self.load_model_checkpoint(model, self._checkpoint_path)
-        return model
-
-    def load_model_checkpoint(
-        self,
-        model: torch.nn.Module,
-        checkpoint_path: str,
-    ) -> torch.nn.Module:
-        """Initializes the model with the weights.
-
-        Args:
-            model: model to initialize.
-            checkpoint_path: The path to the checkpoint to load the model weights from.
-
-        Returns:
-            the model initialized with the checkpoint.
-        """
-        logger.info(f"Loading {model.__class__.__name__} from checkpoint {checkpoint_path}")
-
-        with open(checkpoint_path, "rb") as f:
-            checkpoint = torch.load(f, map_location="cpu")  # type: ignore[arg-type]
-            if "state_dict" in checkpoint:
-                checkpoint = checkpoint["state_dict"]
-            model.load_state_dict(checkpoint, strict=True)
-            logger.info(
-                f"Loaded modules for {model.__class__.__name__} from checkpoint "
-                f"{checkpoint_path}"
-            )
+            _utils.load_model_weights(model, self._checkpoint_path)
         return model
 
     @override
