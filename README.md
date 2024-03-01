@@ -46,16 +46,8 @@ The following datasets are supported
 
 ### Vision
 - [BACH](./docs/datasets/bach.md)
-<<<<<<< HEAD
-<<<<<<< HEAD
+- [CRC](./docs/datasets/crc.md)
 - [MHIST](./docs/datasets/mhist.md)
-- [CRC-HE](./docs/datasets/crc_he.md)
-=======
-- [CRC](./docs/datasets/crc.md)
->>>>>>> 188-rename-crc_he-to-just-crc
-=======
-- [CRC](./docs/datasets/crc.md)
->>>>>>> main
 - [PatchCamelyon](./docs/datasets/patch_camelyon.md)
 - [TotalSegmentator](./docs/datasets/total_segmentator.md)
 
