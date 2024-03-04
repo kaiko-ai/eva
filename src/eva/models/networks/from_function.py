@@ -21,6 +21,7 @@ class ModelFromFunction(nn.Module):
         path: Callable[..., nn.Module],
         arguments: Dict[str, Any] | None = None,
         checkpoint_path: str | None = None,
+        tensor_transforms: Callable | None = None,
     ) -> None:
         """Initializes and constructs the model.
 
@@ -34,6 +35,7 @@ class ModelFromFunction(nn.Module):
         self._path = path
         self._arguments = arguments
         self._checkpoint_path = checkpoint_path
+        self._tensor_transforms = tensor_transforms
 
         self._network = self.build_model()
 
@@ -47,4 +49,10 @@ class ModelFromFunction(nn.Module):
 
     @override
     def forward(self, tensor: torch.Tensor) -> torch.Tensor:
-        return self._network(tensor)
+        tensor = self._network(tensor)
+        return self._apply_transforms(tensor)
+
+    def _apply_transforms(self, tensor: torch.Tensor) -> torch.Tensor:
+        if self._tensor_transforms is not None:
+            return self._tensor_transforms(tensor)
+        return tensor
