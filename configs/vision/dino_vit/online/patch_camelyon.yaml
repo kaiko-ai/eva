@@ -2,7 +2,7 @@
 trainer:
   class_path: eva.Trainer
   init_args:
-    default_root_dir: &LIGHTNING_ROOT ${oc.env:LIGHTNING_ROOT, logs/dino_vits16/online/bach}
+    default_root_dir: &LIGHTNING_ROOT ${oc.env:LIGHTNING_ROOT, logs/dino_vits16/online/patch_camelyon}
     max_steps: &MAX_STEPS 12500
     callbacks:
       - class_path: pytorch_lightning.callbacks.LearningRateMonitor
@@ -13,12 +13,12 @@ trainer:
           filename: best
           save_last: true
           save_top_k: 1
-          monitor: &MONITOR_METRIC ${oc.env:MONITOR_METRIC, val/MulticlassAccuracy}
+          monitor: &MONITOR_METRIC ${oc.env:MONITOR_METRIC, val/BinaryAccuracy}
           mode: &MONITOR_METRIC_MODE ${oc.env:MONITOR_METRIC_MODE, max}
       - class_path: pytorch_lightning.callbacks.EarlyStopping
         init_args:
           min_delta: 0
-          patience: 500
+          patience: 17
           monitor: *MONITOR_METRIC
           mode: *MONITOR_METRIC_MODE
     logger:
@@ -35,15 +35,15 @@ model:
         path: torch.hub.load
         arguments:
           repo_or_dir: facebookresearch/dino:main
-          model: dino_vits16
+          model: ${oc.env:DINO_BACKBONE, dino_vits16}
           pretrained: ${oc.env:PRETRAINED, true}
         checkpoint_path: &CHECKPOINT_PATH ${oc.env:CHECKPOINT_PATH, null}
     head:
       class_path: torch.nn.Linear
       init_args:
-        in_features: 384
-        out_features: &NUM_CLASSES 4
-    criterion: torch.nn.CrossEntropyLoss
+        in_features: ${oc.env:IN_FEATURES, 384}
+        out_features: 1
+    criterion: torch.nn.BCEWithLogitsLoss
     optimizer:
       class_path: torch.optim.SGD
       init_args:
@@ -58,17 +58,15 @@ model:
     metrics:
       common:
         - class_path: eva.metrics.AverageLoss
-        - class_path: eva.metrics.MulticlassClassificationMetrics
-          init_args:
-            num_classes: *NUM_CLASSES
+        - class_path: eva.metrics.BinaryClassificationMetrics
 data:
   class_path: eva.DataModule
   init_args:
     datasets:
       train:
-        class_path: eva.vision.datasets.BACH
+        class_path: eva.vision.datasets.PatchCamelyon
         init_args: &DATASET_ARGS
-          root: ${oc.env:DATA_ROOT, ./data}/bach
+          root: ${oc.env:DATA_ROOT, ./data}/patch_camelyon
           split: train
           download: ${oc.env:DOWNLOAD_DATA, true}
           image_transforms:
@@ -77,14 +75,21 @@ data:
               size: ${oc.env:RESIZE_DIM, 224}  
               mean: ${oc.env:NORMALIZE_MEAN, [0.485, 0.456, 0.406]} 
               std: ${oc.env:NORMALIZE_STD, [0.229, 0.224, 0.225]}
+          target_transforms:
+            class_path: eva.vision.data.transforms.common.ArrayToFloatTensor
       val:
-        class_path: eva.vision.datasets.BACH
+        class_path: eva.vision.datasets.PatchCamelyon
         init_args:
           <<: *DATASET_ARGS
           split: val
+      test:
+        class_path: eva.vision.datasets.PatchCamelyon
+        init_args:
+          <<: *DATASET_ARGS
+          split: test
     dataloaders:
       train:
-        batch_size: &BATCH_SIZE 256
+        batch_size: &BATCH_SIZE ${oc.env:BATCH_SIZE, 64}
         shuffle: true
       val:
         batch_size: *BATCH_SIZE
