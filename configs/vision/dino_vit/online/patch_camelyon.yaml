@@ -35,7 +35,7 @@ model:
         path: torch.hub.load
         arguments:
           repo_or_dir: facebookresearch/dino:main
-          model: ${oc.env:BACKBONE, dino_vits16}
+          model: ${oc.env:DINO_BACKBONE, dino_vits16}
           pretrained: ${oc.env:PRETRAINED, true}
         checkpoint_path: &CHECKPOINT_PATH ${oc.env:CHECKPOINT_PATH, null}
     head:
@@ -89,7 +89,7 @@ data:
           split: test
     dataloaders:
       train:
-        batch_size: &BATCH_SIZE ${oc.env:BATCH_SIZE, 256}
+        batch_size: &BATCH_SIZE ${oc.env:BATCH_SIZE, 64}
         shuffle: true
       val:
         batch_size: *BATCH_SIZE

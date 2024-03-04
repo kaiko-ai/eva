@@ -34,7 +34,7 @@ trainer:
               path: torch.hub.load
               arguments:
                 repo_or_dir: facebookresearch/dino:main
-                model: ${oc.env:BACKBONE, dino_vits16}
+                model: ${oc.env:DINO_BACKBONE, dino_vits16}
                 pretrained: ${oc.env:PRETRAINED, true}
     logger:
       - class_path: pytorch_lightning.loggers.TensorBoardLogger
@@ -117,4 +117,4 @@ data:
       test:
         batch_size: *BATCH_SIZE
       predict:
-        batch_size: &PREDICT_BATCH_SIZE ${oc.env:PREDICT_BATCH_SIZE, 128}
+        batch_size: &PREDICT_BATCH_SIZE ${oc.env:PREDICT_BATCH_SIZE, 64}

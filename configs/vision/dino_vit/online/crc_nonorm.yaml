@@ -35,7 +35,7 @@ model:
         path: torch.hub.load
         arguments:
           repo_or_dir: facebookresearch/dino:main
-          model: ${oc.env:BACKBONE, dino_vits16}
+          model: ${oc.env:DINO_BACKBONE, dino_vits16}
           pretrained: ${oc.env:PRETRAINED, true}
     head:
       class_path: torch.nn.Linear
