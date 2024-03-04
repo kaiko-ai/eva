@@ -10,9 +10,6 @@ trainer:
           logging_interval: epoch
       - class_path: pytorch_lightning.callbacks.ModelCheckpoint
         init_args:
-          filename: best
-          save_last: true
-          save_top_k: 1
           monitor: &MONITOR_METRIC val/MulticlassAccuracy
           mode: &MONITOR_METRIC_MODE max
     logger:
@@ -72,14 +69,15 @@ data:
           split: test
     dataloaders:
       train:
-        batch_size: &BATCH_SIZE 32
-        num_workers: 0
-        pin_memory: false
-        persistent_workers: false
-        prefetch_factor: null
+        batch_size: &BATCH_SIZE 16
+        shuffle: true
+        # num_workers: 0
+        # pin_memory: false
+        # persistent_workers: false
+        # prefetch_factor: null
       val:
         batch_size: *BATCH_SIZE
-        num_workers: 0
-        pin_memory: false
-        persistent_workers: false
-        prefetch_factor: null
+        # num_workers: 0
+        # pin_memory: false
+        # persistent_workers: false
+        # prefetch_factor: null

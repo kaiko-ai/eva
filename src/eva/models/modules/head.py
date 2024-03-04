@@ -103,7 +103,10 @@ class HeadModule(module.ModelModule):
             The batch step output.
         """
         data, targets, metadata = INPUT_BATCH(*batch)
-        predictions = self(data)
+        if "mask" in metadata:
+            predictions = self(data, mask=metadata["mask"])
+        else:
+            predictions = self(data)
         loss = self.criterion(predictions, targets)
         return {
             "loss": loss,

@@ -19,6 +19,7 @@ class SlideEmbeddingDataset(PatchEmbeddingDataset):
         "path": "path",
         "target": "target",
         "split": "split",
+        "mask": "mask",
         "slide_id": "slide_id",
     }
 
@@ -67,11 +68,12 @@ class SlideEmbeddingDataset(PatchEmbeddingDataset):
         self._seed = seed
         self._pad_value = pad_value
         self._slide_id_column = self._column_mapping["slide_id"]
+        self._mask_column = self._column_mapping["mask"]
         self._embedding_column = "embedding_tensor"
 
     @override
     def __getitem__(self, index) -> Tuple[torch.Tensor, torch.Tensor | np.ndarray, Dict[str, Any]]:
-        metadata = {"slide_id": self._data.at[index, self._slide_id_column]}
+        metadata = {"slide_id": self._data.at[index, self._slide_id_column], "mask": self._data.at[index, self._mask_column]}
         embedding, target = self._apply_transforms(
             self._data.at[index, self._embedding_column], self._load_target(index)
         )
@@ -86,6 +88,7 @@ class SlideEmbeddingDataset(PatchEmbeddingDataset):
             self._data.at[index, self._embedding_column] = self._load_embedding(index, 2)
 
         self._data = self._sample_n_patches_per_slide(self._data)
+        i = 0
 
     def _sample_n_patches_per_slide(self, df: pd.DataFrame) -> pd.DataFrame:
         """This function randomly selects n_patches_per_slide patch embeddings per slide.
@@ -111,15 +114,19 @@ class SlideEmbeddingDataset(PatchEmbeddingDataset):
             stacked_embeddings = torch.cat(df[self._embedding_column].tolist(), dim=0)
 
             dim0 = stacked_embeddings.shape[0]
+            n_masked = 0
             if pad_size and dim0 < pad_size:
+                # [n_patches_in_slide, embedding_dim] -> [pad_size, embedding_dim]
+                n_masked = pad_size - dim0
                 stacked_embeddings = F.pad(
-                    stacked_embeddings,
-                    pad=(0, 0, 0, pad_size - dim0),
-                    mode="constant",
-                    value=self._pad_value,
+                    stacked_embeddings, pad=(0, 0, 0, n_masked), mode="constant", value=0
                 )
+                mask = torch.zeros(pad_size, 1).bool()
+                mask[-n_masked:, :] = True
+            else:
+                mask = torch.zeros(stacked_embeddings.shape[0], 1).bool()
 
-            result = {self._embedding_column: stacked_embeddings}
+            result = {self._embedding_column: stacked_embeddings, self._mask_column: mask}
             remaining_columns = set(df.columns) - set(result.keys())
             for col in remaining_columns:
                 # metadata is the same for patches of the same slide, so just take the first entry

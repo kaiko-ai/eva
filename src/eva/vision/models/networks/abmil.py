@@ -1,33 +1,125 @@
-"""ABMIL Network."""
+"""ABMIL classifier to aggregate a sequence of embeddings for a slide level classification task.
+Detailed methodology described in [1]
 
-from typing import Type
+Their original reference implementation, which uses different variable names
+than the paper, was used as a guidance:
+https://github.com/AMLab-Amsterdam/AttentionDeepMIL/blob/master/model.py
+
+Note:
+    - In this implementation, M and L follow the paper notation, not the reference
+      implementation.
+    - use_bias: The paper didn't use bias in their formalism, but their published
+      example code inadvertently does.
+    - To prevent dot product similarities near-equal due to concentration of measure
+      as a consequence of large input embedding dimensionality (>128), we added the
+      option to project the input embeddings to a lower dimensionality
+
+[1] Maximilian Ilse, Jakub M. Tomczak, Max Welling, "Attention-based Deep Multiple
+    Instance Learning", 2018
+    https://arxiv.org/abs/1802.04712
+"""
+
+from typing import Optional, Callable
 
 import torch
 import torch.nn as nn
 
-from eva.models.networks import MLP
 
+class MLP(torch.nn.Sequential):
+    """A Multi-layer Perceptron (MLP) network."""
+
+    def __init__(
+        self,
+        input_size: int,
+        output_size: int,
+        hidden_layer_sizes: tuple[int, ...] = (),
+        dropout: float = 0.0,
+        activation_fn: Callable[..., torch.nn.Module] = nn.ReLU,
+    ):
+        """Initializes the MLP.
+
+        Args:
+            input_size: The number of input features.
+            output_size: The number of output features.
+            hidden_layer_sizes: A list specifying the number of units in each hidden layer.
+            dropout: Dropout probability for hidden layers.
+            activation_fn: Activation function to use for hidden layers. Default is ReLU.
+        """
+        super(MLP, self).__init__()
+
+        self.activation_fn = activation_fn
+
+        # Initialize hidden layers
+        layers = []
+        prev_size = input_size
+        for size in hidden_layer_sizes:
+            layers.append(nn.Linear(prev_size, size))
+            layers.append(self.activation_fn())
+            layers.append(nn.Dropout(dropout))
+            prev_size = size
+
+        layers.append(nn.Linear(prev_size, output_size))
+        super().__init__(*layers)
+
+
+class AttnNetGated(nn.Module):
+    """Gated Attention mechanism used for HIPT and ABMIL classifiers.
+
+    refactored from HIPT/2-Weakly-Supervised-Subtyping/models/model_utils.py
+    Attention Network with Sigmoid Gating (3 fc layers)
+
+    Args:
+        input_dim: input feature dimension
+        hidden_dim: hidden layer dimension
+        dropout: dropout rate
+        n_classes: number of classes
+        use_bias: whether to use bias in the linear layers
+        activation_a: activation function for attention_a, default is nn.Tanh
+        activation_b: activation function for attention_b, default is nn.Sigmoid
+    """
+
+    def __init__(
+        self,
+        input_dim: int,
+        hidden_dim: int,
+        dropout: float = 0.25,
+        n_classes: int = 1,
+        use_bias: bool = True,
+        activation_a: nn.Module = nn.Tanh(),
+        activation_b: nn.Module = nn.Sigmoid(),
+    ):
+        super().__init__()
+
+        def make_attention(activation):
+            return nn.Sequential(
+                nn.Linear(input_dim, hidden_dim, bias=use_bias), nn.Dropout(p=dropout), activation
+            )
+
+        self.attention_a = make_attention(activation_a)
+        self.attention_b = make_attention(activation_b)
+        self.attention_c = nn.Linear(hidden_dim, n_classes)
+
+    def forward(self, x):
+        """Forward pass."""
+        a = self.attention_a(x)  # [..., hidden_dim]
+        b = self.attention_b(x)  # [..., hidden_dim]
+        att = a.mul(b)  # [..., hidden_dim]
+        att = self.attention_c(att)  # [..., n_classes]
+        return att
 
 class ABMIL(torch.nn.Module):
-    """ABMIL network for multiple instance learning classification tasks.
+    """ABMIL classifier. Takes an array of patch level embeddings per slide as input.
 
-    Takes an array of patch level embeddings per slide as input. This implementation supports
-    batched inputs of shape (batch_size, n_instances, input_size). For slides with less than
-    n_instances patches, you can apply padding and provide a mask tensor to the forward pass.
-
-    The original implementation from [1] was used as a reference:
-    https://github.com/AMLab-Amsterdam/AttentionDeepMIL/blob/master/model.py
-
-    Notes:
-        - use_bias: The paper didn't use bias in their formalism, but their published
-        example code inadvertently does.
-        - To prevent dot product similarities near-equal due to concentration of measure
-        as a consequence of large input embedding dimensionality (>128), we added the
-        option to project the input embeddings to a lower dimensionality
-
-    [1] Maximilian Ilse, Jakub M. Tomczak, Max Welling, "Attention-based Deep Multiple
-        Instance Learning", 2018
-        https://arxiv.org/abs/1802.04712
+    Args:
+        input_size: input embedding dimension
+        output_size: number of classes
+        projected_input_size: size of the projected input. if None, no projection is performed.
+        hidden_size_attention: hidden dimension in attention network
+        hidden_sizes_mlp: dimensions for hidden layers in last mlp
+        use_bias: whether to use bias in the attention network
+        dropout_input_embeddings: dropout rate for the input embeddings
+        dropout_attention: dropout rate for the attention network and classifier
+        dropout_mlp: dropout rate for the final MLP network
     """
 
     def __init__(
@@ -41,65 +133,50 @@ class ABMIL(torch.nn.Module):
         dropout_input_embeddings: float = 0.0,
         dropout_attention: float = 0.0,
         dropout_mlp: float = 0.0,
-        pad_value: int | float | None = float("-inf"),
     ) -> None:
-        """Initializes the ABMIL network.
-
-        Args:
-            input_size: input embedding dimension
-            output_size: number of classes
-            projected_input_size: size of the projected input. if None, no projection is performed.
-            hidden_size_attention: hidden dimension in attention network
-            hidden_sizes_mlp: dimensions for hidden layers in last mlp
-            use_bias: whether to use bias in the attention network
-            dropout_input_embeddings: dropout rate for the input embeddings
-            dropout_attention: dropout rate for the attention network and classifier
-            dropout_mlp: dropout rate for the final MLP network
-            pad_value: Value indicating padding in the input tensor. If specified, entries with
-                this value in the will be masked. If set to None, no masking is applied.
-        """
         super().__init__()
 
-        self._pad_value = pad_value
-
         if projected_input_size:
+            M = projected_input_size  # noqa: N806
             self.projector = nn.Sequential(
-                nn.Linear(input_size, projected_input_size, bias=True),
-                nn.Dropout(p=dropout_input_embeddings),
+                nn.Linear(input_size, M, bias=True), nn.Dropout(p=dropout_input_embeddings)
             )
-            input_size = projected_input_size
         else:
+            M = input_size  # noqa: N806
             self.projector = nn.Dropout(p=dropout_input_embeddings)
 
-        self.gated_attention = GatedAttention(
-            input_dim=input_size,
-            hidden_dim=hidden_size_attention,
+        L = hidden_size_attention  # noqa: N806
+
+        self.gated_attention = AttnNetGated(
+            input_dim=M,
+            hidden_dim=L,
             dropout=dropout_attention,
             n_classes=1,
             use_bias=use_bias,
         )
 
         self.classifier = MLP(
-            input_size=input_size,
+            input_size=M,
             output_size=output_size,
             hidden_layer_sizes=hidden_sizes_mlp,
             dropout=dropout_mlp,
-            hidden_activation_fn=nn.ReLU,
+            activation_fn=nn.ReLU,
         )
 
-    def forward(self, input_tensor: torch.Tensor) -> torch.Tensor:
+    def forward(self, input: torch.Tensor, mask: Optional[torch.BoolTensor] = None):
         """Forward pass.
 
         Args:
-            input_tensor: Tensor with expected shape of (batch_size, n_instances, input_size).
-            pad_value: Value indicating padding in the input tensor. If None no masking is applied.
+            input: input tensor with expected shape of (batch_size, n_instances, input_size).
+            mask: mask tensor where true values correspond to entries in the input tensor that
+                should be ignored. expected shape is (batch_size, n_instances, 1).
         """
-        input_tensor, mask = self._mask_values(input_tensor, self._pad_value)
 
-        # (batch_size, n_instances, input_size) -> (batch_size, n_instances, projected_input_size)
-        input_tensor = self.projector(input_tensor)
+        # Project input to lower dimensionality (batch_size, n_instances, M)
+        input = self.projector(input)
 
-        attention_logits = self.gated_attention(input_tensor)  # (batch_size, n_instances, 1)
+        # Gated attention & masking
+        attention_logits = self.gated_attention(input)  # (batch_size, n_instances, 1)
         if mask is not None:
             # fill masked values with -inf, which will yield 0s after softmax
             attention_logits = attention_logits.masked_fill(mask, float("-inf"))
@@ -107,69 +184,10 @@ class ABMIL(torch.nn.Module):
         attention_weights = nn.functional.softmax(attention_logits, dim=1)
         # (batch_size, n_instances, 1)
 
-        attention_result = torch.matmul(torch.transpose(attention_weights, 1, 2), input_tensor)
-        # (batch_size, 1, hidden_size_attention)
+        attention_result = torch.matmul(torch.transpose(attention_weights, 1, 2), input)
+        # (batch_size, 1, L)
 
-        attention_result = torch.squeeze(attention_result, 1)  # (batch_size, hidden_size_attention)
+        attention_result = torch.squeeze(attention_result, 1)  # (batch_size, L)
 
+        # Final MLP classifier network
         return self.classifier(attention_result)  # (batch_size, output_size)
-
-    def _mask_values(self, input_tensor: torch.Tensor, pad_value: float | None):
-        """Masks the padded values in the input tensor."""
-        if pad_value is None:
-            return input_tensor, None
-        else:
-            # (batch_size, n_instances, input_size)
-            mask = input_tensor == pad_value
-
-            # (batch_size, n_instances, input_size) -> (batch_size, n_instances, 1)
-            mask = mask.all(dim=-1, keepdim=True)
-
-            # Fill masked values with 0, so that they don't contribute to dense layers
-            input_tensor = input_tensor.masked_fill(mask, 0)
-
-            return input_tensor, mask
-
-
-class GatedAttention(nn.Module):
-    """Attention mechanism with Sigmoid Gating using 3 linear layers."""
-
-    def __init__(
-        self,
-        input_dim: int,
-        hidden_dim: int,
-        dropout: float = 0.25,
-        n_classes: int = 1,
-        use_bias: bool = True,
-        activation_a: Type[nn.Module] = nn.Tanh,
-        activation_b: Type[nn.Module] = nn.Sigmoid,
-    ):
-        """Initializes the GatedAttention network.
-
-        Args:
-            input_dim: input feature dimension
-            hidden_dim: hidden layer dimension
-            dropout: dropout rate
-            n_classes: number of classes
-            use_bias: whether to use bias in the linear layers
-            activation_a: activation function for attention_a, default is nn.Tanh
-            activation_b: activation function for attention_b, default is nn.Sigmoid
-        """
-        super().__init__()
-
-        def make_attention(activation: nn.Module):
-            return nn.Sequential(
-                nn.Linear(input_dim, hidden_dim, bias=use_bias), nn.Dropout(p=dropout), activation
-            )
-
-        self.attention_a = make_attention(activation_a())
-        self.attention_b = make_attention(activation_b())
-        self.attention_c = nn.Linear(hidden_dim, n_classes)
-
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        """Forward pass."""
-        a = self.attention_a(x)  # [..., hidden_dim]
-        b = self.attention_b(x)  # [..., hidden_dim]
-        att = a.mul(b)  # [..., hidden_dim]
-        att = self.attention_c(att)  # [..., n_classes]
-        return att
