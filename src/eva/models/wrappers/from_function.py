@@ -54,7 +54,4 @@ class ModelFromFunction(wrappers.BaseModel):
 
     @override
     def _forward(self, tensor: torch.Tensor) -> torch.Tensor:
-        return self._model(
-            torch.from_numpy(tensor.detach().cpu().numpy()).float().to(tensor.device)
-        )
-        # return self._model(tensor)
+        return self._model(tensor)
