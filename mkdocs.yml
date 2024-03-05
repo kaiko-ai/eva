@@ -32,6 +32,7 @@ nav:
       - user-guide/index.md
       - Getting started: user-guide/getting_started.md
       - How to use eva: user-guide/how_to_use.md
+      - Tutorials: user-guide/tutorials.md
   - Reference API:
     - reference/index.md
     - Interface: reference/interface.md
