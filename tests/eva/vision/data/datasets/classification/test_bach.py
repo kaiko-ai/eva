@@ -22,9 +22,9 @@ def test_length(bach_dataset: datasets.BACH, expected_length: int) -> None:
     "split, index",
     [
         (None, 0),
-        # (None, 9),
-        # ("train", 0),
-        # ("train", 2),
+        (None, 9),
+        ("train", 0),
+        ("train", 2),
     ],
 )
 def test_sample(bach_dataset: datasets.BACH, index: int) -> None:
