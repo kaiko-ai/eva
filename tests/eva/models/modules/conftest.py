@@ -35,7 +35,11 @@ def datamodule(
 @pytest.fixture(scope="function")
 def trainer(max_epochs: int = 1) -> eva_trainer.Trainer:
     """Returns a model trainer fixture."""
-    return eva_trainer.Trainer(max_epochs=max_epochs, accelerator="cpu")
+    return eva_trainer.Trainer(
+        max_epochs=max_epochs,
+        accelerator="cpu",
+        default_root_dir="logs/test",
+    )
 
 
 @pytest.fixture(scope="function")
