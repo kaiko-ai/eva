@@ -6,8 +6,8 @@ import pytest
 import torch
 from torch.utils import data as torch_data
 
-from eva import trainers
 from eva.data import dataloaders, datamodules, datasets
+from eva.trainers import trainer as eva_trainer
 
 
 @pytest.fixture(scope="function")
@@ -33,9 +33,9 @@ def datamodule(
 
 
 @pytest.fixture(scope="function")
-def trainer(max_epochs: int = 1) -> trainers.Trainer:
+def trainer(max_epochs: int = 1) -> eva_trainer.Trainer:
     """Returns a model trainer fixture."""
-    return trainers.Trainer(max_epochs=max_epochs, accelerator="cpu")
+    return eva_trainer.Trainer(max_epochs=max_epochs, accelerator="cpu")
 
 
 @pytest.fixture(scope="function")

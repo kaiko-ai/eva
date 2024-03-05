@@ -23,22 +23,18 @@ class Interface:
 
         This method uses the specified trainer to fit the model using the provided data.
 
-        Example usecases:
+        Example use cases:
         - Using a model consisting of a frozen backbone and a head, the backbone will generate
           the embeddings on the fly which are then used as input features to train the head on
           the downstream task specified by the given dataset.
         - Fitting only the head network using a dataset that loads pre-computed embeddings.
-
 
         Args:
             model: The model module.
             data: The data module.
             trainer: The trainer which processes the model and data.
         """
-        trainer.fit(model=model, datamodule=data)
-        trainer.validate(datamodule=data)
-        if data.datasets.test is not None:
-            trainer.test(datamodule=data)
+        trainers.fit_and_validate(trainer=trainer, model=model, datamodule=data)
 
     def predict(
         self,

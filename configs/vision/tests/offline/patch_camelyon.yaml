@@ -2,7 +2,7 @@
 trainer:
   class_path: eva.Trainer
   init_args:
-    default_root_dir: &LIGHTNING_ROOT ${oc.env:LIGHTNING_ROOT, logs/tests/patch_camelyon}
+    default_root_dir: &LIGHTNING_ROOT ${oc.env:LIGHTNING_ROOT, logs/test/offline/patch_camelyon}
     max_epochs: &MAX_EPOCHS 20
     callbacks:
       - class_path: eva.callbacks.EmbeddingsWriter

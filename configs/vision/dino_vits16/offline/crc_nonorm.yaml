@@ -2,7 +2,7 @@
 trainer:
   class_path: eva.Trainer
   init_args:
-    default_root_dir: &LIGHTNING_ROOT ${oc.env:LIGHTNING_ROOT, logs/dino_vits16/offline/crc_nonorm}
+    default_root_dir: &OUTPUT_ROOT ${oc.env:OUTPUT_ROOT, logs/dino_vits16/offline/crc_nonorm}
     max_steps: &MAX_STEPS 12500
     callbacks:
       - class_path: pytorch_lightning.callbacks.LearningRateMonitor
@@ -38,7 +38,7 @@ trainer:
     logger:
       - class_path: pytorch_lightning.loggers.TensorBoardLogger
         init_args:
-          save_dir: *LIGHTNING_ROOT
+          save_dir: *OUTPUT_ROOT
           name: ""
 model:
   class_path: eva.HeadModule
