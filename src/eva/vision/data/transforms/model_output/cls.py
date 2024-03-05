@@ -1,3 +1,5 @@
+"""Transforms for extracting the CLS output from a model output."""
+
 import torch
 from transformers import modeling_outputs
 
@@ -6,16 +8,16 @@ class ExtractCLSFeatures:
     """Extracts the CLS token from a ViT model output."""
 
     def __call__(
-        self, x: torch.Tensor | modeling_outputs.BaseModelOutputWithPooling
+        self, tensor: torch.Tensor | modeling_outputs.BaseModelOutputWithPooling
     ) -> torch.Tensor:
         """Call method for the transformation.
 
         Args:
-            x: The tensor representing the model output.
+            tensor: The tensor representing the model output.
         """
-        if isinstance(x, torch.Tensor):
-            return x[:, 0, :]
-        elif isinstance(x, modeling_outputs.BaseModelOutputWithPooling):
-            return x.last_hidden_state[:, 0, :]
+        if isinstance(tensor, torch.Tensor):
+            return tensor[:, 0, :]
+        elif isinstance(tensor, modeling_outputs.BaseModelOutputWithPooling):
+            return tensor.last_hidden_state[:, 0, :]
         else:
-            raise ValueError(f"Unsupported type {type(x)}")
+            raise ValueError(f"Unsupported type {type(tensor)}")
