@@ -18,7 +18,7 @@ jobs:
         python-version: "3.10"
         architecture: x64
     - name: Setting up NOX
-      uses: wntrblm/nox@2023.04.22
+      uses: wntrblm/nox@2024.03.02
       with:
         python-versions: "3.10"
     - name: Lint checks
@@ -45,7 +45,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
         architecture: x64
     - name: Setting up NOX
-      uses: wntrblm/nox@2023.04.22
+      uses: wntrblm/nox@2024.03.02
       with:
         python-versions: ${{ matrix.python-version }}
     - name: Unit Tests

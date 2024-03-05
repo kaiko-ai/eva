@@ -45,7 +45,8 @@ Supported datasets & tasks include:
 
 -	**Patch Camelyon**: binary breast cancer classification
 -	**BACH**: multiclass breast cancer classification
--	**CRC HE**: multiclass colorectal cancer classification
+-	**CRC**: multiclass colorectal cancer classification
+-	**MHIST**: binary colorectal polyp cancer classification
 -	**TotalSegmentator**: radiology/CT-scan for segmentation of anatomical structures
 
 To compare your FM, eva also provides support to evaluate and compare several publicly available models on the same tasks. These include:

@@ -25,7 +25,7 @@ by broad-based crypts, often with complex structure and heavy serration.
 | **Image dimension**  | 224 x 224 x 3                                       |
 | **FoV (μm/px)**      | 40x (0.25)                                          |
 | **Files format**     | `.png` images                                       |
-| **Number of images** | 3,152 (2,175 train, 977 val)                        |
+| **Number of images** | 3,152 (2,175 train, 977 test)                       |
 | **Splits in use**    | annotations.csv (train / test)                      |
 
 
@@ -36,11 +36,10 @@ We use the splits according to the data sources:
  - Train split: `annotations.csv` :: "Partition" == "train"
  - Test split: `annotations.csv` :: "Partition" == "test"
 
-| Splits   | Train           | Validation   | 
+| Splits   | Train           | Test         | 
 |----------|-----------------|--------------|
 | #Samples | 2,175 (69%)     | 977 (31%)    | 
 
-__A validation split is not provided.__
 
 ### Organization
 

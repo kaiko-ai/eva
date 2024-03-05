@@ -18,7 +18,7 @@ trainer:
       - class_path: pytorch_lightning.callbacks.EarlyStopping
         init_args:
           min_delta: 0
-          patience: 100
+          patience: 48
           monitor: *MONITOR_METRIC
           mode: *MONITOR_METRIC_MODE
       - class_path: eva.callbacks.EmbeddingsWriter
@@ -33,7 +33,7 @@ trainer:
               path: torch.hub.load
               arguments:
                 repo_or_dir: facebookresearch/dino:main
-                model: dino_vits16
+                model: ${oc.env:DINO_BACKBONE, dino_vits16}
                 pretrained: ${oc.env:PRETRAINED, true}
     logger:
       - class_path: pytorch_lightning.loggers.TensorBoardLogger
@@ -46,7 +46,7 @@ model:
     head:
       class_path: torch.nn.Linear
       init_args:
-        in_features: 384
+        in_features: ${oc.env:IN_FEATURES, 384}
         out_features: &NUM_CLASSES 9
     criterion: torch.nn.CrossEntropyLoss
     optimizer:
