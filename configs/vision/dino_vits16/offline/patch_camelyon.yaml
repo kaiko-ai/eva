@@ -36,6 +36,7 @@ trainer:
                 repo_or_dir: facebookresearch/dino:main
                 model: dino_vits16
                 pretrained: ${oc.env:PRETRAINED, true}
+              checkpoint_path: ${oc.env:CHECKPOINT_PATH, null}
     logger:
       - class_path: pytorch_lightning.loggers.TensorBoardLogger
         init_args:
