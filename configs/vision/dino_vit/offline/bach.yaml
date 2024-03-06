@@ -2,8 +2,11 @@
 trainer:
   class_path: eva.Trainer
   init_args:
-    default_root_dir: &OUTPUT_ROOT ${oc.env:OUTPUT_ROOT, logs/dino_vits16/offline/bach}
-    max_steps: &MAX_STEPS 12500
+    default_root_dir: &OUTPUT_ROOT ${oc.env:OUTPUT_ROOT, logs/${oc.env:DINO_BACKBONE, dino_vits16}/offline/bach}
+    # max_steps: &MAX_STEPS 12500
+    max_steps: &MAX_STEPS 2
+    limit_train_batches: 2
+    limit_val_batches: 2
     callbacks:
       - class_path: pytorch_lightning.callbacks.LearningRateMonitor
         init_args:

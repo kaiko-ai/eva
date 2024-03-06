@@ -4,6 +4,8 @@ trainer:
   init_args:
     default_root_dir: &LIGHTNING_ROOT ${oc.env:LIGHTNING_ROOT, logs/test/offline/patch_camelyon}
     max_epochs: &MAX_EPOCHS 20
+    limit_train_batches: 2
+    limit_val_batches: 2
     callbacks:
       - class_path: eva.callbacks.EmbeddingsWriter
         init_args:

@@ -1,8 +1,7 @@
 """Main interface class."""
 
-from eva import trainers
+from eva import trainers as eva_trainer
 from eva.data import datamodules
-from eva.data.datamodules import schemas
 from eva.models import modules
 
 
@@ -15,11 +14,11 @@ class Interface:
 
     def fit(
         self,
+        trainer: eva_trainer.Trainer,
         model: modules.ModelModule,
         data: datamodules.DataModule,
-        trainer: trainers.Trainer,
     ) -> None:
-        """Perform model training and evaluation in place.
+        """Perform model training and evaluation out-of-place.
 
         This method uses the specified trainer to fit the model using the provided data.
 
@@ -30,38 +29,44 @@ class Interface:
         - Fitting only the head network using a dataset that loads pre-computed embeddings.
 
         Args:
-            model: The model module.
+            trainer: The base trainer to use but not modify.
+            model: The model module to use but not modify.
             data: The data module.
-            trainer: The trainer which processes the model and data.
         """
-        trainers.fit_and_validate(trainer=trainer, model=model, datamodule=data)
+        eva_trainer.run_evaluation_session(
+            base_trainer=trainer,
+            base_model=model,
+            datamodule=data,
+            n_runs=2,
+        )
 
     def predict(
         self,
+        trainer: eva_trainer.Trainer,
         model: modules.ModelModule,
         data: datamodules.DataModule,
-        trainer: trainers.Trainer,
     ) -> None:
-        """Perform model prediction in place.
+        """Perform model prediction out-of-place.
 
         This method performs inference with a pre-trained foundation model to compute embeddings.
 
         Args:
-            model: The model module.
+            trainer: The base trainer to use but not modify.
+            model: The model module to use but not modify.
             data: The data module.
-            trainer: The trainer which processes the model and data.
         """
-        predict_datamodule = datamodules.DataModule(
-            dataloaders=schemas.DataloadersSchema(predict=data.dataloaders.predict),
-            datasets=schemas.DatasetsSchema(predict=data.datasets.predict),
+        eva_trainer.infer_model(
+            base_trainer=trainer,
+            base_model=model,
+            datamodule=data,
+            return_predictions=False,
         )
-        trainer.predict(model=model, datamodule=predict_datamodule, return_predictions=False)
 
     def predict_fit(
         self,
+        trainer: eva_trainer.Trainer,
         model: modules.ModelModule,
         data: datamodules.DataModule,
-        trainer: trainers.Trainer,
     ) -> None:
         """Combines the predict and fit commands in one method.
 
@@ -70,9 +75,9 @@ class Interface:
         2. fit: training the head network using the embeddings generated in step 1.
 
         Args:
-            model: The model module.
+            trainer: The base trainer to use but not modify.
+            model: The model module to use but not modify.
             data: The data module.
-            trainer: The trainer which processes the model and data.
         """
         self.predict(model=model, data=data, trainer=trainer)
         self.fit(model=model, data=data, trainer=trainer)
