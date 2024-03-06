@@ -23,15 +23,21 @@ class BaseModel(nn.Module):
 
     @override
     def forward(self, tensor: torch.Tensor) -> torch.Tensor:
-        tensor = self._forward(tensor)
+        tensor = self.model_forward(tensor)
         return self._apply_transforms(tensor)
 
     @abc.abstractmethod
-    def _load_model(self) -> Callable[..., torch.Tensor]:
+    def load_model(self) -> Callable[..., torch.Tensor]:
+        """Loads the model."""
         raise NotImplementedError
 
     @abc.abstractmethod
-    def _forward(self, x: torch.Tensor) -> torch.Tensor:
+    def model_forward(self, tensor: torch.Tensor) -> torch.Tensor:
+        """Implements the forward pass of the model.
+
+        Args:
+            tensor: The input tensor to the model.
+        """
         raise NotImplementedError
 
     def _apply_transforms(self, tensor: torch.Tensor) -> torch.Tensor:

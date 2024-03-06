@@ -41,11 +41,10 @@ class ModelFromFunction(wrappers.BaseModel):
         self._checkpoint_path = checkpoint_path
         self._tensor_transforms = tensor_transforms
 
-        self._model = self._load_model()
+        self._model = self.load_model()
 
     @override
-    def _load_model(self) -> nn.Module:
-        """Builds and returns the model."""
+    def load_model(self) -> nn.Module:
         class_path = jsonargparse.class_from_function(self._path, func_return=nn.Module)
         model = class_path(**self._arguments or {})
         if self._checkpoint_path is not None:
@@ -53,5 +52,5 @@ class ModelFromFunction(wrappers.BaseModel):
         return model
 
     @override
-    def _forward(self, tensor: torch.Tensor) -> torch.Tensor:
+    def model_forward(self, tensor: torch.Tensor) -> torch.Tensor:
         return self._model(tensor)

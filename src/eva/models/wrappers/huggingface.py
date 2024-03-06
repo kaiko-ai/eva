@@ -23,13 +23,13 @@ class HuggingFaceModel(wrappers.BaseModel):
         super().__init__(tensor_transforms=tensor_transforms)
 
         self._model_name_or_path = model_name_or_path
-        self._model = self._load_model()
+        self._model = self.load_model()
 
     @override
-    def _load_model(self) -> Any:
+    def load_model(self) -> Any:
         config = transformers.AutoConfig.from_pretrained(self._model_name_or_path)
         return transformers.AutoModel.from_pretrained(self._model_name_or_path, config=config)
 
     @override
-    def _forward(self, tensor: torch.Tensor) -> torch.Tensor:
+    def model_forward(self, tensor: torch.Tensor) -> torch.Tensor:
         return self._model(tensor)
