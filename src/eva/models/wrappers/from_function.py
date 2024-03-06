@@ -31,7 +31,7 @@ class ModelFromFunction(wrappers.BaseModel):
             arguments: The extra callable function / class arguments.
             checkpoint_path: The path to the checkpoint to load the model weights from. This is
                 currently only supported for torch model checkpoints. For other formats, the
-                checkpoint loading should be handed within the provided callable object in <path>.
+                checkpoint loading should be handled within the provided callable object in <path>.
             tensor_transforms: The transforms to apply to the output tensor produced by the model.
         """
         super().__init__()
