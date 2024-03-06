@@ -7,10 +7,11 @@ import torch
 from torch import nn
 from typing_extensions import override
 
+from eva.models import wrappers
 from eva.models.networks import _utils
 
 
-class ModelFromFunction(nn.Module):
+class ModelFromFunction(wrappers.BaseModel):
     """Wrapper class for models which are initialized from functions.
 
     This is helpful for initializing models in a `.yaml` configuration file.
@@ -21,24 +22,29 @@ class ModelFromFunction(nn.Module):
         path: Callable[..., nn.Module],
         arguments: Dict[str, Any] | None = None,
         checkpoint_path: str | None = None,
+        tensor_transforms: Callable | None = None,
     ) -> None:
         """Initializes and constructs the model.
 
         Args:
             path: The path to the callable object (class or function).
             arguments: The extra callable function / class arguments.
-            checkpoint_path: The path to the checkpoint to load the model weights from.
+            checkpoint_path: The path to the checkpoint to load the model weights from. This is
+                currently only supported for torch model checkpoints. For other formats, the
+                checkpoint loading should be handled within the provided callable object in <path>.
+            tensor_transforms: The transforms to apply to the output tensor produced by the model.
         """
         super().__init__()
 
         self._path = path
         self._arguments = arguments
         self._checkpoint_path = checkpoint_path
+        self._tensor_transforms = tensor_transforms
 
-        self._network = self.build_model()
+        self._model = self.load_model()
 
-    def build_model(self) -> nn.Module:
-        """Builds and returns the model."""
+    @override
+    def load_model(self) -> nn.Module:
         class_path = jsonargparse.class_from_function(self._path, func_return=nn.Module)
         model = class_path(**self._arguments or {})
         if self._checkpoint_path is not None:
@@ -46,5 +52,5 @@ class ModelFromFunction(nn.Module):
         return model
 
     @override
-    def forward(self, tensor: torch.Tensor) -> torch.Tensor:
-        return self._network(tensor)
+    def model_forward(self, tensor: torch.Tensor) -> torch.Tensor:
+        return self._model(tensor)

@@ -37,7 +37,7 @@ model:
           repo_or_dir: facebookresearch/dino:main
           model: ${oc.env:DINO_BACKBONE, dino_vits16}
           pretrained: ${oc.env:PRETRAINED, true}
-        checkpoint_path: &CHECKPOINT_PATH ${oc.env:CHECKPOINT_PATH, null}
+        checkpoint_path: ${oc.env:CHECKPOINT_PATH, null}
     head:
       class_path: torch.nn.Linear
       init_args:
