@@ -1,4 +1,4 @@
-"""Helper functions and utilities for trainer."""
+"""Helper functions and utilities for trainer logging."""
 
 import hashlib
 import sys

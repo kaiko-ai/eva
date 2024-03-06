@@ -2,6 +2,7 @@
 trainer:
   class_path: eva.Trainer
   init_args:
+    n_runs: 5
     default_root_dir: &OUTPUT_ROOT ${oc.env:OUTPUT_ROOT, logs/${oc.env:DINO_BACKBONE, dino_vits16}/offline/crc_nonorm}
     max_steps: &MAX_STEPS 12500
     callbacks:
@@ -23,7 +24,7 @@ trainer:
           mode: *MONITOR_METRIC_MODE
       - class_path: eva.callbacks.EmbeddingsWriter
         init_args:
-          output_dir: &EMBEDDINGS_DIR ${oc.env:EMBEDDINGS_ROOT, ./data/embeddings}/crc_nonorm
+          output_dir: &EMBEDDINGS_DIR ${oc.env:EMBEDDINGS_ROOT, ./data/embeddings}/${oc.env:DINO_BACKBONE, dino_vits16}/crc_nonorm
           dataloader_idx_map:
             0: train
             1: val

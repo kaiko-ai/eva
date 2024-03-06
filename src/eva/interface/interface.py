@@ -32,13 +32,9 @@ class Interface:
             trainer: The base trainer to use but not modify.
             model: The model module to use but not modify.
             data: The data module.
+            n_runs: The amount of runs (fit and evaluate) to perform.
         """
-        eva_trainer.run_evaluation_session(
-            base_trainer=trainer,
-            base_model=model,
-            datamodule=data,
-            n_runs=2,
-        )
+        trainer.run_evaluation_session(model=model, datamodule=data)
 
     def predict(
         self,
@@ -79,5 +75,5 @@ class Interface:
             model: The model module to use but not modify.
             data: The data module.
         """
-        self.predict(model=model, data=data, trainer=trainer)
-        self.fit(model=model, data=data, trainer=trainer)
+        self.predict(trainer=trainer, model=model, data=data)
+        self.fit(trainer=trainer, model=model, data=data)

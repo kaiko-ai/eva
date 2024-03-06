@@ -1,13 +1,12 @@
 """Fit session related functions."""
 
-import copy
-from collections import abc
-from typing import Any, Tuple
+from typing import Tuple
 
 from pytorch_lightning.utilities.types import _EVALUATE_OUTPUT
 
 from eva.data import datamodules
 from eva.models import modules
+from eva.trainers import _utils
 from eva.trainers import trainer as eva_trainer
 
 
@@ -32,11 +31,10 @@ def run_evaluation_session(
         n_runs: The amount of runs (fit and evaluate) to perform.
     """
     for run_index in range(n_runs):
-        run_id = _get_run_id(run_index)
-        evaluation_run(base_trainer, base_model, datamodule, run_id=run_id)
+        run_evaluation(base_trainer, base_model, datamodule, run_id=f"run_{run_index}")
 
 
-def evaluation_run(
+def run_evaluation(
     base_trainer: eva_trainer.Trainer,
     base_model: modules.ModelModule,
     datamodule: datamodules.DataModule,
@@ -55,30 +53,9 @@ def evaluation_run(
     Returns:
         A tuple of with the validation and the test metrics (if exists).
     """
-    trainer, model = _clone(base_trainer, base_model)
+    trainer, model = _utils.clone(base_trainer, base_model)
     trainer.setup_log_dirs(run_id or "")
     return fit_and_validate(trainer, model, datamodule)
-
-
-def infer_model(
-    base_trainer: eva_trainer.Trainer,
-    base_model: modules.ModelModule,
-    datamodule: datamodules.DataModule,
-    *,
-    return_predictions: bool = False,
-) -> None:
-    """Performs model inference out-of-place.
-
-    Args:
-        base_trainer: The base trainer to use but not modify.
-        base_model: The model module to use but not modify.
-        datamodule: The data module.
-        return_predictions: Whether to return the model predictions.
-    """
-    trainer, model = _clone(base_trainer, base_model)
-    return trainer.predict(
-        model=model, datamodule=datamodule, return_predictions=return_predictions
-    )
 
 
 def fit_and_validate(
@@ -105,14 +82,27 @@ def fit_and_validate(
     return validation_scores, test_scores
 
 
-def _get_run_id(run_index: int) -> str:
-    """Creates and returns the run id."""
-    return f"run_{run_index}"
+def infer_model(
+    base_trainer: eva_trainer.Trainer,
+    base_model: modules.ModelModule,
+    datamodule: datamodules.DataModule,
+    *,
+    return_predictions: bool = False,
+) -> None:
+    """Performs model inference out-of-place.
 
+    Note that the input `base_model` and `base_trainer` would
+    not be modified.
 
-def _clone(*inputs: Any) -> Any:
-    """Deep copies a list of object and returns them."""
-    if not isinstance(inputs, abc.Iterable):
-        return copy.deepcopy(inputs)
-
-    return [copy.deepcopy(obj) for obj in inputs]
+    Args:
+        base_trainer: The base trainer to use but not modify.
+        base_model: The model module to use but not modify.
+        datamodule: The data module.
+        return_predictions: Whether to return the model predictions.
+    """
+    trainer, model = _utils.clone(base_trainer, base_model)
+    return trainer.predict(
+        model=model,
+        datamodule=datamodule,
+        return_predictions=return_predictions,
+    )
