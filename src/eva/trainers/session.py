@@ -46,7 +46,8 @@ def fit_and_validate(
 ) -> Tuple[_EVALUATE_OUTPUT, _EVALUATE_OUTPUT | None]:
     """Fits and evaluates a model without altering the input objects.
 
-    Note that, if set, it will evaluate the model on the test set as well.
+    If the test set is set in the datamodule, it will evaluate the model
+    on the test set as well.
 
     Args:
         trainer: The trainer module.

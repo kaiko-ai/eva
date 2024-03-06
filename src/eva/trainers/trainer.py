@@ -22,7 +22,6 @@ class Trainer(pl_trainer.Trainer):
         self,
         *args: Any,
         default_root_dir: str = "logs",
-        n_runs: int = 1,
         **kwargs: Any,
     ) -> None:
         """Initializes the trainer.
@@ -30,8 +29,6 @@ class Trainer(pl_trainer.Trainer):
         For the input arguments, refer to ::class::`pytorch_lightning.Trainer`.
         """
         super().__init__(*args, default_root_dir=default_root_dir, **kwargs)
-
-        self._n_runs = n_runs
 
         self._session_id: str = utils.generate_session_id()
         self._log_dir: str = self.default_log_dir
