@@ -1,8 +1,8 @@
 ---
-n_runs: 5
 trainer:
   class_path: eva.Trainer
   init_args:
+    n_runs: 5
     default_root_dir: &OUTPUT_ROOT ${oc.env:OUTPUT_ROOT, logs/${oc.env:DINO_BACKBONE, dino_vits16}/offline/crc}
     max_steps: &MAX_STEPS 12500
     callbacks:
