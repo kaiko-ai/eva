@@ -2,15 +2,6 @@
 
 Before starting to use ***eva***, it's important to get familiar with the different workflows, subcommands and configurations.
 
-## *online* vs. *offline* workflows
-
-We distinguish between the *online* and *offline* workflow:
-
-- *online*: This mode uses raw images as input and generates the embeddings using a frozen FM backbone on the fly to train a downstream head network.
-- *offline*: In this mode, embeddings are pre-computed and stored locally in a first step, and loaded in a 2nd step from disk to train the downstream head network.
-
-The *online* workflow can be used to quickly run a complete evaluation without saving and tracking embeddings. The *offline* workflow runs faster (only one FM-backbone forward pass) and is ideal to experiment with different decoders on the same FM-backbone.
-
 
 ## ***eva*** subcommands
 
@@ -21,9 +12,18 @@ python -m eva <subcommand> --config <path-to-config-file>
 
 The *eva* interface supports the subcommands: `predict`, `fit` and `predict_fit`.
 
- - **`fit`**: is used to train a decoder for a specific task (e.g. classification) and subsequently evaluate the performance. This can be done *online* (fit directly on input images) or as the 2nd step of the *offline* workflow (fit on input embeddings that were previously computed with the `predict` command)
+ - **`fit`**: is used to train a decoder for a specific task and subsequently evaluate the performance. This can be done *online* or *offline* \*
 - **`predict`**: is used to compute embeddings for input images with a provided FM-checkpoint. This is the first step of the *offline* workflow
-- **`predict_fit`**: runs `predict` and `fit` sequentially. Like the `fit`-online run, it runs a complete evaluation (both steps of the *offline* workflow) with images as input.
+- **`predict_fit`**: runs `predict` and `fit` sequentially. Like the `fit`-online run, it runs a complete evaluation with images as input.
+
+### \* *online* vs. *offline* workflows
+
+We distinguish between the *online* and *offline* workflow:
+
+- *online*: This mode uses raw images as input and generates the embeddings using a frozen FM backbone on the fly to train a downstream head network.
+- *offline*: In this mode, embeddings are pre-computed and stored locally in a first step, and loaded in a 2nd step from disk to train the downstream head network.
+
+The *online* workflow can be used to quickly run a complete evaluation without saving and tracking embeddings. The *offline* workflow runs faster (only one FM-backbone forward pass) and is ideal to experiment with different decoders on the same FM-backbone.
 
 
 ## Run configurations
@@ -39,9 +39,7 @@ To get a better understanding, inspect some of the provided [config files](https
 
 ### Environment variables
 
-To customize runs, you can overwrite some of the config-parameters by setting them as environment variables.
-
-These include:
+To customize runs, you can overwrite the config-parameters listed below by setting them as environment variables.
 
 |                         |                           |
 |-------------------------|---------------------------|
