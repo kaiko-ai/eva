@@ -2,7 +2,8 @@
 trainer:
   class_path: eva.Trainer
   init_args:
-    default_root_dir: &LIGHTNING_ROOT ${oc.env:LIGHTNING_ROOT, logs/dino_vits16/offline/patch_camelyon}
+    n_runs: 5
+    default_root_dir: &OUTPUT_ROOT ${oc.env:OUTPUT_ROOT, logs/${oc.env:DINO_BACKBONE, dino_vits16}/offline/patch_camelyon}
     max_steps: &MAX_STEPS 12500
     callbacks:
       - class_path: pytorch_lightning.callbacks.LearningRateMonitor
@@ -23,7 +24,7 @@ trainer:
           mode: *MONITOR_METRIC_MODE
       - class_path: eva.callbacks.EmbeddingsWriter
         init_args:
-          output_dir: &EMBEDDINGS_DIR ${oc.env:EMBEDDINGS_ROOT, ./data/embeddings}/patch_camelyon
+          output_dir: &EMBEDDINGS_DIR ${oc.env:EMBEDDINGS_ROOT, ./data/embeddings}/${oc.env:DINO_BACKBONE, dino_vits16}/patch_camelyon
           dataloader_idx_map:
             0: train
             1: val
@@ -40,7 +41,7 @@ trainer:
     logger:
       - class_path: pytorch_lightning.loggers.TensorBoardLogger
         init_args:
-          save_dir: *LIGHTNING_ROOT
+          save_dir: *OUTPUT_ROOT
           name: ""
 model:
   class_path: eva.HeadModule

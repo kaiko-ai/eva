@@ -7,9 +7,9 @@ import pytest
 import torch
 from torch import nn
 
-from eva import trainers
 from eva.data import datamodules
 from eva.models import modules
+from eva.trainers import trainer as eva_trainer
 
 N_CLASSES = 4
 """The number of classes in the dataset."""
@@ -25,7 +25,7 @@ N_CLASSES = 4
 def test_inference_module_predict(
     model: modules.InferenceModule,
     datamodule: datamodules.DataModule,
-    trainer: trainers.Trainer,
+    trainer: eva_trainer.Trainer,
 ) -> None:
     """Tests the HeadModule fit pipeline."""
     predictions = trainer.predict(model, datamodule=datamodule)
