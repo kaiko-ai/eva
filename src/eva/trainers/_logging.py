@@ -3,8 +3,8 @@
 import hashlib
 import sys
 from datetime import datetime
-from lightning_fabric.utilities import cloud_io
 
+from lightning_fabric.utilities import cloud_io
 from loguru import logger
 
 
@@ -52,7 +52,7 @@ def _fetch_config_path() -> str | None:
         The path to the configuration file.
     """
     inputs = sys.argv
-    config_paths = [inputs[i + 1] for i, arg in enumerate(inputs) if arg=="--config"]
+    config_paths = [inputs[i + 1] for i, arg in enumerate(inputs) if arg == "--config"]
     if len(config_paths) == 0 or len(config_paths) > 1:
         # TODO combine the multiple configuration files
         # and produced hash for the merged one.
@@ -73,7 +73,9 @@ def _generate_hash_from_config(path: str, max_hash_len: int = 8) -> str:
     """
     fs = cloud_io.get_filesystem(path)
     with fs.open(path, "r") as stream:
-        config = stream.read().encode("utf-8")
+        config = stream.read()
+        if isinstance(config, str):
+            config = config.encode("utf-8")
         config_sha256 = hashlib.sha256(config)
         hash_id = config_sha256.hexdigest()
     return hash_id[:max_hash_len]
