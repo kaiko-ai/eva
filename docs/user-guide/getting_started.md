@@ -1,38 +1,36 @@
-# Getting Started - Installing ***eva***
+# Getting Started
 
 *Note: this section applies in the current form only to Kaiko-internal user testing and will be revised for the public package when publishing eva*
 
-## Download the repository
+## Installation
 
-First, install GIT LFS on your machine (see [reference](https://git-lfs.com/)) which is used to track assets, 
-such as sample images used for tests.
+
+- Create and activate a virtual environment with Python 3.10+
+
+- Install ***eva*** and the ***eva-vision*** package with:
+
 ```
-brew install git lfs
-```
-Navigate to the directory where you'd like to install *eva* and install git-lfs:
-```
-git lfs install
-```
-Now clone the repo:
-```
-git clone git@github.com:kaiko-ai/eva.git
+pip install git+ssh://git@github.com/kaiko-ai/eva.git
+pip install "eva[vision]"
 ```
 
-## Setup the environment
+- To be able to use the existing configs, you have to download them first
 
-Now install ***eva*** and it's dependencies in a virtual environment. This can be done with the Python 
-package and dependency manager PDM (see [documentation](https://pdm-project.org/latest/)).
+    - Go to [the ***eva*** GitHub repo](https://github.com/kaiko-ai/eva/tree/main)
+    - Download the repo as zip file by clicking on `Code` > `Download ZIP`
+    - Unzzip the file and copy the "config" folder into the directory where you installed eva
 
-Install PDM on your machine:
+
+## Run ***eva***
+
+Run a complete ***eva*** workflow with the:
 ```
-brew install pdm
+python -m eva fit --config configs/vision/tests/online/bach.yaml 
 ```
-Navigate to the ***eva*** root directory and run:
-```
-pdm install
-```
-This will install ***eva*** and all its dependencies in a virtual environment. Activate the venv with:
-```
-source .venv/bin/activate
-```
-Now you are ready to explore [How to use eva](how_to_use.md) 
+This will:
+
+ - Download and extract the BACH dataset to `./data}/bach`, if it has not been downloaded before.
+ - Fit a complete model consisting of the frozen FM-backbone (a pretrained `dino_vits16`) and a downstream head (single layer MLP) on the BACH-train split.
+ - Evaluate the trained model on the val split and report the results
+
+To learn more about how to run ***eva*** and customize your runs, familiarize yourself with [How to use ***eva***](how_to_use.md) and get started with [Tutorials](tutorials.md) 

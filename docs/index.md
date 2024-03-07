@@ -84,7 +84,7 @@ To standardize evaluations, the default configurations ***eva*** uses are based 
 | **Nesterov momentum**   | true                      |
 | **LR Schedule**         | Cosine without warmup     |
 
-*For smaller datasets (e.g. BACh with 400 samples) we reduce the Bach size to 256 and scale the learning rate accordingly.
+*For smaller datasets (e.g. BACH with 400 samples) we reduce the batch size to 256 and scale the learning rate accordingly.
 
 - [1]: [Virchow: A Million-Slide Digital Pathology Foundation Model, 2024](https://arxiv.org/pdf/2309.07778.pdf)
 - [2]: [Scaling Self-Supervised Learning for Histopathology with Masked Image Modeling](https://www.medrxiv.org/content/10.1101/2023.07.21.23292757v1.full.pdf)
