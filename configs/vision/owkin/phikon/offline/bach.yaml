@@ -2,7 +2,8 @@
 trainer:
   class_path: eva.Trainer
   init_args:
-    default_root_dir: &OUTPUT_ROOT ${oc.env:OUTPUT_ROOT, logs/${oc.env:DINO_BACKBONE, dino_vits16}/online/bach}
+    n_runs: 5
+    default_root_dir: &OUTPUT_ROOT ${oc.env:OUTPUT_ROOT, logs/${oc.env:DINO_BACKBONE, owkin/phikon}/offline/bach}
     max_steps: &MAX_STEPS 12500
     callbacks:
       - class_path: pytorch_lightning.callbacks.LearningRateMonitor
@@ -21,6 +22,18 @@ trainer:
           patience: 800
           monitor: *MONITOR_METRIC
           mode: *MONITOR_METRIC_MODE
+      - class_path: eva.callbacks.EmbeddingsWriter
+        init_args:
+          output_dir: &EMBEDDINGS_DIR ${oc.env:EMBEDDINGS_ROOT, ./data/embeddings}/${oc.env:DINO_BACKBONE, owkin/phikon}/bach
+          dataloader_idx_map:
+            0: train
+            1: val
+          backbone:
+            class_path: eva.models.wrappers.HuggingFaceModel
+            init_args:
+              model_name_or_path: owkin/phikon
+              tensor_transforms: 
+                class_path: eva.vision.data.transforms.model_output.ExtractCLSFeatures
     logger:
       - class_path: pytorch_lightning.loggers.TensorBoardLogger
         init_args:
@@ -29,19 +42,10 @@ trainer:
 model:
   class_path: eva.HeadModule
   init_args:
-    backbone:
-      class_path: eva.models.ModelFromFunction
-      init_args:
-        path: torch.hub.load
-        arguments:
-          repo_or_dir: facebookresearch/dino:main
-          model: ${oc.env:DINO_BACKBONE, dino_vits16}
-          pretrained: ${oc.env:PRETRAINED, true}
-        checkpoint_path: &CHECKPOINT_PATH ${oc.env:CHECKPOINT_PATH, null}
     head:
       class_path: torch.nn.Linear
       init_args:
-        in_features: ${oc.env:IN_FEATURES, 384}
+        in_features: ${oc.env:IN_FEATURES, 768}
         out_features: &NUM_CLASSES 4
     criterion: torch.nn.CrossEntropyLoss
     optimizer:
@@ -66,25 +70,38 @@ data:
   init_args:
     datasets:
       train:
-        class_path: eva.vision.datasets.BACH
+        class_path: eva.vision.data.datasets.embeddings.PatchEmbeddingDataset
         init_args: &DATASET_ARGS
-          root: ${oc.env:DATA_ROOT, ./data}/bach
+          root: *EMBEDDINGS_DIR
           split: train
-          download: ${oc.env:DOWNLOAD_DATA, true}
-          image_transforms:
-            class_path: eva.vision.data.transforms.common.ResizeAndCrop
-            init_args:
-              size: ${oc.env:RESIZE_DIM, 224}  
-              mean: ${oc.env:NORMALIZE_MEAN, [0.485, 0.456, 0.406]} 
-              std: ${oc.env:NORMALIZE_STD, [0.229, 0.224, 0.225]}
+          column_mapping:
+            path: embedding
       val:
-        class_path: eva.vision.datasets.BACH
+        class_path: eva.vision.data.datasets.embeddings.PatchEmbeddingDataset
         init_args:
           <<: *DATASET_ARGS
           split: val
+      predict:
+        - class_path: eva.vision.datasets.BACH
+          init_args: &PREDICT_DATASET_ARGS
+            root: ${oc.env:DATA_ROOT, ./data}/bach
+            split: train
+            download: ${oc.env:DOWNLOAD_DATA, true}
+            image_transforms:
+              class_path: eva.vision.data.transforms.common.ResizeAndCrop
+              init_args:
+                size: ${oc.env:RESIZE_DIM, 224}  
+                mean: ${oc.env:NORMALIZE_MEAN, [0.485, 0.456, 0.406]} 
+                std: ${oc.env:NORMALIZE_STD, [0.229, 0.224, 0.225]}  
+        - class_path: eva.vision.datasets.BACH
+          init_args:
+            <<: *PREDICT_DATASET_ARGS
+            split: val
     dataloaders:
       train:
         batch_size: &BATCH_SIZE 256
         shuffle: true
       val:
         batch_size: *BATCH_SIZE
+      predict:
+        batch_size: &PREDICT_BATCH_SIZE ${oc.env:PREDICT_BATCH_SIZE, 128}
