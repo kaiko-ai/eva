@@ -62,5 +62,6 @@ nav:
     - datasets/index.md
     - BACH: datasets/bach.md
     - CRC: datasets/crc.md
+    - MHIST: datasets/mhist.md
     - PatchCamelyon: datasets/patch_camelyon.md
     - TotalSegmentator: datasets/total_segmentator.md

@@ -46,7 +46,7 @@ Supported datasets & tasks include:
 -	**[Patch Camelyon](datasets/patch_camelyon.md)**: binary breast cancer classification
 -	**[BACH](datasets/bach.md)**: multiclass breast cancer classification
 -	**[CRC](datasets/crc.md)**: multiclass colorectal cancer classification
--	**[MHIST](datasets/mhist.md)**: binary colorectal cancer classification
+-	**[MHIST](datasets/mhist.md)**: binary colorectal polyp cancer classification
 -	**[TotalSegmentator](datasets/total_segmentator.md)**: radiology/CT-scan for segmentation of anatomical structures
 
 To evaluate FMs, ***eva*** provides support for several formats. These include model checkpoints saved with PyTorch lightning, models available from HuggingFace and onnx-models.
