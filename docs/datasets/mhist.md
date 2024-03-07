@@ -29,18 +29,6 @@ by broad-based crypts, often with complex structure and heavy serration.
 | **Splits in use**    | annotations.csv (train / test)                      |
 
 
-### Splits
-
-We use the splits according to the data sources:
-
- - Train split: `annotations.csv` :: "Partition" == "train"
- - Test split: `annotations.csv` :: "Partition" == "test"
-
-| Splits   | Train           | Test         | 
-|----------|-----------------|--------------|
-| #Samples | 2,175 (69%)     | 977 (31%)    | 
-
-
 ### Organization
 
 The contents from `images.zip` and the file `annotations.csv` from [bmirds](https://bmirds.github.io/MHIST/#accessing-dataset) are organized as follows:
@@ -63,6 +51,17 @@ the data (`images.zip`, `annotations.csv`, `Dataset Research Use Agreement.pdf` 
 Please create a root folder, e.g. `mhist`, and download all the files there, which unzipping the contents of
 `images.zip` to a directory named `images` inside your root folder (i.e. `mhist/images`). Afterwards, you can
 (optionally) delete the `images.zip` file.
+
+### Splits
+
+We work with the splits provided by the data source. Since no "validation" split is provided, we use the "test" split as validation split.
+
+ - Train split: `annotations.csv` :: "Partition" == "train"
+ - Valdation split: `annotations.csv` :: "Partition" == "test"
+
+| Splits   | Train           | Validation   | 
+|----------|-----------------|--------------|
+| #Samples | 2,175 (69%)     | 977 (31%)    | 
 
 ## Relevant links
 
