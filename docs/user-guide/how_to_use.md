@@ -6,8 +6,8 @@ Before starting to use ***eva***, it's important to get familiar with the differ
 
 We distinguish between the *online* and *offline* workflow:
 
- - *online*: fits and evaluates a complete model (frozen FM-backbone and trainable head) with images and labels as input.
- - *offline*: separates `predict` (computing of embeddings with FM-backbone) from `fit` (training and evaluation of the decoder).
+- *online*: This mode uses raw images as input and generates the embeddings using a frozen FM backbone on the fly to train a downstream head network.
+- *offline*: In this mode, embeddings are pre-computed and stored locally in a first step, and loaded in a 2nd step from disk to train the downstream head network.
 
 The *online* workflow can be used to quickly run a complete evaluation without saving and tracking embeddings. The *offline* workflow runs faster (only one FM-backbone forward pass) and is ideal to experiment with different decoders on the same FM-backbone.
 
