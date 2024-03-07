@@ -40,7 +40,7 @@ _Oncology FM Evaluation Framework by KAIKO.ai_
 ### Download the eva repo
 
 First, make sure [GIT LFS](https://git-lfs.com/), which is used to track assets, 
-such as sample images used for tests, is installed on your machine. (instructions [here](https://docs.github.com/en/repositories/working-with-files/managing-large-files/installing-git-large-file-storage))
+such as sample images used for tests, is installed on your machine (instructions [here](https://docs.github.com/en/repositories/working-with-files/managing-large-files/installing-git-large-file-storage)).
 
 Now, clone the repo:
 ```
