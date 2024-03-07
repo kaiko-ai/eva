@@ -1,10 +1,10 @@
 # Tutorials
 
 
-Before starting, download the configs for this tutorial from the [***eva*** GitHub repo](https://github.com/kaiko-ai/eva/tree/main):
+If not done so already, download the configs for this tutorial from the [***eva*** GitHub repo](https://github.com/kaiko-ai/eva/tree/main):
 
 1. Download the repo as zip file by clicking on `Code` > `Download ZIP`
-2. Unzzip the file and copy the "config" folder into the directory where you installed eva
+2. Unzzip the file and copy the "config" folder into the directory where you installed ***eva***
 
 
 ## 1. Run an *online*-evaluation
@@ -19,15 +19,14 @@ python -m eva fit --config configs/vision/dino_vit/online/bach.yaml
 The `fit` run will:
 
  - Download and extract the BACH dataset to `./data/bach`, if it has not been downloaded before.
- - Fit a complete model consisting of the frozen FM-backbone (a pretrained `dino_vits16`) and a downstream head (single layer MLP) on the BACH-train split.
+ - Fit a complete model - the frozen FM-backbone (a pretrained `dino_vits16`) and a downstream head (single layer MLP) - on the BACH-train split.
  - Evaluate the trained model on the val split and report the results
-
-The running time will depend on your internet connection and compute setup. A complete run with internet speed ~200MB/s on a MacBook Pro with M1+ chip should take around 20 [**TBD**] minutes.
 
 Once the run is complete:
 
  - check out some of the raw images in `<...>/eva/data/bach/ICIAR2018_BACH_Challenge` (this can already be done once the data download step is complete)
  - check out the evaluation results json file in `<...>/eva/logs/dino_vit/online/bach` [**TBD**]
+
 
 
 ## 2. Run a complete *offline*-evaluation
@@ -39,7 +38,7 @@ python -m eva predict_fit --config configs/vision/dino_vit/offline/patch_camelyo
 
 The `predict_fit` run will:
 
- - Download and extract the BACH dataset to `./data}/bach`, if it has not been downloaded before. If you ran the *online*-evaluation above before, this step will be skipped.
+ - Download and extract the BACH dataset to `./data/bach`, if it has not been downloaded before. If you ran the *online*-evaluation above before, this step will be skipped.
  - ("predict") Computes the embeddings for all input images with the FM-backbone (a pretrained `dino_vits16`) and stores them in `./data/embeddings/bach` along with a `manifest.csv` file that keeps track of the mapping between input images and embeddings.
  - ("fit") Fit a downstream head (single layer MLP) on the BACH-train split, using the computed embeddings and provided labels as input.
  - Evaluate the trained model on the val split and report the results

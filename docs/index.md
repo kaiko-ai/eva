@@ -31,7 +31,7 @@ _Oncology FM Evaluation Framework by Kaiko_
 
 With the first release, ***eva*** supports performance evaluation for vision Foundation Models ("FMs") and supervised machine learning ("ML") models on WSI-patch-level image classification- and radiology (CT-scans) segmentation tasks.
 
-The goal of this project is to provide the open-source community with an easy-to-use framework that follows industry practices to provide a robust, reproducible and fair evaluation benchmark across FMs of different sizes and architectures.
+The goal of this project is to provide the open-source community with an easy-to-use framework that follows industry best practices to provide a robust, reproducible and fair evaluation benchmark across FMs of different sizes and architectures.
 
 Support for additional modalities and tasks will be added in future releases.
 
@@ -43,21 +43,44 @@ With a trained FM as input, you can run ***eva*** on several publicly available 
 
 Supported datasets & tasks include:
 
--	**Patch Camelyon**: binary breast cancer classification
--	**BACH**: multiclass breast cancer classification
--	**CRC HE**: multiclass colorectal cancer classification
--	**TotalSegmentator**: radiology/CT-scan for segmentation of anatomical structures
+-	**[Patch Camelyon](datasets/patch_camelyon.md)**: binary breast cancer classification
+-	**[BACH](datasets/bach.md)**: multiclass breast cancer classification
+-	**[CRC](datasets/crc.md)**: multiclass colorectal cancer classification
+-	**[MHIST](datasets/mhist.md)**: binary colorectal cancer classification
+-	**[TotalSegmentator](datasets/total_segmentator.md)**: radiology/CT-scan for segmentation of anatomical structures
 
-To compare your FM, eva also provides support to evaluate and compare several publicly available models on the same tasks. These include:
+To evaluate FMs, ***eva*** provides support for several formats. These include model checkpoints saved with PyTorch lightning, models available from HuggingFace and onnx-models.
 
--	Pretrained Resnet18 (timm)
--	Baseline FM: DINO with randomly initialized ViT-S16 backbone
--	Lunit: DINO with ViT-S backbone
--	Kaiko: DINO with ViT-S backbone
 
 ### 2. Evaluate ML models on your own dataset & task
 
 If you have your own labelled dataset, all that is needed is to implement a dataset class tailored to your source data. Start from one our out-of-the box provided dataset classes, adapt it to your data and run eva to see how different publicly available models are performing on your task.
+
+## Evaluation results
+
+We evaluated the following seven FMs on eva on the 4 supported WSI-patch-level image classification tasks:
+
+ - DINO ViT-S16 with random weights (baseline model)
+ - DINO ViT-S16 pretrained from imagenet
+ - DINO ViT-B8 pretrained from imagenet
+ - Kaiko DINO ViT-S16, trained on TCGA data
+ - Kaiko DINO ViT-B8, trained on TCGA data
+ - Lunit - ViT-S16
+ - Owkin - ViT base (accessible via [HuggingFace](https://huggingface.co/owkin/phikon))
+
+
+<div align="center">
+
+<img src="./images/eva-results.png" width="800">
+
+<br />
+
+</div>
+
+
+The runs used the deafult setup described in the section below. The table shows the average performance & standard deviation over 5 runs. To replicate those results yourself, refer to the [Tutorials](user-guide/tutorials.md).
+
+***eva*** trains the decoder on the "train" split and uses the "validation" split for monitoring, early stopping and checkpoint selection. Evaluation results are reported on the "validation" split and, if available, on the "test" split.
 
 ## Evaluation setup
 

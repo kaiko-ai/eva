@@ -14,9 +14,8 @@ pip install git+ssh://git@github.com/kaiko-ai/eva.git
 pip install "eva[vision]"
 ```
 
-- To be able to use the existing configs, you have to download them first
+- To be able to use the existing configs, you have to first download them from the [***eva*** GitHub repo](https://github.com/kaiko-ai/eva/tree/main):
 
-    - Go to [the ***eva*** GitHub repo](https://github.com/kaiko-ai/eva/tree/main)
     - Download the repo as zip file by clicking on `Code` > `Download ZIP`
     - Unzzip the file and copy the "config" folder into the directory where you installed eva
 
@@ -29,7 +28,7 @@ python -m eva fit --config configs/vision/tests/online/bach.yaml
 ```
 This will:
 
- - Download and extract the BACH dataset to `./data}/bach`, if it has not been downloaded before.
+ - Download and extract the BACH dataset to `./data/bach`, if it has not been downloaded before.
  - Fit a complete model consisting of the frozen FM-backbone (a pretrained `dino_vits16`) and a downstream head (single layer MLP) on the BACH-train split.
  - Evaluate the trained model on the val split and report the results
 
