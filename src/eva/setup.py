@@ -4,6 +4,36 @@ import os
 import sys
 import warnings
 
+import jsonargparse
+from loguru import logger
+
+
+def _configure_jsonargparse() -> None:
+    """Configures the `jsonargparse` library."""
+    jsonargparse.set_config_read_mode(
+        urls_enabled=True,
+        fsspec_enabled=True,
+    )
+
+
+def _initialize_logger() -> None:
+    """Initializes, manipulates and customizes the logger.
+
+    This customizable logger can be used by just importing `loguru`
+    from everywhere as follows:
+    >>> from loguru import logger
+    >>> logger.info(...)
+    """
+    logger.remove()
+    logger.add(
+        sys.stderr,
+        format="<magenta>[{time:HH:mm:ss}]</magenta>"
+        " <bold><level>{level}</level></bold> "
+        " | {message}",
+        colorize=True,
+        level="INFO",
+    )
+
 
 def _suppress_warnings() -> None:
     """Suppress all warnings from all subprocesses."""
@@ -13,7 +43,7 @@ def _suppress_warnings() -> None:
 
 
 def _enable_mps_fallback() -> None:
-    """If not set, it enables the MPS fallback in torch.
+    """It enables the MPS fallback in torch.
 
     Note that this action has to take place before importing torch.
     """
@@ -23,6 +53,8 @@ def _enable_mps_fallback() -> None:
 
 def setup() -> None:
     """Sets up the environment before the module is imported."""
+    _configure_jsonargparse()
+    _initialize_logger()
     _suppress_warnings()
     _enable_mps_fallback()
 

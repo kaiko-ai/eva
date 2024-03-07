@@ -3,21 +3,23 @@
 import multiprocessing
 import sys
 import traceback
+from typing import Any
 
 
 class Process(multiprocessing.Process):
-    """multiprocessing.Process wrapper with logic to propagate exceptions to the parent process.
+    """Multiprocessing wrapper with logic to propagate exceptions to the parent process.
 
     Source: https://stackoverflow.com/a/33599967/4992248
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         """Initialize the process."""
         multiprocessing.Process.__init__(self, *args, **kwargs)
+
         self._parent_conn, self._child_conn = multiprocessing.Pipe()
         self._exception = None
 
-    def run(self):
+    def run(self) -> None:
         """Run the process."""
         try:
             multiprocessing.Process.run(self)
@@ -33,7 +35,7 @@ class Process(multiprocessing.Process):
             self._exception = self._parent_conn.recv()
         return self._exception
 
-    def check_exceptions(self):
+    def check_exceptions(self) -> None:
         """Check for exception propagate it to the parent process."""
         if not self.is_alive():
             if self.exception:

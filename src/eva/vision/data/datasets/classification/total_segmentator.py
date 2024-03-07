@@ -186,13 +186,11 @@ class TotalSegmentatorClassification(base.ImageClassification):
 
     def _save_manifest(self, df: pd.DataFrame) -> None:
         """Saves the dataset manifest to a CSV file."""
-        manifest_path = os.path.join(self._root, "manifest.csv")
-        df.to_csv(manifest_path, index=False)
+        df.to_csv(self._manifest_path, index=False)
 
     def _load_manifest(self) -> pd.DataFrame:
         """Loads the dataset manifest from a CSV file."""
-        manifest_path = os.path.join(self._root, "manifest.csv")
-        return pd.read_csv(manifest_path)
+        return pd.read_csv(self._manifest_path)
 
     def _generate_ordered_splits(self, df: pd.DataFrame) -> pd.DataFrame:
         """Orders each class by path and then splits it into train, val and test sets."""

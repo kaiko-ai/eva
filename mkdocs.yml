@@ -28,8 +28,10 @@ markdown_extensions:
     toc_depth: 2
 nav:
   - eva: index.md
-  - Getting Started: getting-started.md
-  - User Guide: user-guide.md
+  - User Guide:
+      - user-guide/index.md
+      - Getting started: user-guide/getting_started.md
+      - How to use eva: user-guide/how_to_use.md
   - Reference API:
     - reference/index.md
     - Interface: reference/interface.md
@@ -42,8 +44,11 @@ nav:
       - reference/metrics/index.md
       - reference/metrics/core.md
       - reference/metrics/defaults.md
+      - reference/metrics/average_loss.md
+      - reference/metrics/binary_balanced_accuracy.md
     - Models: 
       - Modules: reference/models/modules.md
+      - Networks: reference/models/networks.md
     - Vision:
       - Data:
         - reference/vision/data/index.md

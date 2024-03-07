@@ -2,7 +2,7 @@
 trainer:
   class_path: eva.Trainer
   init_args:
-    default_root_dir: &OUTPUT_DIR ${oc.env:OUTPUT_DIR, logs/offline/test_patch}
+    default_root_dir: &OUTPUT_DIR ${oc.env:OUTPUT_DIR, logs/test/offline/slides}
     max_epochs: &MAX_EPOCHS 5
     callbacks:
       - class_path: pytorch_lightning.callbacks.LearningRateMonitor

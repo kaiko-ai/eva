@@ -12,7 +12,7 @@ from tests.eva import _cli
 @pytest.mark.parametrize(
     "configuration_file",
     [
-        "configs/vision/tests/patch_camelyon.yaml",
+        "configs/vision/tests/online/patch_camelyon.yaml",
         "configs/vision/tests/offline/patches.yaml",
         "configs/vision/tests/offline/slides.yaml",
     ],

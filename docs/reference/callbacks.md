@@ -1,4 +1,4 @@
 # Callbacks
 
 ## Writers
-::: src.eva.callbacks.writers.embeddings.EmbeddingsWriter
+::: eva.callbacks.writers.EmbeddingsWriter

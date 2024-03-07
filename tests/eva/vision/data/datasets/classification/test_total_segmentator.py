@@ -1,7 +1,7 @@
 """TotalSegmentator dataset tests."""
 
 import os
-from typing import Literal
+from typing import Iterator, Literal
 from unittest.mock import patch
 
 import numpy as np
@@ -33,7 +33,7 @@ def test_sample(total_segmentator_dataset: datasets.TotalSegmentatorClassificati
 def total_segmentator_dataset(
     split: Literal["train", "val", "test"],
     assets_path: str,
-) -> datasets.TotalSegmentatorClassification:
+) -> Iterator[datasets.TotalSegmentatorClassification]:
     """TotalSegmentator dataset fixture."""
     with patch("eva.vision.data.datasets.TotalSegmentatorClassification._verify_dataset") as _:
         dataset = datasets.TotalSegmentatorClassification(
@@ -44,4 +44,7 @@ def total_segmentator_dataset(
         )
         dataset.prepare_data()
         dataset.setup()
-        return dataset
+        yield dataset
+
+        if os.path.isfile(dataset._manifest_path):
+            os.remove(dataset._manifest_path)

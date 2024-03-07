@@ -1,12 +1,12 @@
 """Type annotations for model modules."""
 
-from typing import Any, Dict, NamedTuple, Union
+from typing import Any, Dict, NamedTuple
 
 import pytorch_lightning as pl
 import torch
 from torch import nn
 
-MODEL_TYPE = Union[nn.Module, pl.LightningModule]
+MODEL_TYPE = nn.Module | pl.LightningModule
 """The expected model type."""
 
 
