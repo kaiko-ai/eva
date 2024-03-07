@@ -3,6 +3,7 @@
 import hashlib
 import sys
 from datetime import datetime
+from lightning_fabric.utilities import cloud_io
 
 from loguru import logger
 
@@ -33,7 +34,7 @@ def _generate_config_hash(max_hash_len: int = 8) -> str:
     config_path = _fetch_config_path()
     if config_path is None:
         logger.warning(
-            "No or multiple configuration file found from command line arguments."
+            "No or multiple configuration file found from command line arguments. "
             "No configuration hash code will created for this experiment."
         )
         return ""
@@ -50,7 +51,8 @@ def _fetch_config_path() -> str | None:
     Returns:
         The path to the configuration file.
     """
-    config_paths = [f for f in sys.argv if f.endswith(".yaml")]
+    inputs = sys.argv
+    config_paths = [inputs[i + 1] for i, arg in enumerate(inputs) if arg=="--config"]
     if len(config_paths) == 0 or len(config_paths) > 1:
         # TODO combine the multiple configuration files
         # and produced hash for the merged one.
@@ -69,7 +71,8 @@ def _generate_hash_from_config(path: str, max_hash_len: int = 8) -> str:
     Returns:
         Hash of the configuration file content.
     """
-    with open(path, "r") as stream:
+    fs = cloud_io.get_filesystem(path)
+    with fs.open(path, "r") as stream:
         config = stream.read().encode("utf-8")
         config_sha256 = hashlib.sha256(config)
         hash_id = config_sha256.hexdigest()

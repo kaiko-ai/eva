@@ -4,7 +4,16 @@ import os
 import sys
 import warnings
 
+import jsonargparse
 from loguru import logger
+
+
+def _configure_jsonargparse() -> None:
+    """Configures the `jsonargparse` library."""
+    jsonargparse.set_config_read_mode(
+        urls_enabled=True,
+        fsspec_enabled=True,
+    )
 
 
 def _initialize_logger() -> None:
@@ -44,6 +53,7 @@ def _enable_mps_fallback() -> None:
 
 def setup() -> None:
     """Sets up the environment before the module is imported."""
+    _configure_jsonargparse()
     _initialize_logger()
     _suppress_warnings()
     _enable_mps_fallback()
