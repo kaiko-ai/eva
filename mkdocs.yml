@@ -32,6 +32,7 @@ nav:
       - user-guide/index.md
       - Getting started: user-guide/getting_started.md
       - How to use eva: user-guide/how_to_use.md
+      - Tutorials: user-guide/tutorials.md
   - Reference API:
     - reference/index.md
     - Interface: reference/interface.md
@@ -60,6 +61,6 @@ nav:
   - Datasets: 
     - datasets/index.md
     - BACH: datasets/bach.md
-    - CRC_HE: datasets/crc_he.md
+    - CRC: datasets/crc.md
     - PatchCamelyon: datasets/patch_camelyon.md
     - TotalSegmentator: datasets/total_segmentator.md

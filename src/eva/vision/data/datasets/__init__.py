@@ -3,7 +3,6 @@
 from eva.vision.data.datasets.classification import (
     BACH,
     CRC,
-    CRC_NONORM,
     MHIST,
     PatchCamelyon,
     TotalSegmentatorClassification,
@@ -15,7 +14,6 @@ from eva.vision.data.datasets.vision import VisionDataset
 __all__ = [
     "BACH",
     "CRC",
-    "CRC_NONORM",
     "MHIST",
     "PatchEmbeddingDataset",
     "ImageSegmentation",
