@@ -2,9 +2,11 @@
 trainer:
   class_path: eva.Trainer
   init_args:
-    n_runs: 5
+    # n_runs: 5
     default_root_dir: &OUTPUT_ROOT ${oc.env:OUTPUT_ROOT, logs/${oc.env:DINO_BACKBONE, dino_vits16}/offline/bach}
-    max_steps: &MAX_STEPS 12500
+    # max_steps: &MAX_STEPS 12500
+    n_runs: 1
+    max_steps: &MAX_STEPS 2
     callbacks:
       - class_path: pytorch_lightning.callbacks.LearningRateMonitor
         init_args:
@@ -108,3 +110,16 @@ data:
         batch_size: *BATCH_SIZE
       predict:
         batch_size: &PREDICT_BATCH_SIZE ${oc.env:PREDICT_BATCH_SIZE, 128}
+
+
+# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+# ┃      Validate metric      ┃       DataLoader 0        ┃
+# ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+# │      val/AverageLoss      │    3.8205270767211914     │
+# │    val/MulticlassAUROC    │    0.6337184309959412     │
+# │  val/MulticlassAccuracy   │    0.3166082203388214     │
+# │   val/MulticlassF1Score   │    0.25786733627319336    │
+# │  val/MulticlassPrecision  │    0.24189814925193787    │
+# │   val/MulticlassRecall    │    0.3166082203388214     │
+# └───────────────────────────┴───────────────────────────┘
+
