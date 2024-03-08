@@ -1,14 +1,15 @@
-"""Operations which are executed with the package import."""
+"""Operations which are executed when the CLI is triggered."""
 
 import os
 import sys
 import warnings
 
 import jsonargparse
+import yaml
 from lightning_fabric.utilities import seed as pl_seed
 from loguru import logger
 
-from eva.utils import logo, workers
+from eva.utils import workers
 
 
 def _configure_random_seed(seed: int | None = None) -> None:
@@ -17,9 +18,21 @@ def _configure_random_seed(seed: int | None = None) -> None:
     Args:
         seed: The seed number to use. If `None`, it will read the seed from
             `EVA_GLOBAL_SEED` env variable. If `None` and the `EVA_GLOBAL_SEED`
-            env variable is not set, then the seed defaults to `42`.
+            env variable is not set, then the seed defaults to `42`. If `None`
+            and the `EVA_GLOBAL_SEED` is set to `False`, it will not set the seed.
     """
     effective_seed = seed or os.environ.get("EVA_GLOBAL_SEED", default=42)
+    if isinstance(effective_seed, str):
+        effective_seed = yaml.safe_load(effective_seed)
+        if not isinstance(effective_seed, (bool, int)):
+            raise ValueError(
+                f"Invalid 'EVA_GLOBAL_SEED' value '{effective_seed}'. "
+                "It should be an integer or a boolean value."
+            )
+
+    if isinstance(effective_seed, bool) and effective_seed is False:
+        return
+
     pl_seed.seed_everything(seed=int(effective_seed), workers=True)
 
 
@@ -69,12 +82,8 @@ def _enable_mps_fallback() -> None:
 @workers.main_worker_only
 def setup() -> None:
     """Sets up the environment before the module is imported."""
-    logo.print_cli_logo()
     _configure_random_seed()
     _configure_jsonargparse()
     _initialize_logger()
     _suppress_warnings()
     _enable_mps_fallback()
-
-
-setup()
