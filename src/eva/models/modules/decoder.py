@@ -48,15 +48,15 @@ class DecoderModule(module.ModelModule):
         """
         super().__init__(metrics=metrics, postprocess=postprocess)
 
-        self.head = head
+        self.decoder = decoder
         self.criterion = criterion
-        self.backbone = backbone
+        self.encoder = encoder
         self.optimizer = optimizer
         self.lr_scheduler = lr_scheduler
 
     @override
     def configure_optimizers(self) -> Any:
-        parameters = list(self.head.parameters())
+        parameters = list(self.decoder.parameters())
         optimizer = self.optimizer(parameters)
         lr_scheduler = self.lr_scheduler(optimizer)
         return {"optimizer": optimizer, "lr_scheduler": lr_scheduler}
