@@ -2,6 +2,7 @@
 trainer:
   class_path: eva.Trainer
   init_args:
+    n_runs: 5
     default_root_dir: &LIGHTNING_ROOT ${oc.env:LIGHTNING_ROOT, logs/dino_vits16/offline/mhist}
     max_steps: &MAX_STEPS 12500
     callbacks:
