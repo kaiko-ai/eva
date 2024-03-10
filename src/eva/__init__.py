@@ -1,12 +1,13 @@
 """EVA core API."""
 
-from eva import setup  # isort:skip # noqa: F401
+from eva.cli import cli
 from eva.data import DataLoader, DataloadersSchema, DataModule, DatasetsSchema
 from eva.interface import Interface
 from eva.models import HeadModule, InferenceModule
 from eva.trainers import Trainer
 
 __all__ = [
+    "cli",
     "DataLoader",
     "DataloadersSchema",
     "DataModule",
