@@ -14,7 +14,7 @@ trainer:
           save_dir: *OUTPUT_ROOT
           name: ""
 model:
-  class_path: eva.HeadModule
+  class_path: eva.DecoderModule
   init_args:
     encoder:
       class_path: eva.models.ModelFromFunction

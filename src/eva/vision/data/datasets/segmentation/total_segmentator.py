@@ -2,7 +2,6 @@
 
 import functools
 import os
-from glob import glob
 from typing import Callable, Dict, List, Literal, Tuple
 
 import cv2
@@ -92,15 +91,15 @@ class TotalSegmentator2D(base.ImageSegmentation):
     @functools.cached_property
     @override
     def classes(self) -> List[str]:
-        def get_filename(path: str) -> str:
-            """Returns the filename from the full path."""
-            return os.path.basename(path).split(".")[0]
+        # def get_filename(path: str) -> str:
+        #     """Returns the filename from the full path."""
+        #     return os.path.basename(path).split(".")[0]
 
-        first_sample_labels = os.path.join(
-            self._root, self._samples_dirs[0], "segmentations", "*.nii.gz"
-        )
+        # first_sample_labels = os.path.join(
+        #     self._root, self._samples_dirs[0], "segmentations", "*.nii.gz"
+        # )
         # return sorted(map(get_filename, glob(first_sample_labels)))
-        return ["heart"]
+        return ["heart", "liver", "lung"]                                                 
 
     @property
     @override

@@ -5,7 +5,7 @@
 groups = ["default", "all", "dev", "docs", "lint", "test", "vision"]
 strategy = ["cross_platform", "inherit_metadata"]
 lock_version = "4.4.1"
-content_hash = "sha256:1705b7230d9db36c709bbccf831bfa5c393acb87b7bb168af05b58a60e5a92c0"
+content_hash = "sha256:b8657c693ea696bffe2864111d5f6f2547f8062a401d088c10d55f388e7ccb36"
 
 [[package]]
 name = "absl-py"
@@ -16,6 +16,16 @@ groups = ["all", "default", "dev"]
 files = [
     {file = "absl-py-2.1.0.tar.gz", hash = "sha256:7820790efbb316739cde8b4e19357243fc3608a152024288513dd968d7d959ff"},
     {file = "absl_py-2.1.0-py3-none-any.whl", hash = "sha256:526a04eadab8b4ee719ce68f204172ead1027549089702d99b9059f129ff1308"},
+]
+
+[[package]]
+name = "addict"
+version = "2.4.0"
+summary = "Addict is a dictionary whose items can be set using both attribute and item syntax."
+groups = ["vision"]
+files = [
+    {file = "addict-2.4.0-py3-none-any.whl", hash = "sha256:249bb56bbfd3cdc2a004ea0ff4c2b6ddc84d53bc2194761636eb314d5cfa5dfc"},
+    {file = "addict-2.4.0.tar.gz", hash = "sha256:b3b2210e0e067a281f5646c8c5db92e99b7231ea8b0eb5f74dbdf9e259d4e494"},
 ]
 
 [[package]]
@@ -323,7 +333,7 @@ name = "contourpy"
 version = "1.2.0"
 requires_python = ">=3.9"
 summary = "Python library for calculating contours of 2D quadrilateral grids"
-groups = ["all", "vision"]
+groups = ["vision"]
 dependencies = [
     "numpy<2.0,>=1.20",
 ]
@@ -456,7 +466,7 @@ name = "cycler"
 version = "0.12.1"
 requires_python = ">=3.8"
 summary = "Composable style cycles"
-groups = ["all", "vision"]
+groups = ["vision"]
 files = [
     {file = "cycler-0.12.1-py3-none-any.whl", hash = "sha256:85cef7cff222d8644161529808465972e51340599459b8ac3ccbac5a854e0d30"},
     {file = "cycler-0.12.1.tar.gz", hash = "sha256:88bb128f02ba341da8ef447245a9e138fae777f6a23943da4540077d3601eb1c"},
@@ -510,7 +520,7 @@ name = "fonttools"
 version = "4.49.0"
 requires_python = ">=3.8"
 summary = "Tools to manipulate font files"
-groups = ["all", "vision"]
+groups = ["vision"]
 files = [
     {file = "fonttools-4.49.0-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:d970ecca0aac90d399e458f0b7a8a597e08f95de021f17785fb68e2dc0b99717"},
     {file = "fonttools-4.49.0-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:ac9a745b7609f489faa65e1dc842168c18530874a5f5b742ac3dd79e26bca8bc"},
@@ -621,6 +631,20 @@ dependencies = [
 files = [
     {file = "fsspec-2024.2.0-py3-none-any.whl", hash = "sha256:817f969556fa5916bc682e02ca2045f96ff7f586d45110fcb76022063ad2c7d8"},
     {file = "fsspec-2024.2.0.tar.gz", hash = "sha256:b6ad1a679f760dda52b1168c859d01b7b80648ea6f7f7c7f5a8a91dc3f3ecb84"},
+]
+
+[[package]]
+name = "ftfy"
+version = "6.1.3"
+requires_python = ">=3.8,<4"
+summary = "Fixes mojibake and other problems with Unicode, after the fact"
+groups = ["vision"]
+dependencies = [
+    "wcwidth<0.3.0,>=0.2.12",
+]
+files = [
+    {file = "ftfy-6.1.3-py3-none-any.whl", hash = "sha256:e49c306c06a97f4986faa7a8740cfe3c13f3106e85bcec73eb629817e671557c"},
+    {file = "ftfy-6.1.3.tar.gz", hash = "sha256:693274aead811cff24c1e8784165aa755cd2f6e442a5ec535c7d697f6422a422"},
 ]
 
 [[package]]
@@ -760,6 +784,20 @@ files = [
 ]
 
 [[package]]
+name = "importlib-metadata"
+version = "7.0.2"
+requires_python = ">=3.8"
+summary = "Read metadata from Python packages"
+groups = ["vision"]
+dependencies = [
+    "zipp>=0.5",
+]
+files = [
+    {file = "importlib_metadata-7.0.2-py3-none-any.whl", hash = "sha256:f4bc4c0c070c490abf4ce96d715f68e95923320370efb66143df00199bb6c100"},
+    {file = "importlib_metadata-7.0.2.tar.gz", hash = "sha256:198f568f3230878cb1b44fbd7975f87906c22336dba2e4a7f05278c281fbd792"},
+]
+
+[[package]]
 name = "iniconfig"
 version = "2.0.0"
 requires_python = ">=3.7"
@@ -830,7 +868,7 @@ name = "kiwisolver"
 version = "1.4.5"
 requires_python = ">=3.7"
 summary = "A fast implementation of the Cassowary constraint solver"
-groups = ["all", "vision"]
+groups = ["vision"]
 files = [
     {file = "kiwisolver-1.4.5-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:05703cf211d585109fcd72207a31bb170a0f22144d68298dc5e61b3c946518af"},
     {file = "kiwisolver-1.4.5-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:146d14bebb7f1dc4d5fbf74f8a6cb15ac42baadee8912eb84ac0b3b2a3dc6ac3"},
@@ -942,7 +980,7 @@ name = "markdown-it-py"
 version = "3.0.0"
 requires_python = ">=3.8"
 summary = "Python port of markdown-it. Markdown parsing, done right!"
-groups = ["dev", "lint"]
+groups = ["dev", "lint", "vision"]
 dependencies = [
     "mdurl~=0.1",
 ]
@@ -996,7 +1034,7 @@ name = "matplotlib"
 version = "3.8.3"
 requires_python = ">=3.9"
 summary = "Python plotting package"
-groups = ["all", "vision"]
+groups = ["vision"]
 dependencies = [
     "contourpy>=1.0.1",
     "cycler>=0.10",
@@ -1038,7 +1076,7 @@ name = "mdurl"
 version = "0.1.2"
 requires_python = ">=3.7"
 summary = "Markdown URL utilities"
-groups = ["dev", "lint"]
+groups = ["dev", "lint", "vision"]
 files = [
     {file = "mdurl-0.1.2-py3-none-any.whl", hash = "sha256:84008a41e51615a49fc9966191ff91509e3c40b939176e643fd50a5c2196b8f8"},
     {file = "mdurl-0.1.2.tar.gz", hash = "sha256:bb413d29f5eea38f31dd4754dd7377d4465116fb207585f97bf925588687c1ba"},
@@ -1184,10 +1222,53 @@ files = [
 ]
 
 [[package]]
+name = "mmcv"
+version = "2.1.0"
+requires_python = ">=3.7"
+summary = "OpenMMLab Computer Vision Foundation"
+groups = ["vision"]
+dependencies = [
+    "Pillow",
+    "addict",
+    "mmengine>=0.3.0",
+    "numpy",
+    "opencv-python>=3",
+    "packaging",
+    "pyyaml",
+    "regex; sys_platform == \"win32\"",
+    "yapf",
+]
+files = [
+    {file = "mmcv-2.1.0.tar.gz", hash = "sha256:d387bcab66b467479b6660310e23746cfc79c6e57acf04094680adb499a5cd3f"},
+]
+
+[[package]]
+name = "mmengine"
+version = "0.10.3"
+requires_python = ">=3.7"
+summary = "Engine of OpenMMLab projects"
+groups = ["vision"]
+dependencies = [
+    "addict",
+    "matplotlib",
+    "numpy",
+    "opencv-python>=3",
+    "pyyaml",
+    "regex; sys_platform == \"win32\"",
+    "rich",
+    "termcolor",
+    "yapf",
+]
+files = [
+    {file = "mmengine-0.10.3-py3-none-any.whl", hash = "sha256:3160c6f9042d0d1adbe8bba0296ad6c918563035ca15373864004e5e429a7041"},
+    {file = "mmengine-0.10.3.tar.gz", hash = "sha256:5dfb84e89db2e0f6683e877916b6d1a1411f45f11cbf2ac9cd730574912c4628"},
+]
+
+[[package]]
 name = "mmsegmentation"
 version = "1.2.2"
 summary = "Open MMLab Semantic Segmentation Toolbox and Benchmark"
-groups = ["all", "vision"]
+groups = ["vision"]
 dependencies = [
     "matplotlib",
     "numpy",
@@ -1611,6 +1692,32 @@ files = [
 ]
 
 [[package]]
+name = "opencv-python"
+version = "4.9.0.80"
+requires_python = ">=3.6"
+summary = "Wrapper package for OpenCV python bindings."
+groups = ["vision"]
+dependencies = [
+    "numpy>=1.17.0; python_version >= \"3.7\"",
+    "numpy>=1.17.3; python_version >= \"3.8\"",
+    "numpy>=1.19.3; python_version >= \"3.6\" and platform_system == \"Linux\" and platform_machine == \"aarch64\"",
+    "numpy>=1.19.3; python_version >= \"3.9\"",
+    "numpy>=1.21.2; python_version >= \"3.10\"",
+    "numpy>=1.21.4; python_version >= \"3.10\" and platform_system == \"Darwin\"",
+    "numpy>=1.23.5; python_version >= \"3.11\"",
+    "numpy>=1.26.0; python_version >= \"3.12\"",
+]
+files = [
+    {file = "opencv-python-4.9.0.80.tar.gz", hash = "sha256:1a9f0e6267de3a1a1db0c54213d022c7c8b5b9ca4b580e80bdc58516c922c9e1"},
+    {file = "opencv_python-4.9.0.80-cp37-abi3-macosx_10_16_x86_64.whl", hash = "sha256:7e5f7aa4486651a6ebfa8ed4b594b65bd2d2f41beeb4241a3e4b1b85acbbbadb"},
+    {file = "opencv_python-4.9.0.80-cp37-abi3-macosx_11_0_arm64.whl", hash = "sha256:71dfb9555ccccdd77305fc3dcca5897fbf0cf28b297c51ee55e079c065d812a3"},
+    {file = "opencv_python-4.9.0.80-cp37-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:7b34a52e9da36dda8c151c6394aed602e4b17fa041df0b9f5b93ae10b0fcca2a"},
+    {file = "opencv_python-4.9.0.80-cp37-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:e4088cab82b66a3b37ffc452976b14a3c599269c247895ae9ceb4066d8188a57"},
+    {file = "opencv_python-4.9.0.80-cp37-abi3-win32.whl", hash = "sha256:dcf000c36dd1651118a2462257e3a9e76db789a78432e1f303c7bac54f63ef6c"},
+    {file = "opencv_python-4.9.0.80-cp37-abi3-win_amd64.whl", hash = "sha256:3f16f08e02b2a2da44259c7cc712e779eff1dd8b55fdb0323e8cab09548086c0"},
+]
+
+[[package]]
 name = "opencv-python-headless"
 version = "4.9.0.80"
 requires_python = ">=3.6"
@@ -1778,7 +1885,7 @@ name = "platformdirs"
 version = "4.2.0"
 requires_python = ">=3.8"
 summary = "A small Python package for determining appropriate platform-specific dirs, e.g. a \"user data dir\"."
-groups = ["dev", "docs", "lint", "test"]
+groups = ["dev", "docs", "lint", "test", "vision"]
 files = [
     {file = "platformdirs-4.2.0-py3-none-any.whl", hash = "sha256:0614df2a2f37e1a662acbd8e2b25b92ccf8632929bc6d43467e17fe89c75e068"},
     {file = "platformdirs-4.2.0.tar.gz", hash = "sha256:ef0cc731df711022c174543cb70a9b5bd22e5a9337c8624ef2c2ceb8ddad8768"},
@@ -1800,7 +1907,7 @@ name = "prettytable"
 version = "3.10.0"
 requires_python = ">=3.8"
 summary = "A simple Python library for easily displaying tabular data in a visually appealing ASCII table format"
-groups = ["all", "vision"]
+groups = ["vision"]
 dependencies = [
     "wcwidth",
 ]
@@ -1864,7 +1971,7 @@ name = "pygments"
 version = "2.17.2"
 requires_python = ">=3.7"
 summary = "Pygments is a syntax highlighting package written in Python."
-groups = ["dev", "docs", "lint", "test"]
+groups = ["dev", "docs", "lint", "test", "vision"]
 files = [
     {file = "pygments-2.17.2-py3-none-any.whl", hash = "sha256:b27c2826c47d0f3219f29554824c30c5e8945175d888647acd804ddd04af846c"},
     {file = "pygments-2.17.2.tar.gz", hash = "sha256:da46cec9fd2de5be3a8a784f434e4c4ab670b4ff54d605c4c2717e9d49c4c367"},
@@ -1890,7 +1997,7 @@ name = "pyparsing"
 version = "3.1.2"
 requires_python = ">=3.6.8"
 summary = "pyparsing module - Classes and methods to define and execute parsing grammars"
-groups = ["all", "vision"]
+groups = ["vision"]
 files = [
     {file = "pyparsing-3.1.2-py3-none-any.whl", hash = "sha256:f9db75911801ed778fe61bb643079ff86601aca99fcae6345aa67292038fb742"},
     {file = "pyparsing-3.1.2.tar.gz", hash = "sha256:a1bac0ce561155ecc3ed78ca94d3c9378656ad4c94c1270de543f621420f94ad"},
@@ -1993,12 +2100,12 @@ files = [
 
 [[package]]
 name = "pytz"
-version = "2024.1"
+version = "2023.4"
 summary = "World timezone definitions, modern and historical"
 groups = ["all", "default", "dev"]
 files = [
-    {file = "pytz-2024.1-py2.py3-none-any.whl", hash = "sha256:328171f4e3623139da4983451950b28e95ac706e13f3f2630a879749e7a8b319"},
-    {file = "pytz-2024.1.tar.gz", hash = "sha256:2a29735ea9c18baf14b448846bde5a48030ed267578472d8955cd0e7443a9812"},
+    {file = "pytz-2023.4-py2.py3-none-any.whl", hash = "sha256:f90ef520d95e7c46951105338d918664ebfd6f1d995bd7d153127ce90efafa6a"},
+    {file = "pytz-2023.4.tar.gz", hash = "sha256:31d4583c4ed539cd037956140d695e42c033a19e984bfce9964a3f7d59bc2b40"},
 ]
 
 [[package]]
@@ -2006,7 +2113,7 @@ name = "pyyaml"
 version = "6.0.1"
 requires_python = ">=3.6"
 summary = "YAML parser and emitter for Python"
-groups = ["all", "default", "dev", "docs", "lint"]
+groups = ["all", "default", "dev", "docs", "lint", "vision"]
 files = [
     {file = "PyYAML-6.0.1-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:d858aa552c999bc8a8d57426ed01e40bef403cd8ccdd0fc5f6f04a00414cac2a"},
     {file = "PyYAML-6.0.1-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:fd66fc5d0da6d9815ba2cebeb4205f95818ff4b79c3ebe268e75d961704af52f"},
@@ -2053,7 +2160,7 @@ name = "regex"
 version = "2023.12.25"
 requires_python = ">=3.7"
 summary = "Alternative regular expression module, to replace re."
-groups = ["all", "default", "dev", "docs"]
+groups = ["all", "default", "dev", "docs", "vision"]
 files = [
     {file = "regex-2023.12.25-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:0694219a1d54336fd0445ea382d49d36882415c0134ee1e8332afd1529f0baa5"},
     {file = "regex-2023.12.25-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:b014333bd0217ad3d54c143de9d4b9a3ca1c5a29a6d0d554952ea071cff0f1f8"},
@@ -2106,34 +2213,34 @@ files = [
 
 [[package]]
 name = "requests"
-version = "2.31.0"
-requires_python = ">=3.7"
+version = "2.28.2"
+requires_python = ">=3.7, <4"
 summary = "Python HTTP for Humans."
 groups = ["all", "default", "dev", "docs"]
 dependencies = [
     "certifi>=2017.4.17",
     "charset-normalizer<4,>=2",
     "idna<4,>=2.5",
-    "urllib3<3,>=1.21.1",
+    "urllib3<1.27,>=1.21.1",
 ]
 files = [
-    {file = "requests-2.31.0-py3-none-any.whl", hash = "sha256:58cd2187c01e70e6e26505bca751777aa9f2ee0b7f4300988b709f44e013003f"},
-    {file = "requests-2.31.0.tar.gz", hash = "sha256:942c5a758f98d790eaed1a29cb6eefc7ffb0d1cf7af05c3d2791656dbd6ad1e1"},
+    {file = "requests-2.28.2-py3-none-any.whl", hash = "sha256:64299f4909223da747622c030b781c0d7811e359c37124b4bd368fb8c6518baa"},
+    {file = "requests-2.28.2.tar.gz", hash = "sha256:98b1b2782e3c6c4904938b84c0eb932721069dfdb9134313beff7c83c2df24bf"},
 ]
 
 [[package]]
 name = "rich"
-version = "13.7.0"
+version = "13.4.2"
 requires_python = ">=3.7.0"
 summary = "Render rich text, tables, progress bars, syntax highlighting, markdown and more to the terminal"
-groups = ["dev", "lint"]
+groups = ["dev", "lint", "vision"]
 dependencies = [
     "markdown-it-py>=2.2.0",
     "pygments<3.0.0,>=2.13.0",
 ]
 files = [
-    {file = "rich-13.7.0-py3-none-any.whl", hash = "sha256:6da14c108c4866ee9520bbffa71f6fe3962e193b7da68720583850cd4548e235"},
-    {file = "rich-13.7.0.tar.gz", hash = "sha256:5cb5123b5cf9ee70584244246816e9114227e0b98ad9176eede6ad54bf5403fa"},
+    {file = "rich-13.4.2-py3-none-any.whl", hash = "sha256:8f87bc7ee54675732fa66a05ebfe489e27264caeeff3728c945d25971b6485ec"},
+    {file = "rich-13.4.2.tar.gz", hash = "sha256:d653d6bccede5844304c605d5aac802c7cf9621efd700b46c7ec2b51ea914898"},
 ]
 
 [[package]]
@@ -2250,7 +2357,7 @@ name = "scipy"
 version = "1.12.0"
 requires_python = ">=3.9"
 summary = "Fundamental algorithms for scientific computing in Python"
-groups = ["all", "vision"]
+groups = ["vision"]
 dependencies = [
     "numpy<1.29.0,>=1.22.4",
 ]
@@ -2278,13 +2385,13 @@ files = [
 
 [[package]]
 name = "setuptools"
-version = "69.1.0"
-requires_python = ">=3.8"
+version = "60.2.0"
+requires_python = ">=3.7"
 summary = "Easily download, build, install, upgrade, and uninstall Python packages"
 groups = ["all", "default", "dev", "lint"]
 files = [
-    {file = "setuptools-69.1.0-py3-none-any.whl", hash = "sha256:c054629b81b946d63a9c6e732bc8b2513a7c3ea645f11d0139a2191d735c60c6"},
-    {file = "setuptools-69.1.0.tar.gz", hash = "sha256:850894c4195f09c4ed30dba56213bf7c3f21d86ed6bdaafb5df5972593bfc401"},
+    {file = "setuptools-60.2.0-py3-none-any.whl", hash = "sha256:5c89b1a14a67ac5f0956f1cb0aeb7d1d3f4c8ba4e4e1ab7bf1af4933f9a2f0fe"},
+    {file = "setuptools-60.2.0.tar.gz", hash = "sha256:675fcebecb43c32eb930481abf907619137547f4336206e4d673180242e1a278"},
 ]
 
 [[package]]
@@ -2360,6 +2467,17 @@ files = [
 ]
 
 [[package]]
+name = "termcolor"
+version = "2.4.0"
+requires_python = ">=3.8"
+summary = "ANSI color formatting for output in terminal"
+groups = ["vision"]
+files = [
+    {file = "termcolor-2.4.0-py3-none-any.whl", hash = "sha256:9297c0df9c99445c2412e832e882a7884038a25617c60cea2ad69488d4040d63"},
+    {file = "termcolor-2.4.0.tar.gz", hash = "sha256:aab9e56047c8ac41ed798fa36d892a37aca6b3e9159f3e0c24bc64a9b3ac7b7a"},
+]
+
+[[package]]
 name = "timm"
 version = "0.9.16"
 requires_python = ">=3.8"
@@ -2381,7 +2499,7 @@ files = [
 name = "tk"
 version = "0.1.0"
 summary = "TensorKit is a deep learning helper between Python and C++."
-groups = ["default"]
+groups = ["all", "default", "dev"]
 files = [
     {file = "tk-0.1.0-py3-none-any.whl", hash = "sha256:703a69ff0d5ba2bd2f7440582ad10160e4a6561595d33457dc6caa79b9bf4930"},
     {file = "tk-0.1.0.tar.gz", hash = "sha256:60bc8923d5d35f67f5c6bd93d4f0c49d2048114ec077768f959aef36d4ed97f8"},
@@ -2478,8 +2596,7 @@ name = "tomli"
 version = "2.0.1"
 requires_python = ">=3.7"
 summary = "A lil' TOML parser"
-groups = ["dev", "lint", "test"]
-marker = "python_version < \"3.11\""
+groups = ["dev", "lint", "test", "vision"]
 files = [
     {file = "tomli-2.0.1-py3-none-any.whl", hash = "sha256:939de3e7a6161af0c887ef91b7d41a53e7c5a1ca976325f429cb46ea9bc30ecc"},
     {file = "tomli-2.0.1.tar.gz", hash = "sha256:de526c12914f0c550d15924c62d72abc48d6fe7364aa87328337a31007fe8a4f"},
@@ -2577,7 +2694,7 @@ files = [
 
 [[package]]
 name = "tqdm"
-version = "4.66.2"
+version = "4.65.2"
 requires_python = ">=3.7"
 summary = "Fast, Extensible Progress Meter"
 groups = ["all", "default", "dev"]
@@ -2585,8 +2702,8 @@ dependencies = [
     "colorama; platform_system == \"Windows\"",
 ]
 files = [
-    {file = "tqdm-4.66.2-py3-none-any.whl", hash = "sha256:1ee4f8a893eb9bef51c6e35730cebf234d5d0b6bd112b0271e10ed7c24a02bd9"},
-    {file = "tqdm-4.66.2.tar.gz", hash = "sha256:6cd52cdf0fef0e0f543299cfc96fec90d7b8a7e88745f411ec33eb44d5ed3531"},
+    {file = "tqdm-4.65.2-py3-none-any.whl", hash = "sha256:6c431f7dee4f57284c8f4bd2eb1d4af00d730d38cc6098bd79880bcbec676276"},
+    {file = "tqdm-4.65.2.tar.gz", hash = "sha256:5f7d8b4ac76016ce9d51a7f0ea30d30984888d97c474fdc4a4148abfb5ee76aa"},
 ]
 
 [[package]]
@@ -2651,13 +2768,13 @@ files = [
 
 [[package]]
 name = "urllib3"
-version = "2.2.0"
-requires_python = ">=3.8"
+version = "1.26.18"
+requires_python = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, !=3.5.*"
 summary = "HTTP library with thread-safe connection pooling, file post, and more."
 groups = ["all", "default", "dev", "docs"]
 files = [
-    {file = "urllib3-2.2.0-py3-none-any.whl", hash = "sha256:ce3711610ddce217e6d113a2732fafad960a03fd0318c91faa79481e35c11224"},
-    {file = "urllib3-2.2.0.tar.gz", hash = "sha256:051d961ad0c62a94e50ecf1af379c3aba230c66c710493493560c0c223c49f20"},
+    {file = "urllib3-1.26.18-py2.py3-none-any.whl", hash = "sha256:34b97092d7e0a3a8cf7cd10e386f401b3737364026c45e622aa02903dffe0f07"},
+    {file = "urllib3-1.26.18.tar.gz", hash = "sha256:f8ecc1bba5667413457c529ab955bf8c67b45db799d159066261719e328580a0"},
 ]
 
 [[package]]
@@ -2712,7 +2829,7 @@ files = [
 name = "wcwidth"
 version = "0.2.13"
 summary = "Measures the displayed width of unicode strings in a terminal"
-groups = ["all", "vision"]
+groups = ["vision"]
 files = [
     {file = "wcwidth-0.2.13-py2.py3-none-any.whl", hash = "sha256:3da69048e4540d84af32131829ff948f1e022c1c6bdb8d6102117aac784f6859"},
     {file = "wcwidth-0.2.13.tar.gz", hash = "sha256:72ea0c06399eb286d978fdedb6923a9eb47e1c486ce63e9b4e64fc18303972b5"},
@@ -2757,6 +2874,22 @@ dependencies = [
 files = [
     {file = "yamllint-1.35.1-py3-none-any.whl", hash = "sha256:2e16e504bb129ff515b37823b472750b36b6de07963bd74b307341ef5ad8bdc3"},
     {file = "yamllint-1.35.1.tar.gz", hash = "sha256:7a003809f88324fd2c877734f2d575ee7881dd9043360657cc8049c809eba6cd"},
+]
+
+[[package]]
+name = "yapf"
+version = "0.40.2"
+requires_python = ">=3.7"
+summary = "A formatter for Python code"
+groups = ["vision"]
+dependencies = [
+    "importlib-metadata>=6.6.0",
+    "platformdirs>=3.5.1",
+    "tomli>=2.0.1",
+]
+files = [
+    {file = "yapf-0.40.2-py3-none-any.whl", hash = "sha256:adc8b5dd02c0143108878c499284205adb258aad6db6634e5b869e7ee2bd548b"},
+    {file = "yapf-0.40.2.tar.gz", hash = "sha256:4dab8a5ed7134e26d57c1647c7483afb3f136878b579062b786c9ba16b94637b"},
 ]
 
 [[package]]
@@ -2817,4 +2950,15 @@ files = [
     {file = "yarl-1.9.4-cp312-cp312-win_amd64.whl", hash = "sha256:a9bd00dc3bc395a662900f33f74feb3e757429e545d831eef5bb280252631984"},
     {file = "yarl-1.9.4-py3-none-any.whl", hash = "sha256:928cecb0ef9d5a7946eb6ff58417ad2fe9375762382f1bf5c55e61645f2c43ad"},
     {file = "yarl-1.9.4.tar.gz", hash = "sha256:566db86717cf8080b99b58b083b773a908ae40f06681e87e589a976faf8246bf"},
+]
+
+[[package]]
+name = "zipp"
+version = "3.17.0"
+requires_python = ">=3.8"
+summary = "Backport of pathlib-compatible object wrapper for zip files"
+groups = ["vision"]
+files = [
+    {file = "zipp-3.17.0-py3-none-any.whl", hash = "sha256:0e923e726174922dce09c53c59ad483ff7bbb8e572e00c7f7c46b88556409f31"},
+    {file = "zipp-3.17.0.tar.gz", hash = "sha256:84e64a1c28cf7e91ed2078bb8cc8c259cb19b76942096c8d7b84947690cabaf0"},
 ]
