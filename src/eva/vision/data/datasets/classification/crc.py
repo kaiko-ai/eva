@@ -24,7 +24,7 @@ class CRC(base.ImageClassification):
 
     _val_resource: structs.DownloadResource = structs.DownloadResource(
         filename="CRC-VAL-HE-7K.zip",
-        url="https://zenodo.org/records/1214456/files/NCT-CRC-HE-7K.zip?download=1",
+        url="https://zenodo.org/records/1214456/files/CRC-VAL-HE-7K.zip?download=1",
         md5="md5:2fd1651b4f94ebd818ebf90ad2b6ce06",
     )
     """Validation resource."""
