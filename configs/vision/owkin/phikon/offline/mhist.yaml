@@ -3,7 +3,7 @@ trainer:
   class_path: eva.Trainer
   init_args:
     n_runs: 5
-    default_root_dir: &LIGHTNING_ROOT ${oc.env:LIGHTNING_ROOT, logs/dino_vits16/offline/mhist}
+    default_root_dir: &OUTPUT_ROOT ${oc.env:OUTPUT_ROOT, logs/${oc.env:DINO_BACKBONE, owkin/phikon}/offline/mhist}
     max_steps: &MAX_STEPS 12500
     callbacks:
       - class_path: pytorch_lightning.callbacks.LearningRateMonitor
@@ -24,22 +24,20 @@ trainer:
           mode: *MONITOR_METRIC_MODE
       - class_path: eva.callbacks.EmbeddingsWriter
         init_args:
-          output_dir: &EMBEDDINGS_DIR ${oc.env:EMBEDDINGS_ROOT, ./data/embeddings}/mhist
+          output_dir: &EMBEDDINGS_DIR ${oc.env:EMBEDDINGS_ROOT, ./data/embeddings}/${oc.env:DINO_BACKBONE, owkin/phikon}/mhist
           dataloader_idx_map:
             0: train
             1: test
           backbone:
-            class_path: eva.models.ModelFromFunction
+            class_path: eva.models.wrappers.HuggingFaceModel
             init_args:
-              path: torch.hub.load
-              arguments:
-                repo_or_dir: facebookresearch/dino:main
-                model: dino_vits16
-                pretrained: ${oc.env:PRETRAINED, true}
+              model_name_or_path: owkin/phikon
+              tensor_transforms: 
+                class_path: eva.vision.data.transforms.model_output.ExtractCLSFeatures
     logger:
       - class_path: pytorch_lightning.loggers.TensorBoardLogger
         init_args:
-          save_dir: *LIGHTNING_ROOT
+          save_dir: *OUTPUT_ROOT
           name: ""
 model:
   class_path: eva.HeadModule
@@ -47,7 +45,7 @@ model:
     head:
       class_path: torch.nn.Linear
       init_args:
-        in_features: 384
+        in_features: 768
         out_features: 1
     criterion: torch.nn.BCEWithLogitsLoss
     optimizer:
