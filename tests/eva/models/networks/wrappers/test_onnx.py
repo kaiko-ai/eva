@@ -8,7 +8,7 @@ import pytest
 import torch
 from pytorch_lightning.demos import boring_classes
 
-from eva.models.wrappers import ONNXModel
+from eva.models.networks import wrappers
 
 
 @pytest.mark.parametrize(
@@ -22,7 +22,7 @@ def test_onnx_model(
     model_path: str, input_shape: Tuple[int, ...], expected_output_shape: Tuple[int, ...]
 ) -> None:
     """Tests the forward pass using the ONNXModel wrapper."""
-    model = ONNXModel(path=model_path)
+    model = wrappers.ONNXModel(path=model_path)
     model.eval()
 
     input_tensor = torch.rand(1, 32)

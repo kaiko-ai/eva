@@ -6,10 +6,10 @@ import torch
 import transformers
 from typing_extensions import override
 
-from eva.models import wrappers
+from eva.models.networks.wrappers import base
 
 
-class HuggingFaceModel(wrappers.BaseModel):
+class HuggingFaceModel(base.BaseModel):
     """Wrapper class for loading HuggingFace `transformers` models."""
 
     def __init__(self, model_name_or_path: str, tensor_transforms: Callable | None = None) -> None:

@@ -6,10 +6,10 @@ import onnxruntime as ort
 import torch
 from typing_extensions import override
 
-from eva.models import wrappers
+from eva.models.networks.wrappers import base
 
 
-class ONNXModel(wrappers.BaseModel):
+class ONNXModel(base.BaseModel):
     """Wrapper class for loading ONNX models."""
 
     def __init__(

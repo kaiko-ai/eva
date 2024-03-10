@@ -7,11 +7,11 @@ import torch
 from torch import nn
 from typing_extensions import override
 
-from eva.models import wrappers
 from eva.models.networks import _utils
+from eva.models.networks.wrappers import base
 
 
-class ModelFromFunction(wrappers.BaseModel):
+class ModelFromFunction(base.BaseModel):
     """Wrapper class for models which are initialized from functions.
 
     This is helpful for initializing models in a `.yaml` configuration file.

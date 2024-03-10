@@ -1,6 +1,6 @@
 """Networks API."""
 
+from eva.models.networks import wrappers
 from eva.models.networks.mlp import MLP
-from eva.models.wrappers.from_function import ModelFromFunction
 
-__all__ = ["ModelFromFunction", "MLP"]
+__all__ = ["wrappers", "MLP"]
