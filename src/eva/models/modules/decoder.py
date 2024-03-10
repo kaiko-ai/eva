@@ -1,4 +1,4 @@
-""""Neural Network Decoder Module."""
+"""Neural Network Decoder Module."""
 
 from typing import Any, Callable
 

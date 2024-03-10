@@ -49,7 +49,6 @@ class TotalSegmentator2D(base.ImageSegmentation):
         self,
         root: str,
         split: Literal["train", "val"] | None,
-        task: str | None = "SegTHOR",
         version: Literal["small", "full"] = "small",
         download: bool = False,
         image_transforms: Callable | None = None,
@@ -62,7 +61,6 @@ class TotalSegmentator2D(base.ImageSegmentation):
             root: Path to the root directory of the dataset. The dataset will
                 be downloaded and extracted here, if it does not already exist.
             split: Dataset split to use. If None, the entire dataset is used.
-            task: The nnUNet task name.
             version: The version of the dataset to initialize.
             download: Whether to download the data for the specified split.
                 Note that the download will be executed only by additionally
@@ -85,7 +83,6 @@ class TotalSegmentator2D(base.ImageSegmentation):
 
         self._root = root
         self._split = split
-        self._task = task
         self._version = version
         self._download = download
 
@@ -95,18 +92,6 @@ class TotalSegmentator2D(base.ImageSegmentation):
     @functools.cached_property
     @override
     def classes(self) -> List[str]:
-        task_classes = {
-            "SegTHOR": ["aorta", "esophagus", "heart", "trachea"],
-            None: self._get_all_classes(),
-        }
-        classes = task_classes.get(self._task)
-        if classes is None:
-            raise ValueError(
-                f"Invalid task name. Please choose one of the bellow: {task_classes.keys()}"
-            )
-        return classes
-
-    def _get_all_classes(self) -> List[str]:
         def get_filename(path: str) -> str:
             """Returns the filename from the full path."""
             return os.path.basename(path).split(".")[0]
@@ -114,7 +99,8 @@ class TotalSegmentator2D(base.ImageSegmentation):
         first_sample_labels = os.path.join(
             self._root, self._samples_dirs[0], "segmentations", "*.nii.gz"
         )
-        return sorted(map(get_filename, glob(first_sample_labels)))
+        # return sorted(map(get_filename, glob(first_sample_labels)))
+        return ["heart"]
 
     @property
     @override
@@ -151,7 +137,7 @@ class TotalSegmentator2D(base.ImageSegmentation):
     def load_mask(self, index: int) -> np.ndarray:
         masks_dir = self._get_masks_dir(index)
         slice_index = self._get_sample_slice_index(index)
-        mask_paths = [os.path.join(masks_dir, label + ".nii.gz") for label in self.classes]
+        mask_paths = (os.path.join(masks_dir, label + ".nii.gz") for label in self.classes)
         masks = np.stack([io.read_nifti(path, slice_index) for path in mask_paths])
         return np.transpose(masks, (1, 2, 0))
 
@@ -211,9 +197,6 @@ class TotalSegmentator2D(base.ImageSegmentation):
             raise ValueError("Invalid data version. Use 'small' or 'full'.")
 
         for resource in resources:
-            if os.path.isdir(self._root):
-                continue
-
             utils.download_and_extract_archive(
                 resource.url,
                 download_root=self._root,

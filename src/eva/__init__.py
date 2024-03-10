@@ -3,7 +3,7 @@
 from eva import setup  # isort:skip # noqa: F401
 from eva.data import DataLoader, DataloadersSchema, DataModule, DatasetsSchema
 from eva.interface import Interface
-from eva.models import HeadModule, InferenceModule
+from eva.models import DecoderModule, HeadModule, InferenceModule
 from eva.trainers import Trainer
 
 __all__ = [
@@ -12,6 +12,7 @@ __all__ = [
     "DataModule",
     "DatasetsSchema",
     "Interface",
+    "DecoderModule",
     "HeadModule",
     "InferenceModule",
     "Trainer",
