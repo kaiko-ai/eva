@@ -7,11 +7,11 @@ import torch
 from torch import nn
 from typing_extensions import override
 
-from eva.models import wrappers
 from eva.models.networks import _utils
+from eva.models.networks.wrappers import base
 
 
-class ModelFromFunction(wrappers.BaseModel):
+class ModelFromFunction(base.BaseModel):
     """Wrapper class for models which are initialized from functions.
 
     This is helpful for initializing models in a `.yaml` configuration file.
@@ -29,10 +29,12 @@ class ModelFromFunction(wrappers.BaseModel):
         Args:
             path: The path to the callable object (class or function).
             arguments: The extra callable function / class arguments.
-            checkpoint_path: The path to the checkpoint to load the model weights from. This is
-                currently only supported for torch model checkpoints. For other formats, the
-                checkpoint loading should be handled within the provided callable object in <path>.
-            tensor_transforms: The transforms to apply to the output tensor produced by the model.
+            checkpoint_path: The path to the checkpoint to load the model
+                weights from. This is currently only supported for torch
+                model checkpoints. For other formats, the checkpoint loading
+                should be handled within the provided callable object in <path>.
+            tensor_transforms: The transforms to apply to the output tensor
+                produced by the model.
         """
         super().__init__()
 

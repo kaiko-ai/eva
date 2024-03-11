@@ -15,7 +15,8 @@ class BaseModel(nn.Module):
         """Initializes the model.
 
         Args:
-            tensor_transforms: The transforms to apply to the output tensor produced by the model.
+            tensor_transforms: The transforms to apply to the output tensor
+                produced by the model.
         """
         super().__init__()
 
