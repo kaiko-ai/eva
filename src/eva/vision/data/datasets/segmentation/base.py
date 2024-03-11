@@ -72,7 +72,6 @@ class ImageSegmentation(vision.VisionDataset[Tuple[np.ndarray, np.ndarray]], abc
 
         Args:
             index: The index of the data sample target mask to load.
-            slice_index: The slice index to fetch.
 
         Returns:
             The sample mask as a stack of binary mask arrays (label, height, width).
