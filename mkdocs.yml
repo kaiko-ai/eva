@@ -32,7 +32,12 @@ nav:
       - user-guide/index.md
       - Getting started: user-guide/getting_started.md
       - How to use eva: user-guide/how_to_use.md
-      - Tutorials: user-guide/tutorials.md
+#      - Tutorials: user-guide/tutorials.md
+      - Tutorials:
+        - user-guide/tutorials/index.md
+        - user-guide/tutorials/eva_subcommands.md
+        - user-guide/tutorials/replicate_results.md
+        - user-guide/tutorials/evaluate_resnet.md
   - Reference API:
     - reference/index.md
     - Interface: reference/interface.md
