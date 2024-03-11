@@ -29,10 +29,6 @@ However, if you did **not** compute the embeddings for the specified FM before, 
 ```
 python -m eva predict_fit --config configs/vision/dino_vit/offline/bach.yaml
 ```
-Download the BACH dataset and compute the embeddings with the `predict_fit` command:
-```
-python -m eva predict --config configs/vision/dino_vit/offline/bach.yaml
-```
 Once the session completes, check the results in `logs/dino_vits16/offline/bach/<session-id>/results.json`. Can you confirm that the `MulticlassAccuracy` matches the one reported on the [***eva*** main page](../../index.md) for DINO ViT-S16 (N/A)?
 
 
