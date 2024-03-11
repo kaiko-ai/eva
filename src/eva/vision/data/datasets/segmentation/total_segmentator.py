@@ -129,7 +129,7 @@ class TotalSegmentator2D(base.ImageSegmentation):
     def load_image(self, index: int) -> np.ndarray:
         image_path = self._get_image_path(index)
         slice_index = self._get_sample_slice_index(index)
-        image_array = io.read_nifti(image_path, slice_index)
+        image_array = io.read_nifti_slice(image_path, slice_index)
         return cv2.cvtColor(image_array, cv2.COLOR_GRAY2RGB)
 
     @override
@@ -137,7 +137,7 @@ class TotalSegmentator2D(base.ImageSegmentation):
         masks_dir = self._get_masks_dir(index)
         slice_index = self._get_sample_slice_index(index)
         mask_paths = (os.path.join(masks_dir, label + ".nii.gz") for label in self.classes)
-        masks = np.stack([io.read_nifti(path, slice_index) for path in mask_paths])
+        masks = np.stack([io.read_nifti_slice(path, slice_index) for path in mask_paths])
         return np.transpose(masks, (1, 2, 0))
 
     def _get_masks_dir(self, index: int) -> str:
@@ -158,7 +158,7 @@ class TotalSegmentator2D(base.ImageSegmentation):
     def _get_sample_slice_index(self, index: int) -> int:
         """Returns the corresponding slice index."""
         image_path = self._get_image_path(index)
-        total_slices = _fetch_number_of_slices(image_path)
+        total_slices = io.fetch_total_nifti_slices(image_path)
         slice_indices = np.linspace(0, total_slices - 1, num=self._n_slices_per_image, dtype=int)
         return slice_indices[index % self._n_slices_per_image]
 
@@ -202,10 +202,3 @@ class TotalSegmentator2D(base.ImageSegmentation):
                 filename=resource.filename,
                 remove_finished=True,
             )
-
-
-@functools.lru_cache(maxsize=2000)
-def _fetch_number_of_slices(image_path: str) -> int:
-    """Fetches and returns the total number of slices of the image."""
-    image_array = io.read_nifti(image_path)
-    return image_array.shape[-1]
