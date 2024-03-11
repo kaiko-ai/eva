@@ -1,5 +1,8 @@
-# Tutorials
+# Online v.s. offline evaluations
 
+This Tutorial shows in detail how to run *online* & *offline* evaluations using eva.
+
+Remember that the *online* mode computes the foundation model embeddings on the fly while training the downstream decoder, while in *offline* mode we generate first generate and save the embeddings for all images, and then load them in a 2nd step from disk to train the downstream head network. *Offline* evaluations run faster, because the foundation forward pass to generate the embeddings is done only once per image. On the other hand, the *online* mode doesn't require storing the embeddings on disk and might be more handy for small datasets or experimental runs.
 
 If not done so already, download the configs for this tutorial from the [***eva*** GitHub repo](https://github.com/kaiko-ai/eva/tree/main):
 

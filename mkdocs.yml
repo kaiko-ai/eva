@@ -32,7 +32,9 @@ nav:
       - user-guide/index.md
       - Getting started: user-guide/getting_started.md
       - How to use eva: user-guide/how_to_use.md
-      - Tutorials: user-guide/tutorials.md
+      - Tutorials: 
+        - Online v.s. Offline Evaluations: user-guide/tutorials/online_vs_offline.md
+        - Model Wrappers: user-guide/tutorials/model_wrappers.md
   - Reference API:
     - reference/index.md
     - Interface: reference/interface.md

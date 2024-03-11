@@ -39,7 +39,7 @@ Support for additional modalities and tasks will be added in future releases.
 
 ### 1. Evaluate your own FMs on public benchmark datasets
 
-With a trained FM as input, you can run ***eva*** on several publicly available datasets & tasks for which ***eva*** provides out-of the box support. One ***eva*** run will automatically download and preprocess the relevant data, compute embeddings with the trained FM, fit and evaluate a classification head and report the mean and standard deviation of the relevant performance metrics the selected task.
+With a trained FM as input, you can run ***eva*** on several publicly available datasets & tasks for which ***eva*** provides out-of the box support. One ***eva*** run will automatically download and preprocess the relevant data, compute embeddings with the trained FM, fit and evaluate a downstream head and report the mean and standard deviation of the relevant performance metrics the selected task.
 
 Supported datasets & tasks include:
 
