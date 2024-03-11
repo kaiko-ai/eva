@@ -38,6 +38,7 @@ nav:
         - user-guide/tutorials/eva_subcommands.md
         - user-guide/tutorials/replicate_results.md
         - user-guide/tutorials/evaluate_resnet.md
+      - Replicate evaluations: user-guide/replicate_evaluations.md
   - Reference API:
     - reference/index.md
     - Interface: reference/interface.md
