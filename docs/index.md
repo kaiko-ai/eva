@@ -39,7 +39,7 @@ Support for additional modalities and tasks will be added in future releases.
 
 ### 1. Evaluate your own FMs on public benchmark datasets
 
-With a trained FM as input, you can run ***eva*** on several publicly available datasets & tasks for which ***eva*** provides out-of the box support. One ***eva*** run will automatically download and preprocess the relevant data, compute embeddings with the trained FM, fit and evaluate a classification head and report the mean and standard deviation of the relevant performance metrics the selected task.
+With a trained FM as input, you can run ***eva*** on several publicly available datasets & tasks for which ***eva*** provides out-of the box support. One ***eva*** run will automatically download and preprocess the relevant data, compute embeddings with the trained FM, fit and evaluate a downstream head and report the mean and standard deviation of the relevant performance metrics the selected task.
 
 Supported datasets & tasks include:
 
@@ -80,8 +80,8 @@ The runs used the default setup described in the section below. The table shows 
 
 ***eva*** trains the decoder on the "train" split and uses the "validation" split for monitoring, early stopping and checkpoint selection. Evaluation results are reported on the "validation" split and, if available, on the "test" split.
 
-For more details on the FM-backbones and instructions to replicate those results with ***eva***, refer to the [Replicate results section](user-guide/replicate_evaluations.md) 
-in the [User Guide](user-guide/index.md).
+For more details on the FM-backbones and instructions to replicate those results with ***eva***, refer to the [Replicate results section](user-guide/advanced/replicate_evaluations.md) 
+in the [Advanced user guide](user-guide/advanced/index.md).
 
 ## Evaluation setup
 

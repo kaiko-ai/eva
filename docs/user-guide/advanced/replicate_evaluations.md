@@ -12,7 +12,7 @@ to an FM that produces embeddings without any prior learning on image tasks. To 
 ```
 # set environment variables:
 export PRETRAINED=false
-export EMBEDDINGS_DIR="./data/embeddings/dino_vits16_random/<task>"
+export EMBEDDINGS_ROOT="./data/embeddings/dino_vits16_random"
 export DINO_BACKBONE=dino_vits16
 export CHECKPOINT_PATH=null
 export NORMALIZE_MEAN=[0.485,0.456,0.406]
@@ -29,7 +29,7 @@ The next baseline model, uses a pretrained ViT-S16 backbone with ImageNet weight
 ```
 # set environment variables:
 export PRETRAINED=true
-export EMBEDDINGS_DIR="./data/embeddings/dino_vits16_imagenet/<task>"
+export EMBEDDINGS_ROOT="./data/embeddings/dino_vits16_imagenet"
 export DINO_BACKBONE=dino_vits16
 export CHECKPOINT_PATH=null
 export NORMALIZE_MEAN=[0.485,0.456,0.406]
@@ -45,7 +45,7 @@ To evaluate performance on the larger ViT-B8 backbone pretrained on ImageNet, ru
 ```
 # set environment variables:
 export PRETRAINED=true
-export EMBEDDINGS_DIR="./data/embeddings/dino_vitb8_imagenet/<task>"
+export EMBEDDINGS_ROOT="./data/embeddings/dino_vitb8_imagenet"
 export DINO_BACKBONE=dino_vitb8
 export CHECKPOINT_PATH=null
 export NORMALIZE_MEAN=[0.485,0.456,0.406]
@@ -63,7 +63,7 @@ on [GitHub](https://github.com/lunit-io/benchmark-ssl-pathology/releases/). To e
 ```
 # set environment variables:
 export PRETRAINED=false
-export EMBEDDINGS_DIR="./data/embeddings/dino_vits16_lunit/<task>"
+export EMBEDDINGS_ROOT="./data/embeddings/dino_vits16_lunit"
 export DINO_BACKBONE=dino_vits16
 export CHECKPOINT_PATH="https://github.com/lunit-io/benchmark-ssl-pathology/releases/download/pretrained-weights/dino_vit_small_patch16_ep200.torch"
 export NORMALIZE_MEAN=[0.70322989,0.53606487,0.66096631]
@@ -80,7 +80,7 @@ python -m eva predict_fit --config configs/vision/dino_vit/offline/<task>.yaml
 
 ```
 # set environment variables:
-export EMBEDDINGS_DIR="./data/embeddings/dino_vitb16_owkin/<task>
+export EMBEDDINGS_ROOT="./data/embeddings/dino_vitb16_owkin"
 
 # run eva:
 python -m eva predict_fit --config configs/vision/owkin/phikon/offline/<task>.yaml
@@ -98,7 +98,7 @@ on [GitHub](https://github.com/lunit-io/benchmark-ssl-pathology/releases/), run:
 ```
 # set environment variables:
 export PRETRAINED=false
-export EMBEDDINGS_DIR="./data/embeddings/dino_vits16_kaiko/<task>"
+export EMBEDDINGS_ROOT="./data/embeddings/dino_vits16_kaiko"
 export DINO_BACKBONE=dino_vits16
 export CHECKPOINT_PATH=[TBD*]
 export NORMALIZE_MEAN=[0.5,0.5,0.5]
@@ -121,7 +121,7 @@ on [GitHub](https://github.com/lunit-io/benchmark-ssl-pathology/releases/), run:
 ```
 # set environment variables:
 export PRETRAINED=false
-export EMBEDDINGS_DIR="./data/embeddings/dino_vitb8_kaiko/<task>"
+export EMBEDDINGS_ROOT="./data/embeddings/dino_vitb8_kaiko"
 export DINO_BACKBONE=dino_vitb8
 export CHECKPOINT_PATH=[TBD*]
 export NORMALIZE_MEAN=[0.5,0.5,0.5]

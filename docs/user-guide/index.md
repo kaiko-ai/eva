@@ -8,10 +8,10 @@ Install ***eva*** on your machine.
 
 Get familiar with the different workflows, subcommands and configurations.
 
-### [Tutorials](tutorials.md)
+### [Tutorials](tutorials/index.md)
 
 Run ***eva*** with the different subcommands, replicate our evaluation results and train a supervised ResNet18 from scratch.
 
-### [Replicate evaluations](replicate_evaluations.md)
+### [Advanced user guide](advanced/index.md)
 
-Find the instructions to completely replicate the evaluation results presented [on the ***eva*** main page](../index.md)
+Get to know **eva** in more depth by studying our advanced user guides.

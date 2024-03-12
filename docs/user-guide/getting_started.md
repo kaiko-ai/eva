@@ -32,4 +32,4 @@ This will:
  - Fit a complete model consisting of the frozen FM-backbone (a pretrained `dino_vits16`) and a downstream head (single layer MLP) on the BACH-train split.
  - Evaluate the trained model on the val split and report the results
 
-To learn more about how to run ***eva*** and customize your runs, familiarize yourself with [How to use ***eva***](how_to_use.md) and get started with [Tutorials](tutorials.md) 
+To learn more about how to run ***eva*** and customize your runs, familiarize yourself with [How to use ***eva***](how_to_use.md) and get started with [Tutorials](tutorials/index.md) 
