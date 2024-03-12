@@ -4,9 +4,11 @@ import collections
 import json
 import os
 import statistics
+import sys
 from typing import Any, Dict, List, Mapping
 
 from lightning_fabric.utilities import cloud_io
+from loguru import logger
 from pytorch_lightning.utilities.types import _EVALUATE_OUTPUT
 from toolz import dicttoolz
 
@@ -20,16 +22,19 @@ class SessionRecorder:
     def __init__(
         self,
         output_dir: str,
-        save_as: str = "results.json",
+        results_file: str = "results.json",
+        config_file: str = "config.yaml",
     ) -> None:
         """Initializes the recorder.
 
         Args:
             output_dir: The destination folder to save the results.
-            save_as: The output filename.
+            results_file: The name of the results json file.
+            config_file: The name of the yaml configuration file.
         """
         self._output_dir = output_dir
-        self._save_as = save_as
+        self._results_file = results_file
+        self._config_file = config_file
 
         self._validation_metrics: List[SESSION_METRICS] = []
         self._test_metrics: List[SESSION_METRICS] = []
@@ -37,7 +42,17 @@ class SessionRecorder:
     @property
     def filename(self) -> str:
         """Returns the output filename."""
-        return os.path.join(self._output_dir, self._save_as)
+        return os.path.join(self._output_dir, self._results_file)
+
+    @property
+    def config_path(self) -> str | None:
+        """Returns the path to the .yaml configuration file from CLI args if available."""
+        if "--config" in sys.argv:
+            config_path = sys.argv[sys.argv.index("--config") + 1]
+            if not config_path.endswith(".yaml"):
+                logger.warning(f"Unexpected config file {config_path}, should be a .yaml file.")
+                return None
+            return config_path
 
     def update(
         self,
@@ -63,6 +78,7 @@ class SessionRecorder:
         """Saves the recorded results."""
         results = self.export()
         _save_json(results, self.filename)
+        self._save_config()
 
     def reset(self) -> None:
         """Resets the state of the tracked metrics."""
@@ -77,6 +93,12 @@ class SessionRecorder:
         """Updates the test metrics in-place."""
         if metrics:
             self._test_metrics = _update_session_metrics(self._test_metrics, metrics)
+
+    def _save_config(self) -> None:
+        """Saves the configuration file."""
+        if self.config_path:
+            fs = cloud_io.get_filesystem(self._output_dir, anon=False)
+            fs.copy(self.config_path, os.path.join(self._output_dir, self._config_file))
 
 
 def _update_session_metrics(
