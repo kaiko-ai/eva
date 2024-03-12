@@ -1,7 +1,7 @@
 # Model Wrappers
 
-In this Tutorial, we demonstrate how to use `eva`'s model wrapper API (`eva.models.networks.wrappers`) to load different model formats from a series of sources such as PyTorch Hub, HuggingFace Model Hub and ONNX. 
 
+This document shows how to use **eva**'s model wrapper API (`eva.models.networks.wrappers`) to load different model formats from a series of sources such as PyTorch Hub, HuggingFace Model Hub and ONNX. 
 
 ## Loading PyTorch models
 The `eva` framework is built on top of PyTorch Lightning and thus naturally supports loading PyTorch models.
