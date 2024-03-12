@@ -1,8 +1,8 @@
 """NIfTI I/O related functions."""
 
 from typing import Any
+
 import nibabel as nib
-import numpy as np
 import numpy.typing as npt
 
 from eva.vision.utils.io import _utils
@@ -25,7 +25,7 @@ def read_nifti_slice(path: str, slice_index: int) -> npt.NDArray[Any]:
     """
     _utils.check_file(path)
     image_data = nib.load(path)  # type: ignore
-    dtype = image_data.get_data_dtype()
+    dtype = image_data.get_data_dtype()  # type: ignore
     image_slice = image_data.slicer[:, :, slice_index : slice_index + 1]  # type: ignore
     image_array = image_slice.get_fdata()
     return image_array.astype(dtype)

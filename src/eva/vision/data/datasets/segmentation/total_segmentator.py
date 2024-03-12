@@ -5,7 +5,6 @@ import os
 from glob import glob
 from typing import Callable, Dict, List, Literal, Tuple
 
-import cv2
 import numpy as np
 from torchvision.datasets import utils
 from typing_extensions import override
