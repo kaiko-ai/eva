@@ -43,14 +43,18 @@ With a trained FM as input, you can run ***eva*** on several publicly available 
 
 Supported datasets & tasks include:
 
+*Patch-level pathology datasets*
+
 -	**[Patch Camelyon](datasets/patch_camelyon.md)**: binary breast cancer classification
 -	**[BACH](datasets/bach.md)**: multiclass breast cancer classification
 -	**[CRC](datasets/crc.md)**: multiclass colorectal cancer classification
 -	**[MHIST](datasets/mhist.md)**: binary colorectal polyp cancer classification
+
+*Radiology datasets*
+
 -	**[TotalSegmentator](datasets/total_segmentator.md)**: radiology/CT-scan for segmentation of anatomical structures
 
-To evaluate FMs, ***eva*** provides support for several formats. These include model checkpoints saved with PyTorch lightning, models available from HuggingFace and onnx-models.
-
+To evaluate FMs, ***eva*** provides support different formats, including models trained with PyTorch lightning, models available from HuggingFace and ONNX-models. For other formats a custom wrapper can be implemented.
 
 ### 2. Evaluate ML models on your own dataset & task
 
@@ -83,7 +87,7 @@ in the [User Guide](user-guide/index.md).
 
 For WSI-patch-level/microscopy image classification tasks, FMs that produce image embeddings are evaluated with a single linear layer MLP with embeddings as inputs and label-predictions as output.
 
-To standardize evaluations, the default configurations ***eva*** uses are based on the evaluation protocol proposed by Virchow [1] and dataset/task specific characteristics. To stop training as appropriate we use early stopping after 10% of the maximal number of steps [2].
+To standardize evaluations, the default configurations ***eva*** uses are based on the evaluation protocol proposed by [1] and dataset/task specific characteristics. To stop training as appropriate we use early stopping after 10% of the maximal number of steps as suggested in [2].
 
 |                         |                           |
 |-------------------------|---------------------------|
@@ -96,7 +100,7 @@ To standardize evaluations, the default configurations ***eva*** uses are based 
 | **Batch size**          | dataset specific*         |
 | **Base learning rate**  | 0.01                      |
 | **Learning Rate**       | [Base learning rate] * [Batch size] / [Base batch size]   |
-| **Max epochs**          | [n samples] * [Number of steps] /  [Batch size]  |
+| **Max epochs**          | [Number of samples] * [Number of steps] /  [Batch size]  |
 | **Early stopping**      | 10% * [Max epochs]  |
 | **Optimizer**           | SGD                       |
 | **Momentum**            | 0.9                       |
@@ -104,7 +108,7 @@ To standardize evaluations, the default configurations ***eva*** uses are based 
 | **Nesterov momentum**   | true                      |
 | **LR Schedule**         | Cosine without warmup     |
 
-*For smaller datasets (e.g. BACH with 400 samples) we reduce the batch size to 256 and scale the learning rate accordingly.
+\* For smaller datasets (e.g. BACH with 400 samples) we reduce the batch size to 256 and scale the learning rate accordingly.
 
 - [1]: [Virchow: A Million-Slide Digital Pathology Foundation Model, 2024](https://arxiv.org/pdf/2309.07778.pdf)
 - [2]: [Scaling Self-Supervised Learning for Histopathology with Masked Image Modeling](https://www.medrxiv.org/content/10.1101/2023.07.21.23292757v1.full.pdf)
