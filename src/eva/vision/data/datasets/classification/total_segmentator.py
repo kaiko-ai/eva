@@ -109,7 +109,7 @@ class TotalSegmentatorClassification(base.ImageClassification):
     @override
     def load_image(self, index: int) -> np.ndarray:
         image_path, ct_slice = self._get_image_path_and_slice(index)
-        return io.read_nifti(image_path, ct_slice)
+        return io.read_nifti_slice(image_path, ct_slice)
 
     @override
     def load_target(self, index: int) -> np.ndarray:
