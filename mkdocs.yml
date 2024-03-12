@@ -1,4 +1,6 @@
 site_name: eva
+repo_name: kaiko-eva
+repo_url: https://github.com/kaiko-ai/eva
 theme:
   name: "material"
   features:
@@ -6,6 +8,22 @@ theme:
     - navigation.indexes
     - search.suggest
     - search.highlight
+  logo: images/logo_small.png
+  palette:
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-night
+        name: Switch to light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to dark mode
 plugins:
   search: null
   mkdocstrings:
@@ -30,14 +48,13 @@ nav:
   - eva: index.md
   - User Guide:
       - user-guide/index.md
-      - Getting started: user-guide/getting_started.md
-      - How to use eva: user-guide/how_to_use.md
+      - Getting started:
+        - user-guide/getting-started/installation.md
+        - user-guide/getting-started/how_to_use.md
       - Tutorials:
-        - user-guide/tutorials/index.md
         - user-guide/tutorials/offline_vs_online.md
         - user-guide/tutorials/evaluate_resnet.md
       - Advanced user guide:
-        - user-guide/advanced/index.md
         - user-guide/advanced/replicate_evaluations.md
         - user-guide/advanced/model_wrappers.md
   - Reference API:
