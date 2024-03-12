@@ -9,6 +9,7 @@ from typing import Any, Dict, List, Mapping
 
 from lightning_fabric.utilities import cloud_io
 from loguru import logger
+from omegaconf import OmegaConf
 from pytorch_lightning.utilities.types import _EVALUATE_OUTPUT
 from toolz import dicttoolz
 
@@ -98,10 +99,13 @@ class SessionRecorder:
             self._test_metrics = _update_session_metrics(self._test_metrics, metrics)
 
     def _save_config(self) -> None:
-        """Saves the configuration yaml file to the output directory."""
+        """Saves the config yaml with resolved env placeholders to the output directory."""
         if self.config_path:
+            config = OmegaConf.load(self.config_path)
             fs = cloud_io.get_filesystem(self._output_dir, anon=False)
-            fs.copy(self.config_path, os.path.join(self._output_dir, self._config_file))
+            with fs.open(os.path.join(self._output_dir, self._config_file), "w") as file:
+                config_yaml = OmegaConf.to_yaml(config, resolve=True)
+                file.write(config_yaml)
 
 
 def _update_session_metrics(
