@@ -55,22 +55,22 @@ class DecoderModule(module.ModelModule):
         self.lr_scheduler = lr_scheduler
 
         
-        import transformers
+        # import transformers
 
-        model = transformers.Mask2FormerModel(
-            config=transformers.Mask2FormerConfig(
-                backbone="vit_small_patch16_224",
-                use_timm_backbone=True,
-                backbone_kwargs={
-                    "dynamic_img_size": True,
-                    "num_classes": 0,
-                }
-            )
-        )
+        # model = transformers.Mask2FormerModel(
+        #     config=transformers.Mask2FormerConfig(
+        #         backbone="vit_small_patch16_224",
+        #         use_timm_backbone=True,
+        #         backbone_kwargs={
+        #             "dynamic_img_size": True,
+        #             "num_classes": 0,
+        #         }
+        #     )
+        # )
+        # print(model)
 
-        # from mmseg.models import decode_heads
-        # decoder = decode_heads.Mask2FormerHead(num_classes=3)
-        print(model)
+        from mmseg.models import decode_heads
+        decoder = decode_heads.Mask2FormerHead(num_classes=3)
         quit()
 
     @override
