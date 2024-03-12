@@ -35,11 +35,11 @@ nav:
       - Tutorials:
         - user-guide/tutorials/index.md
         - user-guide/tutorials/offline_vs_online.md
-        - 
-        - Online v.s. Offline Evaluations: user-guide/tutorials/online_vs_offline/evaluate_resnet.md
+        - user-guide/tutorials/evaluate_resnet.md
       - Advanced user guide:
-        - Replicate evaluations: user-guide/advanced/replicate_evaluations.md
-        - Model Wrappers: user-guide/advanced/model_wrappers.md
+        - user-guide/advanced/index.md
+        - user-guide/advanced/replicate_evaluations.md
+        - user-guide/advanced/model_wrappers.md
   - Reference API:
     - reference/index.md
     - Interface: reference/interface.md

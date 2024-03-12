@@ -1,10 +1,10 @@
 # Model Wrappers
 
 
-This document shows how to use **eva**'s model wrapper API (`eva.models.networks.wrappers`) to load different model formats from a series of sources such as PyTorch Hub, HuggingFace Model Hub and ONNX. 
+This document shows how to use **eva**'s [Model Wrapper API](../../../reference/models/networks/#wrappers) (`eva.models.networks.wrappers`) to load different model formats from a series of sources such as PyTorch Hub, HuggingFace Model Hub and ONNX. 
 
 ## Loading PyTorch models
-The `eva` framework is built on top of PyTorch Lightning and thus naturally supports loading PyTorch models.
+The **eva** framework is built on top of PyTorch Lightning and thus naturally supports loading PyTorch models.
 You just need to specify the class path of your model in the backbone section of the `.yaml` config file.
 
 ```
@@ -50,7 +50,7 @@ backbone:
 
 
 ## Loading models from HuggingFace Hub
-For loading models from HuggingFace Hub, `eva` provides a custom wrapper class `HuggingFaceModel` which can be used as follows:
+For loading models from HuggingFace Hub, **eva** provides a custom wrapper class `HuggingFaceModel` which can be used as follows:
 
 ```
 backbone:
@@ -75,7 +75,7 @@ init_args:
 
 ## Implementing custom model wrappers
 
-You can also implement your own model wrapper classes, in case your model format is not supported by the wrapper classes that `eva` already provides. To do so, you need to subclass `eva.models.networks.wrappers.BaseModel` and implement the following abstract methods: 
+You can also implement your own model wrapper classes, in case your model format is not supported by the wrapper classes that **eva** already provides. To do so, you need to subclass `eva.models.networks.wrappers.BaseModel` and implement the following abstract methods: 
 
 - `load_model`: Returns an instantiated model object & loads pre-trained model weights from a checkpoint if available. 
 - `model_forward`: Implements the forward pass of the model and returns the output as a `torch.Tensor` of shape `[embedding_dim]`

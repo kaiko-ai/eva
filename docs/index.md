@@ -80,8 +80,8 @@ The runs used the default setup described in the section below. The table shows 
 
 ***eva*** trains the decoder on the "train" split and uses the "validation" split for monitoring, early stopping and checkpoint selection. Evaluation results are reported on the "validation" split and, if available, on the "test" split.
 
-For more details on the FM-backbones and instructions to replicate those results with ***eva***, refer to the [Replicate results section](user-guide/replicate_evaluations.md) 
-in the [User Guide](user-guide/index.md).
+For more details on the FM-backbones and instructions to replicate those results with ***eva***, refer to the [Replicate results section](user-guide/advanced/replicate_evaluations.md) 
+in the [Advanced user guide](user-guide/advanced/index.md).
 
 ## Evaluation setup
 
