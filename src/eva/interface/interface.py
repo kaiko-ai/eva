@@ -32,7 +32,6 @@ class Interface:
             trainer: The base trainer to use but not modify.
             model: The model module to use but not modify.
             data: The data module.
-            n_runs: The amount of runs (fit and evaluate) to perform.
         """
         trainer.run_evaluation_session(model=model, datamodule=data)
 

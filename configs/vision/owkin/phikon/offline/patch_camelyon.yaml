@@ -30,7 +30,7 @@ trainer:
             1: val
             2: test
           backbone:
-            class_path: eva.models.wrappers.HuggingFaceModel
+            class_path: eva.models.networks.wrappers.HuggingFaceModel
             init_args:
               model_name_or_path: owkin/phikon
               tensor_transforms: 

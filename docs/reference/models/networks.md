@@ -3,4 +3,8 @@
 Reference information for the model `Networks` API.
 
 ::: eva.models.networks.MLP
-::: eva.models.networks.ModelFromFunction
+
+## Wrappers
+::: eva.models.networks.wrappers.ModelFromFunction
+::: eva.models.networks.wrappers.HuggingFaceModel
+::: eva.models.networks.wrappers.ONNXModel

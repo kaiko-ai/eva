@@ -92,7 +92,6 @@ class ABMIL(torch.nn.Module):
 
         Args:
             input_tensor: Tensor with expected shape of (batch_size, n_instances, input_size).
-            pad_value: Value indicating padding in the input tensor. If None no masking is applied.
         """
         input_tensor, mask = self._mask_values(input_tensor, self._pad_value)
 

@@ -15,13 +15,13 @@ trainer:
             1: val
             2: test
           backbone:
-            class_path: eva.models.ModelFromFunction
+            class_path: eva.models.networks.wrappers.ModelFromFunction
             init_args:
               path: torch.hub.load
               arguments:
                 repo_or_dir: facebookresearch/dino:main
                 model: dino_vits16
-                pretrained: true
+                pretrained: false
               checkpoint_path: &CHECKPOINT_PATH ${oc.env:CHECKPOINT_PATH, null}
       - class_path: pytorch_lightning.callbacks.LearningRateMonitor
         init_args:

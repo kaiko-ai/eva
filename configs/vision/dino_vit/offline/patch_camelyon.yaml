@@ -30,7 +30,7 @@ trainer:
             1: val
             2: test
           backbone:
-            class_path: eva.models.ModelFromFunction
+            class_path: eva.models.networks.wrappers.ModelFromFunction
             init_args:
               path: torch.hub.load
               arguments:

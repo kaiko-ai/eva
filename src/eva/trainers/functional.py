@@ -6,7 +6,7 @@ from pytorch_lightning.utilities.types import _EVALUATE_OUTPUT
 
 from eva.data import datamodules
 from eva.models import modules
-from eva.trainers import _utils
+from eva.trainers import _recorder, _utils
 from eva.trainers import trainer as eva_trainer
 
 
@@ -30,8 +30,13 @@ def run_evaluation_session(
         datamodule: The data module.
         n_runs: The amount of runs (fit and evaluate) to perform.
     """
+    recorder = _recorder.SessionRecorder(output_dir=base_trainer.default_log_dir)
     for run_index in range(n_runs):
-        run_evaluation(base_trainer, base_model, datamodule, run_id=f"run_{run_index}")
+        validation_scores, test_scores = run_evaluation(
+            base_trainer, base_model, datamodule, run_id=f"run_{run_index}"
+        )
+        recorder.update(validation_scores, test_scores)
+    recorder.save()
 
 
 def run_evaluation(

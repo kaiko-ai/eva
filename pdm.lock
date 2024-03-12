@@ -5,7 +5,7 @@
 groups = ["default", "all", "dev", "docs", "lint", "test", "vision"]
 strategy = ["cross_platform", "inherit_metadata"]
 lock_version = "4.4.1"
-content_hash = "sha256:b8657c693ea696bffe2864111d5f6f2547f8062a401d088c10d55f388e7ccb36"
+content_hash = "sha256:4a0fc209e696f309cbae96910ab7cc96f0b84e4f651cc8d58ad8408bbcf34394"
 
 [[package]]
 name = "absl-py"
@@ -2600,6 +2600,17 @@ groups = ["dev", "lint", "test", "vision"]
 files = [
     {file = "tomli-2.0.1-py3-none-any.whl", hash = "sha256:939de3e7a6161af0c887ef91b7d41a53e7c5a1ca976325f429cb46ea9bc30ecc"},
     {file = "tomli-2.0.1.tar.gz", hash = "sha256:de526c12914f0c550d15924c62d72abc48d6fe7364aa87328337a31007fe8a4f"},
+]
+
+[[package]]
+name = "toolz"
+version = "0.12.1"
+requires_python = ">=3.7"
+summary = "List processing tools and functional utilities"
+groups = ["all", "default", "dev"]
+files = [
+    {file = "toolz-0.12.1-py3-none-any.whl", hash = "sha256:d22731364c07d72eea0a0ad45bafb2c2937ab6fd38a3507bf55eae8744aa7d85"},
+    {file = "toolz-0.12.1.tar.gz", hash = "sha256:ecca342664893f177a13dac0e6b41cbd8ac25a358e5f215316d43e2100224f4d"},
 ]
 
 [[package]]

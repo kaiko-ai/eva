@@ -1,59 +1,65 @@
-"""TotalSegmentator dataset class."""
+"""TotalSegmentator 2D segmentation dataset class."""
 
-import math
+import functools
 import os
-from collections import defaultdict
-from pathlib import Path
-from typing import Callable, List, Literal, Tuple
+from glob import glob
+from typing import Callable, Dict, List, Literal, Tuple
 
 import numpy as np
-import pandas as pd
-from loguru import logger
-from torchvision.datasets.utils import download_url, extract_archive
+from torchvision.datasets import utils
 from typing_extensions import override
 
-from eva.vision.data.datasets import structs
+from eva.vision.data.datasets import _utils, structs
 from eva.vision.data.datasets.classification import base
 from eva.vision.utils import io
 
 
 class TotalSegmentatorClassification(base.ImageClassification):
-    """Dataset class for TotalSegmentator images and classification targets.
+    """TotalSegmentator multi-label classification dataset."""
 
-    Create the multi-label classification dataset for the TotalSegmentator data.
-    """
+    _train_index_ranges: List[Tuple[int, int]] = [(0, 83)]
+    """Train range indices."""
 
-    resources: List[structs.DownloadResource] = [
+    _val_index_ranges: List[Tuple[int, int]] = [(83, 103)]
+    """Validation range indices."""
+
+    _n_slices_per_image: int = 20
+    """The amount of slices to sample per 3D CT scan image."""
+
+    _resources_full: List[structs.DownloadResource] = [
         structs.DownloadResource(
             filename="Totalsegmentator_dataset_v201.zip",
+            url="https://zenodo.org/records/10047292/files/Totalsegmentator_dataset_v201.zip",
+            md5="fe250e5718e0a3b5df4c4ea9d58a62fe",
+        ),
+    ]
+    """Resources for the full dataset version."""
+
+    _resources_small: List[structs.DownloadResource] = [
+        structs.DownloadResource(
+            filename="Totalsegmentator_dataset_small_v201.zip",
             url="https://zenodo.org/records/10047263/files/Totalsegmentator_dataset_small_v201.zip",
             md5="6b5524af4b15e6ba06ef2d700c0c73e0",
         ),
     ]
-
-    # TODO: switch to use complete instead of small dataset:
-    #  - url="https://zenodo.org/records/10047292/files/Totalsegmentator_dataset_v201.zip"
-    #  - md5="fe250e5718e0a3b5df4c4ea9d58a62fe"
+    """Resources for the small dataset version."""
 
     def __init__(
         self,
         root: str,
-        split: Literal["train", "val", "test"],
-        split_ratios: structs.SplitRatios | None = None,
-        sample_every_n_slices: int = 25,
+        split: Literal["train", "val"] | None,
+        version: Literal["small", "full"] = "small",
         download: bool = False,
         image_transforms: Callable | None = None,
         target_transforms: Callable | None = None,
     ) -> None:
-        """Initializes the dataset.
+        """Initialize dataset.
 
         Args:
             root: Path to the root directory of the dataset. The dataset will
                 be downloaded and extracted here, if it does not already exist.
             split: Dataset split to use. If None, the entire dataset is used.
-            split_ratios: Ratios for the train, val and test splits.
-            sample_every_n_slices: Number of slices to skip when sampling slices
-                from the 3D images.
+            version: The version of the dataset to initialize.
             download: Whether to download the data for the specified split.
                 Note that the download will be executed only by additionally
                 calling the :meth:`prepare_data` method and if the data does not
@@ -70,159 +76,128 @@ class TotalSegmentatorClassification(base.ImageClassification):
 
         self._root = root
         self._split = split
-        self._split_ratios = split_ratios or self.default_split_ratios
-        self._sample_every_n_slices = sample_every_n_slices
+        self._version = version
         self._download = download
 
-        self._data: pd.DataFrame
-        self._path_key, self._split_key = "path", "split"
-        self._manifest_path = os.path.join(self._root, "manifest.csv")
-        self._classes = []
+        self._samples_dirs: List[str] = []
+        self._indices: List[int] = []
+
+    @functools.cached_property
+    @override
+    def classes(self) -> List[str]:
+        def get_filename(path: str) -> str:
+            """Returns the filename from the full path."""
+            return os.path.basename(path).split(".")[0]
+
+        first_sample_labels = os.path.join(
+            self._root, self._samples_dirs[0], "segmentations", "*.nii.gz"
+        )
+        return sorted(map(get_filename, glob(first_sample_labels)))
 
     @property
-    def default_split_ratios(self) -> structs.SplitRatios:
-        """Returns the default split ratios."""
-        return structs.SplitRatios(train=0.6, val=0.2, test=0.2)
+    @override
+    def class_to_idx(self) -> Dict[str, int]:
+        return {label: index for index, label in enumerate(self.classes)}
+
+    @override
+    def filename(self, index: int) -> str:
+        sample_dir = self._samples_dirs[self._indices[index]]
+        return os.path.join(sample_dir, "ct.nii.gz")
 
     @override
     def prepare_data(self) -> None:
         if self._download:
             self._download_dataset()
-        if not os.path.isdir(os.path.join(self._root, "Totalsegmentator_dataset_v201")):
-            logger.info("Extracting archive ...")
-            extract_archive(
-                from_path=os.path.join(self._root, "Totalsegmentator_dataset_v201.zip"),
-                to_path=os.path.join(self._root, "Totalsegmentator_dataset_v201"),
-            )
-        self._classes = self._get_classes()
-        df = self._load_dataset()
-        df = self._generate_ordered_splits(df)
-        self._verify_dataset(df)
-        if not os.path.isfile(self._manifest_path):
-            self._save_manifest(df)
 
     @override
     def setup(self) -> None:
-        df = self._load_manifest()
-        self._data = df.loc[df[self._split_key] == self._split].reset_index(drop=True)
-
-    @override
-    def load_image(self, index: int) -> np.ndarray:
-        image_path, ct_slice = self._get_image_path_and_slice(index)
-        return io.read_nifti(image_path, ct_slice)
-
-    @override
-    def load_target(self, index: int) -> np.ndarray:
-        targets = self._data[self._classes].loc[index]
-        return np.asarray(targets, dtype=np.int64)
+        self._samples_dirs = self._fetch_samples_dirs()
+        self._indices = self._create_indices()
 
     @override
     def __len__(self) -> int:
-        return len(self._data)
+        return len(self._indices) * self._n_slices_per_image
 
     @override
-    def filename(self, index: int) -> str:
-        return self._data.at[index, self._path_key]
+    def load_image(self, index: int) -> np.ndarray:
+        image_path = self._get_image_path(index)
+        slice_index = self._get_sample_slice_index(index)
+        image_array = io.read_nifti_slice(image_path, slice_index)
+        return image_array.repeat(3, axis=2)
+
+    @override
+    def load_target(self, index: int) -> np.ndarray:
+        masks = self._load_masks(index)
+        targets = [1 in masks[..., mask_index] for mask_index in range(masks.shape[-1])]
+        return np.asarray(targets, dtype=np.int64)
+
+    def _load_masks(self, index: int) -> np.ndarray:
+        """Returns the `index`'th target mask sample."""
+        masks_dir = self._get_masks_dir(index)
+        slice_index = self._get_sample_slice_index(index)
+        mask_paths = (os.path.join(masks_dir, label + ".nii.gz") for label in self.classes)
+        masks = [io.read_nifti_slice(path, slice_index) for path in mask_paths]
+        return np.concatenate(masks, axis=-1)
+
+    def _get_masks_dir(self, index: int) -> str:
+        """Returns the directory of the corresponding masks."""
+        sample_dir = self._get_sample_dir(index)
+        return os.path.join(self._root, sample_dir, "segmentations")
+
+    def _get_image_path(self, index: int) -> str:
+        """Returns the corresponding image path."""
+        sample_dir = self._get_sample_dir(index)
+        return os.path.join(self._root, sample_dir, "ct.nii.gz")
+
+    def _get_sample_dir(self, index: int) -> str:
+        """Returns the corresponding sample directory."""
+        sample_index = self._indices[index // self._n_slices_per_image]
+        return self._samples_dirs[sample_index]
+
+    def _get_sample_slice_index(self, index: int) -> int:
+        """Returns the corresponding slice index."""
+        image_path = self._get_image_path(index)
+        total_slices = io.fetch_total_nifti_slices(image_path)
+        slice_indices = np.linspace(0, total_slices - 1, num=self._n_slices_per_image, dtype=int)
+        return slice_indices[index % self._n_slices_per_image]
+
+    def _fetch_samples_dirs(self) -> List[str]:
+        """Returns the name of all the samples of all the splits of the dataset."""
+        sample_filenames = [
+            filename
+            for filename in os.listdir(self._root)
+            if os.path.isdir(os.path.join(self._root, filename))
+        ]
+        return sorted(sample_filenames)
+
+    def _create_indices(self) -> List[int]:
+        """Builds the dataset indices for the specified split."""
+        split_index_ranges = {
+            "train": self._train_index_ranges,
+            "val": self._val_index_ranges,
+            None: [(0, 103)],
+        }
+        index_ranges = split_index_ranges.get(self._split)
+        if index_ranges is None:
+            raise ValueError("Invalid data split. Use 'train', 'val' or `None`.")
+
+        return _utils.ranges_to_indices(index_ranges)
 
     def _download_dataset(self) -> None:
-        os.makedirs(self._root, exist_ok=True)
-        for resource in self.resources:
-            download_url(
+        """Downloads the dataset."""
+        dataset_resources = {
+            "small": self._resources_small,
+            "full": self._resources_full,
+            None: (0, 103),
+        }
+        resources = dataset_resources.get(self._version)
+        if resources is None:
+            raise ValueError("Invalid data version. Use 'small' or 'full'.")
+
+        for resource in resources:
+            utils.download_and_extract_archive(
                 resource.url,
-                root=self._root,
+                download_root=self._root,
                 filename=resource.filename,
-                md5=resource.md5,
+                remove_finished=True,
             )
-
-    def _get_image_path_and_slice(self, index: int) -> Tuple[str, int]:
-        return (
-            os.path.join(self._root, self._data.at[index, self._path_key]),
-            self._data.at[index, "slice"],
-        )
-
-    def _get_classes(self) -> List[str]:
-        classes = [
-            f.split(".")[0]
-            for f in sorted(
-                os.listdir(
-                    os.path.join(self._root, "Totalsegmentator_dataset_v201/s0011/segmentations")
-                )
-            )
-        ]
-        if len(classes) == 0:
-            raise ValueError("No classes found in the dataset.")
-
-        return classes
-
-    def _load_dataset(self) -> pd.DataFrame:
-        """Loads the dataset manifest from a CSV file or creates the dataframe it does not exist."""
-        if os.path.isfile(self._manifest_path):
-            return pd.read_csv(self._manifest_path)
-
-        data_dict = defaultdict(list)
-        for i, path in enumerate(Path(self._root).glob("**/*ct.nii.gz")):
-            img_data = io.read_nifti(str(path))
-            n_slices = img_data.shape[-1]
-
-            # load all masks for an image:
-            masks = {}
-            for cl in self._classes:
-                mask_path = os.path.join(path.parents[0], "segmentations", cl + ".nii.gz")
-                masks[cl] = io.read_nifti(mask_path)
-
-            # sample slices and extract label for each class:
-            np.random.seed(i)
-            start_slice = np.random.choice(min(self._sample_every_n_slices, n_slices))
-            for i in range(start_slice, n_slices, self._sample_every_n_slices):
-                data_dict["path"].append(path)
-                data_dict["slice"].append(i)
-                for cl in self._classes:
-                    label = int(masks[cl][:, :, i].max())
-                    data_dict[cl].append(label)
-
-            df = pd.DataFrame(data_dict)
-
-        return df  # type: ignore
-
-    def _save_manifest(self, df: pd.DataFrame) -> None:
-        """Saves the dataset manifest to a CSV file."""
-        df.to_csv(self._manifest_path, index=False)
-
-    def _load_manifest(self) -> pd.DataFrame:
-        """Loads the dataset manifest from a CSV file."""
-        return pd.read_csv(self._manifest_path)
-
-    def _generate_ordered_splits(self, df: pd.DataFrame) -> pd.DataFrame:
-        """Orders each class by path and then splits it into train, val and test sets."""
-        paths = sorted(df[self._path_key].unique())
-        n_train_paths, n_val_paths = (
-            round(len(paths) * self._split_ratios.train),
-            round(len(paths) * self._split_ratios.val),
-        )
-        train_paths, val_paths, test_paths = (
-            paths[:n_train_paths],
-            paths[n_train_paths : n_train_paths + n_val_paths],
-            paths[n_train_paths + n_val_paths :],
-        )
-
-        dfs = [
-            pd.merge(df, pd.DataFrame({"path": train_paths, self._split_key: "train"}), on="path"),
-            pd.merge(df, pd.DataFrame({"path": val_paths, self._split_key: "val"}), on="path"),
-            pd.merge(df, pd.DataFrame({"path": test_paths, self._split_key: "test"}), on="path"),
-        ]
-
-        return pd.concat(dfs).reset_index(drop=True)
-
-    def _verify_dataset(self, df: pd.DataFrame) -> None:
-        if len(df) != 1454:
-            raise ValueError(f"Expected 3633 samples but manifest lists {len(df)}.")
-
-        if df.shape[1] - 3 != len(self._classes) or len(self._classes) != 117:
-            raise ValueError(f"Expected 117 classes but manifest lists {df.shape[1]-3}.")
-
-        split_ratios = df["split"].value_counts(normalize=True)
-        if not all(
-            math.isclose(split_ratios[split], getattr(self._split_ratios, split), abs_tol=1e-2)
-            for split in ["train", "val", "test"]
-        ):
-            raise ValueError(f"Unexpected split ratios: {split_ratios}.")

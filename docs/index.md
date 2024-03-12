@@ -60,21 +60,24 @@ If you have your own labelled dataset, all that is needed is to implement a data
 
 We evaluated the following seven FMs on eva on the 4 supported WSI-patch-level image classification tasks:
 
-| FM-backbone                                                                | PCam - val*      | PCam - test*    | BACH - val**    | CRC - val**      | MHIST - val* |
-|----------------------------------------------------------------------------|------------------|-----------------|-----------------|------------------|--------------|
-| DINO ViT-S16 random weights                                                | 0.765 (±0.0036)  | 0.726 (±0.0024) | 0.416 (±0.014)  | 0.643 (±0.0046)	 | TBD          |
-| DINO ViT-S16 imagenet                                                      | 0.871 (±0.0039)  | 0.856 (±0.0044) | 0.673 (±0.0041) | 0.936 (±0.0009)  | TBD          |
-| DINO ViT-B8 imagenet	                                                      | 0.872 (±0.0013)  | 0.854 (±0.0015) | 0.704 (±0.008)  | 0.942 (±0.0005)  | TBD          |
-| Kaiko DINO ViT-S16	                                                        | 0.911 (±0.0017)  | 0.899 (±0.002)  | 0.773 (±0.0069) | 0.954 (±0.0012)  | TBD          |
-| Kaiko DINO ViT-B8                                                          | 0.902 (±0.0013)  | 0.887 (±0.0031) | 0.798 (±0.0063) | 0.949 (±0.0001)  | TBD          | 
-| Lunit - ViT-S16                                                            | 0.89 (±0.0009)   | 0.897 (±0.0029) | 0.765 (±0.0108) | TBD              | TBD          | 
-| Owkin - ViT base (from [HuggingFace](https://huggingface.co/owkin/phikon)) | 	0.914 (±0.0012) | 0.919 (±0.0082) | 0.717 (±0.0031) | TBD              | TBD          | 
+| FM-backbone                 | pretraining | PCam - val*      | PCam - test*    | BACH - val**    | CRC - val**     | MHIST - val* |
+|-----------------------------|-------------|------------------|-----------------|-----------------|-----------------|--------------|
+| DINO ViT-S16 random weights | N/A         | 0.765 (±0.0036) | 0.726 (±0.0024) | 0.416 (±0.014)  | 0.643 (±0.0046)	| 0.551 (±0.017)|
+| DINO ViT-S16 imagenet       | ImageNet    | 0.871 (±0.0039) | 0.856 (±0.0044) | 0.673 (±0.0041) | 0.936 (±0.0009) | 0.823 (±0.0051)|
+| DINO ViT-B8 imagenet	       | ImageNet    | 0.872 (±0.0013) | 0.854 (±0.0015) | 0.704 (±0.008)  | 0.942 (±0.0005) | 0.813 (±0.0026)|
+| Lunit - ViT-S16             | TCGA        | 0.89 (±0.0009) | 0.897 (±0.0029) | 0.765 (±0.0108) | 0.936 (±0.001)| 0.762 (±0.0032)| 
+| Owkin - iBOT ViT-B16        | TCGA        | 	0.914 (±0.0012) | 0.919 (±0.0082) | 0.717 (±0.0031) | 0.938 (±0.0005)| 0.799 (±0.0021)| 
+| kaiko.ai - DINO ViT-S16	    | TCGA        | 0.911 (±0.0017) | 0.899 (±0.002)  | 0.773 (±0.0069) | 0.954 (±0.0012) | 0.829 (±0.0035)|
+| kaiko.ai - DINO ViT-B8      | TCGA        | 0.902 (±0.0013) | 0.887 (±0.0031) | 0.798 (±0.0063) | 0.949 (±0.0001) | 0.803 (±0.0038)| 
 
 The reported performance metrics are *balanced binary accuracy* * and *balanced multiclass accuracy* **
 
-The runs used the deafult setup described in the section below. The table shows the average performance & standard deviation over 5 runs. To replicate those results yourself, refer to the [Tutorials](user-guide/tutorials.md).
+The runs used the default setup described in the section below. The table shows the average performance & standard deviation over 5 runs.
 
 ***eva*** trains the decoder on the "train" split and uses the "validation" split for monitoring, early stopping and checkpoint selection. Evaluation results are reported on the "validation" split and, if available, on the "test" split.
+
+For more details on the FM-backbones and instructions to replicate those results with ***eva***, refer to the [Replicate results section](user-guide/replicate_evaluations.md) 
+in the [User Guide](user-guide/index.md).
 
 ## Evaluation setup
 

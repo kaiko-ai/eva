@@ -6,7 +6,7 @@ import pytest
 import torch
 from torch import nn
 
-from eva.models import networks
+from eva.models.networks import wrappers
 
 
 @pytest.mark.parametrize(
@@ -17,7 +17,7 @@ from eva.models import networks
     ],
 )
 def test_model_from_function(
-    model_from_function: networks.ModelFromFunction,
+    model_from_function: wrappers.ModelFromFunction,
 ) -> None:
     """Tests the model_from_function network."""
     input_tensor = torch.Tensor(4, 10)
@@ -38,13 +38,13 @@ def test_error_model_from_function(
 ) -> None:
     """Tests the model_from_function network."""
     with pytest.raises(TypeError):
-        networks.ModelFromFunction(path=path, arguments=arguments)
+        wrappers.ModelFromFunction(path=path, arguments=arguments)
 
 
 @pytest.fixture(scope="function")
 def model_from_function(
     path: Callable[..., nn.Module],
     arguments: Dict[str, Any] | None,
-) -> networks.ModelFromFunction:
+) -> wrappers.ModelFromFunction:
     """ModelFromFunction fixture."""
-    return networks.ModelFromFunction(path=path, arguments=arguments)
+    return wrappers.ModelFromFunction(path=path, arguments=arguments)

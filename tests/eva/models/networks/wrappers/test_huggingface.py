@@ -6,7 +6,7 @@ import pytest
 import torch
 from transformers import modeling_outputs
 
-from eva.models import wrappers
+from eva.models.networks import wrappers
 from eva.vision.data.transforms import ExtractCLSFeatures
 
 
