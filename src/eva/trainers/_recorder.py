@@ -98,7 +98,7 @@ class SessionRecorder:
             self._test_metrics = _update_session_metrics(self._test_metrics, metrics)
 
     def _save_config(self) -> None:
-        """Saves the configuration file."""
+        """Saves the configuration yaml file to the output directory."""
         if self.config_path:
             fs = cloud_io.get_filesystem(self._output_dir, anon=False)
             fs.copy(self.config_path, os.path.join(self._output_dir, self._config_file))
