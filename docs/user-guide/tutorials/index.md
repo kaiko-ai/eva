@@ -2,13 +2,9 @@
 
 To familiarize yourself with ***eva***, try out some of our tutorials.
 
-### [***eva*** subcommands](eva_subcommands.md)
+### [*Offline* vs. *Online* evaluations](offline_vs_online.md)
 
-Run the three subcommands `predict`, `fit` and `predict_fit` described in [How to use eva](../how_to_use.md).
-
-### [Replicate results](replicate_results.md)
-
-See if you can replicate some of the evaluation results presented in the [***eva*** main page](../../index.md).
+Run ***eva*** with the three subcommands `predict`, `fit` and `predict_fit` described in [How to use eva](../how_to_use.md).
 
 ### [Evaluate a ResNet](evaluate_resnet.md)
 

@@ -43,7 +43,7 @@ With a trained FM as input, you can run ***eva*** on several publicly available 
 
 Supported datasets & tasks include:
 
-*Patch-level pathology datasets*
+*WSI patch-level pathology datasets*
 
 -	**[Patch Camelyon](datasets/patch_camelyon.md)**: binary breast cancer classification
 -	**[BACH](datasets/bach.md)**: multiclass breast cancer classification

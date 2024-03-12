@@ -47,7 +47,7 @@ To customize runs, without the need of creating custom config-files, you can ove
 | `DINO_BACKBONE`          | the backbone architecture, e.g. "dino_vits16" |
 | `PRETRAINED`             | whether to load FM-backbone weights from a pretrained model |
 | `MONITOR_METRIC`         | the metric to monitor for early stopping and model checkpoint loading |
-| `EMBEDDINGS_DIR`         | the directory to store the computed embeddings |
+| `EMBEDDINGS_ROOT`        | the directory to store the computed embeddings |
 | `IN_FEATURES`            | the input feature dimension (embedding)           |
 | `DINO_BACKBONE`          | Backbone model architecture if a facebookresearch/dino FM is evaluated |
 | `CHECKPOINT_PATH`        | Path to the FM-checkpoint to be evaluated           |

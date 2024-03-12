@@ -34,8 +34,7 @@ nav:
       - How to use eva: user-guide/how_to_use.md
       - Tutorials:
         - user-guide/tutorials/index.md
-        - user-guide/tutorials/eva_subcommands.md
-        - user-guide/tutorials/replicate_results.md
+        - user-guide/tutorials/offline_vs_online.md
         - user-guide/tutorials/evaluate_resnet.md
       - Replicate evaluations: user-guide/replicate_evaluations.md
   - Reference API:
