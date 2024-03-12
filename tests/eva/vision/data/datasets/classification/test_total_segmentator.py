@@ -27,9 +27,7 @@ def test_length(
         "train",
     ],
 )
-def test_sample(
-    total_segmentator_dataset: datasets.TotalSegmentatorClassification
-) -> None:
+def test_sample(total_segmentator_dataset: datasets.TotalSegmentatorClassification) -> None:
     """Tests the format of a dataset sample."""
     # assert data sample is a tuple
     sample = total_segmentator_dataset[0]
