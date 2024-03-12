@@ -1,7 +1,8 @@
 """Tests the SessionRecorder class."""
 
-import tempfile
+import os
 from typing import Any, Dict, List
+from unittest import mock
 
 import pytest
 from pytorch_lightning.utilities.types import _EVALUATE_OUTPUT
@@ -101,8 +102,32 @@ def test_session_recorder(
     _calculate_metric()
 
 
+def test_save_config(session_recorder: _recorder.SessionRecorder, tmp_path_factory):
+    """Tests if the input .yaml configuration file is saved."""
+    # Save a fake .yaml configuration file
+    config_dir = tmp_path_factory.mktemp("config")
+    input_config_path = os.path.join(config_dir, "config.yaml")
+    with open(input_config_path, "w") as file:
+        file.write("test: true")
+
+    # Invoke the save method and check if the file is saved to the output directory
+    with mock.patch.object(
+        _recorder.SessionRecorder, "config_path", new_callable=mock.PropertyMock
+    ) as mock_config_path:
+        mock_config_path.return_value = input_config_path
+        assert isinstance(session_recorder.config_path, str)
+
+        output_config_path = os.path.join(
+            session_recorder._output_dir, os.path.basename(session_recorder.config_path)
+        )
+
+        assert not os.path.isfile(output_config_path)
+        session_recorder.save()
+        assert os.path.isfile(output_config_path)
+
+
 @pytest.fixture(scope="function")
-def session_recorder() -> _recorder.SessionRecorder:
+def session_recorder(tmp_path_factory) -> _recorder.SessionRecorder:
     """`SessionRecorder` fixture."""
-    with tempfile.TemporaryDirectory() as tempdir:
-        return _recorder.SessionRecorder(output_dir=tempdir)
+    output_dir = tmp_path_factory.mktemp("output")
+    return _recorder.SessionRecorder(output_dir=output_dir)
