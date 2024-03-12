@@ -1,4 +1,24 @@
-"""NOX lint and test automation API."""
+"""Packaging, testing and release process automation API.
+
+The automation is build using `nox` (https://nox.thea.codes/en/stable/).
+
+Quick guide:
+
+To run all the sessions:
+>>> nox
+
+To run only the code-quality check tagged session:
+>>> nox -t quality
+
+To run only the unit-test tagged session:
+>>> nox -t tests
+
+To run a session (fmt, lint, check, test):
+>>> nox -s {fmt,lint,check,test}
+
+To run a session and pass extra arguments:
+>>> nox -s test -- tests/eva/metrics/test_average_loss.py
+"""
 
 import os
 
@@ -31,7 +51,7 @@ os.environ.pop("PYTHONPATH", None)
 
 @nox.session(tags=["fmt", "format", "quality"])
 def fmt(session: nox.Session) -> None:
-    """Fixes the source code format."""
+    """Formats the source code format."""
     args = session.posargs or LOCATIONS
     session.run_always("pdm", "install", "--no-default", "--group", "lint", external=True)
     session.run("isort", *args)
