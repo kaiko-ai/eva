@@ -1,8 +1,8 @@
 # Train and evaluate a ResNet
 
-If you read [How to use eva](../how_to_use.md) and followed the [Tutorials](../tutorials.md) to this point, you might ask yourself why you would not always use the *offline* workflow to run a complete evaluation. An *offline*-run stores the computed embeddings and runs faster than the *online*-workflow which computes a encoder-forward pass in every epoch.
+If you read [How to use eva](../how_to_use.md) and followed the [Tutorials](../tutorials.md) to this point, you might ask yourself why you would not always use the *offline* workflow to run a complete evaluation. An *offline*-run stores the computed embeddings and runs faster than the *online*-workflow which computes a backbone-forward pass in every epoch.
 
-One use case for the *online*-workflow is the evaluation of a supervised ML model that does not rely on an encoder/decoder architecture. To demonstrate this, lets train a ResNet 18 from [Pytoch Image Models (timm)](https://timm.fast.ai/).
+One use case for the *online*-workflow is the evaluation of a supervised ML model that does not rely on an backbone/head architecture. To demonstrate this, lets train a ResNet 18 from [Pytoch Image Models (timm)](https://timm.fast.ai/).
 
 To do this we need to create a new config-file:
 
