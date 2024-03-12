@@ -1,6 +1,6 @@
 # Datasets
 
-**eva** provides native support for several public datasets. When possible, the corresponding dataset classes facilitate automatic download to disk, if not possible, this documentation provides download instructions.
+***eva*** provides native support for several public datasets. When possible, the corresponding dataset classes facilitate automatic download to disk, if not possible, this documentation provides download instructions.
 
 ## Vision Datasets Overview
 

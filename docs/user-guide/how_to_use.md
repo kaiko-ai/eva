@@ -30,7 +30,7 @@ The *online* workflow can be used to quickly run a complete evaluation without s
 
 ### Config files
 
-The setup for an ***eva*** run is provided in a `.yaml` config file specified with the `--config` flag.
+The setup for an ***eva*** run is provided in a `.yaml` config file which is defined with the `--config` flag.
 
 A config file specifies the setup for the *trainer* (including callback for the model backbone), the *model* (setup of the trainable decoder) and *data* module. 
 
@@ -39,7 +39,7 @@ To get a better understanding, inspect some of the provided [config files](https
 
 ### Environment variables
 
-To customize runs, you can overwrite the config-parameters listed below by setting them as environment variables.
+To customize runs, without the need of creating custom config-files, you can overwrite the config-parameters listed below by setting them as environment variables.
 
 |                         |                           |
 |-------------------------|---------------------------|
@@ -47,7 +47,14 @@ To customize runs, you can overwrite the config-parameters listed below by setti
 | `DINO_BACKBONE`          | the backbone architecture, e.g. "dino_vits16" |
 | `PRETRAINED`             | whether to load FM-backbone weights from a pretrained model |
 | `MONITOR_METRIC`         | the metric to monitor for early stopping and model checkpoint loading |
-| `EMBEDDINGS_DIR`         | the directory to store the computed embeddings |
+| `EMBEDDINGS_ROOT`        | the directory to store the computed embeddings |
 | `IN_FEATURES`            | the input feature dimension (embedding)           |
+| `DINO_BACKBONE`          | Backbone model architecture if a facebookresearch/dino FM is evaluated |
+| `CHECKPOINT_PATH`        | Path to the FM-checkpoint to be evaluated           |
+| `MAX_STEPS`             | Maximum number of training steps (if early stopping is not triggered) |
 | `BATCH_SIZE`             | Batch size for a training step |
+| `LR_VALUE`             | Learning rate for training the decoder |
+| `NUM_CLASSES`             | Number of classes for classification tasks |
 | `PREDICT_BATCH_SIZE`             | Batch size for a predict step |
+| `MONITOR_METRIC`             | Metric to be monitored for early stopping |
+| `MONITOR_METRIC_MODE`             | "min" or "max", depending on the `MONITOR_METRIC` used |

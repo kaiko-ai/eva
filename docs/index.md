@@ -39,18 +39,22 @@ Support for additional modalities and tasks will be added in future releases.
 
 ### 1. Evaluate your own FMs on public benchmark datasets
 
-With a trained FM as input, you can run ***eva*** on several publicly available datasets & tasks for which ***eva*** provides out-of the box support. One ***eva*** run will automatically download and preprocess the relevant data, compute embeddings with the trained FM, fit and evaluate a classification head and report the mean and standard deviation of the relevant performance metrics the selected task.
+With a trained FM as input, you can run ***eva*** on several publicly available datasets & tasks for which ***eva*** provides out-of the box support. One ***eva*** run will automatically download and preprocess the relevant data, compute embeddings with the trained FM, fit and evaluate a downstream head and report the mean and standard deviation of the relevant performance metrics the selected task.
 
 Supported datasets & tasks include:
+
+*WSI patch-level pathology datasets*
 
 -	**[Patch Camelyon](datasets/patch_camelyon.md)**: binary breast cancer classification
 -	**[BACH](datasets/bach.md)**: multiclass breast cancer classification
 -	**[CRC](datasets/crc.md)**: multiclass colorectal cancer classification
 -	**[MHIST](datasets/mhist.md)**: binary colorectal polyp cancer classification
+
+*Radiology datasets*
+
 -	**[TotalSegmentator](datasets/total_segmentator.md)**: radiology/CT-scan for segmentation of anatomical structures
 
-To evaluate FMs, ***eva*** provides support for several formats. These include model checkpoints saved with PyTorch lightning, models available from HuggingFace and onnx-models.
-
+To evaluate FMs, ***eva*** provides support different formats, including models trained with PyTorch lightning, models available from HuggingFace and ONNX-models. For other formats a custom wrapper can be implemented.
 
 ### 2. Evaluate ML models on your own dataset & task
 
@@ -62,9 +66,9 @@ We evaluated the following seven FMs on eva on the 4 supported WSI-patch-level i
 
 | FM-backbone                 | pretraining | PCam - val*      | PCam - test*    | BACH - val**    | CRC - val**     | MHIST - val* |
 |-----------------------------|-------------|------------------|-----------------|-----------------|-----------------|--------------|
-| DINO ViT-S16 random weights | N/A         | 0.765 (±0.0036) | 0.726 (±0.0024) | 0.416 (±0.014)  | 0.643 (±0.0046)	| 0.551 (±0.017)|
-| DINO ViT-S16 imagenet       | ImageNet    | 0.871 (±0.0039) | 0.856 (±0.0044) | 0.673 (±0.0041) | 0.936 (±0.0009) | 0.823 (±0.0051)|
-| DINO ViT-B8 imagenet	       | ImageNet    | 0.872 (±0.0013) | 0.854 (±0.0015) | 0.704 (±0.008)  | 0.942 (±0.0005) | 0.813 (±0.0026)|
+| DINO ViT-S16                | N/A         | 0.765 (±0.0036) | 0.726 (±0.0024) | 0.416 (±0.014)  | 0.643 (±0.0046)	| 0.551 (±0.017)|
+| DINO ViT-S16                | ImageNet    | 0.871 (±0.0039) | 0.856 (±0.0044) | 0.673 (±0.0041) | 0.936 (±0.0009) | 0.823 (±0.0051)|
+| DINO ViT-B8        	        | ImageNet    | 0.872 (±0.0013) | 0.854 (±0.0015) | 0.704 (±0.008)  | 0.942 (±0.0005) | 0.813 (±0.0026)|
 | Lunit - ViT-S16             | TCGA        | 0.89 (±0.0009) | 0.897 (±0.0029) | 0.765 (±0.0108) | 0.936 (±0.001)| 0.762 (±0.0032)| 
 | Owkin - iBOT ViT-B16        | TCGA        | 	0.914 (±0.0012) | 0.919 (±0.0082) | 0.717 (±0.0031) | 0.938 (±0.0005)| 0.799 (±0.0021)| 
 | kaiko.ai - DINO ViT-S16	    | TCGA        | 0.911 (±0.0017) | 0.899 (±0.002)  | 0.773 (±0.0069) | 0.954 (±0.0012) | 0.829 (±0.0035)|
@@ -76,14 +80,14 @@ The runs used the default setup described in the section below. The table shows 
 
 ***eva*** trains the decoder on the "train" split and uses the "validation" split for monitoring, early stopping and checkpoint selection. Evaluation results are reported on the "validation" split and, if available, on the "test" split.
 
-For more details on the FM-backbones and instructions to replicate those results with ***eva***, refer to the [Replicate results section](user-guide/replicate_evaluations.md) 
-in the [User Guide](user-guide/index.md).
+For more details on the FM-backbones and instructions to replicate those results with ***eva***, refer to the [Replicate results section](user-guide/advanced/replicate_evaluations.md) 
+in the [Advanced user guide](user-guide/advanced/index.md).
 
 ## Evaluation setup
 
 For WSI-patch-level/microscopy image classification tasks, FMs that produce image embeddings are evaluated with a single linear layer MLP with embeddings as inputs and label-predictions as output.
 
-To standardize evaluations, the default configurations ***eva*** uses are based on the evaluation protocol proposed by Virchow [1] and dataset/task specific characteristics. To stop training as appropriate we use early stopping after 10% of the maximal number of steps [2].
+To standardize evaluations, the default configurations ***eva*** uses are based on the evaluation protocol proposed by [1] and dataset/task specific characteristics. To stop training as appropriate we use early stopping after 10% of the maximal number of steps as suggested in [2].
 
 |                         |                           |
 |-------------------------|---------------------------|
@@ -96,7 +100,7 @@ To standardize evaluations, the default configurations ***eva*** uses are based 
 | **Batch size**          | dataset specific*         |
 | **Base learning rate**  | 0.01                      |
 | **Learning Rate**       | [Base learning rate] * [Batch size] / [Base batch size]   |
-| **Max epochs**          | [n samples] * [Number of steps] /  [Batch size]  |
+| **Max epochs**          | [Number of samples] * [Number of steps] /  [Batch size]  |
 | **Early stopping**      | 10% * [Max epochs]  |
 | **Optimizer**           | SGD                       |
 | **Momentum**            | 0.9                       |
@@ -104,7 +108,7 @@ To standardize evaluations, the default configurations ***eva*** uses are based 
 | **Nesterov momentum**   | true                      |
 | **LR Schedule**         | Cosine without warmup     |
 
-*For smaller datasets (e.g. BACH with 400 samples) we reduce the batch size to 256 and scale the learning rate accordingly.
+\* For smaller datasets (e.g. BACH with 400 samples) we reduce the batch size to 256 and scale the learning rate accordingly.
 
 - [1]: [Virchow: A Million-Slide Digital Pathology Foundation Model, 2024](https://arxiv.org/pdf/2309.07778.pdf)
 - [2]: [Scaling Self-Supervised Learning for Histopathology with Masked Image Modeling](https://www.medrxiv.org/content/10.1101/2023.07.21.23292757v1.full.pdf)

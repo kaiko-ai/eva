@@ -32,8 +32,14 @@ nav:
       - user-guide/index.md
       - Getting started: user-guide/getting_started.md
       - How to use eva: user-guide/how_to_use.md
-      - Tutorials: user-guide/tutorials.md
-      - Replicate evaluations: user-guide/replicate_evaluations.md
+      - Tutorials:
+        - user-guide/tutorials/index.md
+        - user-guide/tutorials/offline_vs_online.md
+        - user-guide/tutorials/evaluate_resnet.md
+      - Advanced user guide:
+        - user-guide/advanced/index.md
+        - user-guide/advanced/replicate_evaluations.md
+        - user-guide/advanced/model_wrappers.md
   - Reference API:
     - reference/index.md
     - Interface: reference/interface.md
