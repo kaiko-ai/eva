@@ -46,7 +46,7 @@ class SessionRecorder:
 
     @property
     def config_path(self) -> str | None:
-        """Returns the path to the .yaml configuration file from CLI args if available."""
+        """Returns the path to the .yaml configuration file from sys args if available."""
         if "--config" in sys.argv:
             try:
                 config_path = sys.argv[sys.argv.index("--config") + 1]
@@ -55,7 +55,7 @@ class SessionRecorder:
                 else:
                     return config_path
             except IndexError as e:
-                logger.warning(f"Failed to fetch config_path from system args {e}")
+                logger.warning(f"Failed to fetch config_path from sys args {e}")
 
     def update(
         self,
