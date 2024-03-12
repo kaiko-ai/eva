@@ -1,6 +1,6 @@
 # User Guide
 
-Here you will find everything you need to install, understand and interact with ***eva***.
+Here you can find everything you need to install, understand and interact with ***eva***.
 
 ### Getting started
 
