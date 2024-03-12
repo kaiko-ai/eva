@@ -8,10 +8,16 @@ _Oncology FM Evaluation Framework by KAIKO.ai_
 
 
 <a href="https://www.python.org/">
-  <img src="https://img.shields.io/badge/-Python_3.11-blue?logo=python&logoColor=white" />
+  <img src="https://img.shields.io/badge/-python-blue?logo=python&logoColor=white&style=flat-square" />
+</a>
+<a href="https://lightning.ai/docs/pytorch/stable/">
+  <img src="https://img.shields.io/badge/⚡️ lightning-792ee5?logo=pytorchlightning&logoColor=white&style=flat-square" />
+</a>
+<a href="https://github.com/wntrblm/nox">
+  <img src="https://img.shields.io/badge/%F0%9F%A6%8A  nox-D85E00?style=flat-square" />
 </a>
 <a href="https://www.apache.org/licenses/LICENSE-2.0">
-  <img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg" />
+  <img src="https://img.shields.io/badge/License-Apache%202.0-blue?style=flat-square" />
 </a>
 
 <br />
@@ -73,14 +79,18 @@ to [how-to-use]http://127.0.0.1:8000/user-guide/how_to_use/ to run *eva*
 
 ## Datasets
 
-The following datasets are supported
+The following datasets are supported natively:
 
 ### Vision
-- [BACH](./docs/datasets/bach.md)
-- [CRC](./docs/datasets/crc.md)
-- [MHIST](./docs/datasets/mhist.md)
-- [PatchCamelyon](./docs/datasets/patch_camelyon.md)
-- [TotalSegmentator](./docs/datasets/total_segmentator.md)
+
+#### Patch-level pathology datasets:
+  - [BACH](./docs/datasets/bach.md)
+  - [CRC](./docs/datasets/crc.md)
+  - [MHIST](./docs/datasets/mhist.md)
+  - [PatchCamelyon](./docs/datasets/patch_camelyon.md)
+
+#### Radiology datasets:
+  - [TotalSegmentator](./docs/datasets/total_segmentator.md)
 
 ## Contributing
 

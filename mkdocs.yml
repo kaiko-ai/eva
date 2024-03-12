@@ -35,6 +35,7 @@ nav:
       - Tutorials: 
         - Online v.s. Offline Evaluations: user-guide/tutorials/online_vs_offline.md
         - Model Wrappers: user-guide/tutorials/model_wrappers.md
+      - Replicate evaluations: user-guide/replicate_evaluations.md
   - Reference API:
     - reference/index.md
     - Interface: reference/interface.md
