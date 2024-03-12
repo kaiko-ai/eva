@@ -48,11 +48,14 @@ class SessionRecorder:
     def config_path(self) -> str | None:
         """Returns the path to the .yaml configuration file from CLI args if available."""
         if "--config" in sys.argv:
-            config_path = sys.argv[sys.argv.index("--config") + 1]
-            if not config_path.endswith(".yaml"):
-                logger.warning(f"Unexpected config file {config_path}, should be a .yaml file.")
-                return None
-            return config_path
+            try:
+                config_path = sys.argv[sys.argv.index("--config") + 1]
+                if not config_path.endswith(".yaml"):
+                    logger.warning(f"Unexpected config file {config_path}, should be a .yaml file.")
+                else:
+                    return config_path
+            except IndexError as e:
+                logger.warning(f"Failed to fetch config_path from system args {e}")
 
     def update(
         self,
