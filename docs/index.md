@@ -119,3 +119,9 @@ To standardize evaluations, the default configurations *eva* uses are based on t
 ## Next steps
 
 Check out the [User Guide](user-guide/index.md) to get started with *eva*
+
+<br />
+
+<div align="center">
+  <img src="images/kaiko-logo.png" width="200">
+</div>
