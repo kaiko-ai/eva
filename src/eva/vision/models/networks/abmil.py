@@ -49,7 +49,8 @@ class ABMIL(torch.nn.Module):
         Args:
             input_size: input embedding dimension
             output_size: number of classes
-            projected_input_size: size of the projected input. if `None`, no projection is performed.
+            projected_input_size: size of the projected input. if `None`, no projection is
+                performed.
             hidden_size_attention: hidden dimension in attention network
             hidden_sizes_mlp: dimensions for hidden layers in last mlp
             use_bias: whether to use bias in the attention network
