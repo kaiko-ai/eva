@@ -7,15 +7,6 @@
 _Oncology FM Evaluation Framework by kaiko.ai_
 
 
-<a href="https://www.python.org/">
-  <img src="https://img.shields.io/badge/-python-blue?logo=python&logoColor=white&style=flat-square" />
-</a>
-<a href="https://lightning.ai/docs/pytorch/stable/">
-  <img src="https://img.shields.io/badge/⚡️ lightning-792ee5?logo=pytorchlightning&logoColor=white&style=flat-square" />
-</a>
-<a href="https://github.com/wntrblm/nox">
-  <img src="https://img.shields.io/badge/%F0%9F%A6%8A  nox-D85E00?style=flat-square" />
-</a>
 <a href="https://www.apache.org/licenses/LICENSE-2.0">
   <img src="https://img.shields.io/badge/License-Apache%202.0-blue?style=flat-square" />
 </a>
