@@ -30,4 +30,4 @@ This would:
  - Fit a model consisting of the frozen FM-backbone and a classification head on the train split.
  - Evaluate the trained model on the validation split and report the results.
 
-However, before starting to run ***eva***, you might want to familiarize yourself with [How to use ***eva***](how_to_use.md) and then proceed to running ***eva*** with the [Tutorials](tutorials/index.md) :) 
+However, before starting to run ***eva***, you might want to familiarize yourself with [How to use ***eva***](how_to_use.md) and then proceed to running ***eva*** with the [Tutorials](../tutorials/offline_vs_online.md)

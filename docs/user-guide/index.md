@@ -18,4 +18,4 @@ To familiarize yourself with ***eva***, try out some of our tutorials.
 Get to know **eva** in more depth by studying our advanced user guides.
 
  - See how to [replicate our evaluations](advanced/replicate_evaluations.md) of public FM-checkpoints.
- - Understand how to use ***eva***'s [Model Wrapper](model_wrappers.md) API to load models from different formats and sources.
+ - Understand how to use ***eva***'s [Model Wrapper](advanced/model_wrappers.md) API to load models from different formats and sources.
