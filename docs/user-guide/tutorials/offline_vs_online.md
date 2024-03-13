@@ -71,7 +71,7 @@ export LR_VALUE=0.1
 export PRETRAINED=true
 export EMBEDDINGS_ROOT=./data/embeddings/dino_vits16_pretrained
 
-python -m predict_eva fit --config configs/vision/dino_vit/offline/bach.yaml
+python -m eva predict_fit --config configs/vision/dino_vit/offline/bach.yaml
 ```
 
 Once the session is complete, inspect the evaluation results as you did in *Step 2*. Compare the performance metrics and training curves. Can you observe better performance with the ImageNet pretrained encoder?

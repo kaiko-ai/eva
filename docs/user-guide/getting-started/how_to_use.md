@@ -51,6 +51,7 @@ To customize runs, without the need of creating custom config-files, you can ove
 | `IN_FEATURES`            | the input feature dimension (embedding)           |
 | `DINO_BACKBONE`          | Backbone model architecture if a facebookresearch/dino FM is evaluated |
 | `CHECKPOINT_PATH`        | Path to the FM-checkpoint to be evaluated           |
+| `N_RUNS`             | Number of `fit` runs to perform in a session, defaults to 5 |
 | `MAX_STEPS`             | Maximum number of training steps (if early stopping is not triggered) |
 | `BATCH_SIZE`             | Batch size for a training step |
 | `LR_VALUE`             | Learning rate for training the decoder |
