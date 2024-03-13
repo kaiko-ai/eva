@@ -10,17 +10,17 @@ The tissue classes are: Adipose (ADI), background (BACK), debris (DEB), lymphocy
 
 ### Key stats
 
-|                      |                                                     |
-|----------------------|-----------------------------------------------------|
-| **Modality**         | Vision (WSI patches)                                |
-| **Task**             | Multiclass classification (9 classes)               |
-| **Cancer type**      | Colorectal                                          |
-| **Data size**        | total: 11.7GB (train), 800MB (val)                  |
-| **Image dimension**  | 224 x 224 x 3                                       |
-| **FoV (μm/px)**      | 20x (0.5)                                           |
-| **Files format**     | `.tif` images                                       |
-| **Number of images** | 107,180 (100k train, 7.2k val)                      |
-| **Splits in use**    | NCT-CRC-HE-100K (train), CRC-VAL-HE-7K (val)        |
+|                                |                                                     |
+|--------------------------------|-----------------------------------------------------|
+| **Modality**                   | Vision (WSI patches)                                |
+| **Task**                       | Multiclass classification (9 classes)               |
+| **Cancer type**                | Colorectal                                          |
+| **Data size**                  | total: 11.7GB (train), 800MB (val)                  |
+| **Image dimension**            | 224 x 224 x 3                                       |
+| **Magnification (μm/px)**      | 20x (0.5)                                           |
+| **Files format**               | `.tif` images                                       |
+| **Number of images**           | 107,180 (100k train, 7.2k val)                      |
+| **Splits in use**              | NCT-CRC-HE-100K (train), CRC-VAL-HE-7K (val)        |
 
 
 ### Splits
