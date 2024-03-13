@@ -11,7 +11,7 @@ class ArrayToTensor:
         """Call method for the transformation.
 
         Args:
-            array (np.ndarray): The input numpy array.
+            array: The input numpy array.
         """
         return torch.from_numpy(array)
 
@@ -23,6 +23,6 @@ class ArrayToFloatTensor(ArrayToTensor):
         """Call method for the transformation.
 
         Args:
-            array (np.ndarray): The input numpy array.
+            array: The input numpy array.
         """
         return super().__call__(array).float()
