@@ -34,7 +34,7 @@ class Trainer(pl_trainer.Trainer):
         Args:
             args: Positional arguments of ::class::`pytorch_lightning.Trainer`.
             default_root_dir: The default root directory to store the output logs.
-                Unlike in ::class::`pytorch_lightning.Trainer`, this path would be the 
+                Unlike in ::class::`pytorch_lightning.Trainer`, this path would be the
                 prioritized destination point.
             n_runs: The amount of runs (fit and evaluate) to perform in an evaluation session.
             kwargs: Kew-word arguments of ::class::`pytorch_lightning.Trainer`.

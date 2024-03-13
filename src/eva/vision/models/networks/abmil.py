@@ -12,8 +12,8 @@ class ABMIL(torch.nn.Module):
     """ABMIL network for multiple instance learning classification tasks.
 
     Takes an array of patch level embeddings per slide as input. This implementation supports
-    batched inputs of shape (`batch_size`, `n_instances`, `input_size`). For slides with less 
-    than `n_instances` patches, you can apply padding and provide a mask tensor to the forward 
+    batched inputs of shape (`batch_size`, `n_instances`, `input_size`). For slides with less
+    than `n_instances` patches, you can apply padding and provide a mask tensor to the forward
     pass.
 
     The original implementation from [1] was used as a reference:

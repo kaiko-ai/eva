@@ -39,14 +39,14 @@ class SlideEmbeddingDataset(PatchEmbeddingDataset):
         `[k, embedding_dim]`. This dataset class will then stack the patch embeddings for each
         slide, sample n_patches_per_slide patch embeddings (or pad with zeros if there are less
         patches) and finally return tensors of shape `[n_patches_per_slide, embedding_dim]` suitable
-        to train multi-instance learning (MIL) heads. For slides with less than 
+        to train multi-instance learning (MIL) heads. For slides with less than
         `n_patches_per_slide` patches, the resulting tensor is padded.
 
         Args:
             root: Root directory of the dataset. If specified, the paths in the manifest
                 file are expected to be relative to this directory.
             manifest_path: Path to the manifest file. Can be either a `.csv` or `.parquet` file,
-                with the required columns: `path`, `target`, `split` (names can be adjusted using 
+                with the required columns: `path`, `target`, `split` (names can be adjusted using
                 the column_mapping parameter). If `None`, will default to `<root>/manifest.csv`.
             split: Dataset split to use.
             column_mapping: Mapping between the standardized column names and the actual
@@ -91,7 +91,7 @@ class SlideEmbeddingDataset(PatchEmbeddingDataset):
         """This function randomly selects n_patches_per_slide patch embeddings per slide.
 
         After sampling, the patch embeddings of each slide are stacked as tensors of shape
-        `[n_patches_per_slide, embedding_dim]`. For slides that have less than 
+        `[n_patches_per_slide, embedding_dim]`. For slides that have less than
         `n_patches_per_slide` patches, the resulting tensor is padded with `self._pad_value.`
         """
         if self._embedding_column not in df.columns:
