@@ -86,7 +86,7 @@ For more details on the FM-backbones and instructions to replicate the results, 
 ## Evaluation setup
 
 ### WSI-patch-level image classification tasks
-We generate embeddings for all patches using the FM to train a downstream head consisting of a single linear layer in a supervised setup for each of the benchmark datasets. The FM weights are frozen throughout this process.
+With the FM we generate embeddings for all WSI patches and then use these embeddings as input to train a downstream head consisting of a single linear layer in a supervised setup for each of the benchmark datasets. The FM weights are frozen throughout this process.
 
 To standardize evaluations, the default configurations *eva* uses are based on the evaluation protocol proposed by [1] and dataset/task specific characteristics. We use early stopping after 10% of the maximal number of steps as suggested by [2].
 
