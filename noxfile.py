@@ -93,3 +93,15 @@ def ci(session: nox.Session) -> None:
     session.notify("lint")
     session.notify("check")
     session.notify("test")
+
+
+@nox.session
+def build(session: nox.Session) -> None:
+    """Builds the source and wheel distributions."""
+    session.run("pdm", "build")
+
+
+@nox.session
+def publish(session: nox.Session) -> None:
+    """Builds and publishes the source and wheel distributions."""
+    session.run("pdm", "publish")
