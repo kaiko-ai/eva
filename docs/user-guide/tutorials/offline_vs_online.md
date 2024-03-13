@@ -15,7 +15,7 @@ Open a terminal in the folder where you installed *eva* and run:
 export PRETRAINED=false
 export EMBEDDINGS_ROOT=./data/embeddings/dino_vits16_random
 
-python -m eva predict --config configs/vision/dino_vit/offline/bach.yaml
+eva predict --config configs/vision/dino_vit/offline/bach.yaml
 ```
 
 Executing this command will:
@@ -43,7 +43,7 @@ With a batch size of 100 and a dastaset size of 400 samples, one epoch is equiva
 
 Now fit the decoder classifier, by running
 ```
-python -m eva fit --config configs/vision/dino_vit/offline/bach.yaml
+eva fit --config configs/vision/dino_vit/offline/bach.yaml
 ```
 
 Executing this command will:
@@ -71,7 +71,7 @@ export LR_VALUE=0.1
 export PRETRAINED=true
 export EMBEDDINGS_ROOT=./data/embeddings/dino_vits16_pretrained
 
-python -m eva predict_fit --config configs/vision/dino_vit/offline/bach.yaml
+eva predict_fit --config configs/vision/dino_vit/offline/bach.yaml
 ```
 
 Once the session is complete, inspect the evaluation results as you did in *Step 2*. Compare the performance metrics and training curves. Can you observe better performance with the ImageNet pretrained encoder?
@@ -89,7 +89,7 @@ export BATCH_SIZE=100
 export LR_VALUE=0.1
 export PRETRAINED=true
 
-python -m eva fit --config configs/vision/dino_vit/online/bach.yaml
+eva fit --config configs/vision/dino_vit/online/bach.yaml
 ```
 
 Executing this command will:
