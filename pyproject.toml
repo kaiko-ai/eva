@@ -5,8 +5,8 @@ requires = [
 build-backend = "pdm.backend"
 
 [project]
-name = "eva"
-version = "0.0.0.dev1"
+name = "kaiko-eva"
+version = "0.0.0.dev2"
 description = "Evaluation Framework for oncology foundation models."
 readme = "README.md"
 authors = [
@@ -40,9 +40,8 @@ file = "LICENSE"
 
 [project.optional-dependencies]
 vision = [
-    "torchvision>=0.16.2",
-    "opencv-python-headless>=4.9.0.80",
     "torchvision>=0.17.0",
+    "opencv-python-headless>=4.9.0.80",
     "h5py>=3.10.0",
 ]
 all = [
