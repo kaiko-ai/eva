@@ -7,17 +7,17 @@ The BACH dataset consists of microscopy and WSI images, of which we use only the
 
 ### Key stats
 
-|                      |                                                          |
-|----------------------|----------------------------------------------------------|
-| **Modality**         | Vision (microscopy images)                               |
-| **Task**             | Multiclass classification (4 classes)                    |
-| **Cancer type**      | Breast                                                   |
-| **Data size**        | total: 10.4GB / data in use: 7.37 GB (18.9 MB per image) |
-| **Image dimension**  | 1536 x 2048 x 3                                          |
-| **FoV (μm/px)**      | 20x (0.5)                                                |
-| **Files format**     | `.tif` images                                            |
-| **Number of images** | 408 (102 from each class)                                |
-| **Splits in use**    | one labelled split                                       |
+|                           |                                                          |
+|---------------------------|----------------------------------------------------------|
+| **Modality**              | Vision (microscopy images)                               |
+| **Task**                  | Multiclass classification (4 classes)                    |
+| **Cancer type**           | Breast                                                   |
+| **Data size**             | total: 10.4GB / data in use: 7.37 GB (18.9 MB per image) |
+| **Image dimension**       | 1536 x 2048 x 3                                          |
+| **Magnification (μm/px)** | 20x (0.5)                                                |
+| **Files format**          | `.tif` images                                            |
+| **Number of images**      | 408 (102 from each class)                                |
+| **Splits in use**         | one labelled split                                       |
 
 
 ### Organization
@@ -51,8 +51,8 @@ leakage due to images belonging to the same patient. Because the small dataset i
 does not allow to split the data three-ways with sufficient amount of data in each split, we only create a train and val 
 split and leave it to the user to submit predictions on the official test split to the [BACH Challenge Leaderboard](https://iciar2018-challenge.grand-challenge.org/evaluation/challenge/leaderboard/).
 
-| Splits | Train     | Validation | 
-|---|-----------|------------|
+| Splits   | Train     | Validation | 
+|----------|-----------|------------|
 | #Samples | 268 (67%) | 132 (33%)  |
 
 
