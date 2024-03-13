@@ -7,19 +7,19 @@ The PatchCamelyon benchmark is a image classification dataset with 327,680 color
 
 ### Key stats
 
-|                      |                             |
-|----------------------|-----------------------------|
-| **Modality**         | Vision (WSI patches)        |
-| **Task**             | Binary classification       |
-| **Cancer type**      | Breast                      |
-| **Data size**        | 8 GB                        |
-| **Image dimension**  | 96 x 96 x 3                 |
-| **FoV (μm/px)**      | 10x (1.0) \*                |
-| **Files format**     | `h5`                        |
-| **Number of images** | 327,680 (50% of each class) |
+|                                |                             |
+|--------------------------------|-----------------------------|
+| **Modality**                   | Vision (WSI patches)        |
+| **Task**                       | Binary classification       |
+| **Cancer type**                | Breast                      |
+| **Data size**                  | 8 GB                        |
+| **Image dimension**            | 96 x 96 x 3                 |
+| **Magnification (μm/px)**      | 10x (1.0) \*                |
+| **Files format**               | `h5`                        |
+| **Number of images**           | 327,680 (50% of each class) |
 
 
-\* The slides were acquired and digitized at 2 different medical centers using a 40x objective but under-sampled to 10x to increase the field of view. Some papers do categorize it as 10x.
+\* The slides were acquired and digitized at 2 different medical centers using a 40x objective but under-sampled to 10x to increase the field of view.
 
 ### Splits
 

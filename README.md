@@ -36,7 +36,7 @@ _Oncology FM Evaluation Framework by KAIKO.ai_
 
 ### _About_
 
-`eva` is [Kaiko](https://kaiko.ai/)'s evaluation framework for oncology foundation models.
+`eva` is [kaiko.ai](https://kaiko.ai/)'s evaluation framework for oncology foundation models (FMs).
 
 ## Installation
 
