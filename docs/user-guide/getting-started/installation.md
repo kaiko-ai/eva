@@ -8,8 +8,7 @@
 - Install *eva* and the *eva-vision* package with:
 
 ```
-pip install git+ssh://git@github.com/kaiko-ai/eva.git
-pip install "eva[vision]"
+pip install --index-url https://nexus.infra.prd.kaiko.ai/repository/python-all/simple 'kaiko-eva[vision]'
 ```
 
 - To be able to use the existing configs, you have to first download them from the [*eva* GitHub repo](https://github.com/kaiko-ai/eva/tree/main):
@@ -22,7 +21,7 @@ pip install "eva[vision]"
 
 Now you are all setup. You could run a complete *eva* workflow, for example with:
 ```
-python -m eva fit --config configs/vision/dino_vit/online/bach.yaml 
+eva fit --config configs/vision/dino_vit/online/bach.yaml 
 ```
 This would:
 

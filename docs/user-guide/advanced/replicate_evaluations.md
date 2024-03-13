@@ -19,7 +19,7 @@ export NORMALIZE_MEAN=[0.485,0.456,0.406]
 export NORMALIZE_STD=[0.229,0.224,0.225]
 
 # run eva:
-python -m eva predict_fit --config configs/vision/dino_vit/offline/<task>.yaml
+eva predict_fit --config configs/vision/dino_vit/offline/<task>.yaml
 ```
 
 ## DINO ViT-S16 (ImageNet)
@@ -36,7 +36,7 @@ export NORMALIZE_MEAN=[0.485,0.456,0.406]
 export NORMALIZE_STD=[0.229,0.224,0.225]
 
 # run eva:
-python -m eva predict_fit --config configs/vision/dino_vit/offline/<task>.yaml
+eva predict_fit --config configs/vision/dino_vit/offline/<task>.yaml
 ```
 
 ## DINO ViT-B8 (ImageNet)
@@ -52,7 +52,7 @@ export NORMALIZE_MEAN=[0.485,0.456,0.406]
 export NORMALIZE_STD=[0.229,0.224,0.225]
 
 # run eva:
-python -m eva predict_fit --config configs/vision/dino_vit/offline/<task>.yaml
+eva predict_fit --config configs/vision/dino_vit/offline/<task>.yaml
 ```
 
 ## Lunit - DINO ViT-S16 (TCGA)
@@ -70,7 +70,7 @@ export NORMALIZE_MEAN=[0.70322989,0.53606487,0.66096631]
 export NORMALIZE_STD=[0.21716536,0.26081574,0.20723464]
 
 # run eva:
-python -m eva predict_fit --config configs/vision/dino_vit/offline/<task>.yaml
+eva predict_fit --config configs/vision/dino_vit/offline/<task>.yaml
 ```
 
 ## Owkin - iBOT ViT-B16 (TCGA)
@@ -83,7 +83,7 @@ python -m eva predict_fit --config configs/vision/dino_vit/offline/<task>.yaml
 export EMBEDDINGS_ROOT="./data/embeddings/dino_vitb16_owkin"
 
 # run eva:
-python -m eva predict_fit --config configs/vision/owkin/phikon/offline/<task>.yaml
+eva predict_fit --config configs/vision/owkin/phikon/offline/<task>.yaml
 ```
 
 Note: since ***eva*** provides the config files to evaluate tasks with the Phikon FM in 
@@ -105,7 +105,7 @@ export NORMALIZE_MEAN=[0.5,0.5,0.5]
 export NORMALIZE_STD=[0.5,0.5,0.5]
 
 # run eva:
-python -m eva predict_fit --config configs/vision/dino_vit/offline/<task>.yaml
+eva predict_fit --config configs/vision/dino_vit/offline/<task>.yaml
 ```
 
 \* path to public checkpoint will be added when available, currently the checkpoint is stored on Azure blob storage:
@@ -128,7 +128,7 @@ export NORMALIZE_MEAN=[0.5,0.5,0.5]
 export NORMALIZE_STD=[0.5,0.5,0.5]
 
 # run eva:
-python -m eva predict_fit --config configs/vision/dino_vit/offline/<task>.yaml
+eva predict_fit --config configs/vision/dino_vit/offline/<task>.yaml
 ```
 
 \* path to public checkpoint will be added when available, currently the checkpoint is stored on Azure blob storage:
