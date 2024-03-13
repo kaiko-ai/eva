@@ -1,6 +1,6 @@
 # *Offline* vs. *online* evaluations
 
-In this tutorial we run ***eva*** with the three subcommands `predict`, `fit` and `predict_fit`, and take a look at the difference between *offline* and *online* workflows.
+In this tutorial we run *eva* with the three subcommands `predict`, `fit` and `predict_fit`, and take a look at the difference between *offline* and *online* workflows.
 
 For this tutorial we use the [BACH](../../datasets/bach.md) classification task which uses a relatively small dataset.
 
@@ -10,7 +10,7 @@ For this tutorial we use the [BACH](../../datasets/bach.md) classification task 
 
 First, lets use the `predict`-command to download the data and compute embeddings. In this example we use a randomly initialized `dino_vits16` as backbone.
 
-Open a terminal in the folder where you installed ***eva*** and run:
+Open a terminal in the folder where you installed *eva* and run:
 ```
 export PRETRAINED=false
 export EMBEDDINGS_ROOT=./data/embeddings/dino_vits16_random
@@ -33,7 +33,7 @@ Once the session is complete, verify that:
 
 Now we can use the `fit`-command to evaluate the FM on the precomputed embeddings.
 
-To ensure a quick run for the purpose of this exercise, lets overwrite some of the default parameters. In the terminal, where you run ***eva*** set:
+To ensure a quick run for the purpose of this exercise, lets overwrite some of the default parameters. In the terminal, where you run *eva* set:
 ```
 export MAX_STEPS=20
 export BATCH_SIZE=100

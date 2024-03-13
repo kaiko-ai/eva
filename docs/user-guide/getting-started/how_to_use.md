@@ -1,9 +1,9 @@
-# How to use ***eva***
+# How to use *eva*
 
 Before starting to use ***eva***, it's important to get familiar with the different workflows, subcommands and configurations.
 
 
-## ***eva*** subcommands
+## *eva* subcommands
 
 To run an evaluation, we call:
 ```

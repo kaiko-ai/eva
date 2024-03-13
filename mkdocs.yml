@@ -8,19 +8,19 @@ theme:
     - navigation.indexes
     - search.suggest
     - search.highlight
-  logo: images/logo_small.png
+  logo: images/eva-stripes.png
   palette:
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
-      primary: indigo
-      accent: indigo
+      primary: black
+      accent: black
       toggle:
         icon: material/weather-night
         name: Switch to light mode
     - media: "(prefers-color-scheme: light)"
       scheme: default
-      primary: indigo
-      accent: indigo
+      primary: white
+      accent: white
       toggle:
         icon: material/weather-sunny
         name: Switch to dark mode

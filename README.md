@@ -4,7 +4,7 @@
 
 <br />
 
-_Oncology FM Evaluation Framework by KAIKO.ai_
+_Oncology FM Evaluation Framework by kaiko.ai_
 
 
 <a href="https://www.python.org/">
