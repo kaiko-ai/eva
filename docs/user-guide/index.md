@@ -1,17 +1,21 @@
 # User Guide
 
-### [Getting started](getting_started.md)
+Here you can find everything you need to install, understand and interact with ***eva***.
 
-Install ***eva*** on your machine.
+### Getting started
 
-### [How to use eva](how_to_use.md)
+[Install](getting-started/installation.md) ***eva*** on your machine and learn [how to use eva](getting-started/how_to_use.md).
 
-Get familiar with the different workflows, subcommands and configurations.
+### Tutorials
 
-### [Tutorials](tutorials/index.md)
+To familiarize yourself with ***eva***, try out some of our tutorials.
 
-Run ***eva*** with the different subcommands, replicate our evaluation results and train a supervised ResNet18 from scratch.
+ - Go through [*Offline* vs. *online* evaluations](tutorials/offline_vs_online.md) to run ***eva*** workflows.
+ - Train and [evaluate a ResNet](tutorials/evaluate_resnet.md) model from scratch.
 
-### [Advanced user guide](advanced/index.md)
+### Advanced user guide
 
 Get to know **eva** in more depth by studying our advanced user guides.
+
+ - See how to [replicate our evaluations](advanced/replicate_evaluations.md) of public FM-checkpoints.
+ - Understand how to use ***eva***'s [Model Wrapper](model_wrappers.md) API to load models from different formats and sources.
