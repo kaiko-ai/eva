@@ -31,7 +31,7 @@ _Oncology FM Evaluation Framework by Kaiko_
 
 With the first release, ***eva*** supports performance evaluation for vision Foundation Models ("FMs") and supervised machine learning ("ML") models on WSI-patch-level image classification- and radiology (CT-scans) segmentation tasks.
 
-The goal of this project is to provide the open-source community with an easy-to-use framework that follows industry best practices to provide a robust, reproducible and fair evaluation benchmark across FMs of different sizes and architectures.
+The goal of this project is to provide the open-source community with an easy-to-use framework that follows industry best practices to deliver a robust, reproducible and fair evaluation benchmark across FMs of different sizes and architectures.
 
 Support for additional modalities and tasks will be added in future releases.
 
@@ -39,7 +39,7 @@ Support for additional modalities and tasks will be added in future releases.
 
 ### 1. Evaluate your own FMs on public benchmark datasets
 
-With a specified FM as input, you can run ***eva*** on several publicly available datasets & tasks. One evaluation run will download and preprocess the relevant data, compute embeddings, fit and evaluate a downstream head and report the mean and standard deviation of the relevant performance metrics.
+With a specified FM as input, you can run *eva* on several publicly available datasets & tasks. One evaluation run will download and preprocess the relevant data, compute embeddings, fit and evaluate a downstream head and report the mean and standard deviation of the relevant performance metrics.
 
 Supported datasets & tasks include:
 
@@ -54,11 +54,11 @@ Supported datasets & tasks include:
 
 -	**[TotalSegmentator](datasets/total_segmentator.md)**: radiology/CT-scan for segmentation of anatomical structures
 
-To evaluate FMs, ***eva*** provides support fpr different model-formats, including models trained with PyTorch, models available on HuggingFace and ONNX-models. For other formats custom wrappers can be implemented.
+To evaluate FMs, *eva* provides support fpr different model-formats, including models trained with PyTorch, models available on HuggingFace and ONNX-models. For other formats custom wrappers can be implemented.
 
 ### 2. Evaluate ML models on your own dataset & task
 
-If you have your own labelled dataset, all that is needed is to implement a dataset class tailored to your source data. Start from one of our out-of-the box provided dataset classes, adapt it to your data and run ***eva*** to see how different FMs perform on your task.
+If you have your own labelled dataset, all that is needed is to implement a dataset class tailored to your source data. Start from one of our out-of-the box provided dataset classes, adapt it to your data and run *eva* to see how different FMs perform on your task.
 
 ## Evaluation results
 
@@ -86,7 +86,7 @@ For more details on the FM-backbones and instructions to replicate the results, 
 
 For WSI-patch-level image classification tasks, FMs that produce image embeddings are evaluated with a single linear layer MLP with embeddings as inputs and label-predictions as output.
 
-To standardize evaluations, the default configurations ***eva*** uses are based on the evaluation protocol proposed by [1] and dataset/task specific characteristics. We use early stopping after 10% of the maximal number of steps as suggested by [2].
+To standardize evaluations, the default configurations *eva* uses are based on the evaluation protocol proposed by [1] and dataset/task specific characteristics. We use early stopping after 10% of the maximal number of steps as suggested by [2].
 
 |                         |                           |
 |-------------------------|---------------------------|
@@ -114,8 +114,14 @@ To standardize evaluations, the default configurations ***eva*** uses are based 
 
 ## License
 
-***eva*** is distributed under the terms of the [Apache-2.0 license](https://github.com/kaiko-ai/eva?tab=Apache-2.0-1-ov-file#readme).
+*eva* is distributed under the terms of the [Apache-2.0 license](https://github.com/kaiko-ai/eva?tab=Apache-2.0-1-ov-file#readme).
 
 ## Next steps
 
-Check out the [User Guide](user-guide/index.md) to get started with ***eva***
+Check out the [User Guide](user-guide/index.md) to get started with *eva*
+
+<br />
+
+<div align="center">
+  <img src="images/kaiko-logo.png" width="200">
+</div>

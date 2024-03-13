@@ -1,6 +1,6 @@
 # Replicate evaluations
 
-To produce the evaluation results presented [here](../index.md), you can run ***eva*** with the settings below.
+To produce the evaluation results presented [here](../index.md), you can run *eva* with the settings below.
 
 Make sure to replace `<task>` in the commands below with `bach`, `crc`, `mhist` or `patch_camelyon`.
 
