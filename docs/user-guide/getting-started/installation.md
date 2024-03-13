@@ -17,7 +17,7 @@ pip install --index-url https://nexus.infra.prd.kaiko.ai/repository/python-all/s
 azcopy copy https://kaiko.blob.core.windows.net/long-term-experimental/eva/configs . --recursive=true
 ```
 
-(Alternativaely you can also download them from the [*eva* GitHub repo](https://github.com/kaiko-ai/eva/tree/main))
+(Alternatively you can also download them from the [*eva* GitHub repo](https://github.com/kaiko-ai/eva/tree/main))
 
 
 ## Run *eva*
