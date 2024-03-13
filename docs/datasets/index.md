@@ -6,15 +6,14 @@
 
 ### Whole Slide (WSI) and microscopy image datasets
 
-| Dataset                            | #Patches | Patch Size | FoV (μm/px)  | Task                       | Cancer Type      |
-|------------------------------------|----------|------------|--------------|----------------------------|------------------|
-| [BACH](bach.md)                    | 400      | 2048x1536  | 20x (0.5)    | Classification (4 classes) | Breast           |
-| [CRC](crc.md)                      | 107,180  | 224x224    | 20x (0.5)    | Classification (9 classes) | Colorectal       |
-| [PatchCamelyon](patch_camelyon.md) | 327,680  | 96x96      | 10x (1.0) \* | Classification (2 classes) | Breast           |
-| [MHIST](mhist.md)                  | 3,152    | 224x224    | 40x (0.25)   | Classification (2 classes) | Colorectal Polyp |
+| Dataset                            | #Patches | Patch Size | Magnification (μm/px)  | Task                       | Cancer Type      |
+|------------------------------------|----------|------------|------------------------|----------------------------|------------------|
+| [BACH](bach.md)                    | 400      | 2048x1536  | 20x (0.5)              | Classification (4 classes) | Breast           |
+| [CRC](crc.md)                      | 107,180  | 224x224    | 20x (0.5)              | Classification (9 classes) | Colorectal       |
+| [PatchCamelyon](patch_camelyon.md) | 327,680  | 96x96      | 10x (1.0) \*           | Classification (2 classes) | Breast           |
+| [MHIST](mhist.md)                  | 3,152    | 224x224    |  5x (2.0) \*           | Classification (2 classes) | Colorectal Polyp |
 
-\* The slides were acquired and digitized at 2 different centres using a 40x objective but under-sampled to 10x to increase the field of view. Some papers do categorize it as 10x.
-
+\* Downsampled from 40x (0.25 μm/px) to increase the field of view.
 
 ### Radiology datasets
 
