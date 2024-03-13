@@ -20,7 +20,6 @@ class ResizeAndCrop(torch_transforms.Compose):
         Args:
             size: Desired output size of the crop. If size is an `int` instead
                 of sequence like (h, w), a square crop (size, size) is made.
-                Defaults to `224`.
             mean: Sequence of means for each image channel.
             std: Sequence of standard deviations for each image channel.
         """

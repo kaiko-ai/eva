@@ -27,7 +27,7 @@ class VisionDataset(Dataset, abc.ABC, Generic[DataSample]):
         This method is preferred for creating datasets or performing
         train/val/test splits. If implemented, it will be called via
         :class:`eva.data.datamodules.DataModule` at the beginning of fit
-        (train + validate), validate, test, or predict and it is called
+        (train + validate), validate, test, or predict and it will be called
         from every process (i.e. GPU) across all the nodes in DDP.
         """
 
@@ -36,7 +36,7 @@ class VisionDataset(Dataset, abc.ABC, Generic[DataSample]):
 
         Used to clean-up when the run is finished. If implemented, it will
         be called via :class:`eva.data.datamodules.DataModule` at the end
-        of fit (train + validate), validate, test, or predict and it is
+        of fit (train + validate), validate, test, or predict and it will be
         called from every process (i.e. GPU) across all the nodes in DDP.
         """
 
