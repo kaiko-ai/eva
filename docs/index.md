@@ -54,7 +54,7 @@ Supported datasets & tasks include:
 
 -	**[TotalSegmentator](datasets/total_segmentator.md)**: radiology/CT-scan for segmentation of anatomical structures
 
-To evaluate FMs, ***eva*** provides support different model-formats, including models trained with PyTorch lightning, models available on HuggingFace and ONNX-models. For other formats a custom wrapper can be implemented.
+To evaluate FMs, ***eva*** provides support fpr different model-formats, including models trained with PyTorch, models available on HuggingFace and ONNX-models. For other formats custom wrappers can be implemented.
 
 ### 2. Evaluate ML models on your own dataset & task
 
