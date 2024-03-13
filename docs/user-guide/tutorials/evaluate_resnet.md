@@ -29,7 +29,6 @@ To reduce training time, lets overwrite some of the default parameters. In the t
 ```
 export OUTPUT_ROOT=logs/resnet/bach
 export MAX_STEPS=20
-export BATCH_SIZE=100
 export LR_VALUE=0.1
 ```
 Now train and evaluate the model by running:
