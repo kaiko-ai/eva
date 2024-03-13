@@ -9,7 +9,7 @@ class Interface:
     """A high-level interface for training and validating a machine learning model.
 
     This class provides a convenient interface to connect a model, data, and trainer
-    for training and validating the model using the specified data and trainer.
+    to train and validate a model.
     """
 
     def fit(
@@ -23,6 +23,7 @@ class Interface:
         This method uses the specified trainer to fit the model using the provided data.
 
         Example use cases:
+        
         - Using a model consisting of a frozen backbone and a head, the backbone will generate
           the embeddings on the fly which are then used as input features to train the head on
           the downstream task specified by the given dataset.

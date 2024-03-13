@@ -16,7 +16,7 @@ class DataModule(pl.LightningDataModule):
 
     It will initialize and create the mapping between dataloaders and
     datasets. During the `prepare_data`, `setup` and `teardown`, the
-    datamodule will call the respectively methods from all the datasets,
+    datamodule will call the respective methods from all datasets,
     given that they are defined.
     """
 

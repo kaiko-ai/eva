@@ -19,7 +19,7 @@ def run_evaluation_session(
 ) -> None:
     """Runs a downstream evaluation session out-of-place.
 
-    It performs an evaluation run (fit and evaluate) the model
+    It performs an evaluation run (fit and evaluate) on the model
     multiple times. Note that as the input `base_trainer` and
     `base_model` would be cloned, the input object would not
     be modified.

@@ -12,8 +12,9 @@ class ABMIL(torch.nn.Module):
     """ABMIL network for multiple instance learning classification tasks.
 
     Takes an array of patch level embeddings per slide as input. This implementation supports
-    batched inputs of shape (batch_size, n_instances, input_size). For slides with less than
-    n_instances patches, you can apply padding and provide a mask tensor to the forward pass.
+    batched inputs of shape (`batch_size`, `n_instances`, `input_size`). For slides with less 
+    than `n_instances` patches, you can apply padding and provide a mask tensor to the forward 
+    pass.
 
     The original implementation from [1] was used as a reference:
     https://github.com/AMLab-Amsterdam/AttentionDeepMIL/blob/master/model.py
@@ -48,7 +49,7 @@ class ABMIL(torch.nn.Module):
         Args:
             input_size: input embedding dimension
             output_size: number of classes
-            projected_input_size: size of the projected input. if None, no projection is performed.
+            projected_input_size: size of the projected input. if `None`, no projection is performed.
             hidden_size_attention: hidden dimension in attention network
             hidden_sizes_mlp: dimensions for hidden layers in last mlp
             use_bias: whether to use bias in the attention network
@@ -56,7 +57,7 @@ class ABMIL(torch.nn.Module):
             dropout_attention: dropout rate for the attention network and classifier
             dropout_mlp: dropout rate for the final MLP network
             pad_value: Value indicating padding in the input tensor. If specified, entries with
-                this value in the will be masked. If set to None, no masking is applied.
+                this value in the will be masked. If set to `None`, no masking is applied.
         """
         super().__init__()
 
@@ -151,8 +152,8 @@ class GatedAttention(nn.Module):
             dropout: dropout rate
             n_classes: number of classes
             use_bias: whether to use bias in the linear layers
-            activation_a: activation function for attention_a, default is nn.Tanh
-            activation_b: activation function for attention_b, default is nn.Sigmoid
+            activation_a: activation function for attention_a.
+            activation_b: activation function for attention_b.
         """
         super().__init__()
 

@@ -19,7 +19,7 @@ class DataLoader:
     batch_size: int | None = 1
     """How many samples per batch to load.
 
-    Set None for iterable dataset where dataset produces batches.
+    Set to `None` for iterable dataset where dataset produces batches.
     """
 
     shuffle: bool = False
