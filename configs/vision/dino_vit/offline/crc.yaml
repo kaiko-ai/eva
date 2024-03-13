@@ -54,7 +54,7 @@ model:
     optimizer:
       class_path: torch.optim.SGD
       init_args:
-        lr: &LR_VALUE 0.01
+        lr: &LR_VALUE ${oc.env:LR_VALUE, 0.01}
         momentum: 0.9
         weight_decay: 0.0
     lr_scheduler:

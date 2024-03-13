@@ -54,7 +54,7 @@ model:
     optimizer:
       class_path: torch.optim.SGD
       init_args:
-        lr: &LR_VALUE 0.00064
+        lr: &LR_VALUE ${oc.env:LR_VALUE, 0.000625}
         momentum: 0.9
         weight_decay: 0.0
     lr_scheduler:
@@ -102,7 +102,7 @@ data:
             split: val
     dataloaders:
       train:
-        batch_size: &BATCH_SIZE 256
+        batch_size: &BATCH_SIZE ${oc.env:BATCH_SIZE, 256}
         shuffle: true
       val:
         batch_size: *BATCH_SIZE
