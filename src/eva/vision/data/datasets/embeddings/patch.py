@@ -38,12 +38,11 @@ class PatchEmbeddingDataset(VisionDataset):
                 file are expected to be relative to this directory.
             manifest_path: Path to the manifest file. Can be either a .csv or .parquet file, with
                 the required columns: path, target, split (names can be adjusted using the
-                column_mapping parameter). If None, will default to `<root>/manifest.csv`.
+                column_mapping parameter). If `None`, it will default to `<root>/manifest.csv`.
             split: Dataset split to use.
             column_mapping: Mapping between the standardized column names and the actual
                 column names in the provided manifest file.
-            target_transforms: A function/transform that takes in the target
-                and transforms it.
+            target_transforms: A function/transform that transforms the target.
         """
         super().__init__()
 

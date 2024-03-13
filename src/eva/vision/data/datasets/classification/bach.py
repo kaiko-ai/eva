@@ -55,12 +55,12 @@ class BACH(base.ImageClassification):
         """Initialize the dataset.
 
         The dataset is split into train and validation by taking into account
-        the patient ids to avoid any data leakage.
+        the patient IDs to avoid any data leakage.
 
         Args:
             root: Path to the root directory of the dataset. The dataset will
                 be downloaded and extracted here, if it does not already exist.
-            split: Dataset split to use. If None, the entire dataset is used.
+            split: Dataset split to use. If `None`, the entire dataset is used.
             download: Whether to download the data for the specified split.
                 Note that the download will be executed only by additionally
                 calling the :meth:`prepare_data` method and if the data does

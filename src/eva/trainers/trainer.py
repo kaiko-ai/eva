@@ -16,7 +16,7 @@ from eva.trainers import _logging, functional
 class Trainer(pl_trainer.Trainer):
     """Core trainer class.
 
-    It is an extended version of lightning's core trainer class.
+    This is an extended version of lightning's core trainer class.
     """
 
     @argparse._defaults_from_env_vars
@@ -34,8 +34,8 @@ class Trainer(pl_trainer.Trainer):
         Args:
             args: Positional arguments of ::class::`pytorch_lightning.Trainer`.
             default_root_dir: The default root directory to store the output logs.
-                In difference with ::class::`pytorch_lightning.Trainer`, this path
-                would be the prior destination point.
+                Unlike in ::class::`pytorch_lightning.Trainer`, this path would be the
+                prioritized destination point.
             n_runs: The amount of runs (fit and evaluate) to perform in an evaluation session.
             kwargs: Kew-word arguments of ::class::`pytorch_lightning.Trainer`.
         """
@@ -83,7 +83,7 @@ class Trainer(pl_trainer.Trainer):
         It performs an evaluation run (fit and evaluate) the model
         `self._n_run` times. Note that the input `base_model` would
         not be modified, so the weights of the input model will remain
-        as is.
+        as they are.
 
         Args:
             model: The base model module to evaluate.

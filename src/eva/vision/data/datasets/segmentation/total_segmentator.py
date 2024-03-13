@@ -59,7 +59,7 @@ class TotalSegmentator2D(base.ImageSegmentation):
         Args:
             root: Path to the root directory of the dataset. The dataset will
                 be downloaded and extracted here, if it does not already exist.
-            split: Dataset split to use. If None, the entire dataset is used.
+            split: Dataset split to use. If `None`, the entire dataset is used.
             version: The version of the dataset to initialize.
             download: Whether to download the data for the specified split.
                 Note that the download will be executed only by additionally
