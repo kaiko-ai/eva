@@ -114,3 +114,15 @@ def bump(session: nox.Session) -> None:
     """
     session.run_always("pdm", "self", "add", "pdm-bump", external=True)
     session.run("pdm", "bump", *session.posargs, external=True)
+
+
+@nox.session
+def build(session: nox.Session) -> None:
+    """Builds the source and wheel distributions."""
+    session.run("pdm", "build")
+
+
+@nox.session
+def publish(session: nox.Session) -> None:
+    """Builds and publishes the source and wheel distributions."""
+    session.run("pdm", "publish")
