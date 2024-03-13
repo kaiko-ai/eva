@@ -1,4 +1,4 @@
-# *Offline* vs. *Online* evaluations
+# *Offline* vs. *online* evaluations
 
 In this tutorial we run ***eva*** with the three subcommands `predict`, `fit` and `predict_fit`, and take a look at the difference between *offline* and *online* workflows.
 
