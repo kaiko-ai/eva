@@ -1,12 +1,13 @@
 [build-system]
-requires = ["pdm-backend"]
+requires = [
+    "pdm-backend",
+]
 build-backend = "pdm.backend"
 
 [project]
 name = "eva"
-version = "0.0.1"
+version = "0.0.0.dev1"
 description = "Evaluation Framework for oncology foundation models."
-license = {file = "LICENSE"}
 readme = "README.md"
 authors = [
     { name = "Ioannis Gatopoulos", email = "ioannis@kaiko.ai" },
@@ -34,6 +35,9 @@ dependencies = [
     "toolz>=0.12.1",
 ]
 
+[project.license]
+file = "LICENSE"
+
 [project.optional-dependencies]
 vision = [
     "torchvision>=0.16.2",
@@ -41,7 +45,12 @@ vision = [
     "torchvision>=0.17.0",
     "h5py>=3.10.0",
 ]
-all = ["eva[vision]"]
+all = [
+    "eva[vision]",
+]
+
+[project.scripts]
+eva = "eva.__main__:main"
 
 [tool.pdm.dev-dependencies]
 lint = [
@@ -64,10 +73,9 @@ docs = [
     "mkdocstrings[python]>=0.24.0",
     "mkdocs-material>=9.5.6",
 ]
-dev = ["eva[lint, test, docs]"]
-
-[project.scripts]
-eva = "eva.__main__:main"
+dev = [
+    "eva[lint, test, docs]",
+]
 
 [tool.isort]
 atomic = true
@@ -76,14 +84,27 @@ line_length = 100
 skip_gitignore = true
 
 [tool.black]
-target-version = ["py310"]
+target-version = [
+    "py310",
+]
 line-length = 100
 
 [tool.ruff]
-lint.select = ["A", "B", "C", "D", "E", "F"]
-lint.ignore = ["D401"]
 line-length = 100
 target-version = "py310"
+
+[tool.ruff.lint]
+select = [
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F",
+]
+ignore = [
+    "D401",
+]
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
@@ -92,11 +113,13 @@ convention = "google"
 docstring-quotes = "double"
 
 [tool.bandit]
-exclude_dirs = [".venv", "tests/**"]
+exclude_dirs = [
+    ".venv",
+    "tests/**",
+]
 
 [tool.pyright]
 pythonVersion = "3.10"
-# Skip due to https://github.com/microsoft/pyright/issues/7095
 reportIncompatibleMethodOverride = false
 exclude = [
     "__pypackages__",
@@ -121,7 +144,10 @@ testpaths = "tests/"
 
 [tool.coverage]
 precision = 2
-range = [95, 100]
+range = [
+    95,
+    100,
+]
 
 [tool.coverage.run]
 omit = [
