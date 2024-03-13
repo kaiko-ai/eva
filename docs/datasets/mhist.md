@@ -16,18 +16,19 @@ by broad-based crypts, often with complex structure and heavy serration.
 
 ### Key stats
 
-|                      |                                                     |
-|----------------------|-----------------------------------------------------|
-| **Modality**         | Vision (WSI patches)                                |
-| **Task**             | Binary classification (2 classes)                   |
-| **Cancer type**      | Colorectal Polyp                                    |
-| **Data size**        | 354 MB                                              |
-| **Image dimension**  | 224 x 224 x 3                                       |
-| **FoV (μm/px)**      | 40x (0.25)                                          |
-| **Files format**     | `.png` images                                       |
-| **Number of images** | 3,152 (2,175 train, 977 test)                       |
-| **Splits in use**    | annotations.csv (train / test)                      |
+|                                |                                                     |
+|--------------------------------|-----------------------------------------------------|
+| **Modality**                   | Vision (WSI patches)                                |
+| **Task**                       | Binary classification (2 classes)                   |
+| **Cancer type**                | Colorectal Polyp                                    |
+| **Data size**                  | 354 MB                                              |
+| **Image dimension**            | 224 x 224 x 3                                       |
+| **Magnification (μm/px)**      | 5x (2.0) \*                                         |
+| **Files format**               | `.png` images                                       |
+| **Number of images**           | 3,152 (2,175 train, 977 test)                       |
+| **Splits in use**              | annotations.csv (train / test)                      |
 
+\* Downsampled from 40x to increase the field of view.
 
 ### Organization
 
