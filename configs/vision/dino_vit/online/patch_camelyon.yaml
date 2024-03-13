@@ -3,7 +3,7 @@ trainer:
   class_path: eva.Trainer
   init_args:
     default_root_dir: &OUTPUT_ROOT ${oc.env:OUTPUT_ROOT, logs/${oc.env:DINO_BACKBONE, dino_vits16}/online/patch_camelyon}
-    max_steps: &MAX_STEPS 12500
+    max_steps: &MAX_STEPS ${oc.env:MAX_STEPS, 12500}
     callbacks:
       - class_path: pytorch_lightning.callbacks.LearningRateMonitor
         init_args:
@@ -47,7 +47,7 @@ model:
     optimizer:
       class_path: torch.optim.SGD
       init_args:
-        lr: &LR_VALUE 0.00064
+        lr: &LR_VALUE ${oc.env:LR_VALUE, 0.01}
         momentum: 0.9
         weight_decay: 0.0
     lr_scheduler:
@@ -89,7 +89,7 @@ data:
           split: test
     dataloaders:
       train:
-        batch_size: &BATCH_SIZE ${oc.env:BATCH_SIZE, 64}
+        batch_size: &BATCH_SIZE ${oc.env:BATCH_SIZE, 4096}
         shuffle: true
       val:
         batch_size: *BATCH_SIZE

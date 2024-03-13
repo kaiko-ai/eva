@@ -3,7 +3,7 @@ trainer:
   class_path: eva.Trainer
   init_args:
     default_root_dir: &OUTPUT_ROOT ${oc.env:OUTPUT_ROOT, logs/${oc.env:DINO_BACKBONE, dino_vits16}/online/crc}
-    max_steps: &MAX_STEPS 12500
+    max_steps: &MAX_STEPS ${oc.env:MAX_STEPS, 12500}
     callbacks:
       - class_path: pytorch_lightning.callbacks.LearningRateMonitor
         init_args:
@@ -47,7 +47,7 @@ model:
     optimizer:
       class_path: torch.optim.SGD
       init_args:
-        lr: &LR_VALUE 0.00064
+        lr: &LR_VALUE ${oc.env:LR_VALUE, 0.01}
         momentum: 0.9
         weight_decay: 0.0
     lr_scheduler:
@@ -74,8 +74,8 @@ data:
           image_transforms:
             class_path: eva.vision.data.transforms.common.ResizeAndCrop
             init_args:
-              mean: [0.485, 0.456, 0.406]
-              std: [0.229, 0.224, 0.225]
+              mean: ${oc.env:NORMALIZE_MEAN, [0.485, 0.456, 0.406]}
+              std: ${oc.env:NORMALIZE_STD, [0.229, 0.224, 0.225]}
       val:
         class_path: eva.vision.datasets.CRC
         init_args:
@@ -83,7 +83,7 @@ data:
           split: val
     dataloaders:
       train:
-        batch_size: &BATCH_SIZE ${oc.env:BATCH_SIZE, 256}
+        batch_size: &BATCH_SIZE ${oc.env:BATCH_SIZE, 4096}
         shuffle: true
       val:
         batch_size: *BATCH_SIZE

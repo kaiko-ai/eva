@@ -107,4 +107,4 @@ data:
       val:
         batch_size: *BATCH_SIZE
       predict:
-        batch_size: &PREDICT_BATCH_SIZE ${oc.env:PREDICT_BATCH_SIZE, 128}
+        batch_size: &PREDICT_BATCH_SIZE ${oc.env:PREDICT_BATCH_SIZE, 64}
