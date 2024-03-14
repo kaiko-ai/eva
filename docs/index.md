@@ -74,8 +74,9 @@ We evaluated the following FMs on the 4 supported WSI-patch-level image classifi
 | DINO ViT-B8        	        | ImageNet    | 0.872 (±0.004) | 0.854 (±0.002) | 0.704 (±0.008)  | 0.942 (±0.001) | 0.813 (±0.003)|
 | Lunit - ViT-S16             | TCGA        | 0.89 (±0.001) | 0.897 (±0.003) | 0.765 (±0.011) | 0.936 (±0.001)| 0.762 (±0.004)| 
 | Owkin - iBOT ViT-B16        | TCGA        | 	**0.914 (±0.002)** | **0.919 (±0.009)** | 0.717 (±0.004) | 0.938 (±0.001)| 0.799 (±0.003)| 
-| kaiko.ai - DINO ViT-S16	    | TCGA        | 0.911 (±0.002) | 0.899 (±0.002)  | **0.773 (±0.007)** | **0.954 (±0.002)** | **0.829 (±0.004)**|
-| kaiko.ai - DINO ViT-B8      | TCGA        | 0.902 (±0.002) | 0.887 (±0.004) | 0.798 (±0.007) | 0.949 (±0.001) | 0.803 (±0.004)| 
+| kaiko.ai - DINO ViT-S16	    | TCGA        | 0.911 (±0.002) | 0.899 (±0.002)  | 0.773 (±0.007) | **0.954 (±0.002)** | **0.829 (±0.004)**|
+| kaiko.ai - DINO ViT-B8      | TCGA        | 0.902 (±0.002) | 0.887 (±0.004) | **0.798 (±0.007)** | 0.950 (±0.003) | 0.803 (±0.004)| 
+| kaiko.ai - DINOv2 ViT-L14   | TCGA        | 0.900 (±0.002) | 0.896 (±0.001) | 0.768 (±0.006) | 0.945 (±0.001) | 0.777 (±0.008)| 
 
 \* Metric in table: *Balanced Accuracy* (for binary & multiclass). The runs use the default setup described in the section below. The table shows the average performance & standard deviation over 5 runs.
 
