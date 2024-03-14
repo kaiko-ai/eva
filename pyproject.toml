@@ -50,6 +50,7 @@ all = [
 
 [project.scripts]
 eva = "eva.__main__:main"
+kaiko-eva = "eva.__main__:main"
 
 [tool.pdm.build]
 package-dir = "src"
