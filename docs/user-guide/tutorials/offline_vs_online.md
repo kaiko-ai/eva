@@ -20,7 +20,7 @@ eva predict --config configs/vision/dino_vit/offline/bach.yaml
 
 Executing this command will:
 
- - Download and extract the BACH dataset to `./data/bach` (if it has not already been downloaded to this location).
+ - Download and extract the BACH dataset to `./data/bach` (if it has not already been downloaded to this location). This will take a few minutes.
  - Compute the embeddings for all input images with the specified FM-backbone and store them in the `EMBEDDINGS_ROOT` along with a `manifest.csv` file.
 
 Once the session is complete, verify that:
@@ -33,15 +33,13 @@ Once the session is complete, verify that:
 
 Now we can use the `fit`-command to evaluate the FM on the precomputed embeddings.
 
-To ensure a quick run for the purpose of this exercise, lets overwrite some of the default parameters. In the terminal, where you run *eva* set:
+To ensure a quick run for the purpose of this exercise, lets overwrite some of the default parameters. In the terminal where you run *eva*, set:
 ```
 export MAX_STEPS=20
-export BATCH_SIZE=100
 export LR_VALUE=0.1
 ```
-With a batch size of 100 and a dastaset size of 400 samples, one epoch is equivalent to 400/100=4 steps. Setting `MAX_STEPS` to 20 therefore ensures a maximum of 20/4=5 epochs.
 
-Now fit the decoder classifier, by running
+Now fit the decoder classifier, by running:
 ```
 eva fit --config configs/vision/dino_vit/offline/bach.yaml
 ```
@@ -61,12 +59,13 @@ tensorboard --logdir logs/dino_vits16/offline/bach
 
 ### 3. Run a complete *offline*-workflow
 
-With the `predict_fit`-command, the two steps above can be executed with one command. Let's do this now but this time let's use an FM pretrained from ImageNet.
+With the `predict_fit`-command, the two steps above can be executed with one command. Let's do this, but this time let's use an FM pretrained from ImageNet.
 
 Go back to the terminal and execute:
 ```
+export N_RUNS=1
 export MAX_STEPS=20
-export BATCH_SIZE=100
+export BATCH_SIZE=256
 export LR_VALUE=0.1
 export PRETRAINED=true
 export EMBEDDINGS_ROOT=./data/embeddings/dino_vits16_pretrained
@@ -84,8 +83,9 @@ As in *Step 3* above, we again use a `dino_vits16` pretrained from ImageNet.
 
 Run a complete online workflow with the following command:
 ```
+export N_RUNS=1
 export MAX_STEPS=20
-export BATCH_SIZE=100
+export BATCH_SIZE=256
 export LR_VALUE=0.1
 export PRETRAINED=true
 
@@ -99,4 +99,5 @@ Executing this command will:
 
 Once the run is complete:
 
-- Check the evaluation results in `logs/dino_vits16/offline/bach/<session-id>/results.json` and compare them to the results of *Step 3*. Do they match? 
+- Check the evaluation results in `logs/dino_vits16/offline/bach/<session-id>/results.json` and compare them to the results of *Step 3*. Do they match?
+- You might have noticed that the *online* run took considerably longer than the *offline* run. Do you understand why that is?
