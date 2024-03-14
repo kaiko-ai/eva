@@ -2,7 +2,6 @@
 
 import os
 from typing import Literal
-from unittest import mock
 
 import numpy as np
 import pytest
@@ -42,8 +41,8 @@ def patch_camelyon_dataset(
     split: Literal["train", "val", "test"], assets_path: str
 ) -> datasets.PatchCamelyon:
     """PatchCamelyon dataset fixture."""
-    with mock.patch("eva.vision.data.datasets.PatchCamelyon.validate") as _:
-        return datasets.PatchCamelyon(
-            root=os.path.join(assets_path, "vision", "datasets", "patch_camelyon"),
-            split=split,
-        )
+    dataset = datasets.PatchCamelyon(
+        root=os.path.join(assets_path, "vision", "datasets", "patch_camelyon"),
+        split=split,
+    )
+    return dataset

@@ -2,7 +2,6 @@
 
 import os
 from typing import Literal
-from unittest import mock
 
 import numpy as np
 import pytest
@@ -45,11 +44,10 @@ def test_sample(mhist_dataset: datasets.MHIST, index: int) -> None:
 @pytest.fixture(scope="function")
 def mhist_dataset(split: Literal["train", "test"], assets_path: str) -> datasets.MHIST:
     """MHIST dataset fixture."""
-    with mock.patch("eva.vision.data.datasets.MHIST.validate") as _:
-        dataset = datasets.MHIST(
-            root=os.path.join(assets_path, "vision", "datasets", "mhist"),
-            split=split,
-        )
-        dataset.prepare_data()
-        dataset.setup()
-        return dataset
+    dataset = datasets.MHIST(
+        root=os.path.join(assets_path, "vision", "datasets", "mhist"),
+        split=split,
+    )
+    dataset.prepare_data()
+    dataset.configure()
+    return dataset
