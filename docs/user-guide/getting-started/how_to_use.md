@@ -30,7 +30,7 @@ The *online* workflow can be used to quickly run a complete evaluation without s
 
 ### Config files
 
-The setup for an ***eva*** run is provided in a `.yaml` config file which is defined with the `--config` flag.
+The setup for an *eva* run is provided in a `.yaml` config file which is defined with the `--config` flag.
 
 A config file specifies the setup for the *trainer* (including callback for the model backbone), the *model* (setup of the trainable decoder) and *data* module. 
 
