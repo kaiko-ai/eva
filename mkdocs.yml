@@ -8,6 +8,7 @@ theme:
     - navigation.indexes
     - search.suggest
     - search.highlight
+    - content.code.copy
   logo: images/eva-stripes.png
   palette:
     - media: "(prefers-color-scheme: dark)"
@@ -42,8 +43,15 @@ plugins:
           filters:
           - '!^_'
 markdown_extensions:
-  toc:
-    toc_depth: 2
+  - toc:
+      toc_depth: 2
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
 nav:
   - eva: index.md
   - User Guide:

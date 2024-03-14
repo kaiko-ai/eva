@@ -34,6 +34,6 @@ export LR_VALUE=0.1
 ```
 Now train and evaluate the model by running:
 ```
-python -m eva fit --config configs/vision/resnet18/bach.yaml
+eva fit --config configs/vision/resnet18/bach.yaml
 ```
 Once the run is complete, take a look at the results in `logs/resnet/bach/<session-id>/results.json`. How does the performance compare to the results observed in the previous tutorials?
