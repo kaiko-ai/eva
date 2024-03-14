@@ -27,46 +27,42 @@ _Oncology FM Evaluation Framework by kaiko.ai_
 
 ### _About_
 
-`eva` is [kaiko.ai](https://kaiko.ai/)'s evaluation framework for oncology foundation models (FMs).
+`eva` is [kaiko.ai](https://kaiko.ai/)'s evaluation framework for oncology foundation models (FMs). Check out the [documentation](https://kaikoevasandbox.z13.web.core.windows.net/) for more information.
+
 
 ## Installation
 
 *Note: this section will be revised for the public package when publishing eva*
 
+- Create and activate a virtual environment with Python 3.10+
 
-### Download the eva repo
+- Install *eva* and the *eva-vision* package with:
 
-First, make sure [GIT LFS](https://git-lfs.com/), which is used to track assets, 
-such as sample images used for tests, is installed on your machine (instructions [here](https://docs.github.com/en/repositories/working-with-files/managing-large-files/installing-git-large-file-storage)).
-
-Now, clone the repo:
 ```
-git clone git@github.com:kaiko-ai/eva.git
+pip install --index-url https://nexus.infra.prd.kaiko.ai/repository/python-all/simple 'kaiko-eva[vision]'
 ```
 
-### Environment and dependencies
+- To be able to use the existing configs, download them into directory where you installed *eva*. You can get them from our blob storage with:
 
-Now install *eva* and it's dependencies in a virtual environment. This can be done with the Python 
-package and dependency manager PDM (see [documentation](https://pdm-project.org/latest/)).
+```
+azcopy copy https://kaiko.blob.core.windows.net/long-term-experimental/eva/configs . --recursive=true
+```
 
-Install PDM on your machine:
+(Alternatively you can also download them from the [*eva* GitHub repo](https://github.com/kaiko-ai/eva/tree/main))
+
+### Run *eva*
+
+Now you can run a complete *eva* workflow, for example with:
 ```
-brew install pdm
+eva fit --config configs/vision/dino_vit/online/bach.yaml 
 ```
-Navigate to the eva root directory and run:
-```
-pdm install
-```
-This will install eva and all its dependencies in a virtual environment. Activate the venv with:
-```
-source .venv/bin/activate
-```
-Now you are ready to start! Start the documentation
-```
-mkdocs serve
-```
-and explore it in your [browser](http://127.0.0.1:8000/). Read through the main page and navigate
-to [how-to-use]http://127.0.0.1:8000/user-guide/how_to_use/ to run *eva*
+This will:
+
+ - Download and extract the dataset, if it has not been downloaded before.
+ - Fit a model consisting of the frozen FM-backbone and a classification head on the train split.
+ - Evaluate the trained model on the validation split and report the results.
+
+For more information, documentation and tutorials, refer to the [documentation](https://kaikoevasandbox.z13.web.core.windows.net/).
 
 ## Datasets
 
