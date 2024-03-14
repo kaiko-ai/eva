@@ -51,6 +51,19 @@ all = [
 [project.scripts]
 eva = "eva.__main__:main"
 
+[tool.pdm.build]
+excludes = [
+    "./**/.git",
+]
+package-dir = "src"
+includes = [
+    "src/eva",
+]
+
+[tool.pdm.scripts]
+ci = "nox -s ci"
+bump = "nox -s bump"
+
 [tool.pdm.dev-dependencies]
 lint = [
     "isort>=5.12.0",
