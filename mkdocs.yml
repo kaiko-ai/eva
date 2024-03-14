@@ -16,7 +16,7 @@ theme:
       primary: black
       accent: black
       toggle:
-        icon: material/egg
+        icon: material/weather-night
         name: Switch to light mode
     - media: "(prefers-color-scheme: light)"
       scheme: default
