@@ -7,7 +7,7 @@ import numpy as np
 from torchvision.datasets import folder, utils
 from typing_extensions import override
 
-from eva.vision.data.datasets import _utils, structs
+from eva.vision.data.datasets import _utils, _validators, structs
 from eva.vision.data.datasets.classification import base
 from eva.vision.utils import io
 
@@ -48,7 +48,7 @@ class BACH(base.ImageClassification):
         self,
         root: str,
         split: Literal["train", "val"] | None = None,
-        download: bool = False,
+        download: bool | None = None,
         image_transforms: Callable | None = None,
         target_transforms: Callable | None = None,
     ) -> None:
@@ -108,13 +108,22 @@ class BACH(base.ImageClassification):
             self._download_dataset()
 
     @override
-    def setup(self) -> None:
+    def configure(self) -> None:
         self._samples = folder.make_dataset(
             directory=self.dataset_path,
             class_to_idx=self.class_to_idx,
             extensions=(".tif"),
         )
         self._indices = self._make_indices()
+
+    @override
+    def validate(self) -> None:
+        _validators.check_dataset_integrity(
+            self,
+            length=268 if self._split == "train" else 132,
+            n_classes=4,
+            first_and_last_labels=("Benign", "Normal"),
+        )
 
     @override
     def load_image(self, index: int) -> np.ndarray:

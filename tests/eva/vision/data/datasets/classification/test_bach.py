@@ -2,6 +2,7 @@
 
 import os
 from typing import Literal
+from unittest import mock
 
 import numpy as np
 import pytest
@@ -44,10 +45,11 @@ def test_sample(bach_dataset: datasets.BACH, index: int) -> None:
 @pytest.fixture(scope="function")
 def bach_dataset(split: Literal["train", "val"], assets_path: str) -> datasets.BACH:
     """BACH dataset fixture."""
-    dataset = datasets.BACH(
-        root=os.path.join(assets_path, "vision", "datasets", "bach"),
-        split=split,
-    )
-    dataset.prepare_data()
-    dataset.setup()
-    return dataset
+    with mock.patch("eva.vision.data.datasets.BACH.validate") as _:
+        dataset = datasets.BACH(
+            root=os.path.join(assets_path, "vision", "datasets", "bach"),
+            split=split,
+        )
+        dataset.prepare_data()
+        dataset.setup()
+        return dataset

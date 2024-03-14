@@ -2,10 +2,11 @@
 
 import os
 import tempfile
-from unittest.mock import patch
+from unittest import mock
 
 import pytest
 
+from eva.vision.data import datasets
 from tests.eva import _cli
 
 
@@ -19,6 +20,7 @@ from tests.eva import _cli
 )
 def test_fit_from_configuration(configuration_file: str, lib_path: str) -> None:
     """Tests CLI `fit` command with a given configuration file."""
+    datasets.PatchCamelyon.validate = mock.MagicMock(return_value=None)
     _cli.run_cli_from_main(
         cli_args=[
             "fit",
@@ -36,8 +38,9 @@ def test_fit_from_configuration(configuration_file: str, lib_path: str) -> None:
 )
 def test_predict_fit_from_configuration(configuration_file: str, lib_path: str) -> None:
     """Tests CLI `predict_fit` command with a given configuration file."""
+    datasets.PatchCamelyon.validate = mock.MagicMock(return_value=None)
     with tempfile.TemporaryDirectory() as output_dir:
-        with patch.dict(os.environ, {"EMBEDDINGS_ROOT": output_dir}):
+        with mock.patch.dict(os.environ, {"EMBEDDINGS_ROOT": output_dir}):
             _cli.run_cli_from_main(
                 cli_args=[
                     "predict_fit",

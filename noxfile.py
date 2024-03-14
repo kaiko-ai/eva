@@ -56,7 +56,7 @@ def fmt(session: nox.Session) -> None:
     session.run_always("pdm", "install", "--no-default", "--group", "lint", external=True)
     session.run("isort", *args)
     session.run("black", *args)
-    session.run("ruff", "--fix-only", *args)
+    session.run("ruff", "check", "--fix-only", *args)
 
 
 @nox.session(tags=["lint", "quality"])
@@ -66,7 +66,7 @@ def lint(session: nox.Session) -> None:
     session.run_always("pdm", "install", "--no-default", "--group", "lint", external=True)
     session.run("isort", "--check-only", *args)
     session.run("black", "--check", *args)
-    session.run("ruff", *args)
+    session.run("ruff", "check", *args)
     session.run("yamllint", *args)
     session.run("bandit", "-q", "-c", "pyproject.toml", "-r", *args)
 

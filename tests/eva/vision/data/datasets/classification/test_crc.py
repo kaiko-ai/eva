@@ -2,6 +2,7 @@
 
 import os
 from typing import Literal
+from unittest import mock
 
 import numpy as np
 import pytest
@@ -35,10 +36,11 @@ def test_sample(crc_dataset: datasets.CRC, index: int) -> None:
 @pytest.fixture(scope="function")
 def crc_dataset(split: Literal["train", "val"], assets_path: str) -> datasets.CRC:
     """CRC dataset fixture."""
-    dataset = datasets.CRC(
-        root=os.path.join(assets_path, "vision", "datasets", "crc"),
-        split=split,
-    )
-    dataset.prepare_data()
-    dataset.setup()
-    return dataset
+    with mock.patch("eva.vision.data.datasets.CRC.validate") as _:
+        dataset = datasets.CRC(
+            root=os.path.join(assets_path, "vision", "datasets", "crc"),
+            split=split,
+        )
+        dataset.prepare_data()
+        dataset.setup()
+        return dataset

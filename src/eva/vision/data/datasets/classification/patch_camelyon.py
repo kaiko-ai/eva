@@ -8,7 +8,7 @@ import numpy as np
 from torchvision.datasets import utils
 from typing_extensions import override
 
-from eva.vision.data.datasets import structs
+from eva.vision.data.datasets import _validators, structs
 from eva.vision.data.datasets.classification import base
 
 _URL_TEMPLATE = "https://zenodo.org/records/2546921/files/{filename}.gz?download=1"
@@ -109,6 +109,20 @@ class PatchCamelyon(base.ImageClassification):
     def prepare_data(self) -> None:
         if self._download:
             self._download_dataset()
+
+    @override
+    def validate(self) -> None:
+        expected_length = {
+            "train": 262144,
+            "val": 32768,
+            "test": 32768,
+        }
+        _validators.check_dataset_integrity(
+            self,
+            length=expected_length.get(self._split, 0),
+            n_classes=2,
+            first_and_last_labels=("no_tumor", "tumor"),
+        )
 
     @override
     def load_image(self, index: int) -> np.ndarray:
