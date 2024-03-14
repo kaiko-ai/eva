@@ -5,7 +5,7 @@ requires = [
 build-backend = "pdm.backend"
 
 [project]
-name = "eva"
+name = "kaiko-eva"
 version = "0.0.0.dev2"
 description = "Evaluation Framework for oncology foundation models."
 readme = "README.md"
@@ -45,23 +45,19 @@ vision = [
     "h5py>=3.10.0",
 ]
 all = [
-    "eva[vision]",
+    "kaiko-eva[vision]",
 ]
 
 [project.scripts]
 eva = "eva.__main__:main"
 
 [tool.pdm.build]
-excludes = [
-    "./**/.git",
-]
 package-dir = "src"
 includes = [
     "src/eva",
 ]
 
 [tool.pdm.scripts]
-ci = "nox -s ci"
 bump = "nox -s bump"
 
 [tool.pdm.dev-dependencies]
@@ -86,7 +82,7 @@ docs = [
     "mkdocs-material>=9.5.6",
 ]
 dev = [
-    "eva[lint, test, docs]",
+    "kaiko-eva[lint,test,docs]",
 ]
 
 [tool.isort]
