@@ -5,7 +5,7 @@ requires = [
 build-backend = "pdm.backend"
 
 [project]
-name = "kaiko-eva"
+name = "eva"
 version = "0.0.0.dev2"
 description = "Evaluation Framework for oncology foundation models."
 readme = "README.md"
