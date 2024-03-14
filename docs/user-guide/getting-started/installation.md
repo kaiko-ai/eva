@@ -11,10 +11,13 @@
 pip install --index-url https://nexus.infra.prd.kaiko.ai/repository/python-all/simple 'kaiko-eva[vision]'
 ```
 
-- To be able to use the existing configs, you have to first download them from the [*eva* GitHub repo](https://github.com/kaiko-ai/eva/tree/main):
+- To be able to use the existing configs, you will first need to download them into directory where you installed *eva*. Get them from our blob storage with:
 
-    - Download the repo as zip file by clicking on `Code` > `Download ZIP`
-    - Unzzip the file and copy the "configs" folder into the directory where you installed eva
+```
+azcopy copy https://kaiko.blob.core.windows.net/long-term-experimental/eva/configs . --recursive=true
+```
+
+(Alternatively you can also download them from the [*eva* GitHub repo](https://github.com/kaiko-ai/eva/tree/main))
 
 
 ## Run *eva*

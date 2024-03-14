@@ -27,9 +27,9 @@ hide:
 
 </div>
 
-_Oncology FM Evaluation Framework by Kaiko_
+_Oncology FM Evaluation Framework by kaiko.ai_
 
-With the first release, ***eva*** supports performance evaluation for vision Foundation Models ("FMs") and supervised machine learning ("ML") models on WSI-patch-level image classification- and radiology (CT-scans) segmentation tasks.
+With the first release, ***eva*** supports performance evaluation for vision Foundation Models ("FMs") and supervised machine learning models on WSI-patch-level image classification- and radiology (CT-scans) segmentation tasks.
 
 The goal of this project is to provide the open-source community with an easy-to-use framework that follows industry best practices to deliver a robust, reproducible and fair evaluation benchmark across FMs of different sizes and architectures.
 
@@ -67,7 +67,7 @@ If you have your own labelled dataset, all that is needed is to implement a data
 
 We evaluated the following FMs on the 4 supported WSI-patch-level image classification tasks:
 
-| FM-backbone                 | pretraining | PCam - val*      | PCam - test*    | BACH - val**    | CRC - val**     | MHIST - val* |
+| FM-backbone                 | pretraining | PCam - val*      | PCam - test*    | BACH - val*    | CRC - val*     | MHIST - val* |
 |-----------------------------|-------------|------------------|-----------------|-----------------|-----------------|--------------|
 | DINO ViT-S16                | N/A         | 0.765 (±0.004) | 0.726 (±0.003) | 0.416 (±0.014)  | 0.643 (±0.005)	| 0.551 (±0.017)|
 | DINO ViT-S16                | ImageNet    | 0.871 (±0.004) | 0.856 (±0.005) | 0.673 (±0.005) | 0.936 (±0.001) | 0.823 (±0.006)|
@@ -85,7 +85,6 @@ For more details on the FM-backbones and instructions to replicate the results, 
 
 ## Evaluation setup
 
-### WSI-patch-level image classification tasks
 With the FM we generate embeddings for all WSI patches and then use these embeddings as input to train a downstream head consisting of a single linear layer in a supervised setup for each of the benchmark datasets. The FM weights are frozen throughout this process.
 
 To standardize evaluations, the default configurations *eva* uses are based on the evaluation protocol proposed by [1] and dataset/task specific characteristics. We use early stopping after 10% of the maximal number of steps as suggested by [2].
