@@ -5,8 +5,9 @@ import os
 import random
 import tempfile
 from pathlib import Path
-from typing import List, Literal
+from typing import List, Literal, Tuple
 
+import numpy as np
 import pandas as pd
 import pytest
 import pytorch_lightning as pl
@@ -100,7 +101,6 @@ def dataset(
     train_dataset = FakeDataset(split="train", length=n_samples, size=sample_shape)
     val_dataset = FakeDataset(split="val", length=n_samples, size=sample_shape)
     test_dataset = FakeDataset(split="test", length=n_samples, size=sample_shape)
-
     return [train_dataset, val_dataset, test_dataset]
 
 
@@ -119,7 +119,12 @@ def dataloader(batch_size: int) -> dataloaders.DataLoader:
 class FakeDataset(boring_classes.RandomDataset, datasets.Dataset):
     """Fake prediction dataset."""
 
-    def __init__(self, split: Literal["train", "val", "test"], size: int = 32, length: int = 10):
+    def __init__(
+        self,
+        split: Literal["train", "val", "test"],
+        size: int = 32,
+        length: int = 10,
+    ) -> None:
         """Initializes the dataset."""
         super().__init__(size=size, length=length)
         self._split = split
@@ -129,7 +134,7 @@ class FakeDataset(boring_classes.RandomDataset, datasets.Dataset):
         return f"{self._split}-{index}"
 
     @override
-    def __getitem__(self, index: int):
+    def __getitem__(self, index: int) -> Tuple[np.array, int]:
         data = boring_classes.RandomDataset.__getitem__(self, index)
         target = random.choice([0, 1])
         return data, target

@@ -9,10 +9,10 @@ import torch.nn.functional as F
 import tqdm
 from typing_extensions import override
 
-from eva.vision.data.datasets.embeddings.patch import PatchEmbeddingDataset
+from eva.vision.data.datasets.embeddings.patch import PatchEmbeddingsDataset
 
 
-class SlideEmbeddingDataset(PatchEmbeddingDataset):
+class SlideEmbeddingDataset(PatchEmbeddingsDataset):
     """Embedding dataset."""
 
     default_column_mapping: Dict[str, str] = {
