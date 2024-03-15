@@ -57,5 +57,5 @@ def total_segmentator_dataset(
         split=split,
     )
     dataset.prepare_data()
-    dataset.setup()
+    dataset.configure()
     return dataset

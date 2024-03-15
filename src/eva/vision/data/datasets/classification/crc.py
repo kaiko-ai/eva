@@ -7,7 +7,7 @@ import numpy as np
 from torchvision.datasets import folder, utils
 from typing_extensions import override
 
-from eva.vision.data.datasets import structs
+from eva.vision.data.datasets import _validators, structs
 from eva.vision.data.datasets.classification import base
 from eva.vision.utils import io
 
@@ -100,8 +100,22 @@ class CRC(base.ImageClassification):
             self._download_dataset()
 
     @override
-    def setup(self) -> None:
+    def configure(self) -> None:
         self._samples = self._make_dataset()
+
+    @override
+    def validate(self) -> None:
+        expected_length = {
+            "train": 100000,
+            "val": 7180,
+            None: 107180,
+        }
+        _validators.check_dataset_integrity(
+            self,
+            length=expected_length.get(self._split, 0),
+            n_classes=9,
+            first_and_last_labels=("ADI", "TUM"),
+        )
 
     @override
     def load_image(self, index: int) -> np.ndarray:

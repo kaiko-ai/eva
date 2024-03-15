@@ -49,5 +49,5 @@ def mhist_dataset(split: Literal["train", "test"], assets_path: str) -> datasets
         split=split,
     )
     dataset.prepare_data()
-    dataset.setup()
+    dataset.configure()
     return dataset

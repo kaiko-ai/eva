@@ -6,6 +6,7 @@ from typing import Callable, Dict, List, Literal, Tuple
 import numpy as np
 from typing_extensions import override
 
+from eva.vision.data.datasets import _validators
 from eva.vision.data.datasets.classification import base
 from eva.vision.utils import io
 
@@ -56,8 +57,17 @@ class MHIST(base.ImageClassification):
         return image_filename
 
     @override
-    def setup(self) -> None:
+    def configure(self) -> None:
         self._samples = self._make_dataset()
+
+    @override
+    def validate(self) -> None:
+        _validators.check_dataset_integrity(
+            self,
+            length=2175 if self._split == "train" else 977,
+            n_classes=2,
+            first_and_last_labels=("SSA", "HP"),
+        )
 
     @override
     def load_image(self, index: int) -> np.ndarray:
