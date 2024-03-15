@@ -6,7 +6,7 @@ In this tutorial we run *eva* with the three subcommands `predict`, `fit` and `p
 
 For this tutorial we use the [BACH](../../datasets/bach.md) classification task which is available on [Zenodo](https://zenodo.org/records/3632035) and is distributed under [*Attribution-NonCommercial-ShareAlike 4.0 International*](https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode) license.
 
-If you have not yet downloaded the data to your machine, open the config `configs/vision/dino_vit/offline/bach.yaml` and change the download option in line 73 to `download: true`.
+If you have not yet downloaded the BACH data to your machine, open `configs/vision/dino_vit/offline/bach.yaml` and enable automatic download by setting: `download: true`.
 
 ## *Offline* evaluations
 
