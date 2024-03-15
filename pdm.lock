@@ -5,7 +5,7 @@
 groups = ["default", "dev", "vision", "docs", "test", "lint"]
 strategy = ["cross_platform", "inherit_metadata"]
 lock_version = "4.4.1"
-content_hash = "sha256:bd500d2ec4a294feaa389d7183178851e0e51e6a091fb65b74c1d2358a378f8a"
+content_hash = "sha256:e7257e42ccd05b1592c004c7a0223d9066a6a314816de4c3556dbdb6aff1e0f7"
 
 [[package]]
 name = "absl-py"
