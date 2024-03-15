@@ -2,7 +2,11 @@
 
 In this tutorial we run *eva* with the three subcommands `predict`, `fit` and `predict_fit`, and take a look at the difference between *offline* and *online* workflows.
 
-For this tutorial we use the [BACH](../../datasets/bach.md) classification task which uses a relatively small dataset.
+### Before you start
+
+For this tutorial we use the [BACH](../../datasets/bach.md) classification task which is available on [Zenodo](https://zenodo.org/records/3632035) and is distributed under [*Attribution-NonCommercial-ShareAlike 4.0 International*](https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode) license.
+
+If you have not yet downloaded the BACH data to your machine, open `configs/vision/dino_vit/offline/bach.yaml` and enable automatic download by setting: `download: true`.
 
 ## *Offline* evaluations
 
