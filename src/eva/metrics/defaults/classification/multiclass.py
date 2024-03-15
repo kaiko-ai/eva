@@ -69,9 +69,9 @@ class MulticlassClassificationMetrics(core.MetricCollection):
             compute_groups=[
                 [
                     "MulticlassAccuracy",
+                    "MulticlassF1Score",
                     "MulticlassPrecision",
                     "MulticlassRecall",
-                    "MulticlassF1Score",
                 ],
                 [
                     "MulticlassAUROC",
