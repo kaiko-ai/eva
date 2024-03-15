@@ -48,11 +48,13 @@ The PatchCamelyon data from [zenodo](https://zenodo.org/records/2546921) is orga
 The dataset class `PatchCamelyon` supports download the data no runtime with the initialized argument
 `download: bool = True`.
 
+*Note that in the provided `PatchCamelyon`-config files the download argument is set to `false`. To enable automatic download you will need to open the config and set `download: true`.*
+
 Labels are provided by source files, splits are given by file names.
 
 ## Relevant links
 
-* [PatchCamelyon dataset on zenodo](https://zenodo.org/records/2546921)
+* [PatchCamelyon dataset on zenodo](https://zenodo.org/records/1494286)
 * [GitHub repository](https://github.com/basveeling/pcam)
 * [Reference API Vision dataset classes](../reference/vision/data/datasets.md)
 
