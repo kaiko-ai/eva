@@ -70,14 +70,6 @@ class SlideEmbeddingDataset(PatchEmbeddingDataset):
         self._embedding_column = "embedding_tensor"
 
     @override
-    def __getitem__(self, index) -> Tuple[torch.Tensor, torch.Tensor | np.ndarray, Dict[str, Any]]:
-        metadata = {"slide_id": self._data.at[index, self._slide_id_column]}
-        embedding, target = self._apply_transforms(
-            self._data.at[index, self._embedding_column], self._load_target(index)
-        )
-        return (embedding, target, metadata)
-
-    @override
     def setup(self):
         super().setup()
 
@@ -86,6 +78,14 @@ class SlideEmbeddingDataset(PatchEmbeddingDataset):
             self._data.at[index, self._embedding_column] = self._load_embedding(index, 2)
 
         self._data = self._sample_n_patches_per_slide(self._data)
+
+    @override
+    def __getitem__(self, index) -> Tuple[torch.Tensor, torch.Tensor | np.ndarray, Dict[str, Any]]:
+        metadata = {"slide_id": self._data.at[index, self._slide_id_column]}
+        embedding, target = self._apply_transforms(
+            self._data.at[index, self._embedding_column], self._load_target(index)
+        )
+        return (embedding, target, metadata)
 
     def _sample_n_patches_per_slide(self, df: pd.DataFrame) -> pd.DataFrame:
         """This function randomly selects n_patches_per_slide patch embeddings per slide.

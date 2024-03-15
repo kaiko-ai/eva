@@ -61,15 +61,6 @@ class PatchEmbeddingDataset(VisionDataset):
         self._split_column = self._column_mapping["split"]
 
     @override
-    def __getitem__(self, index) -> Tuple[torch.Tensor, torch.Tensor | np.ndarray]:
-        embedding, target = self._load_embedding(index, 1, True), self._load_target(index)
-        return self._apply_transforms(embedding, target)
-
-    @override
-    def __len__(self) -> int:
-        return len(self._data)
-
-    @override
     def filename(self, index: int) -> str:
         return self._data.at[index, self._path_column]
 
@@ -78,6 +69,15 @@ class PatchEmbeddingDataset(VisionDataset):
         self._data = self._load_manifest()
         self._data = self._data.loc[self._data[self._split_column] == self._split]
         self._data = self._data.reset_index(drop=True)
+
+    @override
+    def __getitem__(self, index) -> Tuple[torch.Tensor, torch.Tensor | np.ndarray]:
+        embedding, target = self._load_embedding(index, 1, True), self._load_target(index)
+        return self._apply_transforms(embedding, target)
+
+    @override
+    def __len__(self) -> int:
+        return len(self._data)
 
     def _load_embedding(
         self, index: int, expected_ndim: int, squeeze: bool = False
