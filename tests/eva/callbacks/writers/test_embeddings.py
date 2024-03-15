@@ -58,8 +58,8 @@ def test_embeddings_writer(datamodule: datamodules.DataModule, model: modules.He
 
         # Check if the manifest file is in the expected format
         df_manifest = pd.read_csv(os.path.join(output_dir, "manifest.csv"))
-        assert "filename" in df_manifest.columns
-        assert "embedding" in df_manifest.columns
+        assert "origin" in df_manifest.columns
+        assert "embeddings" in df_manifest.columns
         assert "target" in df_manifest.columns
         assert "split" in df_manifest.columns
         assert len(df_manifest) == total_n_predictions

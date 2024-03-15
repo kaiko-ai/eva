@@ -1,68 +1,43 @@
-"""Tests for the embedding datasets."""
+"""Tests for the patch embedding datasets."""
 
 import os
+from typing import Tuple
 
 import numpy as np
 import pytest
+import torch
 
-from eva.vision.data.datasets.embeddings import PatchEmbeddingDataset, SlideEmbeddingDataset
+from eva.vision.data import datasets
 
 
-def test_patch_embedding_dataset(patches_manifest_path: str, root_dir: str):
-    """Test that the patch level dataset has the correct length and item shapes/types."""
-    ds = PatchEmbeddingDataset(
-        manifest_path=patches_manifest_path,
-        root=root_dir,
-        split="train",
+@pytest.mark.parametrize(
+    "split, embeddings_shape",
+    [("train", (8,)), ("val", (8,))],
+)
+def test_patch_embedding_dataset(
+    patch_embeddings_dataset: datasets.PatchEmbeddingsDataset, embeddings_shape: Tuple[int, ...]
+):
+    """Test that the PatchEmbeddingsDataset level dataset."""
+    # assert data sample is a tuple
+    sample = patch_embeddings_dataset[0]
+    assert isinstance(sample, tuple)
+    assert len(sample) == 2
+    # assert the format of the `image` and `target`
+    embeddings, target = sample
+    assert isinstance(embeddings, torch.Tensor)
+    assert embeddings.shape == embeddings_shape
+    assert isinstance(target, np.ndarray)
+    assert target in [0, 1]
+
+
+@pytest.fixture(scope="function")
+def patch_embeddings_dataset(split: str, assets_path: str) -> datasets.PatchEmbeddingsDataset:
+    """PatchEmbeddingsDataset dataset fixture."""
+    dataset = datasets.PatchEmbeddingsDataset(
+        root=os.path.join(assets_path, "vision", "datasets", "embeddings", "patch"),
+        manifest_file="manifest.csv",
+        split=split,
     )
-    ds.setup()
-
-    expected_shape = (8,)
-    assert len(ds) == 3
-    for i in range(len(ds)):
-        assert isinstance(ds[i], tuple)
-        assert len(ds[i]) == 2
-        embedding, target = ds[i]
-        assert embedding.shape == expected_shape
-        assert isinstance(target, np.ndarray)
-        assert np.issubdtype(target.dtype, int)
-
-
-def test_slide_embedding_dataset(slides_manifest_path: str, root_dir: str):
-    """Test that the slide level dataset has the correct length and embedding tensor shapes."""
-    ds = SlideEmbeddingDataset(
-        manifest_path=slides_manifest_path,
-        root=root_dir,
-        split="train",
-        n_patches_per_slide=10,
-    )
-    ds.setup()
-
-    expected_shape = (10, 8)
-    assert len(ds) == 3
-    for i in range(len(ds)):
-        assert isinstance(ds[i], tuple)
-        assert len(ds[i]) == 3
-        embedding, target, metadata = ds[i]
-        assert embedding.shape == expected_shape
-        assert isinstance(target, np.ndarray)
-        assert np.issubdtype(target.dtype, int)
-        assert isinstance(metadata, dict)
-
-
-@pytest.fixture()
-def patches_manifest_path(assets_path: str) -> str:
-    """Path to a fake patch level manifest."""
-    return os.path.join(assets_path, "vision/manifests/embeddings/patches.csv")
-
-
-@pytest.fixture()
-def slides_manifest_path(assets_path: str) -> str:
-    """Path to a fake patch level manifest."""
-    return os.path.join(assets_path, "vision/manifests/embeddings/slides.csv")
-
-
-@pytest.fixture()
-def root_dir(assets_path: str) -> str:
-    """Root directory for the fake embeddings."""
-    return os.path.join(assets_path, "vision/datasets/embeddings")
+    dataset.prepare_data()
+    dataset.setup()
+    return dataset

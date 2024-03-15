@@ -1,7 +1,7 @@
 """Dataset class for patch embeddings."""
 
 import os
-from typing import Callable, Dict, Literal, Tuple
+from typing import Callable, Dict, Tuple
 
 import numpy as np
 import pandas as pd
@@ -9,113 +9,130 @@ import torch
 from typing_extensions import override
 
 from eva.vision.data.datasets.vision import VisionDataset
+from eva.vision.utils import io
 
 
-class PatchEmbeddingDataset(VisionDataset):
-    """Embedding dataset."""
+class PatchEmbeddingsDataset(VisionDataset):
+    """Embeddings dataset."""
 
     default_column_mapping: Dict[str, str] = {
-        "path": "path",
+        "data": "embeddings",
         "target": "target",
         "split": "split",
     }
+    """The default column mapping of the variables to the manifest columns."""
 
     def __init__(
         self,
         root: str,
-        manifest_path: str | None,
-        split: Literal["train", "val", "test"],
-        column_mapping: Dict[str, str] | None = None,
+        manifest_file: str,
+        split: str | None = None,
+        column_mapping: Dict[str, str] = default_column_mapping,
+        embeddings_transforms: Callable | None = None,
         target_transforms: Callable | None = None,
-    ):
+    ) -> None:
         """Initialize dataset.
 
-        Expects a manifest file listing the paths of .pt files that contain tensor embeddings
-        of shape [embedding_dim] or [1, embedding_dim].
+        Expects a manifest file listing the paths of .pt files that contain
+        tensor embeddings of shape [embedding_dim] or [1, embedding_dim].
 
         Args:
-            root: Root directory of the dataset. If specified, the paths in the manifest
-                file are expected to be relative to this directory.
-            manifest_path: Path to the manifest file. Can be either a .csv or .parquet file, with
-                the required columns: path, target, split (names can be adjusted using the
-                column_mapping parameter). If `None`, it will default to `<root>/manifest.csv`.
-            split: Dataset split to use.
-            column_mapping: Mapping between the standardized column names and the actual
-                column names in the provided manifest file.
+            root: Root directory of the dataset.
+            manifest_file: The path to the manifest file, which is relative to
+                the `root` argument.
+            split: The dataset split to use. The `split` column of the manifest
+                file will be splitted based on this value.
+            column_mapping: Defines the map between the variables and the manifest
+                columns. It will overwrite the `default_column_mapping` with
+                the provided values, so that `column_mapping` can contain only the
+                values which are altered or missing.
+            embeddings_transforms: A function/transform that transforms the embedding.
             target_transforms: A function/transform that transforms the target.
         """
         super().__init__()
 
         self._root = root
+        self._manifest_file = manifest_file
         self._split = split
-        self._manifest_path = manifest_path if manifest_path else os.path.join(root, "manifest.csv")
+        self._column_mapping = self.default_column_mapping | column_mapping
+        self._embeddings_transforms = embeddings_transforms
         self._target_transforms = target_transforms
 
         self._data: pd.DataFrame
 
-        self._column_mapping = self.default_column_mapping
-        if column_mapping:
-            self._column_mapping.update(column_mapping)
-        self._path_column = self._column_mapping["path"]
-        self._target_column = self._column_mapping["target"]
-        self._split_column = self._column_mapping["split"]
+    @override
+    def filename(self, index: int) -> str:
+        return self._data.at[index, self._column_mapping["data"]]
 
     @override
-    def __getitem__(self, index) -> Tuple[torch.Tensor, torch.Tensor | np.ndarray]:
-        embedding, target = self._load_embedding(index, 1, True), self._load_target(index)
-        return self._apply_transforms(embedding, target)
+    def setup(self):
+        self._data = self._load_manifest()
+
+    @override
+    def __getitem__(self, index) -> Tuple[torch.Tensor, np.ndarray]:
+        embeddings = self._load_embeddings(index)
+        target = self._load_target(index)
+        return self._apply_transforms(embeddings, target)
 
     @override
     def __len__(self) -> int:
         return len(self._data)
 
-    @override
-    def filename(self, index: int) -> str:
-        return self._data.at[index, self._path_column]
+    def _load_embeddings(self, index: int) -> torch.Tensor:
+        """Returns the `index`'th embedding sample.
 
-    @override
-    def setup(self):
-        self._data = self._load_manifest()
-        self._data = self._data.loc[self._data[self._split_column] == self._split]
-        self._data = self._data.reset_index(drop=True)
+        Args:
+            index: The index of the data sample to load.
 
-    def _load_embedding(
-        self, index: int, expected_ndim: int, squeeze: bool = False
-    ) -> torch.Tensor:
-        path = self._get_embedding_path(index)
-        tensor = torch.load(path, map_location="cpu")
-        tensor = tensor.squeeze(0) if squeeze else tensor
-        if tensor.ndim != expected_ndim:
-            raise ValueError(f"Unexpected tensor shape {tensor.shape} for {path}")
-        return tensor
+        Returns:
+            The sample embedding as an array.
+        """
+        filename = self.filename(index)
+        embeddings_path = os.path.join(self._root, filename)
+        tensor = torch.load(embeddings_path, map_location="cpu")
+        return tensor.squeeze(0)
 
     def _load_target(self, index: int) -> np.ndarray:
-        return np.asarray(self._data.at[index, self._target_column], dtype=np.int64)
+        """Returns the `index`'th target sample.
 
-    def _get_embedding_path(self, index: int) -> str:
-        return os.path.join(self._root, self.filename(index))
+        Args:
+            index: The index of the data sample to load.
+
+        Returns:
+            The sample target as an array.
+        """
+        target = self._data.at[index, self._column_mapping["target"]]
+        return np.asarray(target, dtype=np.int64)
 
     def _load_manifest(self) -> pd.DataFrame:
-        if self._manifest_path.endswith(".csv"):
-            return pd.read_csv(self._manifest_path)
-        elif self._manifest_path.endswith(".parquet"):
-            return pd.read_parquet(self._manifest_path)
-        else:
-            raise ValueError(f"Failed to load manifest file {self._manifest_path}")
+        """Loads manifest file and filters the data based on the split column.
+
+        Returns:
+            The data as a pandas DataFrame.
+        """
+        manifest_path = os.path.join(self._root, self._manifest_file)
+        data = io.read_dataframe(manifest_path)
+        if self._split is not None:
+            filtered_data = data.loc[data[self._column_mapping["split"]] == self._split]
+            data = filtered_data.reset_index(drop=True)
+        return data
 
     def _apply_transforms(
-        self, embedding: torch.Tensor, target: np.ndarray
-    ) -> Tuple[torch.Tensor, torch.Tensor | np.ndarray]:
+        self, embeddings: torch.Tensor, target: np.ndarray
+    ) -> Tuple[torch.Tensor, np.ndarray]:
         """Applies the transforms to the provided data and returns them.
 
         Args:
-            embedding: The embedding to be transformed.
+            embeddings: The embeddings to be transformed.
             target: The training target.
 
         Returns:
-            A tuple with the image and the target transformed.
+            A tuple with the embeddings and the target transformed.
         """
+        if self._embeddings_transforms is not None:
+            embeddings = self._embeddings_transforms(embeddings)
+
         if self._target_transforms is not None:
             target = self._target_transforms(target)
 
-        return embedding, target
+        return embeddings, target

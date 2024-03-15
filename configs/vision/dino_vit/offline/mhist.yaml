@@ -24,7 +24,7 @@ trainer:
           mode: *MONITOR_METRIC_MODE
       - class_path: eva.callbacks.EmbeddingsWriter
         init_args:
-          output_dir: &EMBEDDINGS_DIR ${oc.env:EMBEDDINGS_ROOT, ./data/embeddings}/${oc.env:DINO_BACKBONE, dino_vits16}/mhist
+          output_dir: &DATASET_EMBEDDINGS_ROOT ${oc.env:EMBEDDINGS_ROOT, ./data/embeddings}/${oc.env:DINO_BACKBONE, dino_vits16}/mhist
           dataloader_idx_map:
             0: train
             1: test
@@ -71,16 +71,15 @@ data:
   init_args:
     datasets:
       train:
-        class_path: eva.vision.data.datasets.embeddings.PatchEmbeddingDataset
+        class_path: eva.vision.data.datasets.embeddings.PatchEmbeddingsDataset
         init_args: &DATASET_ARGS
-          root: *EMBEDDINGS_DIR
+          root: *DATASET_EMBEDDINGS_ROOT
+          manifest_file: manifest.csv
           split: train
-          column_mapping:
-            path: embedding
           target_transforms:
             class_path: eva.vision.data.transforms.common.ArrayToFloatTensor
       val:
-        class_path: eva.vision.data.datasets.embeddings.PatchEmbeddingDataset
+        class_path: eva.vision.data.datasets.embeddings.PatchEmbeddingsDataset
         init_args:
           <<: *DATASET_ARGS
           split: test

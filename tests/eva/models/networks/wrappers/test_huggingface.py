@@ -7,14 +7,14 @@ import torch
 from transformers import modeling_outputs
 
 from eva.models.networks import wrappers
-from eva.vision.data.transforms import ExtractCLSFeatures
+from eva.vision.models.networks import postprocesses
 
 
 @pytest.mark.parametrize(
     "model_name_or_path, tensor_transforms, expected_output_shape",
     [
         ("hf-internal-testing/tiny-random-ViTModel", None, (16, 226, 32)),
-        ("hf-internal-testing/tiny-random-ViTModel", ExtractCLSFeatures(), (16, 32)),
+        ("hf-internal-testing/tiny-random-ViTModel", postprocesses.ExtractCLSFeatures(), (16, 32)),
     ],
 )
 def test_huggingface_model(

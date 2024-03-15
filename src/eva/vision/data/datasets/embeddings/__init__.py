@@ -1,6 +1,5 @@
-"""Embedding Datasets API."""
+"""Embeddings Datasets API."""
 
-from eva.vision.data.datasets.embeddings.patch import PatchEmbeddingDataset
-from eva.vision.data.datasets.embeddings.slide import SlideEmbeddingDataset
+from eva.vision.data.datasets.embeddings.patch import PatchEmbeddingsDataset
 
-__all__ = ["PatchEmbeddingDataset", "SlideEmbeddingDataset"]
+__all__ = ["PatchEmbeddingsDataset"]
