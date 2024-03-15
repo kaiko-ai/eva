@@ -89,7 +89,11 @@ data:
           init_args: &PREDICT_DATASET_ARGS
             root: ${oc.env:DATA_ROOT, ./data}/bach
             split: train
-            download: ${oc.env:DOWNLOAD_DATA, true}
+            download: false
+            # Set `download: true` to download the dataset from https://zenodo.org/records/3632035
+            # The BACH dataset is distributed under the following license
+            # Attribution-NonCommercial-NoDerivs 4.0 International license
+            # (see: https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode)
             image_transforms:
               class_path: eva.vision.data.transforms.common.ResizeAndCrop
               init_args:

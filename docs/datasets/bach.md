@@ -46,6 +46,8 @@ ICAR2018_BACH_Challenge
 The `BACH` dataset class supports download the data no runtime with the initialized argument
 `download: bool = True`.
 
+*Note that in the provided `BACH`-config files the download argument is set to `false`. To enable automatic download you will need to open the config and set `download: true`.*
+
 The splits are created from the indices specified in the BACH dataset class. These indices were picked to prevent data 
 leakage due to images belonging to the same patient. Because the small dataset in combination with the patient ID constraint 
 does not allow to split the data three-ways with sufficient amount of data in each split, we only create a train and val 

@@ -4,6 +4,8 @@ To produce the evaluation results presented [here](../index.md), you can run *ev
 
 Make sure to replace `<task>` in the commands below with `bach`, `crc`, `mhist` or `patch_camelyon`.
 
+*Note that to run the commands below you will need to first download the data. [BACH](../../datasets/bach.md), [CRC](../../datasets/crc.md) and [PatchCamelyon](../../datasets/patch_camelyon.md) provide automatic download by setting the argument `download: true` in their respective config-files. In the case of [MHIST](../../datasets/mhist.md) you will need to download the data manually by following the instructions provided [here](../../datasets/mhist.md#download-and-preprocessing).*
+
 ## DINO ViT-S16 (random weights)
 
 Evaluating the backbone with randomly initialized weights serves as a baseline to compare the pretrained FMs 
