@@ -9,7 +9,7 @@ import numpy as np
 from torchvision.datasets import utils
 from typing_extensions import override
 
-from eva.vision.data.datasets import _utils, structs
+from eva.vision.data.datasets import _utils, _validators, structs
 from eva.vision.data.datasets.segmentation import base
 from eva.vision.utils import io
 
@@ -116,9 +116,18 @@ class TotalSegmentator2D(base.ImageSegmentation):
             self._download_dataset()
 
     @override
-    def setup(self) -> None:
+    def configure(self) -> None:
         self._samples_dirs = self._fetch_samples_dirs()
         self._indices = self._create_indices()
+
+    @override
+    def validate(self) -> None:
+        _validators.check_dataset_integrity(
+            self,
+            length=1660 if self._split == "train" else 400,
+            n_classes=117,
+            first_and_last_labels=("adrenal_gland_left", "vertebrae_T9"),
+        )
 
     @override
     def __len__(self) -> int:

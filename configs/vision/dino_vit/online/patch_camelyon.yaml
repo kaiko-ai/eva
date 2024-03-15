@@ -68,7 +68,11 @@ data:
         init_args: &DATASET_ARGS
           root: ${oc.env:DATA_ROOT, ./data}/patch_camelyon
           split: train
-          download: ${oc.env:DOWNLOAD_DATA, true}
+          download: false
+          # Set `download: true` to download the dataset from https://zenodo.org/records/1494286
+          # The PatchCamelyon dataset is distributed under the following license: 
+          # "Creative Commons Zero v1.0 Universal"
+          # (see: https://choosealicense.com/licenses/cc0-1.0/)
           image_transforms:
             class_path: eva.vision.data.transforms.common.ResizeAndCrop
             init_args:

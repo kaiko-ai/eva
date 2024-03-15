@@ -49,5 +49,5 @@ def bach_dataset(split: Literal["train", "val"], assets_path: str) -> datasets.B
         split=split,
     )
     dataset.prepare_data()
-    dataset.setup()
+    dataset.configure()
     return dataset

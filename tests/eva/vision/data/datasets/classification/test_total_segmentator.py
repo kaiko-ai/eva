@@ -59,5 +59,5 @@ def total_segmentator_dataset(
         download=False,
     )
     dataset.prepare_data()
-    dataset.setup()
+    dataset.configure()
     return dataset

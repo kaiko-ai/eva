@@ -41,7 +41,8 @@ def patch_camelyon_dataset(
     split: Literal["train", "val", "test"], assets_path: str
 ) -> datasets.PatchCamelyon:
     """PatchCamelyon dataset fixture."""
-    return datasets.PatchCamelyon(
+    dataset = datasets.PatchCamelyon(
         root=os.path.join(assets_path, "vision", "datasets", "patch_camelyon"),
         split=split,
     )
+    return dataset

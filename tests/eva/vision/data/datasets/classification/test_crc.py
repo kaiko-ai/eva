@@ -40,5 +40,5 @@ def crc_dataset(split: Literal["train", "val"], assets_path: str) -> datasets.CR
         split=split,
     )
     dataset.prepare_data()
-    dataset.setup()
+    dataset.configure()
     return dataset
