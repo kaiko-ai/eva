@@ -5,8 +5,8 @@ import torch
 
 from eva.metrics import defaults
 
-PREDS_ONE = torch.tensor([[0.70, 0.05, 0.99, 0.10, 0.3]])
-TARGET_ONE = torch.tensor([[0, 1, 1, 0, 1]])
+PREDS_ONE = torch.tensor([0.70, 0.05, 0.99, 0.10, 0.3])
+TARGET_ONE = torch.tensor([0, 1, 1, 0, 1])
 EXPECTED_ONE = {
     "BinaryAUROC": torch.tensor(0.5000),
     "BinaryAccuracy": torch.tensor(0.4000),
