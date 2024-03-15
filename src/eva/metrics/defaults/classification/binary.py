@@ -36,11 +36,18 @@ class BinaryClassificationMetrics(core.MetricCollection):
         """
         super().__init__(
             metrics=[
+                classification.BinaryAUROC(
+                    ignore_index=ignore_index,
+                ),
                 classification.BinaryAccuracy(
                     threshold=threshold,
                     ignore_index=ignore_index,
                 ),
                 metrics.BinaryBalancedAccuracy(
+                    threshold=threshold,
+                    ignore_index=ignore_index,
+                ),
+                classification.BinaryF1Score(
                     threshold=threshold,
                     ignore_index=ignore_index,
                 ),
@@ -52,28 +59,17 @@ class BinaryClassificationMetrics(core.MetricCollection):
                     threshold=threshold,
                     ignore_index=ignore_index,
                 ),
-                classification.BinaryF1Score(
-                    threshold=threshold,
-                    ignore_index=ignore_index,
-                ),
-                classification.BinaryAUROC(
-                    ignore_index=ignore_index,
-                ),
             ],
             prefix=prefix,
             postfix=postfix,
             compute_groups=[
                 [
+                    "BinaryAUROC",
                     "BinaryAccuracy",
+                    "BinaryBalancedAccuracy",
+                    "BinaryF1Score",
                     "BinaryPrecision",
                     "BinaryRecall",
-                    "BinaryF1Score",
-                ],
-                [
-                    "BinaryBalancedAccuracy",  # needs to be separate, as derived from multiclass
-                ],
-                [
-                    "BinaryAUROC",
                 ],
             ],
         )
