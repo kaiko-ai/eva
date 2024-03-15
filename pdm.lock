@@ -5,7 +5,7 @@
 groups = ["default", "dev", "vision", "docs", "test", "lint"]
 strategy = ["cross_platform", "inherit_metadata"]
 lock_version = "4.4.1"
-content_hash = "sha256:e7257e42ccd05b1592c004c7a0223d9066a6a314816de4c3556dbdb6aff1e0f7"
+content_hash = "sha256:d2ff437403b80555474a4b49b05b5e937d1524118d286e9687c9e402da67b8fa"
 
 [[package]]
 name = "absl-py"
@@ -2244,7 +2244,7 @@ files = [
 
 [[package]]
 name = "torchmetrics"
-version = "1.2.1"
+version = "1.3.1"
 requires_python = ">=3.8"
 summary = "PyTorch native Metrics"
 groups = ["default"]
@@ -2252,11 +2252,11 @@ dependencies = [
     "lightning-utilities>=0.8.0",
     "numpy>1.20.0",
     "packaging>17.1",
-    "torch>=1.8.1",
+    "torch>=1.10.0",
 ]
 files = [
-    {file = "torchmetrics-1.2.1-py3-none-any.whl", hash = "sha256:fe03a8c53d0ae5800d34ea615f56295fda281282cd83f647d2184e81c1d4efee"},
-    {file = "torchmetrics-1.2.1.tar.gz", hash = "sha256:217387738f84939c39b534b20d4983e737cc448d27aaa5340e0327948d97ca3e"},
+    {file = "torchmetrics-1.3.1-py3-none-any.whl", hash = "sha256:a44bd1edee629bbf463eb81bfba8300b3785d8b3b8d758bdcafa862b80955b4f"},
+    {file = "torchmetrics-1.3.1.tar.gz", hash = "sha256:8d371f7597a1a5eb02d5f2ed59642d6fef09093926997ce91e18b1147cc8defa"},
 ]
 
 [[package]]

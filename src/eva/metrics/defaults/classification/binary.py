@@ -2,7 +2,7 @@
 
 from torchmetrics import classification
 
-from eva.metrics import core, binary_balanced_accuracy
+from eva.metrics import binary_balanced_accuracy, core
 
 
 class BinaryClassificationMetrics(core.MetricCollection):
@@ -63,12 +63,14 @@ class BinaryClassificationMetrics(core.MetricCollection):
             postfix=postfix,
             compute_groups=[
                 [
-                    "BinaryAUROC",
                     "BinaryAccuracy",
                     "BinaryBalancedAccuracy",
                     "BinaryF1Score",
                     "BinaryPrecision",
                     "BinaryRecall",
+                ],
+                [
+                    "BinaryAUROC",
                 ],
             ],
         )
