@@ -33,6 +33,7 @@ dependencies = [
     "onnxruntime>=1.17.1",
     "onnx>=1.15.0",
     "toolz>=0.12.1",
+    "torchmetrics==1.2.1",
 ]
 
 [project.license]
@@ -43,9 +44,6 @@ vision = [
     "torchvision>=0.17.0",
     "opencv-python-headless>=4.9.0.80",
     "h5py>=3.10.0",
-]
-all = [
-    "kaiko-eva[vision]",
 ]
 
 [project.scripts]
@@ -81,9 +79,6 @@ docs = [
     "mkdocs>=1.5.3",
     "mkdocstrings[python]>=0.24.0",
     "mkdocs-material>=9.5.6",
-]
-dev = [
-    "kaiko-eva[lint,test,docs]",
 ]
 
 [tool.isort]

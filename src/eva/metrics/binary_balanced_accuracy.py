@@ -2,6 +2,7 @@
 
 from torch import Tensor
 from torchmetrics.classification import stat_scores
+from torchmetrics.utilities.compute import _safe_divide
 
 
 class BinaryBalancedAccuracy(stat_scores.BinaryStatScores):
@@ -16,4 +17,6 @@ class BinaryBalancedAccuracy(stat_scores.BinaryStatScores):
     def compute(self) -> Tensor:
         """Compute accuracy based on inputs passed in to ``update`` previously."""
         tp, fp, tn, fn = self._final_state()
-        return 0.5 * (tp / (tp + fn) + tn / (tn + fp))
+        sensitivity = _safe_divide(tp, tp + fn)
+        specificity = _safe_divide(tn, tn + fp)
+        return 0.5 * (sensitivity + specificity)

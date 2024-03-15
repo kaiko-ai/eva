@@ -2,8 +2,7 @@
 
 from torchmetrics import classification
 
-from eva import metrics
-from eva.metrics import core
+from eva.metrics import core, binary_balanced_accuracy
 
 
 class BinaryClassificationMetrics(core.MetricCollection):
@@ -20,12 +19,12 @@ class BinaryClassificationMetrics(core.MetricCollection):
 
         The metrics instantiated here are:
 
+        - BinaryAUROC
         - BinaryAccuracy
         - BinaryBalancedAccuracy
+        - BinaryF1Score
         - BinaryPrecision
         - BinaryRecall
-        - BinaryF1Score
-        - BinaryAUROC
 
         Args:
             threshold: Threshold for transforming probability to binary (0,1) predictions
@@ -43,7 +42,7 @@ class BinaryClassificationMetrics(core.MetricCollection):
                     threshold=threshold,
                     ignore_index=ignore_index,
                 ),
-                metrics.BinaryBalancedAccuracy(
+                binary_balanced_accuracy.BinaryBalancedAccuracy(
                     threshold=threshold,
                     ignore_index=ignore_index,
                 ),
