@@ -48,7 +48,7 @@ class BACH(base.ImageClassification):
         self,
         root: str,
         split: Literal["train", "val"] | None = None,
-        download: bool = None,
+        download: bool = False,
         image_transforms: Callable | None = None,
         target_transforms: Callable | None = None,
     ) -> None:
