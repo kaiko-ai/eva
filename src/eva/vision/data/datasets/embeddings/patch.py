@@ -89,8 +89,7 @@ class PatchEmbeddingsDataset(VisionDataset):
         """
         filename = self.filename(index)
         embeddings_path = os.path.join(self._root, filename)
-        # tensor = torch.load(embeddings_path, map_location="cpu")
-        tensor = torch.load(embeddings_path)
+        tensor = torch.load(embeddings_path, map_location="cpu")
         return tensor.squeeze(0)
 
     def _load_target(self, index: int) -> np.ndarray:
