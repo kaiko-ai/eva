@@ -47,8 +47,8 @@ data:
       train:
         class_path: eva.vision.data.datasets.embeddings.PatchEmbeddingsDataset
         init_args: &DATASET_ARGS
-          root: ${oc.env:TESTS_ROOT, tests/eva}/assets/vision/datasets/embeddings
-          manifest_path: ${oc.env:TESTS_ROOT, tests/eva}/assets/vision/manifests/embeddings/patches.csv
+          root: ${oc.env:TESTS_ROOT, tests/eva}/assets/vision/datasets/embeddings/patch
+          manifest_file: manifest.csv
           split: train
       val:
         class_path: eva.vision.data.datasets.embeddings.PatchEmbeddingsDataset

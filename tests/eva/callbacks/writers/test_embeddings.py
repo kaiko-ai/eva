@@ -5,9 +5,8 @@ import os
 import random
 import tempfile
 from pathlib import Path
-from typing import List, Literal, Tuple
+from typing import List, Literal
 
-import numpy as np
 import pandas as pd
 import pytest
 import pytorch_lightning as pl
@@ -134,7 +133,7 @@ class FakeDataset(boring_classes.RandomDataset, datasets.Dataset):
         return f"{self._split}-{index}"
 
     @override
-    def __getitem__(self, index: int) -> Tuple[np.array, int]:
+    def __getitem__(self, index: int):
         data = boring_classes.RandomDataset.__getitem__(self, index)
         target = random.choice([0, 1])
         return data, target
