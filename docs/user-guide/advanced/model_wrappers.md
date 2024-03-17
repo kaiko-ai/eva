@@ -58,7 +58,7 @@ backbone:
   init_args:
     model_name_or_path: owkin/phikon
     tensor_transforms: 
-      class_path: eva.vision.data.transforms.model_output.ExtractCLSFeatures
+      class_path: eva.models.networks.transforms.ExtractCLSFeatures
 ```
 
 In the above example, the forward pass implemented by the `owkin/phikon` model returns an output tensor containing the hidden states of all input tokens. In order to extract the state corresponding to the CLS token only, we can specify a transformation via the `tensor_transforms` argument which will be applied to the model output.

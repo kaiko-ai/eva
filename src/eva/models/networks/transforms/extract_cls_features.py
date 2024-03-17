@@ -16,8 +16,10 @@ class ExtractCLSFeatures:
             tensor: The tensor representing the model output.
         """
         if isinstance(tensor, torch.Tensor):
-            return tensor[:, 0, :]
+            transformed_tensor = tensor[:, 0, :]
         elif isinstance(tensor, modeling_outputs.BaseModelOutputWithPooling):
-            return tensor.last_hidden_state[:, 0, :]
+            transformed_tensor = tensor.last_hidden_state[:, 0, :]
         else:
             raise ValueError(f"Unsupported type {type(tensor)}")
+
+        return transformed_tensor
