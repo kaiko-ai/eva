@@ -69,9 +69,7 @@ lint = [
     "black>=23.1.0",
     "ruff>=0.0.254",
     "yamllint>=1.29.0",
-    "nox>=2022.11.21",
     "bandit>=1.7.6",
-    "pyright>=1.1.295",
 ]
 typecheck = [
     "pyright>=1.1.295",
