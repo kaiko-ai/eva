@@ -7,12 +7,12 @@ Before starting to use ***eva***, it's important to get familiar with the differ
 
 To run an evaluation, we call:
 ```
-python -m eva <subcommand> --config <path-to-config-file>
+eva <subcommand> --config <path-to-config-file>
 ```
 
 The *eva* interface supports the subcommands: `predict`, `fit` and `predict_fit`.
 
- - **`fit`**: is used to train a decoder for a specific task and subsequently evaluate the performance. This can be done *online* or *offline* \*
+- **`fit`**: is used to train a decoder for a specific task and subsequently evaluate the performance. This can be done *online* or *offline* \*
 - **`predict`**: is used to compute embeddings for input images with a provided FM-checkpoint. This is the first step of the *offline* workflow
 - **`predict_fit`**: runs `predict` and `fit` sequentially. Like the `fit`-online run, it runs a complete evaluation with images as input.
 
@@ -44,12 +44,13 @@ To customize runs, without the need of creating custom config-files, you can ove
 |                         |                           |
 |-------------------------|---------------------------|
 | `OUTPUT_ROOT`            | the directory to store logging outputs and recorded results |
-| `DINO_BACKBONE`          | the backbone architecture, e.g. "dino_vits16" |
-| `PRETRAINED`             | whether to load FM-backbone weights from a pretrained model |
 | `MONITOR_METRIC`         | the metric to monitor for early stopping and model checkpoint loading |
 | `EMBEDDINGS_ROOT`        | the directory to store the computed embeddings |
 | `IN_FEATURES`            | the input feature dimension (embedding)           |
+| `REPO_OR_DIR`            | github repo with format, e.g. "facebookresearch/dino:main" |
 | `DINO_BACKBONE`          | Backbone model architecture if a facebookresearch/dino FM is evaluated |
+| `PRETRAINED`             | whether to load FM-backbone weights from a pretrained model |
+| `FORCE_RELOAD`          | whether to force a fresh download of the github repo unconditionally |
 | `CHECKPOINT_PATH`        | Path to the FM-checkpoint to be evaluated           |
 | `N_RUNS`             | Number of `fit` runs to perform in a session, defaults to 5 |
 | `MAX_STEPS`             | Maximum number of training steps (if early stopping is not triggered) |

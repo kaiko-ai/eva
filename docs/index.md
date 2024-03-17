@@ -27,7 +27,7 @@ hide:
 
 </div>
 
-_Oncology FM Evaluation Framework by kaiko.ai_
+_Oncology FM Evaluation Framework by [kaiko.ai](https://www.kaiko.ai/)_
 
 With the first release, ***eva*** supports performance evaluation for vision Foundation Models ("FMs") and supervised machine learning models on WSI-patch-level image classification- and radiology (CT-scans) segmentation tasks.
 
@@ -78,17 +78,19 @@ We evaluated the following FMs on the 4 supported WSI-patch-level image classifi
 | kaiko.ai - DINO ViT-B8      | TCGA        | 0.902 (±0.002) | 0.887 (±0.004) | **0.798 (±0.007)** | 0.950 (±0.003) | 0.803 (±0.004)| 
 | kaiko.ai - DINOv2 ViT-L14   | TCGA        | 0.900 (±0.002) | 0.896 (±0.001) | 0.768 (±0.006) | 0.945 (±0.001) | 0.777 (±0.008)| 
 
-\* Metric in table: *Balanced Accuracy* (for binary & multiclass). The runs use the default setup described in the section below. The table shows the average performance & standard deviation over 5 runs.
+\* Metric in table: *Balanced Accuracy* (for binary & multiclass). The table shows the average performance & standard deviation over 5 runs.
 
-***eva*** trains the decoder on the "train" split and uses the "validation" split for monitoring, early stopping and checkpoint selection. Evaluation results are reported on the "validation" split and, if available, on the "test" split.
+The runs use the default setup described in the section below.
+
+*eva* trains the decoder on the "train" split and uses the "validation" split for monitoring, early stopping and checkpoint selection. Evaluation results are reported on the "validation" split and, if available, on the "test" split.
 
 For more details on the FM-backbones and instructions to replicate the results, please refer to the [Replicate evaluations](user-guide/advanced/replicate_evaluations.md).
 
 ## Evaluation setup
 
-With the FM we generate embeddings for all WSI patches and then use these embeddings as input to train a downstream head consisting of a single linear layer in a supervised setup for each of the benchmark datasets. The FM weights are frozen throughout this process.
+With the FM, *eva* computes embeddings for all WSI patches which are then used as input to train a downstream head consisting of a single linear layer in a supervised setup for each of the benchmark datasets.
 
-To standardize evaluations, the default configurations *eva* uses are based on the evaluation protocol proposed by [1] and dataset/task specific characteristics. We use early stopping after 10% of the maximal number of steps as suggested by [2].
+To standardize evaluations, the default configurations *eva* uses are based on the evaluation protocol proposed by [1] and dataset/task specific characteristics. We use early stopping with a patience of 5% of the maximal number of epochs.
 
 |                         |                           |
 |-------------------------|---------------------------|
@@ -112,7 +114,6 @@ To standardize evaluations, the default configurations *eva* uses are based on t
 \* For smaller datasets (e.g. BACH with 400 samples) we reduce the batch size to 256 and scale the learning rate accordingly.
 
 - [1]: [Virchow: A Million-Slide Digital Pathology Foundation Model, 2024](https://arxiv.org/pdf/2309.07778.pdf)
-- [2]: [Scaling Self-Supervised Learning for Histopathology with Masked Image Modeling](https://www.medrxiv.org/content/10.1101/2023.07.21.23292757v1.full.pdf)
 
 ## License
 
