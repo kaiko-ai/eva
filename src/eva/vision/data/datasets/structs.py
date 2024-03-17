@@ -1,4 +1,4 @@
-"""Data classes and structures for datasets."""
+"""Helper dataclasses and data structures for vision datasets."""
 
 import dataclasses
 
