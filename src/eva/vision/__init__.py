@@ -11,4 +11,4 @@ except ImportError as e:
     )
     raise ImportError(str(e) + "\n\n" + msg) from e
 
-__all__ = ["utils", "models", "datasets", "transforms"]
+__all__ = ["models", "utils", "datasets", "transforms"]
