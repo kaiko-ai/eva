@@ -1,5 +1,5 @@
 """Vision Models API."""
 
-from eva.vision.models.networks.abmil import ABMIL
+from eva.vision.models import networks
 
-__all__ = ["ABMIL"]
+__all__ = ["networks"]
