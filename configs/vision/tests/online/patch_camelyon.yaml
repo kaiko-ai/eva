@@ -62,6 +62,7 @@ data:
     dataloaders:
       train:
         batch_size: &BATCH_SIZE 2
+        shuffle: true
         num_workers: 0
         pin_memory: false
         persistent_workers: false
