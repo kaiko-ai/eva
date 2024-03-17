@@ -76,6 +76,7 @@ lint = [
 typecheck = [
     "pyright>=1.1.295",
     "pytest>=7.2.2",
+    "nox>=2024.3.2",
 ]
 test = [
     "pygments>=2.14.0",
