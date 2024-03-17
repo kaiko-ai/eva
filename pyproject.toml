@@ -6,7 +6,7 @@ build-backend = "pdm.backend"
 
 [project]
 name = "kaiko-eva"
-version = "0.0.0.dev2"
+version = "0.0.0.dev3"
 description = "Evaluation Framework for oncology foundation models."
 readme = "README.md"
 authors = [
@@ -45,7 +45,9 @@ vision = [
     "h5py>=3.10.0",
 ]
 all = [
-    "kaiko-eva[vision]",
+    "torchvision>=0.17.0",
+    "opencv-python-headless>=4.9.0.80",
+    "h5py>=3.10.0",
 ]
 
 [project.scripts]
@@ -66,12 +68,13 @@ lint = [
     "isort>=5.12.0",
     "black>=23.1.0",
     "ruff>=0.0.254",
-    "pyright>=1.1.295",
     "yamllint>=1.29.0",
     "nox>=2022.11.21",
     "bandit>=1.7.6",
+    "pyright>=1.1.295",
 ]
 test = [
+    "pyright>=1.1.295",
     "pygments>=2.14.0",
     "pytest>=7.2.2",
     "nox>=2022.11.21",
@@ -83,7 +86,20 @@ docs = [
     "mkdocs-material>=9.5.6",
 ]
 dev = [
-    "kaiko-eva[lint,test,docs]",
+    "isort>=5.12.0",
+    "black>=23.1.0",
+    "ruff>=0.0.254",
+    "yamllint>=1.29.0",
+    "nox>=2022.11.21",
+    "bandit>=1.7.6",
+    "pyright>=1.1.295",
+    "pygments>=2.14.0",
+    "pytest>=7.2.2",
+    "nox>=2022.11.21",
+    "pytest-cov>=4.1.0",
+    "mkdocs>=1.5.3",
+    "mkdocstrings[python]>=0.24.0",
+    "mkdocs-material>=9.5.6",
 ]
 
 [tool.isort]
