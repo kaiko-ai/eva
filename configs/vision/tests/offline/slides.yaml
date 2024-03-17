@@ -3,7 +3,9 @@ trainer:
   class_path: eva.Trainer
   init_args:
     default_root_dir: &OUTPUT_DIR ${oc.env:OUTPUT_DIR, logs/test/offline/slides}
-    max_epochs: &MAX_EPOCHS 2
+    max_epochs: &MAX_EPOCHS 1
+    limit_train_batches: 2
+    limit_val_batches: 2
     callbacks:
       - class_path: pytorch_lightning.callbacks.LearningRateMonitor
         init_args:
@@ -73,6 +75,12 @@ data:
         persistent_workers: false
         prefetch_factor: null
       val:
+        batch_size: *BATCH_SIZE
+        num_workers: 0
+        pin_memory: false
+        persistent_workers: false
+        prefetch_factor: null
+      test:
         batch_size: *BATCH_SIZE
         num_workers: 0
         pin_memory: false

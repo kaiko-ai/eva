@@ -1,4 +1,4 @@
-"""Implementation of the balanced accuracy for binary classification tasks."""
+"""Binary balanced accuracy metric."""
 
 from torch import Tensor
 from torchmetrics.classification import stat_scores
