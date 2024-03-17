@@ -3,7 +3,7 @@ trainer:
   class_path: eva.Trainer
   init_args:
     default_root_dir: &LIGHTNING_ROOT ${oc.env:LIGHTNING_ROOT, logs/test/offline/patch_camelyon}
-    max_epochs: &MAX_EPOCHS 20
+    max_epochs: &MAX_EPOCHS 1
     limit_train_batches: 2
     limit_val_batches: 2
     callbacks:
@@ -98,7 +98,7 @@ data:
             split: val
     dataloaders:
       train:
-        batch_size: &BATCH_SIZE 256
+        batch_size: &BATCH_SIZE 2
         shuffle: true
         num_workers: 0
         pin_memory: false
@@ -117,7 +117,7 @@ data:
         persistent_workers: false
         prefetch_factor: null
       predict:
-        batch_size: &PREDICT_BATCH_SIZE 32
+        batch_size: &PREDICT_BATCH_SIZE 2
         num_workers: 0
         pin_memory: false
         persistent_workers: false
