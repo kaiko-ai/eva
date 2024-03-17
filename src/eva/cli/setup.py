@@ -55,9 +55,9 @@ def _initialize_logger() -> None:
     logger.remove()
     logger.add(
         sys.stderr,
-        format="<magenta>[{time:HH:mm:ss}]</magenta>"
-        " <bold><level>{level}</level></bold> "
-        " | {message}",
+        format="<blue>{time:HH:mm:ss}</blue>"
+        " :: <bold><level>{level}</level></bold>"
+        " :: {message}",
         colorize=True,
         level="INFO",
     )
