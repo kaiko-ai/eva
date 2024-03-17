@@ -117,7 +117,7 @@ data:
         persistent_workers: false
         prefetch_factor: null
       predict:
-        batch_size: &PREDICT_BATCH_SIZE 1
+        batch_size: &PREDICT_BATCH_SIZE 2
         num_workers: 0
         pin_memory: false
         persistent_workers: false
