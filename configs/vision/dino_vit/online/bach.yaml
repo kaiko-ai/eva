@@ -18,7 +18,7 @@ trainer:
       - class_path: pytorch_lightning.callbacks.EarlyStopping
         init_args:
           min_delta: 0
-          patience: 800
+          patience: 400
           monitor: *MONITOR_METRIC
           mode: *MONITOR_METRIC_MODE
     logger:
