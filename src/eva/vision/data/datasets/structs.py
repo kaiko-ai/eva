@@ -15,17 +15,3 @@ class DownloadResource:
 
     md5: str | None = None
     """The MD5 hash of the resource."""
-
-
-@dataclasses.dataclass(frozen=True)
-class SplitRatios:
-    """Contains split ratios for train, val and test."""
-
-    train: float
-    """Train split ratio."""
-
-    val: float
-    """Validation split ratio."""
-
-    test: float
-    """Test split ratio."""
