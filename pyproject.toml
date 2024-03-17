@@ -81,7 +81,6 @@ typecheck = [
 test = [
     "pygments>=2.14.0",
     "pytest>=7.2.2",
-    "nox>=2022.11.21",
     "pytest-cov>=4.1.0",
 ]
 docs = [
