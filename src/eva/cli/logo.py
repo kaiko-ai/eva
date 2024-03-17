@@ -11,7 +11,7 @@ _EVA_LOGO: str = r"""
 
 
 ANSI_LOGO_COLOR = "\33[0;34m"
-"""ANSI color reset code."""
+"""ANSI main logo color."""
 
 ANSI_COLOR_RESET = "\33[0m"
 """ANSI color reset code."""
