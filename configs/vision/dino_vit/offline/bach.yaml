@@ -19,7 +19,7 @@ trainer:
       - class_path: pytorch_lightning.callbacks.EarlyStopping
         init_args:
           min_delta: 0
-          patience: 800
+          patience: 400
           monitor: *MONITOR_METRIC
           mode: *MONITOR_METRIC_MODE
       - class_path: eva.callbacks.EmbeddingsWriter
@@ -33,9 +33,10 @@ trainer:
             init_args:
               path: torch.hub.load
               arguments:
-                repo_or_dir: facebookresearch/dino:main
+                repo_or_dir: ${oc.env:REPO_OR_DIR, facebookresearch/dino:main}
                 model: ${oc.env:DINO_BACKBONE, dino_vits16}
                 pretrained: ${oc.env:PRETRAINED, true}
+                force_reload: ${oc.env:FORCE_RELOAD, false}
               checkpoint_path: ${oc.env:CHECKPOINT_PATH, null}
     logger:
       - class_path: pytorch_lightning.loggers.TensorBoardLogger
