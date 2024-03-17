@@ -10,6 +10,9 @@ _EVA_LOGO: str = r"""
 """
 
 
+ANSI_LOGO_COLOR = "\33[0;34m"
+"""ANSI color reset code."""
+
 ANSI_COLOR_RESET = "\33[0m"
 """ANSI color reset code."""
 
@@ -18,17 +21,15 @@ def _print_logo(
     logo: str,
     prefix: str = "",
     suffix: str = "",
-    ansi_color: str = "\33[0;35m",
 ) -> None:
     r"""Prints an ASCII terminal art logo in terminal.
 
     Args:
         logo: The desired art logo to print.
-        prefix: Characters to add before the logo. Defaults to "".
-        suffix: Characters to add after the logo. Defaults to "".
-        ansi_color: The color of the output. Defaults to "\33[0;32m".
+        prefix: Characters to add before the logo.
+        suffix: Characters to add after the logo.
     """
-    colored_logo = f"{ansi_color}{logo}{ANSI_COLOR_RESET}"
+    colored_logo = f"{ANSI_LOGO_COLOR}{logo}{ANSI_COLOR_RESET}"
     print(prefix + colored_logo + suffix)
 
 
