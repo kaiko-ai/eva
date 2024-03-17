@@ -73,7 +73,7 @@ data:
   init_args:
     datasets:
       train:
-        class_path: eva.data.datasets.classification.PatchEmbeddingsDataset
+        class_path: eva.data.datasets.classification.EmbeddingsDataset
         init_args: &DATASET_ARGS
           root: *DATASET_EMBEDDINGS_ROOT
           manifest_file: manifest.csv
@@ -81,12 +81,12 @@ data:
           target_transforms:
             class_path: eva.vision.data.transforms.common.ArrayToFloatTensor
       val:
-        class_path: eva.data.datasets.classification.PatchEmbeddingsDataset
+        class_path: eva.data.datasets.classification.EmbeddingsDataset
         init_args:
           <<: *DATASET_ARGS
           split: val
       test:
-        class_path: eva.data.datasets.classification.PatchEmbeddingsDataset
+        class_path: eva.data.datasets.classification.EmbeddingsDataset
         init_args:
           <<: *DATASET_ARGS
           split: test

@@ -70,14 +70,14 @@ data:
   init_args:
     datasets:
       train:
-        class_path: eva.data.datasets.classification.PatchEmbeddingsDataset
+        class_path: eva.data.datasets.classification.EmbeddingsDataset
         init_args: &DATASET_ARGS
           root: *EMBEDDINGS_DIR
           split: train
           column_mapping:
             path: embedding
       val:
-        class_path: eva.data.datasets.classification.PatchEmbeddingsDataset
+        class_path: eva.data.datasets.classification.EmbeddingsDataset
         init_args:
           <<: *DATASET_ARGS
           split: val

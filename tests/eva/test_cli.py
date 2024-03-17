@@ -10,8 +10,8 @@ from tests.eva import _cli
 @pytest.mark.parametrize(
     "configuration_file",
     [
-        "configs/core/tests/offline/patches.yaml",
-        # "configs/core/tests/offline/slides.yaml",  # TODO
+        "configs/core/tests/offline/embeddings.yaml",
+        # "configs/core/tests/offline/multi-embeddings.yaml",  # TODO
     ],
 )
 def test_fit_from_configuration(configuration_file: str, lib_path: str) -> None:

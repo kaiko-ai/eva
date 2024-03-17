@@ -1,4 +1,4 @@
-"""Patch embeddings classification dataset."""
+"""Embeddings classification dataset."""
 
 import os
 from typing import Callable, Dict, Tuple
@@ -12,8 +12,8 @@ from eva.data.datasets import base
 from eva.utils import io
 
 
-class PatchEmbeddingsDataset(base.Dataset):
-    """Embeddings dataset classification dataset."""
+class EmbeddingsDataset(base.Dataset):
+    """Embeddings classification dataset."""
 
     default_column_mapping: Dict[str, str] = {
         "data": "embeddings",

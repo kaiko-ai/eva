@@ -74,13 +74,13 @@ data:
   init_args:
     datasets:
       train:
-        class_path: eva.data.datasets.classification.PatchEmbeddingsDataset
+        class_path: eva.data.datasets.classification.EmbeddingsDataset
         init_args: &DATASET_ARGS
           root: *DATASET_EMBEDDINGS_ROOT
           manifest_file: manifest.csv
           split: train
       val:
-        class_path: eva.data.datasets.classification.PatchEmbeddingsDataset
+        class_path: eva.data.datasets.classification.EmbeddingsDataset
         init_args:
           <<: *DATASET_ARGS
           split: val
