@@ -38,7 +38,17 @@ class MulticlassClassificationMetrics(core.MetricCollection):
         """
         super().__init__(
             metrics=[
+                classification.MulticlassAUROC(
+                    num_classes=num_classes,
+                    average=average,
+                    ignore_index=ignore_index,
+                ),
                 classification.MulticlassAccuracy(
+                    num_classes=num_classes,
+                    average=average,
+                    ignore_index=ignore_index,
+                ),
+                classification.MulticlassF1Score(
                     num_classes=num_classes,
                     average=average,
                     ignore_index=ignore_index,
@@ -49,16 +59,6 @@ class MulticlassClassificationMetrics(core.MetricCollection):
                     ignore_index=ignore_index,
                 ),
                 classification.MulticlassRecall(
-                    num_classes=num_classes,
-                    average=average,
-                    ignore_index=ignore_index,
-                ),
-                classification.MulticlassF1Score(
-                    num_classes=num_classes,
-                    average=average,
-                    ignore_index=ignore_index,
-                ),
-                classification.MulticlassAUROC(
                     num_classes=num_classes,
                     average=average,
                     ignore_index=ignore_index,
