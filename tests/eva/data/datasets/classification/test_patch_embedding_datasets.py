@@ -7,7 +7,7 @@ import numpy as np
 import pytest
 import torch
 
-from eva.vision.data import datasets
+from eva.data.datasets import classification
 
 
 @pytest.mark.parametrize(
@@ -15,7 +15,8 @@ from eva.vision.data import datasets
     [("train", (8,)), ("val", (8,))],
 )
 def test_patch_embedding_dataset(
-    patch_embeddings_dataset: datasets.PatchEmbeddingsDataset, embeddings_shape: Tuple[int, ...]
+    patch_embeddings_dataset: classification.PatchEmbeddingsDataset,
+    embeddings_shape: Tuple[int, ...],
 ):
     """Test that the PatchEmbeddingsDataset level dataset."""
     # assert data sample is a tuple
@@ -31,9 +32,9 @@ def test_patch_embedding_dataset(
 
 
 @pytest.fixture(scope="function")
-def patch_embeddings_dataset(split: str, assets_path: str) -> datasets.PatchEmbeddingsDataset:
+def patch_embeddings_dataset(split: str, assets_path: str) -> classification.PatchEmbeddingsDataset:
     """PatchEmbeddingsDataset dataset fixture."""
-    dataset = datasets.PatchEmbeddingsDataset(
+    dataset = classification.PatchEmbeddingsDataset(
         root=os.path.join(assets_path, "vision", "datasets", "embeddings", "patch"),
         manifest_file="manifest.csv",
         split=split,

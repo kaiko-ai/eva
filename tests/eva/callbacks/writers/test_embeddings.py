@@ -77,7 +77,7 @@ def model(input_shape: int = 32, n_classes: int = 4) -> modules.HeadModule:
 
 @pytest.fixture(scope="function")
 def datamodule(
-    dataset: List[datasets.Dataset],
+    dataset: List[datasets.TorchDataset],
     dataloader: dataloaders.DataLoader,
 ) -> datamodules.DataModule:
     """Returns a dummy classification datamodule fixture."""
@@ -95,7 +95,7 @@ def datamodule(
 def dataset(
     n_samples: int,
     sample_shape: int = 32,
-) -> List[datasets.Dataset]:
+) -> List[datasets.TorchDataset]:
     """Fake dataset fixture."""
     train_dataset = FakeDataset(split="train", length=n_samples, size=sample_shape)
     val_dataset = FakeDataset(split="val", length=n_samples, size=sample_shape)

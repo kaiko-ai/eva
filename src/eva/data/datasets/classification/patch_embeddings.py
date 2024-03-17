@@ -1,4 +1,4 @@
-"""Dataset class for patch embeddings."""
+"""Patch embeddings classification dataset."""
 
 import os
 from typing import Callable, Dict, Tuple
@@ -8,12 +8,12 @@ import pandas as pd
 import torch
 from typing_extensions import override
 
-from eva.vision.data.datasets.vision import VisionDataset
-from eva.vision.utils import io
+from eva.data.datasets import base
+from eva.utils import io
 
 
-class PatchEmbeddingsDataset(VisionDataset):
-    """Embeddings dataset."""
+class PatchEmbeddingsDataset(base.Dataset):
+    """Embeddings dataset classification dataset."""
 
     default_column_mapping: Dict[str, str] = {
         "data": "embeddings",
@@ -60,22 +60,38 @@ class PatchEmbeddingsDataset(VisionDataset):
 
         self._data: pd.DataFrame
 
-    @override
     def filename(self, index: int) -> str:
+        """Returns the filename of the `index`'th data sample.
+
+        Note that this is the relative file path to the root.
+
+        Args:
+            index: The index of the data-sample to select.
+
+        Returns:
+            The filename of the `index`'th data sample.
+        """
         return self._data.at[index, self._column_mapping["data"]]
 
     @override
     def setup(self):
         self._data = self._load_manifest()
 
-    @override
     def __getitem__(self, index) -> Tuple[torch.Tensor, np.ndarray]:
+        """Returns the `index`'th data sample.
+
+        Args:
+            index: The index of the data-sample to select.
+
+        Returns:
+            A data sample and its target.
+        """
         embeddings = self._load_embeddings(index)
         target = self._load_target(index)
         return self._apply_transforms(embeddings, target)
 
-    @override
     def __len__(self) -> int:
+        """Returns the total length of the data."""
         return len(self._data)
 
     def _load_embeddings(self, index: int) -> torch.Tensor:
