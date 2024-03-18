@@ -7,8 +7,7 @@ def _fetch_version(package_name: str) -> str:
     """Fetches the version of an installed package.
 
     If it fails to do so, it returns a "*", indicating
-    that the package, as not installed, it is reachable
-    and operating at it's latest version.
+    that the package has been installed as editable.
 
     Args:
         package_name: The name of the package to fetch
