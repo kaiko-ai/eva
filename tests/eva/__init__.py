@@ -1,1 +1,1 @@
-"""EVA core tests."""
+"""eva core tests."""
