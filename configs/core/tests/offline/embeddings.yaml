@@ -49,7 +49,7 @@ data:
       train:
         class_path: eva.data.datasets.classification.EmbeddingsDataset
         init_args: &DATASET_ARGS
-          root: ${oc.env:TESTS_ROOT, tests/eva}/assets/core/datasets/embeddings/patch
+          root: ${oc.env:TESTS_ROOT, tests/eva}/assets/core/datasets/embeddings
           manifest_file: manifest.csv
           split: train
       val:

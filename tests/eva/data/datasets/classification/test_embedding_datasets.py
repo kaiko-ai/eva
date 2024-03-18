@@ -35,7 +35,7 @@ def test_patch_embedding_dataset(
 def patch_embeddings_dataset(split: str, assets_path: str) -> classification.EmbeddingsDataset:
     """EmbeddingsDataset dataset fixture."""
     dataset = classification.EmbeddingsDataset(
-        root=os.path.join(assets_path, "core", "datasets", "embeddings", "patch"),
+        root=os.path.join(assets_path, "core", "datasets", "embeddings"),
         manifest_file="manifest.csv",
         split=split,
     )
