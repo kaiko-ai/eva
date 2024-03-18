@@ -2,8 +2,8 @@
 
 from typing import List
 
-import pytorch_lightning as pl
-from pytorch_lightning.utilities.types import EVAL_DATALOADERS, TRAIN_DATALOADERS
+import lightning.pytorch as pl
+from lightning.pytorch.utilities.types import EVAL_DATALOADERS, TRAIN_DATALOADERS
 from typing_extensions import override
 
 from eva.core.data import dataloaders as dataloaders_lib

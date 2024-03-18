@@ -2,7 +2,7 @@
 
 from typing import Tuple
 
-from pytorch_lightning.utilities.types import _EVALUATE_OUTPUT
+from lightning.pytorch.utilities.types import _EVALUATE_OUTPUT
 
 from eva.core.data import datamodules
 from eva.core.models import modules

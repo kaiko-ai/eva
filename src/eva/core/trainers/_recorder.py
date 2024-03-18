@@ -10,7 +10,7 @@ from typing import Any, Dict, List, Mapping
 from lightning_fabric.utilities import cloud_io
 from loguru import logger
 from omegaconf import OmegaConf
-from pytorch_lightning.utilities.types import _EVALUATE_OUTPUT
+from lightning.pytorch.utilities.types import _EVALUATE_OUTPUT
 from toolz import dicttoolz
 
 SESSION_METRICS = Mapping[str, List[float]]

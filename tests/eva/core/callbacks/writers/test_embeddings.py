@@ -8,8 +8,8 @@ from typing import List, Literal
 
 import pandas as pd
 import pytest
-import pytorch_lightning as pl
-from pytorch_lightning.demos import boring_classes
+import lightning.pytorch as pl
+from lightning.pytorch.demos import boring_classes
 from torch import nn
 from typing_extensions import override
 

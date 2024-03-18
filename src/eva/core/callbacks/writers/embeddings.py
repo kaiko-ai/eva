@@ -5,10 +5,10 @@ import io
 import os
 from typing import Any, Dict, Sequence
 
-import pytorch_lightning as pl
+import lightning.pytorch as pl
 import torch
 from loguru import logger
-from pytorch_lightning import callbacks
+from lightning.pytorch import callbacks
 from torch import multiprocessing, nn
 from typing_extensions import override
 

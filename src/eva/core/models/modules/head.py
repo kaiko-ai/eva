@@ -3,8 +3,8 @@
 from typing import Any, Callable
 
 import torch
-from pytorch_lightning.cli import LRSchedulerCallable, OptimizerCallable
-from pytorch_lightning.utilities.types import STEP_OUTPUT
+from lightning.pytorch.cli import LRSchedulerCallable, OptimizerCallable
+from lightning.pytorch.utilities.types import STEP_OUTPUT
 from torch import optim
 from torch.optim import lr_scheduler
 from typing_extensions import override

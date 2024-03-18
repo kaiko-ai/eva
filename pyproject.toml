@@ -6,7 +6,7 @@ build-backend = "pdm.backend"
 
 [project]
 name = "kaiko-eva"
-version = "0.0.0.dev4"
+version = "0.0.0.dev5"
 description = "Evaluation Framework for oncology foundation models."
 readme = "README.md"
 authors = [
@@ -21,14 +21,14 @@ maintainers = [
 ]
 requires-python = ">=3.10"
 dependencies = [
-    "pytorch-lightning>=2.1.4",
-    "loguru>=0.7.2",
     "jsonargparse[omegaconf]>=4.27.4",
+    "lightning>=2.2.1",
+    "tensorboard>=2.16.2",
+    "loguru>=0.7.2",
     "pandas>=2.2.0",
     "pyarrow>=15.0.0",
     "nibabel>=5.2.0",
     "timm>=0.9.12",
-    "tensorboard>=2.16.2",
     "transformers>=4.38.2",
     "onnxruntime>=1.17.1",
     "onnx>=1.15.0",

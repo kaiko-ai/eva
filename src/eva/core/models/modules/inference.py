@@ -1,7 +1,7 @@
 """Model inference module."""
 
 import torch
-from pytorch_lightning.utilities.types import STEP_OUTPUT
+from lightning.pytorch.utilities.types import STEP_OUTPUT
 from typing_extensions import override
 
 from eva.core.models.modules import module
