@@ -1,19 +1,14 @@
-"""EVA core API."""
+"""eva public API."""
 
-from eva.cli import cli
-from eva.data import DataLoader, DataloadersSchema, DataModule, DatasetsSchema
-from eva.interface import Interface
-from eva.models import HeadModule, InferenceModule
-from eva.trainers import Trainer
+from eva import core
+from eva.core import DataModule, HeadModule, Trainer, callbacks, metrics, models
 
 __all__ = [
-    "cli",
-    "DataLoader",
-    "DataloadersSchema",
+    "core",
+    "callbacks",
+    "metrics",
+    "models",
     "DataModule",
-    "DatasetsSchema",
-    "Interface",
     "HeadModule",
-    "InferenceModule",
     "Trainer",
 ]

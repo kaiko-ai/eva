@@ -22,14 +22,14 @@ trainer:
           patience: 51
           monitor: *MONITOR_METRIC
           mode: *MONITOR_METRIC_MODE
-      - class_path: eva.callbacks.EmbeddingsWriter
+      - class_path: eva.core.callbacks.EmbeddingsWriter
         init_args:
           output_dir: &EMBEDDINGS_DIR ${oc.env:EMBEDDINGS_ROOT, ./data/embeddings}/${oc.env:DINO_BACKBONE, owkin/phikon}/mhist
           dataloader_idx_map:
             0: train
             1: test
           backbone:
-            class_path: eva.models.networks.wrappers.HuggingFaceModel
+            class_path: eva.core.models.networks.wrappers.HuggingFaceModel
             init_args:
               model_name_or_path: owkin/phikon
               tensor_transforms: 
@@ -68,16 +68,16 @@ data:
   init_args:
     datasets:
       train:
-        class_path: eva.data.datasets.classification.EmbeddingsDataset
+        class_path: eva.core.data.datasets.classification.EmbeddingsDataset
         init_args: &DATASET_ARGS
           root: *EMBEDDINGS_DIR
           split: train
           column_mapping:
             path: embedding
           target_transforms:
-            class_path: eva.vision.data.transforms.common.ArrayToFloatTensor
+            class_path: eva.core.data.transforms.ArrayToFloatTensor
       val:
-        class_path: eva.data.datasets.classification.EmbeddingsDataset
+        class_path: eva.core.data.datasets.classification.EmbeddingsDataset
         init_args:
           <<: *DATASET_ARGS
           split: test

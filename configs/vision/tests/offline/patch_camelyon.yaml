@@ -15,7 +15,7 @@ trainer:
             1: val
             2: test
           backbone:
-            class_path: eva.models.networks.wrappers.ModelFromFunction
+            class_path: eva.core.models.networks.wrappers.ModelFromFunction
             init_args:
               path: torch.hub.load
               arguments:
@@ -65,15 +65,15 @@ data:
   init_args:
     datasets:
       train:
-        class_path: eva.data.datasets.classification.EmbeddingsDataset
+        class_path: eva.core.data.datasets.classification.EmbeddingsDataset
         init_args: &DATASET_ARGS
           root: *DATASET_EMBEDDINGS_ROOT
           manifest_file: manifest.csv
           split: train
           target_transforms:
-            class_path: eva.vision.data.transforms.common.ArrayToFloatTensor
+            class_path: eva.core.data.transforms.ArrayToFloatTensor
       val:
-        class_path: eva.data.datasets.classification.EmbeddingsDataset
+        class_path: eva.core.data.datasets.classification.EmbeddingsDataset
         init_args:
           <<: *DATASET_ARGS
           split: val

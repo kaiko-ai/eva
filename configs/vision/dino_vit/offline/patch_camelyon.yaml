@@ -22,7 +22,7 @@ trainer:
           patience: 9
           monitor: *MONITOR_METRIC
           mode: *MONITOR_METRIC_MODE
-      - class_path: eva.callbacks.EmbeddingsWriter
+      - class_path: eva.core.callbacks.EmbeddingsWriter
         init_args:
           output_dir: &DATASET_EMBEDDINGS_ROOT ${oc.env:EMBEDDINGS_ROOT, ./data/embeddings}/${oc.env:DINO_BACKBONE, dino_vits16}/patch_camelyon
           dataloader_idx_map:
@@ -73,20 +73,20 @@ data:
   init_args:
     datasets:
       train:
-        class_path: eva.data.datasets.classification.EmbeddingsDataset
+        class_path: eva.core.data.datasets.classification.EmbeddingsDataset
         init_args: &DATASET_ARGS
           root: *DATASET_EMBEDDINGS_ROOT
           manifest_file: manifest.csv
           split: train
           target_transforms:
-            class_path: eva.vision.data.transforms.common.ArrayToFloatTensor
+            class_path: eva.core.data.transforms.ArrayToFloatTensor
       val:
-        class_path: eva.data.datasets.classification.EmbeddingsDataset
+        class_path: eva.core.data.datasets.classification.EmbeddingsDataset
         init_args:
           <<: *DATASET_ARGS
           split: val
       test:
-        class_path: eva.data.datasets.classification.EmbeddingsDataset
+        class_path: eva.core.data.datasets.classification.EmbeddingsDataset
         init_args:
           <<: *DATASET_ARGS
           split: test

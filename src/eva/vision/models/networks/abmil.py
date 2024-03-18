@@ -5,7 +5,7 @@ from typing import Type
 import torch
 import torch.nn as nn
 
-from eva.models.networks import MLP
+from eva.core.models.networks import MLP
 
 
 class ABMIL(torch.nn.Module):
