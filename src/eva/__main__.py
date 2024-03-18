@@ -1,10 +1,10 @@
-"""EVA's main entry-point module."""
+"""Main entry-point module."""
 
-from eva.cli import cli
+from eva.core.cli import cli
 
 
 def main() -> None:
-    """EVA's main entry-point.
+    """Main entry-point.
 
     The CLI fetches the input arguments from `sys.argv`.
 

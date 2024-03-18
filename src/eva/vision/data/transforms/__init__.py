@@ -1,5 +1,5 @@
 """Vision data transforms."""
 
-from eva.vision.data.transforms.common import ArrayToFloatTensor, ArrayToTensor, ResizeAndCrop
+from eva.vision.data.transforms.common import ResizeAndCrop
 
-__all__ = ["ArrayToTensor", "ResizeAndCrop", "ArrayToFloatTensor"]
+__all__ = ["ResizeAndCrop"]

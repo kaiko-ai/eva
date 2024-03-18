@@ -30,7 +30,7 @@ model:
   class_path: eva.HeadModule
   init_args:
     backbone:
-      class_path: eva.models.networks.wrappers.ModelFromFunction
+      class_path: eva.models.ModelFromFunction
       init_args:
         path: torch.hub.load
         arguments:
@@ -76,7 +76,7 @@ data:
               mean: ${oc.env:NORMALIZE_MEAN, [0.485, 0.456, 0.406]} 
               std: ${oc.env:NORMALIZE_STD, [0.229, 0.224, 0.225]}
           target_transforms:
-            class_path: eva.vision.data.transforms.common.ArrayToFloatTensor
+            class_path: eva.core.data.transforms.ArrayToFloatTensor
       val:
         class_path: eva.vision.datasets.MHIST
         init_args:
