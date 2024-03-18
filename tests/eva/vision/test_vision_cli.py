@@ -1,4 +1,4 @@
-"""Tests regarding the EVA `fit` CLI command on vision datasets."""
+"""Tests regarding eva's CLI commands on vision datasets."""
 
 import os
 import tempfile
@@ -8,6 +8,35 @@ import pytest
 
 from eva.vision.data import datasets
 from tests.eva import _cli
+
+
+@pytest.mark.parametrize(
+    "configuration_file",
+    [
+        "configs/vision/dino_vit/online/bach.yaml",
+        "configs/vision/dino_vit/online/crc.yaml",
+        "configs/vision/dino_vit/online/mhist.yaml",
+        "configs/vision/dino_vit/online/patch_camelyon.yaml",
+        "configs/vision/dino_vit/offline/bach.yaml",
+        "configs/vision/dino_vit/offline/crc.yaml",
+        "configs/vision/dino_vit/offline/mhist.yaml",
+        "configs/vision/dino_vit/offline/patch_camelyon.yaml",
+        "configs/vision/owkin/phikon/offline/bach.yaml",
+        "configs/vision/owkin/phikon/offline/crc.yaml",
+        "configs/vision/owkin/phikon/offline/mhist.yaml",
+        "configs/vision/owkin/phikon/offline/patch_camelyon.yaml",
+    ],
+)
+def test_configuration_initialization(configuration_file: str, lib_path: str) -> None:
+    """Tests that a given configuration file can be initialized."""
+    _cli.run_cli_from_main(
+        cli_args=[
+            "fit",
+            "--config",
+            os.path.join(lib_path, configuration_file),
+            "--print_config",
+        ]
+    )
 
 
 @pytest.mark.parametrize(

@@ -30,7 +30,7 @@ model:
   class_path: eva.HeadModule
   init_args:
     backbone:
-      class_path: eva.models.networks.wrappers.ModelFromFunction
+      class_path: eva.models.ModelFromFunction
       init_args:
         path: torch.hub.load
         arguments:

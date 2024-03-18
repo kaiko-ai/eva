@@ -6,7 +6,7 @@ build-backend = "pdm.backend"
 
 [project]
 name = "kaiko-eva"
-version = "0.0.0.dev3"
+version = "0.0.0.dev4"
 description = "Evaluation Framework for oncology foundation models."
 readme = "README.md"
 authors = [
