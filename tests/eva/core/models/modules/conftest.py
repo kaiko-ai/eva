@@ -16,7 +16,7 @@ def datamodule(
     dataset_fixture: str,
     dataloader: dataloaders.DataLoader,
 ) -> datamodules.DataModule:
-    """Returns a dummy classification datamodule fixture."""
+    """Returns a dummy datamodule fixture."""
     dataset = request.getfixturevalue(dataset_fixture)
     return datamodules.DataModule(
         datasets=datamodules.DatasetsSchema(
