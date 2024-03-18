@@ -1,4 +1,4 @@
-# EVA Style Guide
+# *eva* Style Guide
 
 This document contains our style guides used in `eva`.
 

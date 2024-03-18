@@ -1,4 +1,4 @@
-"""EVA's main cli manager."""
+"""eva's main cli manager."""
 
 import jsonargparse
 
