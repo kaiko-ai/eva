@@ -22,7 +22,7 @@ trainer:
           patience: 9
           monitor: *MONITOR_METRIC
           mode: *MONITOR_METRIC_MODE
-      - class_path: eva.core.callbacks.EmbeddingsWriter
+      - class_path: eva.callbacks.EmbeddingsWriter
         init_args:
           output_dir: &DATASET_EMBEDDINGS_ROOT ${oc.env:EMBEDDINGS_ROOT, ./data/embeddings}/${oc.env:DINO_BACKBONE, dino_vits16}/patch_camelyon
           dataloader_idx_map:
