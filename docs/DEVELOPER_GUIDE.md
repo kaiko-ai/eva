@@ -1,23 +1,26 @@
 # Developer Guide
 
-## Installation
 
-To contribute any feature to EVA, you must install from source.
+## Setting up a DEV environment
 
+We use [PDM](https://pdm-project.org/latest/) as a package and dependency manager.
+You can set up a local python environment for development as follows: 
 1. Install package and dependency manager PDM following the instructions [here](https://pdm-project.org/latest/#other-installation-methods).
-2. Run `pdm install -G dev` to install the development dependencies. This will create a virtual environment in `eva/.venv`.
-3. Run `pdm run python` to run a Python script or start an interactive Python shell within the context of the PDM-managed project environment. Alternatively, you can also activate the venv manually with `source .venv/bin/activate`.
+2. Install system dependencies
+    - For MacOS: `brew install Cmake`
+    - For Linux (Debian): `sudo apt-get install build-essential cmake`
+3. Run `pdm install -G dev` to install the python dependencies. This will create a virtual environment in `eva/.venv`.
 
+## Adding new dependencies 
 
-PDM quick guide:
-- `pdm lock -G all -G vision -G lint -G test -G dev` to generate or update the pdm.lock file including the specified groups.
-- `pdm install -G all`	to install all groups locked in the lockfile.
-- `pdm install -G vision`	to install dependencies only from vision group.
-- `pdm update -G all` to update all dependencies in the lock file.
-- `pdm add <package-name>` to add a package.
-- `pdm remove <package-name>` to remove a package.
-- `pdm add -G vision <package-name>` to add a package to eva[vision].
-- `pdm remove -G vision <package-name>` to remove a package from eva[vision].
+Add a new dependency to the `core` submodule:<br>
+`pdm add <package_name>`
+
+Add a new dependency to the `vision` submodule:<br>
+`pdm add -G vision <package_name>`
+
+After adding a new dependency, you also need to update the `pdm.lock` file:<br>
+`pdm update`
 
 For more information about managing dependencies please look [here](https://pdm-project.org/latest/usage/dependency/#manage-dependencies).
 
@@ -35,3 +38,4 @@ Commands:
 - `nox -s lint` to run the code lining tests.
 - `nox -s check` to run the type-annotation tests.
 - `nox -s test` to run the unit tests.
+  - `nox -s test -- tests/eva/metrics/test_average_loss.py` to run specific tests
