@@ -3,7 +3,7 @@
 import abc
 from typing import Generic, TypeVar
 
-from eva.data.datasets import base
+from eva.core.data.datasets import base
 
 DataSample = TypeVar("DataSample")
 """The data sample type."""
