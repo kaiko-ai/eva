@@ -43,8 +43,7 @@ ICAR2018_BACH_Challenge
 
 ## Download and preprocessing
 
-The `BACH` dataset class supports download the data no runtime with the initialized argument
-`download: bool = True`.
+The `BACH` dataset class supports downloading the data during runtime by setting the init argument `download=True`.
 
 *Note that in the provided `BACH`-config files the download argument is set to `false`. To enable automatic download you will need to open the config and set `download: true`.*
 
