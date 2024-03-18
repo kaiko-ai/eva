@@ -2,7 +2,7 @@
 
 import pytest
 
-from eva.data import dataloaders, datamodules, datasets
+from eva.core.data import dataloaders, datamodules, datasets
 
 
 @pytest.fixture(scope="function")
