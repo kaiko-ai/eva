@@ -67,8 +67,7 @@ CRC-VAL-HE-7K                  # All images used for validation
 
 ## Download and preprocessing
 
-The `CRC` dataset class supports download the data no runtime with the initialized argument
-`download: bool = True`.
+The `CRC` dataset class supports downloading the data during runtime by setting the init argument `download=True`.
 
 *Note that in the provided `CRC`-config files the download argument is set to `false`. To enable automatic download you will need to open the config and set `download: true`.*
 
