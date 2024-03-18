@@ -162,7 +162,7 @@ class CRC(base.ImageClassification):
             resource_dir = resource.filename.rsplit(".", maxsplit=1)[0]
             if os.path.isdir(os.path.join(self._root, resource_dir)):
                 continue
-            
+
             self._print_license()
             utils.download_and_extract_archive(
                 resource.url,

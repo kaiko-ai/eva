@@ -147,7 +147,7 @@ class BACH(base.ImageClassification):
         for resource in self._resources:
             if os.path.isdir(self.dataset_path):
                 continue
-            
+
             self._print_license()
             utils.download_and_extract_archive(
                 resource.url,
