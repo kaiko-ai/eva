@@ -5,10 +5,10 @@ from typing import List
 
 from eva.data import dataloaders, datasets
 
-TRAIN_DATASET = datasets.Dataset | None
+TRAIN_DATASET = datasets.TorchDataset | None
 """Train dataset."""
 
-EVAL_DATASET = datasets.Dataset | List[datasets.Dataset] | None
+EVAL_DATASET = datasets.TorchDataset | List[datasets.TorchDataset] | None
 """Evaluation dataset."""
 
 

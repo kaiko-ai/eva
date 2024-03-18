@@ -9,7 +9,7 @@ from eva.vision.utils.io import _utils
 
 
 def read_nifti_slice(path: str, slice_index: int) -> npt.NDArray[Any]:
-    """Reads a NIfTI image from a file path as `uint8`.
+    """Reads and loads a NIfTI image from a file path as `uint8`.
 
     Args:
         path: The path to the NIfTI file.

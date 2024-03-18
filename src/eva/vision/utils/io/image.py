@@ -8,7 +8,7 @@ from eva.vision.utils.io import _utils
 
 
 def read_image(path: str) -> npt.NDArray[np.uint8]:
-    """Reads the image from a file path as a RGB.
+    """Reads and loads the image from a file path as a RGB.
 
     Args:
         path: The path of the image file.
@@ -24,7 +24,7 @@ def read_image(path: str) -> npt.NDArray[np.uint8]:
 
 
 def read_image_as_array(path: str, flags: int = cv2.IMREAD_UNCHANGED) -> npt.NDArray[np.uint8]:
-    """Loads an image file as a numpy array.
+    """Reads and loads an image file as a numpy array.
 
     Args:
         path: The path to the image file.
