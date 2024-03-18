@@ -14,7 +14,7 @@ def test_datamodule_methods(datamodule: datamodules.DataModule) -> None:
     """Tests the core datamodule methods."""
 
     def assert_dataset(
-        dataset: datasets.Dataset | List[datasets.Dataset] | None, expected_called: bool
+        dataset: datasets.TorchDataset | List[datasets.TorchDataset] | None, expected_called: bool
     ):
         datasets = dataset if isinstance(dataset, list) else [dataset]
         for ds in datasets:

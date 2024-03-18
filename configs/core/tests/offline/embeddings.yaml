@@ -2,7 +2,7 @@
 trainer:
   class_path: eva.Trainer
   init_args:
-    default_root_dir: &OUTPUT_DIR ${oc.env:OUTPUT_DIR, logs/test/offline/slides}
+    default_root_dir: &OUTPUT_DIR ${oc.env:OUTPUT_DIR, logs/test/offline/patches}
     max_epochs: &MAX_EPOCHS 1
     limit_train_batches: 2
     limit_val_batches: 2
@@ -20,13 +20,10 @@ model:
   class_path: eva.HeadModule
   init_args:
     head:
-      class_path: eva.vision.models.networks.ABMIL
+      class_path: torch.nn.Linear
       init_args:
-        input_size: 8
-        output_size: &NUM_CLASSES 2
-        hidden_size_attention: 4
-        hidden_sizes_mlp: [2]
-        use_bias: true
+        in_features: 8
+        out_features: &NUM_CLASSES 2
     criterion: torch.nn.CrossEntropyLoss
     optimizer:
       class_path: torch.optim.SGD
@@ -50,19 +47,18 @@ data:
   init_args:
     datasets:
       train:
-        class_path: eva.vision.data.datasets.embeddings.SlideEmbeddingDataset
+        class_path: eva.data.datasets.classification.EmbeddingsDataset
         init_args: &DATASET_ARGS
-          root: ${oc.env:TESTS_ROOT, tests/eva}/assets/vision/datasets/embeddings
-          manifest_path: ${oc.env:TESTS_ROOT, tests/eva}/assets/vision/manifests/embeddings/slides.csv
+          root: ${oc.env:TESTS_ROOT, tests/eva}/assets/core/datasets/embeddings
+          manifest_file: manifest.csv
           split: train
-          n_patches_per_slide: 10
       val:
-        class_path: eva.vision.data.datasets.embeddings.SlideEmbeddingDataset
+        class_path: eva.data.datasets.classification.EmbeddingsDataset
         init_args:
           <<: *DATASET_ARGS
           split: val
       test:
-        class_path: eva.vision.data.datasets.embeddings.SlideEmbeddingDataset
+        class_path: eva.data.datasets.classification.EmbeddingsDataset
         init_args:
           <<: *DATASET_ARGS
           split: test

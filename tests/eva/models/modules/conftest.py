@@ -48,7 +48,7 @@ def classification_dataset(
     input_shape: Tuple[int, ...] = (3, 8, 8),
     target_shape: Tuple[int, ...] = (),
     n_classes: int = 4,
-) -> datasets.Dataset:
+) -> datasets.TorchDataset:
     """Dummy classification dataset fixture."""
     return torch_data.TensorDataset(
         torch.randn((n_samples,) + input_shape),
@@ -62,7 +62,7 @@ def classification_dataset_with_metadata(
     input_shape: Tuple[int, ...] = (3, 8, 8),
     target_shape: Tuple[int, ...] = (),
     n_classes: int = 4,
-) -> datasets.Dataset:
+) -> datasets.TorchDataset:
     """Dummy classification dataset fixture with metadata."""
     return torch_data.TensorDataset(
         torch.randn((n_samples,) + input_shape),

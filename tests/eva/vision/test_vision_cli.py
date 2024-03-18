@@ -14,8 +14,6 @@ from tests.eva import _cli
     "configuration_file",
     [
         "configs/vision/tests/online/patch_camelyon.yaml",
-        "configs/vision/tests/offline/patches.yaml",
-        "configs/vision/tests/offline/slides.yaml",
     ],
 )
 def test_fit_from_configuration(configuration_file: str, lib_path: str) -> None:

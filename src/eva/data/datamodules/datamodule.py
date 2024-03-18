@@ -93,7 +93,7 @@ class DataModule(pl.LightningDataModule):
     def _initialize_dataloaders(
         self,
         dataloader: dataloaders_lib.DataLoader,
-        datasets: datasets_lib.Dataset | List[datasets_lib.Dataset],
+        datasets: datasets_lib.TorchDataset | List[datasets_lib.TorchDataset],
     ) -> EVAL_DATALOADERS:
         """Initializes dataloaders from a given set of dataset.
 

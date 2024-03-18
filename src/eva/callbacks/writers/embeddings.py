@@ -154,7 +154,7 @@ def _init_manifest(output_dir: str, overwrite: bool = False) -> tuple[io.TextIOW
         )
     manifest_file = open(manifest_path, "w", newline="")
     manifest_writer = csv.writer(manifest_file)
-    manifest_writer.writerow(["filename", "embedding", "target", "split"])
+    manifest_writer.writerow(["origin", "embeddings", "target", "split"])
     return manifest_file, manifest_writer
 
 

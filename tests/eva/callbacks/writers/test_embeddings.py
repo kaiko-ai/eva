@@ -67,8 +67,8 @@ def test_embeddings_writer(datamodule: datamodules.DataModule, model: modules.He
 
         # Check if the manifest file is in the expected format
         df_manifest = pd.read_csv(os.path.join(output_dir, "manifest.csv"))
-        assert "filename" in df_manifest.columns
-        assert "embedding" in df_manifest.columns
+        assert "origin" in df_manifest.columns
+        assert "embeddings" in df_manifest.columns
         assert "target" in df_manifest.columns
         assert "split" in df_manifest.columns
         assert len(df_manifest) == total_n_predictions
@@ -87,7 +87,7 @@ def model(n_classes: int = 4) -> modules.HeadModule:
 @pytest.fixture(scope="function")
 def dataset(
     n_samples: int,
-) -> List[datasets.Dataset]:
+) -> List[datasets.TorchDataset]:
     """Fake dataset fixture."""
     train_dataset = FakeDataset(split="train", length=n_samples, size=SAMPLE_SHAPE)
     val_dataset = FakeDataset(split="val", length=n_samples, size=SAMPLE_SHAPE)
@@ -96,10 +96,15 @@ def dataset(
     return [train_dataset, val_dataset, test_dataset]
 
 
-class FakeDataset(boring_classes.RandomDataset, datasets.Dataset):
+class FakeDataset(boring_classes.RandomDataset, datasets.TorchDataset):
     """Fake prediction dataset."""
 
-    def __init__(self, split: Literal["train", "val", "test"], size: int = 32, length: int = 10):
+    def __init__(
+        self,
+        split: Literal["train", "val", "test"],
+        size: int = 32,
+        length: int = 10,
+    ) -> None:
         """Initializes the dataset."""
         super().__init__(size=size, length=length)
         self._split = split
