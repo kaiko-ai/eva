@@ -113,7 +113,6 @@ class PatchCamelyon(base.ImageClassification):
     @override
     def prepare_data(self) -> None:
         if self._download:
-            self._print_license()
             self._download_dataset()
 
     @override
@@ -150,6 +149,7 @@ class PatchCamelyon(base.ImageClassification):
             if utils.check_integrity(file_path, resource.md5):
                 continue
 
+            self._print_license()
             utils.download_and_extract_archive(
                 resource.url,
                 download_root=self._root,

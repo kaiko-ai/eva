@@ -108,7 +108,6 @@ class BACH(base.ImageClassification):
     @override
     def prepare_data(self) -> None:
         if self._download:
-            self._print_license()
             self._download_dataset()
 
     @override
@@ -148,7 +147,8 @@ class BACH(base.ImageClassification):
         for resource in self._resources:
             if os.path.isdir(self.dataset_path):
                 continue
-
+            
+            self._print_license()
             utils.download_and_extract_archive(
                 resource.url,
                 download_root=self._root,

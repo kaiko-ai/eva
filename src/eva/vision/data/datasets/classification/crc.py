@@ -100,7 +100,6 @@ class CRC(base.ImageClassification):
     @override
     def prepare_data(self) -> None:
         if self._download:
-            self._print_license()
             self._download_dataset()
 
     @override
@@ -163,7 +162,8 @@ class CRC(base.ImageClassification):
             resource_dir = resource.filename.rsplit(".", maxsplit=1)[0]
             if os.path.isdir(os.path.join(self._root, resource_dir)):
                 continue
-
+            
+            self._print_license()
             utils.download_and_extract_archive(
                 resource.url,
                 download_root=self._root,
