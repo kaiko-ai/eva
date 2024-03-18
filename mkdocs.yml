@@ -67,27 +67,28 @@ nav:
         - user-guide/advanced/model_wrappers.md
   - Reference API:
     - reference/index.md
-    - Interface: reference/interface.md
-    - Callbacks: reference/callbacks.md
-    - Data:
-      - reference/data/dataloaders.md
-      - reference/data/datamodules.md
-      - reference/data/datasets.md
-    - Metrics: 
-      - reference/metrics/index.md
-      - reference/metrics/core.md
-      - reference/metrics/defaults.md
-      - reference/metrics/average_loss.md
-      - reference/metrics/binary_balanced_accuracy.md
-    - Models: 
-      - Modules: reference/models/modules.md
-      - Networks: reference/models/networks.md
-    - Trainers:
-      - Trainer: reference/trainers/trainer.md
-      - Functional: reference/trainers/functional.md
-    - Utils:
-      - Multiprocessing: reference/utils/multiprocessing.md
-      - Workers: reference/utils/workers.md
+    - Core:
+      - Interface: reference/core/interface.md
+      - Callbacks: reference/core/callbacks.md
+      - Data:
+        - reference/core/data/dataloaders.md
+        - reference/core/data/datamodules.md
+        - reference/core/data/datasets.md
+      - Metrics: 
+        - reference/core/metrics/index.md
+        - reference/core/metrics/core.md
+        - reference/core/metrics/defaults.md
+        - reference/core/metrics/average_loss.md
+        - reference/core/metrics/binary_balanced_accuracy.md
+      - Models: 
+        - Modules: reference/core/models/modules.md
+        - Networks: reference/core/models/networks.md
+      - Trainers:
+        - Trainer: reference/core/trainers/trainer.md
+        - Functional: reference/core/trainers/functional.md
+      - Utils:
+        - Multiprocessing: reference/core/utils/multiprocessing.md
+        - Workers: reference/core/utils/workers.md
     - Vision:
       - reference/vision/index.md
       - Data:

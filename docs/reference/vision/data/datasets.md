@@ -11,7 +11,3 @@
 ## Segmentation datasets
 ::: eva.vision.data.datasets.ImageSegmentation
 ::: eva.vision.data.datasets.TotalSegmentator2D
-
-## Embeddings datasets
-::: eva.vision.data.datasets.PatchEmbeddingDataset
-::: eva.vision.data.datasets.SlideEmbeddingDataset
