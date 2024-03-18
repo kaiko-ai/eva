@@ -81,7 +81,7 @@ The following datasets are supported natively:
 
 ## Contributing
 
-EVA is an open source project and welcomes contributions of all kinds. Please checkout the [developer](./docs/DEVELOPER_GUIDE.md) and [contributing guide](./docs/CONTRIBUTING.md) for help on how to do so.
+_eva_ is an open source project and welcomes contributions of all kinds. Please checkout the [developer](./docs/DEVELOPER_GUIDE.md) and [contributing guide](./docs/CONTRIBUTING.md) for help on how to do so.
 
 All contributors must follow the [code of conduct](./docs/CODE_OF_CONDUCT.md).
 
