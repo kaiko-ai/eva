@@ -41,22 +41,21 @@ To get a better understanding, inspect some of the provided [config files](https
 
 To customize runs, without the need of creating custom config-files, you can overwrite the config-parameters listed below by setting them as environment variables.
 
-|                         |                           |
-|-------------------------|---------------------------|
-| `OUTPUT_ROOT`            | the directory to store logging outputs and recorded results |
-| `MONITOR_METRIC`         | the metric to monitor for early stopping and model checkpoint loading |
-| `EMBEDDINGS_ROOT`        | the directory to store the computed embeddings |
-| `IN_FEATURES`            | the input feature dimension (embedding)           |
-| `REPO_OR_DIR`            | github repo with format, e.g. "facebookresearch/dino:main" |
-| `DINO_BACKBONE`          | Backbone model architecture if a facebookresearch/dino FM is evaluated |
-| `PRETRAINED`             | whether to load FM-backbone weights from a pretrained model |
-| `FORCE_RELOAD`          | whether to force a fresh download of the github repo unconditionally |
-| `CHECKPOINT_PATH`        | Path to the FM-checkpoint to be evaluated           |
-| `N_RUNS`             | Number of `fit` runs to perform in a session, defaults to 5 |
-| `MAX_STEPS`             | Maximum number of training steps (if early stopping is not triggered) |
-| `BATCH_SIZE`             | Batch size for a training step |
-| `LR_VALUE`             | Learning rate for training the decoder |
-| `NUM_CLASSES`             | Number of classes for classification tasks |
-| `PREDICT_BATCH_SIZE`             | Batch size for a predict step |
-| `MONITOR_METRIC`             | Metric to be monitored for early stopping |
-| `MONITOR_METRIC_MODE`             | "min" or "max", depending on the `MONITOR_METRIC` used |
+|                         | Type  | Description |
+|-------------------------|-------|-------------|
+| `OUTPUT_ROOT`           | str   | The directory to store logging outputs and evaluation results |
+| `EMBEDDINGS_ROOT`       | str   | The directory to store the computed embeddings |
+| `CHECKPOINT_PATH`       | str   | Path to the FM-checkpoint to be evaluated |
+| `IN_FEATURES`           | int   | The input feature dimension (embedding) |
+| `NUM_CLASSES`           | int   | Number of classes for classification tasks |
+| `N_RUNS`                | int   | Number of `fit` runs to perform in a session, defaults to 5 |
+| `MAX_STEPS`             | int   | Maximum number of training steps (if early stopping is not triggered) |
+| `BATCH_SIZE`            | int   | Batch size for a training step |
+| `PREDICT_BATCH_SIZE`    | int   | Batch size for a predict step |
+| `LR_VALUE`              | float | Learning rate for training the decoder |
+| `MONITOR_METRIC`        | str   | The metric to monitor for early stopping and final model checkpoint loading |
+| `MONITOR_METRIC_MODE`   | str   | "min" or "max", depending on the `MONITOR_METRIC` used |
+| `REPO_OR_DIR`           | str   | GitHub repo with format containing model implementation, e.g. "facebookresearch/dino:main" |
+| `DINO_BACKBONE`         | str   | Backbone model architecture if a facebookresearch/dino FM is evaluated |
+| `FORCE_RELOAD`          | bool  | Whether to force a fresh download of the github repo unconditionally |
+| `PRETRAINED`            | bool  | Whether to load FM-backbone weights from a pretrained model |
