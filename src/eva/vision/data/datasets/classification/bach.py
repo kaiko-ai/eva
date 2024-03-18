@@ -44,6 +44,9 @@ class BACH(base.ImageClassification):
     ]
     """Dataset resources."""
 
+    _license: str = "CC BY-NC-ND 4.0 (https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode)"
+    """Dataset license."""
+
     def __init__(
         self,
         root: str,
@@ -105,6 +108,7 @@ class BACH(base.ImageClassification):
     @override
     def prepare_data(self) -> None:
         if self._download:
+            self._print_license()
             self._download_dataset()
 
     @override
@@ -151,6 +155,10 @@ class BACH(base.ImageClassification):
                 filename=resource.filename,
                 remove_finished=True,
             )
+
+    def _print_license(self) -> None:
+        """Prints the dataset license."""
+        print(f"Dataset license: {self._license}")
 
     def _make_indices(self) -> List[int]:
         """Builds the dataset indices for the specified split."""

@@ -60,6 +60,10 @@ class PatchCamelyon(base.ImageClassification):
     ]
     """Test resources."""
 
+    _license: str = "Creative Commons Zero v1.0 Universal (https://choosealicense.com/licenses/cc0-1.0/)"
+    """Dataset license."""
+
+
     def __init__(
         self,
         root: str,
@@ -108,6 +112,7 @@ class PatchCamelyon(base.ImageClassification):
     @override
     def prepare_data(self) -> None:
         if self._download:
+            self._print_license()
             self._download_dataset()
 
     @override
@@ -191,3 +196,7 @@ class PatchCamelyon(base.ImageClassification):
         split_suffix = "valid" if self._split == "val" else self._split
         filename = f"camelyonpatch_level_2_split_{split_suffix}_{datatype}.h5"
         return os.path.join(self._root, filename)
+
+    def _print_license(self) -> None:
+        """Prints the dataset license."""
+        print(f"Dataset license: {self._license}")
