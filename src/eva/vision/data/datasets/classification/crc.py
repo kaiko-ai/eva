@@ -29,6 +29,9 @@ class CRC(base.ImageClassification):
     )
     """Validation resource."""
 
+    _license: str = "CC BY 4.0 LEGAL CODE (https://creativecommons.org/licenses/by/4.0/legalcode)"
+    """Dataset license."""
+
     def __init__(
         self,
         root: str,
@@ -160,9 +163,14 @@ class CRC(base.ImageClassification):
             if os.path.isdir(os.path.join(self._root, resource_dir)):
                 continue
 
+            self._print_license()
             utils.download_and_extract_archive(
                 resource.url,
                 download_root=self._root,
                 filename=resource.filename,
                 remove_finished=True,
             )
+
+    def _print_license(self) -> None:
+        """Prints the dataset license."""
+        print(f"Dataset license: {self._license}")
