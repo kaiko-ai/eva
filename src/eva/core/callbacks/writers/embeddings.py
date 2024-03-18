@@ -7,8 +7,8 @@ from typing import Any, Dict, Sequence
 
 import lightning.pytorch as pl
 import torch
-from loguru import logger
 from lightning.pytorch import callbacks
+from loguru import logger
 from torch import multiprocessing, nn
 from typing_extensions import override
 
