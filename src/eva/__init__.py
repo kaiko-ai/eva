@@ -1,14 +1,31 @@
 """eva public API."""
 
-from eva import core
-from eva.core import DataModule, HeadModule, Trainer, callbacks, metrics, models
+from eva.core import (
+    DataLoader,
+    DataloadersSchema,
+    DataModule,
+    DatasetsSchema,
+    HeadModule,
+    InferenceModule,
+    Interface,
+    Trainer,
+    callbacks,
+    data,
+    metrics,
+    models,
+)
 
 __all__ = [
-    "core",
+    "DataLoader",
+    "DataloadersSchema",
+    "DataModule",
+    "DatasetsSchema",
+    "HeadModule",
+    "InferenceModule",
+    "Interface",
+    "Trainer",
     "callbacks",
+    "data",
     "metrics",
     "models",
-    "DataModule",
-    "HeadModule",
-    "Trainer",
 ]
