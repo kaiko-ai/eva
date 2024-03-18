@@ -6,17 +6,17 @@ trainer:
     default_root_dir: &OUTPUT_ROOT ${oc.env:OUTPUT_ROOT, logs/${oc.env:DINO_BACKBONE, dino_vits16}/offline/crc}
     max_steps: &MAX_STEPS ${oc.env:MAX_STEPS, 12500}
     callbacks:
-      - class_path: pytorch_lightning.callbacks.LearningRateMonitor
+      - class_path: lightning.pytorch.callbacks.LearningRateMonitor
         init_args:
           logging_interval: epoch
-      - class_path: pytorch_lightning.callbacks.ModelCheckpoint
+      - class_path: lightning.pytorch.callbacks.ModelCheckpoint
         init_args:
           filename: best
           save_last: true
           save_top_k: 1
           monitor: &MONITOR_METRIC ${oc.env:MONITOR_METRIC, val/MulticlassAccuracy}
           mode: &MONITOR_METRIC_MODE ${oc.env:MONITOR_METRIC_MODE, max}
-      - class_path: pytorch_lightning.callbacks.EarlyStopping
+      - class_path: lightning.pytorch.callbacks.EarlyStopping
         init_args:
           min_delta: 0
           patience: 24
@@ -39,7 +39,7 @@ trainer:
                 force_reload: ${oc.env:FORCE_RELOAD, false}
               checkpoint_path: ${oc.env:CHECKPOINT_PATH, null}
     logger:
-      - class_path: pytorch_lightning.loggers.TensorBoardLogger
+      - class_path: lightning.pytorch.loggers.TensorBoardLogger
         init_args:
           save_dir: *OUTPUT_ROOT
           name: ""

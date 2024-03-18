@@ -5,7 +5,7 @@ import functools
 from typing import Callable, List
 
 import torch
-from pytorch_lightning.utilities.types import STEP_OUTPUT
+from lightning.pytorch.utilities.types import STEP_OUTPUT
 
 Transform = Callable[[torch.Tensor], torch.Tensor]
 """Post-process transform type."""

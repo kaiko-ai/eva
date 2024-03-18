@@ -6,10 +6,10 @@ import tempfile
 from pathlib import Path
 from typing import List, Literal
 
+import lightning.pytorch as pl
 import pandas as pd
 import pytest
-import pytorch_lightning as pl
-from pytorch_lightning.demos import boring_classes
+from lightning.pytorch.demos import boring_classes
 from torch import nn
 from typing_extensions import override
 

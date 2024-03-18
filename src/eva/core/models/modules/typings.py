@@ -2,7 +2,7 @@
 
 from typing import Any, Dict, NamedTuple
 
-import pytorch_lightning as pl
+import lightning.pytorch as pl
 import torch
 from torch import nn
 

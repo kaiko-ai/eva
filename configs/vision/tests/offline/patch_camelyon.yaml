@@ -23,7 +23,7 @@ trainer:
                 model: dino_vits16
                 pretrained: false
               checkpoint_path: &CHECKPOINT_PATH ${oc.env:CHECKPOINT_PATH, null}
-      - class_path: pytorch_lightning.callbacks.ModelCheckpoint
+      - class_path: lightning.pytorch.callbacks.ModelCheckpoint
         init_args:
           filename: best
           save_last: true
@@ -31,7 +31,7 @@ trainer:
           monitor: &MONITOR_METRIC val/BinaryAccuracy
           mode: &MONITOR_METRIC_MODE max
     logger:
-      - class_path: pytorch_lightning.loggers.TensorBoardLogger
+      - class_path: lightning.pytorch.loggers.TensorBoardLogger
         init_args:
           save_dir: *LIGHTNING_ROOT
           name: ""

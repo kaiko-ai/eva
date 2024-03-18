@@ -2,10 +2,10 @@
 
 from typing import Any, Mapping
 
-import pytorch_lightning as pl
+import lightning.pytorch as pl
 import torch
-from pytorch_lightning.utilities import memory
-from pytorch_lightning.utilities.types import STEP_OUTPUT
+from lightning.pytorch.utilities import memory
+from lightning.pytorch.utilities.types import STEP_OUTPUT
 from typing_extensions import override
 
 from eva.core.metrics import structs as metrics_lib

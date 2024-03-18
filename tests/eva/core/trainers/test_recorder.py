@@ -5,7 +5,7 @@ from typing import Any, Dict, List
 from unittest import mock
 
 import pytest
-from pytorch_lightning.utilities.types import _EVALUATE_OUTPUT
+from lightning.pytorch.utilities.types import _EVALUATE_OUTPUT
 
 from eva.core.trainers import _recorder
 

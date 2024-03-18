@@ -3,9 +3,9 @@
 import os
 from typing import Any
 
-from pytorch_lightning import loggers as pl_loggers
-from pytorch_lightning import trainer as pl_trainer
-from pytorch_lightning.utilities import argparse
+from lightning.pytorch import loggers as pl_loggers
+from lightning.pytorch import trainer as pl_trainer
+from lightning.pytorch.utilities import argparse
 from typing_extensions import override
 
 from eva.core.data import datamodules
@@ -29,15 +29,15 @@ class Trainer(pl_trainer.Trainer):
     ) -> None:
         """Initializes the trainer.
 
-        For the input arguments, refer to ::class::`pytorch_lightning.Trainer`.
+        For the input arguments, refer to ::class::`lightning.pytorch.Trainer`.
 
         Args:
-            args: Positional arguments of ::class::`pytorch_lightning.Trainer`.
+            args: Positional arguments of ::class::`lightning.pytorch.Trainer`.
             default_root_dir: The default root directory to store the output logs.
-                Unlike in ::class::`pytorch_lightning.Trainer`, this path would be the
+                Unlike in ::class::`lightning.pytorch.Trainer`, this path would be the
                 prioritized destination point.
             n_runs: The amount of runs (fit and evaluate) to perform in an evaluation session.
-            kwargs: Kew-word arguments of ::class::`pytorch_lightning.Trainer`.
+            kwargs: Kew-word arguments of ::class::`lightning.pytorch.Trainer`.
         """
         super().__init__(*args, default_root_dir=default_root_dir, **kwargs)
 

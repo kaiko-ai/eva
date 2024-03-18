@@ -6,7 +6,7 @@ from typing import Tuple
 
 import pytest
 import torch
-from pytorch_lightning.demos import boring_classes
+from lightning.pytorch.demos import boring_classes
 
 from eva.core.models.networks import wrappers
 

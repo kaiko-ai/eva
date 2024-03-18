@@ -7,11 +7,11 @@ trainer:
     limit_train_batches: 2
     limit_val_batches: 2
     callbacks:
-      - class_path: pytorch_lightning.callbacks.LearningRateMonitor
+      - class_path: lightning.pytorch.callbacks.LearningRateMonitor
         init_args:
           logging_interval: epoch
     logger:
-      - class_path: pytorch_lightning.loggers.TensorBoardLogger
+      - class_path: lightning.pytorch.loggers.TensorBoardLogger
         init_args:
           save_dir: *OUTPUT_DIR
           name: ""
