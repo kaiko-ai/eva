@@ -2,7 +2,7 @@
 
 import pytest
 
-from eva.data import datasets, dataloaders, datamodules
+from eva.data import dataloaders, datamodules, datasets
 
 
 @pytest.fixture(scope="function")
@@ -10,7 +10,7 @@ def datamodule(
     dataset: datasets.TorchDataset,
     dataloader: dataloaders.DataLoader,
 ) -> datamodules.DataModule:
-    """Returns a dummy classification datamodule fixture."""
+    """Returns a dummy datamodule fixture."""
     return datamodules.DataModule(
         datasets=datamodules.DatasetsSchema(
             train=dataset,
