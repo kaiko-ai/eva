@@ -29,7 +29,7 @@ trainer:
             0: train
             1: val
           backbone:
-            class_path: eva.core.models.networks.wrappers.ModelFromFunction
+            class_path: eva.models.ModelFromFunction
             init_args:
               path: torch.hub.load
               arguments:
@@ -74,13 +74,13 @@ data:
   init_args:
     datasets:
       train:
-        class_path: eva.core.data.datasets.classification.EmbeddingsDataset
+        class_path: eva.datasets.EmbeddingsClassificationDataset
         init_args: &DATASET_ARGS
           root: *DATASET_EMBEDDINGS_ROOT
           manifest_file: manifest.csv
           split: train
       val:
-        class_path: eva.core.data.datasets.classification.EmbeddingsDataset
+        class_path: eva.datasets.EmbeddingsClassificationDataset
         init_args:
           <<: *DATASET_ARGS
           split: val

@@ -1,5 +1,5 @@
 """Classification datasets API."""
 
-from eva.core.data.datasets.classification.embeddings import EmbeddingsDataset
+from eva.core.data.datasets.classification.embeddings import EmbeddingsClassificationDataset
 
-__all__ = ["EmbeddingsDataset"]
+__all__ = ["EmbeddingsClassificationDataset"]

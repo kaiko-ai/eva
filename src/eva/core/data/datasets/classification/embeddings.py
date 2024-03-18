@@ -12,7 +12,7 @@ from eva.core.data.datasets import base
 from eva.core.utils import io
 
 
-class EmbeddingsDataset(base.Dataset):
+class EmbeddingsClassificationDataset(base.Dataset):
     """Embeddings classification dataset."""
 
     default_column_mapping: Dict[str, str] = {

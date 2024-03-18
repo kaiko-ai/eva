@@ -15,10 +15,10 @@ from eva.core.data.datasets import classification
     [("train", (8,)), ("val", (8,))],
 )
 def test_patch_embedding_dataset(
-    patch_embeddings_dataset: classification.EmbeddingsDataset,
+    patch_embeddings_dataset: classification.EmbeddingsClassificationDataset,
     embeddings_shape: Tuple[int, ...],
 ):
-    """Test that the EmbeddingsDataset level dataset."""
+    """Test that the EmbeddingsClassificationDataset level dataset."""
     # assert data sample is a tuple
     sample = patch_embeddings_dataset[0]
     assert isinstance(sample, tuple)
@@ -32,9 +32,11 @@ def test_patch_embedding_dataset(
 
 
 @pytest.fixture(scope="function")
-def patch_embeddings_dataset(split: str, assets_path: str) -> classification.EmbeddingsDataset:
-    """EmbeddingsDataset dataset fixture."""
-    dataset = classification.EmbeddingsDataset(
+def patch_embeddings_dataset(
+    split: str, assets_path: str
+) -> classification.EmbeddingsClassificationDataset:
+    """EmbeddingsClassificationDataset dataset fixture."""
+    dataset = classification.EmbeddingsClassificationDataset(
         root=os.path.join(assets_path, "core", "datasets", "embeddings"),
         manifest_file="manifest.csv",
         split=split,

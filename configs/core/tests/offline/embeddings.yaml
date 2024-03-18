@@ -47,18 +47,18 @@ data:
   init_args:
     datasets:
       train:
-        class_path: eva.core.data.datasets.classification.EmbeddingsDataset
+        class_path: eva.datasets.EmbeddingsClassificationDataset
         init_args: &DATASET_ARGS
           root: ${oc.env:TESTS_ROOT, tests/eva}/assets/core/datasets/embeddings
           manifest_file: manifest.csv
           split: train
       val:
-        class_path: eva.core.data.datasets.classification.EmbeddingsDataset
+        class_path: eva.datasets.EmbeddingsClassificationDataset
         init_args:
           <<: *DATASET_ARGS
           split: val
       test:
-        class_path: eva.core.data.datasets.classification.EmbeddingsDataset
+        class_path: eva.datasets.EmbeddingsClassificationDataset
         init_args:
           <<: *DATASET_ARGS
           split: test

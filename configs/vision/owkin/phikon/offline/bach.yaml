@@ -29,7 +29,7 @@ trainer:
             0: train
             1: val
           backbone:
-            class_path: eva.core.models.networks.wrappers.HuggingFaceModel
+            class_path: eva.models.HuggingFaceModel
             init_args:
               model_name_or_path: owkin/phikon
               tensor_transforms: 
@@ -70,14 +70,14 @@ data:
   init_args:
     datasets:
       train:
-        class_path: eva.core.data.datasets.classification.EmbeddingsDataset
+        class_path: eva.datasets.EmbeddingsClassificationDataset
         init_args: &DATASET_ARGS
           root: *EMBEDDINGS_DIR
           split: train
           column_mapping:
             path: embedding
       val:
-        class_path: eva.core.data.datasets.classification.EmbeddingsDataset
+        class_path: eva.datasets.EmbeddingsClassificationDataset
         init_args:
           <<: *DATASET_ARGS
           split: val

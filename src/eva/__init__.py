@@ -14,6 +14,7 @@ from eva.core import (
     metrics,
     models,
 )
+from eva.core.data import datasets
 
 __all__ = [
     "DataLoader",
@@ -28,4 +29,5 @@ __all__ = [
     "data",
     "metrics",
     "models",
+    "datasets",
 ]
