@@ -60,9 +60,10 @@ class PatchCamelyon(base.ImageClassification):
     ]
     """Test resources."""
 
-    _license: str = "Creative Commons Zero v1.0 Universal (https://choosealicense.com/licenses/cc0-1.0/)"
+    _license: str = (
+        "Creative Commons Zero v1.0 Universal (https://choosealicense.com/licenses/cc0-1.0/)"
+    )
     """Dataset license."""
-
 
     def __init__(
         self,
