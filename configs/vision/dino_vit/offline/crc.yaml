@@ -29,7 +29,7 @@ trainer:
             0: train
             1: val
           backbone:
-            class_path: eva.models.networks.wrappers.ModelFromFunction
+            class_path: eva.core.models.networks.wrappers.ModelFromFunction
             init_args:
               path: torch.hub.load
               arguments:
