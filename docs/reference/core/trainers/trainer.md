@@ -2,4 +2,4 @@
 
 Reference information for the `Trainers` API.
 
-::: eva.trainers.Trainer
+::: eva.core.trainers.Trainer
