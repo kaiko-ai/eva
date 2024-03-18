@@ -73,6 +73,7 @@ data:
         class_path: eva.datasets.EmbeddingsClassificationDataset
         init_args: &DATASET_ARGS
           root: *EMBEDDINGS_DIR
+          manifest_file: manifest.csv
           split: train
           column_mapping:
             path: embedding
