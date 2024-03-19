@@ -46,6 +46,9 @@ plugins:
 extra:
   version:
     provider: mike
+    default:
+      - latest
+      - dev
 markdown_extensions:
   - toc:
       toc_depth: 2
