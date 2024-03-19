@@ -27,7 +27,7 @@ _Oncology FM Evaluation Framework by kaiko.ai_
 
 ### _About_
 
-`eva` is [kaiko.ai](https://kaiko.ai/)'s evaluation framework for oncology foundation models (FMs). Check out the [documentation](https://kaikoevasandbox.z13.web.core.windows.net/) for more information.
+`eva` is [kaiko.ai](https://kaiko.ai/)'s evaluation framework for oncology foundation models (FMs). Check out the documentation (LINK TO BE ADDED) for more information.
 
 
 ## Installation
@@ -39,16 +39,10 @@ _Oncology FM Evaluation Framework by kaiko.ai_
 - Install *eva* and the *eva-vision* package with:
 
 ```
-pip install --index-url https://nexus.infra.prd.kaiko.ai/repository/python-all/simple 'kaiko-eva[vision]'
+pip install 'kaiko-eva[vision]'
 ```
 
-- To be able to use the existing configs, download them into directory where you installed *eva*. You can get them from our blob storage with:
-
-```
-azcopy copy https://kaiko.blob.core.windows.net/long-term-experimental/eva/configs . --recursive=true
-```
-
-(Alternatively you can also download them from the [*eva* GitHub repo](https://github.com/kaiko-ai/eva/tree/main))
+- To be able to use the existing configs, download them from the [*eva* GitHub repo](https://github.com/kaiko-ai/eva/tree/main) and move them to directory where you installed *eva*. 
 
 ### Run *eva*
 
@@ -62,7 +56,7 @@ This will:
  - Fit a model consisting of the frozen FM-backbone and a classification head on the train split.
  - Evaluate the trained model on the validation split and report the results.
 
-For more information, documentation and tutorials, refer to the [documentation](https://kaikoevasandbox.z13.web.core.windows.net/).
+For more information, documentation and tutorials, refer to the documentation (LINK TO BE ADDED).
 
 ## Datasets
 
