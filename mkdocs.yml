@@ -27,6 +27,7 @@ theme:
         name: Switch to dark mode
 plugins:
   search: null
+  mike: null
   mkdocstrings:
     handlers:
       python:
@@ -42,6 +43,9 @@ plugins:
           show_root_heading: true
           filters:
           - '!^_'
+extra:
+  version:
+    provider: mike
 markdown_extensions:
   - toc:
       toc_depth: 2
