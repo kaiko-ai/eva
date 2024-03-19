@@ -90,7 +90,7 @@ For more details on the FM-backbones and instructions to replicate the results, 
 
 *Note that the current version of eva implements the task- & model-independent and fixed default set up following the standard evaluation protocol proposed by [1] and described in the table below. We selected this approach to prioritize reliable, robust and fair FM-evaluation while being in line with common literature. Additionally, with future versions we are planning to allow the use of cross-validation and hyper-parameter tuning to find the optimal setup to achieve best possible performance on the implemented downstream tasks.*
 
-With the FM as input, *eva* computes embeddings for all WSI patches which are then used as input to train a downstream head consisting of a single linear layer in a supervised setup for each of the benchmark datasets. We use early stopping with a patience of 5% of the maximal number of epochs.
+With a provided FM, *eva* computes embeddings for all input images (WSI patches) which are then used to train a downstream head consisting of a single linear layer in a supervised setup for each of the benchmark datasets. We use early stopping with a patience of 5% of the maximal number of epochs.
 
 |                         |                           |
 |-------------------------|---------------------------|
@@ -104,7 +104,7 @@ With the FM as input, *eva* computes embeddings for all WSI patches which are th
 | **Base learning rate**  | 0.01                      |
 | **Learning Rate**       | [Base learning rate] * [Batch size] / [Base batch size]   |
 | **Max epochs**          | [Number of samples] * [Number of steps] /  [Batch size]  |
-| **Early stopping**      | 10% * [Max epochs]  |
+| **Early stopping**      | 5% * [Max epochs]  |
 | **Optimizer**           | SGD                       |
 | **Momentum**            | 0.9                       |
 | **Weight Decay**        | 0.0                       |

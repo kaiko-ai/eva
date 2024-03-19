@@ -12,7 +12,7 @@ If you have not yet downloaded the BACH data to your machine, open `configs/visi
 
 ### 1. Compute the embeddings
 
-First, lets use the `predict`-command to download the data and compute embeddings. In this example we use a randomly initialized `dino_vits16` as backbone.
+First, let's use the `predict`-command to download the data and compute embeddings. In this example we use a randomly initialized `dino_vits16` as backbone.
 
 Open a terminal in the folder where you installed *eva* and run:
 ```
@@ -37,7 +37,7 @@ Once the session is complete, verify that:
 
 Now we can use the `fit`-command to evaluate the FM on the precomputed embeddings.
 
-To ensure a quick run for the purpose of this exercise, lets overwrite some of the default parameters. In the terminal where you run *eva*, set:
+To ensure a quick run for the purpose of this exercise, let's overwrite some of the default parameters. In the terminal where you run *eva*, set:
 ```
 export MAX_STEPS=20
 export LR_VALUE=0.1
