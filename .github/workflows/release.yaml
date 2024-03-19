@@ -41,6 +41,9 @@ jobs:
           eva --version
       - name: Publish package distributions to PyPI
         run: pdm publish --no-build
+        env:
+          PDM_PUBLISH_USERNAME: ${{ secrets.PYPI_USERNAME }}
+          PDM_PUBLISH_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
       - name: Create Release
         uses: actions/create-release@main
         env:
