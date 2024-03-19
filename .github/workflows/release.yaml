@@ -12,47 +12,39 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      # - name: Setting up PDM
-      #   uses: pdm-project/setup-pdm@v4
-      #   with:
-      #     python-version: "3.10"
-      #     architecture: x64
-      # - name: Check prerelease
-      #   id: check_version
-      #   run: |
-      #     if [[ "${{ github.ref }}" =~ ^refs/tags/[0-9.]+$ ]]; then
-      #       echo "PRERELEASE=false" >> $GITHUB_OUTPUT
-      #     else
-      #       echo "PRERELEASE=true" >> $GITHUB_OUTPUT
-      #     fi
-      # - name: Setting up nox
-      #   uses: wntrblm/nox@2024.03.02
-      #   with:
-      #     python-versions: "3.10"
-      # - name: Build artifacts
-      #   run: |
-      #     nox -s build
-      # - name: Test Build
-      #   run: |
-      #     python -m pip install dist/*.whl
-      #     eva --version
-
-      - name: "Set latest tag"
-        id: set-latest-tag
-        run: echo "latest_tag=$(git tag | sort --version-sort | tail -n1)" >> $GITHUB_ENV
+      - name: Setting up PDM
+        uses: pdm-project/setup-pdm@v4
+        with:
+          python-version: "3.10"
+          architecture: x64
+      - name: Check prerelease
+        id: check_version
+        run: |
+          if [[ "${{ github.ref }}" =~ ^refs/tags/[0-9.]+$ ]]; then
+            echo "PRERELEASE=false" >> $GITHUB_OUTPUT
+          else
+            echo "PRERELEASE=true" >> $GITHUB_OUTPUT
+          fi
+      - name: Setting up nox
+        uses: wntrblm/nox@2024.03.02
+        with:
+          python-versions: "3.10"
+      - name: Build artifacts
+        run: |
+          nox -s build
+      - name: Test Build
+        run: |
+          python -m pip install dist/*.whl
+          eva --version
       - name: Build Release Docs
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git fetch origin gh-pages:gh-pages
           tag="${{ github.ref_name }}"
-          DOC_VERSION=${tag%.*}
-          echo "$DOC_VERSION"
-          echo ${{ github.ref_name }}
-          echo ${{ env.latest_tag }}
-
-        # nox -s deploy_docs -- --alias-type=copy --update-aliases "$DOC_VERSION" latest
-        # git push origin gh-pages
+          DOC_VERSION="0.0.0dev5"
+          nox -s deploy_docs -- --alias-type=copy --update-aliases "$DOC_VERSION" latest
+          git push origin gh-pages
       # - name: Publish package distributions to PyPI
       #   run: pdm publish --no-build
       #   env:
