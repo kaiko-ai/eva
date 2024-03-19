@@ -42,7 +42,7 @@ _Oncology FM Evaluation Framework by kaiko.ai_
 pip install 'kaiko-eva[vision]'
 ```
 
-- To be able to use the existing configs, download from the [*eva* GitHub repo](https://github.com/kaiko-ai/eva/tree/main) and move them to directory where you installed *eva*. 
+- To be able to use the existing configs, download them from the [*eva* GitHub repo](https://github.com/kaiko-ai/eva/tree/main) and move them to directory where you installed *eva*. 
 
 ### Run *eva*
 
