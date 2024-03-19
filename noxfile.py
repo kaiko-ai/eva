@@ -140,6 +140,14 @@ def bump(session: nox.Session) -> None:
 
 
 @nox.session
+def docs(session: nox.Session) -> None:
+    """Builds and deploys the code documentation."""
+    args = session.posargs or []
+    session.run_always("pdm", "install", "--group", "docs", external=True)
+    session.run("pdm", "run", "mkdocs", *args)
+
+
+@nox.session
 def build(session: nox.Session) -> None:
     """Builds the source and wheel distributions."""
     session.run("pdm", "build")
