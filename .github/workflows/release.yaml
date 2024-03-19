@@ -43,7 +43,7 @@ jobs:
           git fetch origin gh-pages:gh-pages
           tag="${{ github.ref_name }}"
           DOC_VERSION=${tag%.*}
-          nox -s build_and_deply_docs -- --no-redirect --update-aliases "$DOC_VERSION" latest
+          nox -s deploy_docs -- --alias-type=copy --update-aliases "$DOC_VERSION" latest
           git push origin gh-pages
       - name: Publish package distributions to PyPI
         run: pdm publish --no-build
