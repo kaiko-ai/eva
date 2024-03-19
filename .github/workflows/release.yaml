@@ -10,9 +10,6 @@ on:
 jobs:
   release-pypi:
     runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-      contents: write
     steps:
       - uses: actions/checkout@v4
       - name: Setting up PDM
@@ -35,10 +32,19 @@ jobs:
       - name: Build artifacts
         run: |
           nox -s build
-      - name: Test Build
+      # - name: Test Build
+      #   run: |
+      #     python -m pip install dist/*.whl
+      #     eva --version
+      - name: Build Release Docs
         run: |
-          python -m pip install dist/*.whl
-          eva --version
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git fetch origin gh-pages:gh-pages
+          tag="${{ github.ref_name }}"
+          DOC_VERSION=${tag%.*}
+          nox -s build_and_deply_docs -- --no-redirect --update-aliases "$DOC_VERSION" latest
+          git push origin gh-pages
       - name: Publish package distributions to PyPI
         run: pdm publish --no-build
         env:
