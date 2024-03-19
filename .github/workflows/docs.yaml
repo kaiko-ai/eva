@@ -24,10 +24,10 @@ jobs:
         uses: wntrblm/nox@2024.03.02
         with:
           python-versions: "3.10"
+      - name: Configure Git Credentials
+        run: |
+          git config user.email "action@github.com"
+          git config user.name "GitHub Action"
       - name: Build Documentation
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git fetch origin gh-pages:gh-pages
           nox -s docs -- --update-aliases dev
-          git push origin gh-pages

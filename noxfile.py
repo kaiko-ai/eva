@@ -144,7 +144,7 @@ def docs(session: nox.Session) -> None:
     """Builds and deploys the code documentation."""
     args = session.posargs or []
     session.run_always("pdm", "install", "--group", "docs", external=True)
-    session.run("pdm", "run", "mike", "deploy", *args)
+    session.run("pdm", "run", "mkdocs", *args)
 
 
 @nox.session
