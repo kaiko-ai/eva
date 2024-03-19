@@ -27,6 +27,8 @@ hide:
 
 </div>
 
+# Introduction
+
 _Oncology FM Evaluation Framework by [kaiko.ai](https://www.kaiko.ai/)_
 
 With the first release, ***eva*** supports performance evaluation for vision Foundation Models ("FMs") and supervised machine learning models on WSI-patch-level image classification- and radiology (CT-scans) segmentation tasks.
