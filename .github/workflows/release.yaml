@@ -22,10 +22,10 @@ jobs:
         uses: wntrblm/nox@2024.03.02
         with:
           python-versions: "3.10"
-        - name: Build artifacts
-          run: |
-            nox -s build
-        - name: Test Build
-          run: |
-            python -m pip install dist/*.whl
-            eva --version
+      - name: Build artifacts
+        run: |
+          nox -s build
+      - name: Test Build
+        run: |
+          python -m pip install dist/*.whl
+          eva --version
