@@ -40,7 +40,7 @@ Simple installation from PyPI:
 # to install the core version only
 pip install kaiko-eva
 
-# to install the expanded vision version
+# to install the expanded `vision` version
 pip install 'kaiko-eva[vision]'
 
 # to install everything
