@@ -2,7 +2,6 @@
 name: Publish Develop Docs 
 
 on:
-  pull_request:
   push:
     branches:
       - main
@@ -34,5 +33,4 @@ jobs:
         run: |
           git fetch origin gh-pages:gh-pages
           nox -s docs -- deploy --update-aliases dev
-          nox -s docs -- set-default dev --push
           git push origin gh-pages
