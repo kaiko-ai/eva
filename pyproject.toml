@@ -21,14 +21,11 @@ maintainers = [
 ]
 requires-python = ">=3.10"
 dependencies = [
-    "jsonargparse[omegaconf]>=4.27.4",
     "lightning>=2.2.1",
+    "jsonargparse[omegaconf]>=4.27.4",
     "tensorboard>=2.16.2",
     "loguru>=0.7.2",
     "pandas>=2.2.0",
-    "pyarrow>=15.0.0",
-    "nibabel>=5.2.0",
-    "timm>=0.9.12",
     "transformers>=4.38.2",
     "onnxruntime>=1.17.1",
     "onnx>=1.15.0",
@@ -40,14 +37,18 @@ file = "LICENSE"
 
 [project.optional-dependencies]
 vision = [
-    "torchvision>=0.17.0",
-    "opencv-python-headless>=4.9.0.80",
     "h5py>=3.10.0",
+    "nibabel>=5.2.0",
+    "opencv-python-headless>=4.9.0.80",
+    "timm>=0.9.12",
+    "torchvision>=0.17.0",
 ]
 all = [
-    "torchvision>=0.17.0",
-    "opencv-python-headless>=4.9.0.80",
     "h5py>=3.10.0",
+    "nibabel>=5.2.0",
+    "opencv-python-headless>=4.9.0.80",
+    "timm>=0.9.12",
+    "torchvision>=0.17.0",
 ]
 
 [project.scripts]
@@ -157,6 +158,8 @@ addopts = [
     "--color=yes",
     "--durations=0",
     "--strict-markers",
+    "--no-cov-on-fail",
+    "--maxfail=1",
 ]
 filterwarnings = [
     "ignore::DeprecationWarning",

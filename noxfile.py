@@ -81,7 +81,30 @@ def check(session: nox.Session) -> None:
 
 @nox.session(python=PYTHON_VERSIONS, tags=["unit-tests", "tests"])
 def test(session: nox.Session) -> None:
-    """Runs the tests and code coverage analysis session of the source code."""
+    """Runs the tests and code coverage analysis session of all the source code."""
+    session.notify("test_core")
+    session.notify("test_vision")
+
+
+@nox.session(python=PYTHON_VERSIONS, tags=["unit-tests", "tests"])
+def test_core(session: nox.Session) -> None:
+    """Runs the tests and code coverage analysis session of the core source code."""
+    args = session.posargs or ["--cov"]
+    session.run_always("pdm", "install", "--group", "test", external=True)
+    session.run("pytest", os.path.join("tests", "eva", "core"), *args)
+
+
+@nox.session(python=PYTHON_VERSIONS, tags=["unit-tests", "tests"])
+def test_vision(session: nox.Session) -> None:
+    """Runs the tests and code coverage analysis session of the vision source code."""
+    args = session.posargs or ["--cov"]
+    session.run_always("pdm", "install", "--group", "test", "--group", "vision", external=True)
+    session.run("pytest", os.path.join("tests", "eva", "vision"), *args)
+
+
+@nox.session(python=PYTHON_VERSIONS, tags=["unit-tests", "tests"])
+def test_all(session: nox.Session) -> None:
+    """Runs the tests and code coverage analysis session of all the source code."""
     args = session.posargs or ["--cov"]
     session.run_always("pdm", "install", "--group", "test", "--group", "all", external=True)
     session.run("pytest", *args)
