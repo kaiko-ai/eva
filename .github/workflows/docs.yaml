@@ -1,4 +1,6 @@
-name: Build/Publish Develop Docs 
+---
+name: Publish Develop Docs 
+
 on:
   pull_request:
   push:
@@ -30,4 +32,4 @@ jobs:
           git config user.name "GitHub Action"
       - name: Build Documentation
         run: |
-          nox -s docs -- --update-aliases dev
+          nox -s docs -- gh-deploy --force --remote-branch gh-pages
