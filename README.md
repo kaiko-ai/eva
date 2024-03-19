@@ -10,7 +10,6 @@ _Oncology FM Evaluation Framework by kaiko.ai_
 [![CI](https://github.com/kaiko-ai/eva/workflows/CI/badge.svg)](https://github.com/kaiko-ai/eva/actions?query=workflow%3ACI)
 [![license](https://img.shields.io/badge/License-Apache%202.0-blue.svg?labelColor=gray)](https://github.com/kaiko-ai/eva#license)
 
-<br />
 
 <p align="center">
   <a href="#installation">Installation</a> •
@@ -92,6 +91,8 @@ All contributors must follow the [code of conduct](./docs/CODE_OF_CONDUCT.md).
 
 Our codebase is built using multiple opensource contributions
 
+<div align="center">
+
 [![python](https://img.shields.io/badge/-Python-blue?logo=python&logoColor=white)](https://github.com/pre-commit/pre-commit)
 [![pytorch](https://img.shields.io/badge/PyTorch-ee4c2c?logo=pytorch&logoColor=white)](https://pytorch.org/get-started/locally/)
 [![lightning](https://img.shields.io/badge/-⚡️_Lightning-792ee5?logo=pytorchlightning&logoColor=white)](https://pytorchlightning.ai/)<br>
@@ -102,7 +103,7 @@ Our codebase is built using multiple opensource contributions
 [![pdm-managed](https://img.shields.io/badge/pdm-managed-blueviolet)](https://pdm-project.org)
 [![Nox](https://img.shields.io/badge/%F0%9F%A6%8A-Nox-D85E00.svg)](https://github.com/wntrblm/nox)
 [![Built with Material for MkDocs](https://img.shields.io/badge/Material_for_MkDocs-526CFE?logo=MaterialForMkDocs&logoColor=white)](https://squidfunk.github.io/mkdocs-material/)
-
+</div>
 
 ---
 <div align="center">
