@@ -1995,13 +1995,11 @@
 </span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>          drop_rate: 0.0
 </span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>          pretrained: false
 </span></code></pre></div>
-To reduce training time, let's overwrite some of the default parameters. In the terminal where you run <em>eva</em>, set:
-<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>export OUTPUT_ROOT=logs/resnet/bach
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>export MAX_STEPS=50
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>export LR_VALUE=0.01
-</span></code></pre></div>
-Now train and evaluate the model by running:
-<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>eva fit --config configs/vision/resnet18/bach.yaml
+To reduce training time, let's overwrite some of the default parameters. Run the training &amp; evaluation with:
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>OUTPUT_ROOT=logs/resnet/bach \
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>MAX_STEPS=50 \
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>LR_VALUE=0.01 \
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>eva fit --config configs/vision/resnet18/bach.yaml
 </span></code></pre></div>
 Once the run is complete, take a look at the results in <code>logs/resnet/bach/&lt;session-id&gt;/results.json</code> and check out the tensorboard with <code>tensorboard --logdir logs/resnet/bach</code>. How does the performance compare to the results observed in the previous tutorials?</p>
 

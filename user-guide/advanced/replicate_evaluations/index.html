@@ -2195,163 +2195,104 @@
 <p>Make sure to replace <code>&lt;task&gt;</code> in the commands below with <code>bach</code>, <code>crc</code>, <code>mhist</code> or <code>patch_camelyon</code>.</p>
 <p><em>Note that to run the commands below you will need to first download the data. <a href="../../../datasets/bach/">BACH</a>, <a href="../../../datasets/crc/">CRC</a> and <a href="../../../datasets/patch_camelyon/">PatchCamelyon</a> provide automatic download by setting the argument <code>download: true</code> in their respective config-files. In the case of <a href="../../../datasets/mhist/">MHIST</a> you will need to download the data manually by following the instructions provided <a href="../../../datasets/mhist/#download-and-preprocessing">here</a>.</em></p>
 <h2 id="dino-vit-s16-random-weights">DINO ViT-S16 (random weights)</h2>
-<p>Evaluating the backbone with randomly initialized weights serves as a baseline to compare the pretrained FMs 
-to an FM that produces embeddings without any prior learning on image tasks. To evaluate, run:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a># set environment variables:
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>export PRETRAINED=false
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>export EMBEDDINGS_ROOT=&quot;./data/embeddings/dino_vits16_random&quot;
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>export REPO_OR_DIR=facebookresearch/dino:main
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>export DINO_BACKBONE=dino_vits16
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>export CHECKPOINT_PATH=null
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>export IN_FEATURES=384
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>export NORMALIZE_MEAN=[0.485,0.456,0.406]
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>export NORMALIZE_STD=[0.229,0.224,0.225]
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>
-</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a># run eva:
-</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>eva predict_fit --config configs/vision/dino_vit/offline/&lt;task&gt;.yaml
+<p>Evaluating the backbone with randomly initialized weights serves as a baseline to compare the pretrained FMs to an FM that produces embeddings without any prior learning on image tasks. To evaluate, run:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>PRETRAINED=false \
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>EMBEDDINGS_ROOT=&quot;./data/embeddings/dino_vits16_random&quot; \
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>eva predict_fit --config configs/vision/dino_vit/offline/&lt;task&gt;.yaml
 </span></code></pre></div>
 <h2 id="dino-vit-s16-imagenet">DINO ViT-S16 (ImageNet)</h2>
 <p>The next baseline model, uses a pretrained ViT-S16 backbone with ImageNet weights. To evaluate, run:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a># set environment variables:
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>export PRETRAINED=true
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>export EMBEDDINGS_ROOT=&quot;./data/embeddings/dino_vits16_imagenet&quot;
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>export REPO_OR_DIR=facebookresearch/dino:main
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>export DINO_BACKBONE=dino_vits16
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>export CHECKPOINT_PATH=null
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>export IN_FEATURES=384
-</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>export NORMALIZE_MEAN=[0.485,0.456,0.406]
-</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>export NORMALIZE_STD=[0.229,0.224,0.225]
-</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>
-</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a># run eva:
-</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>eva predict_fit --config configs/vision/dino_vit/offline/&lt;task&gt;.yaml
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>EMBEDDINGS_ROOT=&quot;./data/embeddings/dino_vits16_imagenet&quot; \
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>eva predict_fit --config configs/vision/dino_vit/offline/&lt;task&gt;.yaml
 </span></code></pre></div>
 <h2 id="dino-vit-b8-imagenet">DINO ViT-B8 (ImageNet)</h2>
 <p>To evaluate performance on the larger ViT-B8 backbone pretrained on ImageNet, run:
-<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a># set environment variables:
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>export PRETRAINED=true
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>export EMBEDDINGS_ROOT=&quot;./data/embeddings/dino_vitb8_imagenet&quot;
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>export REPO_OR_DIR=facebookresearch/dino:main
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>export DINO_BACKBONE=dino_vitb8
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>export CHECKPOINT_PATH=null
-</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>export IN_FEATURES=384
-</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>export NORMALIZE_MEAN=[0.485,0.456,0.406]
-</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>export NORMALIZE_STD=[0.229,0.224,0.225]
-</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>
-</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a># run eva:
-</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>eva predict_fit --config configs/vision/dino_vit/offline/&lt;task&gt;.yaml
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>EMBEDDINGS_ROOT=&quot;./data/embeddings/dino_vitb8_imagenet&quot; \
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>DINO_BACKBONE=dino_vitb8 \
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>IN_FEATURES=768 \
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>eva predict_fit --config configs/vision/dino_vit/offline/&lt;task&gt;.yaml
 </span></code></pre></div></p>
 <h2 id="lunit-dino-vit-s16-tcga">Lunit - DINO ViT-S16 (TCGA)</h2>
 <p><a href="https://www.lunit.io/en">Lunit</a>, released the weights for a DINO ViT-S16 backbone, pretrained on TCGA data
 on <a href="https://github.com/lunit-io/benchmark-ssl-pathology/releases/">GitHub</a>. To evaluate, run:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a># set environment variables:
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>export PRETRAINED=false
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>export EMBEDDINGS_ROOT=&quot;./data/embeddings/dino_vits16_lunit&quot;
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>export REPO_OR_DIR=facebookresearch/dino:main
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>export DINO_BACKBONE=dino_vits16
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>export CHECKPOINT_PATH=&quot;https://github.com/lunit-io/benchmark-ssl-pathology/releases/download/pretrained-weights/dino_vit_small_patch16_ep200.torch&quot;
-</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>export IN_FEATURES=384
-</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>export NORMALIZE_MEAN=[0.70322989,0.53606487,0.66096631]
-</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>export NORMALIZE_STD=[0.21716536,0.26081574,0.20723464]
-</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>
-</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a># run eva:
-</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>eva predict_fit --config configs/vision/dino_vit/offline/&lt;task&gt;.yaml
+<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>PRETRAINED=false \
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>EMBEDDINGS_ROOT=&quot;./data/embeddings/dino_vits16_lunit&quot; \
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>CHECKPOINT_PATH=&quot;https://github.com/lunit-io/benchmark-ssl-pathology/releases/download/pretrained-weights/dino_vit_small_patch16_ep200.torch&quot; \
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>NORMALIZE_MEAN=[0.70322989,0.53606487,0.66096631] \
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>NORMALIZE_STD=[0.21716536,0.26081574,0.20723464] \
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>eva predict_fit --config configs/vision/dino_vit/offline/&lt;task&gt;.yaml
 </span></code></pre></div>
 <h2 id="owkin-ibot-vit-b16-tcga">Owkin - iBOT ViT-B16 (TCGA)</h2>
 <p><a href="https://www.owkin.com/">Owkin</a> released the weights for "Phikon", an FM trained with iBOT on TCGA data, via
 <a href="https://huggingface.co/owkin/phikon">HuggingFace</a>. To evaluate, run:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a># set environment variables:
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>export EMBEDDINGS_ROOT=&quot;./data/embeddings/dino_vitb16_owkin&quot;
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a># run eva:
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>eva predict_fit --config configs/vision/owkin/phikon/offline/&lt;task&gt;.yaml
+<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>EMBEDDINGS_ROOT=&quot;./data/embeddings/dino_vitb16_owkin&quot; \
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>eva predict_fit --config configs/vision/owkin/phikon/offline/&lt;task&gt;.yaml
 </span></code></pre></div>
-<p>Note: since <strong><em>eva</em></strong> provides the config files to evaluate tasks with the Phikon FM in 
+<p>Note: since <em>eva</em> provides the config files to evaluate tasks with the Phikon FM in 
 "configs/vision/owkin/phikon/offline", it is not necessary to set the environment variables needed for
 the runs above.</p>
 <h2 id="kaikoai-dino-vit-s16-tcga">kaiko.ai - DINO ViT-S16 (TCGA)</h2>
 <p>To evaluate <a href="https://www.kaiko.ai/">kaiko.ai's</a> FM with DINO ViT-S16 backbone, pretrained on TCGA data 
 on <a href="https://github.com/lunit-io/benchmark-ssl-pathology/releases/">GitHub</a>, run:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a># set environment variables:
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>export PRETRAINED=false
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>export EMBEDDINGS_ROOT=&quot;./data/embeddings/dino_vits16_kaiko&quot;
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>export REPO_OR_DIR=facebookresearch/dino:main
-</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>export DINO_BACKBONE=dino_vits16
-</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>export CHECKPOINT_PATH=[TBD*]
-</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>export IN_FEATURES=384
-</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>export NORMALIZE_MEAN=[0.5,0.5,0.5]
-</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>export NORMALIZE_STD=[0.5,0.5,0.5]
-</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>
-</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a># run eva:
-</span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>eva predict_fit --config configs/vision/dino_vit/offline/&lt;task&gt;.yaml
+<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>PRETRAINED=false \
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>EMBEDDINGS_ROOT=&quot;./data/embeddings/dino_vits16_kaiko&quot; \
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>CHECKPOINT_PATH=[TBD*] \
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>NORMALIZE_MEAN=[0.5,0.5,0.5] \
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>NORMALIZE_STD=[0.5,0.5,0.5] \
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>eva predict_fit --config configs/vision/dino_vit/offline/&lt;task&gt;.yaml
 </span></code></pre></div>
 <p>* path to public checkpoint will be added when available.</p>
 <h2 id="kaikoai-dino-vit-s8-tcga">kaiko.ai - DINO ViT-S8 (TCGA)</h2>
 <p>To evaluate <a href="https://www.kaiko.ai/">kaiko.ai's</a> FM with DINO ViT-S8 backbone, pretrained on TCGA data 
 on <a href="https://github.com/lunit-io/benchmark-ssl-pathology/releases/">GitHub</a>, run:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a># set environment variables:
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>export PRETRAINED=false
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>export EMBEDDINGS_ROOT=&quot;./data/embeddings/dino_vits8_kaiko&quot;
-</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>export REPO_OR_DIR=facebookresearch/dino:main
-</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>export DINO_BACKBONE=dino_vits8
-</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>export CHECKPOINT_PATH=[TBD*]
-</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>export IN_FEATURES=384
-</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>export NORMALIZE_MEAN=[0.5,0.5,0.5]
-</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>export NORMALIZE_STD=[0.5,0.5,0.5]
-</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a>
-</span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a># run eva:
-</span><span id="__span-6-12"><a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a>eva predict_fit --config configs/vision/dino_vit/offline/&lt;task&gt;.yaml
+<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>PRETRAINED=false \
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>EMBEDDINGS_ROOT=&quot;./data/embeddings/dino_vits8_kaiko&quot; \
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>DINO_BACKBONE=dino_vits8 \
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>CHECKPOINT_PATH=[TBD*] \
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>NORMALIZE_MEAN=[0.5,0.5,0.5] \
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>NORMALIZE_STD=[0.5,0.5,0.5] \
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>eva predict_fit --config configs/vision/dino_vit/offline/&lt;task&gt;.yaml
 </span></code></pre></div>
 <p>* path to public checkpoint will be added when available.</p>
 <h2 id="kaikoai-dino-vit-b16-tcga">kaiko.ai - DINO ViT-B16 (TCGA)</h2>
 <p>To evaluate <a href="https://www.kaiko.ai/">kaiko.ai's</a> FM with the larger DINO ViT-B16 backbone, pretrained on TCGA data,
 run:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a># set environment variables:
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>export PRETRAINED=false
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>export EMBEDDINGS_ROOT=&quot;./data/embeddings/dino_vitb16_kaiko&quot;
-</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>export REPO_OR_DIR=facebookresearch/dino:main
-</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>export DINO_BACKBONE=dino_vitb16
-</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>export CHECKPOINT_PATH=[TBD*]
-</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>export IN_FEATURES=768
-</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>export NORMALIZE_MEAN=[0.5,0.5,0.5]
-</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>export NORMALIZE_STD=[0.5,0.5,0.5]
-</span><span id="__span-7-10"><a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a>
-</span><span id="__span-7-11"><a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a># run eva:
-</span><span id="__span-7-12"><a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a>eva predict_fit --config configs/vision/dino_vit/offline/&lt;task&gt;.yaml
+<div class="language-text highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>PRETRAINED=false \
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>EMBEDDINGS_ROOT=&quot;./data/embeddings/dino_vitb16_kaiko&quot; \
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>DINO_BACKBONE=dino_vitb16 \
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>CHECKPOINT_PATH=[TBD*] \
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>IN_FEATURES=768 \
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>NORMALIZE_MEAN=[0.5,0.5,0.5] \
+</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>NORMALIZE_STD=[0.5,0.5,0.5] \
+</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>eva predict_fit --config configs/vision/dino_vit/offline/&lt;task&gt;.yaml
 </span></code></pre></div>
 <p>* path to public checkpoint will be added when available.</p>
 <h2 id="kaikoai-dino-vit-b8-tcga">kaiko.ai - DINO ViT-B8 (TCGA)</h2>
 <p>To evaluate <a href="https://www.kaiko.ai/">kaiko.ai's</a> FM with the larger DINO ViT-B8 backbone, pretrained on TCGA data,
 run:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a># set environment variables:
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>export PRETRAINED=false
-</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>export EMBEDDINGS_ROOT=&quot;./data/embeddings/dino_vitb8_kaiko&quot;
-</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>export REPO_OR_DIR=facebookresearch/dino:main
-</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>export DINO_BACKBONE=dino_vitb8
-</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>export CHECKPOINT_PATH=[TBD*]
-</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>export IN_FEATURES=768
-</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>export NORMALIZE_MEAN=[0.5,0.5,0.5]
-</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>export NORMALIZE_STD=[0.5,0.5,0.5]
-</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a>
-</span><span id="__span-8-11"><a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a># run eva:
-</span><span id="__span-8-12"><a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a>eva predict_fit --config configs/vision/dino_vit/offline/&lt;task&gt;.yaml
+<div class="language-text highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>PRETRAINED=false \
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>EMBEDDINGS_ROOT=&quot;./data/embeddings/dino_vitb8_kaiko&quot; \
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>DINO_BACKBONE=dino_vitb8 \
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>CHECKPOINT_PATH=[TBD*] \
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>IN_FEATURES=768 \
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>NORMALIZE_MEAN=[0.5,0.5,0.5] \
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>NORMALIZE_STD=[0.5,0.5,0.5] \
+</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>eva predict_fit --config configs/vision/dino_vit/offline/&lt;task&gt;.yaml
 </span></code></pre></div>
 <p>* path to public checkpoint will be added when available.</p>
 <h2 id="kaikoai-dinov2-vit-l14-tcga">kaiko.ai - DINOv2 ViT-L14 (TCGA)</h2>
 <p>To evaluate <a href="https://www.kaiko.ai/">kaiko.ai's</a> FM with the larger DINOv2 ViT-L14 backbone, pretrained on TCGA data,
 run:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a># set environment variables:
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>export PRETRAINED=false
-</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>export EMBEDDINGS_ROOT=&quot;./data/embeddings/dinov2_vitl14_kaiko&quot;
-</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>export REPO_OR_DIR=facebookresearch/dinov2:main
-</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>export DINO_BACKBONE=dinov2_vitl14_reg
-</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>export FORCE_RELOAD=true
-</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>export CHECKPOINT_PATH=[TBD*]
-</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a>export IN_FEATURES=1024
-</span><span id="__span-9-9"><a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a>export NORMALIZE_MEAN=[0.5,0.5,0.5]
-</span><span id="__span-9-10"><a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a>export NORMALIZE_STD=[0.5,0.5,0.5]
-</span><span id="__span-9-11"><a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a>
-</span><span id="__span-9-12"><a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a># run eva:
-</span><span id="__span-9-13"><a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a>eva predict_fit --config configs/vision/dino_vit/offline/&lt;task&gt;.yaml
+<div class="language-text highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>PRETRAINED=false \
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>EMBEDDINGS_ROOT=&quot;./data/embeddings/dinov2_vitl14_kaiko&quot; \
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>REPO_OR_DIR=facebookresearch/dinov2:main \
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>DINO_BACKBONE=dinov2_vitl14_reg \
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>FORCE_RELOAD=true \
+</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>CHECKPOINT_PATH=[TBD*] \
+</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>IN_FEATURES=1024 \
+</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a>NORMALIZE_MEAN=[0.5,0.5,0.5] \
+</span><span id="__span-9-9"><a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a>NORMALIZE_STD=[0.5,0.5,0.5] \
+</span><span id="__span-9-10"><a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a>eva predict_fit --config configs/vision/dino_vit/offline/&lt;task&gt;.yaml
 </span></code></pre></div>
 <p>* path to public checkpoint will be added when available.</p>
 
