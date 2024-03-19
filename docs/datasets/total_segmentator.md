@@ -1,6 +1,6 @@
 # TotalSegmentator
 
-The TotalSegmentator dataset is an radiology image-segmentation dataset with 1228 3D images and corresponding masks with 117 different anatomical structures. It can be used for segmentation and multilabel classification tasks.
+The TotalSegmentator dataset is a radiology image-segmentation dataset with 1228 3D images and corresponding masks with 117 different anatomical structures. It can be used for segmentation and multilabel classification tasks.
 
 ## Raw data
 

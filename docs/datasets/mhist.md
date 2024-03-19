@@ -58,7 +58,7 @@ Please create a root folder, e.g. `mhist`, and download all the files there, whi
 We work with the splits provided by the data source. Since no "validation" split is provided, we use the "test" split as validation split.
 
  - Train split: `annotations.csv` :: "Partition" == "train"
- - Valdation split: `annotations.csv` :: "Partition" == "test"
+ - Validation split: `annotations.csv` :: "Partition" == "test"
 
 | Splits   | Train           | Validation   | 
 |----------|-----------------|--------------|
