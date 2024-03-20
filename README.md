@@ -109,7 +109,7 @@ In this section you will find model benchmarks which were generated with _eva_.
 | ViT-L/14 _(kaiko.ai)_ <sup>[4]</sup>             | 0.870 | 0.930 | 0.809 | 0.908    | 0.898     |
 
 _Table I: Linear probing evaluation of FMs on patch-level downstream datasets.<br> We report averaged balanced accuracy
-over 5 runs_, with an average standard deviation of ±0.003.
+over 5 runs, with an average standard deviation of ±0.003._
 
 </div>
 
