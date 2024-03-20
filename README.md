@@ -119,7 +119,7 @@ _References_:
 1. _"Emerging properties in self-supervised vision transformers”_
 2. _"Benchmarking self-supervised learning on diverse pathology datasets”_
 3. _"Scaling self-supervised learning for histopathology with masked image modeling”_
-4. _"Towards training Large-Scale Medical Foundation Models: from TCGA to hospital-scale pathology FMs”_
+4. _"Towards Training Large-Scale Pathology Foundation Models: from TCGA to Hospital Scale”_
 
 ## Contributing
 
