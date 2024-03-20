@@ -2176,15 +2176,9 @@
 </ul>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>pip install &quot;kaiko-eva[vision] @ git+https://github.com/kaiko-ai/eva.git&quot;
 </span></code></pre></div>
-<ul>
-<li>To be able to use the existing configs, download them into directory where you installed <em>eva</em>. You can get them from our blob storage with:</li>
-</ul>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>azcopy copy https://kaiko.blob.core.windows.net/long-term-experimental/eva/configs . --recursive=true
-</span></code></pre></div>
-<p>(Alternatively you can also download them from the <a href="https://github.com/kaiko-ai/eva/tree/main"><em>eva</em> GitHub repo</a>)</p>
 <h2 id="run-eva">Run <em>eva</em></h2>
 <p>Now you are all setup and you can start running <em>eva</em> with:
-<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>eva &lt;subcommand&gt; --config &lt;path-to-config-file&gt;
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>eva &lt;subcommand&gt; --config &lt;path-to-config-file&gt;
 </span></code></pre></div>
 To learn how the subcommands and configs work, we recommend you familiarize yourself with <a href="../how_to_use/">How to use <em>eva</em></a> and then proceed to running <em>eva</em> with the <a href="../../tutorials/offline_vs_online/">Tutorials</a>.</p>
 
