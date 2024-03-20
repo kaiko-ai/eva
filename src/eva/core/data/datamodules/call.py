@@ -19,7 +19,7 @@ def call_method_if_exists(objects: Iterable[Any], /, method: str) -> None:
 
 
 def _recursive_iter(objects: Iterable[Any], /) -> Iterable[datasets_lib.TorchDataset]:
-    """Iterates thought an iterable of objects and their respective iterable values.
+    """Iterates through an iterable of objects and their respective iterable values.
 
     Args:
         objects: The objects to iterate from.
