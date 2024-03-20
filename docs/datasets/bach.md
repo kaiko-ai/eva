@@ -1,6 +1,6 @@
 # BACH
 
-The BACH dataset consists of microscopy and WSI images, of which we use only the microscopy images. These are 408 labelled images from 4 classes ("Normal", "Benign", "Invasive", "InSitu"). This dataset was used for the "BACH Grand Challenge on Breast Cancer Histology images".
+The BACH dataset consists of microscopy and WSI images, of which we use only the microscopy images. These are 408 labeled images from 4 classes ("Normal", "Benign", "Invasive", "InSitu"). This dataset was used for the "BACH Grand Challenge on Breast Cancer Histology images".
 
 
 ## Raw data
@@ -17,7 +17,7 @@ The BACH dataset consists of microscopy and WSI images, of which we use only the
 | **Magnification (μm/px)** | 20x (0.42)                                                |
 | **Files format**          | `.tif` images                                            |
 | **Number of images**      | 408 (102 from each class)                                |
-| **Splits in use**         | one labelled split                                       |
+| **Splits in use**         | one labeled split                                       |
 
 
 ### Organization
@@ -26,7 +26,7 @@ The data `ICIAR2018_BACH_Challenge.zip` from [zenodo](https://zenodo.org/records
 
 ```
 ICAR2018_BACH_Challenge
-├── Photos                    # All labelled patches used by eva
+├── Photos                    # All labeled patches used by eva
 │   ├── Normal
 │   │   ├── n032.tif
 │   │   └── ...
