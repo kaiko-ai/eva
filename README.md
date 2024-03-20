@@ -10,7 +10,6 @@ _Oncology FM Evaluation Framework by kaiko.ai_
 [![CI](https://github.com/kaiko-ai/eva/workflows/CI/badge.svg)](https://github.com/kaiko-ai/eva/actions?query=workflow%3ACI)
 [![license](https://img.shields.io/badge/License-Apache%202.0-blue.svg?labelColor=gray)](https://github.com/kaiko-ai/eva#license)
 
-
 <p align="center">
   <a href="#installation">Installation</a> •
   <a href="#how-to-use">How To Use</a> •
@@ -23,7 +22,7 @@ _Oncology FM Evaluation Framework by kaiko.ai_
 
 </div>
 
-<br />
+### Introduction
 
 _`eva`_ is an evaluation framework for oncology foundation models (FMs) by [kaiko.ai](https://kaiko.ai/). Check out the [documentation](https://kaiko-ai.github.io/eva/) for more information.
 
