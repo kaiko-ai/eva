@@ -78,7 +78,7 @@ class Trainer(pl_trainer.Trainer):
         model: modules.ModelModule,
         datamodule: datamodules.DataModule,
     ) -> None:
-        """Runs a evaluation session out-of-place.
+        """Runs an evaluation session out-of-place.
 
         It performs an evaluation run (fit and evaluate) the model
         `self._n_run` times. Note that the input `base_model` would
