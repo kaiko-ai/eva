@@ -63,7 +63,7 @@ To evaluate FMs, *eva* provides support for different model-formats, including m
 
 ### 2. Evaluate ML models on your own dataset & task
 
-If you have your own labelled dataset, all that is needed is to implement a dataset class tailored to your source data. Start from one of our out-of-the box provided dataset classes, adapt it to your data and run *eva* to see how different FMs perform on your task.
+If you have your own labeled dataset, all that is needed is to implement a dataset class tailored to your source data. Start from one of our out-of-the box provided dataset classes, adapt it to your data and run *eva* to see how different FMs perform on your task.
 
 ## Evaluation results
 
