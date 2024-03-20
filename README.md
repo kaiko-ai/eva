@@ -27,6 +27,12 @@ _Oncology FM Evaluation Framework by kaiko.ai_
 
 `eva` is an evaluation framework for oncology foundation models (FMs) by [kaiko.ai](https://kaiko.ai/). Check out the [documentation](https://kaiko-ai.github.io/eva/) for more information.
 
+<div align="center">
+
+<img src="./docs/images/eva-process.gif" width="800">
+
+</div>
+
 ### Highlights:
 - Easy and reliable benchmark of Oncology FMs
 - Automatic embedding inference and evaluation of a downstream task
