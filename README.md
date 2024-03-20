@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="./docs/images/eva-logo.png" width="400">
+<img src="https://github.com/kaiko-ai/eva/blob/main/docs/images/eva-logo.png?raw=true" width="400">
 
 <br />
 
@@ -28,7 +28,7 @@ _`eva`_ is an evaluation framework for oncology foundation models (FMs) by [kaik
 
 <div align="center">
 
-<img src="./docs/images/eva-process.gif" width="800">
+<img src="https://github.com/kaiko-ai/eva/blob/main/docs/images/eva-process.gif?raw=true" width="800">
 
 </div>
 
@@ -149,5 +149,5 @@ Our codebase is built using multiple opensource contributions
 
 ---
 <div align="center">
-  <img src="./docs/images/kaiko-logo.png" width="200">
+  <img src="https://github.com/kaiko-ai/eva/blob/main/docs/images/kaiko-logo.png?raw=true" width="200">
 </div>
