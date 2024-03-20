@@ -11,15 +11,6 @@
 pip install "kaiko-eva[vision] @ git+https://github.com/kaiko-ai/eva.git"
 ```
 
-- To be able to use the existing configs, download them into directory where you installed *eva*. You can get them from our blob storage with:
-
-```
-azcopy copy https://kaiko.blob.core.windows.net/long-term-experimental/eva/configs . --recursive=true
-```
-
-(Alternatively you can also download them from the [*eva* GitHub repo](https://github.com/kaiko-ai/eva/tree/main))
-
-
 ## Run *eva*
 
 Now you are all setup and you can start running *eva* with:
