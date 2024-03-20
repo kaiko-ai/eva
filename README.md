@@ -105,7 +105,7 @@ In this section you will find model benchmarks which were generated with _eva_.
 | ViT-S/16 _(kaiko.ai)_ <sup>[4]</sup>             | 0.797 | 0.943 | 0.828 | 0.903    | 0.893     |
 | ViT-S/8 _(kaiko.ai)_ <sup>[4]</sup>              | 0.834 | 0.946 | 0.832 | 0.897    | 0.887     |
 | ViT-B/16 _(kaiko.ai)_	<sup>[4]</sup>             | 0.810 | 0.960 | 0.826 | 0.900    | 0.898     |
-| ViT-B/8 _(kaiko.ai)_ <sup>[4]</sup>              |       |       |       |          |           |
+| ViT-B/8 _(kaiko.ai)_ <sup>[4]</sup>              | 0.865 | 0.956 | 0.809 |          |           |
 | ViT-L/14 _(kaiko.ai)_ <sup>[4]</sup>             | 0.870 | 0.930 | 0.809 | 0.908    | 0.898     |
 
 _Table I: Linear probing evaluation of FMs on patch-level downstream datasets.<br> We report averaged balanced accuracy
