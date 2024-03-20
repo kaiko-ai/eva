@@ -6,7 +6,7 @@
 
 _Oncology FM Evaluation Framework by kaiko.ai_
 
-[![PyPI](https://img.shields.io/pypi/v/pdm.svg?logo=python)](https://pypi.python.org/pypi/kaiko-eva)
+[![PyPI](https://img.shields.io/pypi/v/kaiko-eva.svg?logo=python)](https://pypi.python.org/pypi/kaiko-eva)
 [![CI](https://github.com/kaiko-ai/eva/workflows/CI/badge.svg)](https://github.com/kaiko-ai/eva/actions?query=workflow%3ACI)
 [![license](https://img.shields.io/badge/License-Apache%202.0-blue.svg?labelColor=gray)](https://github.com/kaiko-ai/eva#license)
 
@@ -25,7 +25,7 @@ _Oncology FM Evaluation Framework by kaiko.ai_
 
 <br />
 
-`eva` is an evaluation framework for oncology foundation models (FMs) by [kaiko.ai](https://kaiko.ai/). Check out the [documentation](https://kaiko-ai.github.io/eva/) for more information.
+_`eva`_ is an evaluation framework for oncology foundation models (FMs) by [kaiko.ai](https://kaiko.ai/). Check out the [documentation](https://kaiko-ai.github.io/eva/) for more information.
 
 <div align="center">
 
@@ -70,13 +70,13 @@ _eva_ can be used directly from the terminal as a CLI tool as follows:
 eva {fit,predict,predict_fit} --config url/or/path/to/the/config.yaml 
 ```
 
-For example, to perform a downstream evaluation of DINO ViT-S/16 on the BACH dataset with linear probing, by first infer the embeddings and perform 5 sequential fits, execute:
+For example, to perform a downstream evaluation of DINO ViT-S/16 on the BACH dataset with linear probing by first inferring the embeddings and performing 5 sequential fits, execute:
 ```sh
 eva predict_fit --config https://raw.githubusercontent.com/kaiko-ai/eva/main/configs/vision/dino_vit/offline/bach.yaml
 ```
 
 > [!NOTE] 
-> All the datasets the support automatic download in the repo have by default the option to `false` and thus you manually have to set the argument to `true`, that is `download=true`.
+> All the datasets that support automatic download in the repo have by default the option to automatically download set to false. For automatic download you have to manually set download=true.
 
 
 To view all the possibles, execute:
