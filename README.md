@@ -16,6 +16,7 @@ _Oncology FM Evaluation Framework by kaiko.ai_
   <a href="#how-to-use">How To Use</a> •
   <a href="https://kaiko-ai.github.io/eva/">Documentation</a> •
   <a href="https://kaiko-ai.github.io/eva/dev/datasets/">Datasets</a> •
+  <a href="#benchmarks">Benchmarks</a> <br>
   <a href="#contributing">Contribute</a> •
   <a href="#acknowledgements">Acknowledgements</a>
 </p>
@@ -25,7 +26,6 @@ _Oncology FM Evaluation Framework by kaiko.ai_
 <br />
 
 `eva` is an evaluation framework for oncology foundation models (FMs) by [kaiko.ai](https://kaiko.ai/). Check out the [documentation](https://kaiko-ai.github.io/eva/) for more information.
-
 
 ### Highlights:
 - Easy and reliable benchmark of Oncology FMs
@@ -80,6 +80,41 @@ eva --help
 
 For more information, please refer to the [documentation](https://kaiko-ai.github.io/eva/dev/user-guide/tutorials/offline_vs_online/) and [tutorials](https://kaiko-ai.github.io/eva/dev/user-guide/advanced/replicate_evaluations/).
 
+## Benchmarks
+
+In this section you will find model benchmarks which were generated with _eva_.
+
+### Table I: WSI patch-level benchmark
+
+<br />
+
+<div align="center">
+
+| Model                                            | BACH  | CRC   | MHIST | PCam/val | PCam/test |
+|--------------------------------------------------|-------|-------|-------|----------|-----------|
+| ViT-S/16 _(random)_	<sup>[1]</sup>               | 0.410 | 0.617 | 0.501 | 0.753    | 0.728     |
+| ViT-S/16 _(ImageNet)_ <sup>[1]</sup>             | 0.695 | 0.935 | 0.831 | 0.864    | 0.849     |
+| ViT-B/8 _(ImageNet)_ <sup>[1]</sup>              | 0.797 | 0.943 | 0.828 | 0.903    | 0.893     |
+| DINO<sub>(p=16)</sub> <sup>[2]</sup>             | 0.710 | 0.935 | 0.814 | 0.870    | 0.856     |
+| Phikon <sup>[3]</sup>                            | 0.725 | 0.935 | 0.777 | 0.912    | 0.915     |
+| ViT-S/16 _(kaiko.ai)_ <sup>[4]</sup>             | 0.797 | 0.943 | 0.828 | 0.903    | 0.893     |
+| ViT-S/8 _(kaiko.ai)_ <sup>[4]</sup>              | 0.834 | 0.946 | 0.832 | 0.897    | 0.887     |
+| ViT-B/16 _(kaiko.ai)_	<sup>[4]</sup>             | 0.810 | 0.960 | 0.826 | 0.900    | 0.898     |
+| ViT-B/8 _(kaiko.ai)_ <sup>[4]</sup>              |       |       |       |          |           |
+| ViT-L/14 _(kaiko.ai)_ <sup>[4]</sup>             | 0.870 | 0.930 | 0.809 | 0.908    | 0.898     |
+
+_Table I: Linear probing evaluation of FMs on patch-level downstream datasets.<br> We report averaged balanced accuracy
+over 5 runs_
+
+</div>
+
+<br />
+
+_References_:
+1. _"Emerging properties in self-supervised vision transformers”_
+2. _"Benchmarking self-supervised learning on diverse pathology datasets”_
+3. _"Scaling self-supervised learning for histopathology with masked image modeling”_
+4. _"Towards training Large-Scale Medical Foundation Models: from TCGA to hospital-scale pathology FMs”_
 
 ## Contributing
 
@@ -104,6 +139,7 @@ Our codebase is built using multiple opensource contributions
 [![pdm-managed](https://img.shields.io/badge/pdm-managed-blueviolet)](https://pdm-project.org)
 [![Nox](https://img.shields.io/badge/%F0%9F%A6%8A-Nox-D85E00.svg)](https://github.com/wntrblm/nox)
 [![Built with Material for MkDocs](https://img.shields.io/badge/Material_for_MkDocs-526CFE?logo=MaterialForMkDocs&logoColor=white)](https://squidfunk.github.io/mkdocs-material/)
+
 </div>
 
 ---
