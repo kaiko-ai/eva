@@ -48,7 +48,7 @@ pip install 'kaiko-eva[all]'
 
 To install the latest version of the `main` branch:
 ```sh
-pip install "kaiko-eva[vision] @ git+https://github.com/kaiko-ai/eva.git"
+pip install "kaiko-eva[all] @ git+https://github.com/kaiko-ai/eva.git"
 ```
 
 You can verify that the installation was successful by executing:
