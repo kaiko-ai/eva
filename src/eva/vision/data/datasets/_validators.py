@@ -47,6 +47,11 @@ def check_dataset_integrity(
 
 
 def check_dataset_exists(dataset_dir: str, download_available: bool) -> None:
+    """Verifies that the dataset folder exists.
+
+    Raise:
+        FileNotFoundError: If the dataset folder does not exist.
+    """
     if not os.path.isdir(dataset_dir):
         error_message = f"Dataset not found at '{dataset_dir}'."
         if download_available:
