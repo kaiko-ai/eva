@@ -28,7 +28,7 @@ _`eva`_ is an evaluation framework for oncology foundation models (FMs) by [kaik
 
 <div align="center">
 
-<img src="https://github.com/kaiko-ai/eva/blob/main/docs/images/eva-process.png?raw=true" width="800">
+<img src=".docs/images/eva-process.png" width="800">
 
 </div>
 
