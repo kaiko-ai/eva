@@ -108,6 +108,7 @@ class TotalSegmentatorClassification(base.ImageClassification):
     def prepare_data(self) -> None:
         if self._download:
             self._download_dataset()
+        _validators.check_dataset_exists(self._root, True)
 
     @override
     def configure(self) -> None:
