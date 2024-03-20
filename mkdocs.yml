@@ -10,6 +10,8 @@ theme:
     - search.suggest
     - search.highlight
     - content.code.copy
+  icon:
+    repo: fontawesome/brands/github-alt
   logo: images/eva-stripes.png
   palette:
     - media: "(prefers-color-scheme: dark)"

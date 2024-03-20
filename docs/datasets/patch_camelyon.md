@@ -1,7 +1,7 @@
 # PatchCamelyon
 
 
-The PatchCamelyon benchmark is a image classification dataset with 327,680 color images (96 x 96px) extracted from histopathologic scans of lymph node sections. Each image is annotated with a binary label indicating presence of metastatic tissue.
+The PatchCamelyon benchmark is an image classification dataset with 327,680 color images (96 x 96px) extracted from histopathologic scans of lymph node sections. Each image is annotated with a binary label indicating presence of metastatic tissue.
 
 ## Raw data
 
@@ -23,7 +23,7 @@ The PatchCamelyon benchmark is a image classification dataset with 327,680 color
 
 ### Splits
 
-The datasource provides train/validation/test splits
+The data source provides train/validation/test splits
 
 | Splits | Train         | Validation   | Test         |
 |---|---------------|--------------|--------------|

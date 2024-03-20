@@ -1,6 +1,6 @@
 # CRC
 
-The CRC-HE dataset consists of labelled patches (9 classes) from colorectal cancer (CRC) and normal tissue. We use the `NCT-CRC-HE-100K` dataset for training and validation and the `CRC-VAL-HE-7K for testing`. 
+The CRC-HE dataset consists of labeled patches (9 classes) from colorectal cancer (CRC) and normal tissue. We use the `NCT-CRC-HE-100K` dataset for training and validation and the `CRC-VAL-HE-7K for testing`. 
 
 The `NCT-CRC-HE-100K-NONORM` consists of 100,000 images without applied color normalization. The `CRC-VAL-HE-7K` consists of 7,180 image patches from 50 patients without overlap with `NCT-CRC-HE-100K-NONORM`.
 
@@ -45,18 +45,18 @@ from [zenodo](https://zenodo.org/records/1214456) are organized as follows:
 
 ```
 NCT-CRC-HE-100K                # All images used for training
-├── ADI                        # All labelled patches belonging to the 1st class
+├── ADI                        # All labeled patches belonging to the 1st class
 │   ├── ADI-AAAFLCLY.tif
 │   ├── ...
-├── BACK                       # All labelled patches belonging to the 2nd class
+├── BACK                       # All labeled patches belonging to the 2nd class
 │   ├── ...
 └── ...
 
 NCT-CRC-HE-100K-NONORM         # All images used for training
-├── ADI                        # All labelled patches belonging to the 1st class
+├── ADI                        # All labeled patches belonging to the 1st class
 │   ├── ADI-AAAFLCLY.tif
 │   ├── ...
-├── BACK                       # All labelled patches belonging to the 2nd class
+├── BACK                       # All labeled patches belonging to the 2nd class
 │   ├── ...
 └── ...
 
