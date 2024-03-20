@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="./docs/images/eva-logo.png" width="400">
+<img src="https://github.com/kaiko-ai/eva/blob/main/docs/images/eva-logo.png?raw=true" width="400">
 
 <br />
 
@@ -25,12 +25,6 @@ _Oncology FM Evaluation Framework by kaiko.ai_
 ### Introduction
 
 _`eva`_ is an evaluation framework for oncology foundation models (FMs) by [kaiko.ai](https://kaiko.ai/). Check out the [documentation](https://kaiko-ai.github.io/eva/) for more information.
-
-<div align="center">
-
-<img src="./docs/images/eva-process.gif" width="800">
-
-</div>
 
 ### Highlights:
 - Easy and reliable benchmark of Oncology FMs
@@ -109,7 +103,7 @@ In this section you will find model benchmarks which were generated with _eva_.
 | ViT-L/14 _(kaiko.ai)_ <sup>[4]</sup>             | 0.870 | 0.930 | 0.809 | 0.908    | 0.898     |
 
 _Table I: Linear probing evaluation of FMs on patch-level downstream datasets.<br> We report averaged balanced accuracy
-over 5 runs_, with an average standard deviation of ±0.003.
+over 5 runs, with an average standard deviation of ±0.003._
 
 </div>
 
@@ -119,7 +113,7 @@ _References_:
 1. _"Emerging properties in self-supervised vision transformers”_
 2. _"Benchmarking self-supervised learning on diverse pathology datasets”_
 3. _"Scaling self-supervised learning for histopathology with masked image modeling”_
-4. _"Towards training Large-Scale Medical Foundation Models: from TCGA to hospital-scale pathology FMs”_
+4. . _"Towards Training Large-Scale Pathology Foundation Models: from TCGA to Hospital Scale”_
 
 ## Contributing
 
@@ -149,5 +143,5 @@ Our codebase is built using multiple opensource contributions
 
 ---
 <div align="center">
-  <img src="./docs/images/kaiko-logo.png" width="200">
+  <img src="https://github.com/kaiko-ai/eva/blob/main/docs/images/kaiko-logo.png?raw=true" width="200">
 </div>
