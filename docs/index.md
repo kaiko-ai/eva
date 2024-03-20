@@ -67,7 +67,7 @@ We evaluated the following FMs on the 4 supported WSI-patch-level image classifi
 
 <center>
 
-| FM-backbone                 | pretraining |  BACH             | CRC                | MHIST              |   PCam/val*        | PCam/test*      |       
+| FM-backbone                 | pretraining |  BACH             | CRC                | MHIST              |   PCam/val         | PCam/test       |       
 |-----------------------------|-------------|------------------ |-----------------   |-----------------   |-----------------   |--------------     |
 | DINO ViT-S16                | N/A         | 0.410 (±0.009)    | 0.617 (±0.008)     | 0.501 (±0.004)     | 0.753 (±0.002)	   | 0.728 (±0.003)    |
 | DINO ViT-S16                | ImageNet    | 0.695 (±0.004)    | 0.935 (±0.003)     | 0.831 (±0.002)     | 0.864 (±0.007)     | 0.849 (±0.007)    |
