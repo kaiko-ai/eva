@@ -11,13 +11,13 @@ _Oncology FM Evaluation Framework by kaiko.ai_
 [![license](https://img.shields.io/badge/License-Apache%202.0-blue.svg?labelColor=gray)](https://github.com/kaiko-ai/eva#license)
 
 <p align="center">
-  <a href="#installation">Installation</a> •
-  <a href="#how-to-use">How To Use</a> •
+  <a href="https://github.com/kaiko-ai/eva#installation">Installation</a> •
+  <a href="https://github.com/kaiko-ai/eva#how-to-use">How To Use</a> •
   <a href="https://kaiko-ai.github.io/eva/">Documentation</a> •
   <a href="https://kaiko-ai.github.io/eva/dev/datasets/">Datasets</a> •
-  <a href="#benchmarks">Benchmarks</a> <br>
-  <a href="#contributing">Contribute</a> •
-  <a href="#acknowledgements">Acknowledgements</a>
+  <a href="https://github.com/kaiko-ai/eva#benchmarks">Benchmarks</a> <br>
+  <a href="https://github.com/kaiko-ai/eva#contributing">Contribute</a> •
+  <a href="https://github.com/kaiko-ai/eva#acknowledgements">Acknowledgements</a>
 </p>
 
 </div>
