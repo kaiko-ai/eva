@@ -20,7 +20,7 @@ def check_dataset_integrity(
     """Verifies the datasets integrity.
 
     Raise:
-        ValuesError: If the input dataset's values do not
+        ValueError: If the input dataset's values do not
             match the expected ones.
     """
     if len(dataset) != length:

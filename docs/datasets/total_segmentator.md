@@ -14,7 +14,7 @@ The TotalSegmentator dataset is a radiology image-segmentation dataset with 1228
 | **Image dimension**   | ~300 x ~300 x ~350 (number of slices) x 1 (grey scale) *  |
 | **Files format**      | `.nii` ("NIFTI") images                                   |
 | **Number of images**  | 1228                                                      |
-| **Splits in use**     | one labelled split                                        |
+| **Splits in use**     | one labeled split                                        |
 
 /* image resolution and number of slices per image vary
 
@@ -37,7 +37,7 @@ Totalsegmentator_dataset_v201
 
 - The dataset class `TotalSegmentator` supports download the data on runtime with the initialized argument
 `download: bool = True`. 
-- For the multilabel classification task, every mask with at least one positive pixel is gets the label "1", all others get the label "0".
+- For the multilabel classification task, every mask with at least one positive pixel it gets the label "1", all others get the label "0".
 - For the multilabel classification task, the `TotalSegmentator` class creates a manifest file with one row/slice and the columns: `path`, `slice`, `split` and additional 117 columns for each class.
 - The 3D images are treated as 2D. Every 25th slice is sampled and treated as individual image
 - The splits with the following sizes are created after ordering images by filename:

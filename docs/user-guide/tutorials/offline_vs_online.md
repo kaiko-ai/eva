@@ -3,10 +3,11 @@
 In this tutorial we run *eva* with the three subcommands `predict`, `fit` and `predict_fit`, and take a look at the difference between *offline* and *online* workflows.
 
 ### Before you start
+If you haven't downloaded the config files yet, please download them from [GitHub](https://github.com/kaiko-ai/eva/tree/main/configs).
 
 For this tutorial we use the [BACH](../../datasets/bach.md) classification task which is available on [Zenodo](https://zenodo.org/records/3632035) and is distributed under [*Attribution-NonCommercial-ShareAlike 4.0 International*](https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode) license.
 
-If you have not yet downloaded the BACH data to your machine, open `configs/vision/dino_vit/offline/bach.yaml` and enable automatic download by setting: `download: true`.
+To let **eva** automatically handle the dataset download, you can open `configs/vision/dino_vit/offline/bach.yaml` and set `download: true`. Before doing so, please make sure that your use case is compliant with the dataset license.
 
 ## *Offline* evaluations
 

@@ -10,6 +10,9 @@ theme:
     - search.suggest
     - search.highlight
     - content.code.copy
+  icon:
+    repo: fontawesome/brands/github-alt
+  favicon: images/eva-stripes.png
   logo: images/eva-stripes.png
   palette:
     - media: "(prefers-color-scheme: dark)"
@@ -73,6 +76,15 @@ nav:
       - Advanced user guide:
         - user-guide/advanced/replicate_evaluations.md
         - user-guide/advanced/model_wrappers.md
+  - Datasets: 
+    - datasets/index.md
+    - WSI-patches:
+      - BACH: datasets/bach.md
+      - CRC: datasets/crc.md
+      - MHIST: datasets/mhist.md
+      - PatchCamelyon: datasets/patch_camelyon.md
+    - Radiology:
+      - TotalSegmentator: datasets/total_segmentator.md
   - Reference API:
     - reference/index.md
     - Core:
@@ -107,12 +119,3 @@ nav:
         - reference/vision/models/networks.md
       - Utils:
         - IO: reference/vision/utils/io.md
-  - Datasets: 
-    - datasets/index.md
-    - WSI-patches:
-      - BACH: datasets/bach.md
-      - CRC: datasets/crc.md
-      - MHIST: datasets/mhist.md
-      - PatchCamelyon: datasets/patch_camelyon.md
-    - Radiology:
-      - TotalSegmentator: datasets/total_segmentator.md

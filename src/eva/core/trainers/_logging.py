@@ -11,8 +11,9 @@ from loguru import logger
 def generate_session_id() -> str:
     """Generates and returns a unique string ID of an experiment.
 
-    The ID is composed of the run timestamp and a its config hash. If the
-    configuration hash is an empty string, it will use only the timestamp.
+    The ID is composed of the run timestamp and a hash based on th used
+    config. If the configuration hash is an empty string, it will use
+    only the timestamp.
     """
     timestamp = _generate_timestamp_hash()
     config_hash = _generate_config_hash()
@@ -34,8 +35,8 @@ def _generate_config_hash(max_hash_len: int = 8) -> str:
     config_path = _fetch_config_path()
     if config_path is None:
         logger.warning(
-            "No or multiple configuration file found from command line arguments. "
-            "No configuration hash code will created for this experiment."
+            "No or multiple configuration files found from command line arguments. "
+            "No configuration hash code will be created for this experiment."
         )
         return ""
 

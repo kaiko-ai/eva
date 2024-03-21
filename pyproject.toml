@@ -6,8 +6,21 @@ build-backend = "pdm.backend"
 
 [project]
 name = "kaiko-eva"
-version = "0.0.0.dev5"
+version = "0.0.0.dev7"
 description = "Evaluation Framework for oncology foundation models."
+keywords = [
+    "machine-learning",
+    "evaluation-framework",
+    "oncology",
+    "foundation-models",
+]
+classifiers = [
+    "Topic :: Software Development :: Build Tools",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
 readme = "README.md"
 authors = [
     { name = "Ioannis Gatopoulos", email = "ioannis@kaiko.ai" },
@@ -31,6 +44,11 @@ dependencies = [
     "onnx>=1.15.0",
     "toolz>=0.12.1",
 ]
+
+[project.urls]
+Homepage = "https://kaiko-ai.github.io/eva/dev/"
+Repository = "https://github.com/kaiko-ai/eva"
+Documentation = "https://kaiko-ai.github.io/eva/dev/"
 
 [project.license]
 file = "LICENSE"

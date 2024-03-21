@@ -9,31 +9,28 @@ hide:
 
 <br />
 
-
-<a href="https://www.python.org/">
-  <img src="https://img.shields.io/badge/-Python_3.11-blue?logo=python&logoColor=white" />
+<a href="https://pypi.python.org/pypi/kaiko-eva">
+  <img src="https://img.shields.io/pypi/v/kaiko-eva.svg?logo=python" />
 </a>
-<a href="https://www.apache.org/licenses/LICENSE-2.0">
-  <img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg" />
+<a href="https://github.com/kaiko-ai/eva/actions?query=workflow%3ACI">
+  <img src="https://github.com/kaiko-ai/eva/workflows/CI/badge.svg" />
+</a>
+<a href="https://github.com/kaiko-ai/eva#license">
+  <img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg?labelColor=gray" />
 </a>
 
 <br />
-
-<p align="center">
-  <a href="user-guide">User Guide</a> •
-  <a href="datasets">Datasets</a> •
-  <a href="reference">Reference API</a>
-</p>
+<br />
 
 </div>
 
-# Introduction
+# 
 
 _Oncology FM Evaluation Framework by [kaiko.ai](https://www.kaiko.ai/)_
 
-With the first release, ***eva*** supports performance evaluation for vision Foundation Models ("FMs") and supervised machine learning models on WSI-patch-level image classification- and radiology (CT-scans) segmentation tasks.
+With the first release, ***eva*** supports performance evaluation for vision Foundation Models ("FMs") and supervised machine learning models on WSI-patch-level image classification task. Support for radiology (CT-scans) segmentation tasks will be added soon.
 
-The goal of this project is to provide the open-source community with an easy-to-use framework that follows industry best practices to deliver a robust, reproducible and fair evaluation benchmark across FMs of different sizes and architectures.
+With *eva* we provide the open-source community with an easy-to-use framework that follows industry best practices to deliver a robust, reproducible and fair evaluation benchmark across FMs of different sizes and architectures.
 
 Support for additional modalities and tasks will be added in future releases.
 
@@ -54,39 +51,42 @@ Supported datasets & tasks include:
 
 *Radiology datasets*
 
--	**[TotalSegmentator](datasets/total_segmentator.md)**: radiology/CT-scan for segmentation of anatomical structures
-
-More datasets & downstream task types will be added in future releases.
+-	**[TotalSegmentator](datasets/total_segmentator.md)**: radiology/CT-scan for segmentation of anatomical structures (*support coming soon*)
 
 To evaluate FMs, *eva* provides support for different model-formats, including models trained with PyTorch, models available on HuggingFace and ONNX-models. For other formats custom wrappers can be implemented.
 
 
 ### 2. Evaluate ML models on your own dataset & task
 
-If you have your own labelled dataset, all that is needed is to implement a dataset class tailored to your source data. Start from one of our out-of-the box provided dataset classes, adapt it to your data and run *eva* to see how different FMs perform on your task.
+If you have your own labeled dataset, all that is needed is to implement a dataset class tailored to your source data. Start from one of our out-of-the box provided dataset classes, adapt it to your data and run *eva* to see how different FMs perform on your task.
 
 ## Evaluation results
 
-We evaluated the following FMs on the 4 supported WSI-patch-level image classification tasks:
+We evaluated the following FMs on the 4 supported WSI-patch-level image classification tasks. On the table below we report *Balanced Accuracy* for binary & multiclass tasks and show the average performance & standard deviation over 5 runs.
 
-| FM-backbone                 | pretraining | PCam - val*      | PCam - test*    | BACH - val*    | CRC - val*     | MHIST - val* |
-|-----------------------------|-------------|------------------|-----------------|-----------------|-----------------|--------------|
-| DINO ViT-S16                | N/A         | 0.765 (±0.004) | 0.726 (±0.003) | 0.416 (±0.014)  | 0.643 (±0.005)	| 0.551 (±0.017)|
-| DINO ViT-S16                | ImageNet    | 0.871 (±0.004) | 0.856 (±0.005) | 0.673 (±0.005) | 0.936 (±0.001) | 0.823 (±0.006)|
-| DINO ViT-B8        	        | ImageNet    | 0.872 (±0.004) | 0.854 (±0.002) | 0.704 (±0.008)  | 0.942 (±0.001) | 0.813 (±0.003)|
-| Lunit - ViT-S16             | TCGA        | 0.89 (±0.001) | 0.897 (±0.003) | 0.765 (±0.011) | 0.936 (±0.001)| 0.762 (±0.004)| 
-| Owkin - iBOT ViT-B16        | TCGA        | 	**0.914 (±0.002)** | **0.919 (±0.009)** | 0.717 (±0.004) | 0.938 (±0.001)| 0.799 (±0.003)| 
-| kaiko.ai - DINO ViT-S16	    | TCGA        | 0.911 (±0.002) | 0.899 (±0.002)  | 0.773 (±0.007) | **0.954 (±0.002)** | **0.829 (±0.004)**|
-| kaiko.ai - DINO ViT-B8      | TCGA        | 0.902 (±0.002) | 0.887 (±0.004) | **0.798 (±0.007)** | 0.950 (±0.003) | 0.803 (±0.004)| 
-| kaiko.ai - DINOv2 ViT-L14   | TCGA        | 0.900 (±0.002) | 0.896 (±0.001) | 0.768 (±0.006) | 0.945 (±0.001) | 0.777 (±0.008)| 
 
-\* Metric in table: *Balanced Accuracy* (for binary & multiclass). The table shows the average performance & standard deviation over 5 runs.
+<center>
+
+| FM-backbone                 | pretraining |  BACH             | CRC                | MHIST              |   PCam/val         | PCam/test       |       
+|-----------------------------|-------------|------------------ |-----------------   |-----------------   |-----------------   |--------------     |
+| DINO ViT-S16                | N/A         | 0.410 (±0.009)    | 0.617 (±0.008)     | 0.501 (±0.004)     | 0.753 (±0.002)	   | 0.728 (±0.003)    |
+| DINO ViT-S16                | ImageNet    | 0.695 (±0.004)    | 0.935 (±0.003)     | 0.831 (±0.002)     | 0.864 (±0.007)     | 0.849 (±0.007)    |
+| DINO ViT-B8        	        | ImageNet    | 0.710 (±0.007)    | 0.939 (±0.001)     | 0.814 (±0.003)     | 0.870 (±0.003)     | 0.856 (±0.004)    |
+| Lunit - ViT-S16             | TCGA        | 0.801 (±0.005)    | 0.934 (±0.001)     | 0.768 (±0.004)     | 0.889 (±0.002)     | 0.895 (±0.006)    | 
+| Owkin - iBOT ViT-B16        | TCGA        | 0.725 (±0.004)    | 0.935 (±0.001)     | 0.777 (±0.005)     | 0.912 (±0.002)     | 0.915 (±0.003)    | 
+| kaiko.ai - DINO ViT-S16	    | TCGA        | 0.797 (±0.003)    | 0.943 (±0.001)     | 0.828 (±0.003)     | 0.903 (±0.001)     | 0.893 (±0.005)    |
+| kaiko.ai - DINO ViT-S8	    | TCGA        | 0.834 (±0.012)    | 0.946 (±0.002)     | **0.832 (±0.006)** | 0.897 (±0.001)     | 0.887 (±0.002)    |
+| kaiko.ai - DINO ViT-B16     | TCGA        | 0.810 (±0.008)    | **0.960 (±0.001)** | 0.826 (±0.003)     | 0.900 (±0.002)     | 0.898 (±0.003)    | 
+| kaiko.ai - DINO ViT-B8      | TCGA        | 0.865 (±0.019)    | 0.956 (±0.001)     | 0.809 (±0.021)     | **0.913 (±0.001)** | **0.921 (±0.002)**| 
+| kaiko.ai - DINOv2 ViT-L14   | TCGA        | **0.870 (±0.005)**| 0.930 (±0.001)     | 0.809 (±0.001)     | 0.908 (±0.001)     | 0.898 (±0.002)    | 
+
+</center>
 
 The runs use the default setup described in the section below.
 
 *eva* trains the decoder on the "train" split and uses the "validation" split for monitoring, early stopping and checkpoint selection. Evaluation results are reported on the "validation" split and, if available, on the "test" split.
 
-For more details on the FM-backbones and instructions to replicate the results, please refer to the [Replicate evaluations](user-guide/advanced/replicate_evaluations.md).
+For more details on the FM-backbones and instructions to replicate the results, check out [Replicate evaluations](user-guide/advanced/replicate_evaluations.md).
 
 ## Evaluation setup
 
