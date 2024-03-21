@@ -104,9 +104,9 @@ class SessionRecorder:
     def save(self) -> None:
         """Saves the recorded results."""
         results = self.export()
-        _print_results(results)
         _save_json(results, self.filename)
         self._save_config()
+        _print_results(results)
 
     def reset(self) -> None:
         """Resets the state of the tracked metrics."""
@@ -175,9 +175,12 @@ def _save_json(data: RESULTS_DICT, save_as: str = "data.json"):
 
 def _print_results(results: RESULTS_DICT) -> None:
     """Prints the results to the console."""
-    for stage in ["val", "test"]:
-        for dataset_idx in range(len(results["metrics"][stage])):
-            _print_table(results["metrics"][stage][dataset_idx], stage, dataset_idx)
+    try:
+        for stage in ["val", "test"]:
+            for dataset_idx in range(len(results["metrics"][stage])):
+                _print_table(results["metrics"][stage][dataset_idx], stage, dataset_idx)
+    except Exception as e:
+        logger.error(f"Failed to print the results: {e}")
 
 
 def _print_table(metrics_dict: Dict[str, SESSION_STATISTICS], stage: str, dataset_idx: int):
