@@ -96,24 +96,25 @@ class BACH(base.ImageClassification):
         return {"Benign": 0, "InSitu": 1, "Invasive": 2, "Normal": 3}
 
     @property
-    def dataset_path(self) -> str:
+    def _dataset_path(self) -> str:
         """Returns the path of the image data of the dataset."""
         return os.path.join(self._root, "ICIAR2018_BACH_Challenge", "Photos")
 
     @override
     def filename(self, index: int) -> str:
         image_path, _ = self._samples[self._indices[index]]
-        return os.path.relpath(image_path, self.dataset_path)
+        return os.path.relpath(image_path, self._dataset_path)
 
     @override
     def prepare_data(self) -> None:
         if self._download:
             self._download_dataset()
+        _validators.check_dataset_exists(self._root, True)
 
     @override
     def configure(self) -> None:
         self._samples = folder.make_dataset(
-            directory=self.dataset_path,
+            directory=self._dataset_path,
             class_to_idx=self.class_to_idx,
             extensions=(".tif"),
         )
@@ -145,7 +146,7 @@ class BACH(base.ImageClassification):
     def _download_dataset(self) -> None:
         """Downloads the dataset."""
         for resource in self._resources:
-            if os.path.isdir(self.dataset_path):
+            if os.path.isdir(self._dataset_path):
                 continue
 
             self._print_license()

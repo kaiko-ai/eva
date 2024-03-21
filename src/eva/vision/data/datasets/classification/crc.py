@@ -95,12 +95,13 @@ class CRC(base.ImageClassification):
     @override
     def filename(self, index: int) -> str:
         image_path, *_ = self._samples[index]
-        return os.path.relpath(image_path, self._dataset_dir)
+        return os.path.relpath(image_path, self._dataset_path)
 
     @override
     def prepare_data(self) -> None:
         if self._download:
             self._download_dataset()
+        _validators.check_dataset_exists(self._root, True)
 
     @override
     def configure(self) -> None:
@@ -135,7 +136,7 @@ class CRC(base.ImageClassification):
         return len(self._samples)
 
     @property
-    def _dataset_dir(self) -> str:
+    def _dataset_path(self) -> str:
         """Returns the full path of dataset directory."""
         dataset_dirs = {
             "train": os.path.join(self._root, "NCT-CRC-HE-100K"),
@@ -150,7 +151,7 @@ class CRC(base.ImageClassification):
     def _make_dataset(self) -> List[Tuple[str, int]]:
         """Builds the dataset for the specified split."""
         dataset = folder.make_dataset(
-            directory=self._dataset_dir,
+            directory=self._dataset_path,
             class_to_idx=self.class_to_idx,
             extensions=(".tif"),
         )
