@@ -1,5 +1,5 @@
 ---
-name: Publish Develop Docs 
+name: Docs
 
 on:
   push:
@@ -29,7 +29,7 @@ jobs:
         run: |
           git config user.email "action@github.com"
           git config user.name "GitHub Action"
-      - name: Build Documentation
+      - name: Deploy Documentation
         run: |
           git fetch origin gh-pages:gh-pages
           nox -s docs -- deploy --update-aliases dev
