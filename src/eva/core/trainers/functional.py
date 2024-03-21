@@ -83,7 +83,11 @@ def fit_and_validate(
     """
     trainer.fit(model, datamodule=datamodule)
     validation_scores = trainer.validate(datamodule=datamodule, verbose=False)
-    test_scores = None if datamodule.datasets.test is None else trainer.test(datamodule=datamodule)
+    test_scores = (
+        None
+        if datamodule.datasets.test is None
+        else trainer.test(datamodule=datamodule, verbose=False)
+    )
     return validation_scores, test_scores
 
 

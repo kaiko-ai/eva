@@ -5,7 +5,7 @@ import json
 import os
 import statistics
 import sys
-from typing import Any, Dict, List, Mapping, TypedDict
+from typing import Dict, List, Mapping, TypedDict
 
 from lightning.pytorch.utilities.types import _EVALUATE_OUTPUT
 from lightning_fabric.utilities import cloud_io
@@ -161,7 +161,7 @@ def _calculate_statistics(session_metrics: SESSION_METRICS) -> Dict[str, SESSION
     return dicttoolz.valmap(_calculate_metric_statistics, session_metrics)
 
 
-def _save_json(data: Dict[str, Any], save_as: str = "data.json"):
+def _save_json(data: RESULTS_DICT, save_as: str = "data.json"):
     """Saves data to a json file."""
     if not save_as.endswith(".json"):
         raise ValueError()
