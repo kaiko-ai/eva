@@ -23,14 +23,6 @@ jobs:
         uses: wntrblm/nox@2024.03.02
         with:
           python-versions: "3.10"
-      - name: Check prerelease
-        id: check_version
-        run: |
-          if [[ "${{ github.ref }}" =~ ^refs/tags/[0-9.]+$ ]]; then
-            echo "PRERELEASE=false" >> $GITHUB_OUTPUT
-          else
-            echo "PRERELEASE=true" >> $GITHUB_OUTPUT
-          fi
       - name: Build artifacts
         run: |
           nox -s build
