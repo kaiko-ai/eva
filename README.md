@@ -64,7 +64,7 @@ _eva_ can be used directly from the terminal as a CLI tool as follows:
 eva {fit,predict,predict_fit} --config url/or/path/to/the/config.yaml 
 ```
 
-When used as a CLI tool, _eva_ supports configuration files (`.yaml`) as an argument to define its functionality.
+When used as a CLI tool, `_eva_` supports configuration files (`.yaml`) as an argument to define its functionality.
 Native supported configs can be found at the [configs](https://github.com/kaiko-ai/eva/tree/main/configs) directory
 of the repo. Apart from cloning the repo, you can download the latest config folder as `.zip` from your browser from
 [here](https://download-directory.github.io/?url=https://github.com/kaiko-ai/eva/tree/main/configs). Alternatively,
