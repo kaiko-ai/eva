@@ -1,8 +1,7 @@
 ---
-name: Publish Develop Docs 
+name: Docs
 
 on:
-  pull_request:
   push:
     branches:
       - main
@@ -30,6 +29,8 @@ jobs:
         run: |
           git config user.email "action@github.com"
           git config user.name "GitHub Action"
-      - name: Build Documentation
+      - name: Deploy Documentation
         run: |
-          nox -s docs -- gh-deploy --force --remote-branch gh-pages
+          git fetch origin gh-pages:gh-pages
+          nox -s docs -- deploy --update-aliases dev
+          git push origin gh-pages

@@ -6,9 +6,13 @@ theme:
   features:
     - navigation.tabs
     - navigation.indexes
+    - navigation.expand
     - search.suggest
     - search.highlight
     - content.code.copy
+  icon:
+    repo: fontawesome/brands/github-alt
+  favicon: images/eva-stripes.png
   logo: images/eva-stripes.png
   palette:
     - media: "(prefers-color-scheme: dark)"
@@ -27,6 +31,7 @@ theme:
         name: Switch to dark mode
 plugins:
   search: null
+  mike: null
   mkdocstrings:
     handlers:
       python:
@@ -42,6 +47,12 @@ plugins:
           show_root_heading: true
           filters:
           - '!^_'
+extra:
+  version:
+    provider: mike
+    default:
+      - latest
+      - dev
 markdown_extensions:
   - toc:
       toc_depth: 2
@@ -53,7 +64,7 @@ markdown_extensions:
   - pymdownx.snippets
   - pymdownx.superfences
 nav:
-  - eva: index.md
+  - Introduction: index.md
   - User Guide:
       - user-guide/index.md
       - Getting started:
@@ -65,6 +76,15 @@ nav:
       - Advanced user guide:
         - user-guide/advanced/replicate_evaluations.md
         - user-guide/advanced/model_wrappers.md
+  - Datasets: 
+    - datasets/index.md
+    - WSI-patches:
+      - BACH: datasets/bach.md
+      - CRC: datasets/crc.md
+      - MHIST: datasets/mhist.md
+      - PatchCamelyon: datasets/patch_camelyon.md
+    - Radiology:
+      - TotalSegmentator: datasets/total_segmentator.md
   - Reference API:
     - reference/index.md
     - Core:
@@ -99,10 +119,3 @@ nav:
         - reference/vision/models/networks.md
       - Utils:
         - IO: reference/vision/utils/io.md
-  - Datasets: 
-    - datasets/index.md
-    - BACH: datasets/bach.md
-    - CRC: datasets/crc.md
-    - MHIST: datasets/mhist.md
-    - PatchCamelyon: datasets/patch_camelyon.md
-    - TotalSegmentator: datasets/total_segmentator.md

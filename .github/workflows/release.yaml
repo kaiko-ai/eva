@@ -9,6 +9,9 @@ on:
 jobs:
   release-pypi:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: write
     steps:
       - uses: actions/checkout@v4
       - name: Setting up PDM
@@ -41,20 +44,11 @@ jobs:
           git config --local user.name "GitHub Action"
           git fetch origin gh-pages:gh-pages
           tag="${{ github.ref_name }}"
-          DOC_VERSION="0.0.0dev5"
+          DOC_VERSION=${tag%.*}
           nox -s deploy_docs -- --alias-type=copy --update-aliases "$DOC_VERSION" latest
           git push origin gh-pages
-      # - name: Publish package distributions to PyPI
-      #   run: pdm publish --no-build
-      #   env:
-      #     PDM_PUBLISH_USERNAME: ${{ secrets.PYPI_USERNAME }}
-      #     PDM_PUBLISH_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-      # - name: Create Release
-      #   uses: actions/create-release@main
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #   with:
-      #     tag_name: ${{ github.ref }}
-      #     release_name: v${{ github.ref }}
-      #     draft: true
-      #     prerelease: ${{ steps.check_version.outputs.PRERELEASE }}
+      - name: Publish package distributions to PyPI
+        run: nox -s publish -- --no-build
+        env:
+          PDM_PUBLISH_USERNAME: ${{ secrets.PYPI_USERNAME }}
+          PDM_PUBLISH_PASSWORD: ${{ secrets.PYPI_PASSWORD }}

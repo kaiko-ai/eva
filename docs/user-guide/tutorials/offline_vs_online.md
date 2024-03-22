@@ -3,10 +3,11 @@
 In this tutorial we run *eva* with the three subcommands `predict`, `fit` and `predict_fit`, and take a look at the difference between *offline* and *online* workflows.
 
 ### Before you start
+If you haven't downloaded the config files yet, please download them from [GitHub](https://github.com/kaiko-ai/eva/tree/main/configs).
 
 For this tutorial we use the [BACH](../../datasets/bach.md) classification task which is available on [Zenodo](https://zenodo.org/records/3632035) and is distributed under [*Attribution-NonCommercial-ShareAlike 4.0 International*](https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode) license.
 
-If you have not yet downloaded the BACH data to your machine, open `configs/vision/dino_vit/offline/bach.yaml` and enable automatic download by setting: `download: true`.
+To let **eva** automatically handle the dataset download, you can open `configs/vision/dino_vit/offline/bach.yaml` and set `download: true`. Before doing so, please make sure that your use case is compliant with the dataset license.
 
 ## *Offline* evaluations
 
@@ -15,10 +16,10 @@ If you have not yet downloaded the BACH data to your machine, open `configs/visi
 First, let's use the `predict`-command to download the data and compute embeddings. In this example we use a randomly initialized `dino_vits16` as backbone.
 
 Open a terminal in the folder where you installed *eva* and run:
-```
-export PRETRAINED=false
-export EMBEDDINGS_ROOT=./data/embeddings/dino_vits16_random
 
+```
+PRETRAINED=false \
+EMBEDDINGS_ROOT=./data/embeddings/dino_vits16_random \
 eva predict --config configs/vision/dino_vit/offline/bach.yaml
 ```
 
@@ -37,14 +38,12 @@ Once the session is complete, verify that:
 
 Now we can use the `fit`-command to evaluate the FM on the precomputed embeddings.
 
-To ensure a quick run for the purpose of this exercise, let's overwrite some of the default parameters. In the terminal where you run *eva*, set:
-```
-export MAX_STEPS=20
-export LR_VALUE=0.1
-```
+To ensure a quick run for the purpose of this exercise, we overwrite some of the default parameters. Run *eva* to fit the decoder classifier with:
 
-Now fit the decoder classifier, by running:
 ```
+N_RUNS=2 \
+MAX_STEPS=20 \
+LR_VALUE=0.1 \
 eva fit --config configs/vision/dino_vit/offline/bach.yaml
 ```
 
@@ -67,13 +66,11 @@ With the `predict_fit`-command, the two steps above can be executed with one com
 
 Go back to the terminal and execute:
 ```
-export N_RUNS=1
-export MAX_STEPS=20
-export BATCH_SIZE=256
-export LR_VALUE=0.1
-export PRETRAINED=true
-export EMBEDDINGS_ROOT=./data/embeddings/dino_vits16_pretrained
-
+N_RUNS=1 \
+MAX_STEPS=20 \
+LR_VALUE=0.1 \
+PRETRAINED=true \
+EMBEDDINGS_ROOT=./data/embeddings/dino_vits16_pretrained \
 eva predict_fit --config configs/vision/dino_vit/offline/bach.yaml
 ```
 
@@ -87,12 +84,10 @@ As in *Step 3* above, we again use a `dino_vits16` pretrained from ImageNet.
 
 Run a complete online workflow with the following command:
 ```
-export N_RUNS=1
-export MAX_STEPS=20
-export BATCH_SIZE=256
-export LR_VALUE=0.1
-export PRETRAINED=true
-
+N_RUNS=1 \
+MAX_STEPS=20 \
+LR_VALUE=0.1 \
+PRETRAINED=true \
 eva fit --config configs/vision/dino_vit/online/bach.yaml
 ```
 

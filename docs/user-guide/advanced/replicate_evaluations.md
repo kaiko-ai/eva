@@ -8,21 +8,11 @@ Make sure to replace `<task>` in the commands below with `bach`, `crc`, `mhist` 
 
 ## DINO ViT-S16 (random weights)
 
-Evaluating the backbone with randomly initialized weights serves as a baseline to compare the pretrained FMs 
-to an FM that produces embeddings without any prior learning on image tasks. To evaluate, run:
+Evaluating the backbone with randomly initialized weights serves as a baseline to compare the pretrained FMs to an FM that produces embeddings without any prior learning on image tasks. To evaluate, run:
 
 ```
-# set environment variables:
-export PRETRAINED=false
-export EMBEDDINGS_ROOT="./data/embeddings/dino_vits16_random"
-export REPO_OR_DIR=facebookresearch/dino:main
-export DINO_BACKBONE=dino_vits16
-export CHECKPOINT_PATH=null
-export IN_FEATURES=384
-export NORMALIZE_MEAN=[0.485,0.456,0.406]
-export NORMALIZE_STD=[0.229,0.224,0.225]
-
-# run eva:
+PRETRAINED=false \
+EMBEDDINGS_ROOT="./data/embeddings/dino_vits16_random" \
 eva predict_fit --config configs/vision/dino_vit/offline/<task>.yaml
 ```
 
@@ -31,17 +21,7 @@ eva predict_fit --config configs/vision/dino_vit/offline/<task>.yaml
 The next baseline model, uses a pretrained ViT-S16 backbone with ImageNet weights. To evaluate, run:
 
 ```
-# set environment variables:
-export PRETRAINED=true
-export EMBEDDINGS_ROOT="./data/embeddings/dino_vits16_imagenet"
-export REPO_OR_DIR=facebookresearch/dino:main
-export DINO_BACKBONE=dino_vits16
-export CHECKPOINT_PATH=null
-export IN_FEATURES=384
-export NORMALIZE_MEAN=[0.485,0.456,0.406]
-export NORMALIZE_STD=[0.229,0.224,0.225]
-
-# run eva:
+EMBEDDINGS_ROOT="./data/embeddings/dino_vits16_imagenet" \
 eva predict_fit --config configs/vision/dino_vit/offline/<task>.yaml
 ```
 
@@ -49,17 +29,9 @@ eva predict_fit --config configs/vision/dino_vit/offline/<task>.yaml
 
 To evaluate performance on the larger ViT-B8 backbone pretrained on ImageNet, run:
 ```
-# set environment variables:
-export PRETRAINED=true
-export EMBEDDINGS_ROOT="./data/embeddings/dino_vitb8_imagenet"
-export REPO_OR_DIR=facebookresearch/dino:main
-export DINO_BACKBONE=dino_vitb8
-export CHECKPOINT_PATH=null
-export IN_FEATURES=384
-export NORMALIZE_MEAN=[0.485,0.456,0.406]
-export NORMALIZE_STD=[0.229,0.224,0.225]
-
-# run eva:
+EMBEDDINGS_ROOT="./data/embeddings/dino_vitb8_imagenet" \
+DINO_BACKBONE=dino_vitb8 \
+IN_FEATURES=768 \
 eva predict_fit --config configs/vision/dino_vit/offline/<task>.yaml
 ```
 
@@ -69,17 +41,11 @@ eva predict_fit --config configs/vision/dino_vit/offline/<task>.yaml
 on [GitHub](https://github.com/lunit-io/benchmark-ssl-pathology/releases/). To evaluate, run:
 
 ```
-# set environment variables:
-export PRETRAINED=false
-export EMBEDDINGS_ROOT="./data/embeddings/dino_vits16_lunit"
-export REPO_OR_DIR=facebookresearch/dino:main
-export DINO_BACKBONE=dino_vits16
-export CHECKPOINT_PATH="https://github.com/lunit-io/benchmark-ssl-pathology/releases/download/pretrained-weights/dino_vit_small_patch16_ep200.torch"
-export IN_FEATURES=384
-export NORMALIZE_MEAN=[0.70322989,0.53606487,0.66096631]
-export NORMALIZE_STD=[0.21716536,0.26081574,0.20723464]
-
-# run eva:
+PRETRAINED=false \
+EMBEDDINGS_ROOT="./data/embeddings/dino_vits16_lunit" \
+CHECKPOINT_PATH="https://github.com/lunit-io/benchmark-ssl-pathology/releases/download/pretrained-weights/dino_vit_small_patch16_ep200.torch" \
+NORMALIZE_MEAN=[0.70322989,0.53606487,0.66096631] \
+NORMALIZE_STD=[0.21716536,0.26081574,0.20723464] \
 eva predict_fit --config configs/vision/dino_vit/offline/<task>.yaml
 ```
 
@@ -89,14 +55,11 @@ eva predict_fit --config configs/vision/dino_vit/offline/<task>.yaml
 [HuggingFace](https://huggingface.co/owkin/phikon). To evaluate, run:
 
 ```
-# set environment variables:
-export EMBEDDINGS_ROOT="./data/embeddings/dino_vitb16_owkin"
-
-# run eva:
+EMBEDDINGS_ROOT="./data/embeddings/dino_vitb16_owkin" \
 eva predict_fit --config configs/vision/owkin/phikon/offline/<task>.yaml
 ```
 
-Note: since ***eva*** provides the config files to evaluate tasks with the Phikon FM in 
+Note: since *eva* provides the config files to evaluate tasks with the Phikon FM in 
 "configs/vision/owkin/phikon/offline", it is not necessary to set the environment variables needed for
 the runs above.
 
@@ -106,17 +69,11 @@ To evaluate [kaiko.ai's](https://www.kaiko.ai/) FM with DINO ViT-S16 backbone, p
 on [GitHub](https://github.com/lunit-io/benchmark-ssl-pathology/releases/), run:
 
 ```
-# set environment variables:
-export PRETRAINED=false
-export EMBEDDINGS_ROOT="./data/embeddings/dino_vits16_kaiko"
-export REPO_OR_DIR=facebookresearch/dino:main
-export DINO_BACKBONE=dino_vits16
-export CHECKPOINT_PATH=[TBD*]
-export IN_FEATURES=384
-export NORMALIZE_MEAN=[0.5,0.5,0.5]
-export NORMALIZE_STD=[0.5,0.5,0.5]
-
-# run eva:
+PRETRAINED=false \
+EMBEDDINGS_ROOT="./data/embeddings/dino_vits16_kaiko" \
+CHECKPOINT_PATH=[TBD*] \
+NORMALIZE_MEAN=[0.5,0.5,0.5] \
+NORMALIZE_STD=[0.5,0.5,0.5] \
 eva predict_fit --config configs/vision/dino_vit/offline/<task>.yaml
 ```
 
@@ -128,17 +85,12 @@ To evaluate [kaiko.ai's](https://www.kaiko.ai/) FM with DINO ViT-S8 backbone, pr
 on [GitHub](https://github.com/lunit-io/benchmark-ssl-pathology/releases/), run:
 
 ```
-# set environment variables:
-export PRETRAINED=false
-export EMBEDDINGS_ROOT="./data/embeddings/dino_vits8_kaiko"
-export REPO_OR_DIR=facebookresearch/dino:main
-export DINO_BACKBONE=dino_vits8
-export CHECKPOINT_PATH=[TBD*]
-export IN_FEATURES=384
-export NORMALIZE_MEAN=[0.5,0.5,0.5]
-export NORMALIZE_STD=[0.5,0.5,0.5]
-
-# run eva:
+PRETRAINED=false \
+EMBEDDINGS_ROOT="./data/embeddings/dino_vits8_kaiko" \
+DINO_BACKBONE=dino_vits8 \
+CHECKPOINT_PATH=[TBD*] \
+NORMALIZE_MEAN=[0.5,0.5,0.5] \
+NORMALIZE_STD=[0.5,0.5,0.5] \
 eva predict_fit --config configs/vision/dino_vit/offline/<task>.yaml
 ```
 
@@ -150,17 +102,13 @@ To evaluate [kaiko.ai's](https://www.kaiko.ai/) FM with the larger DINO ViT-B16 
 run:
 
 ```
-# set environment variables:
-export PRETRAINED=false
-export EMBEDDINGS_ROOT="./data/embeddings/dino_vitb16_kaiko"
-export REPO_OR_DIR=facebookresearch/dino:main
-export DINO_BACKBONE=dino_vitb16
-export CHECKPOINT_PATH=[TBD*]
-export IN_FEATURES=768
-export NORMALIZE_MEAN=[0.5,0.5,0.5]
-export NORMALIZE_STD=[0.5,0.5,0.5]
-
-# run eva:
+PRETRAINED=false \
+EMBEDDINGS_ROOT="./data/embeddings/dino_vitb16_kaiko" \
+DINO_BACKBONE=dino_vitb16 \
+CHECKPOINT_PATH=[TBD*] \
+IN_FEATURES=768 \
+NORMALIZE_MEAN=[0.5,0.5,0.5] \
+NORMALIZE_STD=[0.5,0.5,0.5] \
 eva predict_fit --config configs/vision/dino_vit/offline/<task>.yaml
 ```
 
@@ -172,17 +120,13 @@ To evaluate [kaiko.ai's](https://www.kaiko.ai/) FM with the larger DINO ViT-B8 b
 run:
 
 ```
-# set environment variables:
-export PRETRAINED=false
-export EMBEDDINGS_ROOT="./data/embeddings/dino_vitb8_kaiko"
-export REPO_OR_DIR=facebookresearch/dino:main
-export DINO_BACKBONE=dino_vitb8
-export CHECKPOINT_PATH=[TBD*]
-export IN_FEATURES=768
-export NORMALIZE_MEAN=[0.5,0.5,0.5]
-export NORMALIZE_STD=[0.5,0.5,0.5]
-
-# run eva:
+PRETRAINED=false \
+EMBEDDINGS_ROOT="./data/embeddings/dino_vitb8_kaiko" \
+DINO_BACKBONE=dino_vitb8 \
+CHECKPOINT_PATH=[TBD*] \
+IN_FEATURES=768 \
+NORMALIZE_MEAN=[0.5,0.5,0.5] \
+NORMALIZE_STD=[0.5,0.5,0.5] \
 eva predict_fit --config configs/vision/dino_vit/offline/<task>.yaml
 ```
 
@@ -194,18 +138,15 @@ To evaluate [kaiko.ai's](https://www.kaiko.ai/) FM with the larger DINOv2 ViT-L1
 run:
 
 ```
-# set environment variables:
-export PRETRAINED=false
-export EMBEDDINGS_ROOT="./data/embeddings/dinov2_vitl14_kaiko"
-export REPO_OR_DIR=facebookresearch/dinov2:main
-export DINO_BACKBONE=dinov2_vitl14_reg
-export FORCE_RELOAD=true
-export CHECKPOINT_PATH=[TBD*]
-export IN_FEATURES=1024
-export NORMALIZE_MEAN=[0.5,0.5,0.5]
-export NORMALIZE_STD=[0.5,0.5,0.5]
-
-# run eva:
+PRETRAINED=false \
+EMBEDDINGS_ROOT="./data/embeddings/dinov2_vitl14_kaiko" \
+REPO_OR_DIR=facebookresearch/dinov2:main \
+DINO_BACKBONE=dinov2_vitl14_reg \
+FORCE_RELOAD=true \
+CHECKPOINT_PATH=[TBD*] \
+IN_FEATURES=1024 \
+NORMALIZE_MEAN=[0.5,0.5,0.5] \
+NORMALIZE_STD=[0.5,0.5,0.5] \
 eva predict_fit --config configs/vision/dino_vit/offline/<task>.yaml
 ```
 
