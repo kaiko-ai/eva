@@ -24,7 +24,8 @@ _Oncology FM Evaluation Framework by kaiko.ai_
 
 <br />
 
-_`eva`_ is an evaluation framework for oncology foundation models (FMs) by [kaiko.ai](https://kaiko.ai/). Check out the [documentation](https://kaiko-ai.github.io/eva/) for more information.
+_`eva`_ is an evaluation framework for oncology foundation models (FMs) by [kaiko.ai](https://kaiko.ai/).
+Check out the [documentation](https://kaiko-ai.github.io/eva/) for more information.
 
 ### Highlights:
 - Easy and reliable benchmark of Oncology FMs
@@ -63,13 +64,28 @@ _eva_ can be used directly from the terminal as a CLI tool as follows:
 eva {fit,predict,predict_fit} --config url/or/path/to/the/config.yaml 
 ```
 
-For example, to perform a downstream evaluation of DINO ViT-S/16 on the BACH dataset with linear probing by first inferring the embeddings and performing 5 sequential fits, execute:
+When used as a CLI tool, `_eva_` supports configuration files (`.yaml`) as an argument to define its functionality.
+Native supported configs can be found at the [configs](https://github.com/kaiko-ai/eva/tree/main/configs) directory
+of the repo. Apart from cloning the repo, you can download the latest config folder as `.zip` from your browser from
+[here](https://download-directory.github.io/?url=https://github.com/kaiko-ai/eva/tree/main/configs). Alternatively,
+from a specific release the configs can be downloaded from the terminal as follows:
 ```sh
+curl -LO https://github.com/kaiko-ai/eva/releases/download/0.0.1/configs.zip | unzip configs.zip
+```
+
+For example, to perform a downstream evaluation of DINO ViT-S/16 on the BACH dataset with
+linear probing by first inferring the embeddings and performing 5 sequential fits, execute:
+```sh
+# from a locally stored config file
+eva predict_fit --config ./configs/vision/dino_vit/offline/bach.yaml
+
+# from a remote stored config file
 eva predict_fit --config https://raw.githubusercontent.com/kaiko-ai/eva/main/configs/vision/dino_vit/offline/bach.yaml
 ```
 
 > [!NOTE] 
-> All the datasets that support automatic download in the repo have by default the option to automatically download set to false. For automatic download you have to manually set download=true.
+> All the datasets that support automatic download in the repo have by default the option to automatically download set to false.
+> For automatic download you have to manually set download=true.
 
 
 To view all the possibles, execute:
@@ -77,7 +93,8 @@ To view all the possibles, execute:
 eva --help
 ```
 
-For more information, please refer to the [documentation](https://kaiko-ai.github.io/eva/dev/user-guide/tutorials/offline_vs_online/) and [tutorials](https://kaiko-ai.github.io/eva/dev/user-guide/advanced/replicate_evaluations/).
+For more information, please refer to the [documentation](https://kaiko-ai.github.io/eva/dev/user-guide/tutorials/offline_vs_online/)
+and [tutorials](https://kaiko-ai.github.io/eva/dev/user-guide/advanced/replicate_evaluations/).
 
 ## Benchmarks
 
@@ -117,7 +134,8 @@ _References_:
 
 ## Contributing
 
-_eva_ is an open source project and welcomes contributions of all kinds. Please checkout the [developer](./docs/DEVELOPER_GUIDE.md) and [contributing guide](./docs/CONTRIBUTING.md) for help on how to do so.
+_eva_ is an open source project and welcomes contributions of all kinds. Please checkout the [developer](./docs/DEVELOPER_GUIDE.md)
+and [contributing guide](./docs/CONTRIBUTING.md) for help on how to do so.
 
 All contributors must follow the [code of conduct](./docs/CODE_OF_CONDUCT.md).
 
