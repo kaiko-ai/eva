@@ -70,7 +70,7 @@ of the repo. Apart from cloning the repo, you can download the latest config fol
 [here](https://download-directory.github.io/?url=https://github.com/kaiko-ai/eva/tree/main/configs). Alternatively,
 from a specific release the configs can be downloaded from the terminal as follows:
 ```sh
-curl -LO https://github.com/kaiko-ai/eva/releases/download/0.0.1/configs.zip | unzip configs.zip
+curl -LO https://github.com/kaiko-ai/eva/releases/download/0.0.1/configs.zip | unzip configs
 ```
 
 For example, to perform a downstream evaluation of DINO ViT-S/16 on the BACH dataset with
