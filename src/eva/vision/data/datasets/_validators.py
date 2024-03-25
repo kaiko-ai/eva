@@ -1,5 +1,7 @@
 """Dataset validation related functions."""
 
+import os
+
 from typing_extensions import List, Tuple
 
 from eva.vision.data.datasets import vision
@@ -42,3 +44,16 @@ def check_dataset_integrity(
             f"({(dataset_classes[0], dataset_classes[-1])}) does not match the expected "
             f"ones ({first_and_last_labels}). {_SUFFIX_ERROR_MESSAGE}"
         )
+
+
+def check_dataset_exists(dataset_dir: str, download_available: bool) -> None:
+    """Verifies that the dataset folder exists.
+
+    Raise:
+        FileNotFoundError: If the dataset folder does not exist.
+    """
+    if not os.path.isdir(dataset_dir):
+        error_message = f"Dataset not found at '{dataset_dir}'."
+        if download_available:
+            error_message += " You can set `download=True` to download the dataset automatically."
+        raise FileNotFoundError(error_message)

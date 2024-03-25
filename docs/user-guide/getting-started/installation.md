@@ -8,7 +8,7 @@
 - Install *eva* and the *eva-vision* package with:
 
 ```
-pip install "kaiko-eva[vision] @ git+https://github.com/kaiko-ai/eva.git"
+pip install "kaiko-eva[vision]"
 ```
 
 ## Run *eva*

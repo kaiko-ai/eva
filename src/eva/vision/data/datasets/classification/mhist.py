@@ -57,6 +57,10 @@ class MHIST(base.ImageClassification):
         return image_filename
 
     @override
+    def prepare_data(self) -> None:
+        _validators.check_dataset_exists(self._root, False)
+
+    @override
     def configure(self) -> None:
         self._samples = self._make_dataset()
 
