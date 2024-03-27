@@ -4,8 +4,6 @@ name: CI
 on:
   workflow_dispatch:
   pull_request:
-    branches:
-      - main
     paths-ignore:
       - "docs/**"
       - "*.md"
@@ -21,8 +19,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
       - name: Setting up PDM
         uses: pdm-project/setup-pdm@v4
         with:
@@ -50,7 +46,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           lfs: true
-          token: ${{ secrets.GITHUB_TOKEN }}
       - name: Setting up PDM
         uses: pdm-project/setup-pdm@v4
         with:
