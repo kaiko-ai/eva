@@ -98,7 +98,7 @@ and [tutorials](https://kaiko-ai.github.io/eva/dev/user-guide/advanced/replicate
 
 ## Benchmarks
 
-In this section you will find model benchmarks which were generated with _eva_.
+In this section you will find model benchmarks which were generated with `_eva_`.
 
 ### Table I: WSI patch-level benchmark
 
