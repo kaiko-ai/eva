@@ -12,8 +12,8 @@ hide:
 <a href="https://pypi.python.org/pypi/kaiko-eva">
   <img src="https://img.shields.io/pypi/v/kaiko-eva.svg?logo=python" />
 </a>
-<a href="https://github.com/kaiko-ai/eva/actions?query=workflow%3ACI">
-  <img src="https://github.com/kaiko-ai/eva/workflows/CI/badge.svg" />
+<a href="https://github.com/kaiko-ai/eva">
+  <img src="https://img.shields.io/badge/repo-main-green?logo=github" />
 </a>
 <a href="https://github.com/kaiko-ai/eva#license">
   <img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg?labelColor=gray" />
