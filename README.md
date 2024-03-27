@@ -7,6 +7,7 @@
 _Oncology FM Evaluation Framework by kaiko.ai_
 
 [![PyPI](https://img.shields.io/pypi/v/kaiko-eva.svg?logo=python)](https://pypi.python.org/pypi/kaiko-eva)
+[![docs](https://img.shields.io/badge/docs-latest-green)](https://kaiko-ai.github.io/eva/latest)
 [![license](https://img.shields.io/badge/License-Apache%202.0-blue.svg?labelColor=gray)](https://github.com/kaiko-ai/eva#license)
 
 <p align="center">
