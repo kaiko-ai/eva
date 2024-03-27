@@ -48,6 +48,7 @@ class SessionRecorder:
         output_dir: str,
         results_file: str = "results.json",
         config_file: str = "config.yaml",
+        verbose: bool = True,
     ) -> None:
         """Initializes the recorder.
 
@@ -55,10 +56,12 @@ class SessionRecorder:
             output_dir: The destination folder to save the results.
             results_file: The name of the results json file.
             config_file: The name of the yaml configuration file.
+            verbose: Whether to print the session metrics.
         """
         self._output_dir = output_dir
         self._results_file = results_file
         self._config_file = config_file
+        self._verbose = verbose
 
         self._validation_metrics: List[SESSION_METRICS] = []
         self._test_metrics: List[SESSION_METRICS] = []
@@ -106,7 +109,8 @@ class SessionRecorder:
         results = self.export()
         _save_json(results, self.filename)
         self._save_config()
-        _print_results(results)
+        if self._verbose:
+            _print_results(results)
 
     def reset(self) -> None:
         """Resets the state of the tracked metrics."""

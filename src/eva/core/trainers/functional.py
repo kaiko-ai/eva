@@ -16,6 +16,7 @@ def run_evaluation_session(
     datamodule: datamodules.DataModule,
     *,
     n_runs: int = 1,
+    verbose: bool = True,
 ) -> None:
     """Runs a downstream evaluation session out-of-place.
 
@@ -29,11 +30,12 @@ def run_evaluation_session(
         base_model: The base model module to use.
         datamodule: The data module.
         n_runs: The amount of runs (fit and evaluate) to perform.
+        verbose: Whether to verbose the session metrics.
     """
-    recorder = _recorder.SessionRecorder(output_dir=base_trainer.default_log_dir)
+    recorder = _recorder.SessionRecorder(output_dir=base_trainer.default_log_dir, verbose=verbose)
     for run_index in range(n_runs):
         validation_scores, test_scores = run_evaluation(
-            base_trainer, base_model, datamodule, run_id=f"run_{run_index}"
+            base_trainer, base_model, datamodule, run_id=f"run_{run_index}", verbose=not verbose,
         )
         recorder.update(validation_scores, test_scores)
     recorder.save()
@@ -60,13 +62,14 @@ def run_evaluation(
     """
     trainer, model = _utils.clone(base_trainer, base_model)
     trainer.setup_log_dirs(run_id or "")
-    return fit_and_validate(trainer, model, datamodule)
+    return fit_and_validate(trainer, model, datamodule, verbose=True)
 
 
 def fit_and_validate(
     trainer: eva_trainer.Trainer,
     model: modules.ModelModule,
     datamodule: datamodules.DataModule,
+    verbose: bool = True,
 ) -> Tuple[_EVALUATE_OUTPUT, _EVALUATE_OUTPUT | None]:
     """Fits and evaluates a model in-place.
 
@@ -82,11 +85,11 @@ def fit_and_validate(
         A tuple of with the validation and the test metrics (if exists).
     """
     trainer.fit(model, datamodule=datamodule)
-    validation_scores = trainer.validate(datamodule=datamodule, verbose=False)
+    validation_scores = trainer.validate(datamodule=datamodule, verbose=verbose)
     test_scores = (
         None
         if datamodule.datasets.test is None
-        else trainer.test(datamodule=datamodule, verbose=False)
+        else trainer.test(datamodule=datamodule, verbose=verbose)
     )
     return validation_scores, test_scores
 

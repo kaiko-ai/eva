@@ -77,6 +77,7 @@ class Trainer(pl_trainer.Trainer):
         self,
         model: modules.ModelModule,
         datamodule: datamodules.DataModule,
+        verbose: bool = True,
     ) -> None:
         """Runs an evaluation session out-of-place.
 
@@ -94,4 +95,5 @@ class Trainer(pl_trainer.Trainer):
             base_model=model,
             datamodule=datamodule,
             n_runs=self._n_runs,
+            verbose=False,
         )
