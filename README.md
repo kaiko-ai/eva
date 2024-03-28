@@ -7,7 +7,7 @@
 _Oncology FM Evaluation Framework by kaiko.ai_
 
 [![PyPI](https://img.shields.io/pypi/v/kaiko-eva.svg?logo=python)](https://pypi.python.org/pypi/kaiko-eva)
-[![CI](https://github.com/kaiko-ai/eva/workflows/CI/badge.svg)](https://github.com/kaiko-ai/eva/actions?query=workflow%3ACI)
+[![docs](https://img.shields.io/badge/docs-latest-green)](https://kaiko-ai.github.io/eva/latest)
 [![license](https://img.shields.io/badge/License-Apache%202.0-blue.svg?labelColor=gray)](https://github.com/kaiko-ai/eva#license)
 
 <p align="center">
@@ -70,7 +70,7 @@ of the repo. Apart from cloning the repo, you can download the latest config fol
 [here](https://download-directory.github.io/?url=https://github.com/kaiko-ai/eva/tree/main/configs). Alternatively,
 from a specific release the configs can be downloaded from the terminal as follows:
 ```sh
-curl -LO https://github.com/kaiko-ai/eva/releases/download/0.0.1/configs.zip | unzip configs.zip
+curl -LO https://github.com/kaiko-ai/eva/releases/download/0.0.1/configs.zip | unzip configs
 ```
 
 For example, to perform a downstream evaluation of DINO ViT-S/16 on the BACH dataset with
@@ -98,7 +98,7 @@ and [tutorials](https://kaiko-ai.github.io/eva/dev/user-guide/advanced/replicate
 
 ## Benchmarks
 
-In this section you will find model benchmarks which were generated with _eva_.
+In this section you will find model benchmarks which were generated with `_eva_`.
 
 ### Table I: WSI patch-level benchmark
 
