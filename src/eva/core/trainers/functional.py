@@ -30,12 +30,17 @@ def run_evaluation_session(
         base_model: The base model module to use.
         datamodule: The data module.
         n_runs: The amount of runs (fit and evaluate) to perform.
-        verbose: Whether to verbose the session metrics.
+        verbose: Whether to verbose the session metrics instead of
+            these of each individual runs and vice-versa.
     """
     recorder = _recorder.SessionRecorder(output_dir=base_trainer.default_log_dir, verbose=verbose)
     for run_index in range(n_runs):
         validation_scores, test_scores = run_evaluation(
-            base_trainer, base_model, datamodule, run_id=f"run_{run_index}", verbose=not verbose,
+            base_trainer,
+            base_model,
+            datamodule,
+            run_id=f"run_{run_index}",
+            verbose=not verbose,
         )
         recorder.update(validation_scores, test_scores)
     recorder.save()
@@ -47,6 +52,7 @@ def run_evaluation(
     datamodule: datamodules.DataModule,
     *,
     run_id: str | None = None,
+    verbose: bool = True,
 ) -> Tuple[_EVALUATE_OUTPUT, _EVALUATE_OUTPUT | None]:
     """Fits and evaluates a model out-of-place.
 
@@ -56,13 +62,15 @@ def run_evaluation(
         datamodule: The data module.
         run_id: The run id to be appended to the output log directory.
             If `None`, it will use the log directory of the trainer as is.
+        verbose: Whether to print the validation and test metrics
+            in the end of the training.
 
     Returns:
         A tuple of with the validation and the test metrics (if exists).
     """
     trainer, model = _utils.clone(base_trainer, base_model)
     trainer.setup_log_dirs(run_id or "")
-    return fit_and_validate(trainer, model, datamodule, verbose=True)
+    return fit_and_validate(trainer, model, datamodule, verbose=verbose)
 
 
 def fit_and_validate(
@@ -80,6 +88,8 @@ def fit_and_validate(
         trainer: The trainer module to use and update in-place.
         model: The model module to use and update in-place.
         datamodule: The data module.
+        verbose: Whether to print the validation and test metrics
+            in the end of the training.
 
     Returns:
         A tuple of with the validation and the test metrics (if exists).

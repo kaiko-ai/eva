@@ -174,7 +174,7 @@ def _save_json(data: RESULTS_DICT, save_as: str = "data.json"):
     fs = cloud_io.get_filesystem(output_dir, anon=False)
     fs.makedirs(output_dir, exist_ok=True)
     with fs.open(save_as, "w") as file:
-        json.dump(data, file, indent=4, sort_keys=True)
+        json.dump(data, file, indent=2, sort_keys=True)
 
 
 def _print_results(results: RESULTS_DICT) -> None:
