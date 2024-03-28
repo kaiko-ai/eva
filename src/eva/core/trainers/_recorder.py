@@ -5,16 +5,39 @@ import json
 import os
 import statistics
 import sys
-from typing import Any, Dict, List, Mapping
+from typing import Dict, List, Mapping, TypedDict
 
 from lightning.pytorch.utilities.types import _EVALUATE_OUTPUT
 from lightning_fabric.utilities import cloud_io
 from loguru import logger
 from omegaconf import OmegaConf
+from rich import console as rich_console
+from rich import table as rich_table
 from toolz import dicttoolz
 
 SESSION_METRICS = Mapping[str, List[float]]
 """Session metrics type-hint."""
+
+
+class SESSION_STATISTICS(TypedDict):
+    """Type-hint for aggregated metrics of multiple runs with mean & stdev."""
+
+    mean: float
+    stdev: float
+    values: List[float]
+
+
+class STAGE_RESULTS(TypedDict):
+    """Type-hint for metrics statstics for val & test stages."""
+
+    val: List[Dict[str, SESSION_STATISTICS]]
+    test: List[Dict[str, SESSION_STATISTICS]]
+
+
+class RESULTS_DICT(TypedDict):
+    """Type-hint for the final results dictionary."""
+
+    metrics: STAGE_RESULTS
 
 
 class SessionRecorder:
@@ -25,6 +48,7 @@ class SessionRecorder:
         output_dir: str,
         results_file: str = "results.json",
         config_file: str = "config.yaml",
+        verbose: bool = True,
     ) -> None:
         """Initializes the recorder.
 
@@ -32,10 +56,12 @@ class SessionRecorder:
             output_dir: The destination folder to save the results.
             results_file: The name of the results json file.
             config_file: The name of the yaml configuration file.
+            verbose: Whether to print the session metrics.
         """
         self._output_dir = output_dir
         self._results_file = results_file
         self._config_file = config_file
+        self._verbose = verbose
 
         self._validation_metrics: List[SESSION_METRICS] = []
         self._test_metrics: List[SESSION_METRICS] = []
@@ -67,13 +93,13 @@ class SessionRecorder:
         self._update_validation_metrics(validation_scores)
         self._update_test_metrics(test_scores)
 
-    def compute(self) -> Dict[str, List[Dict[str, Any]]]:
+    def compute(self) -> STAGE_RESULTS:
         """Computes and returns the session statistics."""
         validation_statistics = list(map(_calculate_statistics, self._validation_metrics))
         test_statistics = list(map(_calculate_statistics, self._test_metrics))
         return {"val": validation_statistics, "test": test_statistics}
 
-    def export(self) -> Dict[str, Any]:
+    def export(self) -> RESULTS_DICT:
         """Exports the results."""
         statistics = self.compute()
         return {"metrics": statistics}
@@ -83,6 +109,8 @@ class SessionRecorder:
         results = self.export()
         _save_json(results, self.filename)
         self._save_config()
+        if self._verbose:
+            _print_results(results)
 
     def reset(self) -> None:
         """Resets the state of the tracked metrics."""
@@ -125,10 +153,10 @@ def _init_session_metrics(n_datasets: int) -> List[SESSION_METRICS]:
     return [collections.defaultdict(list) for _ in range(n_datasets)]
 
 
-def _calculate_statistics(session_metrics: SESSION_METRICS) -> Dict[str, float | List[float]]:
+def _calculate_statistics(session_metrics: SESSION_METRICS) -> Dict[str, SESSION_STATISTICS]:
     """Calculate the metric statistics of a dataset session run."""
 
-    def _calculate_metric_statistics(values: List[float]) -> Dict[str, float | List[float]]:
+    def _calculate_metric_statistics(values: List[float]) -> SESSION_STATISTICS:
         """Calculates and returns the metric statistics."""
         mean = statistics.mean(values)
         stdev = statistics.stdev(values) if len(values) > 1 else 0
@@ -137,7 +165,7 @@ def _calculate_statistics(session_metrics: SESSION_METRICS) -> Dict[str, float |
     return dicttoolz.valmap(_calculate_metric_statistics, session_metrics)
 
 
-def _save_json(data: Dict[str, Any], save_as: str = "data.json"):
+def _save_json(data: RESULTS_DICT, save_as: str = "data.json"):
     """Saves data to a json file."""
     if not save_as.endswith(".json"):
         raise ValueError()
@@ -146,4 +174,38 @@ def _save_json(data: Dict[str, Any], save_as: str = "data.json"):
     fs = cloud_io.get_filesystem(output_dir, anon=False)
     fs.makedirs(output_dir, exist_ok=True)
     with fs.open(save_as, "w") as file:
-        json.dump(data, file, indent=4, sort_keys=True)
+        json.dump(data, file, indent=2, sort_keys=True)
+
+
+def _print_results(results: RESULTS_DICT) -> None:
+    """Prints the results to the console."""
+    try:
+        for stage in ["val", "test"]:
+            for dataset_idx in range(len(results["metrics"][stage])):
+                _print_table(results["metrics"][stage][dataset_idx], stage, dataset_idx)
+    except Exception as e:
+        logger.error(f"Failed to print the results: {e}")
+
+
+def _print_table(metrics_dict: Dict[str, SESSION_STATISTICS], stage: str, dataset_idx: int):
+    """Prints the metrics of a single dataset as a table."""
+    metrics_table = rich_table.Table(
+        title=f"\n{stage.capitalize()} Dataset {dataset_idx}", title_style="bold"
+    )
+    metrics_table.add_column("Metric", style="cyan")
+    metrics_table.add_column("Mean", style="magenta")
+    metrics_table.add_column("Stdev", style="magenta")
+    metrics_table.add_column("All", style="magenta")
+
+    n_runs = len(metrics_dict[next(iter(metrics_dict))]["values"])
+    for metric_name, metric_dict in metrics_dict.items():
+        row = [
+            metric_name,
+            f'{metric_dict["mean"]:.3f}',
+            f'{metric_dict["stdev"]:.3f}',
+            ", ".join(f'{metric_dict["values"][i]:.3f}' for i in range(n_runs)),
+        ]
+        metrics_table.add_row(*row)
+
+    console = rich_console.Console()
+    console.print(metrics_table)

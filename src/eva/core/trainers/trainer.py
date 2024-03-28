@@ -94,4 +94,5 @@ class Trainer(pl_trainer.Trainer):
             base_model=model,
             datamodule=datamodule,
             n_runs=self._n_runs,
+            verbose=self._n_runs > 1,
         )

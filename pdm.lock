@@ -5,7 +5,7 @@
 groups = ["default", "dev", "docs", "all", "typecheck", "lint", "vision", "test"]
 strategy = ["cross_platform", "inherit_metadata"]
 lock_version = "4.4.1"
-content_hash = "sha256:4f1bba07786b708fe7be9ff1c02c816a26da0556ab6f29352786ce4f468501df"
+content_hash = "sha256:d4a0761420ef16deca511b3f9846a2b1061e03116ca8100f3134f0e31ebe203d"
 
 [[package]]
 name = "absl-py"
@@ -842,7 +842,7 @@ name = "markdown-it-py"
 version = "3.0.0"
 requires_python = ">=3.8"
 summary = "Python port of markdown-it. Markdown parsing, done right!"
-groups = ["dev", "lint"]
+groups = ["default", "dev", "lint"]
 dependencies = [
     "mdurl~=0.1",
 ]
@@ -896,7 +896,7 @@ name = "mdurl"
 version = "0.1.2"
 requires_python = ">=3.7"
 summary = "Markdown URL utilities"
-groups = ["dev", "lint"]
+groups = ["default", "dev", "lint"]
 files = [
     {file = "mdurl-0.1.2-py3-none-any.whl", hash = "sha256:84008a41e51615a49fc9966191ff91509e3c40b939176e643fd50a5c2196b8f8"},
     {file = "mdurl-0.1.2.tar.gz", hash = "sha256:bb413d29f5eea38f31dd4754dd7377d4465116fb207585f97bf925588687c1ba"},
@@ -1689,7 +1689,7 @@ name = "pygments"
 version = "2.17.2"
 requires_python = ">=3.7"
 summary = "Pygments is a syntax highlighting package written in Python."
-groups = ["dev", "docs", "lint", "test"]
+groups = ["default", "dev", "docs", "lint", "test"]
 files = [
     {file = "pygments-2.17.2-py3-none-any.whl", hash = "sha256:b27c2826c47d0f3219f29554824c30c5e8945175d888647acd804ddd04af846c"},
     {file = "pygments-2.17.2.tar.gz", hash = "sha256:da46cec9fd2de5be3a8a784f434e4c4ab670b4ff54d605c4c2717e9d49c4c367"},
@@ -1734,7 +1734,7 @@ files = [
 
 [[package]]
 name = "pyright"
-version = "1.1.354"
+version = "1.1.355"
 requires_python = ">=3.7"
 summary = "Command line wrapper for pyright"
 groups = ["dev", "typecheck"]
@@ -1742,8 +1742,8 @@ dependencies = [
     "nodeenv>=1.6.0",
 ]
 files = [
-    {file = "pyright-1.1.354-py3-none-any.whl", hash = "sha256:f28d61ae8ae035fc52ded1070e8d9e786051a26a4127bbd7a4ba0399b81b37b5"},
-    {file = "pyright-1.1.354.tar.gz", hash = "sha256:b1070dc774ff2e79eb0523fe87f4ba9a90550de7e4b030a2bc9e031864029a1f"},
+    {file = "pyright-1.1.355-py3-none-any.whl", hash = "sha256:bf30b6728fd68ae7d09c98292b67152858dd89738569836896df786e52b5fe48"},
+    {file = "pyright-1.1.355.tar.gz", hash = "sha256:dca4104cd53d6484e6b1b50b7a239ad2d16d2ffd20030bcf3111b56f44c263bf"},
 ]
 
 [[package]]
@@ -1951,7 +1951,7 @@ name = "rich"
 version = "13.7.1"
 requires_python = ">=3.7.0"
 summary = "Render rich text, tables, progress bars, syntax highlighting, markdown and more to the terminal"
-groups = ["dev", "lint"]
+groups = ["default", "dev", "lint"]
 dependencies = [
     "markdown-it-py>=2.2.0",
     "pygments<3.0.0,>=2.13.0",
@@ -2386,7 +2386,7 @@ files = [
 
 [[package]]
 name = "transformers"
-version = "4.38.2"
+version = "4.39.0"
 requires_python = ">=3.8.0"
 summary = "State-of-the-art Machine Learning for JAX, PyTorch and TensorFlow"
 groups = ["default"]
@@ -2403,8 +2403,8 @@ dependencies = [
     "tqdm>=4.27",
 ]
 files = [
-    {file = "transformers-4.38.2-py3-none-any.whl", hash = "sha256:c4029cb9f01b3dd335e52f364c52d2b37c65b4c78e02e6a08b1919c5c928573e"},
-    {file = "transformers-4.38.2.tar.gz", hash = "sha256:c5fc7ad682b8a50a48b2a4c05d4ea2de5567adb1bdd00053619dbe5960857dd5"},
+    {file = "transformers-4.39.0-py3-none-any.whl", hash = "sha256:7801785b1f016d667467e8c372c1c3653c18fe32ba97952059e3bea79ba22b08"},
+    {file = "transformers-4.39.0.tar.gz", hash = "sha256:517a13cd633b10bea01c92ab0b3059762872c7c29da3d223db9d28e926fe330d"},
 ]
 
 [[package]]
