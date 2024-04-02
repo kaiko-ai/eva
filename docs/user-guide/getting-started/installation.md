@@ -1,8 +1,5 @@
 # Installation
 
-*Note: this section applies in the current form only to Kaiko-internal user testing and will be revised for the public package when publishing eva*
-
-
 - Create and activate a virtual environment with Python 3.10+
 
 - Install *eva* and the *eva-vision* package with:
