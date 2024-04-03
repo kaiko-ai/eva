@@ -1,4 +1,4 @@
-"""Dataset class for slide embeddings (composed of multiple patch embeddings)."""
+"""Dataset class for where a sample corresponds to multiple embeddings."""
 
 import os
 from typing import Callable, Dict, List, Literal
@@ -11,7 +11,10 @@ from eva.core.data.datasets.embeddings import base
 
 
 class MultiEmbeddingsClassificationDataset(base.EmbeddingsDataset):
-    """Embedding dataset."""
+    """Dataset class for where a sample corresponds to multiple embeddings.
+
+    Example Usecase: Slide level dataset where each slide has multiple patch embeddings.
+    """
 
     def __init__(
         self,
@@ -24,9 +27,14 @@ class MultiEmbeddingsClassificationDataset(base.EmbeddingsDataset):
     ):
         """Initialize dataset.
 
-        Expects a manifest file listing the paths of `.pt` files. Each slide can have either
-        one or multiple `.pt` files, each containing a sequence of patch embeddings of shape
-        `[k, embedding_dim]`.
+        Expects a manifest file listing the paths of `.pt` files containing tensor embeddings.
+
+        The manifest is required to have a `column_mapping["multi_id"]` column that contains the
+        unique identifier group of embeddings. For oncology datasets, this would be usually
+        the slide id. Each row in the manifest file points to a .pt file that can contain
+        one or multiple embeddings. There can also be multiple rows for the same `multi_id`,
+        in which case the embeddings from the different .pt files corresponding to that same
+        `multi_id` will be stacked along the first dimension.
 
         Args:
             root: Root directory of the dataset.
@@ -50,59 +58,49 @@ class MultiEmbeddingsClassificationDataset(base.EmbeddingsDataset):
             target_transforms=target_transforms,
         )
 
-        self._slide_ids: List[int]
+        self._multi_ids: List[int]
 
     @override
     def setup(self):
         super().setup()
-        self._slide_ids = list(self._data[self._column_mapping["slide_id"]].unique())
+        self._multi_ids = list(self._data[self._column_mapping["multi_id"]].unique())
 
     @override
     def _load_embeddings(self, index: int) -> torch.Tensor:
-        """Returns the `index`'th embedding sample.
-
-        Args:
-            index: The index of the data sample to load.
-
-        Returns:
-            The sample embedding as an array.
-        """
-        # Get all embeddings for the slide
-        slide_id = self._slide_ids[index]
+        """Loads and stacks all embedding corresponding to the `index`'th multi_id."""
+        # Get all embeddings for the given index (multi_id)
+        multi_id = self._multi_ids[index]
         embedding_paths = self._data.loc[
-            self._data[self._column_mapping["slide_id"]] == slide_id, self._column_mapping["path"]
+            self._data[self._column_mapping["multi_id"]] == multi_id, self._column_mapping["path"]
         ].to_list()
         embedding_paths = [os.path.join(self._root, path) for path in embedding_paths]
 
-        # Load embeddings and stack
+        # Load embeddings and stack them accross the first dimension
         embeddings = [torch.load(path, map_location="cpu") for path in embedding_paths]
         embeddings = torch.cat(embeddings, dim=0)
 
         if not embeddings.ndim == 2:
-            raise ValueError(f"Expected 2D tensor, got {embeddings.ndim} for slide {slide_id}.")
+            raise ValueError(f"Expected 2D tensor, got {embeddings.ndim} for {multi_id}.")
 
         return embeddings
 
     @override
     def _load_target(self, index: int) -> np.ndarray:
-        """Returns the `index`'th target sample.
+        """Returns the target corresponding to the `index`'th multi_id.
 
-        Args:
-            index: The index of the data sample to load.
-
-        Returns:
-            The sample target as an array.
+        This method assumes that all the embeddings corresponding to the same `multi_id`
+        have the same target. If this is not the case, it will raise an error.
         """
-        slide_id = self._slide_ids[index]
-        slide_targets = self._data.loc[
-            self._data[self._column_mapping["slide_id"]] == slide_id, self._column_mapping["target"]
+        multi_id = self._multi_ids[index]
+        targets = self._data.loc[
+            self._data[self._column_mapping["multi_id"]] == multi_id, self._column_mapping["target"]
         ]
 
-        if not slide_targets.nunique() == 1:
-            raise ValueError(f"Multiple targets found for slide {slide_id}.")
+        if not targets.nunique() == 1:
+            raise ValueError(f"Multiple targets found for {multi_id}.")
 
-        return np.asarray(slide_targets.iloc[0], dtype=np.int64)
+        return np.asarray(targets.iloc[0], dtype=np.int64)
 
+    @override
     def __len__(self) -> int:
-        """Returns the total length of the data."""
         return len(self._data)

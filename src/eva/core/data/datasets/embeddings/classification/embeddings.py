@@ -51,14 +51,6 @@ class EmbeddingsClassificationDataset(base.EmbeddingsDataset):
 
     @override
     def _load_embeddings(self, index: int) -> torch.Tensor:
-        """Returns the `index`'th embedding sample.
-
-        Args:
-            index: The index of the data sample to load.
-
-        Returns:
-            The sample embedding as an array.
-        """
         filename = self.filename(index)
         embeddings_path = os.path.join(self._root, filename)
         tensor = torch.load(embeddings_path, map_location="cpu")
@@ -66,17 +58,9 @@ class EmbeddingsClassificationDataset(base.EmbeddingsDataset):
 
     @override
     def _load_target(self, index: int) -> np.ndarray:
-        """Returns the `index`'th target sample.
-
-        Args:
-            index: The index of the data sample to load.
-
-        Returns:
-            The sample target as an array.
-        """
         target = self._data.at[index, self._column_mapping["target"]]
         return np.asarray(target, dtype=np.int64)
 
+    @override
     def __len__(self) -> int:
-        """Returns the total length of the data."""
         return len(self._data)

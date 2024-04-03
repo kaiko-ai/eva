@@ -16,13 +16,13 @@ default_column_mapping: Dict[str, str] = {
     "path": "embeddings",
     "target": "target",
     "split": "split",
-    "slide_id": "slide_id",
+    "multi_id": "slide_id",
 }
 """The default column mapping of the variables to the manifest columns."""
 
 
 class EmbeddingsDataset(base.Dataset):
-    """Embeddings classification dataset."""
+    """Abstract base class for embedding datasets."""
 
     def __init__(
         self,
@@ -70,12 +70,8 @@ class EmbeddingsDataset(base.Dataset):
             index: The index of the data sample to load.
 
         Returns:
-            The sample embedding as an array.
+            The embedding sample as a tensor.
         """
-        filename = self.filename(index)
-        embeddings_path = os.path.join(self._root, filename)
-        tensor = torch.load(embeddings_path, map_location="cpu")
-        return tensor.squeeze(0)
 
     @abc.abstractmethod
     def _load_target(self, index: int) -> np.ndarray:
@@ -87,6 +83,10 @@ class EmbeddingsDataset(base.Dataset):
         Returns:
             The sample target as an array.
         """
+
+    @abc.abstractmethod
+    def __len__(self) -> int:
+        """Returns the total length of the data."""
 
     def filename(self, index: int) -> str:
         """Returns the filename of the `index`'th data sample.
