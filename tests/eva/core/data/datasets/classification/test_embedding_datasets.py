@@ -7,7 +7,7 @@ import numpy as np
 import pytest
 import torch
 
-from eva.core.data.datasets import classification
+from eva.core.data.datasets.embeddings import classification
 
 
 @pytest.mark.parametrize(
