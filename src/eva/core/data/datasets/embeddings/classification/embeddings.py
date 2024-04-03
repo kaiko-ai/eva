@@ -1,7 +1,7 @@
 """Embeddings classification dataset."""
 
 import os
-from typing import Callable, Dict
+from typing import Callable, Dict, Literal
 
 import numpy as np
 import torch
@@ -17,7 +17,7 @@ class EmbeddingsClassificationDataset(base.EmbeddingsDataset):
         self,
         root: str,
         manifest_file: str,
-        split: str | None = None,
+        split: Literal["train", "val", "test"] | None = None,
         column_mapping: Dict[str, str] = base.default_column_mapping,
         embeddings_transforms: Callable | None = None,
         target_transforms: Callable | None = None,

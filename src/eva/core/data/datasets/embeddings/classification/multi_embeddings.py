@@ -101,7 +101,7 @@ class MultiEmbeddingsClassificationDataset(base.EmbeddingsDataset):
         if not slide_targets.nunique() == 1:
             raise ValueError(f"Multiple targets found for slide {slide_id}.")
 
-        return slide_targets.iloc[0]
+        return np.asarray(slide_targets.iloc[0], dtype=np.int64)
 
     def __len__(self) -> int:
         """Returns the total length of the data."""

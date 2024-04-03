@@ -6,7 +6,7 @@ import torch
 class SampleFromAxis:
     """Samples n_samples entries from a tensor along a given axis."""
 
-    def __init__(self, n_samples: int, seed: int, axis: int = 0):
+    def __init__(self, n_samples: int, seed: int = 42, axis: int = 0):
         """Initialize the transformation.
 
         Args:

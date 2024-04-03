@@ -2,7 +2,7 @@
 
 import abc
 import os
-from typing import Callable, Dict, Tuple
+from typing import Callable, Dict, Literal, Tuple
 
 import numpy as np
 import pandas as pd
@@ -28,7 +28,7 @@ class EmbeddingsDataset(base.Dataset):
         self,
         root: str,
         manifest_file: str,
-        split: str | None = None,
+        split: Literal["train", "val", "test"] | None = None,
         column_mapping: Dict[str, str] = default_column_mapping,
         embeddings_transforms: Callable | None = None,
         target_transforms: Callable | None = None,
