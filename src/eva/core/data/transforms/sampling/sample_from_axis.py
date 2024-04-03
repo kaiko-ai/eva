@@ -37,4 +37,4 @@ class SampleFromAxis:
         indices = torch.randperm(tensor.size(self._axis), generator=self._generator)[
             : self._n_samples
         ]
-        return tensor[indices]
+        return tensor.index_select(self._axis, indices)
