@@ -9,8 +9,9 @@ class DummyLogger(lightning.pytorch.loggers.logger.DummyLogger):
     This logger is currently used as a placeholder when saving results
     to remote storage, as common lightning loggers do not work
     with azure blob storage:
-    https://github.com/Lightning-AI/pytorch-lightning/issues/18861
-    https://github.com/Lightning-AI/pytorch-lightning/issues/19736
+
+    <https://github.com/Lightning-AI/pytorch-lightning/issues/18861>
+    <https://github.com/Lightning-AI/pytorch-lightning/issues/19736>
 
     Simply disabling the loggers when pointing to remote storage doesn't work
     because callbacks such as LearningRateMonitor or ModelCheckpoint require a
