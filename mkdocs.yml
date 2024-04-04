@@ -106,6 +106,7 @@ nav:
       - Trainers:
         - Trainer: reference/core/trainers/trainer.md
         - Functional: reference/core/trainers/functional.md
+      - Loggers: reference/core/loggers/loggers.md
       - Utils:
         - Multiprocessing: reference/core/utils/multiprocessing.md
         - Workers: reference/core/utils/workers.md
