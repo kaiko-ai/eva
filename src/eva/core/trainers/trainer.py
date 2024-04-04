@@ -74,8 +74,7 @@ class Trainer(pl_trainer.Trainer):
                 if isinstance(logger, (pl_loggers.CSVLogger, pl_loggers.TensorBoardLogger)):
                     if not cloud_io._is_local_file_protocol(self.default_root_dir):
                         loguru.logger.warning(
-                            f"Skipping {type(logger).__name__} Logger as "
-                            "remote storage is not supported."
+                            f"Skipped {type(logger).__name__} as remote storage is not supported."
                         )
                         continue
                     else:

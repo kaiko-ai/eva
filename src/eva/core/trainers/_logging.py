@@ -86,7 +86,7 @@ def _generate_hash_from_config(path: str, max_hash_len: int = 8) -> str:
 class PlaceholderLogger(DummyLogger):
     """Placeholder logger class.
 
-    This is placeholder currently used when saving results to remote storage, as
+    This placeholder is currently used when saving results to remote storage, as
     common lightning loggers do not work with azure remote storage:
     https://github.com/Lightning-AI/pytorch-lightning/issues/18861
     https://github.com/Lightning-AI/pytorch-lightning/issues/19736
