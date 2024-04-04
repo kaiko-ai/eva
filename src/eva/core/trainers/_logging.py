@@ -4,6 +4,7 @@ import hashlib
 import sys
 from datetime import datetime
 
+from lightning.pytorch.loggers.logger import DummyLogger
 from lightning_fabric.utilities import cloud_io
 from loguru import logger
 
@@ -80,3 +81,33 @@ def _generate_hash_from_config(path: str, max_hash_len: int = 8) -> str:
         config_sha256 = hashlib.sha256(config)
         hash_id = config_sha256.hexdigest()
     return hash_id[:max_hash_len]
+
+
+class PlaceholderLogger(DummyLogger):
+    """Placeholder logger class.
+
+    This is placeholder currently used when saving results to remote storage, as
+    common lightning loggers do not work with azure remote storage:
+    https://github.com/Lightning-AI/pytorch-lightning/issues/18861
+    https://github.com/Lightning-AI/pytorch-lightning/issues/19736
+
+    Simply disabling the loggers when pointing to remote storage doesn't work
+    because callbacks such as LearningRateMonitor or ModelCheckpoint require a
+    logger to be present.
+    """
+
+    def __init__(self, save_dir: str) -> None:
+        """Initializes the placeholder logger.
+
+        Args:
+            save_dir: The directory to save the logs.
+        """
+        super().__init__()
+        self._save_dir = save_dir
+
+    @property
+    def save_dir(self) -> str:
+        return self._save_dir
+
+    def __deepcopy__(self, memo=None):
+        return self

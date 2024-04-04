@@ -3,9 +3,11 @@
 import os
 from typing import Any
 
+import loguru
 from lightning.pytorch import loggers as pl_loggers
 from lightning.pytorch import trainer as pl_trainer
 from lightning.pytorch.utilities import argparse
+from lightning_fabric.utilities import cloud_io
 from typing_extensions import override
 
 from eva.core.data import datamodules
@@ -65,13 +67,28 @@ class Trainer(pl_trainer.Trainer):
             subdirectory: Whether to append a subdirectory to the output log.
         """
         self._log_dir = os.path.join(self.default_root_dir, self._session_id, subdirectory)
-        os.fspath(self._log_dir)
 
-        for logger in self.loggers:
-            if isinstance(logger, (pl_loggers.CSVLogger, pl_loggers.TensorBoardLogger)):
-                logger._root_dir = self.default_root_dir
-                logger._name = self._session_id
-                logger._version = subdirectory
+        enabled_loggers = []
+        if isinstance(self.loggers, list) and len(self.loggers) > 0:
+            for logger in self.loggers:
+                if isinstance(logger, (pl_loggers.CSVLogger, pl_loggers.TensorBoardLogger)):
+                    if not cloud_io._is_local_file_protocol(self.default_root_dir):
+                        loguru.logger.warning(
+                            f"Skipping {type(logger).__name__} Logger as "
+                            "remote storage is not supported."
+                        )
+                        continue
+                    else:
+                        logger._root_dir = self.default_root_dir
+                        logger._name = self._session_id
+                        logger._version = subdirectory
+                elif logger is not None:
+                    enabled_loggers.append(logger)
+
+        if len(enabled_loggers) > 0:
+            self._loggers = enabled_loggers
+        else:
+            self._loggers = [_logging.PlaceholderLogger(self._log_dir)]
 
     def run_evaluation_session(
         self,
