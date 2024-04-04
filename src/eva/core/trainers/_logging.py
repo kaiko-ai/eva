@@ -87,7 +87,7 @@ class PlaceholderLogger(DummyLogger):
     """Placeholder logger class.
 
     This placeholder is currently used when saving results to remote storage, as
-    common lightning loggers do not work with azure remote storage:
+    common lightning loggers do not work with azure blob storage:
     https://github.com/Lightning-AI/pytorch-lightning/issues/18861
     https://github.com/Lightning-AI/pytorch-lightning/issues/19736
 
