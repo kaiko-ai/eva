@@ -10,6 +10,7 @@ from lightning.pytorch.utilities import argparse
 from lightning_fabric.utilities import cloud_io
 from typing_extensions import override
 
+from eva.core import loggers as eva_loggers
 from eva.core.data import datamodules
 from eva.core.models import modules
 from eva.core.trainers import _logging, functional
@@ -83,7 +84,7 @@ class Trainer(pl_trainer.Trainer):
                         logger._version = subdirectory
                 enabled_loggers.append(logger)
 
-        self._loggers = enabled_loggers or [_logging.PlaceholderLogger(self._log_dir)]
+        self._loggers = enabled_loggers or [eva_loggers.DummyLogger(self._log_dir)]
 
     def run_evaluation_session(
         self,
