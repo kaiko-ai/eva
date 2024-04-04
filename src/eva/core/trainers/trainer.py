@@ -81,13 +81,9 @@ class Trainer(pl_trainer.Trainer):
                         logger._root_dir = self.default_root_dir
                         logger._name = self._session_id
                         logger._version = subdirectory
-                elif logger is not None:
-                    enabled_loggers.append(logger)
+                enabled_loggers.append(logger)
 
-        if len(enabled_loggers) > 0:
-            self._loggers = enabled_loggers
-        else:
-            self._loggers = [_logging.PlaceholderLogger(self._log_dir)]
+        self._loggers = enabled_loggers or [_logging.PlaceholderLogger(self._log_dir)]
 
     def run_evaluation_session(
         self,
