@@ -94,6 +94,7 @@ nav:
         - reference/core/data/dataloaders.md
         - reference/core/data/datamodules.md
         - reference/core/data/datasets.md
+        - reference/core/data/transforms.md
       - Metrics: 
         - reference/core/metrics/index.md
         - reference/core/metrics/core.md
