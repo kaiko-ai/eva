@@ -29,7 +29,7 @@ class MultiEmbeddingsClassificationDataset(base.EmbeddingsDataset):
 
         Expects a manifest file listing the paths of `.pt` files containing tensor embeddings.
 
-        The manifest is required to have a `column_mapping["multi_id"]` column that contains the
+        The manifest must have a `column_mapping["multi_id"]` column that contains the
         unique identifier group of embeddings. For oncology datasets, this would be usually
         the slide id. Each row in the manifest file points to a .pt file that can contain
         one or multiple embeddings. There can also be multiple rows for the same `multi_id`,
