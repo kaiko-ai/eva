@@ -1,3 +1,5 @@
+"""Dummy logger class."""
+
 import lightning.pytorch.loggers.logger
 
 
@@ -16,17 +18,20 @@ class DummyLogger(lightning.pytorch.loggers.logger.DummyLogger):
     """
 
     def __init__(self, save_dir: str) -> None:
-        """Initializes the placeholder logger.
+        """Initializes the logger.
 
         Args:
-            save_dir: The directory to save the logs.
+            save_dir: The save directory (this logger does not save anything,
+                but callbacks might use this path to save their outputs).
         """
         super().__init__()
         self._save_dir = save_dir
 
     @property
     def save_dir(self) -> str:
+        """Returns the save directory."""
         return self._save_dir
 
     def __deepcopy__(self, memo=None):
+        """Override of the deepcopy method."""
         return self
