@@ -13,7 +13,7 @@ from eva.core.data.datasets.embeddings import base
 class MultiEmbeddingsClassificationDataset(base.EmbeddingsDataset):
     """Dataset class for where a sample corresponds to multiple embeddings.
 
-    Example Usecase: Slide level dataset where each slide has multiple patch embeddings.
+    Example use case: Slide level dataset where each slide has multiple patch embeddings.
     """
 
     def __init__(
