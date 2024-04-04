@@ -56,7 +56,7 @@ class EmbeddingsDataset(base.Dataset):
         self._root = root
         self._manifest_file = manifest_file
         self._split = split
-        self._column_mapping = column_mapping
+        self._column_mapping = default_column_mapping | column_mapping
         self._embeddings_transforms = embeddings_transforms
         self._target_transforms = target_transforms
 
