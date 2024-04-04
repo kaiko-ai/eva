@@ -1,7 +1,8 @@
-"""Embeddings classification dataset."""
+"""Base dataset class for Embeddings."""
 
+import abc
 import os
-from typing import Callable, Dict, Tuple
+from typing import Callable, Dict, Literal, Tuple
 
 import numpy as np
 import pandas as pd
@@ -11,22 +12,23 @@ from typing_extensions import override
 from eva.core.data.datasets import base
 from eva.core.utils import io
 
+default_column_mapping: Dict[str, str] = {
+    "path": "embeddings",
+    "target": "target",
+    "split": "split",
+    "multi_id": "slide_id",
+}
+"""The default column mapping of the variables to the manifest columns."""
 
-class EmbeddingsClassificationDataset(base.Dataset):
-    """Embeddings classification dataset."""
 
-    default_column_mapping: Dict[str, str] = {
-        "data": "embeddings",
-        "target": "target",
-        "split": "split",
-    }
-    """The default column mapping of the variables to the manifest columns."""
+class EmbeddingsDataset(base.Dataset):
+    """Abstract base class for embedding datasets."""
 
     def __init__(
         self,
         root: str,
         manifest_file: str,
-        split: str | None = None,
+        split: Literal["train", "val", "test"] | None = None,
         column_mapping: Dict[str, str] = default_column_mapping,
         embeddings_transforms: Callable | None = None,
         target_transforms: Callable | None = None,
@@ -54,11 +56,37 @@ class EmbeddingsClassificationDataset(base.Dataset):
         self._root = root
         self._manifest_file = manifest_file
         self._split = split
-        self._column_mapping = self.default_column_mapping | column_mapping
+        self._column_mapping = default_column_mapping | column_mapping
         self._embeddings_transforms = embeddings_transforms
         self._target_transforms = target_transforms
 
         self._data: pd.DataFrame
+
+    @abc.abstractmethod
+    def _load_embeddings(self, index: int) -> torch.Tensor:
+        """Returns the `index`'th embedding sample.
+
+        Args:
+            index: The index of the data sample to load.
+
+        Returns:
+            The embedding sample as a tensor.
+        """
+
+    @abc.abstractmethod
+    def _load_target(self, index: int) -> np.ndarray:
+        """Returns the `index`'th target sample.
+
+        Args:
+            index: The index of the data sample to load.
+
+        Returns:
+            The sample target as an array.
+        """
+
+    @abc.abstractmethod
+    def __len__(self) -> int:
+        """Returns the total length of the data."""
 
     def filename(self, index: int) -> str:
         """Returns the filename of the `index`'th data sample.
@@ -71,7 +99,7 @@ class EmbeddingsClassificationDataset(base.Dataset):
         Returns:
             The filename of the `index`'th data sample.
         """
-        return self._data.at[index, self._column_mapping["data"]]
+        return self._data.at[index, self._column_mapping["path"]]
 
     @override
     def setup(self):
@@ -89,36 +117,6 @@ class EmbeddingsClassificationDataset(base.Dataset):
         embeddings = self._load_embeddings(index)
         target = self._load_target(index)
         return self._apply_transforms(embeddings, target)
-
-    def __len__(self) -> int:
-        """Returns the total length of the data."""
-        return len(self._data)
-
-    def _load_embeddings(self, index: int) -> torch.Tensor:
-        """Returns the `index`'th embedding sample.
-
-        Args:
-            index: The index of the data sample to load.
-
-        Returns:
-            The sample embedding as an array.
-        """
-        filename = self.filename(index)
-        embeddings_path = os.path.join(self._root, filename)
-        tensor = torch.load(embeddings_path, map_location="cpu")
-        return tensor.squeeze(0)
-
-    def _load_target(self, index: int) -> np.ndarray:
-        """Returns the `index`'th target sample.
-
-        Args:
-            index: The index of the data sample to load.
-
-        Returns:
-            The sample target as an array.
-        """
-        target = self._data.at[index, self._column_mapping["target"]]
-        return np.asarray(target, dtype=np.int64)
 
     def _load_manifest(self) -> pd.DataFrame:
         """Loads manifest file and filters the data based on the split column.

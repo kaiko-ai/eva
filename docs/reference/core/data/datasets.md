@@ -6,3 +6,4 @@ Reference information for the `Dataset` base class.
 
 ## Embeddings datasets
 ::: eva.core.data.datasets.EmbeddingsClassificationDataset
+::: eva.core.data.datasets.MultiEmbeddingsClassificationDataset
