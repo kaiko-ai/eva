@@ -11,7 +11,7 @@ from eva.core.data.datasets.embeddings import base
 
 
 class EmbeddingsClassificationDataset(base.EmbeddingsDataset):
-    """Embeddings classification dataset."""
+    """Embeddings dataset class for classification tasks."""
 
     def __init__(
         self,
