@@ -111,6 +111,7 @@ In this section you will find model benchmarks which were generated with `_eva_`
 | ViT-S/16 _(random)_	<sup>[1]</sup>               | 0.410 | 0.617 | 0.501 | 0.753    | 0.728     |
 | ViT-S/16 _(ImageNet)_ <sup>[1]</sup>             | 0.695 | 0.935 | 0.831 | 0.864    | 0.849     |
 | ViT-B/8 _(ImageNet)_ <sup>[1]</sup>              | 0.710 | 0.939 | 0.814 | 0.870    | 0.856     |
+| ViT-L/14 _(ImageNet)_ <sup>[1]</sup>             | 0.707 | 0.916 | 0.832 | 0.873    | 0.888     |
 | DINO<sub>(p=16)</sub> <sup>[2]</sup>             | 0.801 | 0.934 | 0.768 | 0.889    | 0.895     |
 | Phikon <sup>[3]</sup>                            | 0.725 | 0.935 | 0.777 | 0.912    | 0.915     |
 | ViT-S/16 _(kaiko.ai)_ <sup>[4]</sup>             | 0.797 | 0.943 | 0.828 | 0.903    | 0.893     |

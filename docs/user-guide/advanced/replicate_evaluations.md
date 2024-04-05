@@ -35,6 +35,19 @@ IN_FEATURES=768 \
 eva predict_fit --config configs/vision/dino_vit/offline/<task>.yaml
 ```
 
+## DINOv2 ViT-L14 (ImageNet)
+
+To evaluate performance on Dino v2 ViT-L14 backbone pretrained on ImageNet, run:
+```
+PRETRAINED=true \
+EMBEDDINGS_ROOT="./data/embeddings/dinov2_vitl14_kaiko" \
+REPO_OR_DIR=facebookresearch/dinov2:main \
+DINO_BACKBONE=dinov2_vitl14_reg \
+FORCE_RELOAD=true \
+IN_FEATURES=1024 \
+eva predict_fit --config configs/vision/dino_vit/offline/<task>.yaml
+```
+
 ## Lunit - DINO ViT-S16 (TCGA)
 
 [Lunit](https://www.lunit.io/en), released the weights for a DINO ViT-S16 backbone, pretrained on TCGA data
