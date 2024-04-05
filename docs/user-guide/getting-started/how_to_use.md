@@ -1,6 +1,6 @@
 # How to use *eva*
 
-Before starting to use ***eva***, it's important to get familiar with the different workflows, subcommands and configurations.
+Before starting to use *eva*, it's important to get familiar with the different workflows, subcommands and configurations.
 
 
 ## *eva* subcommands
@@ -34,7 +34,7 @@ The setup for an *eva* run is provided in a `.yaml` config file which is defined
 
 A config file specifies the setup for the *trainer* (including callback for the model backbone), the *model* (setup of the trainable decoder) and *data* module. 
 
-The config files for the datasets and models that _eva_ supports out of the box, you can find on [GitHub](https://github.com/kaiko-ai/eva/tree/main/configs). We recommend that you inspect some of them to get a better understanding of their structure and content.
+The config files for the datasets and models that *eva* supports out of the box, you can find on [GitHub](https://github.com/kaiko-ai/eva/tree/main/configs). We recommend that you inspect some of them to get a better understanding of their structure and content.
 
 
 ### Environment variables
