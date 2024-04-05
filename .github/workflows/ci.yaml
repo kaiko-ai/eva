@@ -11,6 +11,25 @@ on:
       - main
 
 jobs:
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Perform gitleaks checks
+        run: |
+          # Download and check
+          curl -LJO https://github.com/gitleaks/gitleaks/releases/download/v8.18.2/gitleaks_8.18.2_linux_x64.tar.gz
+          curl -LJO https://github.com/gitleaks/gitleaks/releases/download/v8.18.2/gitleaks_8.18.2_checksums.txt
+          shasum -a 256 --ignore-missing --quiet -c gitleaks_8.18.2_checksums.txt
+          if [ $? != 0 ]; then exit 1; fi
+          # Extract gitleaks and make executable
+          tar -zxvf gitleaks_8.18.2_linux_x64.tar.gz gitleaks
+          # Run gitleaks
+          gitleaks detect \
+            --config .gitleaks.toml \
+            --gitleaks-ignore-path .gitleaksignore \
+            --no-git
   quality:
     runs-on: ubuntu-latest
     steps:
