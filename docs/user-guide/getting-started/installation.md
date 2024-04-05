@@ -10,7 +10,7 @@ pip install "kaiko-eva[vision]"
 
 ## Run *eva*
 
-Now you are all setup and you can start running *eva* with:
+Now you are all set and you can start running *eva* with:
 ```
 eva <subcommand> --config <path-to-config-file>
 ```
