@@ -114,11 +114,12 @@ In this section you will find model benchmarks which were generated with `_eva_`
 | ViT-L/14 _(ImageNet)_ <sup>[1]</sup>             | 0.707 | 0.916 | 0.832 | 0.873    | 0.888     |
 | DINO<sub>(p=16)</sub> <sup>[2]</sup>             | 0.801 | 0.934 | 0.768 | 0.889    | 0.895     |
 | Phikon <sup>[3]</sup>                            | 0.725 | 0.935 | 0.777 | 0.912    | 0.915     |
-| ViT-S/16 _(kaiko.ai)_ <sup>[4]</sup>             | 0.797 | 0.943 | 0.828 | 0.903    | 0.893     |
-| ViT-S/8 _(kaiko.ai)_ <sup>[4]</sup>              | 0.834 | 0.946 | 0.832 | 0.897    | 0.887     |
-| ViT-B/16 _(kaiko.ai)_	<sup>[4]</sup>             | 0.810 | 0.960 | 0.826 | 0.900    | 0.898     |
-| ViT-B/8 _(kaiko.ai)_ <sup>[4]</sup>              | 0.865 | 0.956 | 0.809 | 0.913    | 0.921     |
-| ViT-L/14 _(kaiko.ai)_ <sup>[4]</sup>             | 0.870 | 0.930 | 0.809 | 0.908    | 0.898     |
+| UNI <sup>[4]</sup>                               | 0.814 | 0.950 | 0.837 | 0.936    | 0.938     |
+| ViT-S/16 _(kaiko.ai)_ <sup>[5]</sup>             | 0.797 | 0.943 | 0.828 | 0.903    | 0.893     |
+| ViT-S/8 _(kaiko.ai)_ <sup>[5]</sup>              | 0.834 | 0.946 | 0.832 | 0.897    | 0.887     |
+| ViT-B/16 _(kaiko.ai)_	<sup>[5]</sup>             | 0.810 | 0.960 | 0.826 | 0.900    | 0.898     |
+| ViT-B/8 _(kaiko.ai)_ <sup>[5]</sup>              | 0.865 | 0.956 | 0.809 | 0.913    | 0.921     |
+| ViT-L/14 _(kaiko.ai)_ <sup>[5]</sup>             | 0.870 | 0.930 | 0.809 | 0.908    | 0.898     |
 
 _Table I: Linear probing evaluation of FMs on patch-level downstream datasets.<br> We report averaged balanced accuracy
 over 5 runs, with an average standard deviation of ±0.003._
@@ -131,7 +132,8 @@ _References_:
 1. _"Emerging properties in self-supervised vision transformers”_
 2. _"Benchmarking self-supervised learning on diverse pathology datasets”_
 3. _"Scaling self-supervised learning for histopathology with masked image modeling”_
-4. _"Towards Training Large-Scale Pathology Foundation Models: from TCGA to Hospital Scale”_
+4. _"A General-Purpose Self-Supervised Model for Computational Pathology”_
+5. _"Towards Training Large-Scale Pathology Foundation Models: from TCGA to Hospital Scale”_
 
 ## Contributing
 
