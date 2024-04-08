@@ -103,7 +103,7 @@ Now evaluate the model by running:
 ```
 EMBEDDINGS_ROOT="./data/embeddings/dinov2_vitl16_uni" \
 IN_FEATURES=1024 \
-eva predict_fit --config configs/vision/dino_vit/offline/<task>.yaml
+eva predict_fit --config path/to/<task>.yaml
 ```
 
 
