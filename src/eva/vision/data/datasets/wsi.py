@@ -144,7 +144,6 @@ class MultiWsiDataset(torch_datasets.ConcatDataset):
                     target_mpp=self._target_mpp,
                     backend=self._backend,
                     transforms=self._transforms,
-                    dataset_idx=index,
                 )
             )
         return wsi_datasets
