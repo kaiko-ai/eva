@@ -1,17 +1,18 @@
 import enum
 
-from eva.vision.data import wsi
+from eva.vision.data.wsi.base import Wsi
+from eva.vision.data.wsi.openslide import WsiOpenslide
 
 
 class WsiBackend(enum.Enum):
-    OPENSLIDE = (0,)
+    OPENSLIDE = 0
     AUTO = 1
 
 
-def get_wsi_class(backend: WsiBackend) -> wsi.Wsi:
+def get_wsi_class(backend: WsiBackend) -> Wsi:
     match backend:
         case WsiBackend.OPENSLIDE:
-            return wsi.WsiOpenslide
+            return WsiOpenslide
         case WsiBackend.AUTO:
             raise NotImplementedError
         case _:

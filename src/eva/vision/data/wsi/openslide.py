@@ -1,40 +1,44 @@
-from typing import Any
+from typing import List, Tuple
 
+import numpy as np
 import openslide
 from typing_extensions import override
 
-from eva.vision.data import wsi
+from eva.vision.data.wsi import base
 
 
-class WsiOpenslide(wsi.Wsi):
-    _slide: openslide.OpenSlide
-
-    @override
-    @property
-    def level_dimensions(self) -> list[tuple[int, int]]:
-        return self._slide.level_dimensions
+class WsiOpenslide(base.Wsi):
+    _wsi: openslide.OpenSlide
 
     @override
     @property
-    def level_downsamples(self) -> list[float]:
-        return self._slide.level_downsamples
+    def level_dimensions(self) -> List[Tuple[int, int]]:
+        return self._wsi.level_dimensions
+
+    @override
+    @property
+    def level_downsamples(self) -> List[float]:
+        return self._wsi.level_downsamples
 
     @override
     @property
     def mpp(self) -> float:
         try:
-            x_mpp = float(self._slide.properties["openslide.mpp-x"])
-            y_mpp = float(self._slide.properties["openslide.mpp-y"])
+            x_mpp = float(self._wsi.properties["openslide.mpp-x"])
+            y_mpp = float(self._wsi.properties["openslide.mpp-y"])
             return (x_mpp + y_mpp) / 2.0
         except KeyError:
             # TODO: add overwrite_mpp class attribute to allow setting a default value
             raise ValueError("Microns per pixel (mpp) value is not available for this slide.")
 
     @override
-    def read_region(self, location: tuple[int, int], level: int, size: tuple[int, int]) -> Any:
-        return self._slide.read_region(location, level, size)
+    def read_region(
+        self, location: Tuple[int, int], level: int, size: Tuple[int, int]
+    ) -> np.ndarray:
+        data = self._wsi.read_region(location, level, size)
+
+        return np.array(data.convert("RGB"))
 
     @override
-    @staticmethod
-    def open_slide(file_path: str) -> openslide.OpenSlide:
-        return openslide.OpenSlide(file_path)
+    def open_slide(self) -> openslide.OpenSlide:
+        self._wsi = openslide.open_slide(self._file_path)
