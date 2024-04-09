@@ -4,17 +4,17 @@ from typing import Any, Dict
 
 import numpy as np
 
-from eva.core.models.modules.typings import INPUT_BATCH
+from eva.core.models.modules.typings import DATA_SAMPLE
 from eva.vision.data.datasets.wsi import MultiWsiDataset
 
 
 class MultiWsiClassificationDataset(MultiWsiDataset):
-    def __getitem__(self, index: int) -> INPUT_BATCH:
+    def __getitem__(self, index: int) -> DATA_SAMPLE:
         data = super().__getitem__(index)
         target = self._load_target(index)
         metadata = self._load_metadata(index)
 
-        return INPUT_BATCH(data, target, metadata)
+        return DATA_SAMPLE(data, target, metadata)
 
     def _load_target(self, index: int) -> np.ndarray:
         dataset_idx = bisect.bisect_right(self.cumulative_sizes, index)
