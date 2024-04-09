@@ -23,7 +23,6 @@ class WsiDataset(vision.VisionDataset):
         target_mpp: float,
         backend: wsi.WsiBackend = wsi.WsiBackend.OPENSLIDE,
         transforms: Callable | None = None,
-        dataset_idx: int = 0,
     ):
         """Args:
         file_path: Path to the whole-slide image file.
@@ -33,10 +32,7 @@ class WsiDataset(vision.VisionDataset):
         target_mpp: Target microns per pixel (mpp) for the patches.
         backend: The backend to use for reading the whole-slide images.
         transforms: A function that takes in an image and returns a transformed version.
-        dataset_idx: Index of the dataset, useful when using in combination with ConcatDataset.
         """
-        self.dataset_idx = dataset_idx
-
         self._file_path = file_path
         self._n_samples = n_samples
         self._width = width
