@@ -17,28 +17,28 @@ class Wsi(abc.ABC):
     @property
     @abc.abstractmethod
     def level_dimensions(self) -> List[tuple[int, int]]:
-        """A list of (width, height) tuples for each zoom level, from highest to lowest resolution."""
+        """A list of (width, height) tuples for each level, from highest to lowest resolution."""
 
     @property
     @abc.abstractmethod
     def level_downsamples(self) -> List[float]:
-        """A list of downsampling factors for each zoom level, relative to the highest resolution."""
+        """A list of downsampling factors for each level, relative to the highest resolution."""
 
     @property
     @abc.abstractmethod
     def mpp(self) -> float:
-        """Microns per pixel at the highest resolution, indicating physical size per image pixel."""
+        """Microns per pixel at the highest resolution."""
 
     @abc.abstractmethod
     def read_region(
-        self, location: Tuple[int, int], level: int, size: Tuple[int, int]
+        self, location: Tuple[int, int], size: Tuple[int, int], level: int
     ) -> np.ndarray:
         """Reads and returns image data for a specified region and zoom level.
 
         Args:
             location: Top-left corner (x, y) to start reading.
+            size: Region size as (width, height), relative to <location>.
             level: Zoom level, with 0 being the highest resolution.
-            size: Region size as (width, height).
         """
 
     @abc.abstractmethod

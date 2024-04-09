@@ -33,7 +33,7 @@ class WsiOpenslide(base.Wsi):
 
     @override
     def read_region(
-        self, location: Tuple[int, int], level: int, size: Tuple[int, int]
+        self, location: Tuple[int, int], size: Tuple[int, int], level: int
     ) -> np.ndarray:
         data = self._wsi.read_region(location, level, size)
 
