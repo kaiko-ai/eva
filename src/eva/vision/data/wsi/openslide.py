@@ -8,6 +8,8 @@ from eva.vision.data.wsi import base
 
 
 class WsiOpenslide(base.Wsi):
+    """Class for loading data from WSI files using the OpenSlide library."""
+
     _wsi: openslide.OpenSlide
 
     @override
