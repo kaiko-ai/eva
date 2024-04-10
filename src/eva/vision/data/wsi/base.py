@@ -5,6 +5,8 @@ import numpy as np
 
 
 class Wsi(abc.ABC):
+    """Base class for loading data from WSI (whole slide image) files."""
+
     def __init__(self, file_path: str):
         """Initializes a new class instance.
 
@@ -43,7 +45,7 @@ class Wsi(abc.ABC):
 
     @abc.abstractmethod
     def open_slide(self) -> Any:
-        """Opens the while slide image file.
+        """Opens the WSI file.
 
         Note: This shouldn't be called in the constructor as wsi backends usually contain
         C types or pointers, which the standard Python pickler cannot serialize, leading to
