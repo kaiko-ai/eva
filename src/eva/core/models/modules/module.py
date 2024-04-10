@@ -9,7 +9,7 @@ from lightning.pytorch.utilities.types import STEP_OUTPUT
 from typing_extensions import override
 
 from eva.core.metrics import structs as metrics_lib
-from eva.core.models.modules.typings import INPUT_BATCH
+from eva.core.models.modules.typings import DATA_SAMPLE
 from eva.core.models.modules.utils import batch_postprocess
 
 
@@ -50,7 +50,7 @@ class ModelModule(pl.LightningModule):
     def on_train_batch_end(
         self,
         outputs: STEP_OUTPUT,
-        batch: INPUT_BATCH,
+        batch: DATA_SAMPLE,
         batch_idx: int,
     ) -> None:
         outputs = self._common_batch_end(outputs)
@@ -63,7 +63,7 @@ class ModelModule(pl.LightningModule):
     def on_validation_batch_end(
         self,
         outputs: STEP_OUTPUT,
-        batch: INPUT_BATCH,
+        batch: DATA_SAMPLE,
         batch_idx: int,
         dataloader_idx: int = 0,
     ) -> None:
@@ -82,7 +82,7 @@ class ModelModule(pl.LightningModule):
     def on_test_batch_end(
         self,
         outputs: STEP_OUTPUT,
-        batch: INPUT_BATCH,
+        batch: DATA_SAMPLE,
         batch_idx: int,
         dataloader_idx: int = 0,
     ) -> None:

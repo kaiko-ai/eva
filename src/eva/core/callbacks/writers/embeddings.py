@@ -13,7 +13,7 @@ from torch import multiprocessing, nn
 from typing_extensions import override
 
 from eva.core.callbacks.writers.typings import QUEUE_ITEM
-from eva.core.models.modules.typings import INPUT_BATCH
+from eva.core.models.modules.typings import DATA_SAMPLE
 from eva.core.utils import multiprocessing as eva_multiprocessing
 
 
@@ -72,12 +72,12 @@ class EmbeddingsWriter(callbacks.BasePredictionWriter):
         pl_module: pl.LightningModule,
         prediction: Any,
         batch_indices: Sequence[int],
-        batch: INPUT_BATCH,
+        batch: DATA_SAMPLE,
         batch_idx: int,
         dataloader_idx: int,
     ) -> None:
         dataset = trainer.predict_dataloaders[dataloader_idx].dataset  # type: ignore
-        _, targets, metadata = INPUT_BATCH(*batch)
+        _, targets, metadata = DATA_SAMPLE(*batch)
         split = self._dataloader_idx_map.get(dataloader_idx)
 
         embeddings = self._get_embeddings(prediction)

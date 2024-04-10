@@ -5,7 +5,7 @@ from lightning.pytorch.utilities.types import STEP_OUTPUT
 from typing_extensions import override
 
 from eva.core.models.modules import module
-from eva.core.models.modules.typings import INPUT_BATCH, MODEL_TYPE
+from eva.core.models.modules.typings import DATA_SAMPLE, MODEL_TYPE
 
 
 class InferenceModule(module.ModelModule):
@@ -28,10 +28,10 @@ class InferenceModule(module.ModelModule):
     @override
     def predict_step(
         self,
-        batch: INPUT_BATCH,
+        batch: DATA_SAMPLE,
         batch_idx: int,
         dataloader_idx: int = 0,
     ) -> STEP_OUTPUT:
-        data, *_ = INPUT_BATCH(*batch)
+        data, *_ = DATA_SAMPLE(*batch)
         predictions = self(data)
         return predictions
