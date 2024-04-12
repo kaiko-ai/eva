@@ -1,6 +1,14 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:recommended"
-  ]
+    "config:recommended",
+    ":ignoreUnstable",
+    ":enableVulnerabilityAlertsWithLabel(security)",
+    "helpers:pinGitHubActionDigests",
+    ":separateMultipleMajorReleases"
+  ],
+  "assigneesFromCodeOwners": true,
+  "labels": ["renovate"],
+  "timezone": "Europe/Amsterdam",
+  "rebaseWhen": "never"
 }
