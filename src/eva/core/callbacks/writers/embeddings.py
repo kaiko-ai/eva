@@ -85,10 +85,12 @@ class EmbeddingsWriter(callbacks.BasePredictionWriter):
             input_name, save_name = self._construct_save_name(
                 dataset.filename(global_idx), metadata, local_idx
             )
+            save_name = save_name.split(".")[0] + f"_{global_idx}.pt"
             embeddings_buffer, target_buffer = io.BytesIO(), io.BytesIO()
             torch.save(embeddings[local_idx].clone(), embeddings_buffer)
             torch.save(targets[local_idx], target_buffer)  # type: ignore
-            item = QUEUE_ITEM(embeddings_buffer, target_buffer, input_name, save_name, split)
+            slide_id = None if not metadata else metadata.get("slide_id")[local_idx]
+            item = QUEUE_ITEM(embeddings_buffer, target_buffer, input_name, save_name, split, slide_id)
             self._write_queue.put(item)
 
         self._write_process.check_exceptions()
@@ -130,9 +132,9 @@ def _process_write_queue(
         if item is None:
             break
 
-        prediction_buffer, target_buffer, input_name, save_name, split = QUEUE_ITEM(*item)
+        prediction_buffer, target_buffer, input_name, save_name, split, slide_id = QUEUE_ITEM(*item)
         _save_prediction(prediction_buffer, save_name, output_dir)
-        _update_manifest(target_buffer, input_name, save_name, split, manifest_writer)
+        _update_manifest(target_buffer, input_name, save_name, split, slide_id, manifest_writer)
 
     manifest_file.close()
 
@@ -154,7 +156,7 @@ def _init_manifest(output_dir: str, overwrite: bool = False) -> tuple[io.TextIOW
         )
     manifest_file = open(manifest_path, "w", newline="")
     manifest_writer = csv.writer(manifest_file)
-    manifest_writer.writerow(["origin", "embeddings", "target", "split"])
+    manifest_writer.writerow(["origin", "embeddings", "target", "split", "slide_id"])
     return manifest_file, manifest_writer
 
 
@@ -163,7 +165,8 @@ def _update_manifest(
     input_name: str,
     save_name: str,
     split: str | None,
+    slide_id: str | None,
     manifest_writer,
 ) -> None:
     target = torch.load(io.BytesIO(target_buffer.getbuffer()), map_location="cpu")
-    manifest_writer.writerow([input_name, save_name, target.item(), split])
+    manifest_writer.writerow([input_name, save_name, target.item(), split, slide_id])

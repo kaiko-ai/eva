@@ -77,6 +77,7 @@ class MultiEmbeddingsClassificationDataset(base.EmbeddingsDataset):
 
         # Load embeddings and stack them accross the first dimension
         embeddings = [torch.load(path, map_location="cpu") for path in embedding_paths]
+        embeddings = [embedding.unsqueeze(0) if embedding.ndim==1 else embedding for embedding in embeddings]
         embeddings = torch.cat(embeddings, dim=0)
 
         if not embeddings.ndim == 2:
@@ -103,4 +104,4 @@ class MultiEmbeddingsClassificationDataset(base.EmbeddingsDataset):
 
     @override
     def __len__(self) -> int:
-        return len(self._data)
+        return len(self._multi_ids)

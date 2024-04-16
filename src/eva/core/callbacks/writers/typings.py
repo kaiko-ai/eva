@@ -21,3 +21,6 @@ class QUEUE_ITEM(NamedTuple):
 
     split: str | None
     """The dataset split the item belongs to (e.g. train, val, test)."""
+
+    slide_id: str | None = None
+    """Name of the original input file that was used to generate the embedding."""
