@@ -73,10 +73,12 @@ class MultiEmbeddingsClassificationDataset(base.EmbeddingsDataset):
         embedding_paths = self._data.loc[
             self._data[self._column_mapping["multi_id"]] == multi_id, self._column_mapping["path"]
         ].to_list()
-        embedding_paths = [os.path.join(self._root, path) for path in embedding_paths]
 
         # Load embeddings and stack them accross the first dimension
-        embeddings = [torch.load(path, map_location="cpu") for path in embedding_paths]
+        embeddings = []
+        for path in embedding_paths:
+            embedding = torch.load(os.path.join(self._root, path), map_location="cpu")
+            embeddings.append(embedding.unsqueeze(0) if embedding.ndim==1 else embedding)
         embeddings = torch.cat(embeddings, dim=0)
 
         if not embeddings.ndim == 2:
@@ -103,4 +105,4 @@ class MultiEmbeddingsClassificationDataset(base.EmbeddingsDataset):
 
     @override
     def __len__(self) -> int:
-        return len(self._data)
+        return len(self._multi_ids)
