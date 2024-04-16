@@ -85,7 +85,6 @@ class EmbeddingsWriter(callbacks.BasePredictionWriter):
             input_name, save_name = self._construct_save_name(
                 dataset.filename(global_idx), metadata, local_idx
             )
-            save_name = save_name.split(".")[0] + f"_{global_idx}.pt"
             embeddings_buffer, target_buffer = io.BytesIO(), io.BytesIO()
             torch.save(embeddings[local_idx].clone(), embeddings_buffer)
             torch.save(targets[local_idx], target_buffer)  # type: ignore
