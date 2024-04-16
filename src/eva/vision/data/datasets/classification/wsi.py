@@ -1,4 +1,5 @@
 import bisect
+import os
 from typing import Any, Dict
 
 import numpy as np
@@ -26,4 +27,4 @@ class MultiWsiClassificationDataset(MultiWsiDataset):
     def filename(self, index: int) -> str:
         dataset_idx = bisect.bisect_right(self.cumulative_sizes, index)
         full_path = self._manifest.at[dataset_idx, self._column_mapping["path"]]
-        return full_path.split("/")[-1]
+        return os.path.basename(full_path)

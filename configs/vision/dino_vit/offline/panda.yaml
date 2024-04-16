@@ -19,7 +19,7 @@ trainer:
       - class_path: lightning.pytorch.callbacks.EarlyStopping
         init_args:
           min_delta: 0
-          patience: 200
+          patience: 13
           monitor: *MONITOR_METRIC
           mode: *MONITOR_METRIC_MODE
       - class_path: eva.callbacks.EmbeddingsWriter
@@ -56,7 +56,7 @@ model:
     optimizer:
       class_path: torch.optim.SGD
       init_args:
-        lr: &LR_VALUE ${oc.env:LR_VALUE, 0.000625}
+        lr: &LR_VALUE ${oc.env:LR_VALUE, 0.00004}
         momentum: 0.9
         weight_decay: 0.0
     lr_scheduler:
@@ -115,7 +115,7 @@ data:
             manifest_file: manifest_test.csv
     dataloaders:
       train:
-        batch_size: &BATCH_SIZE ${oc.env:BATCH_SIZE, 256}
+        batch_size: &BATCH_SIZE ${oc.env:BATCH_SIZE, 16}
         shuffle: true
       val:
         batch_size: *BATCH_SIZE
