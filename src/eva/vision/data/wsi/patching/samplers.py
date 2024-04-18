@@ -13,8 +13,8 @@ class Sampler(abc.ABC):
     @abc.abstractmethod
     def sample(
         self,
-        height: int,
         width: int,
+        height: int,
         layer_shape: tuple[int, int],
     ) -> Generator[Tuple[int, int], None, None]:
         """Iterator that samples patches."""
