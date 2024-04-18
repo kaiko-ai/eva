@@ -78,7 +78,7 @@ class MultiEmbeddingsClassificationDataset(base.EmbeddingsDataset):
         embeddings = []
         for path in embedding_paths:
             embedding = torch.load(os.path.join(self._root, path), map_location="cpu")
-            embeddings.append(embedding.unsqueeze(0) if embedding.ndim==1 else embedding)
+            embeddings.append(embedding.unsqueeze(0) if embedding.ndim == 1 else embedding)
         embeddings = torch.cat(embeddings, dim=0)
 
         if not embeddings.ndim == 2:

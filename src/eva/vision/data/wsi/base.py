@@ -1,5 +1,7 @@
+"""Base Module for loading data from WSI files."""
+
 import abc
-from typing import Any, List, Tuple
+from typing import Any, Sequence, Tuple
 
 import numpy as np
 
@@ -18,12 +20,12 @@ class Wsi(abc.ABC):
 
     @property
     @abc.abstractmethod
-    def level_dimensions(self) -> List[tuple[int, int]]:
+    def level_dimensions(self) -> Sequence[Tuple[int, int]]:
         """A list of (width, height) tuples for each level, from highest to lowest resolution."""
 
     @property
     @abc.abstractmethod
-    def level_downsamples(self) -> List[float]:
+    def level_downsamples(self) -> Sequence[float]:
         """A list of downsampling factors for each level, relative to the highest resolution."""
 
     @property
@@ -51,3 +53,25 @@ class Wsi(abc.ABC):
         C types or pointers, which the standard Python pickler cannot serialize, leading to
         issues with torch.DataLoader in multiprocessing settings.
         """
+
+    def get_closest_level(self, target_mpp: float) -> int:
+        """Calculate the slide level that is closest to the target mpp.
+
+        Args:
+            slide: The whole-slide image object.
+            target_mpp: The target microns per pixel (mpp) value.
+        """
+        # Calculate the mpp for each level
+        level_mpps = self.mpp * np.array(self.level_downsamples)
+
+        # Ignore levels with higher mpp
+        level_mpps_filtered = level_mpps.copy()
+        level_mpps_filtered[level_mpps_filtered > target_mpp] = 0
+
+        if level_mpps_filtered.max() == 0:
+            # When all levels have higher mpp than target_mpp return the level with lowest mpp
+            level_idx = np.argmin(level_mpps)
+        else:
+            level_idx = np.argmax(level_mpps_filtered)
+
+        return int(level_idx)
