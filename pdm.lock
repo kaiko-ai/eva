@@ -5,7 +5,7 @@
 groups = ["default", "dev", "docs", "all", "typecheck", "lint", "vision", "test"]
 strategy = ["cross_platform", "inherit_metadata"]
 lock_version = "4.4.1"
-content_hash = "sha256:c10565d042a67f776991cc9989f4cc9aee39c75161829ad679c1b394d2bdb906"
+content_hash = "sha256:ffa7b5a5665a4fd7d142fd7c8cf32c533a041f9823b79d24f24a228ec144a1f7"
 
 [[package]]
 name = "absl-py"
@@ -760,7 +760,7 @@ files = [
 
 [[package]]
 name = "lightning"
-version = "2.2.1"
+version = "2.3.0.dev20240407"
 requires_python = ">=3.8"
 summary = "The Deep Learning framework to train, deploy, and ship AI products Lightning fast."
 groups = ["default"]
@@ -777,8 +777,8 @@ dependencies = [
     "typing-extensions<6.0,>=4.4.0",
 ]
 files = [
-    {file = "lightning-2.2.1-py3-none-any.whl", hash = "sha256:fec9b49d29a6019e8fe49e825082bab8d5ea3fde8e4b36dcf5c8896c2bdb86c3"},
-    {file = "lightning-2.2.1.tar.gz", hash = "sha256:b3e46d596b32cafd1fb9b21fdba1b1767df97b1af5cc702693d1c51df60b19aa"},
+    {file = "lightning-2.3.0.dev20240407-py3-none-any.whl", hash = "sha256:27fa1f37a5ab12b917590f833baeea3e02c3a979f49f9a14bb35e2fd0ae29cfd"},
+    {file = "lightning-2.3.0.dev20240407.tar.gz", hash = "sha256:6aab115c1c22a75d359f79db3457d7488682900aa03426a9534ef1a535195310"},
 ]
 
 [[package]]
