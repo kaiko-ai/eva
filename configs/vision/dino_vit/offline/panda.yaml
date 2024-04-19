@@ -96,14 +96,16 @@ data:
           init_args: &PREDICT_DATASET_ARGS
             root: ${oc.env:DATA_ROOT, ./slide_data}/panda
             manifest_file: manifest_train.csv
-            n_samples: 100
+            sampler: 
+              class_path: eva.vision.data.wsi.patching.samplers.RandomSampler
+              init_args:
+                n_samples: 100
             width: 224
             height: 224
-            target_mpp: 0.5
+            target_mpp: 0.503
             transforms:
               class_path: eva.vision.data.transforms.common.ResizeAndCrop
               init_args:
-                size: ${oc.env:RESIZE_DIM, 224} 
                 mean: ${oc.env:NORMALIZE_MEAN, [0.485, 0.456, 0.406]} 
                 std: ${oc.env:NORMALIZE_STD, [0.229, 0.224, 0.225]}
         - class_path: eva.vision.datasets.MultiWsiClassificationDataset
@@ -124,4 +126,3 @@ data:
         batch_size: &PREDICT_BATCH_SIZE ${oc.env:PREDICT_BATCH_SIZE, 64}
         num_workers: 12 #multiprocessing.cpu_count
         prefetch_factor: 2
-

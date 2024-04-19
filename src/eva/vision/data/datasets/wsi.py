@@ -76,7 +76,7 @@ class WsiDataset(vision.VisionDataset):
         x, y = self._coords.x_y[index]
         width, height, level_idx = self._coords.width, self._coords.height, self._coords.level_idx
         patch = self._wsi.read_region((x, y), (width, height), level_idx)
-        patch = self._apply_transforms(torch.from_numpy(patch))
+        patch = self._apply_transforms(patch)
         return patch
 
     def _apply_transforms(self, tensor: torch.Tensor) -> torch.Tensor:
