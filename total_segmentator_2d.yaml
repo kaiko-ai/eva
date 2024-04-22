@@ -1,0 +1,22 @@
+data:
+  class_path: eva.DataModule
+  init_args:
+    datasets:
+      train:
+        class_path: eva.vision.datasets.TotalSegmentator2D
+        init_args: &DATASET_ARGS
+          root: *DATASET_EMBEDDINGS_ROOT
+          split: train
+      val:
+        class_path: eva.vision.datasets.TotalSegmentator2D
+        init_args: &DATASET_ARGS
+          root: *DATASET_EMBEDDINGS_ROOT
+          split: train
+    dataloaders:
+      train:
+        batch_size: &BATCH_SIZE ${oc.env:BATCH_SIZE, 256}
+        shuffle: true
+      val:
+        batch_size: *BATCH_SIZE
+      predict:
+        batch_size: &PREDICT_BATCH_SIZE ${oc.env:PREDICT_BATCH_SIZE, 64}

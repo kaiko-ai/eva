@@ -20,7 +20,7 @@ class BaseModel(nn.Module):
         """
         super().__init__()
 
-        self._output_transforms = tensor_transforms
+        self._tensor_transforms = tensor_transforms
 
     @override
     def forward(self, tensor: torch.Tensor) -> torch.Tensor:
@@ -42,6 +42,6 @@ class BaseModel(nn.Module):
         raise NotImplementedError
 
     def _apply_transforms(self, tensor: torch.Tensor) -> torch.Tensor:
-        if self._output_transforms is not None:
-            tensor = self._output_transforms(tensor)
+        if self._tensor_transforms is not None:
+            tensor = self._tensor_transforms(tensor)
         return tensor
