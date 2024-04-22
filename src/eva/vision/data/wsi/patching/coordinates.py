@@ -50,7 +50,7 @@ class PatchCoordinates:
         x_y = []
         level_idx = wsi_obj.get_closest_level(target_mpp)
         level_mpp = wsi_obj.mpp * wsi_obj.level_downsamples[level_idx]
-        mpp_ratio = level_mpp / target_mpp
+        mpp_ratio = target_mpp / level_mpp
         scaled_width, scaled_height = int(mpp_ratio * width), int(mpp_ratio * height)
 
         for x, y in sampler.sample(

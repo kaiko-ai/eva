@@ -49,7 +49,7 @@ class RandomSampler(Sampler):
         _set_seed(self.seed)
 
         for _ in range(self.n_samples):
-            x_max, y_max = layer_shape[1], layer_shape[0]  # TODO: check if this is correct
+            x_max, y_max = layer_shape[0], layer_shape[1]
             x, y = random.randint(0, x_max - width), random.randint(0, y_max - height)  # nosec
             yield x, y
 
