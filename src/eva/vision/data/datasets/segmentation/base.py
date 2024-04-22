@@ -3,38 +3,28 @@
 import abc
 from typing import Any, Callable, Dict, List, Tuple
 
-import numpy as np
+from torchvision import tv_tensors
 from typing_extensions import override
 
 from eva.vision.data.datasets import vision
 
 
-class ImageSegmentation(vision.VisionDataset[Tuple[np.ndarray, np.ndarray]], abc.ABC):
+class ImageSegmentation(vision.VisionDataset[Tuple[tv_tensors.Image, tv_tensors.Mask]], abc.ABC):
     """Image segmentation abstract dataset."""
 
     def __init__(
         self,
-        image_transforms: Callable | None = None,
-        target_transforms: Callable | None = None,
-        image_target_transforms: Callable | None = None,
+        transforms: Callable | None = None,
     ) -> None:
         """Initializes the image segmentation base class.
 
         Args:
-            image_transforms: A function/transform that takes in an image
-                and returns a transformed version.
-            target_transforms: A function/transform that takes in the target
-                and transforms it.
-            image_target_transforms: A function/transforms that takes in an
+            transforms: A function/transforms that takes in an
                 image and a label and returns the transformed versions of both.
-                This transform happens after the `image_transforms` and
-                `target_transforms`.
         """
         super().__init__()
 
-        self._image_transforms = image_transforms
-        self._target_transforms = target_transforms
-        self._image_target_transforms = image_target_transforms
+        self._transforms = transforms
 
     @property
     def classes(self) -> List[str] | None:
@@ -56,25 +46,26 @@ class ImageSegmentation(vision.VisionDataset[Tuple[np.ndarray, np.ndarray]], abc
         """
 
     @abc.abstractmethod
-    def load_image(self, index: int) -> np.ndarray:
+    def load_image(self, index: int) -> tv_tensors.Image:
         """Loads and returns the `index`'th image sample.
 
         Args:
             index: The index of the data sample to load.
 
         Returns:
-            The image as a numpy array.
+            An image torchvision tensor (channels, height, width).
         """
 
     @abc.abstractmethod
-    def load_mask(self, index: int) -> np.ndarray:
-        """Returns the `index`'th target mask sample.
+    def load_masks(self, index: int) -> tv_tensors.Mask:
+        """Returns the `index`'th target masks sample.
 
         Args:
-            index: The index of the data sample target mask to load.
+            index: The index of the data sample target masks to load.
 
         Returns:
-            The sample mask as a stack of binary mask arrays (label, height, width).
+            The sample masks as a stack of binary torchvision mask
+            tensors (label, height, width).
         """
 
     @abc.abstractmethod
@@ -83,30 +74,24 @@ class ImageSegmentation(vision.VisionDataset[Tuple[np.ndarray, np.ndarray]], abc
         raise NotImplementedError
 
     @override
-    def __getitem__(self, index: int) -> Tuple[np.ndarray, np.ndarray]:
+    def __getitem__(self, index: int) -> Tuple[tv_tensors.Image, tv_tensors.Mask]:
         image = self.load_image(index)
-        mask = self.load_mask(index)
-        return self._apply_transforms(image, mask)
+        masks = self.load_masks(index)
+        return self._apply_transforms(image, masks)
 
     def _apply_transforms(
-        self, image: np.ndarray, target: np.ndarray
-    ) -> Tuple[np.ndarray, np.ndarray]:
+        self, image: tv_tensors.Image, masks: tv_tensors.Mask
+    ) -> Tuple[tv_tensors.Image, tv_tensors.Mask]:
         """Applies the transforms to the provided data and returns them.
 
         Args:
             image: The desired image.
-            target: The target of the image.
+            masks: The target masks of the image.
 
         Returns:
-            A tuple with the image and the target transformed.
+            A tuple with the image and the masks transformed.
         """
-        if self._image_transforms is not None:
-            image = self._image_transforms(image)
+        if self._transforms is not None:
+            image, masks = self._transforms(image, masks)
 
-        if self._target_transforms is not None:
-            target = self._target_transforms(target)
-
-        if self._image_target_transforms is not None:
-            image, target = self._image_target_transforms(image, target)
-
-        return image, target
+        return image, masks
