@@ -11,6 +11,7 @@ from typing_extensions import override
 
 from eva.vision.data import wsi
 from eva.vision.data.datasets import vision
+from eva.vision.data.wsi.backends import wsi_backend
 from eva.vision.data.wsi.patching import samplers
 
 
@@ -24,7 +25,7 @@ class WsiDataset(vision.VisionDataset):
         height: int,
         target_mpp: float,
         sampler: samplers.Sampler,
-        backend: wsi.WsiBackend = wsi.WsiBackend.OPENSLIDE,
+        backend: str = "openslide",
         transforms: Callable[..., torch.Tensor] | None = None,
     ):
         """Initializes a new dataset instance.
@@ -56,9 +57,8 @@ class WsiDataset(vision.VisionDataset):
 
     @cached_property
     def _wsi(self) -> wsi.Wsi:
-        wsi_obj = wsi.get_wsi_class(self._backend)(self._file_path)
-        wsi_obj.open_slide()
-        return wsi_obj
+        # wsi_obj = wsi.get_wsi_class(self._backend)(self._file_path)
+        return wsi_backend(self._backend)(self._file_path)
 
     @cached_property
     def _coords(self) -> wsi.PatchCoordinates:
@@ -76,7 +76,8 @@ class WsiDataset(vision.VisionDataset):
         x, y = self._coords.x_y[index]
         width, height, level_idx = self._coords.width, self._coords.height, self._coords.level_idx
         patch = self._wsi.read_region((x, y), (width, height), level_idx)
-        patch = self._apply_transforms(torch.from_numpy(patch))
+        # patch = self._apply_transforms(torch.from_numpy(patch))  # TODO: Fix this
+        patch = self._apply_transforms(patch)
         return patch
 
     def _apply_transforms(self, tensor: torch.Tensor) -> torch.Tensor:
@@ -101,7 +102,7 @@ class MultiWsiDataset(torch_datasets.ConcatDataset, vision.VisionDataset):
         height: int,
         target_mpp: float,
         sampler: samplers.Sampler,
-        backend: wsi.WsiBackend = wsi.WsiBackend.OPENSLIDE,
+        backend: str = "openslide",
         transforms: Callable | None = None,
         column_mapping: Dict[str, str] = default_column_mapping,
     ):

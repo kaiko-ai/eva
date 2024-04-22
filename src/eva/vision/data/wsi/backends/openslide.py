@@ -15,8 +15,8 @@ class WsiOpenslide(base.Wsi):
     _wsi: openslide.OpenSlide | openslide.ImageSlide
 
     @override
-    def open_slide(self) -> None:
-        self._wsi = openslide.open_slide(self._file_path)
+    def open_file(self, file_path: str) -> openslide.OpenSlide | openslide.ImageSlide:
+        return openslide.open_slide(file_path)
 
     @property
     @override

@@ -7,16 +7,23 @@ import numpy as np
 
 
 class Wsi(abc.ABC):
-    """Base class for loading data from WSI (whole slide image) files."""
+    """Base class for loading data from Whole Slide Image (WSI) files."""
 
     def __init__(self, file_path: str):
-        """Initializes a new class instance.
+        """Initializes a Wsi object.
 
         Args:
-            file_path: The path to the whole slide image file.
+            file_path: The path to the WSI file.
         """
-        self._file_path = file_path
-        self._wsi = None
+        self._wsi = self.open_file(file_path)
+
+    @abc.abstractmethod
+    def open_file(self, file_path: str) -> Any:
+        """Opens the WSI file.
+
+        Args:
+            file_path: The path to the WSI file.
+        """
 
     @property
     @abc.abstractmethod
@@ -43,15 +50,6 @@ class Wsi(abc.ABC):
             location: Top-left corner (x, y) to start reading.
             size: Region size as (width, height), relative to <location>.
             level: Zoom level, with 0 being the highest resolution.
-        """
-
-    @abc.abstractmethod
-    def open_slide(self) -> Any:
-        """Opens the WSI file.
-
-        Note: This shouldn't be called in the constructor as wsi backends usually contain
-        C types or pointers, which the standard Python pickler cannot serialize, leading to
-        issues with torch.DataLoader in multiprocessing settings.
         """
 
     def get_closest_level(self, target_mpp: float) -> int:

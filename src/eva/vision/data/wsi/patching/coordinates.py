@@ -3,7 +3,7 @@
 import dataclasses
 from typing import List, Tuple
 
-from eva.vision.data import wsi
+from eva.vision.data.wsi import backends
 from eva.vision.data.wsi.patching import samplers
 
 
@@ -31,7 +31,7 @@ class PatchCoordinates:
         height: int,
         target_mpp: float,
         sampler: samplers.Sampler,
-        backend: wsi.WsiBackend = wsi.WsiBackend.OPENSLIDE,
+        backend: str = "openslide",
     ) -> "PatchCoordinates":
         """Create a new instance of PatchCoordinates from a whole-slide image file.
 
@@ -45,17 +45,14 @@ class PatchCoordinates:
             sampler: The sampler to use for sampling patch coordinates.
             backend: The backend to use for reading the whole-slide images.
         """
-        wsi_obj = wsi.get_wsi_class(backend)(wsi_path)
-        wsi_obj.open_slide()
+        wsi = backends.wsi_backend(backend)(wsi_path)
         x_y = []
-        level_idx = wsi_obj.get_closest_level(target_mpp)
-        level_mpp = wsi_obj.mpp * wsi_obj.level_downsamples[level_idx]
+        level_idx = wsi.get_closest_level(target_mpp)
+        level_mpp = wsi.mpp * wsi.level_downsamples[level_idx]
         mpp_ratio = target_mpp / level_mpp
         scaled_width, scaled_height = int(mpp_ratio * width), int(mpp_ratio * height)
 
-        for x, y in sampler.sample(
-            scaled_width, scaled_height, wsi_obj.level_dimensions[level_idx]
-        ):
+        for x, y in sampler.sample(scaled_width, scaled_height, wsi.level_dimensions[level_idx]):
             x_y.append((x, y))
 
         return cls(x_y, scaled_width, scaled_height, level_idx)
