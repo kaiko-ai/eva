@@ -3,7 +3,6 @@
 import abc
 from typing import Any, Callable, Dict, List, Tuple
 
-import numpy as np
 from torchvision import tv_tensors
 from typing_extensions import override
 
@@ -54,7 +53,7 @@ class ImageSegmentation(vision.VisionDataset[Tuple[tv_tensors.Image, tv_tensors.
             index: The index of the data sample to load.
 
         Returns:
-            An image torchvision tensor.
+            An image torchvision tensor (channels, height, width).
         """
 
     @abc.abstractmethod

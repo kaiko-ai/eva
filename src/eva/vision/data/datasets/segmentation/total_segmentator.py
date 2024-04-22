@@ -138,7 +138,7 @@ class TotalSegmentator2D(base.ImageSegmentation):
         list_of_mask_arrays = [io.read_nifti_slice(path, slice_index) for path in mask_paths]
         masks = np.concatenate(list_of_mask_arrays, axis=-1)
         return tv_tensors.Mask(masks.transpose(2, 0, 1))
-    
+
     def _get_masks_dir(self, index: int) -> str:
         """Returns the directory of the corresponding masks."""
         sample_dir = self._get_sample_dir(index)
