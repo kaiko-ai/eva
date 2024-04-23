@@ -3,7 +3,7 @@
 import csv
 import io
 import os
-from typing import Any, Dict, Sequence
+from typing import Any, Dict, List, Sequence
 
 import lightning.pytorch as pl
 import torch
@@ -12,7 +12,7 @@ from loguru import logger
 from torch import multiprocessing, nn
 from typing_extensions import override
 
-from eva.core.callbacks.writers.typings import QUEUE_ITEM
+from eva.core.callbacks.writers.typings import ITEM_DICT_ENTRY, QUEUE_ITEM
 from eva.core.models.modules.typings import DATA_SAMPLE
 from eva.core.utils import multiprocessing as eva_multiprocessing
 
@@ -27,6 +27,7 @@ class EmbeddingsWriter(callbacks.BasePredictionWriter):
         dataloader_idx_map: Dict[int, str] | None = None,
         group_key: str | None = None,
         overwrite: bool = True,
+        save_every_n: int = 1000,
     ) -> None:
         """Initializes a new EmbeddingsWriter instance.
 
@@ -43,6 +44,8 @@ class EmbeddingsWriter(callbacks.BasePredictionWriter):
                 embedding files will be saved in subdirectories named after the group_key.
                 If specified, the key must be present in the metadata of the input batch.
             overwrite: Whether to overwrite the output directory. Defaults to True.
+            save_every_n: Interval for number of iterations to save the embeddings to disk.
+                During this interval, the embeddings are accumulated in memory.
         """
         super().__init__(write_interval="batch")
 
@@ -51,6 +54,7 @@ class EmbeddingsWriter(callbacks.BasePredictionWriter):
         self._dataloader_idx_map = dataloader_idx_map or {}
         self._group_key = group_key
         self._overwrite = overwrite
+        self._save_every_n = save_every_n
 
         self._write_queue: multiprocessing.Queue
         self._write_process: eva_multiprocessing.Process
@@ -85,8 +89,6 @@ class EmbeddingsWriter(callbacks.BasePredictionWriter):
             input_name, save_name = self._construct_save_name(
                 dataset.filename(global_idx), metadata, local_idx
             )
-            # TODO: group multiple embeddings into one file and remove line below
-            save_name = save_name.split(".")[0] + f"_{global_idx}.pt"
             embeddings_buffer, target_buffer = io.BytesIO(), io.BytesIO()
             torch.save(embeddings[local_idx].clone(), embeddings_buffer)
             torch.save(targets[local_idx], target_buffer)  # type: ignore
@@ -111,7 +113,8 @@ class EmbeddingsWriter(callbacks.BasePredictionWriter):
     def _initialize_write_process(self) -> None:
         self._write_queue = multiprocessing.Queue()
         self._write_process = eva_multiprocessing.Process(
-            target=_process_write_queue, args=(self._write_queue, self._output_dir, self._overwrite)
+            target=_process_write_queue,
+            args=(self._write_queue, self._output_dir, self._save_every_n, self._overwrite),
         )
 
     def _get_embeddings(self, prediction: torch.Tensor) -> torch.Tensor:
@@ -131,26 +134,68 @@ class EmbeddingsWriter(callbacks.BasePredictionWriter):
 
 
 def _process_write_queue(
-    write_queue: multiprocessing.Queue, output_dir: str, overwrite: bool = False
+    write_queue: multiprocessing.Queue, output_dir: str, save_every_n: int, overwrite: bool = False
 ) -> None:
     manifest_file, manifest_writer = _init_manifest(output_dir, overwrite)
+
+    save_name_to_items: Dict[str, ITEM_DICT_ENTRY] = {}
+
+    counter = 0
     while True:
         item = write_queue.get()
         if item is None:
             break
 
-        prediction_buffer, target_buffer, input_name, save_name, split, slide_id = QUEUE_ITEM(*item)
-        _save_prediction(prediction_buffer, save_name, output_dir)
-        _update_manifest(target_buffer, input_name, save_name, split, slide_id, manifest_writer)
+        item = QUEUE_ITEM(*item)
+
+        if item.save_name in save_name_to_items:
+            save_name_to_items[item.save_name].items.append(item)
+        else:
+            save_name_to_items[item.save_name] = ITEM_DICT_ENTRY(items=[item], save_count=0)
+
+        if counter > 0 and counter % save_every_n == 0:
+            save_name_to_items = _save_items(save_name_to_items, output_dir, manifest_writer)
+
+        counter += 1
+
+    if len(save_name_to_items) > 0:
+        _save_items(save_name_to_items, output_dir, manifest_writer)
 
     manifest_file.close()
 
 
-def _save_prediction(prediction_buffer: io.BytesIO, save_name: str, output_dir: str) -> None:
-    save_path = os.path.join(output_dir, save_name)
-    prediction = torch.load(io.BytesIO(prediction_buffer.getbuffer()), map_location="cpu")
+def _save_items(
+    save_name_to_items: Dict[str, ITEM_DICT_ENTRY], output_dir: str, manifest_writer: Any
+) -> Dict[str, ITEM_DICT_ENTRY]:
+    for save_name, entry in save_name_to_items.items():
+        save_path = os.path.join(output_dir, save_name)
+        is_first_save = entry.save_count == 0
+        if is_first_save:
+            _, target, input_name, _, split, slide_id = QUEUE_ITEM(*entry.items[0])
+            _update_manifest(target, input_name, save_name, split, slide_id, manifest_writer)
+        else:
+            pass
+        prediction_buffers = [item.prediction_buffer for item in entry.items]
+        _save_predictions(prediction_buffers, save_path, is_first_save)
+        save_name_to_items[save_name].save_count += 1
+
+    return save_name_to_items
+
+
+def _save_predictions(
+    prediction_buffers: List[io.BytesIO], save_path: str, is_first_save: bool
+) -> None:
+    predictions = [
+        torch.load(io.BytesIO(buffer.getbuffer()), map_location="cpu")
+        for buffer in prediction_buffers
+    ]
+    predictions = torch.stack(predictions, dim=0)
+
+    if not is_first_save:
+        predictions = torch.cat([torch.load(save_path), predictions], dim=0)
+
     os.makedirs(os.path.dirname(save_path), exist_ok=True)
-    torch.save(prediction, save_path)
+    torch.save(predictions, save_path)
 
 
 def _init_manifest(output_dir: str, overwrite: bool = False) -> tuple[io.TextIOWrapper, Any]:

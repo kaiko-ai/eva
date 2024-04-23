@@ -1,26 +1,38 @@
 """Typing definitions for the writer callback functions."""
 
+import dataclasses
 import io
-from typing import NamedTuple
+from typing import List, NamedTuple
 
 
 class QUEUE_ITEM(NamedTuple):
     """The default input batch data scheme."""
 
     prediction_buffer: io.BytesIO
-    """IO buffer containing the prediction tensor"""
+    """IO buffer containing the prediction tensor."""
 
     target_buffer: io.BytesIO
-    """IO buffer containing the target tensor"""
+    """IO buffer containing the target tensor."""
 
     input_name: str
     """Name of the original input file that was used to generate the embedding."""
 
     save_name: str
-    """Name to store the generated embedding"""
+    """Name to store the generated embedding."""
 
     split: str | None
     """The dataset split the item belongs to (e.g. train, val, test)."""
 
     slide_id: str | None = None
     """Unique slide identifier."""
+
+
+@dataclasses.dataclass
+class ITEM_DICT_ENTRY:
+    """Typing for holding queue items and number of save operations."""
+
+    items: List[QUEUE_ITEM]
+    """List of queue items."""
+
+    save_count: int
+    """Number of prior item batch saves to same file."""
