@@ -1,5 +1,6 @@
-from eva.vision.data.wsi.backend import WsiBackend, get_wsi_class
-from eva.vision.data.wsi.base import Wsi
-from eva.vision.data.wsi.openslide import WsiOpenslide
+"""WSI API."""
 
-__all__ = ["Wsi", "WsiOpenslide", "WsiBackend", "get_wsi_class"]
+from eva.vision.data.wsi.backends import Wsi, wsi_backend
+from eva.vision.data.wsi.patching.coordinates import PatchCoordinates
+
+__all__ = ["Wsi", "PatchCoordinates", "wsi_backend"]

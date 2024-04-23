@@ -86,12 +86,18 @@ class EmbeddingsWriter(callbacks.BasePredictionWriter):
                 dataset.filename(global_idx), metadata, local_idx
             )
             # TODO: group multiple embeddings into one file and remove line below
-            save_name = save_name.split(".")[0] + f"_{local_idx}.pt"
+            save_name = save_name.split(".")[0] + f"_{global_idx}.pt"
             embeddings_buffer, target_buffer = io.BytesIO(), io.BytesIO()
             torch.save(embeddings[local_idx].clone(), embeddings_buffer)
             torch.save(targets[local_idx], target_buffer)  # type: ignore
-            slide_id = None if not metadata else metadata.get("slide_id")[local_idx]
-            item = QUEUE_ITEM(embeddings_buffer, target_buffer, input_name, save_name, split, slide_id)
+            slide_id = (
+                list(metadata["slide_id"])[local_idx]
+                if isinstance(metadata, dict) and "slide_id" in metadata
+                else None
+            )
+            item = QUEUE_ITEM(
+                embeddings_buffer, target_buffer, input_name, save_name, split, slide_id
+            )
             self._write_queue.put(item)
 
         self._write_process.check_exceptions()

@@ -1,9 +1,9 @@
+"""Dataset classes for whole-slide images."""
+
 import os
-import random
 from functools import cached_property
 from typing import Callable, Dict
 
-import numpy as np
 import pandas as pd
 import torch
 from torch.utils.data import dataset as torch_datasets
@@ -11,85 +11,73 @@ from typing_extensions import override
 
 from eva.vision.data import wsi
 from eva.vision.data.datasets import vision
+from eva.vision.data.wsi.backends import wsi_backend
+from eva.vision.data.wsi.patching import samplers
 
 
 class WsiDataset(vision.VisionDataset):
+    """Dataset class for reading patches from whole-slide images."""
+
     def __init__(
         self,
         file_path: str,
-        n_samples: int,
         width: int,
         height: int,
         target_mpp: float,
-        backend: wsi.WsiBackend = wsi.WsiBackend.OPENSLIDE,
-        transforms: Callable | None = None,
+        sampler: samplers.Sampler,
+        backend: str = "openslide",
+        transforms: Callable[..., torch.Tensor] | None = None,
     ):
-        """Args:
-        file_path: Path to the whole-slide image file.
-        n_samples: Number of patches to sample from each slide.
-        width: Width of the patches to be extracted, in pixels.
-        height: Height of the patches to be extracted, in pixels.
-        target_mpp: Target microns per pixel (mpp) for the patches.
-        backend: The backend to use for reading the whole-slide images.
-        transforms: A function that takes in an image and returns a transformed version.
+        """Initializes a new dataset instance.
+
+        Args:
+            file_path: Path to the whole-slide image file.
+            width: Width of the patches to be extracted, in pixels.
+            height: Height of the patches to be extracted, in pixels.
+            target_mpp: Target microns per pixel (mpp) for the patches.
+            sampler: The sampler to use for sampling patch coordinates.
+            backend: The backend to use for reading the whole-slide images.
+            transforms: Transforms to apply to the extracted patch tensors.
         """
         self._file_path = file_path
-        self._n_samples = n_samples
         self._width = width
         self._height = height
         self._target_mpp = target_mpp
         self._backend = backend
+        self._sampler = sampler
         self._transforms = transforms
 
+    @override
     def __len__(self):
-        return self._n_samples
+        return len(self._coords.x_y)
 
     @override
-    @property
     def filename(self, index: int) -> str:
         return f"{self._file_path}_{index}"
 
     @cached_property
     def _wsi(self) -> wsi.Wsi:
-        wsi_obj = wsi.get_wsi_class(self._backend)(self._file_path)
-        wsi_obj.open_slide()
-        return wsi_obj
+        # wsi_obj = wsi.get_wsi_class(self._backend)(self._file_path)
+        return wsi_backend(self._backend)(self._file_path)
 
+    @cached_property
+    def _coords(self) -> wsi.PatchCoordinates:
+        return wsi.PatchCoordinates.from_file(
+            wsi_path=self._file_path,
+            width=self._width,
+            height=self._height,
+            target_mpp=self._target_mpp,
+            backend=self._backend,
+            sampler=self._sampler,
+        )
+
+    @override
     def __getitem__(self, index: int) -> torch.Tensor:
-        # Calculate the desired zoom level based on target_mpp
-        level_idx, width, height = self._get_closest_level(self._wsi, self._target_mpp)
-
-        # Random Sampling
-        # TODO: make sampling method configurable
-        # TODO: add support for masking of unwanted regions
-        x_max, y_max = self._wsi.level_dimensions[level_idx]
-        x = random.randint(0, x_max - width)
-        y = random.randint(0, y_max - height)
-
+        x, y = self._coords.x_y[index]
+        width, height, level_idx = self._coords.width, self._coords.height, self._coords.level_idx
         patch = self._wsi.read_region((x, y), (width, height), level_idx)
-        patch = self._apply_transforms(patch)
+        patch = self._apply_transforms(torch.from_numpy(patch).permute(2, 0, 1))
         return patch
-
-    def _get_closest_level(self, slide: wsi.Wsi, target_mpp: float):
-        """Calculate the slide level closest to the target mpp."""
-        # Calculate the mpp for each level
-        level_mpps = slide.mpp * np.array(slide.level_downsamples)
-
-        # Ignore levels with higher mpp
-        level_mpps_filtered = level_mpps.copy()
-        level_mpps_filtered[level_mpps_filtered > target_mpp] = 0
-
-        if level_mpps_filtered.max() == 0:
-            # When all levels have higher mpp than target_mpp return the level with lowest mpp
-            level_idx = np.argmin(level_mpps)
-        else:
-            level_idx = np.argmax(level_mpps_filtered)
-
-        # Calculate the width & height in pixels scaled to the selected level
-        mpp_ratio = slide.mpp / level_mpps[level_idx]
-        width, height = int(mpp_ratio * self._width), int(mpp_ratio * self._height)
-
-        return level_idx, width, height
 
     def _apply_transforms(self, tensor: torch.Tensor) -> torch.Tensor:
         if self._transforms:
@@ -97,7 +85,9 @@ class WsiDataset(vision.VisionDataset):
         return tensor
 
 
-class MultiWsiDataset(torch_datasets.ConcatDataset):
+class MultiWsiDataset(torch_datasets.ConcatDataset, vision.VisionDataset):
+    """Dataset class for reading patches from multiple whole-slide images."""
+
     default_column_mapping: Dict[str, str] = {
         "path": "path",
         "target": "target",
@@ -107,20 +97,37 @@ class MultiWsiDataset(torch_datasets.ConcatDataset):
         self,
         root: str,
         manifest_file: str,
-        n_samples: int,
         width: int,
         height: int,
         target_mpp: float,
-        backend: wsi.WsiBackend = wsi.WsiBackend.OPENSLIDE,
+        sampler: samplers.Sampler,
+        backend: str = "openslide",
         transforms: Callable | None = None,
         column_mapping: Dict[str, str] = default_column_mapping,
     ):
+        """Initializes a new dataset instance.
+
+        Args:
+            root: Root directory of the dataset.
+            manifest_file: The path to the manifest file, which is relative to
+                the `root` argument.
+            width: Width of the patches to be extracted, in pixels.
+            height: Height of the patches to be extracted, in pixels.
+            target_mpp: Target microns per pixel (mpp) for the patches.
+            sampler: The sampler to use for sampling patch coordinates.
+            backend: The backend to use for reading the whole-slide images.
+            transforms: Transforms to apply to the extracted patch tensors.
+            column_mapping: Defines the map between the variables and the manifest
+                columns. It will overwrite the `default_column_mapping` with
+                the provided values, so that `column_mapping` can contain only the
+                values which are altered or missing.
+        """
         self._root = root
         self._manifest_file = manifest_file
-        self._n_samples = n_samples
         self._width = width
         self._height = height
         self._target_mpp = target_mpp
+        self._sampler = sampler
         self._backend = backend
         self._transforms = transforms
         self._column_mapping = column_mapping
@@ -130,18 +137,18 @@ class MultiWsiDataset(torch_datasets.ConcatDataset):
 
     def _load_datasets(self) -> list[WsiDataset]:
         wsi_datasets = []
-        for index, row in self._manifest.iterrows():
-            file_path = os.path.join(self._root, row[self._column_mapping["path"]])
+        for _, row in self._manifest.iterrows():
+            file_path = os.path.join(self._root, str(row[self._column_mapping["path"]]))
             if not os.path.exists(file_path):
                 raise FileNotFoundError(f"File not found: {file_path}")
 
             wsi_datasets.append(
                 WsiDataset(
                     file_path=file_path,
-                    n_samples=self._n_samples,
                     width=self._width,
                     height=self._height,
                     target_mpp=self._target_mpp,
+                    sampler=self._sampler,
                     backend=self._backend,
                     transforms=self._transforms,
                 )
