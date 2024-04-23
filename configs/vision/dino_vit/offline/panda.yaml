@@ -96,7 +96,10 @@ data:
           init_args: &PREDICT_DATASET_ARGS
             root: ${oc.env:DATA_ROOT, ./slide_data}/panda
             manifest_file: manifest_train.csv
-            n_samples: 100
+            sampler:
+              class_path: eva.vision.data.wsi.patching.samplers.RandomSampler
+              init_args:
+                n_samples: 100
             width: 224
             height: 224
             target_mpp: 0.5

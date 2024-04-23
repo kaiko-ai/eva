@@ -86,7 +86,7 @@ class EmbeddingsWriter(callbacks.BasePredictionWriter):
                 dataset.filename(global_idx), metadata, local_idx
             )
             # TODO: group multiple embeddings into one file and remove line below
-            save_name = save_name.split(".")[0] + f"_{local_idx}.pt"
+            save_name = save_name.split(".")[0] + f"_{global_idx}.pt"
             embeddings_buffer, target_buffer = io.BytesIO(), io.BytesIO()
             torch.save(embeddings[local_idx].clone(), embeddings_buffer)
             torch.save(targets[local_idx], target_buffer)  # type: ignore
