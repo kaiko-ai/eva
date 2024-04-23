@@ -3,7 +3,7 @@
 import importlib.util
 from typing import Callable
 
-from eva.vision.data.wsi import base
+from eva.vision.data.wsi.backends.base import Wsi
 
 
 def is_openslide_available() -> bool:
@@ -11,7 +11,7 @@ def is_openslide_available() -> bool:
     return importlib.util.find_spec("openslide") is not None
 
 
-def wsi_backend(backend: str = "openslide") -> Callable[..., base.Wsi]:
+def wsi_backend(backend: str = "openslide") -> Callable[..., Wsi]:
     """Returns the backend to use for reading the whole-slide images."""
     match backend:
         case "openslide":
@@ -28,4 +28,4 @@ def wsi_backend(backend: str = "openslide") -> Callable[..., base.Wsi]:
             raise ValueError(f"Unknown WSI backend selected: {backend}")
 
 
-__all__ = ["is_openslide_available", "wsi_backend"]
+__all__ = ["Wsi", "wsi_backend", "is_openslide_available"]

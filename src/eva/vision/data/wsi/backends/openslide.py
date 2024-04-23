@@ -6,7 +6,7 @@ import numpy as np
 import openslide
 from typing_extensions import override
 
-from eva.vision.data.wsi import base
+from eva.vision.data.wsi.backends import base
 
 
 class WsiOpenslide(base.Wsi):
