@@ -89,8 +89,8 @@ class GridSampler(Sampler):
         """
         _set_seed(self.seed)
 
-        x_range = range(0, layer_shape[1], width - self.overlap[0])
-        y_range = range(0, layer_shape[0], height - self.overlap[1])
+        x_range = range(0, layer_shape[0] - width, width - self.overlap[0])
+        y_range = range(0, layer_shape[1] - height, height - self.overlap[1])
         x_y = [(x, y) for x in x_range for y in y_range]
 
         shuffled_indices = (

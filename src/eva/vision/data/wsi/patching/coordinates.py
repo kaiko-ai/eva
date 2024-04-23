@@ -13,8 +13,8 @@ class PatchCoordinates:
 
     Args:
         x_y: A list of (x, y) coordinates of the patches.
-        width: The width of the patches, in pixels.
-        height: The height of the patches, in pixels.
+        width: The width of the patches, in pixels (refers to x-dim).
+        height: The height of the patches, in pixels (refers to y-dim).
         level_idx: The level index of the patches.
     """
 

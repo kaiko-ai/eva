@@ -25,7 +25,7 @@ def wsi_backend(backend: str = "openslide") -> Callable[..., base.Wsi]:
                     "Please install using `pip install openslide-python`."
                 )
         case _:
-            raise ValueError(f"Unknown WSI backend: {backend}")
+            raise ValueError(f"Unknown WSI backend selected: {backend}")
 
 
 __all__ = ["is_openslide_available", "wsi_backend"]

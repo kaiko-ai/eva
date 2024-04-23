@@ -40,6 +40,8 @@ class WsiOpenslide(base.Wsi):
     def read_region(
         self, location: Tuple[int, int], size: Tuple[int, int], level: int
     ) -> np.ndarray:
+        x_max, y_max = self._wsi.level_dimensions[level]
+        if location[0] + size[0] > x_max or location[1] + size[1] > y_max:
+            raise ValueError(f"Out of bounds region: {location}, {size}, {level}")
         data = self._wsi.read_region(location, level, size)
-
         return np.array(data.convert("RGB"))
