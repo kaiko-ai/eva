@@ -25,9 +25,9 @@ class EmbeddingsWriter(callbacks.BasePredictionWriter):
         output_dir: str,
         backbone: nn.Module | None = None,
         dataloader_idx_map: Dict[int, str] | None = None,
-        group_key: str | None = None,
+        metadata_keys: List[str] | None = None,
         overwrite: bool = True,
-        save_every_n: int = 1000,
+        save_every_n: int = 100,
     ) -> None:
         """Initializes a new EmbeddingsWriter instance.
 
@@ -40,9 +40,8 @@ class EmbeddingsWriter(callbacks.BasePredictionWriter):
                 it will be expected that the input batch returns the features directly.
             dataloader_idx_map: A dictionary mapping dataloader indices to their respective
                 names (e.g. train, val, test).
-            group_key: The metadata key to group the embeddings by. If specified, the
-                embedding files will be saved in subdirectories named after the group_key.
-                If specified, the key must be present in the metadata of the input batch.
+            metadata_keys: An optional list of keys to extract from the batch metadata and store
+                as additional columns in the manifest file.
             overwrite: Whether to overwrite the output directory. Defaults to True.
             save_every_n: Interval for number of iterations to save the embeddings to disk.
                 During this interval, the embeddings are accumulated in memory.
@@ -52,9 +51,9 @@ class EmbeddingsWriter(callbacks.BasePredictionWriter):
         self._output_dir = output_dir
         self._backbone = backbone
         self._dataloader_idx_map = dataloader_idx_map or {}
-        self._group_key = group_key
         self._overwrite = overwrite
         self._save_every_n = save_every_n
+        self._metadata_keys = metadata_keys or []
 
         self._write_queue: multiprocessing.Queue
         self._write_process: eva_multiprocessing.Process
@@ -86,19 +85,14 @@ class EmbeddingsWriter(callbacks.BasePredictionWriter):
 
         embeddings = self._get_embeddings(prediction)
         for local_idx, global_idx in enumerate(batch_indices[: len(embeddings)]):
-            input_name, save_name = self._construct_save_name(
-                dataset.filename(global_idx), metadata, local_idx
-            )
+            input_name = dataset.filename(global_idx)
+            save_name = os.path.splitext(input_name)[0] + ".pt"
             embeddings_buffer, target_buffer = io.BytesIO(), io.BytesIO()
             torch.save(embeddings[local_idx].clone(), embeddings_buffer)
             torch.save(targets[local_idx], target_buffer)  # type: ignore
-            slide_id = (
-                list(metadata["slide_id"])[local_idx]
-                if isinstance(metadata, dict) and "slide_id" in metadata
-                else None
-            )
+            item_metadata = self._get_item_metadata(metadata, local_idx)
             item = QUEUE_ITEM(
-                embeddings_buffer, target_buffer, input_name, save_name, split, slide_id
+                embeddings_buffer, target_buffer, input_name, save_name, split, item_metadata
             )
             self._write_queue.put(item)
 
@@ -114,7 +108,13 @@ class EmbeddingsWriter(callbacks.BasePredictionWriter):
         self._write_queue = multiprocessing.Queue()
         self._write_process = eva_multiprocessing.Process(
             target=_process_write_queue,
-            args=(self._write_queue, self._output_dir, self._save_every_n, self._overwrite),
+            args=(
+                self._write_queue,
+                self._output_dir,
+                self._metadata_keys,
+                self._save_every_n,
+                self._overwrite,
+            ),
         )
 
     def _get_embeddings(self, prediction: torch.Tensor) -> torch.Tensor:
@@ -125,18 +125,28 @@ class EmbeddingsWriter(callbacks.BasePredictionWriter):
         with torch.no_grad():
             return self._backbone(prediction)
 
-    def _construct_save_name(self, input_name, metadata, local_idx):
-        group_name = metadata[self._group_key][local_idx] if self._group_key else None
-        save_name = os.path.splitext(input_name)[0] + ".pt"
-        if group_name:
-            save_name = os.path.join(group_name, save_name)
-        return input_name, save_name
+    def _get_item_metadata(self, metadata: Dict[str, List[Any]], local_idx: int) -> Dict[str, Any]:
+        """Returns the metadata for the item at the given local index."""
+        if not metadata and self._metadata_keys:
+            raise ValueError("Metadata keys are provided but the batch metadata is empty.")
+
+        item_metadata = {}
+        for key in self._metadata_keys:
+            if key not in metadata:
+                raise KeyError(f"Metadata key '{key}' not found in the batch metadata.")
+            item_metadata[key] = metadata[key][local_idx]
+
+        return item_metadata
 
 
 def _process_write_queue(
-    write_queue: multiprocessing.Queue, output_dir: str, save_every_n: int, overwrite: bool = False
+    write_queue: multiprocessing.Queue,
+    output_dir: str,
+    metadata_keys: List[str],
+    save_every_n: int,
+    overwrite: bool = False,
 ) -> None:
-    manifest_file, manifest_writer = _init_manifest(output_dir, overwrite)
+    manifest_file, manifest_writer = _init_manifest(output_dir, metadata_keys, overwrite)
 
     save_name_to_items: Dict[str, ITEM_DICT_ENTRY] = {}
 
@@ -154,30 +164,38 @@ def _process_write_queue(
             save_name_to_items[item.save_name] = ITEM_DICT_ENTRY(items=[item], save_count=0)
 
         if counter > 0 and counter % save_every_n == 0:
-            save_name_to_items = _save_items(save_name_to_items, output_dir, manifest_writer)
+            save_name_to_items = _save_items(
+                save_name_to_items, metadata_keys, output_dir, manifest_writer
+            )
 
         counter += 1
 
     if len(save_name_to_items) > 0:
-        _save_items(save_name_to_items, output_dir, manifest_writer)
+        _save_items(save_name_to_items, metadata_keys, output_dir, manifest_writer)
 
     manifest_file.close()
 
 
 def _save_items(
-    save_name_to_items: Dict[str, ITEM_DICT_ENTRY], output_dir: str, manifest_writer: Any
+    save_name_to_items: Dict[str, ITEM_DICT_ENTRY],
+    metadata_keys: List[str],
+    output_dir: str,
+    manifest_writer: Any,
 ) -> Dict[str, ITEM_DICT_ENTRY]:
     for save_name, entry in save_name_to_items.items():
-        save_path = os.path.join(output_dir, save_name)
-        is_first_save = entry.save_count == 0
-        if is_first_save:
-            _, target, input_name, _, split, slide_id = QUEUE_ITEM(*entry.items[0])
-            _update_manifest(target, input_name, save_name, split, slide_id, manifest_writer)
-        else:
-            pass
-        prediction_buffers = [item.prediction_buffer for item in entry.items]
-        _save_predictions(prediction_buffers, save_path, is_first_save)
-        save_name_to_items[save_name].save_count += 1
+        if len(entry.items) > 0:
+            save_path = os.path.join(output_dir, save_name)
+            is_first_save = entry.save_count == 0
+            if is_first_save:
+                _, target, input_name, _, split, metadata = QUEUE_ITEM(*entry.items[0])
+                metadata = [metadata[key] for key in metadata_keys]  # type: ignore
+                _update_manifest(target, input_name, save_name, split, metadata, manifest_writer)
+            else:
+                pass
+            prediction_buffers = [item.prediction_buffer for item in entry.items]
+            _save_predictions(prediction_buffers, save_path, is_first_save)
+            save_name_to_items[save_name].save_count += 1
+            save_name_to_items[save_name].items = []
 
     return save_name_to_items
 
@@ -198,7 +216,9 @@ def _save_predictions(
     torch.save(predictions, save_path)
 
 
-def _init_manifest(output_dir: str, overwrite: bool = False) -> tuple[io.TextIOWrapper, Any]:
+def _init_manifest(
+    output_dir: str, metadata_keys: List[str] | None, overwrite: bool = False
+) -> tuple[io.TextIOWrapper, Any]:
     manifest_path = os.path.join(output_dir, "manifest.csv")
     if os.path.exists(manifest_path) and not overwrite:
         raise FileExistsError(
@@ -208,7 +228,7 @@ def _init_manifest(output_dir: str, overwrite: bool = False) -> tuple[io.TextIOW
         )
     manifest_file = open(manifest_path, "w", newline="")
     manifest_writer = csv.writer(manifest_file)
-    manifest_writer.writerow(["origin", "embeddings", "target", "split", "slide_id"])
+    manifest_writer.writerow(["origin", "embeddings", "target", "split"] + (metadata_keys or []))
     return manifest_file, manifest_writer
 
 
@@ -217,8 +237,8 @@ def _update_manifest(
     input_name: str,
     save_name: str,
     split: str | None,
-    slide_id: str | None,
+    metadata: List[str],
     manifest_writer,
 ) -> None:
     target = torch.load(io.BytesIO(target_buffer.getbuffer()), map_location="cpu")
-    manifest_writer.writerow([input_name, save_name, target.item(), split, slide_id])
+    manifest_writer.writerow([input_name, save_name, target.item(), split] + metadata)
