@@ -125,10 +125,15 @@ class EmbeddingsWriter(callbacks.BasePredictionWriter):
         with torch.no_grad():
             return self._backbone(prediction)
 
-    def _get_item_metadata(self, metadata: Dict[str, List[Any]], local_idx: int) -> Dict[str, Any]:
+    def _get_item_metadata(
+        self, metadata: Dict[str, Any] | None, local_idx: int
+    ) -> Dict[str, Any] | None:
         """Returns the metadata for the item at the given local index."""
-        if not metadata and self._metadata_keys:
-            raise ValueError("Metadata keys are provided but the batch metadata is empty.")
+        if not metadata:
+            if self._metadata_keys:
+                raise ValueError("Metadata keys are provided but the batch metadata is empty.")
+            else:
+                return None
 
         item_metadata = {}
         for key in self._metadata_keys:
