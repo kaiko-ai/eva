@@ -23,7 +23,7 @@ class TimmEncoder(encoder.Encoder):
         pretrained: bool = False,
         checkpoint_path: str = "",
         out_indices: int | Tuple[int, ...] | None = 1,
-        model_kwrgs: Dict[str, Any] | None = None,
+        model_arguments: Dict[str, Any] | None = None,
     ) -> None:
         """Initializes the encoder.
 
@@ -33,7 +33,7 @@ class TimmEncoder(encoder.Encoder):
             checkpoint_path: Path of checkpoint to load.
             out_indices: Returns last n blocks if `int`, all if `None`, select
                 matching indices if sequence.
-            model_kwrgs: Extra model arguments.
+            model_arguments: Extra model arguments.
         """
         super().__init__()
 
@@ -41,7 +41,7 @@ class TimmEncoder(encoder.Encoder):
         self._pretrained = pretrained
         self._checkpoint_path = checkpoint_path
         self._out_indices = out_indices
-        self._model_kwrgs = model_kwrgs or {}
+        self._model_arguments = model_arguments or {}
 
         self._feature_extractor = self._load_model()
 
@@ -53,7 +53,7 @@ class TimmEncoder(encoder.Encoder):
             checkpoint_path=self._checkpoint_path,
             out_indices=self._out_indices,
             features_only=True,
-            **self._model_kwrgs,
+            **self._model_arguments,
         )
 
     @override
