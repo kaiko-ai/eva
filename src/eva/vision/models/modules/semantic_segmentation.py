@@ -69,11 +69,20 @@ class SemanticSegmentationModule(module.ModelModule):
         *args: Any,
         **kwargs: Any,
     ) -> torch.Tensor:
-        if self.encoder is None:
-            return self.decoder(tensor, image_size)
+        """Maps the input tensor (image tensor or embeddings) to masks.
 
-        patch_embeddings = self.encoder(tensor)
-        return self.decoder(patch_embeddings, tensor.shape[-2:])
+        If `tensor` is image tensor, then the `self.encoder`
+        should be implemented, otherwise it will be interpreted
+        as embeddings, where the `image_size` should be given.
+        """
+        if self.encoder is None and image_size is None:
+            raise ValueError(
+                "Please provide the expected `image_size` that the "
+                "decoder should map the embeddings (`tensor`) to."
+            )
+
+        patch_embeddings = self.encoder(tensor) if self.encoder else tensor
+        return self.decoder(patch_embeddings, image_size or tensor.shape[-2:])
 
     @override
     def on_fit_start(self) -> None:
