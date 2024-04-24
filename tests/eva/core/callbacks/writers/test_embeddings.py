@@ -1,5 +1,6 @@
 """Tests the embeddings writer."""
 
+import functools
 import os
 import random
 import tempfile
@@ -162,27 +163,16 @@ def dataset(
     filenames: List[str] | None,
 ) -> List[datasets.Dataset]:
     """Fake dataset fixture."""
-    train_dataset = FakeDataset(
-        split="train",
+    Dataset = functools.partial(
+        FakeDataset,
         length=n_samples,
         size=SAMPLE_SHAPE,
         metadata_keys=metadata_keys,
         filenames=filenames,
     )
-    val_dataset = FakeDataset(
-        split="val",
-        length=n_samples,
-        size=SAMPLE_SHAPE,
-        metadata_keys=metadata_keys,
-        filenames=filenames,
-    )
-    test_dataset = FakeDataset(
-        split="test",
-        length=n_samples,
-        size=SAMPLE_SHAPE,
-        metadata_keys=metadata_keys,
-        filenames=filenames,
-    )
+    train_dataset = Dataset(split="train")
+    val_dataset = Dataset(split="val")
+    test_dataset = Dataset(split="test")
 
     return [train_dataset, val_dataset, test_dataset]
 
