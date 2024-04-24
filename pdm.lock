@@ -5,7 +5,7 @@
 groups = ["default", "dev", "docs", "all", "typecheck", "lint", "vision", "test"]
 strategy = ["cross_platform", "inherit_metadata"]
 lock_version = "4.4.1"
-content_hash = "sha256:ffa7b5a5665a4fd7d142fd7c8cf32c533a041f9823b79d24f24a228ec144a1f7"
+content_hash = "sha256:e9ce86cdec586c1748ab0b2dfcd22ac15112f38fb0c262d908992a1ca7c349b3"
 
 [[package]]
 name = "absl-py"
@@ -203,7 +203,7 @@ name = "certifi"
 version = "2024.2.2"
 requires_python = ">=3.6"
 summary = "Python package for providing Mozilla's CA Bundle."
-groups = ["all", "default", "dev", "docs", "vision"]
+groups = ["default", "dev", "docs", "vision"]
 files = [
     {file = "certifi-2024.2.2-py3-none-any.whl", hash = "sha256:dc383c07b76109f368f6106eee2b593b04a011ea4d55f652c6ca24a754d1cdd1"},
     {file = "certifi-2024.2.2.tar.gz", hash = "sha256:0569859f95fc761b18b45ef421b1290a0f65f147e92a1e5eb3e635f9a5e4e66f"},
@@ -214,7 +214,7 @@ name = "charset-normalizer"
 version = "3.3.2"
 requires_python = ">=3.7.0"
 summary = "The Real First Universal Charset Detector. Open, modern and actively maintained alternative to Chardet."
-groups = ["all", "default", "dev", "docs", "vision"]
+groups = ["default", "dev", "docs", "vision"]
 files = [
     {file = "charset-normalizer-3.3.2.tar.gz", hash = "sha256:f30c3cb33b24454a82faecaf01b19c18562b1e89558fb6c56de4d9118a032fd5"},
     {file = "charset_normalizer-3.3.2-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:25baf083bf6f6b341f4121c2f3c548875ee6f5339300e08be3f2b2ba1721cdd3"},
@@ -284,7 +284,7 @@ name = "colorama"
 version = "0.4.6"
 requires_python = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,!=3.6.*,>=2.7"
 summary = "Cross-platform colored terminal text."
-groups = ["all", "default", "dev", "docs", "lint", "test", "typecheck", "vision"]
+groups = ["default", "dev", "docs", "lint", "test", "typecheck", "vision"]
 files = [
     {file = "colorama-0.4.6-py2.py3-none-any.whl", hash = "sha256:4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6"},
     {file = "colorama-0.4.6.tar.gz", hash = "sha256:08695f5cb7ed6e0531a20572697297273c47b8cae5a63ffc6d6ed5c201be6e44"},
@@ -627,7 +627,7 @@ name = "huggingface-hub"
 version = "0.21.4"
 requires_python = ">=3.8.0"
 summary = "Client library to download and publish models, datasets and other repos on the huggingface.co hub"
-groups = ["all", "default", "vision"]
+groups = ["default", "vision"]
 dependencies = [
     "filelock",
     "fsspec>=2023.5.0",
@@ -661,7 +661,7 @@ name = "idna"
 version = "3.6"
 requires_python = ">=3.5"
 summary = "Internationalized Domain Names in Applications (IDNA)"
-groups = ["all", "default", "dev", "docs", "vision"]
+groups = ["default", "dev", "docs", "vision"]
 files = [
     {file = "idna-3.6-py3-none-any.whl", hash = "sha256:c05567e9c24a6b9faaa835c4821bad0590fbb9d5779e7caa6e1cc4978e7eb24f"},
     {file = "idna-3.6.tar.gz", hash = "sha256:9ecdbbd083b06798ae1e86adcbfe8ab1479cf864e4ee30fe4e46a003d12491ca"},
@@ -1466,7 +1466,7 @@ groups = ["default"]
 dependencies = [
     "coloredlogs",
     "flatbuffers",
-    "numpy>=1.24.2",
+    "numpy>=1.21.6",
     "packaging",
     "protobuf",
     "sympy",
@@ -1837,7 +1837,7 @@ name = "pyyaml"
 version = "6.0.1"
 requires_python = ">=3.6"
 summary = "YAML parser and emitter for Python"
-groups = ["all", "default", "dev", "docs", "lint", "vision"]
+groups = ["default", "dev", "docs", "lint", "vision"]
 files = [
     {file = "PyYAML-6.0.1-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:d858aa552c999bc8a8d57426ed01e40bef403cd8ccdd0fc5f6f04a00414cac2a"},
     {file = "PyYAML-6.0.1-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:fd66fc5d0da6d9815ba2cebeb4205f95818ff4b79c3ebe268e75d961704af52f"},
@@ -1940,7 +1940,7 @@ name = "requests"
 version = "2.31.0"
 requires_python = ">=3.7"
 summary = "Python HTTP for Humans."
-groups = ["all", "default", "dev", "docs", "vision"]
+groups = ["default", "dev", "docs", "vision"]
 dependencies = [
     "certifi>=2017.4.17",
     "charset-normalizer<4,>=2",
@@ -1998,7 +1998,7 @@ name = "safetensors"
 version = "0.4.2"
 requires_python = ">=3.7"
 summary = ""
-groups = ["all", "default", "vision"]
+groups = ["default", "vision"]
 files = [
     {file = "safetensors-0.4.2-cp310-cp310-macosx_10_12_x86_64.whl", hash = "sha256:69d8bb8384dc2cb5b72c36c4d6980771b293d1a1377b378763f5e37b6bb8d133"},
     {file = "safetensors-0.4.2-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:3d420e19fcef96d0067f4de4699682b4bbd85fc8fea0bd45fcd961fdf3e8c82c"},
@@ -2161,20 +2161,19 @@ files = [
 
 [[package]]
 name = "timm"
-version = "0.9.16"
+version = "1.0.0.dev0"
 requires_python = ">=3.8"
+git = "https://github.com/huggingface/pytorch-image-models.git"
+ref = "main"
+revision = "e741370e2b95e0c2fa3e00808cd9014ee620ca62"
 summary = "PyTorch Image Models"
-groups = ["all", "vision"]
+groups = ["vision"]
 dependencies = [
     "huggingface-hub",
     "pyyaml",
     "safetensors",
     "torch",
     "torchvision",
-]
-files = [
-    {file = "timm-0.9.16-py3-none-any.whl", hash = "sha256:bf5704014476ab011589d3c14172ee4c901fd18f9110a928019cac5be2945914"},
-    {file = "timm-0.9.16.tar.gz", hash = "sha256:891e54f375d55adf31a71ab0c117761f0e472f9f3971858ecdd1e7376b7071e6"},
 ]
 
 [[package]]
@@ -2381,7 +2380,7 @@ name = "tqdm"
 version = "4.66.2"
 requires_python = ">=3.7"
 summary = "Fast, Extensible Progress Meter"
-groups = ["all", "default", "vision"]
+groups = ["default", "vision"]
 dependencies = [
     "colorama; platform_system == \"Windows\"",
 ]
@@ -2455,7 +2454,7 @@ name = "urllib3"
 version = "2.2.1"
 requires_python = ">=3.8"
 summary = "HTTP library with thread-safe connection pooling, file post, and more."
-groups = ["all", "default", "dev", "docs", "vision"]
+groups = ["default", "dev", "docs", "vision"]
 files = [
     {file = "urllib3-2.2.1-py3-none-any.whl", hash = "sha256:450b20ec296a467077128bff42b73080516e71b56ff59a60a02bef2232c4fa9d"},
     {file = "urllib3-2.2.1.tar.gz", hash = "sha256:d0570876c61ab9e520d776c38acbbb5b05a776d3f9ff98a5c8fd5162a444cf19"},
