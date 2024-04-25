@@ -5,7 +5,7 @@ from typing import Any, Dict
 import pytest
 import torch
 
-from eva.core.models.networks import wrappers
+from eva.vision.models import networks
 
 
 @pytest.mark.parametrize(
@@ -26,7 +26,7 @@ from eva.core.models.networks import wrappers
     ],
 )
 def test_timm_model(
-    timm_model: wrappers.TimmModel,
+    timm_model: networks.TimmModel,
     input_tensor: torch.Tensor,
     expected_shape: torch.Size,
 ) -> None:
@@ -40,9 +40,9 @@ def test_timm_model(
 def timm_model(
     model_name: str,
     model_arguments: Dict[str, Any] | None,
-) -> wrappers.TimmModel:
+) -> networks.TimmModel:
     """TimmModel fixture."""
-    return wrappers.TimmModel(
+    return networks.TimmModel(
         model_name=model_name,
         model_arguments=model_arguments,
     )
