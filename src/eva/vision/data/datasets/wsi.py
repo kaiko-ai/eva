@@ -1,7 +1,6 @@
 """Dataset classes for whole-slide images."""
 
 import os
-from functools import cached_property
 from typing import Callable, Dict
 
 import pandas as pd
@@ -11,7 +10,6 @@ from typing_extensions import override
 
 from eva.vision.data import wsi
 from eva.vision.data.datasets import vision
-from eva.vision.data.wsi.backends import wsi_backend
 from eva.vision.data.wsi.patching import samplers
 
 
@@ -55,20 +53,19 @@ class WsiDataset(vision.VisionDataset):
     def filename(self, index: int) -> str:
         return f"{self._file_path}_{index}"
 
-    @cached_property
+    @property
     def _wsi(self) -> wsi.Wsi:
-        # wsi_obj = wsi.get_wsi_class(self._backend)(self._file_path)
-        return wsi_backend(self._backend)(self._file_path)
+        return wsi.get_cached_wsi(self._file_path, self._backend)
 
-    @cached_property
+    @property
     def _coords(self) -> wsi.PatchCoordinates:
-        return wsi.PatchCoordinates.from_file(
-            wsi_path=self._file_path,
+        return wsi.get_cached_coords(
+            file_path=self._file_path,
             width=self._width,
             height=self._height,
             target_mpp=self._target_mpp,
-            backend=self._backend,
             sampler=self._sampler,
+            backend=self._backend,
         )
 
     @override
