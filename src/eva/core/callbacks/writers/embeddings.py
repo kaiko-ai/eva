@@ -151,6 +151,7 @@ def _process_write_queue(
     save_every_n: int,
     overwrite: bool = False,
 ) -> None:
+    """This function receives and processes items added by the main process to the queue."""
     manifest_file, manifest_writer = _init_manifest(output_dir, metadata_keys, overwrite)
 
     name_to_items: Dict[str, ITEM_DICT_ENTRY] = {}
@@ -169,9 +170,7 @@ def _process_write_queue(
             name_to_items[item.save_name] = ITEM_DICT_ENTRY(items=[item], save_count=0)
 
         if counter > 0 and counter % save_every_n == 0:
-            name_to_items = _save_items(
-                name_to_items, metadata_keys, output_dir, manifest_writer
-            )
+            name_to_items = _save_items(name_to_items, metadata_keys, output_dir, manifest_writer)
 
         counter += 1
 
@@ -187,6 +186,20 @@ def _save_items(
     output_dir: str,
     manifest_writer: Any,
 ) -> Dict[str, ITEM_DICT_ENTRY]:
+    """Saves predictions to disk and updates the manifest file.
+
+    If multiple items share the same filename, the predictions are concatenated and saved
+    to the same file. Furthermore, the manifest file will only contain one entry for each
+    filename, which is why this function checks if it's the first time saving to a file.
+
+    Args:
+        name_to_items: A dictionary mapping save names to the corresponding queue items
+            holding the prediction tensors and the information for the manifest file.
+        metadata_keys: A list of keys to extract from the batch metadata. These will be
+            stored as additional columns in the manifest file.
+        output_dir: The directory where the embedding tensors & manifest will be saved.
+        manifest_writer: The CSV writer for the writing to the manifest file.
+    """
     for save_name, entry in name_to_items.items():
         if len(entry.items) > 0:
             save_path = os.path.join(output_dir, save_name)
@@ -206,6 +219,13 @@ def _save_items(
 def _save_predictions(
     prediction_buffers: List[io.BytesIO], save_path: str, is_first_save: bool
 ) -> None:
+    """Saves the embedding tensors to .pt files.
+
+    If it's not the first save to this save_path, the new predictions are concatenated
+    with the existing ones and saved to the same file.
+
+    Example Usecase: Save all patch embeddings corresponding to the same WSI to a single file.
+    """
     predictions = [
         torch.load(io.BytesIO(buffer.getbuffer()), map_location="cpu")
         for buffer in prediction_buffers
