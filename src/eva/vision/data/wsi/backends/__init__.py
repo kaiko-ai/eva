@@ -1,9 +1,12 @@
 """WSI Backends API."""
 
+import functools
 import importlib.util
 from typing import Callable
 
 from eva.vision.data.wsi.backends.base import Wsi
+
+LRU_CACHE_SIZE = 32
 
 
 def is_openslide_available() -> bool:
@@ -28,4 +31,10 @@ def wsi_backend(backend: str = "openslide") -> Callable[..., Wsi]:
             raise ValueError(f"Unknown WSI backend selected: {backend}")
 
 
-__all__ = ["Wsi", "wsi_backend", "is_openslide_available"]
+@functools.lru_cache(LRU_CACHE_SIZE)
+def get_cached_wsi(file_path: str, backend: str) -> Wsi:
+    """Returns a cached instance of the whole-slide image backend reader."""
+    return wsi_backend(backend)(file_path)
+
+
+__all__ = ["Wsi", "wsi_backend", "get_cached_wsi", "is_openslide_available"]

@@ -1,11 +1,14 @@
 """A module for handling coordinates of patches from a whole-slide image."""
 
 import dataclasses
+import functools
 from typing import List, Tuple
 import openslide
 
 from eva.vision.data.wsi import backends
 from eva.vision.data.wsi.patching import samplers
+
+LRU_CACHE_SIZE = 32
 
 
 @dataclasses.dataclass
@@ -92,10 +95,10 @@ class PatchCoordinates:
         # wsi.level_downsamples[level_idx]
 
         # slide = wsi.open_file(wsi_path)
-        
+
         downscale_factor = wsi.level_dimensions[-1][0]/wsi.level_dimensions[level_idx][0]
         patch_size_scaled = int(mpp_ratio * width * downscale_factor)
-        
+
         # slide = openslide.open_slide(wsi_path)
         # image_arr = np.array(slide.read_region([0,0], len(slide.level_dimensions)-1, slide.level_dimensions[-1]))
         image_arr = np.array(
@@ -108,7 +111,28 @@ class PatchCoordinates:
             x_y.append((min(max_x, int(x/downscale_factor)), min(max_y, int(y/downscale_factor))))
 
         return cls(x_y, scaled_width, scaled_height, level_idx)
-    
+
+
+@functools.lru_cache(LRU_CACHE_SIZE)
+def get_cached_coords(
+    file_path: str,
+    width: int,
+    height: int,
+    target_mpp: float,
+    sampler: samplers.Sampler,
+    backend: str,
+) -> PatchCoordinates:
+    """Get a cached instance of PatchCoordinates for the specified parameters."""
+    return PatchCoordinates.from_file(
+        wsi_path=file_path,
+        width=width,
+        height=height,
+        target_mpp=target_mpp,
+        backend=backend,
+        sampler=sampler,
+    )
+
+
 
 def compute_coords(
     image,
@@ -124,7 +148,7 @@ def compute_coords(
     """
     Input:
         image : 3-d np.ndarray
-        patch_size : size of patches/tiles, will be of 
+        patch_size : size of patches/tiles, will be of
             size (patch_size x patch_size x 3)
         precompute : If True, only coordinates will be returned,
             these coordinates match the inputted 'original' image.
@@ -133,26 +157,26 @@ def compute_coords(
             image that it is returned with.
         min_patch_info : Minimum required information in patch
             (see '_eval_and_append_xy_coords')
-        min_axis_info : Minimum fraction of on-bits in x/y dimension to be 
-            considered enough information. For x, this would be fraction of 
-            on-bits in x-dimension of a y:y+patch_size slice. For y, this would 
+        min_axis_info : Minimum fraction of on-bits in x/y dimension to be
+            considered enough information. For x, this would be fraction of
+            on-bits in x-dimension of a y:y+patch_size slice. For y, this would
             be the fraction of on-bits for the whole image in y-dimension
         min_consec_axis_info : Minimum consecutive x/y on-bits
             (see '_get_tissue_parts_indices')
         min_decimal_keep : Threshold for decimal point for removing "excessive" patch
             (see '_get_tissue_subparts_coords')
-    
+
     Output:
-        image [only if precompute is False] : similar to input image, but fits 
+        image [only if precompute is False] : similar to input image, but fits
             to the computed coordinates
         coords : the coordinates that will be used to compute the patches later on
     """
-    
-    
+
+
     if type(image) != np.ndarray:
         # if image is a Tensor
         image = image.numpy()
-    
+
     # masked tissue will be used to compute the coordinates
     mask = _mask_tissue(image)
 
@@ -163,7 +187,7 @@ def compute_coords(
     # # pad image and mask to make sure no tissue is potentially missed out
     # image = _pad_image(image, patch_size, 'maximum')
     # mask = _pad_image(mask, patch_size, 'minimum')
-    
+
     y_sum = mask.sum(axis=1)
     x_sum = mask.sum(axis=0)
     # if on bits in x_sum is greater than in y_sum, the tissue is
@@ -176,55 +200,55 @@ def compute_coords(
         transposed = True
     else:
         transposed = False
-    
+
     # where y_sum is more than the minimum number of on-bits
     y_tissue = np.where(y_sum >= (patch_size*min_axis_info))[0]
-    
+
     if len(y_tissue) < 1:
         print("Not enough tissue in image (y-dim)", RuntimeWarning)
         return [(0, 0, 0)]
         # if precompute: return [(0, 0, 0)]
         # else: return image, [(0, 0, 0)]
-    
+
     y_tissue_parts_indices = _get_tissue_parts_indices(
         y_tissue, patch_size*min_consec_axis_info)
-    
-    if len(y_tissue_parts_indices) < 1: 
+
+    if len(y_tissue_parts_indices) < 1:
         print("Not enough tissue in image (y-dim)", RuntimeWarning)
         return [(0, 0, 0)]
         # if precompute: return [(0, 0, 0)]
         # else: return image, [(0, 0, 0)]
-    
+
     # loop over the tissues in y-dimension
     for yidx in y_tissue_parts_indices:
         y_tissue_subparts_coords = _get_tissue_subparts_coords(
             yidx, patch_size, min_decimal_keep)
-        
+
         for y in y_tissue_subparts_coords:
             # in y_slice, where x_slice_sum is more than the minimum number of on-bits
             x_slice_sum = mask[y:y+patch_size, :].sum(axis=0)
             x_tissue = np.where(x_slice_sum >= (patch_size*min_axis_info))[0]
-            
+
             x_tissue_parts_indices = _get_tissue_parts_indices(
                 x_tissue, patch_size*min_consec_axis_info)
-            
+
             # loop over tissues in x-dimension (inside y_slice 'y:y+patch_size')
             for xidx in x_tissue_parts_indices:
                 x_tissue_subparts_coords = _get_tissue_subparts_coords(
                     xidx, patch_size, min_decimal_keep)
-                
+
                 for x in x_tissue_subparts_coords:
                     coords = _eval_and_append_xy_coords(
-                        coords, image, mask, patch_size, x, y, 
+                        coords, image, mask, patch_size, x, y,
                         min_patch_info, transposed, #precompute
-                    )     
-    
+                    )
+
     if len(coords) < 1:
         print("Not enough tissue in image (x-dim)", RuntimeWarning)
         return [(0, 0, 0)]
         # if precompute: return [(0, 0, 0)]
         # else: return image, [(0, 0, 0)]
-    
+
     # return coords
     np.random.shuffle(coords)
     for y, x in coords[:max_n_samples]:
@@ -256,7 +280,7 @@ def _mask_tissue(image, kernel_size=(7, 7), gray_threshold=220):
     return mask
 
 def _transpose_image(image):
-    """Inputs an image and transposes it, accepts 
+    """Inputs an image and transposes it, accepts
     both 2-d (mask) and 3-d (rgb image) arrays
     """
     if image is None:
@@ -268,7 +292,7 @@ def _transpose_image(image):
     return None
 
 # def _pad_image(image, pad_len, pad_val):
-#     """Pads inputted image, accepts both 
+#     """Pads inputted image, accepts both
 #     2-d (mask) and 3-d (rgb image) arrays
 #     """
 #     if image is None:
@@ -282,9 +306,9 @@ def _transpose_image(image):
 #     return None
 
 def _get_tissue_parts_indices(tissue, min_consec_info):
-    """If there are multiple tissue parts in 'tissue', 'tissue' will be 
-    split. Each tissue part will be taken care of separately (later on), 
-    and if the tissue part is less than min_consec_info, it's considered 
+    """If there are multiple tissue parts in 'tissue', 'tissue' will be
+    split. Each tissue part will be taken care of separately (later on),
+    and if the tissue part is less than min_consec_info, it's considered
     to small and won't be returned.
     """
     split_points = np.where(np.diff(tissue) != 1)[0]+1
@@ -310,26 +334,26 @@ def _get_tissue_subparts_coords(subtissue, patch_size, min_decimal_keep):
     shift = excess // 2
 
     return [
-        i * patch_size + start - shift 
+        i * patch_size + start - shift
         for i in range(num_subparts)
     ]
 
 def _eval_and_append_xy_coords(
     coords,
-    image, 
-    mask, 
-    patch_size, 
-    x, y, 
+    image,
+    mask,
+    patch_size,
+    x, y,
     min_patch_info,
     transposed,
     # precompute
 ):
-    """Based on computed x and y coordinates of patch: 
+    """Based on computed x and y coordinates of patch:
     slices out patch from original image, flattens it,
     preprocesses it, and finally evaluates its mask.
     If patch contains more info than min_patch_info,
-    the patch coordinates are kept, along with a value 
-    'val1' that estimates how much information there 
+    the patch coordinates are kept, along with a value
+    'val1' that estimates how much information there
     is in the patch. Smaller 'val1' assumes more info.
     """
     patch_1d = (
@@ -363,5 +387,5 @@ def _eval_and_append_xy_coords(
             #     coords = np.concatenate([
             #         coords, [[val1, y, x]]
             #     ])
-               
+
     return coords
