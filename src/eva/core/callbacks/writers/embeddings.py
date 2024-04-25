@@ -153,7 +153,7 @@ def _process_write_queue(
 ) -> None:
     manifest_file, manifest_writer = _init_manifest(output_dir, metadata_keys, overwrite)
 
-    save_name_to_items: Dict[str, ITEM_DICT_ENTRY] = {}
+    name_to_items: Dict[str, ITEM_DICT_ENTRY] = {}
 
     counter = 0
     while True:
@@ -163,31 +163,31 @@ def _process_write_queue(
 
         item = QUEUE_ITEM(*item)
 
-        if item.save_name in save_name_to_items:
-            save_name_to_items[item.save_name].items.append(item)
+        if item.save_name in name_to_items:
+            name_to_items[item.save_name].items.append(item)
         else:
-            save_name_to_items[item.save_name] = ITEM_DICT_ENTRY(items=[item], save_count=0)
+            name_to_items[item.save_name] = ITEM_DICT_ENTRY(items=[item], save_count=0)
 
         if counter > 0 and counter % save_every_n == 0:
-            save_name_to_items = _save_items(
-                save_name_to_items, metadata_keys, output_dir, manifest_writer
+            name_to_items = _save_items(
+                name_to_items, metadata_keys, output_dir, manifest_writer
             )
 
         counter += 1
 
-    if len(save_name_to_items) > 0:
-        _save_items(save_name_to_items, metadata_keys, output_dir, manifest_writer)
+    if len(name_to_items) > 0:
+        _save_items(name_to_items, metadata_keys, output_dir, manifest_writer)
 
     manifest_file.close()
 
 
 def _save_items(
-    save_name_to_items: Dict[str, ITEM_DICT_ENTRY],
+    name_to_items: Dict[str, ITEM_DICT_ENTRY],
     metadata_keys: List[str],
     output_dir: str,
     manifest_writer: Any,
 ) -> Dict[str, ITEM_DICT_ENTRY]:
-    for save_name, entry in save_name_to_items.items():
+    for save_name, entry in name_to_items.items():
         if len(entry.items) > 0:
             save_path = os.path.join(output_dir, save_name)
             is_first_save = entry.save_count == 0
@@ -195,14 +195,12 @@ def _save_items(
                 _, target, input_name, _, split, metadata = QUEUE_ITEM(*entry.items[0])
                 metadata = [metadata[key] for key in metadata_keys]  # type: ignore
                 _update_manifest(target, input_name, save_name, split, metadata, manifest_writer)
-            else:
-                pass
             prediction_buffers = [item.prediction_buffer for item in entry.items]
             _save_predictions(prediction_buffers, save_path, is_first_save)
-            save_name_to_items[save_name].save_count += 1
-            save_name_to_items[save_name].items = []
+            name_to_items[save_name].save_count += 1
+            name_to_items[save_name].items = []
 
-    return save_name_to_items
+    return name_to_items
 
 
 def _save_predictions(
