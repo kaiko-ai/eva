@@ -83,6 +83,12 @@ class MultiEmbeddingsClassificationDataset(base.EmbeddingsDataset):
 
         if not embeddings.ndim == 2:
             raise ValueError(f"Expected 2D tensor, got {embeddings.ndim} for {multi_id}.")
+        
+        # pad to [100, 384] if necessary
+        n_embeddings = 150 # 200
+        if embeddings.shape[0] < n_embeddings:
+            n_pad = n_embeddings - embeddings.shape[0]
+            embeddings = torch.nn.functional.pad(embeddings, (0,0,0,n_pad), mode='constant', value=0)
 
         return embeddings
 
