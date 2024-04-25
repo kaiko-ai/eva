@@ -8,12 +8,16 @@ import numpy.typing as npt
 from eva.vision.utils.io import _utils
 
 
-def read_nifti_slice(path: str, slice_index: int) -> npt.NDArray[Any]:
+def read_nifti_slice(
+    path: str, slice_index: int, *, dtype: np.dtype | None = None
+) -> npt.NDArray[Any]:
     """Reads and loads a NIfTI image from a file path as `uint8`.
 
     Args:
         path: The path to the NIfTI file.
         slice_index: The image slice index to return.
+        dtype: The numpy array type to cast the image to.
+            If `None`, it will use the inferred one from the data.
 
     Returns:
         The image as a numpy array (height, width, channels).
@@ -24,7 +28,7 @@ def read_nifti_slice(path: str, slice_index: int) -> npt.NDArray[Any]:
     """
     _utils.check_file(path)
     image_data = nib.load(path)  # type: ignore
-    dtype = image_data.get_data_dtype()  # type: ignore
+    dtype = dtype or image_data.get_data_dtype()  # type: ignore
     image_slice = image_data.slicer[:, :, slice_index : slice_index + 1]  # type: ignore
     image_array = image_slice.get_fdata()
     return image_array.astype(dtype)
