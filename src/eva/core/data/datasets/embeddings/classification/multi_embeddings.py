@@ -21,6 +21,7 @@ class MultiEmbeddingsClassificationDataset(base.EmbeddingsDataset):
         root: str,
         manifest_file: str,
         split: Literal["train", "val", "test"],
+        n_embeddings: int,
         column_mapping: Dict[str, str] = base.default_column_mapping,
         embeddings_transforms: Callable | None = None,
         target_transforms: Callable | None = None,
@@ -42,6 +43,8 @@ class MultiEmbeddingsClassificationDataset(base.EmbeddingsDataset):
                 the `root` argument.
             split: The dataset split to use. The `split` column of the manifest
                 file will be splitted based on this value.
+            n_embeddings: Expected number of embeddings per sample. If less, the embeddings
+                will be padded with zeros.
             column_mapping: Defines the map between the variables and the manifest
                 columns. It will overwrite the `default_column_mapping` with
                 the provided values, so that `column_mapping` can contain only the
@@ -59,6 +62,7 @@ class MultiEmbeddingsClassificationDataset(base.EmbeddingsDataset):
         )
 
         self._multi_ids: List[int]
+        self._n_embeddings = n_embeddings
 
     @override
     def setup(self):
@@ -83,12 +87,12 @@ class MultiEmbeddingsClassificationDataset(base.EmbeddingsDataset):
 
         if not embeddings.ndim == 2:
             raise ValueError(f"Expected 2D tensor, got {embeddings.ndim} for {multi_id}.")
-        
-        # pad to [100, 384] if necessary
-        n_embeddings = 150 # 200
-        if embeddings.shape[0] < n_embeddings:
-            n_pad = n_embeddings - embeddings.shape[0]
-            embeddings = torch.nn.functional.pad(embeddings, (0,0,0,n_pad), mode='constant', value=0)
+
+        if embeddings.shape[0] < self._n_embeddings:
+            n_pad = self._n_embeddings - embeddings.shape[0]
+            embeddings = torch.nn.functional.pad(
+                embeddings, (0, 0, 0, n_pad), mode="constant", value=0
+            )
 
         return embeddings
 

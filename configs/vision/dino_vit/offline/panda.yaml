@@ -25,7 +25,7 @@ trainer:
       - class_path: eva.callbacks.EmbeddingsWriter
         init_args:
           group_key: slide_id
-          output_dir: &DATASET_EMBEDDINGS_ROOT ${oc.env:EMBEDDINGS_ROOT, ./data/embeddings}/${oc.env:DINO_BACKBONE, dino_vits16}/panda_fg_150
+          output_dir: &DATASET_EMBEDDINGS_ROOT ${oc.env:EMBEDDINGS_ROOT, ./data/embeddings}/${oc.env:DINO_BACKBONE, dino_vits16}/panda
           dataloader_idx_map:
             0: train
             1: val
@@ -81,6 +81,7 @@ data:
           root: *DATASET_EMBEDDINGS_ROOT
           manifest_file: manifest.csv
           split: train
+          n_embeddings: 100
       val:
         class_path: eva.datasets.MultiEmbeddingsClassificationDataset
         init_args:
@@ -97,9 +98,12 @@ data:
             root: ${oc.env:DATA_ROOT, ./slide_data}/panda
             manifest_file: manifest_train.csv
             sampler:
-              class_path: eva.vision.data.wsi.patching.samplers.RandomSampler
+              # class_path: eva.vision.data.wsi.patching.samplers.RandomSampler
+              # init_args:
+              #   n_samples: 100
+              class_path: eva.vision.data.wsi.patching.samplers.RandomForegroundSampler
               init_args:
-                n_samples: 100
+                max_n_samples: 100
             width: 224
             height: 224
             target_mpp: 0.5
