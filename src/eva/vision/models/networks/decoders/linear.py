@@ -43,12 +43,20 @@ class LinearDecoder(decoder.Decoder):
     def _forward_head(self, patch_embeddings: torch.Tensor) -> torch.Tensor:
         """Forward of the decoder head.
 
+        Here the following transformations will take place:
+        - (batch_size, hidden_size, num_patches_height, num_patches_width)
+        - (batch_size, hidden_size, num_patches_height * num_patches_width)
+        - (batch_size, num_patches_height * num_patches_width, hidden_size)
+        - (batch_size, num_patches_height * num_patches_width, num_classes)
+        - (batch_size, num_classes, num_patches_height, num_patches_width)
+
         Args:
-            patch_embeddings: The model patch embeddings reshaped to
+            patch_embeddings: The patch embeddings tensor of shape
                 (batch_size, hidden_size, num_patches_height, num_patches_width).
 
         Returns:
-            The logits as a tensor (batch_size, num_classes, height, width).
+            The logits as a tensor (batch_size, num_classes, num_patches_height,
+            num_patches_width).
         """
         batch_size, _, height, width = patch_embeddings.shape
         embeddings_reshaped = patch_embeddings.reshape(batch_size, _, height * width)
@@ -63,8 +71,8 @@ class LinearDecoder(decoder.Decoder):
         """Classify each pixel of the image.
 
         Args:
-            logits: The decoder outputs of shape
-                (batch_size, num_classes, height, width).
+            logits: The decoder outputs of shape (batch_size, num_classes,
+                height, width).
             image_size: The target image size (height, width).
 
         Returns:
@@ -81,7 +89,8 @@ class LinearDecoder(decoder.Decoder):
         """Maps the patch embeddings to a segmentation mask of the image size.
 
         Args:
-            features: List of multi-level image features.
+            features: List of multi-level image features of shape (batch_size,
+                hidden_size, num_patches_height, num_patches_width).
             image_size: The target image size (height, width).
 
         Returns:

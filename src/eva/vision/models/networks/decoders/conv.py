@@ -16,7 +16,9 @@ class ConvDecoder(decoder.Decoder):
         """Initializes the convolutional based decoder head.
 
         Here the input nn layers will be directly applied to the
-        features of shape (batch_size, hidden_size, height, width)
+        features of shape (batch_size, hidden_size, num_patches_height,
+        num_patches_width), where num_patches is image_size / patch_size.
+        Note the num_patches is also known as grid_size.
 
         Args:
             layers: The convolutional layers to be used as the decoder head.
@@ -42,11 +44,11 @@ class ConvDecoder(decoder.Decoder):
         """Forward of the decoder head.
 
         Args:
-            patch_embeddings: The model patch embeddings reshaped to
+            patch_embeddings: The patch embeddings tensor of shape
                 (batch_size, hidden_size, num_patches_height, num_patches_width).
 
         Returns:
-            The logits as a tensor (batch_size, num_classes, height, width).
+            The logits as a tensor (batch_size, num_classes, upscale_height, upscale_width).
         """
         return self._layers(patch_embeddings)
 
@@ -58,8 +60,8 @@ class ConvDecoder(decoder.Decoder):
         """Classify each pixel of the image.
 
         Args:
-            logits: The decoder outputs of shape
-                (batch_size, num_classes, height, width).
+            logits: The decoder outputs of shape (batch_size, num_classes,
+                height, width).
             image_size: The target image size (height, width).
 
         Returns:
@@ -76,7 +78,8 @@ class ConvDecoder(decoder.Decoder):
         """Maps the patch embeddings to a segmentation mask of the image size.
 
         Args:
-            features: List of multi-level image features.
+            features: List of multi-level image features of shape (batch_size,
+                hidden_size, num_patches_height, num_patches_width).
             image_size: The target image size (height, width).
 
         Returns:
