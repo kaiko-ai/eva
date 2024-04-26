@@ -1,10 +1,13 @@
 """A module for handling coordinates of patches from a whole-slide image."""
 
 import dataclasses
+import functools
 from typing import List, Tuple
 
 from eva.vision.data.wsi import backends
 from eva.vision.data.wsi.patching import samplers
+
+LRU_CACHE_SIZE = 32
 
 
 @dataclasses.dataclass
@@ -56,3 +59,23 @@ class PatchCoordinates:
             x_y.append((x, y))
 
         return cls(x_y, scaled_width, scaled_height, level_idx)
+
+
+@functools.lru_cache(LRU_CACHE_SIZE)
+def get_cached_coords(
+    file_path: str,
+    width: int,
+    height: int,
+    target_mpp: float,
+    sampler: samplers.Sampler,
+    backend: str,
+) -> PatchCoordinates:
+    """Get a cached instance of PatchCoordinates for the specified parameters."""
+    return PatchCoordinates.from_file(
+        wsi_path=file_path,
+        width=width,
+        height=height,
+        target_mpp=target_mpp,
+        backend=backend,
+        sampler=sampler,
+    )
