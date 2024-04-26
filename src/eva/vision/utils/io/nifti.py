@@ -13,11 +13,10 @@ def read_nifti_slice(path: str, slice_index: int) -> npt.NDArray[Any]:
 
     Args:
         path: The path to the NIfTI file.
-        slice_index: The image slice index to return. If `None`, it will
-            return the full 3D image.
+        slice_index: The image slice index to return.
 
     Returns:
-        The image as a numpy array.
+        The image as a numpy array (height, width, channels).
 
     Raises:
         FileExistsError: If the path does not exist or it is unreachable.
