@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
       - name: Perform gitleaks checks
         run: |
           # Download and check
@@ -34,9 +34,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
       - name: Setting up PDM
-        uses: pdm-project/setup-pdm@v4
+        uses: pdm-project/setup-pdm@c050bdcb2405837648035b6678c75609d53a749f # v4
         with:
           python-version: "3.10"
           architecture: x64
@@ -58,11 +58,11 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
         with:
           lfs: true
       - name: Setting up PDM
-        uses: pdm-project/setup-pdm@v4
+        uses: pdm-project/setup-pdm@c050bdcb2405837648035b6678c75609d53a749f # v4
         with:
           python-version: ${{ matrix.python-version }}
           architecture: x64
