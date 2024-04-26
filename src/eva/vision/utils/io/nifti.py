@@ -3,6 +3,7 @@
 from typing import Any
 
 import nibabel as nib
+import numpy as np
 import numpy.typing as npt
 
 from eva.vision.utils.io import _utils
