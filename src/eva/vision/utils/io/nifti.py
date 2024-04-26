@@ -1,24 +1,23 @@
 """NIfTI I/O related functions."""
 
-from typing import Any
+from typing import Any, Literal
 
 import nibabel as nib
-import numpy as np
 import numpy.typing as npt
 
 from eva.vision.utils.io import _utils
 
 
 def read_nifti_slice(
-    path: str, slice_index: int, *, dtype: np.dtype | None = None
+    path: str, slice_index: int, *, use_storage_dtype: bool = True
 ) -> npt.NDArray[Any]:
     """Reads and loads a NIfTI image from a file path as `uint8`.
 
     Args:
         path: The path to the NIfTI file.
         slice_index: The image slice index to return.
-        dtype: The numpy array type to cast the image to.
-            If `None`, it will use the inferred one from the data.
+        use_storage_dtype: Whether to cast the raw image
+            array to the inferred type.
 
     Returns:
         The image as a numpy array (height, width, channels).
@@ -29,10 +28,11 @@ def read_nifti_slice(
     """
     _utils.check_file(path)
     image_data = nib.load(path)  # type: ignore
-    dtype = dtype or image_data.get_data_dtype()  # type: ignore
     image_slice = image_data.slicer[:, :, slice_index : slice_index + 1]  # type: ignore
     image_array = image_slice.get_fdata()
-    return image_array.astype(dtype)
+    if use_storage_dtype:
+        image_array = image_array.astype(image_data.get_data_dtype())  # type: ignore
+    return image_array
 
 
 def fetch_total_nifti_slices(path: str) -> int:
