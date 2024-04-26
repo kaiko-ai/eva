@@ -24,12 +24,12 @@ trainer:
           mode: *MONITOR_METRIC_MODE
       - class_path: eva.callbacks.EmbeddingsWriter
         init_args:
-          group_key: slide_id
           output_dir: &DATASET_EMBEDDINGS_ROOT ${oc.env:EMBEDDINGS_ROOT, ./data/embeddings}/${oc.env:DINO_BACKBONE, dino_vits16}/panda
           dataloader_idx_map:
             0: train
             1: val
             2: test
+          metadata_keys: ["slide_id"]
           backbone:
             class_path: eva.models.ModelFromFunction
             init_args:
