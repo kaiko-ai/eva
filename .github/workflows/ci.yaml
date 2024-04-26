@@ -36,7 +36,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
       - name: Setting up PDM
-        uses: pdm-project/setup-pdm@c050bdcb2405837648035b6678c75609d53a749f # v4
+        uses: pdm-project/setup-pdm@568ddd69406b30de1774ec0044b73ae06e716aa4 # v4
         with:
           python-version: "3.10"
           architecture: x64
@@ -62,7 +62,7 @@ jobs:
         with:
           lfs: true
       - name: Setting up PDM
-        uses: pdm-project/setup-pdm@c050bdcb2405837648035b6678c75609d53a749f # v4
+        uses: pdm-project/setup-pdm@568ddd69406b30de1774ec0044b73ae06e716aa4 # v4
         with:
           python-version: ${{ matrix.python-version }}
           architecture: x64
