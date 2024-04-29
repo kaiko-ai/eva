@@ -126,7 +126,6 @@ class GridSampler(Sampler):
             yield x_y[i]
 
 
-# class ForegroundGridSampler(ForegroundSampler, GridSampler):
 class ForegroundGridSampler(ForegroundSampler):
     """Sample patches based on a grid, only returning patches containing foreground.
     
@@ -215,6 +214,16 @@ def _get_grid_coords_and_indices(
     shuffle: bool = True,
     seed: int = 42,
 ):
+    """Get grid coordinates and indices.
+    
+    Args:
+        layer_shape: The shape of the layer.
+        width: The width of the patches.
+        height: The height of the patches.
+        overlap: The overlap between patches in the grid.
+        shuffle: Whether to shuffle the indices.
+        seed: The random seed.
+    """
     x_range = range(0, layer_shape[0] - width, width - overlap[0])
     y_range = range(0, layer_shape[1] - height, height - overlap[1])
     x_y = [(x, y) for x in x_range for y in y_range]
