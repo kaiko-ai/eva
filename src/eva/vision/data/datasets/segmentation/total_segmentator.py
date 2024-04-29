@@ -131,13 +131,18 @@ class TotalSegmentator2D(base.ImageSegmentation):
         return tv_tensors.Image(image_rgb_array.transpose(2, 0, 1))
 
     @override
-    def load_masks(self, index: int) -> tv_tensors.Mask:
+    def load_mask(self, index: int) -> tv_tensors.Mask:
         masks_dir = self._get_masks_dir(index)
         slice_index = self._get_sample_slice_index(index)
         mask_paths = (os.path.join(masks_dir, label + ".nii.gz") for label in self.classes)
-        list_of_mask_arrays = [io.read_nifti_slice(path, slice_index) for path in mask_paths]
-        masks = np.concatenate(list_of_mask_arrays, axis=2)
-        return tv_tensors.Mask(masks.transpose(2, 0, 1))
+        one_hot_encoded = np.concatenate(
+            [io.read_nifti_slice(path, slice_index) for path in mask_paths],
+            axis=2,
+        )
+        background_mask = one_hot_encoded.sum(axis=2, keepdims=True) == 0
+        one_hot_encoded_with_bg = np.concatenate([background_mask, one_hot_encoded], axis=2)
+        segmentation_label = np.argmax(one_hot_encoded_with_bg, axis=2)
+        return tv_tensors.Mask(segmentation_label)
 
     def _get_masks_dir(self, index: int) -> str:
         """Returns the directory of the corresponding masks."""
