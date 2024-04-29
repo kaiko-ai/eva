@@ -3,6 +3,7 @@
 import cv2
 import numpy as np
 import numpy.typing as npt
+from typing import Any
 
 from eva.vision.utils.io import _utils
 
@@ -55,11 +56,13 @@ def read_image_as_array(path: str, flags: int = cv2.IMREAD_UNCHANGED) -> npt.NDA
 
 
 def get_mask(
-    image: np.ndarray,
+    wsi: Any,
+    wsi_path: str,
+    level_idx: int,
     kernel_size: tuple[int, int] = (7, 7),
     gray_threshold: int = 220,
     fill_holes: bool = False,
-) -> np.ndarray:
+) -> tuple[np.ndarray, float]:
     """Extracts a binary mask from an image.
     
     Args:
@@ -68,6 +71,11 @@ def get_mask(
         gray_threshold: The threshold for the gray scale image.
         fill_holes: Whether to fill holes in the mask.
     """
+    image = np.array(
+        wsi.open_file(wsi_path).read_region(
+            [0, 0], len(wsi.level_dimensions) - 1, wsi.level_dimensions[-1]
+        )
+    )
 
     kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, kernel_size)
     gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
@@ -78,4 +86,7 @@ def get_mask(
         contour, _ = cv2.findContours(mask, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_SIMPLE)
         for cnt in contour:
             cv2.drawContours(mask, [cnt], 0, 1, -1)
-    return mask
+
+    mask_scale_factor = wsi.level_dimensions[-1][0] / wsi.level_dimensions[level_idx][0]
+
+    return mask, mask_scale_factor

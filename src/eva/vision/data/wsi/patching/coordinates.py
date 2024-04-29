@@ -4,8 +4,6 @@ import dataclasses
 import functools
 from typing import List, Tuple
 
-import numpy as np
-
 from eva.vision.data.wsi import backends
 from eva.vision.data.wsi.patching import samplers
 from eva.vision.utils.io import get_mask
@@ -52,34 +50,22 @@ class PatchCoordinates:
             backend: The backend to use for reading the whole-slide images.
         """
         wsi = backends.wsi_backend(backend)(wsi_path)
-        x_y = []
         level_idx = wsi.get_closest_level(target_mpp)
         level_mpp = wsi.mpp * wsi.level_downsamples[level_idx]
         mpp_ratio = target_mpp / level_mpp
         scaled_width, scaled_height = int(mpp_ratio * width), int(mpp_ratio * height)
 
-        if not isinstance(sampler, samplers.ForegroundGridSampler):
-            for x, y in sampler.sample(
-                scaled_width, scaled_height, wsi.level_dimensions[level_idx]
-            ):
-                x_y.append((x, y))
-        else:
-            mask_scale_factor = wsi.level_dimensions[-1][0] / wsi.level_dimensions[level_idx][0]
-            image_array = np.array(
-                wsi.open_file(wsi_path).read_region(
-                    [0, 0], len(wsi.level_dimensions) - 1, wsi.level_dimensions[-1]
-                )
-            )
-            mask = get_mask(image_array)
+        sample_args = {}
+        sample_args["width"] = scaled_width
+        sample_args["height"] = scaled_height
+        sample_args["layer_shape"] = wsi.level_dimensions[level_idx]
 
-            for x, y in sampler.sample(
-                width=scaled_width,
-                height=scaled_height,
-                layer_shape=wsi.level_dimensions[level_idx],
-                mask=mask,
-                mask_scale_factor=mask_scale_factor,
-            ):
-                x_y.append((x, y))
+        if isinstance(sampler, samplers.ForegroundSampler):
+            sample_args["mask"] = get_mask(wsi, wsi_path, level_idx)
+
+        x_y = []
+        for x, y in sampler.sample(**sample_args):
+            x_y.append((x, y))
 
         return cls(x_y, scaled_width, scaled_height, level_idx)
 
