@@ -5,7 +5,7 @@ import logging
 import os
 from argparse import Namespace
 from typing import Any, Dict, List, Optional, Set, Union
-
+from toolz import dicttoolz
 from lightning.fabric.loggers import logger
 from lightning.fabric.utilities import cloud_io, rank_zero
 from lightning.fabric.utilities.logger import _add_prefix
@@ -45,7 +45,7 @@ class JSONLogger(logger.Logger):
                 is specified, and the directory already contains a metrics file
                 for that version, it will be overwritten.
             prefix: A string to put at the beginning of metric keys.
-            flush_logs_every_n_steps: How often to flush logs to disk (defaults to every 100 steps).
+            flush_logs_every_n_steps: How often to flush logs to disk.
         """
         super().__init__()
 
@@ -53,10 +53,21 @@ class JSONLogger(logger.Logger):
         self._name = name or ""
         self._version = version
         self._prefix = prefix
-
-        self._fs = cloud_io.get_filesystem(root_dir)
-        self._experiment: _ExperimentWriter | None = None
         self._flush_logs_every_n_steps = flush_logs_every_n_steps
+
+        self._fs = cloud_io.get_filesystem(self._root_dir)
+        self._experiment: _JSONExperimentWriter
+
+    @property
+    @logger.rank_zero_experiment
+    def experiment(self) -> "_JSONExperimentWriter":
+        """Returns the experiment writer object."""
+        if self._experiment is not None:
+            return self._experiment
+
+        self._fs.makedirs(self._root_dir, exist_ok=True)
+        self._experiment = _JSONExperimentWriter(log_dir=self.log_dir)
+        return self._experiment
 
     @property
     @override
@@ -81,21 +92,6 @@ class JSONLogger(logger.Logger):
         version = self.version if isinstance(self.version, str) else f"version_{self.version}"
         return os.path.join(self._root_dir, self.name, version)
 
-    @property
-    @logger.rank_zero_experiment
-    def experiment(self) -> "_ExperimentWriter":
-        """Actual ExperimentWriter object. To use ExperimentWriter features anywhere in your code, do the following.
-
-        Example::
-            self.logger.experiment.some_experiment_writer_function()
-        """
-        if self._experiment is not None:
-            return self._experiment
-
-        os.makedirs(self._root_dir, exist_ok=True)
-        self._experiment = _ExperimentWriter(log_dir=self.log_dir)
-        return self._experiment
-
     @override
     @rank_zero.rank_zero_only
     def log_hyperparams(self, params: Dict[str, Any] | Namespace) -> None:
@@ -104,11 +100,11 @@ class JSONLogger(logger.Logger):
     @override
     @rank_zero.rank_zero_only
     def log_metrics(  # type: ignore[override]
-        self, metrics: Dict[str, Union[Tensor, float]], step: Optional[int] = None
+        self, metrics: Dict[str, Tensor | float], step: int | None = None
     ) -> None:
         metrics = _add_prefix(metrics, self._prefix, self.LOGGER_JOIN_CHAR)
-        if step is None:
-            step = len(self.experiment.metrics)
+        # if step is None:
+        #     step = len(self.experiment.metrics)
         self.experiment.log_metrics(metrics, step)
         if (step + 1) % self._flush_logs_every_n_steps == 0:
             self.save()
@@ -116,33 +112,40 @@ class JSONLogger(logger.Logger):
     @override
     @rank_zero.rank_zero_only
     def save(self) -> None:
-        super().save()
         self.experiment.save()
 
     @override
     @rank_zero.rank_zero_only
     def finalize(self, status: str) -> None:
         if self._experiment is None:
-            # When using multiprocessing, finalize() should be a no-op on the
-            # main process, as no experiment has been initialized there.
+            # When using multiprocessing, finalize() should be a no-op on
+            # the main process, as no experiment has been initialized there.
             return
         self.save()
 
     def _get_next_version(self) -> int:
         versions_root = os.path.join(self._root_dir, self.name)
-
         if not cloud_io._is_dir(self._fs, versions_root, strict=True):
-            log.warning("Missing logger folder: %s", versions_root)
+            log.warning(f"Missing logger folder '{versions_root}'.")
             return 0
 
-        existing_versions = []
-        for d in self._fs.listdir(versions_root):
-            full_path = d["name"]
-            name = os.path.basename(full_path)
+        latest_version = -1
+        for directory in self._fs.listdir(versions_root):
+            full_path, name = directory["name"], os.path.basename(directory["name"])
             if cloud_io._is_dir(self._fs, full_path) and name.startswith("version_"):
-                dir_ver = name.split("_")[1]
-                if dir_ver.isdigit():
-                    existing_versions.append(int(dir_ver))
+                version = name.split("_")[-1]
+                if version.isdigit():
+                    latest_version = max(latest_version, version)
+
+        return max(latest_version, 0)
+
+        existing_versions = []
+        for directory in self._fs.listdir(versions_root):
+            full_path, name = directory["name"], os.path.basename(directory["name"])
+            if cloud_io._is_dir(self._fs, full_path) and name.startswith("version_"):
+                version = name.split("_")[1]
+                if version.isdigit():
+                    existing_versions.append(int(version))
 
         if len(existing_versions) == 0:
             return 0
@@ -150,7 +153,7 @@ class JSONLogger(logger.Logger):
         return max(existing_versions) + 1
 
 
-class _ExperimentWriter:
+class _JSONExperimentWriter:
     """Experiment writer for JSONLogger."""
 
     NAME_METRICS_FILE = "metrics.json"
@@ -183,7 +186,8 @@ class _ExperimentWriter:
         if step is None:
             step = len(self.metrics)
 
-        metrics = {k: _handle_value(v) for k, v in metrics_dict.items()}
+        # metrics = {k: _handle_value(v) for k, v in metrics_dict.items()}
+        metrics = dicttoolz.valmap(_handle_value, metrics_dict)
         metrics["step"] = step
         self.metrics.append(metrics)
 
