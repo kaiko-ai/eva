@@ -6,7 +6,7 @@ import numpy as np
 import numpy.typing as npt
 
 
-def _to_8bit(image_array: npt.NDArray[Any]) -> npt.NDArray[np.uint8]:
+def to_8bit(image_array: npt.NDArray[Any]) -> npt.NDArray[np.uint8]:
     """Casts an image of higher bit image (i.e. 16bit) to 8bit.
 
     Args:

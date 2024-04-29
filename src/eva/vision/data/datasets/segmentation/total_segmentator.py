@@ -5,7 +5,6 @@ import os
 from glob import glob
 from typing import Callable, Dict, List, Literal, Tuple
 
-import cv2
 import numpy as np
 from torchvision import tv_tensors
 from torchvision.datasets import utils
@@ -132,10 +131,8 @@ class TotalSegmentator2D(base.ImageSegmentation):
         slice_index = self._get_sample_slice_index(index)
         image_array = io.read_nifti_slice(image_path, slice_index)
         if self._as_uint8:
-            image_array = convert._to_8bit(image_array)
-            image_rgb_array = cv2.cvtColor(image_array, cv2.COLOR_GRAY2RGB)
-        else:
-            image_rgb_array = image_array.repeat(3, axis=2)
+            image_array = convert.to_8bit(image_array)
+        image_rgb_array = image_array.repeat(3, axis=2)
         return tv_tensors.Image(image_rgb_array.transpose(2, 0, 1))
 
     @override
