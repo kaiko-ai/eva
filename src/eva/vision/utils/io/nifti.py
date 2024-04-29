@@ -1,6 +1,6 @@
 """NIfTI I/O related functions."""
 
-from typing import Any, Literal
+from typing import Any
 
 import nibabel as nib
 import numpy.typing as npt
