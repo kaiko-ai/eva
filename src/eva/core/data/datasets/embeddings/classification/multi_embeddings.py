@@ -21,7 +21,6 @@ class MultiEmbeddingsClassificationDataset(base.EmbeddingsDataset):
         root: str,
         manifest_file: str,
         split: Literal["train", "val", "test"],
-        n_embeddings: int,
         column_mapping: Dict[str, str] = base.default_column_mapping,
         embeddings_transforms: Callable | None = None,
         target_transforms: Callable | None = None,
@@ -62,7 +61,6 @@ class MultiEmbeddingsClassificationDataset(base.EmbeddingsDataset):
         )
 
         self._multi_ids: List[int]
-        self._n_embeddings = n_embeddings
 
     @override
     def setup(self):
@@ -87,12 +85,6 @@ class MultiEmbeddingsClassificationDataset(base.EmbeddingsDataset):
 
         if not embeddings.ndim == 2:
             raise ValueError(f"Expected 2D tensor, got {embeddings.ndim} for {multi_id}.")
-
-        if embeddings.shape[0] < self._n_embeddings:
-            n_pad = self._n_embeddings - embeddings.shape[0]
-            embeddings = torch.nn.functional.pad(
-                embeddings, (0, 0, 0, n_pad), mode="constant", value=0
-            )
 
         return embeddings
 

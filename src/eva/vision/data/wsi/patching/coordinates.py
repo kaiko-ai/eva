@@ -8,15 +8,10 @@ import numpy as np
 
 from eva.vision.data.wsi import backends
 from eva.vision.data.wsi.patching import samplers
+from eva.vision.utils.io import get_mask
 
 LRU_CACHE_SIZE = 32
 
-def open_the_image(wsi, wsi_path): # remove
-    return np.array(
-            wsi.open_file(wsi_path).read_region(
-                [0, 0], len(wsi.level_dimensions) - 1, wsi.level_dimensions[-1]
-            )
-        )
 
 @dataclasses.dataclass
 class PatchCoordinates:
@@ -69,57 +64,24 @@ class PatchCoordinates:
             ):
                 x_y.append((x, y))
         else:
-            downscale_factor = wsi.level_dimensions[-1][0] / wsi.level_dimensions[level_idx][0]
-            # patch_size_scaled = int(scaled_width * downscale_factor)
-
-            # image_arr = np.array(
-            #     wsi.open_file(wsi_path).read_region(
-            #         [0, 0], len(wsi.level_dimensions) - 1, wsi.level_dimensions[-1]
-            #     )
-            # )
-            image_arr = open_the_image(wsi, wsi_path) # remove and uncomment above
+            mask_scale_factor = wsi.level_dimensions[-1][0] / wsi.level_dimensions[level_idx][0]
+            image_array = np.array(
+                wsi.open_file(wsi_path).read_region(
+                    [0, 0], len(wsi.level_dimensions) - 1, wsi.level_dimensions[-1]
+                )
+            )
+            mask = get_mask(image_array)
 
             for x, y in sampler.sample(
                 width=scaled_width,
                 height=scaled_height,
                 layer_shape=wsi.level_dimensions[level_idx],
-                image=image_arr,
-                # patch_size_scaled,
-                scale_factor=downscale_factor,
+                mask=mask,
+                mask_scale_factor=mask_scale_factor,
             ):
                 x_y.append((x, y))
-                # x_y.append((min(max_x, x), min(max_y, y)))
 
         return cls(x_y, scaled_width, scaled_height, level_idx)
-
-        # if not isinstance(sampler, samplers.RandomForegroundSampler):
-        #     for x, y in sampler.sample(
-        #         scaled_width, scaled_height, wsi.level_dimensions[level_idx]
-        #     ):
-        #         x_y.append((x, y))
-        # else:
-        #     downscale_factor = wsi.level_dimensions[-1][0] / wsi.level_dimensions[level_idx][0]
-        #     patch_size_scaled = int(scaled_width * downscale_factor)
-
-        #     image_arr = np.array(
-        #         wsi.open_file(wsi_path).read_region(
-        #             [0, 0], len(wsi.level_dimensions) - 1, wsi.level_dimensions[-1]
-        #         )
-        #     )
-        #     max_x = wsi.level_dimensions[level_idx][0] - scaled_width
-        #     max_y = wsi.level_dimensions[level_idx][1] - scaled_height
-
-        #     for x, y in sampler.sample(
-        #         scaled_width,
-        #         scaled_height,
-        #         wsi.level_dimensions[level_idx],
-        #         image_arr,
-        #         patch_size_scaled,
-        #         downscale_factor,
-        #     ):
-        #         x_y.append((min(max_x, x), min(max_y, y)))
-
-        # return cls(x_y, scaled_width, scaled_height, level_idx)
 
 
 @functools.lru_cache(LRU_CACHE_SIZE)
