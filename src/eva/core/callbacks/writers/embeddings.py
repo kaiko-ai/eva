@@ -3,7 +3,7 @@
 import csv
 import io
 import os
-from typing import Any, Dict, List, Sequence
+from typing import Any, Dict, List, Sequence, Tuple
 
 import lightning.pytorch as pl
 import torch
@@ -241,7 +241,7 @@ def _save_predictions(
 
 def _init_manifest(
     output_dir: str, metadata_keys: List[str] | None, overwrite: bool = False
-) -> tuple[io.TextIOWrapper, Any]:
+) -> Tuple[io.TextIOWrapper, Any]:
     manifest_path = os.path.join(output_dir, "manifest.csv")
     if os.path.exists(manifest_path) and not overwrite:
         raise FileExistsError(
