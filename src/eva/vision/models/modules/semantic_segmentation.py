@@ -1,6 +1,6 @@
 """"Neural Network Semantic Segmentation Module."""
 
-from typing import Any, Callable, Tuple
+from typing import Any, Callable, Tuple, Iterable
 
 import torch
 from lightning.pytorch.cli import LRSchedulerCallable, OptimizerCallable
@@ -56,9 +56,19 @@ class SemanticSegmentationModule(module.ModelModule):
         self.lr_scheduler = lr_scheduler
 
     @override
+    def configure_model(self) -> None:
+        if self.encoder is not None and self.lr_multiplier_encoder == 0:
+            self._freeze_encoder()
+
+    @override
     def configure_optimizers(self) -> Any:
-        parameters = self.parameters()
-        optimizer = self.optimizer(parameters)
+        optimizer = self.optimizer([
+            {"params": self._decoder_params},
+            {
+                "params": self._encoder_params,
+                "lr": self._base_lr * self.lr_multiplier_encoder,
+            },
+        ])
         lr_scheduler = self.lr_scheduler(optimizer)
         return {"optimizer": optimizer, "lr_scheduler": lr_scheduler}
 
@@ -86,11 +96,6 @@ class SemanticSegmentationModule(module.ModelModule):
         return self.decoder(patch_embeddings, image_size or tensor.shape[-2:])
 
     @override
-    def on_fit_start(self) -> None:
-        if self.encoder is not None and self.lr_multiplier_encoder == 0:
-            grad.deactivate_requires_grad(self.encoder)
-
-    @override
     def training_step(self, batch: INPUT_TENSOR_BATCH, *args: Any, **kwargs: Any) -> STEP_OUTPUT:
         return self._batch_step(batch)
 
@@ -106,11 +111,6 @@ class SemanticSegmentationModule(module.ModelModule):
     def predict_step(self, batch: INPUT_BATCH, *args: Any, **kwargs: Any) -> torch.Tensor:
         tensor = INPUT_BATCH(*batch).data
         return tensor if self.backbone is None else self.backbone(tensor)
-
-    @override
-    def on_fit_end(self) -> None:
-        if self.encoder is not None and self.lr_multiplier_encoder == 0:
-            grad.activate_requires_grad(self.encoder)
 
     def _batch_step(self, batch: INPUT_TENSOR_BATCH) -> STEP_OUTPUT:
         """Performs a model forward step and calculates the loss.
@@ -130,3 +130,23 @@ class SemanticSegmentationModule(module.ModelModule):
             "predictions": predictions,
             "metadata": metadata,
         }
+
+    def _freeze_encoder(self) -> None:
+        """Freezes the encoder network."""
+        grad.deactivate_requires_grad(self.encoder)
+
+    @property
+    def _base_lr(self) -> float:
+        """Returns the base learning rate."""
+        base_optimizer = self.optimizer(self.parameters())
+        return base_optimizer.param_groups[-1]["lr"]
+
+    @property
+    def _encoder_params(self) -> Iterable[torch.Tensor]:
+        """Returns the trainable parameters of the encoder."""
+        return filter(lambda p: p.requires_grad, self.encoder.parameters())
+
+    @property
+    def _decoder_params(self) -> Iterable[torch.Tensor]:
+        """Returns the trainable parameters of the decoder."""
+        return filter(lambda p: p.requires_grad, self.decoder.parameters())
