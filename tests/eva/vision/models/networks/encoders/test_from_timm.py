@@ -9,7 +9,7 @@ from eva.vision.models.networks import encoders
 
 
 @pytest.mark.parametrize(
-    "model_name, out_indices, model_kwrgs, input_tensor, expected_len, expected_shape",
+    "model_name, out_indices, model_arguments, input_tensor, expected_len, expected_shape",
     [
         (
             "vit_small_patch16_224",
@@ -56,11 +56,11 @@ def test_timm_encoder(
 def timm_encoder(
     model_name: str,
     out_indices: int | Tuple[int, ...] | None,
-    model_kwrgs: Dict[str, Any] | None,
+    model_arguments: Dict[str, Any] | None,
 ) -> encoders.TimmEncoder:
     """TimmEncoder fixture."""
     return encoders.TimmEncoder(
         model_name=model_name,
         out_indices=out_indices,
-        model_kwrgs=model_kwrgs,
+        model_arguments=model_arguments,
     )
