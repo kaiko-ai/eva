@@ -38,7 +38,7 @@ def test_sample(total_segmentator_dataset: datasets.TotalSegmentator2D, index: i
     assert isinstance(image, tv_tensors.Image)
     assert image.shape == (3, 16, 16)
     assert isinstance(mask, tv_tensors.Mask)
-    assert mask.shape == (3, 16, 16)
+    assert mask.shape == (16, 16)
 
 
 @pytest.fixture(scope="function")
