@@ -126,6 +126,9 @@ class ForegroundGridSampler(ForegroundSampler):
 
     Args:
         max_samples: The maximum number of samples to return.
+        overlap: The overlap between patches in the grid.
+        min_foreground_ratio: The minimum amount of foreground within a sampled patch.
+        seed: The random seed.
     """
 
     def __init__(
@@ -155,7 +158,6 @@ class ForegroundGridSampler(ForegroundSampler):
             height: The height of the patches.
             layer_shape: The shape of the layer.
             mask: The mask of the image.
-            mask_scale_factor: The scale factor of the mask.
         """
         x_y, indices = _get_grid_coords_and_indices(layer_shape, width, height, self.overlap)
 
@@ -186,7 +188,6 @@ class ForegroundGridSampler(ForegroundSampler):
             y: The y-coordinate of the patch.
             width: The width of the patch.
             height: The height of the patch.
-            mask_scale_factor: The scale factor of the mask.
             min_foreground_ratio: The minimum amount of foreground in the patch.
         """
         mask_array, mask_scale_factor = mask
