@@ -16,8 +16,36 @@ class Sampler(abc.ABC):
         width: int,
         height: int,
         layer_shape: tuple[int, int],
+        *args,
     ) -> Generator[Tuple[int, int], None, None]:
         """Iterator that samples patches."""
+
+
+class ForegroundSampler(Sampler):
+    """Base class for samplers with foreground filtering capabilities."""
+
+    @abc.abstractmethod
+    def sample(
+        self,
+        width: int,
+        height: int,
+        layer_shape: tuple[int, int],
+        mask: tuple[np.ndarray, float],
+        *args,
+    ) -> Generator[Tuple[int, int], None, None]:
+        """Iterator that samples patches."""
+
+    @abc.abstractmethod
+    def is_foreground(
+        self,
+        mask: tuple[np.ndarray, float],
+        x: int,
+        y: int,
+        width: int,
+        height: int,
+        min_foreground_ratio=0.35,
+    ) -> bool:
+        """Check if a patch contains sufficient foreground."""
 
 
 class RandomSampler(Sampler):
@@ -87,19 +115,112 @@ class GridSampler(Sampler):
             height: The height of the patches.
             layer_shape: The shape of the layer.
         """
-        _set_seed(self.seed)
-
-        x_range = range(0, layer_shape[0] - width, width - self.overlap[0])
-        y_range = range(0, layer_shape[1] - height, height - self.overlap[1])
-        x_y = [(x, y) for x in x_range for y in y_range]
-
-        shuffled_indices = (
-            np.random.choice(len(x_y), self.max_samples, replace=False)
-            if self.max_samples
-            else range(len(x_y))
-        )
-        for i in shuffled_indices:
+        x_y, indices = _get_grid_coords_and_indices(layer_shape, width, height, self.overlap)
+        max_samples = len(indices) if self.max_samples is None else self.max_samples
+        for i in indices[:max_samples]:
             yield x_y[i]
+
+
+class ForegroundGridSampler(ForegroundSampler):
+    """Sample patches based on a grid, only returning patches containing foreground.
+
+    Args:
+        max_samples: The maximum number of samples to return.
+    """
+
+    def __init__(
+        self,
+        max_samples: int = 20,
+        overlap: tuple[int, int] = (0, 0),
+        seed: int = 42,
+    ):
+        """Initializes the sampler."""
+        self.max_samples = max_samples
+        self.overlap = overlap
+        self.seed = seed
+
+    def sample(
+        self,
+        width: int,
+        height: int,
+        layer_shape: tuple[int, int],
+        mask: tuple[np.ndarray, float],
+    ):
+        """Sample patches from a grid containing foreground.
+
+        Args:
+            width: The width of the patches.
+            height: The height of the patches.
+            layer_shape: The shape of the layer.
+            mask: The mask of the image.
+            mask_scale_factor: The scale factor of the mask.
+        """
+        x_y, indices = _get_grid_coords_and_indices(layer_shape, width, height, self.overlap)
+
+        count = 0
+        for i in indices:
+            if count >= self.max_samples:
+                break
+            if self.is_foreground(mask, x_y[i][0], x_y[i][1], width, height):
+                count += 1
+                yield x_y[i]
+
+    def is_foreground(
+        self,
+        mask: tuple[np.ndarray, float],
+        x: int,
+        y: int,
+        width: int,
+        height: int,
+        min_foreground_ratio=0.35,
+    ) -> bool:
+        """Check if a patch contains sufficient foreground.
+
+        Args:
+            mask: The mask of the image.
+            x: The x-coordinate of the patch.
+            y: The y-coordinate of the patch.
+            width: The width of the patch.
+            height: The height of the patch.
+            mask_scale_factor: The scale factor of the mask.
+            min_foreground_ratio: The minimum amount of foreground in the patch.
+        """
+        mask_array, mask_scale_factor = mask
+        x_, y_, width_, height_ = self.scale_coords(mask_scale_factor, x, y, width, height)
+        patch_mask = mask_array[y_ : y_ + height_, x_ : x_ + width_]
+        return patch_mask.sum() / patch_mask.size > min_foreground_ratio
+
+    def scale_coords(self, scale_factor, *coords):
+        return tuple(int(coord * scale_factor) for coord in coords)
+
+
+def _get_grid_coords_and_indices(
+    layer_shape: tuple[int, int],
+    width: int,
+    height: int,
+    overlap: tuple[int, int],
+    shuffle: bool = True,
+    seed: int = 42,
+):
+    """Get grid coordinates and indices.
+
+    Args:
+        layer_shape: The shape of the layer.
+        width: The width of the patches.
+        height: The height of the patches.
+        overlap: The overlap between patches in the grid.
+        shuffle: Whether to shuffle the indices.
+        seed: The random seed.
+    """
+    x_range = range(0, layer_shape[0] - width, width - overlap[0])
+    y_range = range(0, layer_shape[1] - height, height - overlap[1])
+    x_y = [(x, y) for x in x_range for y in y_range]
+
+    indices = list(range(len(x_y)))
+    if shuffle:
+        _set_seed(seed)
+        np.random.shuffle(indices)
+    return x_y, indices
 
 
 def _set_seed(seed: int) -> None:

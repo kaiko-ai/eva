@@ -6,6 +6,7 @@ from typing import List, Tuple
 
 from eva.vision.data.wsi import backends
 from eva.vision.data.wsi.patching import samplers
+from eva.vision.utils.mask import get_mask
 
 LRU_CACHE_SIZE = 32
 
@@ -49,14 +50,20 @@ class PatchCoordinates:
             backend: The backend to use for reading the whole-slide images.
         """
         wsi = backends.wsi_backend(backend)(wsi_path)
-        x_y = []
         level_idx = wsi.get_closest_level(target_mpp)
         level_mpp = wsi.mpp * wsi.level_downsamples[level_idx]
         mpp_ratio = target_mpp / level_mpp
         scaled_width, scaled_height = int(mpp_ratio * width), int(mpp_ratio * height)
 
-        for x, y in sampler.sample(scaled_width, scaled_height, wsi.level_dimensions[level_idx]):
-            x_y.append((x, y))
+        sample_args = {
+            "width": scaled_width,
+            "height": scaled_height,
+            "layer_shape": wsi.level_dimensions[level_idx],
+        }
+        if isinstance(sampler, samplers.ForegroundSampler):
+            sample_args["mask"] = get_mask(wsi, level_idx)
+
+        x_y = [(x, y) for x, y in sampler.sample(**sample_args)]
 
         return cls(x_y, scaled_width, scaled_height, level_idx)
 

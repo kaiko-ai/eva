@@ -81,6 +81,12 @@ data:
           root: *DATASET_EMBEDDINGS_ROOT
           manifest_file: manifest.csv
           split: train
+          embeddings_transforms:
+            class_path: eva.core.data.transforms.Pad2DTensor
+            init_args:
+              pad_size: 100
+              pad_value: 0
+
       val:
         class_path: eva.datasets.MultiEmbeddingsClassificationDataset
         init_args:
@@ -97,9 +103,9 @@ data:
             root: ${oc.env:DATA_ROOT, ./slide_data}/panda
             manifest_file: manifest_train.csv
             sampler:
-              class_path: eva.vision.data.wsi.patching.samplers.RandomSampler
+              class_path: eva.vision.data.wsi.patching.samplers.ForegroundGridSampler
               init_args:
-                n_samples: 100
+                max_samples: 100
             width: 224
             height: 224
             target_mpp: 0.5
