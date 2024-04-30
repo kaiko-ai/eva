@@ -64,8 +64,8 @@ class LinearDecoder(decoder.Decoder):
             The logits as a tensor (batch_size, n_classes, n_patches_height,
             n_patches_width).
         """
-        batch_size, _, height, width = patch_embeddings.shape
-        embeddings_reshaped = patch_embeddings.reshape(batch_size, _, height * width)
+        batch_size, hidden_size, height, width = patch_embeddings.shape
+        embeddings_reshaped = patch_embeddings.reshape(batch_size, hidden_size, height * width)
         logits = self._layers(embeddings_reshaped.permute(0, 2, 1))
         return logits.permute(0, 2, 1).reshape(batch_size, -1, height, width)
 
