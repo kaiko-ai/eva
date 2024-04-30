@@ -43,7 +43,7 @@ class ForegroundSampler(Sampler):
         y: int,
         width: int,
         height: int,
-        min_foreground_ratio=0.35,
+        min_foreground_ratio: float,
     ) -> bool:
         """Check if a patch contains sufficient foreground."""
 
@@ -132,11 +132,13 @@ class ForegroundGridSampler(ForegroundSampler):
         self,
         max_samples: int = 20,
         overlap: tuple[int, int] = (0, 0),
+        min_foreground_ratio: float = 0.35,
         seed: int = 42,
     ):
         """Initializes the sampler."""
         self.max_samples = max_samples
         self.overlap = overlap
+        self.min_foreground_ratio = min_foreground_ratio
         self.seed = seed
 
     def sample(
@@ -161,7 +163,9 @@ class ForegroundGridSampler(ForegroundSampler):
         for i in indices:
             if count >= self.max_samples:
                 break
-            if self.is_foreground(mask, x_y[i][0], x_y[i][1], width, height):
+            if self.is_foreground(
+                mask, x_y[i][0], x_y[i][1], width, height, self.min_foreground_ratio
+            ):
                 count += 1
                 yield x_y[i]
 
@@ -172,7 +176,7 @@ class ForegroundGridSampler(ForegroundSampler):
         y: int,
         width: int,
         height: int,
-        min_foreground_ratio=0.35,
+        min_foreground_ratio: float,
     ) -> bool:
         """Check if a patch contains sufficient foreground.
 
@@ -186,11 +190,11 @@ class ForegroundGridSampler(ForegroundSampler):
             min_foreground_ratio: The minimum amount of foreground in the patch.
         """
         mask_array, mask_scale_factor = mask
-        x_, y_, width_, height_ = self.scale_coords(mask_scale_factor, x, y, width, height)
+        x_, y_, width_, height_ = self._scale_coords(mask_scale_factor, x, y, width, height)
         patch_mask = mask_array[y_ : y_ + height_, x_ : x_ + width_]
         return patch_mask.sum() / patch_mask.size > min_foreground_ratio
 
-    def scale_coords(self, scale_factor, *coords):
+    def _scale_coords(self, scale_factor, *coords):
         return tuple(int(coord * scale_factor) for coord in coords)
 
 

@@ -63,7 +63,9 @@ class PatchCoordinates:
         if isinstance(sampler, samplers.ForegroundSampler):
             sample_args["mask"] = get_mask(wsi, level_idx)
 
-        x_y = [(x, y) for x, y in sampler.sample(**sample_args)]
+        x_y = []
+        for x, y in sampler.sample(**sample_args):
+            x_y.append((x, y))
 
         return cls(x_y, scaled_width, scaled_height, level_idx)
 
