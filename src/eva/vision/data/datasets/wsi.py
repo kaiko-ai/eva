@@ -72,7 +72,7 @@ class WsiDataset(vision.VisionDataset):
     def __getitem__(self, index: int) -> torch.Tensor:
         x, y = self._coords.x_y[index]
         width, height, level_idx = self._coords.width, self._coords.height, self._coords.level_idx
-        patch = self._wsi.read_region((x, y), (width, height), level_idx)
+        patch = self._wsi.read_region((x, y), level_idx, (width, height))
         patch = self._apply_transforms(torch.from_numpy(patch).permute(2, 0, 1))
         return patch
 

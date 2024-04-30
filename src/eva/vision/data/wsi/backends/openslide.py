@@ -38,7 +38,7 @@ class WsiOpenslide(base.Wsi):
 
     @override
     def read_region(
-        self, location: Tuple[int, int], size: Tuple[int, int], level: int
+        self, location: Tuple[int, int], level: int, size: Tuple[int, int]
     ) -> np.ndarray:
         x_max, y_max = self._wsi.level_dimensions[level]
         if location[0] + size[0] > x_max or location[1] + size[1] > y_max:

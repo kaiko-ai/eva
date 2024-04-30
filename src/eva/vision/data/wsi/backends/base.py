@@ -42,7 +42,7 @@ class Wsi(abc.ABC):
 
     @abc.abstractmethod
     def read_region(
-        self, location: Tuple[int, int], size: Tuple[int, int], level: int
+        self, location: Tuple[int, int], level: int, size: Tuple[int, int]
     ) -> np.ndarray:
         """Reads and returns image data for a specified region and zoom level.
 
