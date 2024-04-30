@@ -12,7 +12,7 @@ from typing_extensions import override
 
 from eva.vision.data.datasets import _utils, _validators, structs
 from eva.vision.data.datasets.segmentation import base
-from eva.vision.utils import io
+from eva.vision.utils import convert, io
 
 
 class TotalSegmentator2D(base.ImageSegmentation):
@@ -51,6 +51,7 @@ class TotalSegmentator2D(base.ImageSegmentation):
         split: Literal["train", "val"] | None,
         version: Literal["small", "full"] = "small",
         download: bool = False,
+        as_uint8: bool = True,
         transforms: Callable | None = None,
     ) -> None:
         """Initialize dataset.
@@ -64,6 +65,7 @@ class TotalSegmentator2D(base.ImageSegmentation):
                 Note that the download will be executed only by additionally
                 calling the :meth:`prepare_data` method and if the data does not
                 exist yet on disk.
+            as_uint8: Whether to convert and return the images as a 8-bit.
             transforms: A function/transforms that takes in an image and a target
                 mask and returns the transformed versions of both.
         """
@@ -73,6 +75,7 @@ class TotalSegmentator2D(base.ImageSegmentation):
         self._split = split
         self._version = version
         self._download = download
+        self._as_uint8 = as_uint8
 
         self._samples_dirs: List[str] = []
         self._indices: List[int] = []
@@ -127,17 +130,24 @@ class TotalSegmentator2D(base.ImageSegmentation):
         image_path = self._get_image_path(index)
         slice_index = self._get_sample_slice_index(index)
         image_array = io.read_nifti_slice(image_path, slice_index)
+        if self._as_uint8:
+            image_array = convert.to_8bit(image_array)
         image_rgb_array = image_array.repeat(3, axis=2)
         return tv_tensors.Image(image_rgb_array.transpose(2, 0, 1))
 
     @override
-    def load_masks(self, index: int) -> tv_tensors.Mask:
+    def load_mask(self, index: int) -> tv_tensors.Mask:
         masks_dir = self._get_masks_dir(index)
         slice_index = self._get_sample_slice_index(index)
         mask_paths = (os.path.join(masks_dir, label + ".nii.gz") for label in self.classes)
-        list_of_mask_arrays = [io.read_nifti_slice(path, slice_index) for path in mask_paths]
-        masks = np.concatenate(list_of_mask_arrays, axis=2)
-        return tv_tensors.Mask(masks.transpose(2, 0, 1))
+        one_hot_encoded = np.concatenate(
+            [io.read_nifti_slice(path, slice_index) for path in mask_paths],
+            axis=2,
+        )
+        background_mask = one_hot_encoded.sum(axis=2, keepdims=True) == 0
+        one_hot_encoded_with_bg = np.concatenate([background_mask, one_hot_encoded], axis=2)
+        segmentation_label = np.argmax(one_hot_encoded_with_bg, axis=2)
+        return tv_tensors.Mask(segmentation_label)
 
     def _get_masks_dir(self, index: int) -> str:
         """Returns the directory of the corresponding masks."""

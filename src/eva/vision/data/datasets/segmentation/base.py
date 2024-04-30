@@ -57,15 +57,15 @@ class ImageSegmentation(vision.VisionDataset[Tuple[tv_tensors.Image, tv_tensors.
         """
 
     @abc.abstractmethod
-    def load_masks(self, index: int) -> tv_tensors.Mask:
+    def load_mask(self, index: int) -> tv_tensors.Mask:
         """Returns the `index`'th target masks sample.
 
         Args:
             index: The index of the data sample target masks to load.
 
         Returns:
-            The sample masks as a stack of binary torchvision mask
-            tensors (label, height, width).
+            The semantic mask as a (H x W) shaped tensor with integer
+            values which represent the pixel class id.
         """
 
     @abc.abstractmethod
@@ -76,22 +76,22 @@ class ImageSegmentation(vision.VisionDataset[Tuple[tv_tensors.Image, tv_tensors.
     @override
     def __getitem__(self, index: int) -> Tuple[tv_tensors.Image, tv_tensors.Mask]:
         image = self.load_image(index)
-        masks = self.load_masks(index)
-        return self._apply_transforms(image, masks)
+        mask = self.load_mask(index)
+        return self._apply_transforms(image, mask)
 
     def _apply_transforms(
-        self, image: tv_tensors.Image, masks: tv_tensors.Mask
+        self, image: tv_tensors.Image, mask: tv_tensors.Mask
     ) -> Tuple[tv_tensors.Image, tv_tensors.Mask]:
         """Applies the transforms to the provided data and returns them.
 
         Args:
             image: The desired image.
-            masks: The target masks of the image.
+            mask: The target segmentation mask.
 
         Returns:
             A tuple with the image and the masks transformed.
         """
         if self._transforms is not None:
-            image, masks = self._transforms(image, masks)
+            image, mask = self._transforms(image, mask)
 
-        return image, masks
+        return image, mask
