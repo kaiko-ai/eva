@@ -15,30 +15,31 @@ class Sampler(abc.ABC):
         self,
         width: int,
         height: int,
-        layer_shape: tuple[int, int],
-        *args,
+        layer_shape: Tuple[int, int],
+        mask: Tuple[np.ndarray, float] | None = None,
     ) -> Generator[Tuple[int, int], None, None]:
-        """Iterator that samples patches."""
+        """Sample patche coordinates.
+
+        Args:
+            width: The width of the patches.
+            height: The height of the patches.
+            layer_shape: The shape of the layer.
+            mask: Tuple containing the mask array and the scaling factor with respect to the
+                provided layer_shape. Optional, only required for samplers with foreground
+                filtering.
+
+        Returns:
+            A generator producing sampled patch coordinates.
+        """
 
 
 class ForegroundSampler(Sampler):
     """Base class for samplers with foreground filtering capabilities."""
 
     @abc.abstractmethod
-    def sample(
-        self,
-        width: int,
-        height: int,
-        layer_shape: tuple[int, int],
-        mask: tuple[np.ndarray, float],
-        *args,
-    ) -> Generator[Tuple[int, int], None, None]:
-        """Iterator that samples patches."""
-
-    @abc.abstractmethod
     def is_foreground(
         self,
-        mask: tuple[np.ndarray, float],
+        mask: Tuple[np.ndarray, float],
         x: int,
         y: int,
         width: int,
@@ -65,7 +66,7 @@ class RandomSampler(Sampler):
         self,
         width: int,
         height: int,
-        layer_shape: tuple[int, int],
+        layer_shape: Tuple[int, int],
     ) -> Generator[Tuple[int, int], None, None]:
         """Sample random patches.
 
@@ -94,7 +95,7 @@ class GridSampler(Sampler):
     def __init__(
         self,
         max_samples: int | None = None,
-        overlap: tuple[int, int] = (0, 0),
+        overlap: Tuple[int, int] = (0, 0),
         seed: int = 42,
     ):
         """Initializes the sampler."""
@@ -106,7 +107,7 @@ class GridSampler(Sampler):
         self,
         width: int,
         height: int,
-        layer_shape: tuple[int, int],
+        layer_shape: Tuple[int, int],
     ) -> Generator[Tuple[int, int], None, None]:
         """Sample patches from a grid.
 
@@ -134,7 +135,7 @@ class ForegroundGridSampler(ForegroundSampler):
     def __init__(
         self,
         max_samples: int = 20,
-        overlap: tuple[int, int] = (0, 0),
+        overlap: Tuple[int, int] = (0, 0),
         min_foreground_ratio: float = 0.35,
         seed: int = 42,
     ):
@@ -148,8 +149,8 @@ class ForegroundGridSampler(ForegroundSampler):
         self,
         width: int,
         height: int,
-        layer_shape: tuple[int, int],
-        mask: tuple[np.ndarray, float],
+        layer_shape: Tuple[int, int],
+        mask: Tuple[np.ndarray, float],
     ):
         """Sample patches from a grid containing foreground.
 
@@ -173,7 +174,7 @@ class ForegroundGridSampler(ForegroundSampler):
 
     def is_foreground(
         self,
-        mask: tuple[np.ndarray, float],
+        mask: Tuple[np.ndarray, float],
         x: int,
         y: int,
         width: int,
@@ -193,6 +194,7 @@ class ForegroundGridSampler(ForegroundSampler):
         mask_array, mask_scale_factor = mask
         x_, y_, width_, height_ = self._scale_coords(mask_scale_factor, x, y, width, height)
         patch_mask = mask_array[y_ : y_ + height_, x_ : x_ + width_]
+        # TODO: look into warning "RuntimeWarning: invalid value encountered in divide"
         return patch_mask.sum() / patch_mask.size > min_foreground_ratio
 
     def _scale_coords(self, scale_factor, *coords):
@@ -200,10 +202,10 @@ class ForegroundGridSampler(ForegroundSampler):
 
 
 def _get_grid_coords_and_indices(
-    layer_shape: tuple[int, int],
+    layer_shape: Tuple[int, int],
     width: int,
     height: int,
-    overlap: tuple[int, int],
+    overlap: Tuple[int, int],
     shuffle: bool = True,
     seed: int = 42,
 ):
