@@ -6,7 +6,7 @@ import pytest
 import torch
 from torch import nn
 
-from eva.vision.models.networks import decoders
+from eva.vision.models.networks.decoders import segmentation
 
 
 @pytest.mark.parametrize(
@@ -21,7 +21,7 @@ from eva.vision.models.networks import decoders
     ],
 )
 def test_linear_decoder(
-    linear_decoder: decoders.LinearDecoder,
+    linear_decoder: segmentation.LinearDecoder,
     features: List[torch.Tensor],
     image_size: Tuple[int, int],
     expected_shape: torch.Size,
@@ -35,6 +35,6 @@ def test_linear_decoder(
 @pytest.fixture(scope="function")
 def linear_decoder(
     layers: nn.Module,
-) -> decoders.LinearDecoder:
+) -> segmentation.LinearDecoder:
     """LinearDecoder fixture."""
-    return decoders.LinearDecoder(layers=layers)
+    return segmentation.LinearDecoder(layers=layers)
