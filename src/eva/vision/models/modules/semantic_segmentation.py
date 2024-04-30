@@ -24,8 +24,8 @@ class SemanticSegmentationModule(module.ModelModule):
         decoder: decoders.Decoder,
         criterion: Callable[..., torch.Tensor],
         encoder: encoders.Encoder | None = None,
-        freeze_encoder: bool = True,
-        optimizer: OptimizerCallable = optim.Adam,
+        lr_multiplier_encoder: float = 0.0,
+        optimizer: OptimizerCallable = optim.AdamW,
         lr_scheduler: LRSchedulerCallable = lr_scheduler.ConstantLR,
         metrics: metrics_lib.MetricsSchema | None = None,
         postprocess: batch_postprocess.BatchPostProcess | None = None,
@@ -37,7 +37,8 @@ class SemanticSegmentationModule(module.ModelModule):
             criterion: The loss function to use.
             encoder: The encoder model. If `None`, it will be expected
                 that the input batch returns the features directly.
-            freeze_encoder: Whether to freeze the encoder.
+            lr_multiplier_encoder: The learning rate multiplier for the
+                encoder parameters. If `0`, it will freeze the encoder.
             optimizer: The optimizer to use.
             lr_scheduler: The learning rate scheduler to use.
             metrics: The metric groups to track.
@@ -50,7 +51,7 @@ class SemanticSegmentationModule(module.ModelModule):
         self.decoder = decoder
         self.criterion = criterion
         self.encoder = encoder
-        self.freeze_encoder = freeze_encoder
+        self.lr_multiplier_encoder = lr_multiplier_encoder
         self.optimizer = optimizer
         self.lr_scheduler = lr_scheduler
 
@@ -86,7 +87,7 @@ class SemanticSegmentationModule(module.ModelModule):
 
     @override
     def on_fit_start(self) -> None:
-        if self.encoder is not None and self.freeze_encoder:
+        if self.encoder is not None and self.lr_multiplier_encoder == 0:
             grad.deactivate_requires_grad(self.encoder)
 
     @override
@@ -108,7 +109,7 @@ class SemanticSegmentationModule(module.ModelModule):
 
     @override
     def on_fit_end(self) -> None:
-        if self.encoder is not None and self.freeze_encoder:
+        if self.encoder is not None and self.lr_multiplier_encoder == 0:
             grad.activate_requires_grad(self.encoder)
 
     def _batch_step(self, batch: INPUT_TENSOR_BATCH) -> STEP_OUTPUT:
