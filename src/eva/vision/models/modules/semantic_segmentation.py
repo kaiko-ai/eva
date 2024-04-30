@@ -63,9 +63,9 @@ class SemanticSegmentationModule(module.ModelModule):
     @override
     def configure_optimizers(self) -> Any:
         optimizer = self.optimizer([
-            {"params": self._decoder_parameters},
+            {"params": self.decoder.parameters()},
             {
-                "params": self._encoder_parameters,
+                "params": filter(lambda p: p.requires_grad, self.encoder.parameters()),
                 "lr": self._base_lr * self.lr_multiplier_encoder,
             },
         ])
@@ -112,6 +112,16 @@ class SemanticSegmentationModule(module.ModelModule):
         tensor = INPUT_BATCH(*batch).data
         return tensor if self.backbone is None else self.backbone(tensor)
 
+    @property
+    def _base_lr(self) -> float:
+        """Returns the base learning rate."""
+        base_optimizer = self.optimizer(self.parameters())
+        return base_optimizer.param_groups[-1]["lr"]
+
+    def _freeze_encoder(self) -> None:
+        """Freezes the encoder network."""
+        grad.deactivate_requires_grad(self.encoder)
+
     def _batch_step(self, batch: INPUT_TENSOR_BATCH) -> STEP_OUTPUT:
         """Performs a model forward step and calculates the loss.
 
@@ -130,23 +140,3 @@ class SemanticSegmentationModule(module.ModelModule):
             "predictions": predictions,
             "metadata": metadata,
         }
-
-    def _freeze_encoder(self) -> None:
-        """Freezes the encoder network."""
-        grad.deactivate_requires_grad(self.encoder)
-
-    @property
-    def _base_lr(self) -> float:
-        """Returns the base learning rate."""
-        base_optimizer = self.optimizer(self.parameters())
-        return base_optimizer.param_groups[-1]["lr"]
-
-    @property
-    def _encoder_parameters(self) -> Iterable[torch.Tensor]:
-        """Returns the trainable parameters of the encoder."""
-        return filter(lambda p: p.requires_grad, self.encoder.parameters())
-
-    @property
-    def _decoder_parameters(self) -> Iterable[torch.Tensor]:
-        """Returns the trainable parameters of the decoder."""
-        return filter(lambda p: p.requires_grad, self.decoder.parameters())
