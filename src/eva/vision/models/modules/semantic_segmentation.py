@@ -63,9 +63,9 @@ class SemanticSegmentationModule(module.ModelModule):
     @override
     def configure_optimizers(self) -> Any:
         optimizer = self.optimizer([
-            {"params": self._decoder_params},
+            {"params": self._decoder_parameters},
             {
-                "params": self._encoder_params,
+                "params": self._encoder_parameters,
                 "lr": self._base_lr * self.lr_multiplier_encoder,
             },
         ])
@@ -142,11 +142,11 @@ class SemanticSegmentationModule(module.ModelModule):
         return base_optimizer.param_groups[-1]["lr"]
 
     @property
-    def _encoder_params(self) -> Iterable[torch.Tensor]:
+    def _encoder_parameters(self) -> Iterable[torch.Tensor]:
         """Returns the trainable parameters of the encoder."""
         return filter(lambda p: p.requires_grad, self.encoder.parameters())
 
     @property
-    def _decoder_params(self) -> Iterable[torch.Tensor]:
+    def _decoder_parameters(self) -> Iterable[torch.Tensor]:
         """Returns the trainable parameters of the decoder."""
         return filter(lambda p: p.requires_grad, self.decoder.parameters())
