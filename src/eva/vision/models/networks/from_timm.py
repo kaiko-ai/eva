@@ -1,14 +1,13 @@
 """Helper wrapper class for timm models."""
 
-from typing import Any, Dict, List
+from typing import Any, Dict
 
 import timm
-import torch
-from torch import nn
-from typing_extensions import override
+
+from eva.core.models.networks import wrappers
 
 
-class TimmModel(nn.Module):
+class TimmModel(wrappers.ModelFromFunction):
     """Wrapper class for timm models."""
 
     def __init__(
@@ -26,24 +25,12 @@ class TimmModel(nn.Module):
             checkpoint_path: Path of checkpoint to load.
             model_arguments: The extra callable function / class arguments.
         """
-        super().__init__()
-
-        self._model_name = model_name
-        self._pretrained = pretrained
-        self._checkpoint_path = checkpoint_path
-        self._model_arguments = model_arguments or {}
-
-        self._feature_extractor = self._load_model()
-
-    def _load_model(self) -> nn.Module:
-        """Builds, loads and returns the model."""
-        return timm.create_model(
-            model_name=self._model_name,
-            pretrained=self._pretrained,
-            checkpoint_path=self._checkpoint_path,
-            **self._model_arguments,
+        super().__init__(
+            path=timm.create_model,
+            arguments={
+                "model_name": model_name,
+                "pretrained": pretrained,
+                "checkpoint_path": checkpoint_path,
+            }
+            | (model_arguments or {}),
         )
-
-    @override
-    def forward(self, tensor: torch.Tensor) -> torch.Tensor | List[torch.Tensor]:
-        return self._feature_extractor(tensor)
