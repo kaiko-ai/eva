@@ -3,8 +3,8 @@
 import os
 from typing import Literal
 
-import numpy as np
 import pytest
+from torchvision import tv_tensors
 
 from eva.vision.data import datasets
 
@@ -35,10 +35,10 @@ def test_sample(total_segmentator_dataset: datasets.TotalSegmentator2D, index: i
     assert len(sample) == 2
     # assert the format of the `image` and `mask`
     image, mask = sample
-    assert isinstance(image, np.ndarray)
-    assert image.shape == (16, 16, 3)
-    assert isinstance(mask, np.ndarray)
-    assert mask.shape == (16, 16, 3)
+    assert isinstance(image, tv_tensors.Image)
+    assert image.shape == (3, 16, 16)
+    assert isinstance(mask, tv_tensors.Mask)
+    assert mask.shape == (16, 16)
 
 
 @pytest.fixture(scope="function")

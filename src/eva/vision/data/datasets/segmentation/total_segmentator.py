@@ -6,12 +6,13 @@ from glob import glob
 from typing import Callable, Dict, List, Literal, Tuple
 
 import numpy as np
+from torchvision import tv_tensors
 from torchvision.datasets import utils
 from typing_extensions import override
 
 from eva.vision.data.datasets import _utils, _validators, structs
 from eva.vision.data.datasets.segmentation import base
-from eva.vision.utils import io
+from eva.vision.utils import convert, io
 
 
 class TotalSegmentator2D(base.ImageSegmentation):
@@ -50,9 +51,8 @@ class TotalSegmentator2D(base.ImageSegmentation):
         split: Literal["train", "val"] | None,
         version: Literal["small", "full"] = "small",
         download: bool = False,
-        image_transforms: Callable | None = None,
-        target_transforms: Callable | None = None,
-        image_target_transforms: Callable | None = None,
+        as_uint8: bool = True,
+        transforms: Callable | None = None,
     ) -> None:
         """Initialize dataset.
 
@@ -65,25 +65,17 @@ class TotalSegmentator2D(base.ImageSegmentation):
                 Note that the download will be executed only by additionally
                 calling the :meth:`prepare_data` method and if the data does not
                 exist yet on disk.
-            image_transforms: A function/transform that takes in an image
-                and returns a transformed version.
-            target_transforms: A function/transform that takes in the target
-                and transforms it.
-            image_target_transforms: A function/transforms that takes in an
-                image and a label and returns the transformed versions of both.
-                This transform happens after the `image_transforms` and
-                `target_transforms`.
+            as_uint8: Whether to convert and return the images as a 8-bit.
+            transforms: A function/transforms that takes in an image and a target
+                mask and returns the transformed versions of both.
         """
-        super().__init__(
-            image_transforms=image_transforms,
-            target_transforms=target_transforms,
-            image_target_transforms=image_target_transforms,
-        )
+        super().__init__(transforms=transforms)
 
         self._root = root
         self._split = split
         self._version = version
         self._download = download
+        self._as_uint8 = as_uint8
 
         self._samples_dirs: List[str] = []
         self._indices: List[int] = []
@@ -134,19 +126,28 @@ class TotalSegmentator2D(base.ImageSegmentation):
         return len(self._indices) * self._n_slices_per_image
 
     @override
-    def load_image(self, index: int) -> np.ndarray:
+    def load_image(self, index: int) -> tv_tensors.Image:
         image_path = self._get_image_path(index)
         slice_index = self._get_sample_slice_index(index)
         image_array = io.read_nifti_slice(image_path, slice_index)
-        return image_array.repeat(3, axis=2)
+        if self._as_uint8:
+            image_array = convert.to_8bit(image_array)
+        image_rgb_array = image_array.repeat(3, axis=2)
+        return tv_tensors.Image(image_rgb_array.transpose(2, 0, 1))
 
     @override
-    def load_mask(self, index: int) -> np.ndarray:
+    def load_mask(self, index: int) -> tv_tensors.Mask:
         masks_dir = self._get_masks_dir(index)
         slice_index = self._get_sample_slice_index(index)
         mask_paths = (os.path.join(masks_dir, label + ".nii.gz") for label in self.classes)
-        masks = [io.read_nifti_slice(path, slice_index) for path in mask_paths]
-        return np.concatenate(masks, axis=-1)
+        one_hot_encoded = np.concatenate(
+            [io.read_nifti_slice(path, slice_index) for path in mask_paths],
+            axis=2,
+        )
+        background_mask = one_hot_encoded.sum(axis=2, keepdims=True) == 0
+        one_hot_encoded_with_bg = np.concatenate([background_mask, one_hot_encoded], axis=2)
+        segmentation_label = np.argmax(one_hot_encoded_with_bg, axis=2)
+        return tv_tensors.Mask(segmentation_label)
 
     def _get_masks_dir(self, index: int) -> str:
         """Returns the directory of the corresponding masks."""
@@ -204,6 +205,9 @@ class TotalSegmentator2D(base.ImageSegmentation):
             raise ValueError("Invalid data version. Use 'small' or 'full'.")
 
         for resource in resources:
+            if os.path.isdir(self._root):
+                continue
+
             utils.download_and_extract_archive(
                 resource.url,
                 download_root=self._root,

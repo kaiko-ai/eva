@@ -11,7 +11,7 @@ from typing_extensions import override
 
 from eva.core.metrics import structs as metrics_lib
 from eva.core.models.modules import module
-from eva.core.models.modules.typings import DATA_SAMPLE, MODEL_TYPE
+from eva.core.models.modules.typings import INPUT_BATCH, MODEL_TYPE
 from eva.core.models.modules.utils import batch_postprocess, grad
 
 
@@ -55,8 +55,13 @@ class HeadModule(module.ModelModule):
         self.lr_scheduler = lr_scheduler
 
     @override
+    def configure_model(self) -> Any:
+        if self.backbone is not None:
+            grad.deactivate_requires_grad(self.backbone)
+
+    @override
     def configure_optimizers(self) -> Any:
-        parameters = list(self.head.parameters())
+        parameters = self.head.parameters()
         optimizer = self.optimizer(parameters)
         lr_scheduler = self.lr_scheduler(optimizer)
         return {"optimizer": optimizer, "lr_scheduler": lr_scheduler}
@@ -67,33 +72,23 @@ class HeadModule(module.ModelModule):
         return self.head(features).squeeze(-1)
 
     @override
-    def on_fit_start(self) -> None:
-        if self.backbone is not None:
-            grad.deactivate_requires_grad(self.backbone)
-
-    @override
-    def training_step(self, batch: DATA_SAMPLE, *args: Any, **kwargs: Any) -> STEP_OUTPUT:
+    def training_step(self, batch: INPUT_BATCH, *args: Any, **kwargs: Any) -> STEP_OUTPUT:
         return self._batch_step(batch)
 
     @override
-    def validation_step(self, batch: DATA_SAMPLE, *args: Any, **kwargs: Any) -> STEP_OUTPUT:
+    def validation_step(self, batch: INPUT_BATCH, *args: Any, **kwargs: Any) -> STEP_OUTPUT:
         return self._batch_step(batch)
 
     @override
-    def test_step(self, batch: DATA_SAMPLE, *args: Any, **kwargs: Any) -> STEP_OUTPUT:
+    def test_step(self, batch: INPUT_BATCH, *args: Any, **kwargs: Any) -> STEP_OUTPUT:
         return self._batch_step(batch)
 
     @override
-    def predict_step(self, batch: DATA_SAMPLE, *args: Any, **kwargs: Any) -> torch.Tensor:
-        tensor = DATA_SAMPLE(*batch).data
+    def predict_step(self, batch: INPUT_BATCH, *args: Any, **kwargs: Any) -> torch.Tensor:
+        tensor = INPUT_BATCH(*batch).data
         return tensor if self.backbone is None else self.backbone(tensor)
 
-    @override
-    def on_fit_end(self) -> None:
-        if self.backbone is not None:
-            grad.activate_requires_grad(self.backbone)
-
-    def _batch_step(self, batch: DATA_SAMPLE) -> STEP_OUTPUT:
+    def _batch_step(self, batch: INPUT_BATCH) -> STEP_OUTPUT:
         """Performs a model forward step and calculates the loss.
 
         Args:
@@ -102,7 +97,7 @@ class HeadModule(module.ModelModule):
         Returns:
             The batch step output.
         """
-        data, targets, metadata = DATA_SAMPLE(*batch)
+        data, targets, metadata = INPUT_BATCH(*batch)
         predictions = self(data)
         loss = self.criterion(predictions, targets)
         return {
