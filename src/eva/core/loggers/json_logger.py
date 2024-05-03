@@ -1,22 +1,21 @@
 """JSON based experimental logger."""
 
-import csv
-import logging
+import json
 import os
 from argparse import Namespace
-from typing import Any, Dict, List, Optional, Set, Union
-from toolz import dicttoolz
-from lightning.fabric.loggers import logger
+from typing import Any, Dict, List, Union
+
+import torch
+from lightning.fabric.loggers.logger import Logger, rank_zero_experiment
 from lightning.fabric.utilities import cloud_io, rank_zero
 from lightning.fabric.utilities.logger import _add_prefix
 from lightning.fabric.utilities.types import _PATH
-from torch import Tensor
+from loguru import logger
+from toolz import dicttoolz
 from typing_extensions import override
 
-log = logging.getLogger(__name__)
 
-
-class JSONLogger(logger.Logger):
+class JSONLogger(Logger):
     """Local file system experimental logger in JSON format.
 
     Logs are saved to ``os.path.join(root_dir, name, version)``.
@@ -55,23 +54,23 @@ class JSONLogger(logger.Logger):
         self._prefix = prefix
         self._flush_logs_every_n_steps = flush_logs_every_n_steps
 
-        self._fs = cloud_io.get_filesystem(self._root_dir)
-        self._experiment: _JSONExperimentWriter
+        self._fs = cloud_io.get_filesystem(self._root_dir, anon=False)
+        self._experiment: _ExperimentWriter | None = None
 
     @property
-    @logger.rank_zero_experiment
-    def experiment(self) -> "_JSONExperimentWriter":
+    @rank_zero_experiment
+    def experiment(self) -> "_ExperimentWriter":
         """Returns the experiment writer object."""
         if self._experiment is not None:
             return self._experiment
 
         self._fs.makedirs(self._root_dir, exist_ok=True)
-        self._experiment = _JSONExperimentWriter(log_dir=self.log_dir)
+        self._experiment = _ExperimentWriter(log_dir=self.log_dir)
         return self._experiment
 
     @property
     @override
-    def root_dir(self) -> str:
+    def root_dir(self) -> str | _PATH:
         return self._root_dir
 
     @property
@@ -100,13 +99,11 @@ class JSONLogger(logger.Logger):
     @override
     @rank_zero.rank_zero_only
     def log_metrics(  # type: ignore[override]
-        self, metrics: Dict[str, Tensor | float], step: int | None = None
+        self, metrics: Dict[str, torch.Tensor | float], step: int | None = None
     ) -> None:
-        metrics = _add_prefix(metrics, self._prefix, self.LOGGER_JOIN_CHAR)
-        # if step is None:
-        #     step = len(self.experiment.metrics)
-        self.experiment.log_metrics(metrics, step)
-        if (step + 1) % self._flush_logs_every_n_steps == 0:
+        metrics = _add_prefix(metrics, self._prefix, self.LOGGER_JOIN_CHAR)  # type: ignore
+        self.experiment.log_metrics(metrics, step=step)
+        if (step or 0 + 1) % self._flush_logs_every_n_steps == 0:
             self.save()
 
     @override
@@ -125,27 +122,19 @@ class JSONLogger(logger.Logger):
 
     def _get_next_version(self) -> int:
         versions_root = os.path.join(self._root_dir, self.name)
+
         if not cloud_io._is_dir(self._fs, versions_root, strict=True):
-            log.warning(f"Missing logger folder '{versions_root}'.")
+            logger.warning("Missing logger folder: %s", versions_root)
             return 0
 
-        latest_version = -1
-        for directory in self._fs.listdir(versions_root):
-            full_path, name = directory["name"], os.path.basename(directory["name"])
-            if cloud_io._is_dir(self._fs, full_path) and name.startswith("version_"):
-                version = name.split("_")[-1]
-                if version.isdigit():
-                    latest_version = max(latest_version, version)
-
-        return max(latest_version, 0)
-
         existing_versions = []
-        for directory in self._fs.listdir(versions_root):
-            full_path, name = directory["name"], os.path.basename(directory["name"])
+        for d in self._fs.listdir(versions_root):
+            full_path = d["name"]
+            name = os.path.basename(full_path)
             if cloud_io._is_dir(self._fs, full_path) and name.startswith("version_"):
-                version = name.split("_")[1]
-                if version.isdigit():
-                    existing_versions.append(int(version))
+                dir_ver = name.split("_")[1]
+                if dir_ver.isdigit():
+                    existing_versions.append(int(dir_ver))
 
         if len(existing_versions) == 0:
             return 0
@@ -153,89 +142,92 @@ class JSONLogger(logger.Logger):
         return max(existing_versions) + 1
 
 
-class _JSONExperimentWriter:
+class _ExperimentWriter:
     """Experiment writer for JSONLogger."""
 
     NAME_METRICS_FILE = "metrics.json"
+    ENCODING = "utf-8"
 
     def __init__(self, log_dir: str) -> None:
         """Initializes the experimental writer.
-        
+
         Args:
             log_dir: Directory for the experiment logs
         """
         self.log_dir = log_dir
 
         self.metrics: List[Dict[str, float]] = []
-        self.metrics_keys: List[str] = []
-
-        self._fs = cloud_io.get_filesystem(log_dir)
-        self.metrics_file_path = os.path.join(self.log_dir, self.NAME_METRICS_FILE)
+        self._fs = cloud_io.get_filesystem(log_dir, anon=False)
 
         self._check_log_dir_exists()
         self._fs.makedirs(self.log_dir, exist_ok=True)
 
-    def log_metrics(self, metrics_dict: Dict[str, float], step: int | None = None) -> None:
+    @property
+    def filename(self) -> str:
+        return os.path.join(self.log_dir, self.NAME_METRICS_FILE)
+
+    def log_metrics(
+        self, metrics_dict: Dict[str, torch.Tensor | float], step: int | None = None
+    ) -> None:
         """Record metrics."""
 
-        def _handle_value(value: Union[Tensor, Any]) -> Any:
-            if isinstance(value, Tensor):
+        def _handle_value(value: Union[torch.Tensor, Any]) -> Any:
+            if isinstance(value, torch.Tensor):
                 return value.item()
             return value
 
-        if step is None:
-            step = len(self.metrics)
-
-        # metrics = {k: _handle_value(v) for k, v in metrics_dict.items()}
-        metrics = dicttoolz.valmap(_handle_value, metrics_dict)
-        metrics["step"] = step
-        self.metrics.append(metrics)
+        item = {
+            "step": step,
+            "metrics": dicttoolz.valmap(_handle_value, metrics_dict),
+        }
+        self.metrics.append(item)
 
     def save(self) -> None:
         """Save recorded metrics into files."""
         if not self.metrics:
             return
 
-        new_keys = self._record_new_keys()
-        file_exists = self._fs.isfile(self.metrics_file_path)
-
-        if new_keys and file_exists:
-            # we need to re-write the file if the keys (header) change
-            self._rewrite_with_new_header(self.metrics_keys)
-
-        with self._fs.open(
-            self.metrics_file_path, mode=("a" if file_exists else "w"), newline=""
-        ) as file:
-            writer = csv.DictWriter(file, fieldnames=self.metrics_keys)
-            if not file_exists:
-                # only write the header if we're writing a fresh file
-                writer.writeheader()
-            writer.writerows(self.metrics)
-
-        self.metrics = []  # reset
-
-    def _record_new_keys(self) -> Set[str]:
-        """Records new keys that have not been logged before."""
-        current_keys = set().union(*self.metrics)
-        new_keys = current_keys - set(self.metrics_keys)
-        self.metrics_keys.extend(new_keys)
-        self.metrics_keys.sort()
-        return new_keys
-
-    def _rewrite_with_new_header(self, fieldnames: List[str]) -> None:
-        with self._fs.open(self.metrics_file_path, "r", newline="") as file:
-            metrics = list(csv.DictReader(file))
-
-        with self._fs.open(self.metrics_file_path, "w", newline="") as file:
-            writer = csv.DictWriter(file, fieldnames=fieldnames)
-            writer.writeheader()
-            writer.writerows(metrics)
+        self._update_metrics()
+        self._save_json()
+        self._reset_metrics()
 
     def _check_log_dir_exists(self) -> None:
         if self._fs.exists(self.log_dir) and self._fs.listdir(self.log_dir):
-            rank_zero.rank_zero_warn(
+            rank_zero.rank_zero_warn(  # type: ignore
                 f"Experiment logs directory {self.log_dir} exists and is not empty."
-                " Previous log files in this directory will be deleted when the new ones are saved!"
+                " Previous log files in this directory will be deleted when the new"
+                " ones are saved!"
             )
-            if self._fs.isfile(self.metrics_file_path):
-                self._fs.rm_file(self.metrics_file_path)
+            if self._fs.isfile(self.filename):
+                self._fs.rm_file(self.filename)
+
+    def _save_json(
+        self,
+        *,
+        indent: int | None = 2,
+    ) -> None:
+        """Saves data to a JSON file.
+
+        Args:
+            indent: The number of spaces per level that should be used to indent
+                the content. An indent level of 0 or negative will only insert
+                newlines. `None` selects the most compact representation.
+        """
+        with self._fs.open(self.filename, mode="w", encoding=self.ENCODING) as file:
+            json.dump(self.metrics, file, indent=indent)
+
+    def _load_json(self) -> Any:
+        """Loads a JSON file and returns its raw data."""
+        with self._fs.open(self.filename, "r", encoding=self.ENCODING) as file:
+            return json.load(file)
+
+    def _update_metrics(self) -> None:
+        """Appends the new tracked metrics with the old ones."""
+        file_exists = self._fs.isfile(self.filename)
+        if file_exists:
+            previous_metrics = self._load_json()
+            self.metrics += previous_metrics
+
+    def _reset_metrics(self) -> None:
+        """Resets metrics."""
+        self.metrics = []

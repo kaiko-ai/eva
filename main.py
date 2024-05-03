@@ -1,65 +1,24 @@
-from lightning.fabric.utilities import cloud_io
-
 from eva.core.loggers.json_logger import JSONLogger
 
-logger = JSONLogger(root_dir=".")
 
-# print(logger)
-
-
-
-root_dir = versions_root = "dummy"
-
-fs = cloud_io.get_filesystem(root_dir)
-# print(cloud_io._is_dir(fs, versions_root, strict=True))
+metrics_one = {"val/AverageLoss": 0.1}
+metrics_two = {"val/AverageLoss": 0.05}
+metrics_three = {"val/AverageLoss": 0.03}
+metrics_four = {"val/AverageLoss": 0.01}
 
 
-# for directory in fs.listdir(versions_root):
-#     print(directory)
+logger = JSONLogger(root_dir=".", version="")
+# logger = JSONLogger(root_dir="az://ml-outputs@kaiko.blob.core.windows.net/experiments/tmp", version="")
 
+logger.log_metrics(metrics=metrics_one)
+logger.save()
 
-strings = [
-    "/Users/ioangatop/Desktop/dev2/eva/dummy/edwin",
-    "/Users/ioangatop/Desktop/dev2/eva/dummy/version_1",
-    "/Users/ioangatop/Desktop/dev2/eva/dummy/version_",
-    "/Users/ioangatop/Desktop/dev2/eva/dummy/version_100",
-    "/Users/ioangatop/Desktop/dev2/eva/dummy/version_1",
-    "/Users/ioangatop/Desktop/dev2/eva/dummy/version_0",
-    "/Users/ioangatop/Desktop/dev2/eva/version_0/dummy/afa",
-    "/Users/ioangatop/Desktop/dev2/eva/dummy/version_5",
-    "/Users/ioangatop/Desktop/dev2/eva/dummy/version_10",
-]
+logger.log_metrics(metrics=metrics_one, step=1)
+logger.save()
 
+logger.log_metrics(metrics=metrics_two, step=2)
+logger.log_metrics(metrics=metrics_three, step=3)
+logger.save()
 
-import re
-
-
-def extract_num(s, p, ret=0):
-    search = p.search(s)
-    if search:
-        return int(search.groups()[0])
-    else:
-        return ret
-
-
-# print re.findall(r"(?<=Version\s)\S+",x)
-
-# filtered_list = list(filter(lambda s: not re.match(r'.*\d', s), strings))
-# filtered_list = list(filter(lambda s: not re.match(r"(?<=version_\s)\S+", s), strings))
-# filtered_list = list(filter(lambda s: not re.match(r"(?P<version_>\w+)", s), strings))
-
-versioned_logs = list(filter(lambda s: re.findall(r"version_\d", s.split("/")[-1]), strings))
-sorted_logs = sorted(versioned_logs, key=lambda s: int(re.findall(r'(\d+)', s)[-1]))
-print(sorted_logs)
-
-
-# print(sorted(x, key=lambda s: int(re.findall(r'(\d+)', s)[-1])))
-
-
-
-
-# s = "/Users/ioangatop/Desktop/dev2/eva/dummy/version_100"
-# # re.search("(nn)", s[::-1])
-# # print(re.search(r'\d+', s).group()[::-1])
-# print()
-
+logger.log_metrics(metrics=metrics_four, step=4)
+logger.save()
