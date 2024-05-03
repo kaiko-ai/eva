@@ -74,6 +74,7 @@ class SemanticSegmentationLogger(base.BatchLogger):
         image_grid = _make_grid_from_outputs(images, targets, predictions)
 
         # from torchvision.utils import save_image
+        # 
         # save_image(image_grid.to(dtype=torch.float32), f"{tag}_{trainer.global_step}.png")
 
         log.log_images(
