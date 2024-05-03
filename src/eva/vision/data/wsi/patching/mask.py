@@ -1,7 +1,8 @@
 """Functions for extracting foreground masks."""
 
 import dataclasses
-from typing import Tuple
+import math
+from typing import Literal, Tuple
 
 import cv2
 import numpy as np
@@ -26,6 +27,7 @@ def get_mask(
     kernel_size: Tuple[int, int] = (7, 7),
     gray_threshold: int = 220,
     fill_holes: bool = False,
+    min_pixels: int | None = 1000 * 1000,
 ) -> Mask:
     """Extracts a binary mask from an image.
 
@@ -35,8 +37,9 @@ def get_mask(
         kernel_size: The size of the kernel for morphological operations.
         gray_threshold: The threshold for the gray scale image.
         fill_holes: Whether to fill holes in the mask.
+        min_pixels: The minimum number of area pixels for the level at which to extract the mask.
     """
-    low_res_level = get_lowest_resolution_level(wsi, min_pixels=1000 * 1000)
+    low_res_level = get_lowest_resolution_level(wsi, min_pixels=min_pixels, errors="raise")
     image = wsi.read_region((0, 0), low_res_level, wsi.level_dimensions[low_res_level])
 
     kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, kernel_size)
@@ -54,13 +57,16 @@ def get_mask(
     return Mask(mask_array=mask, scale_factor=mask_scale_factor)
 
 
-def get_lowest_resolution_level(wsi: Wsi, min_pixels: int | None):
+def get_lowest_resolution_level(
+    wsi: Wsi, min_pixels: int | None, errors: Literal["raise", "ignore"] = "raise"
+):
     """Calculates the WSI level corresponding to the lowest resolution/magnification.
 
     Args:
         wsi: The WSI object.
-        min_pixels: If specified, this funciton will return the lowest resolution
+        min_pixels: If specified, this function will return the lowest resolution
             level with an area of at least `min_pixels` pixels.
+        errors: Whether to raise an error if no level with the requested specification is found.
 
     Returns:
         The lowest resolution level index of the given WSI.
@@ -74,5 +80,8 @@ def get_lowest_resolution_level(wsi: Wsi, min_pixels: int | None):
             if width * height >= min_pixels:
                 valid_level_index = index
                 break
+
+    if errors == "raise" and math.prod(wsi.level_dimensions[valid_level_index]) < min_pixels:
+        raise ValueError("No level with the specified minimum number of pixels available.")
 
     return valid_level_index
