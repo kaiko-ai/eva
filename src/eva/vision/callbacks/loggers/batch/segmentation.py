@@ -9,6 +9,7 @@ from lightning.pytorch.utilities.types import STEP_OUTPUT
 from torchvision.transforms.v2 import functional
 from typing_extensions import override
 
+from eva.core.loggers import log
 from eva.core.models.modules.typings import INPUT_TENSOR_BATCH
 from eva.core.utils import to_cpu
 from eva.vision.callbacks.loggers.batch import base
@@ -65,24 +66,38 @@ class SemanticSegmentationLogger(base.BatchLogger):
             max_samples=self._max_samples,
         )
         images, targets, predictions = to_cpu([images, targets, predictions])
+        predictions = torch.argmax(predictions, dim=1)
 
-        images = [_denormalize_image(image, mean=self._mean, std=self._std) for image in images]
+        images = list(map(self._denomalize_image, images))
         targets = list(map(_draw_semantic_mask, targets))
-        predictions = list(map(_draw_semantic_mask, torch.argmax(predictions, dim=1)))
+        predictions = list(map(_draw_semantic_mask, predictions))
         image_grid = _make_grid_from_outputs(images, targets, predictions)
 
-        from torchvision.utils import save_image
+        # from torchvision.utils import save_image
+        # save_image(image_grid.to(dtype=torch.float32), f"{tag}_{trainer.global_step}.png")
 
-        save_image(image_grid.to(dtype=torch.float32), f"{tag}_{trainer.global_step}.png")
+        log.log_images(
+            trainer.loggers,
+            images=image_grid,
+            tag=tag,
+            step=trainer.global_step,
+        )
+
+    def _denomalize_image(self, image: torch.Tensor) -> torch.Tensor:
+        """De-normalizes an image tensor to (0., 1.) range."""
+        return _denormalize_image(image, mean=self._mean, std=self._std)
 
 
-def _subsample_tensors(tensors_stack: List[torch.Tensor], max_samples: int) -> List[torch.Tensor]:
+def _subsample_tensors(
+    tensors_stack: List[torch.Tensor],
+    max_samples: int,
+) -> List[torch.Tensor]:
     """Sub-samples tensors from a list of tensors in-place.
 
     Args:
         tensors_stack: A list of tensors.
-        max_samples: The maximum number of images displayed in the grid.
-            Defaults to `16`.
+        max_samples: The maximum number of images
+            displayed in the grid.
 
     Returns:
         A sub-sample of the input tensors stack.
@@ -123,8 +138,8 @@ def _denormalize_image(
 def _draw_semantic_mask(tensor: torch.Tensor) -> torch.Tensor:
     """Draws a semantic mask to an image RGB tensor.
 
-    The input semantic mask is a (H x W) shaped tensor with integer values
-    which represent the pixel class id.
+    The input semantic mask is a (H x W) shaped tensor with
+    integer values which represent the pixel class id.
 
     Args:
         tensor: An image tensor of range [0., 1.].
@@ -132,17 +147,12 @@ def _draw_semantic_mask(tensor: torch.Tensor) -> torch.Tensor:
     Returns:
         The image as a numpy tensor in the range of [0., 255.].
     """
-    if tensor.dtype == torch.uint8:
-        return tensor
-
     tensor = torch.squeeze(tensor)
-
     height, width = tensor.shape[-2], tensor.shape[-1]
     red, green, blue = torch.zeros((3, height, width), dtype=torch.uint8)
     for class_id, color in colormap.COLORMAP.items():
         indices = tensor == class_id
         red[indices], green[indices], blue[indices] = color
-
     return torch.stack([red, green, blue])
 
 
