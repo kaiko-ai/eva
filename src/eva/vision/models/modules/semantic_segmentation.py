@@ -65,7 +65,7 @@ class SemanticSegmentationModule(module.ModelModule):
             [
                 {"params": self.decoder.parameters()},
                 {
-                    "params": self.encoder_trainable_parameters(),
+                    "params": self._encoder_trainable_parameters(),
                     "lr": self._base_lr * self.lr_multiplier_encoder,
                 },
             ]
@@ -119,7 +119,6 @@ class SemanticSegmentationModule(module.ModelModule):
         base_optimizer = self.optimizer(self.parameters())
         return base_optimizer.param_groups[-1]["lr"]
 
-    @property
     def _encoder_trainable_parameters(self) -> Iterable[torch.Tensor]:
         """Returns the trainable parameters of the encoder."""
         return (
