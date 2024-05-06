@@ -139,6 +139,29 @@ class TotalSegmentator2D(base.ImageSegmentation):
 
     @override
     def load_mask(self, index: int) -> tv_tensors.Mask:
+        if not os.path.isfile(self._mask_array_filename(index)):
+            mask = self._load_mask_from_nifti(index)
+            self._save_mask_as_array(index, mask)
+        mask = self._load_mask_from_array(index)
+        return mask
+
+    def _save_mask_as_array(self, index, mask: tv_tensors.Mask) -> None:
+        filename = self._mask_array_filename(index)
+        os.makedirs(os.path.dirname(filename), exist_ok=True)
+        np.save(filename, mask.numpy())
+
+    def _mask_array_filename(self, index: int) -> None:
+        sample_index, slice_index = self._indices[index]
+        masks_dir = self._get_masks_dir(sample_index)
+        return os.path.join(masks_dir, "2d_masks", f"{slice_index}.npy")
+
+    def _load_mask_from_array(self, index: int) -> tv_tensors.Mask:
+        filename = self._mask_array_filename(index)
+        segmentation_label = np.load(filename)
+        return tv_tensors.Mask(segmentation_label)
+
+    def _load_mask_from_nifti(self, index: int) -> tv_tensors.Mask:
+        """Loads the segmentation mask from NifTi files."""
         sample_index, slice_index = self._indices[index]
         masks_dir = self._get_masks_dir(sample_index)
         mask_paths = (os.path.join(masks_dir, label + ".nii.gz") for label in self.classes)
