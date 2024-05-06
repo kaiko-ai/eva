@@ -5,7 +5,7 @@
 groups = ["default", "dev", "docs", "all", "typecheck", "lint", "vision", "test"]
 strategy = ["cross_platform", "inherit_metadata"]
 lock_version = "4.4.1"
-content_hash = "sha256:ea6467d141abcf2d277c9c8cf42340385d8b9e6dbee00d49743c67579dccca09"
+content_hash = "sha256:f1e852d1f3aa89e7061fc859e3446b3abfc3bbd019323fa885dc81a6b5cd2659"
 
 [[package]]
 name = "absl-py"
@@ -1520,7 +1520,7 @@ name = "openslide-python"
 version = "1.3.1"
 requires_python = ">=3.8"
 summary = "Python interface to OpenSlide"
-groups = ["vision"]
+groups = ["all", "vision"]
 dependencies = [
     "Pillow",
 ]
