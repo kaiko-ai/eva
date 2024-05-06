@@ -2183,9 +2183,7 @@ You can set up a local python environment for development as follows:
 <p>Add a new dependency to the <code>core</code> submodule:<br>
 <code>pdm add &lt;package_name&gt;</code></p>
 <p>Add a new dependency to the <code>vision</code> submodule:<br>
-<code>pdm add -G vision &lt;package_name&gt;</code></p>
-<p>After adding a new dependency, you also need to update the <code>pdm.lock</code> file:<br>
-<code>pdm update</code></p>
+<code>pdm add -G vision -G all &lt;package_name&gt;</code></p>
 <p>For more information about managing dependencies please look <a href="https://pdm-project.org/latest/usage/dependency/#manage-dependencies">here</a>.</p>
 <h2 id="continuous-integration-ci">Continuous Integration (CI)</h2>
 <p>For testing automation, we use <a href="https://nox.thea.codes/en/stable/index.html"><code>nox</code></a>.</p>
