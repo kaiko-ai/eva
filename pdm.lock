@@ -5,7 +5,7 @@
 groups = ["default", "dev", "docs", "all", "typecheck", "lint", "vision", "test"]
 strategy = ["cross_platform", "inherit_metadata"]
 lock_version = "4.4.1"
-content_hash = "sha256:01893abe4eedac47e0dc55b1097b0dd80675e09772227fd20bb46e4287760674"
+content_hash = "sha256:f1e852d1f3aa89e7061fc859e3446b3abfc3bbd019323fa885dc81a6b5cd2659"
 
 [[package]]
 name = "absl-py"
@@ -760,7 +760,7 @@ files = [
 
 [[package]]
 name = "lightning"
-version = "2.2.1"
+version = "2.2.4"
 requires_python = ">=3.8"
 summary = "The Deep Learning framework to train, deploy, and ship AI products Lightning fast."
 groups = ["default"]
@@ -777,8 +777,8 @@ dependencies = [
     "typing-extensions<6.0,>=4.4.0",
 ]
 files = [
-    {file = "lightning-2.2.1-py3-none-any.whl", hash = "sha256:fec9b49d29a6019e8fe49e825082bab8d5ea3fde8e4b36dcf5c8896c2bdb86c3"},
-    {file = "lightning-2.2.1.tar.gz", hash = "sha256:b3e46d596b32cafd1fb9b21fdba1b1767df97b1af5cc702693d1c51df60b19aa"},
+    {file = "lightning-2.2.4-py3-none-any.whl", hash = "sha256:b44cb8692253f2719b2f84237e94ff84451fe219922c7f04447b52524471379e"},
+    {file = "lightning-2.2.4.tar.gz", hash = "sha256:4cc3fb3edf04fcd63c0ecf75087d2fa06163759fc8c1fc500b16404ac1854f77"},
 ]
 
 [[package]]
@@ -1520,7 +1520,7 @@ name = "openslide-python"
 version = "1.3.1"
 requires_python = ">=3.8"
 summary = "Python interface to OpenSlide"
-groups = ["vision"]
+groups = ["all", "vision"]
 dependencies = [
     "Pillow",
 ]
