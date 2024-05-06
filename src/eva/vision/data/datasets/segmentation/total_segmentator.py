@@ -203,7 +203,7 @@ class TotalSegmentator2D(base.ImageSegmentation):
             (sample_idx, slide_idx)
             for sample_idx in self._get_split_indices()
             for slide_idx in range(self._get_number_of_slices_per_sample(sample_idx))
-            if slide_idx % self._n_slices_per_image or 1 == 0
+            if slide_idx % (self._n_slices_per_image or 1) == 0
         ]
         return indices
 
