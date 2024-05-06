@@ -24,6 +24,9 @@ class TotalSegmentator2D(base.ImageSegmentation):
     }
     """Dataset version and split to the expected size."""
 
+    _n_slices_per_image: int | None = None
+    """The amount of slices to sample per 3D CT scan image."""
+
     _resources_full: List[structs.DownloadResource] = [
         structs.DownloadResource(
             filename="Totalsegmentator_dataset_v201.zip",
@@ -200,6 +203,7 @@ class TotalSegmentator2D(base.ImageSegmentation):
             (sample_idx, slide_idx)
             for sample_idx in self._get_split_indices()
             for slide_idx in range(self._get_number_of_slices_per_sample(sample_idx))
+            if slide_idx % self._n_slices_per_image or 1 == 0
         ]
         return indices
 
