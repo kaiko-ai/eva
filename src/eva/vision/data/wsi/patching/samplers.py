@@ -193,13 +193,13 @@ class ForegroundGridSampler(ForegroundSampler):
             height: The height of the patch.
             min_foreground_ratio: The minimum amount of foreground in the patch.
         """
-        x_, y_, width_, height_ = self._scale_coords(mask.scale_factor, x, y, width, height)
+        x_, y_ = self._scale_coords(x, y, mask.scale_factors)
+        width_, height_ = self._scale_coords(width, height, mask.scale_factors)
         patch_mask = mask.mask_array[y_ : y_ + height_, x_ : x_ + width_]
-        # TODO: look into warning "RuntimeWarning: invalid value encountered in divide"
         return patch_mask.sum() / patch_mask.size > min_foreground_ratio
 
-    def _scale_coords(self, scale_factor, *coords):
-        return tuple(int(coord * scale_factor) for coord in coords)
+    def _scale_coords(self, x: int, y: int, scale_factors: Tuple[float, float]) -> Tuple[int, int]:
+        return int(x / scale_factors[0]), int(y / scale_factors[1])
 
 
 def _get_grid_coords_and_indices(
