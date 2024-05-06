@@ -24,6 +24,9 @@ class TotalSegmentator2D(base.ImageSegmentation):
     }
     """Dataset version and split to the expected size."""
 
+    _sample_every_n_slices: int | None = None
+    """The amount of slices to sub-sample per 3D CT scan image."""
+
     _resources_full: List[structs.DownloadResource] = [
         structs.DownloadResource(
             filename="Totalsegmentator_dataset_v201.zip",
@@ -161,7 +164,7 @@ class TotalSegmentator2D(base.ImageSegmentation):
         sample_dir = self._samples_dirs[sample_index]
         return os.path.join(self._root, sample_dir, "segmentations")
 
-    def _get_sample_total_slices(self, sample_index: int) -> int:
+    def _get_number_of_slices_per_sample(self, sample_index: int) -> int:
         """Returns the total amount of slices of a sample."""
         image_path = self._get_image_path(sample_index)
         return io.fetch_total_nifti_slices(image_path)
@@ -199,7 +202,8 @@ class TotalSegmentator2D(base.ImageSegmentation):
         indices = [
             (sample_idx, slide_idx)
             for sample_idx in self._get_split_indices()
-            for slide_idx in range(self._get_sample_total_slices(sample_idx))
+            for slide_idx in range(self._get_number_of_slices_per_sample(sample_idx))
+            if slide_idx % (self._sample_every_n_slices or 1) == 0
         ]
         return indices
 
