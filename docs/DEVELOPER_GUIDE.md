@@ -17,10 +17,7 @@ Add a new dependency to the `core` submodule:<br>
 `pdm add <package_name>`
 
 Add a new dependency to the `vision` submodule:<br>
-`pdm add -G vision <package_name>`
-
-After adding a new dependency, you also need to update the `pdm.lock` file:<br>
-`pdm update`
+`pdm add -G vision -G all <package_name>`
 
 For more information about managing dependencies please look [here](https://pdm-project.org/latest/usage/dependency/#manage-dependencies).
 

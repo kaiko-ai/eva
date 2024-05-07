@@ -55,8 +55,13 @@ class HeadModule(module.ModelModule):
         self.lr_scheduler = lr_scheduler
 
     @override
+    def configure_model(self) -> Any:
+        if self.backbone is not None:
+            grad.deactivate_requires_grad(self.backbone)
+
+    @override
     def configure_optimizers(self) -> Any:
-        parameters = list(self.head.parameters())
+        parameters = self.head.parameters()
         optimizer = self.optimizer(parameters)
         lr_scheduler = self.lr_scheduler(optimizer)
         return {"optimizer": optimizer, "lr_scheduler": lr_scheduler}
@@ -65,11 +70,6 @@ class HeadModule(module.ModelModule):
     def forward(self, tensor: torch.Tensor, *args: Any, **kwargs: Any) -> torch.Tensor:
         features = tensor if self.backbone is None else self.backbone(tensor)
         return self.head(features).squeeze(-1)
-
-    @override
-    def on_fit_start(self) -> None:
-        if self.backbone is not None:
-            grad.deactivate_requires_grad(self.backbone)
 
     @override
     def training_step(self, batch: INPUT_BATCH, *args: Any, **kwargs: Any) -> STEP_OUTPUT:
@@ -87,11 +87,6 @@ class HeadModule(module.ModelModule):
     def predict_step(self, batch: INPUT_BATCH, *args: Any, **kwargs: Any) -> torch.Tensor:
         tensor = INPUT_BATCH(*batch).data
         return tensor if self.backbone is None else self.backbone(tensor)
-
-    @override
-    def on_fit_end(self) -> None:
-        if self.backbone is not None:
-            grad.activate_requires_grad(self.backbone)
 
     def _batch_step(self, batch: INPUT_BATCH) -> STEP_OUTPUT:
         """Performs a model forward step and calculates the loss.
