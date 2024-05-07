@@ -51,7 +51,7 @@ data:
       train:
         class_path: eva.vision.datasets.TotalSegmentator2D
         init_args: &DATASET_ARGS
-          root: data/total_segmentator
+          root: ${oc.env:DATA_ROOT, ./data}/total_segmentator
           split: train
           download: false
           transforms:
