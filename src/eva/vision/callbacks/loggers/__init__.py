@@ -1,5 +1,5 @@
 """Vision logging related callbacks API."""
 
-from eva.vision.callbacks.loggers import batch
+from eva.vision.callbacks.loggers.batch import SemanticSegmentationLogger
 
-__all__ = ["batch"]
+__all__ = ["SemanticSegmentationLogger"]

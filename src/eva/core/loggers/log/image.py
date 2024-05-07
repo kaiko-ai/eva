@@ -21,9 +21,10 @@ def log_image(
     Args:
         logger: The desired logger.
         tag: The log tag.
-        image: The image tensor to log.
+        image: The image tensor to log. It should have
+            the shape of (3,H,W) and (0,1) normalized.
         caption: The image caption.
-        step: The global step of the log. Defaults to `0`.
+        step: The global step of the log.
     """
     utils.raise_not_supported(logger, "image")
 

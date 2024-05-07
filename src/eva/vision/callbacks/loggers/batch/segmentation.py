@@ -73,9 +73,9 @@ class SemanticSegmentationLogger(base.BatchLogger):
         predictions = list(map(_draw_semantic_mask, predictions))
         image_grid = _make_grid_from_outputs(images, targets, predictions)
 
-        log.log_images(
+        log.log_image(
             trainer.loggers,
-            images=image_grid,
+            image=image_grid,
             tag=tag,
             step=trainer.global_step,
         )
