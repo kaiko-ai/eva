@@ -25,7 +25,7 @@ class SemanticSegmentationLogger(base.BatchLogger):
         number_of_rows: int | None = None,
         mean: Tuple[float, ...] = (0.5, 0.5, 0.5),
         std: Tuple[float, ...] = (0.5, 0.5, 0.5),
-        log_every_n_epochs: int | None = 1,
+        log_every_n_epochs: int | None = 10,
         log_every_n_steps: int | None = None,
     ) -> None:
         """Initializes the callback object.

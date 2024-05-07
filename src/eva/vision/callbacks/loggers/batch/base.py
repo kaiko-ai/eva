@@ -12,6 +12,9 @@ from eva.core.models.modules.typings import INPUT_TENSOR_BATCH
 class BatchLogger(pl.Callback, abc.ABC):
     """Logs training and validation batch assets."""
 
+    _batch_idx_to_log: int = 0
+    """The batch index log."""
+
     def __init__(
         self,
         log_every_n_epochs: int | None = 10,
@@ -39,25 +42,21 @@ class BatchLogger(pl.Callback, abc.ABC):
         self._log_every_n_epochs = log_every_n_epochs
         self._log_every_n_steps = log_every_n_steps
 
-        self._batch_idx = 0
-        self._skip = False
-
-    @abc.abstractmethod
-    def _log_batch(
+    @override
+    def on_sanity_check_start(
         self,
         trainer: pl.Trainer,
-        outputs: STEP_OUTPUT,
-        batch: INPUT_TENSOR_BATCH,
-        tag: str,
+        pl_module: pl.LightningModule,
     ) -> None:
-        """Logs the batch data.
+        self._force_log = False
 
-        Args:
-            trainer: The trainer.
-            outputs: The output of the train / val step.
-            batch: The data batch.
-            tag: The log tag.
-        """
+    @override
+    def on_sanity_check_end(
+        self,
+        trainer: pl.Trainer,
+        pl_module: pl.LightningModule,
+    ) -> None:
+        self._force_log = False
 
     @override
     def on_train_batch_end(
@@ -98,6 +97,23 @@ class BatchLogger(pl.Callback, abc.ABC):
             tag="BatchValidation",
         )
 
+    @abc.abstractmethod
+    def _log_batch(
+        self,
+        trainer: pl.Trainer,
+        outputs: STEP_OUTPUT,
+        batch: INPUT_TENSOR_BATCH,
+        tag: str,
+    ) -> None:
+        """Logs the batch data.
+
+        Args:
+            trainer: The trainer.
+            outputs: The output of the train / val step.
+            batch: The data batch.
+            tag: The log tag.
+        """
+
     def _skip_logging(
         self,
         trainer: pl.Trainer,
@@ -123,9 +139,8 @@ class BatchLogger(pl.Callback, abc.ABC):
         )
 
         conditions = [
-            self._skip,
             skip_due_frequency,
             not trainer.is_global_zero,
-            batch_idx != self._batch_idx,
+            batch_idx != self._batch_idx_to_log,
         ]
         return any(conditions)
