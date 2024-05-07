@@ -27,7 +27,7 @@ model:
           class_path: torch.nn.Conv2d
           init_args:
             in_channels: ${oc.env:IN_FEATURES, 384}
-            out_channels:  &NUM_CLASSES 117
+            out_channels:  &NUM_CLASSES 118
             kernel_size: [1, 1]
     criterion: torch.nn.CrossEntropyLoss
     lr_multiplier_encoder: 0.0
@@ -41,9 +41,17 @@ model:
       init_args:
         total_iters: *MAX_STEPS
         power: 0.9
+    postprocess:
+      targets_transforms:
+        - class_path: torchvision.transforms.v2.ToDtype
+          init_args:
+            dtype: torch.int64
     metrics:
       common:
         - class_path: eva.metrics.AverageLoss
+        - class_path: torchmetrics.Dice
+          init_args:
+            num_classes: *NUM_CLASSES
 data:
   class_path: eva.DataModule
   init_args:
