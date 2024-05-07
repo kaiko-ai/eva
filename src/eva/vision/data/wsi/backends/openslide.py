@@ -32,9 +32,31 @@ class WsiOpenslide(base.Wsi):
     @override
     def mpp(self) -> float:
         # TODO: add overwrite_mpp class attribute to allow setting a default value
-        x_mpp = float(self._wsi.properties["openslide.mpp-x"])
-        y_mpp = float(self._wsi.properties["openslide.mpp-y"])
+        if (
+            self._wsi.properties.get("openslide.mpp-x")
+            and self._wsi.properties.get("openslide.mpp-y")
+        ):
+            x_mpp = float(self._wsi.properties["openslide.mpp-x"])
+            y_mpp = float(self._wsi.properties["openslide.mpp-y"])
+
+        elif (
+            self._wsi.properties.get("tiff.XResolution")
+            and self._wsi.properties.get("tiff.YResolution")
+            and self._wsi.properties.get("tiff.ResolutionUnit")
+        ):
+            unit = self._wsi.properties.get("tiff.ResolutionUnit")
+            if unit not in _conversion_factor_to_micrometer:
+                raise ValueError(f"Unit {unit} not supported.")
+            
+            conversion_factor = _conversion_factor_to_micrometer.get(unit)
+            x_mpp = conversion_factor / float(self._wsi.properties["tiff.XResolution"])
+            y_mpp = conversion_factor / float(self._wsi.properties["tiff.YResolution"])
+        
+        else:
+            raise ValueError("`mpp` cannot be obtained for this slide.")
+
         return (x_mpp + y_mpp) / 2.0
+
 
     @override
     def read_region(
@@ -58,3 +80,21 @@ class WsiOpenslide(base.Wsi):
             data[data[:, :, 3] == 0] = 255
 
         return data[:, :, :3]
+
+
+_conversion_factor_to_micrometer = {
+    "petameter": 10**21,
+    "terameter": 10**18,
+    "gigameter": 10**15,
+    "megameter": 10**12,
+    "kilometer": 10**9,
+    "hectometer": 10**8,
+    "decameter": 10**7,
+    "decimeter": 10**5,
+    "centimeter": 10**4,
+    "millimeter": 10**3,
+    "micrometer": 1,
+    "nanometer": 10**-3,
+    "picometer": 10**-6,
+    "femtometer": 10**-9,
+}
