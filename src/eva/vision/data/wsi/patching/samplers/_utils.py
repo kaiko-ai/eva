@@ -27,8 +27,8 @@ def get_grid_coords_and_indices(
         shuffle: Whether to shuffle the indices.
         seed: The random seed.
     """
-    x_range = range(0, layer_shape[0] - width, width - overlap[0])
-    y_range = range(0, layer_shape[1] - height, height - overlap[1])
+    x_range = range(0, layer_shape[0] - width + 1, width - overlap[0])
+    y_range = range(0, layer_shape[1] - height + 1, height - overlap[1])
     x_y = [(x, y) for x in x_range for y in y_range]
 
     indices = list(range(len(x_y)))
@@ -36,3 +36,15 @@ def get_grid_coords_and_indices(
         set_seed(seed)
         np.random.shuffle(indices)
     return x_y, indices
+
+
+def validate_dimensions(width: int, height: int, layer_shape: Tuple[int, int]) -> None:
+    """Checks if the width / height is bigger than the layer shape.
+
+    Args:
+        width: The width of the patches.
+        height: The height of the patches.
+        layer_shape: The shape of the layer.
+    """
+    if width > layer_shape[0] or height > layer_shape[1]:
+        raise ValueError("The width / height cannot be bigger than the layer shape.")

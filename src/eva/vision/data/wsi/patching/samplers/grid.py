@@ -38,7 +38,10 @@ class GridSampler(base.Sampler):
             height: The height of the patches.
             layer_shape: The shape of the layer.
         """
-        x_y, indices = _utils.get_grid_coords_and_indices(layer_shape, width, height, self.overlap)
+        _utils.validate_dimensions(width, height, layer_shape)
+        x_y, indices = _utils.get_grid_coords_and_indices(
+            layer_shape, width, height, self.overlap, seed=self.seed
+        )
         max_samples = len(indices) if self.max_samples is None else self.max_samples
         for i in indices[:max_samples]:
             yield x_y[i]

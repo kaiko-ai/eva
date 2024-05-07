@@ -44,7 +44,10 @@ class ForegroundGridSampler(base.ForegroundSampler):
             layer_shape: The shape of the layer.
             mask: The mask of the image.
         """
-        x_y, indices = _utils.get_grid_coords_and_indices(layer_shape, width, height, self.overlap)
+        _utils.validate_dimensions(width, height, layer_shape)
+        x_y, indices = _utils.get_grid_coords_and_indices(
+            layer_shape, width, height, self.overlap, seed=self.seed
+        )
 
         count = 0
         for i in indices:
@@ -78,7 +81,7 @@ class ForegroundGridSampler(base.ForegroundSampler):
         x_, y_ = self._scale_coords(x, y, mask.scale_factors)
         width_, height_ = self._scale_coords(width, height, mask.scale_factors)
         patch_mask = mask.mask_array[y_ : y_ + height_, x_ : x_ + width_]
-        return patch_mask.sum() / patch_mask.size > min_foreground_ratio
+        return patch_mask.sum() / patch_mask.size >= min_foreground_ratio
 
     def _scale_coords(self, x: int, y: int, scale_factors: Tuple[float, float]) -> Tuple[int, int]:
         return int(x / scale_factors[0]), int(y / scale_factors[1])

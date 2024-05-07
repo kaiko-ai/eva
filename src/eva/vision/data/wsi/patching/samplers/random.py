@@ -32,9 +32,10 @@ class RandomSampler(base.Sampler):
             height: The height of the patches.
             layer_shape: The shape of the layer.
         """
+        _utils.validate_dimensions(width, height, layer_shape)
         _utils.set_seed(self.seed)
 
+        x_max, y_max = layer_shape[0], layer_shape[1]
         for _ in range(self.n_samples):
-            x_max, y_max = layer_shape[0], layer_shape[1]
             x, y = random.randint(0, x_max - width), random.randint(0, y_max - height)  # nosec
             yield x, y
