@@ -1,6 +1,6 @@
 """Dataset related function and helper functions."""
 
-from typing import List, Tuple
+from typing import List, Sequence, Tuple
 
 
 def indices_to_ranges(indices: List[int]) -> List[Tuple[int, int]]:
@@ -33,11 +33,11 @@ def indices_to_ranges(indices: List[int]) -> List[Tuple[int, int]]:
     return ranges
 
 
-def ranges_to_indices(ranges: List[Tuple[int, int]]) -> List[int]:
+def ranges_to_indices(ranges: Sequence[Tuple[int, int]]) -> List[int]:
     """Unpacks a list of ranges to individual indices.
 
     Args:
-        ranges: The list of ranges to produce the indices from.
+        ranges: A sequence of ranges to produce the indices from.
 
     Return:
         A list of the indices.

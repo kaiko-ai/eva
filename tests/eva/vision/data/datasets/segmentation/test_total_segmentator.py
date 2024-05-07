@@ -11,7 +11,7 @@ from eva.vision.data import datasets
 
 @pytest.mark.parametrize(
     "split, expected_length",
-    [("train", 1660), ("val", 400), (None, 2060)],
+    [("train", 9), ("val", 9), (None, 9)],
 )
 def test_length(
     total_segmentator_dataset: datasets.TotalSegmentator2D, expected_length: int
@@ -25,6 +25,7 @@ def test_length(
     [
         (None, 0),
         ("train", 0),
+        ("val", 0),
     ],
 )
 def test_sample(total_segmentator_dataset: datasets.TotalSegmentator2D, index: int) -> None:
@@ -38,12 +39,12 @@ def test_sample(total_segmentator_dataset: datasets.TotalSegmentator2D, index: i
     assert isinstance(image, tv_tensors.Image)
     assert image.shape == (3, 16, 16)
     assert isinstance(mask, tv_tensors.Mask)
-    assert mask.shape == (3, 16, 16)
+    assert mask.shape == (16, 16)
 
 
 @pytest.fixture(scope="function")
 def total_segmentator_dataset(
-    split: Literal["train", "val"], assets_path: str
+    split: Literal["train", "val"] | None, assets_path: str
 ) -> datasets.TotalSegmentator2D:
     """TotalSegmentator2D dataset fixture."""
     dataset = datasets.TotalSegmentator2D(
@@ -55,6 +56,7 @@ def total_segmentator_dataset(
             "Totalsegmentator_dataset_v201",
         ),
         split=split,
+        version=None,
     )
     dataset.prepare_data()
     dataset.configure()
