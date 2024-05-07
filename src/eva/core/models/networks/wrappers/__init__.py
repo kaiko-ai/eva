@@ -5,4 +5,9 @@ from eva.core.models.networks.wrappers.from_function import ModelFromFunction
 from eva.core.models.networks.wrappers.huggingface import HuggingFaceModel
 from eva.core.models.networks.wrappers.onnx import ONNXModel
 
-__all__ = ["BaseModel", "ModelFromFunction", "HuggingFaceModel", "ONNXModel"]
+__all__ = [
+    "BaseModel",
+    "ModelFromFunction",
+    "HuggingFaceModel",
+    "ONNXModel",
+]
