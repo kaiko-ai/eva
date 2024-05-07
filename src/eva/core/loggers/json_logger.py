@@ -55,7 +55,7 @@ class JSONLogger(Logger):
         self._prefix = prefix
         self._flush_logs_every_n_steps = flush_logs_every_n_steps
 
-        self._fs = cloud_io.get_filesystem(self._root_dir, anon=False)
+        self._fs = cloud_io.get_filesystem(self._root_dir)
         self._experiment: _ExperimentWriter | None = None
 
     @property
@@ -159,7 +159,7 @@ class _ExperimentWriter:
         self.log_dir = log_dir
 
         self.metrics: List[Dict[str, float]] = []
-        self._fs = cloud_io.get_filesystem(log_dir, anon=False)
+        self._fs = cloud_io.get_filesystem(log_dir)
 
         self._check_log_dir_exists()
         self._fs.makedirs(self.log_dir, exist_ok=True)

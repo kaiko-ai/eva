@@ -1466,7 +1466,7 @@ groups = ["default"]
 dependencies = [
     "coloredlogs",
     "flatbuffers",
-    "numpy>=1.24.2",
+    "numpy>=1.21.6",
     "packaging",
     "protobuf",
     "sympy",
