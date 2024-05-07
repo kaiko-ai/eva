@@ -4,7 +4,7 @@ from eva.vision.data.datasets.classification import (
     BACH,
     CRC,
     MHIST,
-    MultiWsiClassificationDataset,
+    WsiClassificationDataset,
     PatchCamelyon,
     TotalSegmentatorClassification,
 )
@@ -23,5 +23,5 @@ __all__ = [
     "VisionDataset",
     "WsiDataset",
     "MultiWsiDataset",
-    "MultiWsiClassificationDataset",
+    "WsiClassificationDataset",
 ]
