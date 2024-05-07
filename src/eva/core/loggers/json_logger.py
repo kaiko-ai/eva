@@ -6,10 +6,11 @@ from argparse import Namespace
 from typing import Any, Dict, List, Union
 
 import torch
-from lightning.fabric.loggers.logger import Logger, rank_zero_experiment
+from lightning.fabric.loggers.logger import rank_zero_experiment
 from lightning.fabric.utilities import cloud_io, rank_zero
 from lightning.fabric.utilities.logger import _add_prefix
 from lightning.fabric.utilities.types import _PATH
+from lightning.pytorch.loggers.logger import Logger
 from loguru import logger
 from toolz import dicttoolz
 from typing_extensions import override
@@ -26,7 +27,7 @@ class JSONLogger(Logger):
     def __init__(
         self,
         root_dir: _PATH,
-        name: str | None = "logs",
+        name: str | None = None,
         version: int | str | None = None,
         prefix: str = "",
         flush_logs_every_n_steps: int = 100,
@@ -118,6 +119,7 @@ class JSONLogger(Logger):
             # When using multiprocessing, finalize() should be a no-op on
             # the main process, as no experiment has been initialized there.
             return
+
         self.save()
 
     def _get_next_version(self) -> int:
@@ -176,10 +178,8 @@ class _ExperimentWriter:
                 return value.item()
             return value
 
-        item = {
-            "step": step,
-            "metrics": dicttoolz.valmap(_handle_value, metrics_dict),
-        }
+        item = dicttoolz.valmap(_handle_value, metrics_dict)
+        item["step"] = step
         self.metrics.append(item)
 
     def save(self) -> None:
@@ -226,7 +226,7 @@ class _ExperimentWriter:
         file_exists = self._fs.isfile(self.filename)
         if file_exists:
             previous_metrics = self._load_json()
-            self.metrics += previous_metrics
+            self.metrics = previous_metrics + self.metrics
 
     def _reset_metrics(self) -> None:
         """Resets metrics."""
