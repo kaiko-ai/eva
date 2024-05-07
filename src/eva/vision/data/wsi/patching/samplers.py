@@ -6,6 +6,8 @@ from typing import Generator, Tuple
 
 import numpy as np
 
+from eva.vision.data.wsi.patching.mask import Mask
+
 
 class Sampler(abc.ABC):
     """Base class for samplers."""
@@ -16,7 +18,7 @@ class Sampler(abc.ABC):
         width: int,
         height: int,
         layer_shape: Tuple[int, int],
-        mask: Tuple[np.ndarray, float] | None = None,
+        mask: Mask | None = None,
     ) -> Generator[Tuple[int, int], None, None]:
         """Sample patche coordinates.
 
@@ -39,7 +41,7 @@ class ForegroundSampler(Sampler):
     @abc.abstractmethod
     def is_foreground(
         self,
-        mask: Tuple[np.ndarray, float],
+        mask: Mask,
         x: int,
         y: int,
         width: int,
@@ -150,7 +152,7 @@ class ForegroundGridSampler(ForegroundSampler):
         width: int,
         height: int,
         layer_shape: Tuple[int, int],
-        mask: Tuple[np.ndarray, float],
+        mask: Mask,
     ):
         """Sample patches from a grid containing foreground.
 
@@ -174,7 +176,7 @@ class ForegroundGridSampler(ForegroundSampler):
 
     def is_foreground(
         self,
-        mask: Tuple[np.ndarray, float],
+        mask: Mask,
         x: int,
         y: int,
         width: int,
@@ -191,14 +193,13 @@ class ForegroundGridSampler(ForegroundSampler):
             height: The height of the patch.
             min_foreground_ratio: The minimum amount of foreground in the patch.
         """
-        mask_array, mask_scale_factor = mask
-        x_, y_, width_, height_ = self._scale_coords(mask_scale_factor, x, y, width, height)
-        patch_mask = mask_array[y_ : y_ + height_, x_ : x_ + width_]
-        # TODO: look into warning "RuntimeWarning: invalid value encountered in divide"
+        x_, y_ = self._scale_coords(x, y, mask.scale_factors)
+        width_, height_ = self._scale_coords(width, height, mask.scale_factors)
+        patch_mask = mask.mask_array[y_ : y_ + height_, x_ : x_ + width_]
         return patch_mask.sum() / patch_mask.size > min_foreground_ratio
 
-    def _scale_coords(self, scale_factor, *coords):
-        return tuple(int(coord * scale_factor) for coord in coords)
+    def _scale_coords(self, x: int, y: int, scale_factors: Tuple[float, float]) -> Tuple[int, int]:
+        return int(x / scale_factors[0]), int(y / scale_factors[1])
 
 
 def _get_grid_coords_and_indices(

@@ -38,7 +38,7 @@ class Wsi(abc.ABC):
     @property
     @abc.abstractmethod
     def mpp(self) -> float:
-        """Microns per pixel at the highest resolution."""
+        """Microns per pixel at the highest resolution (level 0)."""
 
     @abc.abstractmethod
     def read_region(
@@ -47,9 +47,10 @@ class Wsi(abc.ABC):
         """Reads and returns image data for a specified region and zoom level.
 
         Args:
-            location: Top-left corner (x, y) to start reading.
-            size: Region size as (width, height), relative to <location>.
-            level: Zoom level, with 0 being the highest resolution.
+            location: Top-left corner (x, y) to start reading at level 0.
+            level: WSI level to read from.
+            size: Region size as (width, height) in pixels at the selected read level.
+                Remember to scale the size correctly.
         """
 
     def get_closest_level(self, target_mpp: float) -> int:

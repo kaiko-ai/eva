@@ -6,7 +6,7 @@ from typing import List, Tuple
 
 from eva.vision.data.wsi import backends
 from eva.vision.data.wsi.patching import samplers
-from eva.vision.utils.mask import get_mask
+from eva.vision.data.wsi.patching.mask import Mask, get_mask, get_mask_level
 
 LRU_CACHE_SIZE = 32
 
@@ -16,16 +16,18 @@ class PatchCoordinates:
     """A class to store coordinates of patches from a whole-slide image.
 
     Args:
-        x_y: A list of (x, y) coordinates of the patches.
-        width: The width of the patches, in pixels (refers to x-dim).
-        height: The height of the patches, in pixels (refers to y-dim).
-        level_idx: The level index of the patches.
+        x_y: A list of (x, y) coordinates of the patches (refer to level 0).
+        width: The width of the patches, in pixels (refers to level_idx).
+        height: The height of the patches, in pixels (refers to level_idx).
+        level_idx: The level index at which to extract the patches.
+        mask: The foreground mask of the wsi.
     """
 
     x_y: List[Tuple[int, int]]
     width: int
     height: int
     level_idx: int
+    mask: Mask | None = None
 
     @classmethod
     def from_file(
@@ -50,24 +52,26 @@ class PatchCoordinates:
             backend: The backend to use for reading the whole-slide images.
         """
         wsi = backends.wsi_backend(backend)(wsi_path)
-        level_idx = wsi.get_closest_level(target_mpp)
-        level_mpp = wsi.mpp * wsi.level_downsamples[level_idx]
-        mpp_ratio = target_mpp / level_mpp
-        scaled_width, scaled_height = int(mpp_ratio * width), int(mpp_ratio * height)
 
+        # Sample patch coordinates at level 0
+        mpp_ratio_0 = target_mpp / wsi.mpp
         sample_args = {
-            "width": scaled_width,
-            "height": scaled_height,
-            "layer_shape": wsi.level_dimensions[level_idx],
+            "width": int(mpp_ratio_0 * width),
+            "height": int(mpp_ratio_0 * height),
+            "layer_shape": wsi.level_dimensions[0],
         }
         if isinstance(sampler, samplers.ForegroundSampler):
-            sample_args["mask"] = get_mask(wsi, level_idx)
+            mask_level_idx = get_mask_level(wsi, width, height, target_mpp)
+            sample_args["mask"] = get_mask(wsi, mask_level_idx)
 
-        x_y = []
-        for x, y in sampler.sample(**sample_args):
-            x_y.append((x, y))
+        x_y = list(sampler.sample(**sample_args))
 
-        return cls(x_y, scaled_width, scaled_height, level_idx)
+        # Scale dimensions to level that is closest to the target_mpp
+        level_idx = wsi.get_closest_level(target_mpp)
+        mpp_ratio = target_mpp / (wsi.mpp * wsi.level_downsamples[level_idx])
+        scaled_width, scaled_height = int(mpp_ratio * width), int(mpp_ratio * height)
+
+        return cls(x_y, scaled_width, scaled_height, level_idx, sample_args.get("mask"))
 
 
 @functools.lru_cache(LRU_CACHE_SIZE)
