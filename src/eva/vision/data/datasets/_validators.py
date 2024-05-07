@@ -13,7 +13,7 @@ _SUFFIX_ERROR_MESSAGE = "Please verify that the data are properly downloaded and
 def check_dataset_integrity(
     dataset: vision.VisionDataset,
     *,
-    length: int,
+    length: int | None,
     n_classes: int,
     first_and_last_labels: Tuple[str, str],
 ) -> None:
@@ -23,7 +23,7 @@ def check_dataset_integrity(
         ValueError: If the input dataset's values do not
             match the expected ones.
     """
-    if len(dataset) != length:
+    if length and len(dataset) != length:
         raise ValueError(
             f"Dataset's '{dataset.__class__.__qualname__}' length "
             f"({len(dataset)}) does not match the expected one ({length}). "

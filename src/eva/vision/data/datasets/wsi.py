@@ -1,10 +1,11 @@
 """Dataset classes for whole-slide images."""
 
+import bisect
 import os
-from typing import Callable, Dict
+from typing import Callable, List
 
-import pandas as pd
 import torch
+from loguru import logger
 from torch.utils.data import dataset as torch_datasets
 from typing_extensions import override
 
@@ -82,32 +83,25 @@ class WsiDataset(vision.VisionDataset):
         return tensor
 
 
-class MultiWsiDataset(torch_datasets.ConcatDataset, vision.VisionDataset):
+class MultiWsiDataset(torch_datasets.ConcatDataset):
     """Dataset class for reading patches from multiple whole-slide images."""
-
-    default_column_mapping: Dict[str, str] = {
-        "path": "path",
-        "target": "target",
-    }
 
     def __init__(
         self,
         root: str,
-        manifest_file: str,
+        file_paths: List[str],
         width: int,
         height: int,
         target_mpp: float,
         sampler: samplers.Sampler,
         backend: str = "openslide",
         transforms: Callable | None = None,
-        column_mapping: Dict[str, str] = default_column_mapping,
     ):
         """Initializes a new dataset instance.
 
         Args:
             root: Root directory of the dataset.
-            manifest_file: The path to the manifest file, which is relative to
-                the `root` argument.
+            file_paths: List of paths to the whole-slide image files, relative to the root.
             width: Width of the patches to be extracted, in pixels.
             height: Height of the patches to be extracted, in pixels.
             target_mpp: Target microns per pixel (mpp) for the patches.
@@ -120,22 +114,21 @@ class MultiWsiDataset(torch_datasets.ConcatDataset, vision.VisionDataset):
                 values which are altered or missing.
         """
         self._root = root
-        self._manifest_file = manifest_file
+        self._file_paths = file_paths
         self._width = width
         self._height = height
         self._target_mpp = target_mpp
         self._sampler = sampler
         self._backend = backend
         self._transforms = transforms
-        self._column_mapping = column_mapping
 
-        self._manifest = self._load_manifest(os.path.join(self._root, self._manifest_file))
         super().__init__(self._load_datasets())
 
     def _load_datasets(self) -> list[WsiDataset]:
+        logger.info(f"Initializing {len(self._file_paths)} WSI datasets ...")
         wsi_datasets = []
-        for _, row in self._manifest.iterrows():
-            file_path = os.path.join(self._root, str(row[self._column_mapping["path"]]))
+        for file_path in self._file_paths:
+            file_path = os.path.join(self._root, file_path) if self._root else file_path
             if not os.path.exists(file_path):
                 raise FileNotFoundError(f"File not found: {file_path}")
 
@@ -152,11 +145,5 @@ class MultiWsiDataset(torch_datasets.ConcatDataset, vision.VisionDataset):
             )
         return wsi_datasets
 
-    def _load_manifest(self, manifest_path: str) -> pd.DataFrame:
-        df = pd.read_csv(manifest_path)
-
-        missing_columns = set(self._column_mapping.values()) - set(df.columns)
-        if missing_columns:
-            raise ValueError(f"Missing columns in the manifest file: {missing_columns}")
-
-        return df
+    def _get_dataset_idx(self, index: int) -> int:
+        return bisect.bisect_right(self.cumulative_sizes, index)

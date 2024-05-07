@@ -32,8 +32,9 @@ class WsiOpenslide(base.Wsi):
     @override
     def mpp(self) -> float:
         # TODO: add overwrite_mpp class attribute to allow setting a default value
-        x_mpp = float(self._wsi.properties["openslide.mpp-x"])
-        y_mpp = float(self._wsi.properties["openslide.mpp-y"])
+
+        x_mpp = float(self._wsi.properties[openslide.PROPERTY_NAME_MPP_X])
+        y_mpp = float(self._wsi.properties[openslide.PROPERTY_NAME_MPP_Y])
         return (x_mpp + y_mpp) / 2.0
 
     @override

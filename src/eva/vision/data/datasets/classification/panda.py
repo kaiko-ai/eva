@@ -1,0 +1,131 @@
+"""Dataset classes for whole-slide image classification."""
+
+import functools
+import glob
+import os
+from typing import List, Literal
+
+import pandas as pd
+import torch
+from typing_extensions import override
+
+from eva.core.models.modules.typings import DATA_SAMPLE
+from eva.vision.data.datasets import _validators
+from eva.vision.data.datasets.classification import base
+from eva.vision.data.datasets.wsi import MultiWsiDataset
+from eva.vision.data.wsi.patching import samplers
+
+
+class PANDA(MultiWsiDataset, base.ImageClassification):
+    """Dataset class for PANDA images and corresponding targets."""
+
+    _train_split_ratio: float = 0.8
+    """Train split ratio."""
+
+    _val_split_ratio: float = 0.2
+    """Validation split ratio."""
+
+    def __init__(
+        self,
+        root: str,
+        sampler: samplers.Sampler,
+        split: Literal["train", "val"] | None = None,
+        width: int = 224,
+        height: int = 224,
+        target_mpp: float = 0.5,
+        backend: str = "openslide",
+    ) -> None:
+        """Initializes the dataset.
+
+        Args:
+            root: Root directory of the dataset.
+            sampler: The sampler to use for sampling patch coordinates.
+            split: Dataset split to use. If `None`, the entire dataset is used.
+            width: Width of the patches to be extracted, in pixels.
+            height: Height of the patches to be extracted, in pixels.
+            target_mpp: Target microns per pixel (mpp) for the patches.
+            backend: The backend to use for reading the whole-slide images.
+        """
+        self._split = split
+        self._root = root
+        self._width = width
+        self._height = height
+        self._target_mpp = target_mpp
+
+        super().__init__(
+            root=root,
+            file_paths=self._load_file_paths(split),
+            width=width,
+            height=height,
+            sampler=sampler,
+            target_mpp=target_mpp,
+            backend=backend,
+        )
+
+    @property
+    @override
+    def classes(self) -> List[str]:
+        return ["0", "1", "2", "3", "4", "5"]
+
+    @functools.cached_property
+    @override
+    def metadata(self) -> pd.DataFrame:
+        return pd.read_csv(os.path.join(self._root, "train.csv"), index_col="image_id")
+
+    @override
+    def prepare_data(self) -> None:
+        _validators.check_dataset_exists(self._root, True)
+        if not os.path.isdir(os.path.join(self._root, "train_images")):
+            raise FileNotFoundError("'train_images' directory not found in the root folder.")
+        if not os.path.isfile(os.path.join(self._root, "train.csv")):
+            raise FileNotFoundError("'train.csv' file not found in the root folder.")
+
+    @override
+    def validate(self) -> None:
+        _validators.check_dataset_integrity(
+            self,
+            length=None,
+            n_classes=6,
+            first_and_last_labels=("0", "5"),
+        )
+
+    @override
+    def filename(self, index: int) -> str:
+        return os.path.basename(self._file_paths[self._get_dataset_idx(index)])
+
+    @override
+    def __getitem__(self, index: int) -> DATA_SAMPLE:
+        data = super().__getitem__(index)
+        target = self.load_target(index)
+        return DATA_SAMPLE(data, target)
+
+    @override
+    def load_image(self, index: int) -> torch.Tensor:
+        file_path = self._file_paths[self._get_dataset_idx(index)]
+        return torch.tensor(self._path_to_target(file_path))
+
+    @override
+    def load_target(self, index: int) -> torch.Tensor:
+        file_path = self._file_paths[self._get_dataset_idx(index)]
+        return torch.tensor(self._path_to_target(file_path))
+
+    def _load_file_paths(self, split: Literal["train", "val"] | None = None) -> List[str]:
+        """Loads the file paths of the corresponding dataset split."""
+        image_dir = os.path.join(self._root, "train_images")
+        file_paths = sorted(glob.glob(os.path.join(image_dir, "*.tiff")))
+
+        # TODO: remove samples with noisy labels
+
+        match split:
+            case "train":
+                return file_paths[: int(len(file_paths) * self._train_split_ratio)]
+            case "val":
+                return file_paths[int(len(file_paths) * self._train_split_ratio) :]
+            case None:
+                return file_paths
+            case _:
+                raise ValueError("Invalid split. Use 'train', 'val' or `None`.")
+
+    def _path_to_target(self, file_path: str) -> int:
+        slide_id = os.path.basename(file_path).replace(".tiff", "")
+        return self.metadata.loc[slide_id, "isup_grade"]
