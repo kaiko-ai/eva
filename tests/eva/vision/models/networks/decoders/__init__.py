@@ -1,1 +1,1 @@
-"""Vision segmentation decoders tests."""
+"""Vision decoders tests."""

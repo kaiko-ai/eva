@@ -1,6 +1,6 @@
 """"Neural Network Semantic Segmentation Module."""
 
-from typing import Any, Callable, Tuple
+from typing import Any, Callable, Iterable, Tuple
 
 import torch
 from lightning.pytorch.cli import LRSchedulerCallable, OptimizerCallable
@@ -24,8 +24,8 @@ class SemanticSegmentationModule(module.ModelModule):
         decoder: decoders.Decoder,
         criterion: Callable[..., torch.Tensor],
         encoder: encoders.Encoder | None = None,
-        freeze_encoder: bool = True,
-        optimizer: OptimizerCallable = optim.Adam,
+        lr_multiplier_encoder: float = 0.0,
+        optimizer: OptimizerCallable = optim.AdamW,
         lr_scheduler: LRSchedulerCallable = lr_scheduler.ConstantLR,
         metrics: metrics_lib.MetricsSchema | None = None,
         postprocess: batch_postprocess.BatchPostProcess | None = None,
@@ -37,7 +37,8 @@ class SemanticSegmentationModule(module.ModelModule):
             criterion: The loss function to use.
             encoder: The encoder model. If `None`, it will be expected
                 that the input batch returns the features directly.
-            freeze_encoder: Whether to freeze the encoder.
+            lr_multiplier_encoder: The learning rate multiplier for the
+                encoder parameters. If `0`, it will freeze the encoder.
             optimizer: The optimizer to use.
             lr_scheduler: The learning rate scheduler to use.
             metrics: The metric groups to track.
@@ -50,14 +51,25 @@ class SemanticSegmentationModule(module.ModelModule):
         self.decoder = decoder
         self.criterion = criterion
         self.encoder = encoder
-        self.freeze_encoder = freeze_encoder
+        self.lr_multiplier_encoder = lr_multiplier_encoder
         self.optimizer = optimizer
         self.lr_scheduler = lr_scheduler
 
     @override
+    def configure_model(self) -> None:
+        self._freeze_encoder()
+
+    @override
     def configure_optimizers(self) -> Any:
-        parameters = self.parameters()
-        optimizer = self.optimizer(parameters)
+        optimizer = self.optimizer(
+            [
+                {"params": self.decoder.parameters()},
+                {
+                    "params": self._encoder_trainable_parameters(),
+                    "lr": self._base_lr * self.lr_multiplier_encoder,
+                },
+            ]
+        )
         lr_scheduler = self.lr_scheduler(optimizer)
         return {"optimizer": optimizer, "lr_scheduler": lr_scheduler}
 
@@ -85,11 +97,6 @@ class SemanticSegmentationModule(module.ModelModule):
         return self.decoder(patch_embeddings, image_size or tensor.shape[-2:])
 
     @override
-    def on_fit_start(self) -> None:
-        if self.encoder is not None and self.freeze_encoder:
-            grad.deactivate_requires_grad(self.encoder)
-
-    @override
     def training_step(self, batch: INPUT_TENSOR_BATCH, *args: Any, **kwargs: Any) -> STEP_OUTPUT:
         return self._batch_step(batch)
 
@@ -106,10 +113,24 @@ class SemanticSegmentationModule(module.ModelModule):
         tensor = INPUT_BATCH(*batch).data
         return tensor if self.backbone is None else self.backbone(tensor)
 
-    @override
-    def on_fit_end(self) -> None:
-        if self.encoder is not None and self.freeze_encoder:
-            grad.activate_requires_grad(self.encoder)
+    @property
+    def _base_lr(self) -> float:
+        """Returns the base learning rate."""
+        base_optimizer = self.optimizer(self.parameters())
+        return base_optimizer.param_groups[-1]["lr"]
+
+    def _encoder_trainable_parameters(self) -> Iterable[torch.Tensor]:
+        """Returns the trainable parameters of the encoder."""
+        return (
+            self.encoder.parameters()
+            if self.encoder is not None and self.lr_multiplier_encoder > 0
+            else iter(())
+        )
+
+    def _freeze_encoder(self) -> None:
+        """If initialized, Freezes the encoder network."""
+        if self.encoder is not None and self.lr_multiplier_encoder == 0:
+            grad.deactivate_requires_grad(self.encoder)
 
     def _batch_step(self, batch: INPUT_TENSOR_BATCH) -> STEP_OUTPUT:
         """Performs a model forward step and calculates the loss.
