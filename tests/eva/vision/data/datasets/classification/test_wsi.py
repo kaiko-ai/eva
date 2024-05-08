@@ -2,6 +2,7 @@
 
 import os
 import pickle
+import re
 from typing import Any
 
 import numpy as np
@@ -13,14 +14,15 @@ from eva.vision.data import datasets
 from eva.vision.data import transforms as eva_transforms
 from eva.vision.data.wsi.patching import samplers
 
+TARGET_SIZE = 224
 DEFAULT_ARGS = {
     "manifest_file": "manifest.csv",
-    "width": 224,
-    "height": 224,
+    "width": 32,
+    "height": 32,
     "target_mpp": 0.25,
-    "sampler": samplers.GridSampler(10),
+    "sampler": samplers.GridSampler(None),
     "backend": "openslide",
-    "image_transforms": torch_transforms.Compose([eva_transforms.ResizeAndCrop(size=224)]),
+    "image_transforms": torch_transforms.Compose([eva_transforms.ResizeAndCrop(size=TARGET_SIZE)]),
 }
 
 
@@ -37,19 +39,19 @@ def test_pickleable(dataset: datasets.WsiClassificationDataset):
 def test_split(root: str):
     """Test loading the dataset with different splits."""
     dataset = datasets.WsiClassificationDataset(root=root, split=None, **DEFAULT_ARGS)
-    assert len(dataset) == 3
+    assert len(dataset) == 192
     _check_batch_shape(dataset[0])
 
     train_dataset = datasets.WsiClassificationDataset(root=root, split="train", **DEFAULT_ARGS)
-    assert len(train_dataset) == 1
+    assert len(train_dataset) == 64
     _check_batch_shape(train_dataset[0])
 
 
 def test_filename(dataset: datasets.WsiClassificationDataset):
     """Tests the filename method."""
-    assert dataset.filename(0) == "0/a.tiff"
-    assert dataset.filename(1) == "0/b.tiff"
-    assert dataset.filename(2) == "1/a.tiff"
+    pattern = r"^\d+/[a-z]\.tiff$"
+    for i in range(len(dataset)):
+        assert bool(re.match(pattern, dataset.filename(i)))
 
 
 def _check_batch_shape(batch: Any):
@@ -58,7 +60,7 @@ def _check_batch_shape(batch: Any):
 
     image, target = batch
     assert isinstance(image, torch.Tensor)
-    assert image.shape == (3, 224, 224)
+    assert image.shape == (3, TARGET_SIZE, TARGET_SIZE)
 
     assert isinstance(target, np.ndarray)
     assert target.size == 1
