@@ -47,6 +47,8 @@ class WsiOpenslide(base.Wsi):
                 raise ValueError(f"Unit {unit} not supported.")
 
             conversion_factor = _conversion_factor_to_micrometer.get(unit)
+            if conversion_factor is None:
+                raise ValueError(f"Conversion factor for unit {unit} not found.")
             x_mpp = conversion_factor / float(self._wsi.properties["tiff.XResolution"])
             y_mpp = conversion_factor / float(self._wsi.properties["tiff.YResolution"])
         else:
@@ -79,14 +81,6 @@ class WsiOpenslide(base.Wsi):
 
 
 _conversion_factor_to_micrometer = {
-    "petameter": 10**21,
-    "terameter": 10**18,
-    "gigameter": 10**15,
-    "megameter": 10**12,
-    "kilometer": 10**9,
-    "hectometer": 10**8,
-    "decameter": 10**7,
-    "decimeter": 10**5,
     "centimeter": 10**4,
     "millimeter": 10**3,
     "micrometer": 1,
