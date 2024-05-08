@@ -1,16 +1,15 @@
 """WSI classification dataset."""
 
 import os
-from typing import Callable, Dict
+from typing import Callable, Dict, Tuple
 
+import numpy as np
 import pandas as pd
-import torch
 from typing_extensions import override
 
-from eva.core.models.modules.typings import DATA_SAMPLE
-from eva.vision.data.datasets import vision, wsi
-from eva.vision.data.wsi.patching import samplers
+from eva.vision.data.datasets import wsi
 from eva.vision.data.datasets.classification import base
+from eva.vision.data.wsi.patching import samplers
 
 
 class WsiClassificationDataset(wsi.MultiWsiDataset, base.ImageClassification):
@@ -30,7 +29,7 @@ class WsiClassificationDataset(wsi.MultiWsiDataset, base.ImageClassification):
         target_mpp: float,
         sampler: samplers.Sampler,
         backend: str = "openslide",
-        transforms: Callable | None = None,
+        image_transforms: Callable | None = None,
         column_mapping: Dict[str, str] = default_column_mapping,
     ):
         """Initializes the dataset.
@@ -45,7 +44,7 @@ class WsiClassificationDataset(wsi.MultiWsiDataset, base.ImageClassification):
             target_mpp: Target microns per pixel (mpp) for the patches.
             sampler: The sampler to use for sampling patch coordinates.
             backend: The backend to use for reading the whole-slide images.
-            transforms: Transforms to apply to the extracted patch tensors.
+            image_transforms: Transforms to apply to the extracted image patches.
             column_mapping: Mapping of the columns in the manifest file.
         """
         self._root = root
@@ -55,13 +54,14 @@ class WsiClassificationDataset(wsi.MultiWsiDataset, base.ImageClassification):
         self._target_mpp = target_mpp
         self._sampler = sampler
         self._backend = backend
-        self._transforms = transforms
+        self._image_transforms = image_transforms
         self._column_mapping = column_mapping
 
         self._manifest = self._load_manifest(os.path.join(self._root, self._manifest_file))
         self._file_paths = self._manifest[self._column_mapping["path"]].tolist()
 
-        super().__init__(
+        wsi.MultiWsiDataset.__init__(
+            self,
             root=root,
             file_paths=self._file_paths,
             width=width,
@@ -69,7 +69,7 @@ class WsiClassificationDataset(wsi.MultiWsiDataset, base.ImageClassification):
             sampler=sampler,
             target_mpp=target_mpp,
             backend=backend,
-            transforms=transforms,
+            image_transforms=image_transforms,
         )
 
     @override
@@ -78,11 +78,17 @@ class WsiClassificationDataset(wsi.MultiWsiDataset, base.ImageClassification):
         return os.path.basename(full_path)
 
     @override
-    def __getitem__(self, index: int) -> DATA_SAMPLE:
-        data = super().__getitem__(index)
-        target = self._load_target(index)
+    def __getitem__(self, index: int) -> Tuple[np.ndarray, np.ndarray]:
+        return base.ImageClassification.__getitem__(self, index)
 
-        return DATA_SAMPLE(data, target)
+    @override
+    def load_image(self, index: int) -> np.ndarray:
+        return wsi.MultiWsiDataset.__getitem__(self, index)
+
+    @override
+    def load_target(self, index: int) -> np.ndarray:
+        target = self._manifest.at[self._get_dataset_idx(index), self._column_mapping["target"]]
+        return np.asarray(target)
 
     def _load_manifest(self, manifest_path: str) -> pd.DataFrame:
         df = pd.read_csv(manifest_path)
@@ -92,7 +98,3 @@ class WsiClassificationDataset(wsi.MultiWsiDataset, base.ImageClassification):
             raise ValueError(f"Missing columns in the manifest file: {missing_columns}")
 
         return df
-
-    def _load_target(self, index: int) -> torch.Tensor:
-        target = self._manifest.at[self._get_dataset_idx(index), self._column_mapping["target"]]
-        return torch.tensor(target)

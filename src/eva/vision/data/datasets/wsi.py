@@ -4,7 +4,7 @@ import bisect
 import os
 from typing import Callable, List
 
-import torch
+import numpy as np
 from loguru import logger
 from torch.utils.data import dataset as torch_datasets
 from typing_extensions import override
@@ -25,7 +25,7 @@ class WsiDataset(vision.VisionDataset):
         target_mpp: float,
         sampler: samplers.Sampler,
         backend: str = "openslide",
-        transforms: Callable[..., torch.Tensor] | None = None,
+        image_transforms: Callable | None = None,
     ):
         """Initializes a new dataset instance.
 
@@ -36,15 +36,15 @@ class WsiDataset(vision.VisionDataset):
             target_mpp: Target microns per pixel (mpp) for the patches.
             sampler: The sampler to use for sampling patch coordinates.
             backend: The backend to use for reading the whole-slide images.
-            transforms: Transforms to apply to the extracted patch tensors.
+            image_transforms: Transforms to apply to the extracted image patches.
         """
         self._file_path = file_path
         self._width = width
         self._height = height
         self._target_mpp = target_mpp
-        self._backend = backend
         self._sampler = sampler
-        self._transforms = transforms
+        self._backend = backend
+        self._image_transforms = image_transforms
 
     @override
     def __len__(self):
@@ -70,17 +70,17 @@ class WsiDataset(vision.VisionDataset):
         )
 
     @override
-    def __getitem__(self, index: int) -> torch.Tensor:
+    def __getitem__(self, index: int) -> np.ndarray:
         x, y = self._coords.x_y[index]
         width, height, level_idx = self._coords.width, self._coords.height, self._coords.level_idx
         patch = self._wsi.read_region((x, y), level_idx, (width, height))
-        patch = self._apply_transforms(torch.from_numpy(patch).permute(2, 0, 1))
+        patch = self._apply_transforms(patch)
         return patch
 
-    def _apply_transforms(self, tensor: torch.Tensor) -> torch.Tensor:
-        if self._transforms:
-            tensor = self._transforms(tensor)
-        return tensor
+    def _apply_transforms(self, image: np.ndarray) -> np.ndarray:
+        if self._image_transforms is not None:
+            image = self._image_transforms(image)
+        return image
 
 
 class MultiWsiDataset(torch_datasets.ConcatDataset):
@@ -95,7 +95,7 @@ class MultiWsiDataset(torch_datasets.ConcatDataset):
         target_mpp: float,
         sampler: samplers.Sampler,
         backend: str = "openslide",
-        transforms: Callable | None = None,
+        image_transforms: Callable | None = None,
     ):
         """Initializes a new dataset instance.
 
@@ -107,7 +107,7 @@ class MultiWsiDataset(torch_datasets.ConcatDataset):
             target_mpp: Target microns per pixel (mpp) for the patches.
             sampler: The sampler to use for sampling patch coordinates.
             backend: The backend to use for reading the whole-slide images.
-            transforms: Transforms to apply to the extracted patch tensors.
+            image_transforms: Transforms to apply to the extracted image patches.
             column_mapping: Defines the map between the variables and the manifest
                 columns. It will overwrite the `default_column_mapping` with
                 the provided values, so that `column_mapping` can contain only the
@@ -120,7 +120,7 @@ class MultiWsiDataset(torch_datasets.ConcatDataset):
         self._target_mpp = target_mpp
         self._sampler = sampler
         self._backend = backend
-        self._transforms = transforms
+        self._image_transforms = image_transforms
 
         super().__init__(self._load_datasets())
 
@@ -140,7 +140,7 @@ class MultiWsiDataset(torch_datasets.ConcatDataset):
                     target_mpp=self._target_mpp,
                     sampler=self._sampler,
                     backend=self._backend,
-                    transforms=self._transforms,
+                    image_transforms=self._image_transforms,
                 )
             )
         return wsi_datasets
