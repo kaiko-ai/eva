@@ -51,9 +51,19 @@ data:
       train:
         class_path: eva.vision.datasets.TotalSegmentator2D
         init_args: &DATASET_ARGS
+<<<<<<< HEAD
           root: data/total_segmentator
           split: train
           download: false
+=======
+          root: ${oc.env:DATA_ROOT, ./data}/total_segmentator
+          split: train
+          download: false
+          # Set `download: true` to download the dataset from https://zenodo.org/records/10047292
+          # The TotalSegmentator dataset is distributed under the following license: 
+          # "Creative Commons Attribution 4.0 International"
+          # (see: https://creativecommons.org/licenses/by/4.0/deed.en)
+>>>>>>> 402-aggregated-feature-segmentation-downstream-evaluation-tasks
           transforms:
             class_path: eva.vision.data.transforms.common.ResizeAndCrop
       val:
@@ -64,7 +74,11 @@ data:
     dataloaders:
       train:
         batch_size: &BATCH_SIZE ${oc.env:BATCH_SIZE, 16}
+<<<<<<< HEAD
         shuffle: false
+=======
+        shuffle: true
+>>>>>>> 402-aggregated-feature-segmentation-downstream-evaluation-tasks
       val:
         batch_size: *BATCH_SIZE
       predict:

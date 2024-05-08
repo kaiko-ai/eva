@@ -24,6 +24,9 @@ class TotalSegmentator2D(base.ImageSegmentation):
     }
     """Dataset version and split to the expected size."""
 
+    _sample_every_n_slices: int | None = None
+    """The amount of slices to sub-sample per 3D CT scan image."""
+
     _resources_full: List[structs.DownloadResource] = [
         structs.DownloadResource(
             filename="Totalsegmentator_dataset_v201.zip",
@@ -139,29 +142,6 @@ class TotalSegmentator2D(base.ImageSegmentation):
 
     @override
     def load_mask(self, index: int) -> tv_tensors.Mask:
-        if not os.path.isfile(self._mask_array_filename(index)):
-            mask = self._load_mask_from_nifti(index)
-            self._save_mask_as_array(index, mask)
-        mask = self._load_mask_from_array(index)
-        return mask
-
-    def _save_mask_as_array(self, index, mask: tv_tensors.Mask) -> None:
-        filename = self._mask_array_filename(index)
-        os.makedirs(os.path.dirname(filename), exist_ok=True)
-        np.save(filename, mask.numpy())
-
-    def _mask_array_filename(self, index: int) -> None:
-        sample_index, slice_index = self._indices[index]
-        masks_dir = self._get_masks_dir(sample_index)
-        return os.path.join(masks_dir, "2d_masks", f"{slice_index}.npy")
-
-    def _load_mask_from_array(self, index: int) -> tv_tensors.Mask:
-        filename = self._mask_array_filename(index)
-        segmentation_label = np.load(filename)
-        return tv_tensors.Mask(segmentation_label)
-
-    def _load_mask_from_nifti(self, index: int) -> tv_tensors.Mask:
-        """Loads the segmentation mask from NifTi files."""
         sample_index, slice_index = self._indices[index]
         masks_dir = self._get_masks_dir(sample_index)
         mask_paths = (os.path.join(masks_dir, label + ".nii.gz") for label in self.classes)
@@ -174,6 +154,18 @@ class TotalSegmentator2D(base.ImageSegmentation):
         segmentation_label = np.argmax(one_hot_encoded_with_bg, axis=2)
         return tv_tensors.Mask(segmentation_label)
 
+    def export_masks_to_arrays(self) -> None:
+        """Exports the segmentation masks in numpy arrays."""
+        for index in range(len(self)):
+            mask = self.load_mask(index)
+
+            sample_index, slice_index = self._indices[index]
+            masks_dir = self._get_masks_dir(sample_index)
+
+
+            print(index)
+            quit()
+
     def _get_image_path(self, sample_index: int) -> str:
         """Returns the corresponding image path."""
         sample_dir = self._samples_dirs[sample_index]
@@ -184,7 +176,7 @@ class TotalSegmentator2D(base.ImageSegmentation):
         sample_dir = self._samples_dirs[sample_index]
         return os.path.join(self._root, sample_dir, "segmentations")
 
-    def _get_sample_total_slices(self, sample_index: int) -> int:
+    def _get_number_of_slices_per_sample(self, sample_index: int) -> int:
         """Returns the total amount of slices of a sample."""
         image_path = self._get_image_path(sample_index)
         return io.fetch_total_nifti_slices(image_path)
@@ -222,7 +214,8 @@ class TotalSegmentator2D(base.ImageSegmentation):
         indices = [
             (sample_idx, slide_idx)
             for sample_idx in self._get_split_indices()
-            for slide_idx in range(self._get_sample_total_slices(sample_idx))
+            for slide_idx in range(self._get_number_of_slices_per_sample(sample_idx))
+            if slide_idx % (self._sample_every_n_slices or 1) == 0
         ]
         return indices
 
