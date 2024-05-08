@@ -13,14 +13,14 @@ Source: https://www.kaggle.com/competitions/prostate-cancer-grade-assessment
 
 |                           |                                                          |
 |---------------------------|----------------------------------------------------------|
-| **Modality**              | Vision (WSI)                               |
+| **Modality**              | Vision (WSI)                                             |
 | **Task**                  | Multiclass classification (6 classes)                    |
-| **Cancer type**           | Prostate                                                   |
-| **Data size**             | 347 GB  |
+| **Cancer type**           | Prostate                                                 |
+| **Data size**             | 347 GB                                                   |
 | **Image dimension**       | 1536 x 2048 x 3                                          |
-| **Magnification (μm/px)** | 20x (0.5) - Level 0                                          |
-| **Files format**          | `.tiff`                                            |
-| **Number of images**      | 10616 (9555 after removing noisy labels)                                |
+| **Magnification (μm/px)** | 20x (0.5) - Level 0                                      |
+| **Files format**          | `.tiff`                                                  |
+| **Number of images**      | 10616 (9555 after removing noisy labels)                 |
 
 
 ### Organization
