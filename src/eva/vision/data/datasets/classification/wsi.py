@@ -1,7 +1,7 @@
 """WSI classification dataset."""
 
 import os
-from typing import Callable, Dict, Tuple
+from typing import Callable, Dict, Literal, Tuple
 
 import numpy as np
 import pandas as pd
@@ -18,6 +18,7 @@ class WsiClassificationDataset(wsi.MultiWsiDataset, base.ImageClassification):
     default_column_mapping: Dict[str, str] = {
         "path": "path",
         "target": "target",
+        "split": "split",
     }
 
     def __init__(
@@ -29,6 +30,7 @@ class WsiClassificationDataset(wsi.MultiWsiDataset, base.ImageClassification):
         target_mpp: float,
         sampler: samplers.Sampler,
         backend: str = "openslide",
+        split: Literal["train", "val", "test"] | None = None,
         image_transforms: Callable | None = None,
         column_mapping: Dict[str, str] = default_column_mapping,
     ):
@@ -44,11 +46,13 @@ class WsiClassificationDataset(wsi.MultiWsiDataset, base.ImageClassification):
             target_mpp: Target microns per pixel (mpp) for the patches.
             sampler: The sampler to use for sampling patch coordinates.
             backend: The backend to use for reading the whole-slide images.
+            split: The split of the dataset to load.
             image_transforms: Transforms to apply to the extracted image patches.
             column_mapping: Mapping of the columns in the manifest file.
         """
         self._root = root
         self._manifest_file = manifest_file
+        self._split = split
         self._width = width
         self._height = height
         self._target_mpp = target_mpp
@@ -74,8 +78,8 @@ class WsiClassificationDataset(wsi.MultiWsiDataset, base.ImageClassification):
 
     @override
     def filename(self, index: int) -> str:
-        full_path = self._manifest.at[self._get_dataset_idx(index), self._column_mapping["path"]]
-        return os.path.basename(full_path)
+        path = self._manifest.at[self._get_dataset_idx(index), self._column_mapping["path"]]
+        return os.path.basename(path) if os.path.isabs(path) else path
 
     @override
     def __getitem__(self, index: int) -> Tuple[np.ndarray, np.ndarray]:
@@ -97,4 +101,7 @@ class WsiClassificationDataset(wsi.MultiWsiDataset, base.ImageClassification):
         if missing_columns:
             raise ValueError(f"Missing columns in the manifest file: {missing_columns}")
 
-        return df
+        if self._split is not None:
+            df = df.loc[df[self._column_mapping["split"]] == self._split]
+
+        return df.reset_index(drop=True)
