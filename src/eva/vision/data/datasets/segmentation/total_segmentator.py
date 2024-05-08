@@ -91,7 +91,7 @@ class TotalSegmentator2D(base.ImageSegmentation):
         first_sample_labels = os.path.join(
             self._root, self._samples_dirs[0], "segmentations", "*.nii.gz"
         )
-        return sorted(map(get_filename, glob(first_sample_labels)))
+        return ["background"] + sorted(map(get_filename, glob(first_sample_labels)))
 
     @property
     @override
@@ -122,7 +122,7 @@ class TotalSegmentator2D(base.ImageSegmentation):
         _validators.check_dataset_integrity(
             self,
             length=self._expected_dataset_lengths.get(f"{self._split}_{self._version}", 0),
-            n_classes=117,
+            n_classes=118,
             first_and_last_labels=("adrenal_gland_left", "vertebrae_T9"),
         )
 
@@ -144,7 +144,7 @@ class TotalSegmentator2D(base.ImageSegmentation):
     def load_mask(self, index: int) -> tv_tensors.Mask:
         sample_index, slice_index = self._indices[index]
         masks_dir = self._get_masks_dir(sample_index)
-        mask_paths = (os.path.join(masks_dir, label + ".nii.gz") for label in self.classes)
+        mask_paths = (os.path.join(masks_dir, label + ".nii.gz") for label in self.classes[1:])
         one_hot_encoded = np.concatenate(
             [io.read_nifti_slice(path, slice_index) for path in mask_paths],
             axis=2,
