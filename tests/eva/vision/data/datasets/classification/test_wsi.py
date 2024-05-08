@@ -54,6 +54,16 @@ def test_filename(dataset: datasets.WsiClassificationDataset):
         assert bool(re.match(pattern, dataset.filename(i)))
 
 
+def test_missing_columns(root: str):
+    """Test if error is raised if columns are missing in the manifest file."""
+    with pytest.raises(ValueError, match="Missing columns in the manifest file"):
+        datasets.WsiClassificationDataset(
+            root=root,
+            column_mapping={"target": "label"},
+            **DEFAULT_ARGS,
+        )
+
+
 def _check_batch_shape(batch: Any):
     assert isinstance(batch, tuple)
     assert len(batch) == 2

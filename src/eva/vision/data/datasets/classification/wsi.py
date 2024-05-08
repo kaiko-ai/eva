@@ -59,7 +59,7 @@ class WsiClassificationDataset(wsi.MultiWsiDataset, base.ImageClassification):
         self._sampler = sampler
         self._backend = backend
         self._image_transforms = image_transforms
-        self._column_mapping = column_mapping
+        self._column_mapping = self.default_column_mapping | column_mapping
 
         self._manifest = self._load_manifest(os.path.join(self._root, self._manifest_file))
         self._file_paths = self._manifest[self._column_mapping["path"]].tolist()
