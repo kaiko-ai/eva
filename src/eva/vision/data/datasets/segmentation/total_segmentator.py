@@ -8,7 +8,9 @@ from typing import Callable, Dict, List, Literal, Tuple
 import numpy as np
 from torchvision import tv_tensors
 from torchvision.datasets import utils
+from tqdm import tqdm
 from typing_extensions import override
+from concurrent import futures
 
 from eva.vision.data.datasets import _utils, _validators, structs
 from eva.vision.data.datasets.segmentation import base
@@ -52,6 +54,7 @@ class TotalSegmentator2D(base.ImageSegmentation):
         version: Literal["small", "full"] | None = "small",
         download: bool = False,
         as_uint8: bool = True,
+        optimize_mask_loading: bool = True,
         transforms: Callable | None = None,
     ) -> None:
         """Initialize dataset.
@@ -67,6 +70,8 @@ class TotalSegmentator2D(base.ImageSegmentation):
                 calling the :meth:`prepare_data` method and if the data does not
                 exist yet on disk.
             as_uint8: Whether to convert and return the images as a 8-bit.
+            optimize_mask_loading: Whether to pre-process the segmentation masks
+                in order to optimize the loading time.
             transforms: A function/transforms that takes in an image and a target
                 mask and returns the transformed versions of both.
         """
@@ -77,6 +82,7 @@ class TotalSegmentator2D(base.ImageSegmentation):
         self._version = version
         self._download = download
         self._as_uint8 = as_uint8
+        self._optimize_mask_loading = optimize_mask_loading
 
         self._samples_dirs: List[str] = []
         self._indices: List[Tuple[int, int]] = []
@@ -114,6 +120,9 @@ class TotalSegmentator2D(base.ImageSegmentation):
         self._samples_dirs = self._fetch_samples_dirs()
         self._indices = self._create_indices()
 
+        # if self._optimize_mask_loading:
+        #     self._export_masks_to_arrays()
+
     @override
     def validate(self) -> None:
         if self._version is None:
@@ -142,29 +151,30 @@ class TotalSegmentator2D(base.ImageSegmentation):
 
     @override
     def load_mask(self, index: int) -> tv_tensors.Mask:
+        return self._load_mask_from_nifti(index)
+
+    @override
+    def _load_mask_from_nifti(self, index: int) -> tv_tensors.Mask:
+        """Loads the segmentation mask from NifTi file."""
         sample_index, slice_index = self._indices[index]
         masks_dir = self._get_masks_dir(sample_index)
         mask_paths = (os.path.join(masks_dir, label + ".nii.gz") for label in self.classes)
-        one_hot_encoded = np.concatenate(
-            [io.read_nifti_slice(path, slice_index) for path in mask_paths],
-            axis=2,
-        )
+        binary_masks = [io.read_nifti_slice(path, slice_index) for path in mask_paths]
+        one_hot_encoded = np.concatenate(binary_masks, axis=2)
         background_mask = one_hot_encoded.sum(axis=2, keepdims=True) == 0
         one_hot_encoded_with_bg = np.concatenate([background_mask, one_hot_encoded], axis=2)
         segmentation_label = np.argmax(one_hot_encoded_with_bg, axis=2)
         return tv_tensors.Mask(segmentation_label)
 
-    def export_masks_to_arrays(self) -> None:
-        """Exports the segmentation masks in numpy arrays."""
-        for index in range(len(self)):
-            mask = self.load_mask(index)
-
-            sample_index, slice_index = self._indices[index]
-            masks_dir = self._get_masks_dir(sample_index)
-
-
-            print(index)
-            quit()
+    def _export_mask_to_array(self, index: int, mask: tv_tensors.Mask) -> None:
+        """Exports the segmentation mask in a numpy array."""
+        sample_index, slice_index = self._indices[index]
+        masks_dir = self._get_masks_dir(sample_index)
+        filename = os.path.join(masks_dir, "2d_masks", f"{slice_index}.npy")
+        if os.path.isfile(filename):
+            return
+        os.makedirs(os.path.dirname(filename), exist_ok=True)
+        np.save(file=filename, arr=mask.numpy())
 
     def _get_image_path(self, sample_index: int) -> str:
         """Returns the corresponding image path."""
@@ -241,3 +251,10 @@ class TotalSegmentator2D(base.ImageSegmentation):
                 filename=resource.filename,
                 remove_finished=True,
             )
+
+
+import multiprocessing
+
+def _fetch_maximum_available_workers(workers_per_core: int = 2) -> int:
+    """Returns the maximum available workers of the device."""
+    return multiprocessing.cpu_count() * workers_per_core + 1
