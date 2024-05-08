@@ -98,6 +98,8 @@ class WsiClassificationDataset(wsi.MultiWsiDataset, base.ImageClassification):
         df = pd.read_csv(manifest_path)
 
         missing_columns = set(self._column_mapping.values()) - set(df.columns)
+        if self._split is None:
+            missing_columns = missing_columns - {self._column_mapping["split"]}
         if missing_columns:
             raise ValueError(f"Missing columns in the manifest file: {missing_columns}")
 
