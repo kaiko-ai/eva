@@ -68,6 +68,10 @@ all = [
     "opencv-python-headless>=4.9.0.80",
     "timm @ git+https://github.com/huggingface/pytorch-image-models.git@main",
     "torchvision>=0.17.0",
+    "gdown>=5.1.0",
+    "girder-client>=3.2.3",
+    "zdrive>=2.1.5",
+    "google-api-python-client>=2.128.0",
 ]
 
 [project.scripts]
