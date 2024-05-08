@@ -3,20 +3,19 @@
 import functools
 import glob
 import os
-from typing import List, Literal
+from typing import Callable, List, Literal, Tuple
 
+import numpy as np
 import pandas as pd
 import torch
 from typing_extensions import override
 
-from eva.core.models.modules.typings import DATA_SAMPLE
-from eva.vision.data.datasets import _validators
+from eva.vision.data.datasets import _validators, wsi
 from eva.vision.data.datasets.classification import base
-from eva.vision.data.datasets.wsi import MultiWsiDataset
 from eva.vision.data.wsi.patching import samplers
 
 
-class PANDA(MultiWsiDataset, base.ImageClassification):
+class PANDA(wsi.MultiWsiDataset, base.ImageClassification):
     """Dataset class for PANDA images and corresponding targets."""
 
     _train_split_ratio: float = 0.8
@@ -33,6 +32,7 @@ class PANDA(MultiWsiDataset, base.ImageClassification):
         width: int = 224,
         height: int = 224,
         target_mpp: float = 0.5,
+        image_transforms: Callable | None = None,
         backend: str = "openslide",
     ) -> None:
         """Initializes the dataset.
@@ -45,6 +45,7 @@ class PANDA(MultiWsiDataset, base.ImageClassification):
             height: Height of the patches to be extracted, in pixels.
             target_mpp: Target microns per pixel (mpp) for the patches.
             backend: The backend to use for reading the whole-slide images.
+            image_transforms: Transforms to apply to the extracted image patches.
         """
         self._split = split
         self._root = root
@@ -52,7 +53,8 @@ class PANDA(MultiWsiDataset, base.ImageClassification):
         self._height = height
         self._target_mpp = target_mpp
 
-        super().__init__(
+        wsi.MultiWsiDataset.__init__(
+            self,
             root=root,
             file_paths=self._load_file_paths(split),
             width=width,
@@ -60,6 +62,7 @@ class PANDA(MultiWsiDataset, base.ImageClassification):
             sampler=sampler,
             target_mpp=target_mpp,
             backend=backend,
+            image_transforms=image_transforms,
         )
 
     @property
@@ -68,8 +71,8 @@ class PANDA(MultiWsiDataset, base.ImageClassification):
         return ["0", "1", "2", "3", "4", "5"]
 
     @functools.cached_property
-    @override
     def metadata(self) -> pd.DataFrame:
+        """Loads the metadata of the dataset."""
         return pd.read_csv(os.path.join(self._root, "train.csv"), index_col="image_id")
 
     @override
@@ -94,10 +97,8 @@ class PANDA(MultiWsiDataset, base.ImageClassification):
         return os.path.basename(self._file_paths[self._get_dataset_idx(index)])
 
     @override
-    def __getitem__(self, index: int) -> DATA_SAMPLE:
-        data = super().__getitem__(index)
-        target = self.load_target(index)
-        return DATA_SAMPLE(data, target)
+    def __getitem__(self, index: int) -> Tuple[np.ndarray, np.ndarray]:
+        return base.ImageClassification.__getitem__(self, index)
 
     @override
     def load_image(self, index: int) -> torch.Tensor:
