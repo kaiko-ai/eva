@@ -24,12 +24,12 @@ def test_length(patch_camelyon_dataset: datasets.PatchCamelyon, expected_length:
 )
 def test_sample(patch_camelyon_dataset: datasets.PatchCamelyon) -> None:
     """Tests the format of a dataset sample."""
-    # assert data sample is a tuple
     sample = patch_camelyon_dataset[0]
+    # assert data sample is a tuple
     assert isinstance(sample, tuple)
-    assert len(sample) == 2
+    assert len(sample) == 3
     # assert the format of the `image` and `target`
-    image, target = sample
+    image, target, _ = sample
     assert isinstance(image, np.ndarray)
     assert image.shape == (96, 96, 3)
     assert isinstance(target, np.ndarray)

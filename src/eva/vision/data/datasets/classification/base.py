@@ -38,12 +38,11 @@ class ImageClassification(vision.VisionDataset[Tuple[np.ndarray, np.ndarray]], a
     def class_to_idx(self) -> Dict[str, int] | None:
         """Returns a mapping of the class name to its target index."""
 
-    def load_metadata(self, index: int | None) -> Dict[str, Any] | List[Dict[str, Any]] | None:
+    def load_metadata(self, index: int) -> Dict[str, Any] | None:
         """Returns the dataset metadata.
 
         Args:
             index: The index of the data sample to return the metadata of.
-                If `None`, it will return the metadata of the current dataset.
 
         Returns:
             The sample metadata.
@@ -77,10 +76,11 @@ class ImageClassification(vision.VisionDataset[Tuple[np.ndarray, np.ndarray]], a
         raise NotImplementedError
 
     @override
-    def __getitem__(self, index: int) -> Tuple[np.ndarray, np.ndarray]:
+    def __getitem__(self, index: int) -> Tuple[np.ndarray, np.ndarray, Dict[str, Any]]:
         image = self.load_image(index)
         target = self.load_target(index)
-        return self._apply_transforms(image, target)
+        image, target = self._apply_transforms(image, target)
+        return image, target, self.load_metadata(index) or {}
 
     def _apply_transforms(
         self, image: np.ndarray, target: np.ndarray
