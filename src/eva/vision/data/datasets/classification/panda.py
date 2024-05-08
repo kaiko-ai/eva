@@ -8,9 +8,10 @@ from typing import Callable, List, Literal, Tuple
 import numpy as np
 import pandas as pd
 import torch
+from torchvision.datasets import utils
 from typing_extensions import override
 
-from eva.vision.data.datasets import _validators, wsi
+from eva.vision.data.datasets import _validators, structs, wsi
 from eva.vision.data.datasets.classification import base
 from eva.vision.data.wsi.patching import samplers
 
@@ -24,6 +25,14 @@ class PANDA(wsi.MultiWsiDataset, base.ImageClassification):
     _val_split_ratio: float = 0.2
     """Validation split ratio."""
 
+    _resources: List[structs.DownloadResource] = [
+        structs.DownloadResource(
+            filename="train_with_noisy_labels.csv",
+            url="https://raw.githubusercontent.com/analokmaus/kaggle-panda-challenge-public/master/train.csv",
+            md5="5e4bfc78bda9603d2e2faf3ed4b21dfa",
+        )
+    ]
+
     def __init__(
         self,
         root: str,
@@ -32,8 +41,8 @@ class PANDA(wsi.MultiWsiDataset, base.ImageClassification):
         width: int = 224,
         height: int = 224,
         target_mpp: float = 0.5,
-        image_transforms: Callable | None = None,
         backend: str = "openslide",
+        image_transforms: Callable | None = None,
     ) -> None:
         """Initializes the dataset.
 
@@ -73,15 +82,23 @@ class PANDA(wsi.MultiWsiDataset, base.ImageClassification):
     @functools.cached_property
     def metadata(self) -> pd.DataFrame:
         """Loads the metadata of the dataset."""
-        return pd.read_csv(os.path.join(self._root, "train.csv"), index_col="image_id")
+        metadata_path = os.path.join(self._root, "train_with_noisy_labels.csv")
+        return pd.read_csv(metadata_path, index_col="image_id")
 
     @override
     def prepare_data(self) -> None:
+        self._download_resources()
+
         _validators.check_dataset_exists(self._root, True)
         if not os.path.isdir(os.path.join(self._root, "train_images")):
             raise FileNotFoundError("'train_images' directory not found in the root folder.")
-        if not os.path.isfile(os.path.join(self._root, "train.csv")):
+        if not os.path.isfile(os.path.join(self._root, "train_with_noisy_labels.csv")):
             raise FileNotFoundError("'train.csv' file not found in the root folder.")
+
+    def _download_resources(self) -> None:
+        """Downloads the dataset resources."""
+        for resource in self._resources:
+            utils.download_url(resource.url, self._root, resource.filename, resource.md5)
 
     @override
     def validate(self) -> None:
@@ -114,8 +131,7 @@ class PANDA(wsi.MultiWsiDataset, base.ImageClassification):
         """Loads the file paths of the corresponding dataset split."""
         image_dir = os.path.join(self._root, "train_images")
         file_paths = sorted(glob.glob(os.path.join(image_dir, "*.tiff")))
-
-        # TODO: remove samples with noisy labels
+        file_paths = self._filter_noisy_labels(file_paths)
 
         match split:
             case "train":
@@ -127,6 +143,18 @@ class PANDA(wsi.MultiWsiDataset, base.ImageClassification):
             case _:
                 raise ValueError("Invalid split. Use 'train', 'val' or `None`.")
 
+    def _filter_noisy_labels(self, file_paths: List[str]):
+        is_noisy_filter = self.metadata["noise_ratio_10"] == 0
+        non_noisy_image_ids = set(self.metadata.loc[~is_noisy_filter].index)
+        filtered_file_paths = [
+            file_path
+            for file_path in file_paths
+            if self._get_id_from_path(file_path) in non_noisy_image_ids
+        ]
+        return filtered_file_paths
+
     def _path_to_target(self, file_path: str) -> int:
-        slide_id = os.path.basename(file_path).replace(".tiff", "")
-        return self.metadata.loc[slide_id, "isup_grade"]
+        return self.metadata.loc[self._get_id_from_path(file_path), "isup_grade"]
+
+    def _get_id_from_path(self, file_path: str) -> str:
+        return os.path.basename(file_path).replace(".tiff", "")
