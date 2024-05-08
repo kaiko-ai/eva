@@ -8,6 +8,7 @@ import gdown
 from torchvision import tv_tensors
 from tqdm import tqdm
 from typing_extensions import override
+from torchvision.datasets import utils
 
 from eva.vision.data.datasets.segmentation import base
 
@@ -92,4 +93,3 @@ class BCSS(base.ImageSegmentation):
                 quiet=True,
                 use_cookies=False,
             )
-            time.sleep(60)
