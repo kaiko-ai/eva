@@ -50,24 +50,14 @@ class WsiClassificationDataset(wsi.MultiWsiDataset, base.ImageClassification):
             image_transforms: Transforms to apply to the extracted image patches.
             column_mapping: Mapping of the columns in the manifest file.
         """
-        self._root = root
-        self._manifest_file = manifest_file
         self._split = split
-        self._width = width
-        self._height = height
-        self._target_mpp = target_mpp
-        self._sampler = sampler
-        self._backend = backend
-        self._image_transforms = image_transforms
         self._column_mapping = self.default_column_mapping | column_mapping
-
-        self._manifest = self._load_manifest(os.path.join(self._root, self._manifest_file))
-        self._file_paths = self._manifest[self._column_mapping["path"]].tolist()
+        self._manifest = self._load_manifest(os.path.join(root, manifest_file))
 
         wsi.MultiWsiDataset.__init__(
             self,
             root=root,
-            file_paths=self._file_paths,
+            file_paths=self._manifest[self._column_mapping["path"]].tolist(),
             width=width,
             height=height,
             sampler=sampler,
