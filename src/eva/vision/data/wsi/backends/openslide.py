@@ -32,12 +32,11 @@ class WsiOpenslide(base.Wsi):
     @override
     def mpp(self) -> float:
         # TODO: add overwrite_mpp class attribute to allow setting a default value
-        if self._wsi.properties.get("openslide.mpp-x") and self._wsi.properties.get(
-            "openslide.mpp-y"
+        if self._wsi.properties.get(openslide.PROPERTY_NAME_MPP_X) and self._wsi.properties.get(
+            openslide.PROPERTY_NAME_MPP_Y
         ):
-            x_mpp = float(self._wsi.properties["openslide.mpp-x"])
-            y_mpp = float(self._wsi.properties["openslide.mpp-y"])
-
+            x_mpp = float(self._wsi.properties[openslide.PROPERTY_NAME_MPP_X])
+            y_mpp = float(self._wsi.properties[openslide.PROPERTY_NAME_MPP_Y])
         elif (
             self._wsi.properties.get("tiff.XResolution")
             and self._wsi.properties.get("tiff.YResolution")
@@ -50,7 +49,6 @@ class WsiOpenslide(base.Wsi):
             conversion_factor = _conversion_factor_to_micrometer.get(unit)
             x_mpp = conversion_factor / float(self._wsi.properties["tiff.XResolution"])
             y_mpp = conversion_factor / float(self._wsi.properties["tiff.YResolution"])
-
         else:
             raise ValueError("`mpp` cannot be obtained for this slide.")
 
