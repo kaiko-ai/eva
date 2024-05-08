@@ -5,7 +5,7 @@ from eva.vision.data.datasets.classification.crc import CRC
 from eva.vision.data.datasets.classification.mhist import MHIST
 from eva.vision.data.datasets.classification.patch_camelyon import PatchCamelyon
 from eva.vision.data.datasets.classification.total_segmentator import TotalSegmentatorClassification
-from eva.vision.data.datasets.classification.wsi import MultiWsiClassificationDataset
+from eva.vision.data.datasets.classification.wsi import WsiClassificationDataset
 
 __all__ = [
     "BACH",
@@ -13,5 +13,5 @@ __all__ = [
     "MHIST",
     "PatchCamelyon",
     "TotalSegmentatorClassification",
-    "MultiWsiClassificationDataset",
+    "WsiClassificationDataset",
 ]

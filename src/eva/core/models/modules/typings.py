@@ -10,7 +10,7 @@ MODEL_TYPE = nn.Module | pl.LightningModule
 """The expected model type."""
 
 
-class DATA_SAMPLE(NamedTuple):
+class INPUT_BATCH(NamedTuple):
     """The default input batch data scheme."""
 
     data: torch.Tensor

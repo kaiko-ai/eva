@@ -1,40 +1,103 @@
-"""Dataset classes for whole-slide image classification."""
+"""WSI classification dataset."""
 
-import bisect
 import os
-from typing import Any, Dict
+from typing import Any, Callable, Dict, Literal, Tuple
 
-import torch
+import numpy as np
+import pandas as pd
 from typing_extensions import override
 
-from eva.core.models.modules.typings import DATA_SAMPLE
-from eva.vision.data.datasets.wsi import MultiWsiDataset
+from eva.vision.data.datasets import wsi
+from eva.vision.data.datasets.classification import base
+from eva.vision.data.wsi.patching import samplers
 
 
-class MultiWsiClassificationDataset(MultiWsiDataset):
-    """Classification Dataset class for reading patches from multiple whole-slide images.
+class WsiClassificationDataset(wsi.MultiWsiDataset, base.ImageClassification):
+    """A general dataset class for whole-slide image classification using manifest files."""
 
-    # TODO: Replace this by dataset specific classes?
-    """
+    default_column_mapping: Dict[str, str] = {
+        "path": "path",
+        "target": "target",
+        "split": "split",
+    }
+
+    def __init__(
+        self,
+        root: str,
+        manifest_file: str,
+        width: int,
+        height: int,
+        target_mpp: float,
+        sampler: samplers.Sampler,
+        backend: str = "openslide",
+        split: Literal["train", "val", "test"] | None = None,
+        image_transforms: Callable | None = None,
+        column_mapping: Dict[str, str] = default_column_mapping,
+    ):
+        """Initializes the dataset.
+
+        Args:
+            root: Root directory of the dataset.
+            manifest_file: The path to the manifest file, relative to
+                the `root` argument. The `path` column is expected to contain
+                relative paths to the whole-slide images.
+            width: Width of the patches to be extracted, in pixels.
+            height: Height of the patches to be extracted, in pixels.
+            target_mpp: Target microns per pixel (mpp) for the patches.
+            sampler: The sampler to use for sampling patch coordinates.
+            backend: The backend to use for reading the whole-slide images.
+            split: The split of the dataset to load.
+            image_transforms: Transforms to apply to the extracted image patches.
+            column_mapping: Mapping of the columns in the manifest file.
+        """
+        self._split = split
+        self._column_mapping = self.default_column_mapping | column_mapping
+        self._manifest = self._load_manifest(os.path.join(root, manifest_file))
+
+        wsi.MultiWsiDataset.__init__(
+            self,
+            root=root,
+            file_paths=self._manifest[self._column_mapping["path"]].tolist(),
+            width=width,
+            height=height,
+            sampler=sampler,
+            target_mpp=target_mpp,
+            backend=backend,
+            image_transforms=image_transforms,
+        )
 
     @override
     def filename(self, index: int) -> str:
-        dataset_idx = bisect.bisect_right(self.cumulative_sizes, index)
-        full_path = self._manifest.at[dataset_idx, self._column_mapping["path"]]
-        return os.path.basename(full_path)
+        path = self._manifest.at[self._get_dataset_idx(index), self._column_mapping["path"]]
+        return os.path.basename(path) if os.path.isabs(path) else path
 
     @override
-    def __getitem__(self, index: int) -> DATA_SAMPLE:
-        data = super().__getitem__(index)
-        target = self._load_target(index)
-        metadata = self._load_metadata(index)
+    def __getitem__(self, index: int) -> Tuple[np.ndarray, np.ndarray, Dict[str, Any]]:
+        return base.ImageClassification.__getitem__(self, index)
 
-        return DATA_SAMPLE(data, target, metadata)
+    @override
+    def load_image(self, index: int) -> np.ndarray:
+        return wsi.MultiWsiDataset.__getitem__(self, index)
 
-    def _load_target(self, index: int) -> torch.Tensor:
-        dataset_idx = bisect.bisect_right(self.cumulative_sizes, index)
-        target = self._manifest.at[dataset_idx, self._column_mapping["target"]]
-        return torch.tensor(target)
+    @override
+    def load_target(self, index: int) -> np.ndarray:
+        target = self._manifest.at[self._get_dataset_idx(index), self._column_mapping["target"]]
+        return np.asarray(target)
 
-    def _load_metadata(self, index: int) -> Dict[str, Any]:
-        return {"slide_id": self.filename(index).split(".")[0]}
+    @override
+    def load_metadata(self, index: int) -> Dict[str, Any]:
+        return {"wsi_id": self.filename(index).split(".")[0]}
+
+    def _load_manifest(self, manifest_path: str) -> pd.DataFrame:
+        df = pd.read_csv(manifest_path)
+
+        missing_columns = set(self._column_mapping.values()) - set(df.columns)
+        if self._split is None:
+            missing_columns = missing_columns - {self._column_mapping["split"]}
+        if missing_columns:
+            raise ValueError(f"Missing columns in the manifest file: {missing_columns}")
+
+        if self._split is not None:
+            df = df.loc[df[self._column_mapping["split"]] == self._split]
+
+        return df.reset_index(drop=True)
