@@ -27,9 +27,9 @@ SAMPLE_SHAPE = 32
     "batch_size, n_samples, metadata_keys, filenames",
     [
         (5, 7, None, None),
-        (5, 7, ["slide_id"], None),
+        (5, 7, ["wsi_id"], None),
         (8, 16, None, None),
-        (8, 32, ["slide_id"], ["slide_1", "slide_2"]),
+        (8, 32, ["wsi_id"], ["slide_1", "slide_2"]),
     ],
 )
 def test_embeddings_writer(datamodule: datamodules.DataModule, model: modules.HeadModule) -> None:

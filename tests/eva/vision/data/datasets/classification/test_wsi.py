@@ -66,14 +66,17 @@ def test_missing_columns(root: str):
 
 def _check_batch_shape(batch: Any):
     assert isinstance(batch, tuple)
-    assert len(batch) == 2
+    assert len(batch) == 3
 
-    image, target = batch
+    image, target, metadata = batch
     assert isinstance(image, torch.Tensor)
     assert image.shape == (3, TARGET_SIZE, TARGET_SIZE)
 
     assert isinstance(target, np.ndarray)
     assert target.size == 1
+
+    assert isinstance(metadata, dict)
+    assert "wsi_id" in metadata
 
 
 @pytest.fixture

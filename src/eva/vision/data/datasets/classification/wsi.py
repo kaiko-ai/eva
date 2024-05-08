@@ -1,7 +1,7 @@
 """WSI classification dataset."""
 
 import os
-from typing import Callable, Dict, Literal, Tuple
+from typing import Any, Callable, Dict, Literal, Tuple
 
 import numpy as np
 import pandas as pd
@@ -72,7 +72,7 @@ class WsiClassificationDataset(wsi.MultiWsiDataset, base.ImageClassification):
         return os.path.basename(path) if os.path.isabs(path) else path
 
     @override
-    def __getitem__(self, index: int) -> Tuple[np.ndarray, np.ndarray]:
+    def __getitem__(self, index: int) -> Tuple[np.ndarray, np.ndarray, Dict[str, Any]]:
         return base.ImageClassification.__getitem__(self, index)
 
     @override
@@ -83,6 +83,10 @@ class WsiClassificationDataset(wsi.MultiWsiDataset, base.ImageClassification):
     def load_target(self, index: int) -> np.ndarray:
         target = self._manifest.at[self._get_dataset_idx(index), self._column_mapping["target"]]
         return np.asarray(target)
+
+    @override
+    def load_metadata(self, index: int) -> Dict[str, Any]:
+        return {"wsi_id": self.filename(index).split(".")[0]}
 
     def _load_manifest(self, manifest_path: str) -> pd.DataFrame:
         df = pd.read_csv(manifest_path)
