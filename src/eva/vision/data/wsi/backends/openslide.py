@@ -46,7 +46,7 @@ class WsiOpenslide(base.Wsi):
             if unit not in _conversion_factor_to_micrometer:
                 raise ValueError(f"Unit {unit} not supported.")
 
-            conversion_factor = float(_conversion_factor_to_micrometer.get(unit))
+            conversion_factor = float(_conversion_factor_to_micrometer.get(unit))  # type: ignore
             x_mpp = conversion_factor / float(self._wsi.properties["tiff.XResolution"])
             y_mpp = conversion_factor / float(self._wsi.properties["tiff.YResolution"])
         else:
