@@ -111,7 +111,7 @@ class SemanticSegmentationModule(module.ModelModule):
     @override
     def predict_step(self, batch: INPUT_BATCH, *args: Any, **kwargs: Any) -> torch.Tensor:
         tensor = INPUT_BATCH(*batch).data
-        return tensor if self.backbone is None else self.backbone(tensor)
+        return tensor if self.encoder is None else self.encoder(tensor)
 
     @property
     def _base_lr(self) -> float:
