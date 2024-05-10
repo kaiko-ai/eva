@@ -8,6 +8,7 @@ import numpy.typing as npt
 from eva.vision.utils.io import _utils
 import numpy as np
 
+
 def read_nifti_slice(
     path: str, slice_index: int, *, use_storage_dtype: bool = True
 ) -> npt.NDArray[Any]:
