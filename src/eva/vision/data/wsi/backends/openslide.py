@@ -81,6 +81,8 @@ class WsiOpenslide(base.Wsi):
 
 
 _conversion_factor_to_micrometer = {
+    "meter": 10**6,
+    "decimeter": 10**5,
     "centimeter": 10**4,
     "millimeter": 10**3,
     "micrometer": 1,
