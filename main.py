@@ -9,8 +9,9 @@ def main():
     dataset.prepare_data()
     dataset.setup()
 
-    for i in range(0, 1000, 500):
+    for i in range(0, 2000, 500):
         dataset[i]
+        print(i)
 
 
 if __name__ == "__main__":

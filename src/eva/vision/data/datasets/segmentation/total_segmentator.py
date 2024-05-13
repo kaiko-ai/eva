@@ -6,11 +6,10 @@ from glob import glob
 from typing import Callable, Dict, List, Literal, Tuple
 
 import numpy as np
+import tqdm
 from torchvision import tv_tensors
 from torchvision.datasets import utils
-from tqdm import tqdm
 from typing_extensions import override
-from concurrent import futures
 
 from eva.vision.data.datasets import _utils, _validators, structs
 from eva.vision.data.datasets.segmentation import base
@@ -54,6 +53,7 @@ class TotalSegmentator2D(base.ImageSegmentation):
         version: Literal["small", "full"] | None = "small",
         download: bool = False,
         as_uint8: bool = True,
+        classes: List[str] | None = None,
         optimize_mask_loading: bool = True,
         transforms: Callable | None = None,
     ) -> None:
@@ -70,6 +70,8 @@ class TotalSegmentator2D(base.ImageSegmentation):
                 calling the :meth:`prepare_data` method and if the data does not
                 exist yet on disk.
             as_uint8: Whether to convert and return the images as a 8-bit.
+            classes: Whether to configure the dataset with a subset of classes.
+                If `None`, it will use all of them.
             optimize_mask_loading: Whether to pre-process the segmentation masks
                 in order to optimize the loading time.
             transforms: A function/transforms that takes in an image and a target
@@ -82,6 +84,7 @@ class TotalSegmentator2D(base.ImageSegmentation):
         self._version = version
         self._download = download
         self._as_uint8 = as_uint8
+        self._classes = classes
         self._optimize_mask_loading = optimize_mask_loading
 
         self._samples_dirs: List[str] = []
@@ -97,7 +100,13 @@ class TotalSegmentator2D(base.ImageSegmentation):
         first_sample_labels = os.path.join(
             self._root, self._samples_dirs[0], "segmentations", "*.nii.gz"
         )
-        return sorted(map(get_filename, glob(first_sample_labels)))
+        all_classes = sorted(map(get_filename, glob(first_sample_labels)))
+        if self._classes:
+            is_subset = all(name in all_classes for name in self._classes)
+            if not is_subset:
+                raise ValueError("Provided class names are not subset of the dataset onces.")
+
+        return all_classes if self._classes is None else self._classes
 
     @property
     @override
@@ -120,8 +129,8 @@ class TotalSegmentator2D(base.ImageSegmentation):
         self._samples_dirs = self._fetch_samples_dirs()
         self._indices = self._create_indices()
 
-        # if self._optimize_mask_loading:
-        #     self._export_masks_to_arrays()
+        if self._optimize_mask_loading:
+            self._export_semantic_labels_as_arrays()
 
     @override
     def validate(self) -> None:
@@ -131,8 +140,12 @@ class TotalSegmentator2D(base.ImageSegmentation):
         _validators.check_dataset_integrity(
             self,
             length=self._expected_dataset_lengths.get(f"{self._split}_{self._version}", 0),
-            n_classes=117,
-            first_and_last_labels=("adrenal_gland_left", "vertebrae_T9"),
+            n_classes=len(self._classes) if self._classes else 117,
+            first_and_last_labels=(
+                (self._classes[0], self._classes[-1])
+                if self._classes
+                else ("adrenal_gland_left", "vertebrae_T9")
+            ),
         )
 
     @override
@@ -143,7 +156,7 @@ class TotalSegmentator2D(base.ImageSegmentation):
     def load_image(self, index: int) -> tv_tensors.Image:
         sample_index, slice_index = self._indices[index]
         image_path = self._get_image_path(sample_index)
-        image_array = io.read_nifti_slice(image_path, slice_index)
+        image_array = io.read_nifti(image_path, slice_index)
         if self._as_uint8:
             image_array = convert.to_8bit(image_array)
         image_rgb_array = image_array.repeat(3, axis=2)
@@ -151,30 +164,52 @@ class TotalSegmentator2D(base.ImageSegmentation):
 
     @override
     def load_mask(self, index: int) -> tv_tensors.Mask:
-        return self._load_mask_from_nifti(index)
+        if self._optimize_mask_loading:
+            return self._load_mask_slice_from_array(index)
+        return self._load_mask_slice_from_nifti(index)
 
     @override
-    def _load_mask_from_nifti(self, index: int) -> tv_tensors.Mask:
+    def _load_mask_slice_from_array(self, index: int) -> tv_tensors.Mask:
+        """Loads the segmentation mask from a numpy file."""
+        sample_index, slice_index = self._indices[index]
+        masks_dir = self._get_masks_dir(sample_index)
+        filename = os.path.join(masks_dir, "semantic_labels.npy")
+        semantic_labels = np.load(filename)
+        semantic_labels_slice = semantic_labels[:, :, slice_index]
+        return tv_tensors.Mask(semantic_labels_slice)
+
+    @override
+    def _load_mask_slice_from_nifti(self, index: int) -> tv_tensors.Mask:
         """Loads the segmentation mask from NifTi file."""
         sample_index, slice_index = self._indices[index]
         masks_dir = self._get_masks_dir(sample_index)
-        mask_paths = (os.path.join(masks_dir, label + ".nii.gz") for label in self.classes)
-        binary_masks = [io.read_nifti_slice(path, slice_index) for path in mask_paths]
-        one_hot_encoded = np.concatenate(binary_masks, axis=2)
-        background_mask = one_hot_encoded.sum(axis=2, keepdims=True) == 0
-        one_hot_encoded_with_bg = np.concatenate([background_mask, one_hot_encoded], axis=2)
-        segmentation_label = np.argmax(one_hot_encoded_with_bg, axis=2)
-        return tv_tensors.Mask(segmentation_label)
+        mask_paths = [os.path.join(masks_dir, label + ".nii.gz") for label in self.classes]
+        binary_masks = [io.read_nifti(path, slice_index) for path in mask_paths]
+        background_mask = np.zeros_like(binary_masks[0])
+        semantic_labels = np.argmax([background_mask] + binary_masks, axis=0)
+        return tv_tensors.Mask(semantic_labels)
 
-    def _export_mask_to_array(self, index: int, mask: tv_tensors.Mask) -> None:
-        """Exports the segmentation mask in a numpy array."""
-        sample_index, slice_index = self._indices[index]
-        masks_dir = self._get_masks_dir(sample_index)
-        filename = os.path.join(masks_dir, "2d_masks", f"{slice_index}.npy")
-        if os.path.isfile(filename):
-            return
-        os.makedirs(os.path.dirname(filename), exist_ok=True)
-        np.save(file=filename, arr=mask.numpy())
+    def _export_semantic_labels_as_arrays(self) -> None:
+        total_samples = len(self._samples_dirs)
+        for sample_index in tqdm.trange(
+            total_samples,
+            desc=">> Exporting optimized semantic labels",
+        ):
+            masks_dir = self._get_masks_dir(sample_index)
+            filename = os.path.join(masks_dir, "semantic_labels.npy")
+            if os.path.isfile(filename):
+                continue
+
+            mask_paths = [os.path.join(masks_dir, label + ".nii.gz") for label in self.classes]
+            mask_shape = io.fetch_nifti_shape(mask_paths[0])
+            background_mask = np.zeros(mask_shape, dtype=np.int16)
+            binary_masks = [
+                background_mask if path is None else io.read_nifti(path)
+                for path in [None] + mask_paths
+            ]
+            semantic_labels = np.argmax(binary_masks, axis=0)
+
+            np.save(file=filename, arr=semantic_labels)
 
     def _get_image_path(self, sample_index: int) -> str:
         """Returns the corresponding image path."""
@@ -251,10 +286,3 @@ class TotalSegmentator2D(base.ImageSegmentation):
                 filename=resource.filename,
                 remove_finished=True,
             )
-
-
-import multiprocessing
-
-def _fetch_maximum_available_workers(workers_per_core: int = 2) -> int:
-    """Returns the maximum available workers of the device."""
-    return multiprocessing.cpu_count() * workers_per_core + 1

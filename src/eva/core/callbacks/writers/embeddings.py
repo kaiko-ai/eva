@@ -30,19 +30,22 @@ class EmbeddingsWriter(callbacks.BasePredictionWriter):
     ) -> None:
         """Initializes a new EmbeddingsWriter instance.
 
-        This callback writes the embedding files in a separate process to avoid blocking the
-        main process where the model forward pass is executed.
+        This callback writes the embedding files in a separate process
+        to avoid blocking the main process where the model forward pass
+        is executed.
 
         Args:
             output_dir: The directory where the embeddings will be saved.
             backbone: A model to be used as feature extractor. If `None`,
-                it will be expected that the input batch returns the features directly.
-            dataloader_idx_map: A dictionary mapping dataloader indices to their respective
-                names (e.g. train, val, test).
-            group_key: The metadata key to group the embeddings by. If specified, the
-                embedding files will be saved in subdirectories named after the group_key.
-                If specified, the key must be present in the metadata of the input batch.
-            overwrite: Whether to overwrite the output directory. Defaults to True.
+                it will be expected that the input batch returns the
+                features directly.
+            dataloader_idx_map: A dictionary mapping dataloader indices to
+                their respective names (e.g. train, val, test).
+            group_key: The metadata key to group the embeddings by. If specified,
+                the embedding files will be saved in subdirectories named after
+                the group_key. If specified, the key must be present in the metadata
+                of the input batch.
+            overwrite: Whether to overwrite the output directory.
         """
         super().__init__(write_interval="batch")
 
