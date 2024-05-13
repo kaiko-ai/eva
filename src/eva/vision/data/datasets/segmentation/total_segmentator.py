@@ -52,6 +52,7 @@ class TotalSegmentator2D(base.ImageSegmentation):
         version: Literal["small", "full"] | None = "small",
         download: bool = False,
         as_uint8: bool = True,
+        classes: List[str] | None = None,
         transforms: Callable | None = None,
     ) -> None:
         """Initialize dataset.
@@ -67,6 +68,8 @@ class TotalSegmentator2D(base.ImageSegmentation):
                 calling the :meth:`prepare_data` method and if the data does not
                 exist yet on disk.
             as_uint8: Whether to convert and return the images as a 8-bit.
+            classes: Whether to configure the dataset with a subset of classes.
+                If `None`, it will use all of them.
             transforms: A function/transforms that takes in an image and a target
                 mask and returns the transformed versions of both.
         """
@@ -77,6 +80,7 @@ class TotalSegmentator2D(base.ImageSegmentation):
         self._version = version
         self._download = download
         self._as_uint8 = as_uint8
+        self._classes = classes
 
         self._samples_dirs: List[str] = []
         self._indices: List[Tuple[int, int]] = []
@@ -91,7 +95,13 @@ class TotalSegmentator2D(base.ImageSegmentation):
         first_sample_labels = os.path.join(
             self._root, self._samples_dirs[0], "segmentations", "*.nii.gz"
         )
-        return sorted(map(get_filename, glob(first_sample_labels)))
+        all_classes = sorted(map(get_filename, glob(first_sample_labels)))
+        if self._classes:
+            is_subset = all(name in all_classes for name in self._classes)
+            if not is_subset:
+                raise ValueError("Provided class names are not subset of the dataset onces.")
+
+        return all_classes if self._classes is None else self._classes
 
     @property
     @override
@@ -122,8 +132,12 @@ class TotalSegmentator2D(base.ImageSegmentation):
         _validators.check_dataset_integrity(
             self,
             length=self._expected_dataset_lengths.get(f"{self._split}_{self._version}", 0),
-            n_classes=117,
-            first_and_last_labels=("adrenal_gland_left", "vertebrae_T9"),
+            n_classes=len(self._classes) if self._classes else 117,
+            first_and_last_labels=(
+                (self._classes[0], self._classes[-1])
+                if self._classes
+                else ("adrenal_gland_left", "vertebrae_T9")
+            ),
         )
 
     @override
@@ -145,10 +159,8 @@ class TotalSegmentator2D(base.ImageSegmentation):
         sample_index, slice_index = self._indices[index]
         masks_dir = self._get_masks_dir(sample_index)
         mask_paths = (os.path.join(masks_dir, label + ".nii.gz") for label in self.classes)
-        one_hot_encoded = np.concatenate(
-            [io.read_nifti_slice(path, slice_index) for path in mask_paths],
-            axis=2,
-        )
+        binary_masks = [io.read_nifti_slice(path, slice_index) for path in mask_paths]
+        one_hot_encoded = np.concatenate(binary_masks, axis=2)
         background_mask = one_hot_encoded.sum(axis=2, keepdims=True) == 0
         one_hot_encoded_with_bg = np.concatenate([background_mask, one_hot_encoded], axis=2)
         segmentation_label = np.argmax(one_hot_encoded_with_bg, axis=2)
