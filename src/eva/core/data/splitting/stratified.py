@@ -41,8 +41,8 @@ def stratified_split(
         class_indices = np.where(y_indices == c)[0]
         np.random.shuffle(class_indices)
 
-        n_train = int(np.floor(train_ratio * len(class_indices)))
-        n_val = int(np.floor(val_ratio * len(class_indices)))
+        n_train = int(np.floor(train_ratio * len(class_indices))) or 1
+        n_val = int(np.floor(val_ratio * len(class_indices))) or 1
 
         train_indices.extend(class_indices[:n_train])
         val_indices.extend(class_indices[n_train : n_train + n_val])

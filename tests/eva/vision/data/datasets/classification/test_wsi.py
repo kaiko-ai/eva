@@ -20,7 +20,7 @@ DEFAULT_ARGS = {
     "width": 32,
     "height": 32,
     "target_mpp": 0.25,
-    "sampler": samplers.GridSampler(None),
+    "sampler": samplers.GridSampler(),
     "backend": "openslide",
     "image_transforms": torch_transforms.Compose([eva_transforms.ResizeAndCrop(size=TARGET_SIZE)]),
 }

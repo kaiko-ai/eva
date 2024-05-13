@@ -29,9 +29,6 @@ class PANDA(wsi.MultiWsiDataset, base.ImageClassification):
     _test_split_ratio: float = 0.15
     """Test split ratio."""
 
-    # TODO: test split ratio
-    # TODO: update panda.yaml file to use this
-
     _resources: List[structs.DownloadResource] = [
         structs.DownloadResource(
             filename="train_with_noisy_labels.csv",
@@ -39,6 +36,7 @@ class PANDA(wsi.MultiWsiDataset, base.ImageClassification):
             md5="5e4bfc78bda9603d2e2faf3ed4b21dfa",
         )
     ]
+    """Download resources."""
 
     def __init__(
         self,
@@ -98,8 +96,8 @@ class PANDA(wsi.MultiWsiDataset, base.ImageClassification):
     @override
     def prepare_data(self) -> None:
         self._download_resources()
-
         _validators.check_dataset_exists(self._root, True)
+
         if not os.path.isdir(os.path.join(self._root, "train_images")):
             raise FileNotFoundError("'train_images' directory not found in the root folder.")
         if not os.path.isfile(os.path.join(self._root, "train_with_noisy_labels.csv")):
@@ -129,13 +127,12 @@ class PANDA(wsi.MultiWsiDataset, base.ImageClassification):
 
     @override
     def load_image(self, index: int) -> torch.Tensor:
-        file_path = self._file_paths[self._get_dataset_idx(index)]
-        return torch.tensor(self._path_to_target(file_path))
+        return wsi.MultiWsiDataset.__getitem__(self, index)
 
     @override
-    def load_target(self, index: int) -> torch.Tensor:
+    def load_target(self, index: int) -> np.ndarray:
         file_path = self._file_paths[self._get_dataset_idx(index)]
-        return torch.tensor(self._path_to_target(file_path))
+        return np.asarray(self._path_to_target(file_path))
 
     @override
     def load_metadata(self, index: int) -> Dict[str, Any]:
@@ -145,9 +142,11 @@ class PANDA(wsi.MultiWsiDataset, base.ImageClassification):
         """Loads the file paths of the corresponding dataset split."""
         image_dir = os.path.join(self._root, "train_images")
         file_paths = sorted(glob.glob(os.path.join(image_dir, "*.tiff")))
+        if len(file_paths) != len(self.annotations):
+            raise ValueError(f"Expected {len(self.annotations)} images, found {len(file_paths)}.")
         file_paths = self._filter_noisy_labels(file_paths)
-
         targets = [self._path_to_target(file_path) for file_path in file_paths]
+
         train_indices, val_indices, test_indices = splitting.stratified_split(
             samples=file_paths,
             targets=targets,
