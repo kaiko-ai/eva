@@ -1,8 +1,8 @@
 # PANDA (Prostate cANcer graDe Assessment)
 
-The PANDA datasets consists of 10616 whole-slide images of digitized H&E-stained prostate tissue biopsies originating from two medical centers. After the biopsy, the slides were classified into Gleason patterns (3, 4 or 5) based on the architectural growth patterns of the tumor, which are then converted nto an ISUP grade on a 1-5 scale.
+The PANDA datasets consists of 10616 whole-slide images of digitized H&E-stained prostate tissue biopsies originating from two medical centers. After the biopsy, the slides were classified into Gleason patterns (3, 4 or 5) based on the architectural growth patterns of the tumor, which are then converted into an ISUP grade on a 1-5 scale.
 
-The Gleason grading system is the most important prognostic marker for PCa, and the ISUP grade has a crucial role when deciding how a patient should be treated. However, the system suffers from significant inter-observer variability between pathologists, leading to imperfect and noisy labels.
+The Gleason grading system is the most important prognostic marker for prostate cancer and the ISUP grade has a crucial role when deciding how a patient should be treated. However, the system suffers from significant inter-observer variability between pathologists, leading to imperfect and noisy labels.
 
 Source: https://www.kaggle.com/competitions/prostate-cancer-grade-assessment
 

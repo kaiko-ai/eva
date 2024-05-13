@@ -3,7 +3,7 @@
 import functools
 import glob
 import os
-from typing import Callable, List, Literal, Tuple
+from typing import Any, Callable, Dict, List, Literal, Tuple
 
 import numpy as np
 import pandas as pd
@@ -11,6 +11,7 @@ import torch
 from torchvision.datasets import utils
 from typing_extensions import override
 
+from eva.core.data import splitting
 from eva.vision.data.datasets import _validators, structs, wsi
 from eva.vision.data.datasets.classification import base
 from eva.vision.data.wsi.patching import samplers
@@ -19,11 +20,17 @@ from eva.vision.data.wsi.patching import samplers
 class PANDA(wsi.MultiWsiDataset, base.ImageClassification):
     """Dataset class for PANDA images and corresponding targets."""
 
-    _train_split_ratio: float = 0.8
+    _train_split_ratio: float = 0.7
     """Train split ratio."""
 
-    _val_split_ratio: float = 0.2
+    _val_split_ratio: float = 0.15
     """Validation split ratio."""
+
+    _test_split_ratio: float = 0.15
+    """Test split ratio."""
+
+    # TODO: test split ratio
+    # TODO: update panda.yaml file to use this
 
     _resources: List[structs.DownloadResource] = [
         structs.DownloadResource(
@@ -37,12 +44,13 @@ class PANDA(wsi.MultiWsiDataset, base.ImageClassification):
         self,
         root: str,
         sampler: samplers.Sampler,
-        split: Literal["train", "val"] | None = None,
+        split: Literal["train", "val", "test"] | None = None,
         width: int = 224,
         height: int = 224,
         target_mpp: float = 0.5,
         backend: str = "openslide",
         image_transforms: Callable | None = None,
+        seed: int = 42,
     ) -> None:
         """Initializes the dataset.
 
@@ -55,12 +63,14 @@ class PANDA(wsi.MultiWsiDataset, base.ImageClassification):
             target_mpp: Target microns per pixel (mpp) for the patches.
             backend: The backend to use for reading the whole-slide images.
             image_transforms: Transforms to apply to the extracted image patches.
+            seed: Random seed for reproducibility.
         """
         self._split = split
         self._root = root
         self._width = width
         self._height = height
         self._target_mpp = target_mpp
+        self._seed = seed
 
         wsi.MultiWsiDataset.__init__(
             self,
@@ -80,10 +90,10 @@ class PANDA(wsi.MultiWsiDataset, base.ImageClassification):
         return ["0", "1", "2", "3", "4", "5"]
 
     @functools.cached_property
-    def metadata(self) -> pd.DataFrame:
-        """Loads the metadata of the dataset."""
-        metadata_path = os.path.join(self._root, "train_with_noisy_labels.csv")
-        return pd.read_csv(metadata_path, index_col="image_id")
+    def annotations(self) -> pd.DataFrame:
+        """Loads the dataset labels."""
+        path = os.path.join(self._root, "train_with_noisy_labels.csv")
+        return pd.read_csv(path, index_col="image_id")
 
     @override
     def prepare_data(self) -> None:
@@ -114,7 +124,7 @@ class PANDA(wsi.MultiWsiDataset, base.ImageClassification):
         return os.path.basename(self._file_paths[self._get_dataset_idx(index)])
 
     @override
-    def __getitem__(self, index: int) -> Tuple[np.ndarray, np.ndarray]:
+    def __getitem__(self, index: int) -> Tuple[np.ndarray, np.ndarray, Dict[str, Any]]:
         return base.ImageClassification.__getitem__(self, index)
 
     @override
@@ -127,25 +137,41 @@ class PANDA(wsi.MultiWsiDataset, base.ImageClassification):
         file_path = self._file_paths[self._get_dataset_idx(index)]
         return torch.tensor(self._path_to_target(file_path))
 
-    def _load_file_paths(self, split: Literal["train", "val"] | None = None) -> List[str]:
+    @override
+    def load_metadata(self, index: int) -> Dict[str, Any]:
+        return {"wsi_id": self.filename(index).split(".")[0]}
+
+    def _load_file_paths(self, split: Literal["train", "val", "test"] | None = None) -> List[str]:
         """Loads the file paths of the corresponding dataset split."""
         image_dir = os.path.join(self._root, "train_images")
         file_paths = sorted(glob.glob(os.path.join(image_dir, "*.tiff")))
         file_paths = self._filter_noisy_labels(file_paths)
 
+        targets = [self._path_to_target(file_path) for file_path in file_paths]
+        train_indices, val_indices, test_indices = splitting.stratified_split(
+            samples=file_paths,
+            targets=targets,
+            train_ratio=self._train_split_ratio,
+            val_ratio=self._val_split_ratio,
+            test_ratio=self._test_split_ratio,
+            seed=self._seed,
+        )
+
         match split:
             case "train":
-                return file_paths[: int(len(file_paths) * self._train_split_ratio)]
+                return [file_paths[i] for i in train_indices]
             case "val":
-                return file_paths[int(len(file_paths) * self._train_split_ratio) :]
+                return [file_paths[i] for i in val_indices]
+            case "test":
+                return [file_paths[i] for i in test_indices or []]
             case None:
                 return file_paths
             case _:
                 raise ValueError("Invalid split. Use 'train', 'val' or `None`.")
 
     def _filter_noisy_labels(self, file_paths: List[str]):
-        is_noisy_filter = self.metadata["noise_ratio_10"] == 0
-        non_noisy_image_ids = set(self.metadata.loc[~is_noisy_filter].index)
+        is_noisy_filter = self.annotations["noise_ratio_10"] == 0
+        non_noisy_image_ids = set(self.annotations.loc[~is_noisy_filter].index)
         filtered_file_paths = [
             file_path
             for file_path in file_paths
@@ -154,7 +180,7 @@ class PANDA(wsi.MultiWsiDataset, base.ImageClassification):
         return filtered_file_paths
 
     def _path_to_target(self, file_path: str) -> int:
-        return self.metadata.loc[self._get_id_from_path(file_path), "isup_grade"]
+        return self.annotations.loc[self._get_id_from_path(file_path), "isup_grade"]
 
     def _get_id_from_path(self, file_path: str) -> str:
         return os.path.basename(file_path).replace(".tiff", "")
