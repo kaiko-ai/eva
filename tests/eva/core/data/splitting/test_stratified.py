@@ -68,8 +68,3 @@ def test_same_seed_produces_same_outputs(seed):
     assert train1 == train2, "Same seed should produce the same train indices"
     assert val1 == val2, "Same seed should produce the same validation indices"
     assert test1 == test2, "Same seed should produce the same test indices"
-
-
-# Note: Add this to run the tests if the file is executed directly
-if __name__ == "__main__":
-    pytest.main()

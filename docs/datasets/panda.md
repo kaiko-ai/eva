@@ -60,7 +60,6 @@ We then generate random stratified train / validation and test splits using a 0.
 * [Noisy Labels](https://github.com/analokmaus/kaggle-panda-challenge-public)
 
 
-
 ## License
 
 [CC BY-SA-NC 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en)
