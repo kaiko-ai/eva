@@ -3,9 +3,10 @@
 import functools
 import os
 from glob import glob
-from typing import Callable, Dict, List, Literal, Tuple
+from typing import Any, Callable, Dict, List, Literal, Tuple
 
 import numpy as np
+import numpy.typing as npt
 import tqdm
 from torchvision import tv_tensors
 from torchvision.datasets import utils
@@ -175,11 +176,7 @@ class TotalSegmentator2D(base.ImageSegmentation):
     def _load_mask(self, index: int) -> tv_tensors.Mask:
         """Loads and builds the segmentation mask from NifTi files."""
         sample_index, slice_index = self._indices[index]
-        masks_dir = self._get_masks_dir(sample_index)
-        mask_paths = [os.path.join(masks_dir, label + ".nii.gz") for label in self.classes]
-        binary_masks = [io.read_nifti(path, slice_index) for path in mask_paths]
-        background_mask = np.zeros_like(binary_masks[0])
-        semantic_labels = np.argmax([background_mask] + binary_masks, axis=0)
+        semantic_labels = self._load_masks_as_semantic_label(sample_index, slice_index)
         return tv_tensors.Mask(semantic_labels)
 
     def _load_semantic_label_mask(self, index: int) -> tv_tensors.Mask:
@@ -189,6 +186,21 @@ class TotalSegmentator2D(base.ImageSegmentation):
         filename = os.path.join(masks_dir, "semantic_labels", "masks.nii.gz")
         semantic_labels = io.read_nifti(filename, slice_index)
         return tv_tensors.Mask(semantic_labels.squeeze())
+
+    def _load_masks_as_semantic_label(
+        self, sample_index: int, slice_index: int | None = None
+    ) -> npt.NDArray[Any]:
+        """Loads binary masks as a semantic label mask.
+
+        Args:
+            sample_index: The data sample index.
+            slice_index: Whether to return only a specific slice.
+        """
+        masks_dir = self._get_masks_dir(sample_index)
+        mask_paths = [os.path.join(masks_dir, label + ".nii.gz") for label in self.classes]
+        binary_masks = [io.read_nifti(path, slice_index) for path in mask_paths]
+        background_mask = np.zeros_like(binary_masks[0])
+        return np.argmax([background_mask] + binary_masks, axis=0)
 
     def _export_semantic_label_masks(self) -> None:
         """Exports the segmentation binary masks (one-hot) to semantic labels."""
@@ -201,10 +213,7 @@ class TotalSegmentator2D(base.ImageSegmentation):
             if os.path.isfile(filename):
                 continue
 
-            mask_paths = [os.path.join(masks_dir, label + ".nii.gz") for label in self.classes]
-            binary_masks = list(map(io.read_nifti, mask_paths))
-            background_mask = np.zeros_like(binary_masks[0])
-            semantic_labels = np.argmax([background_mask] + binary_masks, axis=0)
+            semantic_labels = self._load_masks_as_semantic_label(sample_index)
 
             os.makedirs(os.path.dirname(filename), exist_ok=True)
             io.save_array_as_nifti(semantic_labels.astype(np.uint8), filename)
