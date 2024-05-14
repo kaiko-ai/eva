@@ -74,7 +74,9 @@ class TotalSegmentator2D(base.ImageSegmentation):
             classes: Whether to configure the dataset with a subset of classes.
                 If `None`, it will use all of them.
             optimize_mask_loading: Whether to pre-process the segmentation masks
-                in order to optimize the loading time.
+                in order to optimize the loading time. In the `setup` method, it
+                will reformat the binary one-hot masks to a semantic mask and store
+                it on disk.
             transforms: A function/transforms that takes in an image and a target
                 mask and returns the transformed versions of both.
         """
