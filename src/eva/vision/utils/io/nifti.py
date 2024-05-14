@@ -3,6 +3,7 @@
 from typing import Any, Tuple
 
 import nibabel as nib
+import numpy as np
 import numpy.typing as npt
 
 from eva.vision.utils.io import _utils
@@ -30,28 +31,22 @@ def read_nifti(
     image_data = nib.load(path)  # type: ignore
     if slice_index is not None:
         image_data = image_data.slicer[:, :, slice_index : slice_index + 1]  # type: ignore
-
     image_array = image_data.get_fdata()  # type: ignore
     if use_storage_dtype:
         image_array = image_array.astype(image_data.get_data_dtype())  # type: ignore
     return image_array
 
 
-def fetch_total_nifti_slices(path: str) -> int:
-    """Fetches the total slides of a NIfTI image file.
+def save_array_as_nifti(array: npt.ArrayLike, filename: str) -> None:
+    """Saved a numpy array as a NIfTI image file.
 
     Args:
-        path: The path to the NIfTI file.
-
-    Returns:
-        The number of the total available slides.
-
-    Raises:
-        FileExistsError: If the path does not exist or it is unreachable.
-        ValueError: If the input channel is invalid for the image.
+        array: The image array to save.
+        filename: The name to save the image like.
     """
-    image_shape = fetch_nifti_shape(path)
-    return image_shape[-1]
+    nifti_image = nib.Nifti1Image(array, affine=np.eye(4))  # type: ignore
+    nifti_image.header.get_xyzt_units()
+    nifti_image.to_filename(filename)
 
 
 def fetch_nifti_shape(path: str) -> Tuple[int]:

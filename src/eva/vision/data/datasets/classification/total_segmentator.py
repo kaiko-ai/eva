@@ -167,7 +167,8 @@ class TotalSegmentatorClassification(base.ImageClassification):
     def _get_sample_slice_index(self, index: int) -> int:
         """Returns the corresponding slice index."""
         image_path = self._get_image_path(index)
-        total_slices = io.fetch_total_nifti_slices(image_path)
+        image_shape = io.fetch_nifti_shape(image_path)
+        total_slices = image_shape[-1]
         slice_indices = np.linspace(0, total_slices - 1, num=self._n_slices_per_image, dtype=int)
         return slice_indices[index % self._n_slices_per_image]
 

@@ -8,6 +8,8 @@ trainer:
       - class_path: eva.vision.callbacks.SemanticSegmentationLogger
         init_args:
           log_every_n_epochs: 1
+          mean: &NORMALIZE_MEAN [0.5, 0.5, 0.5]
+          std: &NORMALIZE_STD [0.5, 0.5, 0.5]
     logger:
       - class_path: lightning.pytorch.loggers.TensorBoardLogger
         init_args:
@@ -65,13 +67,16 @@ data:
         init_args: &DATASET_ARGS
           root: ${oc.env:DATA_ROOT, ./data}/total_segmentator
           split: train
-          download: false
+          download: true
           # Set `download: true` to download the dataset from https://zenodo.org/records/10047292
           # The TotalSegmentator dataset is distributed under the following license: 
           # "Creative Commons Attribution 4.0 International"
           # (see: https://creativecommons.org/licenses/by/4.0/deed.en)
           transforms:
             class_path: eva.vision.data.transforms.common.ResizeAndCrop
+            init_args:
+              mean: *NORMALIZE_MEAN
+              std: *NORMALIZE_STD
       val:
         class_path: eva.vision.datasets.TotalSegmentator2D
         init_args:
@@ -79,7 +84,7 @@ data:
           split: val
     dataloaders:
       train:
-        batch_size: &BATCH_SIZE ${oc.env:BATCH_SIZE, 64}
+        batch_size: &BATCH_SIZE ${oc.env:BATCH_SIZE, 16}
         shuffle: true
       val:
         batch_size: *BATCH_SIZE

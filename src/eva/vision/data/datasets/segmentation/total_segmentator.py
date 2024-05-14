@@ -87,6 +87,11 @@ class TotalSegmentator2D(base.ImageSegmentation):
         self._classes = classes
         self._optimize_mask_loading = optimize_mask_loading
 
+        if self._optimize_mask_loading and self._classes is not None:
+            raise ValueError(
+                "To use customize classes please set the optimize_mask_loading to `False`."
+            )
+
         self._samples_dirs: List[str] = []
         self._indices: List[Tuple[int, int]] = []
 
@@ -128,9 +133,8 @@ class TotalSegmentator2D(base.ImageSegmentation):
     def configure(self) -> None:
         self._samples_dirs = self._fetch_samples_dirs()
         self._indices = self._create_indices()
-
         if self._optimize_mask_loading:
-            self._export_semantic_labels_as_arrays()
+            self._export_semantic_label_masks()
 
     @override
     def validate(self) -> None:
@@ -165,20 +169,11 @@ class TotalSegmentator2D(base.ImageSegmentation):
     @override
     def load_mask(self, index: int) -> tv_tensors.Mask:
         if self._optimize_mask_loading:
-            return self._load_mask_slice_from_array(index)
-        return self._load_mask_slice_from_nifti(index)
+            return self._load_semantic_label_mask(index)
+        return self._load_mask(index)
 
-    def _load_mask_slice_from_array(self, index: int) -> tv_tensors.Mask:
-        """Loads the segmentation mask from a numpy file."""
-        sample_index, slice_index = self._indices[index]
-        masks_dir = self._get_masks_dir(sample_index)
-        filename = os.path.join(masks_dir, "semantic_labels.npy")
-        semantic_labels = np.load(filename)
-        semantic_labels_slice = semantic_labels[:, :, slice_index]
-        return tv_tensors.Mask(semantic_labels_slice)
-
-    def _load_mask_slice_from_nifti(self, index: int) -> tv_tensors.Mask:
-        """Loads the segmentation mask from NifTi file."""
+    def _load_mask(self, index: int) -> tv_tensors.Mask:
+        """Loads and builds the segmentation mask from NifTi files."""
         sample_index, slice_index = self._indices[index]
         masks_dir = self._get_masks_dir(sample_index)
         mask_paths = [os.path.join(masks_dir, label + ".nii.gz") for label in self.classes]
@@ -187,27 +182,32 @@ class TotalSegmentator2D(base.ImageSegmentation):
         semantic_labels = np.argmax([background_mask] + binary_masks, axis=0)
         return tv_tensors.Mask(semantic_labels)
 
-    def _export_semantic_labels_as_arrays(self) -> None:
+    def _load_semantic_label_mask(self, index: int) -> tv_tensors.Mask:
+        """Loads the segmentation mask from a semantic label NifTi file."""
+        sample_index, slice_index = self._indices[index]
+        masks_dir = self._get_masks_dir(sample_index)
+        filename = os.path.join(masks_dir, "semantic_labels", "masks.nii.gz")
+        semantic_labels = io.read_nifti(filename, slice_index)
+        return tv_tensors.Mask(semantic_labels.squeeze())
+
+    def _export_semantic_label_masks(self) -> None:
+        """Exports the segmentation binary masks (one-hot) to semantic labels."""
         total_samples = len(self._samples_dirs)
         for sample_index in tqdm.trange(
-            total_samples,
-            desc=">> Exporting optimized semantic labels",
+            total_samples, desc=">> Exporting optimized semantic masks"
         ):
             masks_dir = self._get_masks_dir(sample_index)
-            filename = os.path.join(masks_dir, "semantic_labels.npy")
+            filename = os.path.join(masks_dir, "semantic_labels", "masks.nii.gz")
             if os.path.isfile(filename):
                 continue
 
             mask_paths = [os.path.join(masks_dir, label + ".nii.gz") for label in self.classes]
-            mask_shape = io.fetch_nifti_shape(mask_paths[0])
-            background_mask = np.zeros(mask_shape, dtype=np.int16)
-            binary_masks = [
-                background_mask if path is None else io.read_nifti(path)
-                for path in [None] + mask_paths
-            ]
-            semantic_labels = np.argmax(binary_masks, axis=0)
+            binary_masks = list(map(io.read_nifti, mask_paths))
+            background_mask = np.zeros_like(binary_masks[0])
+            semantic_labels = np.argmax([background_mask] + binary_masks, axis=0)
 
-            np.save(file=filename, arr=semantic_labels)
+            os.makedirs(os.path.dirname(filename), exist_ok=True)
+            io.save_array_as_nifti(semantic_labels.astype(np.uint8), filename)
 
     def _get_image_path(self, sample_index: int) -> str:
         """Returns the corresponding image path."""
@@ -222,7 +222,8 @@ class TotalSegmentator2D(base.ImageSegmentation):
     def _get_number_of_slices_per_sample(self, sample_index: int) -> int:
         """Returns the total amount of slices of a sample."""
         image_path = self._get_image_path(sample_index)
-        return io.fetch_total_nifti_slices(image_path)
+        image_shape = io.fetch_nifti_shape(image_path)
+        return image_shape[-1]
 
     def _fetch_samples_dirs(self) -> List[str]:
         """Returns the name of all the samples of all the splits of the dataset."""
