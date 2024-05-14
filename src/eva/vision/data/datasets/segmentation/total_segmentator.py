@@ -168,7 +168,6 @@ class TotalSegmentator2D(base.ImageSegmentation):
             return self._load_mask_slice_from_array(index)
         return self._load_mask_slice_from_nifti(index)
 
-    @override
     def _load_mask_slice_from_array(self, index: int) -> tv_tensors.Mask:
         """Loads the segmentation mask from a numpy file."""
         sample_index, slice_index = self._indices[index]
@@ -178,7 +177,6 @@ class TotalSegmentator2D(base.ImageSegmentation):
         semantic_labels_slice = semantic_labels[:, :, slice_index]
         return tv_tensors.Mask(semantic_labels_slice)
 
-    @override
     def _load_mask_slice_from_nifti(self, index: int) -> tv_tensors.Mask:
         """Loads the segmentation mask from NifTi file."""
         sample_index, slice_index = self._indices[index]

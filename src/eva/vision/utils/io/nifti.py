@@ -31,7 +31,7 @@ def read_nifti(
     if slice_index is not None:
         image_data = image_data.slicer[:, :, slice_index : slice_index + 1]  # type: ignore
 
-    image_array = image_data.get_fdata()
+    image_array = image_data.get_fdata()  # type: ignore
     if use_storage_dtype:
         image_array = image_array.astype(image_data.get_data_dtype())  # type: ignore
     return image_array
@@ -50,9 +50,7 @@ def fetch_total_nifti_slices(path: str) -> int:
         FileExistsError: If the path does not exist or it is unreachable.
         ValueError: If the input channel is invalid for the image.
     """
-    _utils.check_file(path)
-    image = nib.load(path)  # type: ignore
-    image_shape = image.header.get_data_shape()  # type: ignore
+    image_shape = fetch_nifti_shape(path)
     return image_shape[-1]
 
 
