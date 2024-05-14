@@ -1,6 +1,6 @@
 # PANDA (Prostate cANcer graDe Assessment)
 
-The PANDA datasets consists of 10616 whole-slide images of digitized H&E-stained prostate tissue biopsies originating from two medical centers. After the biopsy, the slides were classified into Gleason patterns (3, 4 or 5) based on the architectural growth patterns of the tumor, which are then converted into an ISUP grade on a 1-5 scale.
+The PANDA datasets consists of 10616 whole-slide images of digitized H&E-stained prostate tissue biopsies originating from two medical centers. After the biopsy, the slides were classified into Gleason patterns (3, 4 or 5) based on the architectural growth patterns of the tumor, which are then converted into an ISUP grade on a 0-5 scale.
 
 The Gleason grading system is the most important prognostic marker for prostate cancer and the ISUP grade has a crucial role when deciding how a patient should be treated. However, the system suffers from significant inter-observer variability between pathologists, leading to imperfect and noisy labels.
 
@@ -17,7 +17,7 @@ Source: https://www.kaggle.com/competitions/prostate-cancer-grade-assessment
 | **Task**                  | Multiclass classification (6 classes)                    |
 | **Cancer type**           | Prostate                                                 |
 | **Data size**             | 347 GB                                                   |
-| **Image dimension**       | 1536 x 2048 x 3                                          |
+| **Image dimension**       | ~20-25k x ~20-25k x 3                                          |
 | **Magnification (μm/px)** | 20x (0.5) - Level 0                                      |
 | **Files format**          | `.tiff`                                                  |
 | **Number of images**      | 10616 (9555 after removing noisy labels)                 |
@@ -42,7 +42,7 @@ prostate-cancer-grade-assessment
 
 ## Download and preprocessing
 
-The `PANDA` dataset class doesn't downloading the data during runtime and must be downloaded manually from [kaggle](https://www.kaggle.com/competitions/prostate-cancer-grade-assessment/data).
+The `PANDA` dataset class doesn't download the data during runtime and must be downloaded manually from [kaggle](https://www.kaggle.com/competitions/prostate-cancer-grade-assessment/data).
 
 As done in other studies<sup>1</sup>, we exclude ~10% of the samples with noisy labels according to kaggle's [6th place solution](https://www.kaggle.com/competitions/prostate-cancer-grade-assessment/discussion/169230)  resulting in a total dataset size of 9555 WSIs.
 

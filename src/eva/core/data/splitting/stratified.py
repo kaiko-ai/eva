@@ -10,7 +10,7 @@ def stratified_split(
     targets: Sequence[Any],
     train_ratio: float,
     val_ratio: float,
-    test_ratio: float | None = None,
+    test_ratio: float = 0.0,
     seed: int = 42,
 ) -> Tuple[List[int], List[int], List[int] | None]:
     """Splits the samples into stratified train, validation, and test (optional) sets.
@@ -42,11 +42,15 @@ def stratified_split(
         np.random.shuffle(class_indices)
 
         n_train = int(np.floor(train_ratio * len(class_indices))) or 1
-        n_val = int(np.floor(val_ratio * len(class_indices))) or 1
+        n_val = (
+            len(class_indices) - n_train
+            if test_ratio == 0.0
+            else int(np.floor(val_ratio * len(class_indices))) or 1
+        )
 
         train_indices.extend(class_indices[:n_train])
         val_indices.extend(class_indices[n_train : n_train + n_val])
-        if test_ratio is not None and test_ratio > 0.0:
+        if test_ratio > 0.0:
             test_indices.extend(class_indices[n_train + n_val :])
 
     return train_indices, val_indices, test_indices or None

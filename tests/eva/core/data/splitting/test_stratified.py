@@ -8,9 +8,9 @@ from eva.core.data import splitting
 @pytest.mark.parametrize(
     "targets, train_ratio, val_ratio, test_ratio",
     [
-        ([0] * 50 + [1] * 50, 0.8, 0.2, None),
+        ([0] * 50 + [1] * 50, 0.8, 0.2, 0.0),
         ([0] * 50 + [1] * 50, 0.7, 0.15, 0.15),
-        ([0] * 30 + [1] * 70, 0.8, 0.2, None),
+        ([0] * 30 + [1] * 70, 0.8, 0.2, 0.0),
         ([0] * 30 + [1] * 70, 0.7, 0.15, 0.15),
     ],
 )
@@ -34,7 +34,7 @@ def test_stratification(
     assert len(train_indices) + len(val_indices) + len(test_indices or []) == len(samples)
 
 
-@pytest.mark.parametrize("train_ratio, val_ratio, test_ratio", [(0.6, 0.3, None), (0.6, 0.4, 0.3)])
+@pytest.mark.parametrize("train_ratio, val_ratio, test_ratio", [(0.6, 0.3, 0.0), (0.6, 0.4, 0.3)])
 def test_invalid_ratio_sums(train_ratio: float, val_ratio: float, test_ratio: float):
     """Tests if the function raises an error when the ratios do not sum to 1."""
     samples = list(range(100))
