@@ -176,3 +176,6 @@ cython_debug/
 
 # numpy data
 *.npy
+
+# NiFti data
+*.nii.gz
