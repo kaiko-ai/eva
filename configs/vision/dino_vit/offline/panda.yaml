@@ -131,4 +131,3 @@ data:
         batch_size: &PREDICT_BATCH_SIZE ${oc.env:PREDICT_BATCH_SIZE, 64}
         num_workers: 12 #multiprocessing.cpu_count
         prefetch_factor: 2
-
