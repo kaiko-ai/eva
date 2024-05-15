@@ -53,7 +53,7 @@ class TotalSegmentator2D(base.ImageSegmentation):
         split: Literal["train", "val"] | None,
         version: Literal["small", "full"] | None = "small",
         download: bool = False,
-        as_uint8: bool = True,
+        as_uint8: bool = False,
         classes: List[str] | None = None,
         optimize_mask_loading: bool = True,
         transforms: Callable | None = None,
@@ -165,7 +165,7 @@ class TotalSegmentator2D(base.ImageSegmentation):
         image_path = self._get_image_path(sample_index)
         image_array = io.read_nifti(image_path, slice_index)
         if self._as_uint8:
-            image_array = convert.to_8bit(image_array)
+            image_array = convert.to_8bit(image_array.astype(np.float64))
         image_rgb_array = image_array.repeat(3, axis=2)
         return tv_tensors.Image(image_rgb_array.transpose(2, 0, 1))
 
