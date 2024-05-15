@@ -49,7 +49,7 @@ class ModelModule(pl.LightningModule):
 
     @property
     def metrics_device(self) -> torch.device:
-        """Returns the device which the metrics should be calculated.
+        """Returns the device by which the metrics should be calculated.
 
         We allocate the metrics to CPU when operating on single device, as
         it is much faster, but to GPU when employing multiple ones, as DDP
@@ -120,6 +120,10 @@ class ModelModule(pl.LightningModule):
     @override
     def on_test_epoch_end(self) -> None:
         self._compute_and_log_metrics(self.metrics.test_metrics)
+
+    @override
+    def on_predict_start(self) -> None:
+        self.metrics.to(device=self.metrics_device)
 
     def _common_batch_end(self, outputs: STEP_OUTPUT) -> STEP_OUTPUT:
         """Common end step of training, validation and test.
