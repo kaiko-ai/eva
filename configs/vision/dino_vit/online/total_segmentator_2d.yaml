@@ -59,6 +59,7 @@ model:
           init_args:
             num_classes: *NUM_CLASSES
             ignore_index: 0
+      evaluation:
         - class_path: eva.core.metrics.wrappers.ClasswiseWrapper
           init_args:
             metric:
