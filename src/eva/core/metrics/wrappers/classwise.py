@@ -14,6 +14,11 @@ class ClasswiseWrapper(wrappers.ClasswiseWrapper):
     """
 
     @override
+    def forward(self, *args: Any, **kwargs: Any) -> Any:
+        metric_kwargs = self.metric._filter_kwargs(**kwargs)
+        return self._convert(self.metric(*args, **metric_kwargs))
+
+    @override
     def update(self, *args: Any, **kwargs: Any) -> None:
-        m_kwargs = self.metric._filter_kwargs(**kwargs)
-        self.metric.update(*args, **m_kwargs)
+        metric_kwargs = self.metric._filter_kwargs(**kwargs)
+        self.metric.update(*args, **metric_kwargs)
