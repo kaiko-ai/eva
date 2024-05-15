@@ -58,10 +58,10 @@ model:
         - class_path: torchmetrics.Dice
           init_args:
             num_classes: *NUM_CLASSES
-        - class_path: torchmetrics.wrappers.ClasswiseWrapper
+        - class_path: eva.core.metrics.wrappers.ClasswiseWrapper
           init_args:
             metric:
-              class_path: torchmetrics.Dice
+              class_path: torchmetrics.classification.MulticlassF1Score
               init_args:
                 num_classes: *NUM_CLASSES
                 average: null
