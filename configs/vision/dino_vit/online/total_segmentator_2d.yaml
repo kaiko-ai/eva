@@ -58,6 +58,13 @@ model:
         - class_path: torchmetrics.Dice
           init_args:
             num_classes: *NUM_CLASSES
+        - class_path: torchmetrics.wrappers.ClasswiseWrapper
+          init_args:
+            metric:
+              class_path: torchmetrics.Dice
+              init_args:
+                num_classes: *NUM_CLASSES
+                average: null
 data:
   class_path: eva.DataModule
   init_args:
