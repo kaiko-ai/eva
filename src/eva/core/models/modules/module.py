@@ -4,6 +4,7 @@ from typing import Any, Mapping
 
 import lightning.pytorch as pl
 import torch
+from lightning.pytorch.strategies.single_device import SingleDeviceStrategy
 from lightning.pytorch.utilities import memory
 from lightning.pytorch.utilities.types import STEP_OUTPUT
 from typing_extensions import override
@@ -46,6 +47,21 @@ class ModelModule(pl.LightningModule):
         """The default post-processes."""
         return batch_postprocess.BatchPostProcess()
 
+    @property
+    def metrics_device(self) -> torch.device:
+        """Returns the device which the metrics should be calculated.
+
+        We allocate the metrics to CPU when operating on single device, as
+        it is much faster, but to GPU when employing multiple ones, as DDP
+        strategy requires the metrics to be allocated to the module's GPU.
+        """
+        move_to_cpu = isinstance(self.trainer.strategy, SingleDeviceStrategy)
+        return torch.device("cpu") if move_to_cpu else self.device
+
+    @override
+    def on_fit_start(self) -> None:
+        self.metrics.to(device=self.metrics_device)
+
     @override
     def on_train_batch_end(
         self,
@@ -58,6 +74,10 @@ class ModelModule(pl.LightningModule):
             self.metrics.training_metrics,
             batch_outputs=outputs,
         )
+
+    @override
+    def on_validation_start(self) -> None:
+        self.metrics.to(device=self.metrics_device)
 
     @override
     def on_validation_batch_end(
@@ -77,6 +97,10 @@ class ModelModule(pl.LightningModule):
     @override
     def on_validation_epoch_end(self) -> None:
         self._compute_and_log_metrics(self.metrics.validation_metrics)
+
+    @override
+    def on_test_start(self) -> None:
+        self.metrics.to(device=self.metrics_device)
 
     @override
     def on_test_batch_end(
