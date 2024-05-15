@@ -53,7 +53,7 @@ class TotalSegmentator2D(base.ImageSegmentation):
         split: Literal["train", "val"] | None,
         version: Literal["small", "full"] | None = "small",
         download: bool = False,
-        as_uint8: bool = False,
+        as_uint8: bool = True,
         classes: List[str] | None = None,
         optimize_mask_loading: bool = True,
         transforms: Callable | None = None,
