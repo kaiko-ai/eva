@@ -121,10 +121,6 @@ class ModelModule(pl.LightningModule):
     def on_test_epoch_end(self) -> None:
         self._compute_and_log_metrics(self.metrics.test_metrics)
 
-    @override
-    def on_predict_start(self) -> None:
-        self.metrics.to(device=self.metrics_device)
-
     def _common_batch_end(self, outputs: STEP_OUTPUT) -> STEP_OUTPUT:
         """Common end step of training, validation and test.
 
@@ -138,7 +134,7 @@ class ModelModule(pl.LightningModule):
             The updated outputs.
         """
         self._postprocess(outputs)
-        return memory.recursive_detach(outputs, to_cpu=self.device.type == "cpu")
+        return memory.recursive_detach(outputs, to_cpu=self.metrics_device.type == "cpu")
 
     def _forward_and_log_metrics(
         self,
