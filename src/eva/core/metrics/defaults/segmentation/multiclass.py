@@ -7,8 +7,8 @@ from torchmetrics import classification
 from eva.core.metrics import structs
 
 
-class MulticlassClassificationMetrics(structs.MetricCollection):
-    """Default metrics for multi-class classification tasks."""
+class MulticlassSegmentationMetrics(structs.MetricCollection):
+    """Default metrics for multi-class semantic segmentation tasks."""
 
     def __init__(
         self,
@@ -23,24 +23,14 @@ class MulticlassClassificationMetrics(structs.MetricCollection):
         Args:
             num_classes: Integer specifying the number of classes.
             average: Defines the reduction that is applied over labels.
-            ignore_index: Specifies a target value that is ignored and does not
-                contribute to the metric calculation.
-            prefix: A string to append in front of the keys of the output dict.
-            postfix: A string to append after the keys of the output dict.
+            ignore_index: Specifies a target value that is ignored and
+                does not contribute to the metric calculation.
+            prefix: A string to add before the keys in the output dictionary.
+            postfix: A string to add after the keys in the output dictionary.
         """
         super().__init__(
             metrics=[
-                classification.MulticlassAUROC(
-                    num_classes=num_classes,
-                    average=average,
-                    ignore_index=ignore_index,
-                ),
-                classification.MulticlassAccuracy(
-                    num_classes=num_classes,
-                    average=average,
-                    ignore_index=ignore_index,
-                ),
-                classification.MulticlassF1Score(
+                classification.MulticlassJaccardIndex(
                     num_classes=num_classes,
                     average=average,
                     ignore_index=ignore_index,
@@ -55,18 +45,20 @@ class MulticlassClassificationMetrics(structs.MetricCollection):
                     average=average,
                     ignore_index=ignore_index,
                 ),
+                classification.MulticlassF1Score(
+                    num_classes=num_classes,
+                    average=average,
+                    ignore_index=ignore_index,
+                ),
             ],
             prefix=prefix,
             postfix=postfix,
             compute_groups=[
                 [
-                    "MulticlassAccuracy",
-                    "MulticlassF1Score",
+                    "MulticlassJaccardIndex",
                     "MulticlassPrecision",
                     "MulticlassRecall",
-                ],
-                [
-                    "MulticlassAUROC",
+                    "MulticlassF1Score",
                 ],
             ],
         )
