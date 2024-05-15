@@ -13,7 +13,7 @@ def to_8bit(image: npt.NDArray[Any]) -> npt.NDArray[np.uint8]:
         image: The image array to convert.
 
     Returns:
-        The image as normalized as a 8-bit format.
+        The image as uint8 (0, 255) array.
     """
     image_scaled = image - image.min()
     image_scaled /= image_scaled.max()
