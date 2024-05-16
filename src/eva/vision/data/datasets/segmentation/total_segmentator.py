@@ -14,7 +14,7 @@ from typing_extensions import override
 
 from eva.vision.data.datasets import _utils, _validators, structs
 from eva.vision.data.datasets.segmentation import base
-from eva.vision.utils import convert, io
+from eva.vision.utils import io
 
 
 class TotalSegmentator2D(base.ImageSegmentation):
@@ -53,7 +53,6 @@ class TotalSegmentator2D(base.ImageSegmentation):
         split: Literal["train", "val"] | None,
         version: Literal["small", "full"] | None = "small",
         download: bool = False,
-        as_uint8: bool = True,
         classes: List[str] | None = None,
         optimize_mask_loading: bool = True,
         transforms: Callable | None = None,
@@ -70,7 +69,6 @@ class TotalSegmentator2D(base.ImageSegmentation):
                 Note that the download will be executed only by additionally
                 calling the :meth:`prepare_data` method and if the data does not
                 exist yet on disk.
-            as_uint8: Whether to convert and return the images as a 8-bit.
             classes: Whether to configure the dataset with a subset of classes.
                 If `None`, it will use all of them.
             optimize_mask_loading: Whether to pre-process the segmentation masks
@@ -86,7 +84,6 @@ class TotalSegmentator2D(base.ImageSegmentation):
         self._split = split
         self._version = version
         self._download = download
-        self._as_uint8 = as_uint8
         self._classes = classes
         self._optimize_mask_loading = optimize_mask_loading
 
@@ -164,8 +161,6 @@ class TotalSegmentator2D(base.ImageSegmentation):
         sample_index, slice_index = self._indices[index]
         image_path = self._get_image_path(sample_index)
         image_array = io.read_nifti(image_path, slice_index)
-        if self._as_uint8:
-            image_array = convert.to_8bit(image_array.astype(np.float64))
         image_rgb_array = image_array.repeat(3, axis=2)
         return tv_tensors.Image(image_rgb_array.transpose(2, 0, 1))
 

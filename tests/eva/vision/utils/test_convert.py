@@ -1,14 +1,11 @@
 """Tests image conversion related functionalities."""
 
-from typing import Any
-
-import numpy as np
-import numpy.typing as npt
+import torch
 from pytest import mark
 
 from eva.vision.utils import convert
 
-IMAGE_ARRAY_INT16 = np.array(
+IMAGE_ONE = torch.Tensor(
     [
         [
             [-794, -339, -607, -950],
@@ -17,11 +14,10 @@ IMAGE_ARRAY_INT16 = np.array(
             [-790, -325, -564, -969],
         ]
     ],
-    dtype=np.float16,
-)
+).to(dtype=torch.float16)
 """Test input data."""
 
-EXPECTED_ARRAY_INT16 = np.array(
+EXPECTED_ONE = torch.Tensor(
     [
         [
             [33, 120, 69, 3],
@@ -30,21 +26,20 @@ EXPECTED_ARRAY_INT16 = np.array(
             [34, 123, 77, 0],
         ]
     ],
-    dtype=np.uint8,
-)
+).to(dtype=torch.uint8)
 """Test expected/desired features."""
 
 
 @mark.parametrize(
-    "image_array, expected",
+    "image, expected",
     [
-        [IMAGE_ARRAY_INT16, EXPECTED_ARRAY_INT16],
+        [IMAGE_ONE, EXPECTED_ONE],
     ],
 )
-def test_to_8bit(
-    image_array: npt.NDArray[Any],
-    expected: npt.NDArray[np.uint8],
+def test_descale_and_denorm_image(
+    image: torch.Tensor,
+    expected: torch.Tensor,
 ) -> None:
-    """Tests the `to_8bit` image conversion."""
-    actual = convert.to_8bit(image_array)
-    np.testing.assert_allclose(actual, expected)
+    """Tests the `descale_and_denorm_image` image conversion."""
+    actual = convert.descale_and_denorm_image(image, mean=(0.0,), std=(1.0,))
+    torch.testing.assert_close(actual, expected)
