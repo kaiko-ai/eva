@@ -132,7 +132,7 @@ class TotalSegmentatorClassification(base.ImageClassification):
     def load_image(self, index: int) -> np.ndarray:
         image_path = self._get_image_path(index)
         slice_index = self._get_sample_slice_index(index)
-        image_array = io.read_nifti_slice(image_path, slice_index)
+        image_array = io.read_nifti(image_path, slice_index)
         return image_array.repeat(3, axis=2)
 
     @override
@@ -146,7 +146,7 @@ class TotalSegmentatorClassification(base.ImageClassification):
         masks_dir = self._get_masks_dir(index)
         slice_index = self._get_sample_slice_index(index)
         mask_paths = (os.path.join(masks_dir, label + ".nii.gz") for label in self.classes)
-        masks = [io.read_nifti_slice(path, slice_index) for path in mask_paths]
+        masks = [io.read_nifti(path, slice_index) for path in mask_paths]
         return np.concatenate(masks, axis=-1)
 
     def _get_masks_dir(self, index: int) -> str:
@@ -167,7 +167,8 @@ class TotalSegmentatorClassification(base.ImageClassification):
     def _get_sample_slice_index(self, index: int) -> int:
         """Returns the corresponding slice index."""
         image_path = self._get_image_path(index)
-        total_slices = io.fetch_total_nifti_slices(image_path)
+        image_shape = io.fetch_nifti_shape(image_path)
+        total_slices = image_shape[-1]
         slice_indices = np.linspace(0, total_slices - 1, num=self._n_slices_per_image, dtype=int)
         return slice_indices[index % self._n_slices_per_image]
 

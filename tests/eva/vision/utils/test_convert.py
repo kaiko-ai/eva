@@ -17,7 +17,7 @@ IMAGE_ARRAY_INT16 = np.array(
             [-790, -325, -564, -969],
         ]
     ],
-    dtype=np.int16,
+    dtype=np.float16,
 )
 """Test input data."""
 
@@ -25,7 +25,7 @@ EXPECTED_ARRAY_INT16 = np.array(
     [
         [
             [33, 120, 69, 3],
-            [68, 169, 217, 25],
+            [69, 169, 217, 25],
             [74, 183, 255, 25],
             [34, 123, 77, 0],
         ]
