@@ -69,8 +69,6 @@ class TotalSegmentator2D(base.ImageSegmentation):
                 Note that the download will be executed only by additionally
                 calling the :meth:`prepare_data` method and if the data does not
                 exist yet on disk.
-            classes: Whether to configure the dataset with a subset of classes.
-                If `None`, it will use all of them.
             optimize_mask_loading: Whether to pre-process the segmentation masks
                 in order to optimize the loading time. In the `setup` method, it
                 will reformat the binary one-hot masks to a semantic mask and store
