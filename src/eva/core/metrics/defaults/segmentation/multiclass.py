@@ -1,4 +1,4 @@
-"""Default metric collection for multiclass classification tasks."""
+"""Default metric collection for multiclass semantic segmentation tasks."""
 
 from typing import Literal
 
@@ -18,7 +18,7 @@ class MulticlassSegmentationMetrics(structs.MetricCollection):
         prefix: str | None = None,
         postfix: str | None = None,
     ) -> None:
-        """Initializes the multi-class classification metrics.
+        """Initializes the multi-class semantic segmentation metrics.
 
         Args:
             num_classes: Integer specifying the number of classes.
