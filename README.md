@@ -2,7 +2,7 @@
 
 <br />
 
-<img src="https://github.com/kaiko-ai/eva/blob/main/docs/images/eva-logo-v2.png?raw=true" width="340">
+<img src="https://github.com/kaiko-ai/eva/blob/main/docs/images/eva-logo.png?raw=true" width="340">
 
 <br />
 <br />

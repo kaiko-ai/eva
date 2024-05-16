@@ -7,7 +7,7 @@ hide:
 
 <br />
 
-<img src="./images/eva-logo-v2.png" width="340">
+<img src="./images/eva-logo.png" width="340">
 
 <br />
 <br />
