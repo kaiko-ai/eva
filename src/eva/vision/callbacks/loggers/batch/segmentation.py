@@ -1,19 +1,18 @@
 """Segmentation datasets related data loggers."""
 
-from typing import Iterable, List, Tuple
+from typing import List, Tuple
 
 import torch
 import torchvision
 from lightning import pytorch as pl
 from lightning.pytorch.utilities.types import STEP_OUTPUT
-from torchvision.transforms.v2 import functional
 from typing_extensions import override
 
 from eva.core.loggers import log
 from eva.core.models.modules.typings import INPUT_TENSOR_BATCH
 from eva.core.utils import to_cpu
 from eva.vision.callbacks.loggers.batch import base
-from eva.vision.utils import colormap
+from eva.vision.utils import colormap, convert
 
 
 class SemanticSegmentationLogger(base.BatchLogger):
@@ -68,7 +67,7 @@ class SemanticSegmentationLogger(base.BatchLogger):
         images, targets, predictions = to_cpu([images, targets, predictions])
         predictions = torch.argmax(predictions, dim=1)
 
-        images = list(map(self._denormalize_image, images))
+        images = list(map(self._format_image, images))
         targets = list(map(_draw_semantic_mask, targets))
         predictions = list(map(_draw_semantic_mask, predictions))
         image_grid = _make_grid_from_image_groups(
@@ -82,9 +81,9 @@ class SemanticSegmentationLogger(base.BatchLogger):
             step=trainer.global_step,
         )
 
-    def _denormalize_image(self, image: torch.Tensor) -> torch.Tensor:
-        """De-normalizes an image tensor to (0., 1.) range."""
-        return _denormalize_image(image, mean=self._mean, std=self._std)
+    def _format_image(self, image: torch.Tensor) -> torch.Tensor:
+        """Descaled an image tensor to (0, 255) uint8 tensor."""
+        return convert.descale_and_denorm_image(image, mean=self._mean, std=self._std)
 
 
 def _subsample_tensors(
@@ -104,34 +103,6 @@ def _subsample_tensors(
     for i, tensor in enumerate(tensors_stack):
         tensors_stack[i] = tensor[:max_samples]
     return tensors_stack
-
-
-def _denormalize_image(
-    tensor: torch.Tensor,
-    mean: Iterable[float] = (0.0, 0.0, 0.0),
-    std: Iterable[float] = (1.0, 1.0, 1.0),
-    inplace: bool = True,
-) -> torch.Tensor:
-    """De-normalizes an image tensor to (0., 1.) range.
-
-    Args:
-        tensor: An image float tensor.
-        mean: The normalized channels mean values.
-        std: The normalized channels std values.
-        inplace: Whether to perform the operation in-place.
-            Defaults to `True`.
-
-    Returns:
-        The de-normalized image tensor of range (0., 1.).
-    """
-    if not inplace:
-        tensor = tensor.clone()
-
-    return functional.normalize(
-        tensor,
-        mean=[-cmean / cstd for cmean, cstd in zip(mean, std, strict=False)],
-        std=[1 / cstd for cstd in std],
-    )
 
 
 def _draw_semantic_mask(tensor: torch.Tensor) -> torch.Tensor:

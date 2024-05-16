@@ -31,9 +31,11 @@ def read_nifti(
     image_data = nib.load(path)  # type: ignore
     if slice_index is not None:
         image_data = image_data.slicer[:, :, slice_index : slice_index + 1]  # type: ignore
+
     image_array = image_data.get_fdata()  # type: ignore
     if use_storage_dtype:
         image_array = image_array.astype(image_data.get_data_dtype())  # type: ignore
+
     return image_array
 
 
