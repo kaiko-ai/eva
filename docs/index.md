@@ -5,8 +5,11 @@ hide:
 
 <div align="center">
 
-<img src="./images/eva-logo.png" width="400">
+<br />
 
+<img src="./images/eva-logo-v2.png" width="340">
+
+<br />
 <br />
 
 <a href="https://pypi.python.org/pypi/kaiko-eva">

@@ -1,7 +1,10 @@
 <div align="center">
 
-<img src="https://github.com/kaiko-ai/eva/blob/main/docs/images/eva-logo.png?raw=true" width="400">
+<br />
 
+<img src="https://github.com/kaiko-ai/eva/blob/main/docs/images/eva-logo-v2.png?raw=true" width="340">
+
+<br />
 <br />
 
 _Oncology FM Evaluation Framework by kaiko.ai_

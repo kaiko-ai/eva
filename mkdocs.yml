@@ -12,8 +12,8 @@ theme:
     - content.code.copy
   icon:
     repo: fontawesome/brands/github-alt
-  favicon: images/eva-stripes.png
-  logo: images/eva-stripes.png
+  favicon: images/eva-stripes-v2.png
+  logo: images/eva-stripes-v2.png
   palette:
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
