@@ -1,19 +1,18 @@
 """Segmentation datasets related data loggers."""
 
-from typing import Iterable, List, Tuple
+from typing import List, Tuple
 
 import torch
 import torchvision
 from lightning import pytorch as pl
 from lightning.pytorch.utilities.types import STEP_OUTPUT
-from torchvision.transforms.v2 import functional
 from typing_extensions import override
 
 from eva.core.loggers import log
 from eva.core.models.modules.typings import INPUT_TENSOR_BATCH
 from eva.core.utils import to_cpu
 from eva.vision.callbacks.loggers.batch import base
-from eva.vision.utils import colormap
+from eva.vision.utils import colormap, convert
 
 
 class SemanticSegmentationLogger(base.BatchLogger):
@@ -84,8 +83,7 @@ class SemanticSegmentationLogger(base.BatchLogger):
 
     def _format_image(self, image: torch.Tensor) -> torch.Tensor:
         """Descaled an image tensor to (0, 255) uint8 tensor."""
-        norm_image = _descale_image(image, mean=self._mean, std=self._std)
-        return _denorm_image(norm_image)
+        return convert.descale_and_denorm_image(image, mean=self._mean, std=self._std)
 
 
 def _subsample_tensors(
@@ -105,52 +103,6 @@ def _subsample_tensors(
     for i, tensor in enumerate(tensors_stack):
         tensors_stack[i] = tensor[:max_samples]
     return tensors_stack
-
-
-def _descale_image(
-    image: torch.Tensor,
-    mean: Iterable[float] = (0.0, 0.0, 0.0),
-    std: Iterable[float] = (1.0, 1.0, 1.0),
-    inplace: bool = True,
-) -> torch.Tensor:
-    """De-normalizes an image tensor to (0., 1.) range.
-
-    Args:
-        image: An image float tensor.
-        mean: The normalized channels mean values.
-        std: The normalized channels std values.
-        inplace: Whether to perform the operation in-place.
-
-    Returns:
-        The de-normalized image tensor of range (0., 1.).
-    """
-    if not inplace:
-        image = image.clone()
-
-    return functional.normalize(
-        image,
-        mean=[-cmean / cstd for cmean, cstd in zip(mean, std, strict=False)],
-        std=[1 / cstd for cstd in std],
-    )
-
-
-def _denorm_image(image: torch.Tensor, inplace: bool = True) -> torch.Tensor:
-    """De-normalizes an image tensor from (0., 1.) to (0, 255) range.
-
-    Args:
-        image: An image float tensor.
-        inplace: Whether to perform the operation in-place.
-
-    Returns:
-        The image tensor as uint8.
-    """
-    if not inplace:
-        image = image.clone()
-
-    image_scaled = image - image.min()
-    image_scaled /= image_scaled.max()
-    image_scaled *= 255
-    return image_scaled.to(dtype=torch.uint8)
 
 
 def _draw_semantic_mask(tensor: torch.Tensor) -> torch.Tensor:
