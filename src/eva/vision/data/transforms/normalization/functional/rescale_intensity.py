@@ -1,8 +1,8 @@
 """Intensity level functions."""
 
+import sys
 from typing import Tuple
 
-import sys
 import torch
 
 
