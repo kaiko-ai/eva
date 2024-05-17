@@ -43,7 +43,7 @@ def save_array_as_nifti(
     array: npt.ArrayLike,
     filename: str,
     *,
-    dtype: np.dtype = np.int64,
+    dtype: npt.DTypeLike | None = np.int64,
 ) -> None:
     """Saved a numpy array as a NIfTI image file.
 
@@ -52,7 +52,7 @@ def save_array_as_nifti(
         filename: The name to save the image like.
         dtype: The data type to save the image.
     """
-    nifti_image = nib.Nifti1Image(array, affine=np.eye(4), dtype=np.int64)  # type: ignore
+    nifti_image = nib.Nifti1Image(array, affine=np.eye(4), dtype=dtype)  # type: ignore
     nifti_image.header.get_xyzt_units()
     nifti_image.to_filename(filename)
 

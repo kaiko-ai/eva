@@ -1,4 +1,4 @@
-"""Specialized transforms for resizing and normalizing a CT-scan."""
+"""Specialized transforms for resizing, clamping and range normalizing."""
 
 from typing import Callable, Sequence, Tuple
 
@@ -8,8 +8,8 @@ import torchvision.transforms.v2 as torch_transforms
 from eva.vision.data.transforms import normalization
 
 
-class CTScanTransforms(torch_transforms.Compose):
-    """Resizes, crops, clamps and normalizes a ct-scan image."""
+class ResizeAndClamp(torch_transforms.Compose):
+    """Resizes, crops, clamps and normalizes an input image."""
 
     def __init__(
         self,
@@ -39,12 +39,12 @@ class CTScanTransforms(torch_transforms.Compose):
         transforms = [
             torch_transforms.Resize(size=self._size),
             torch_transforms.CenterCrop(size=self._size),
-            # normalization.Clamp(out_range=self._clamp_range),
+            normalization.Clamp(out_range=self._clamp_range),
             torch_transforms.ToDtype(torch.float32),
-            # normalization.RescaleIntensity(
-            #     in_range=self._clamp_range,
-            #     out_range=(0.0, 1.0),
-            # ),
+            normalization.RescaleIntensity(
+                in_range=self._clamp_range,
+                out_range=(0.0, 1.0),
+            ),
             torch_transforms.Normalize(
                 mean=self._mean,
                 std=self._std,

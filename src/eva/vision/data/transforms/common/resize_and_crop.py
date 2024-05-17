@@ -4,7 +4,6 @@ from typing import Callable, Sequence
 
 import torch
 import torchvision.transforms.v2 as torch_transforms
-from torchvision import tv_tensors
 
 
 class ResizeAndCrop(torch_transforms.Compose):
@@ -36,13 +35,7 @@ class ResizeAndCrop(torch_transforms.Compose):
             torch_transforms.ToImage(),
             torch_transforms.Resize(size=self._size),
             torch_transforms.CenterCrop(size=self._size),
-            torch_transforms.ToDtype(
-                {
-                    tv_tensors.Image: torch.float32,
-                    tv_tensors.Mask: torch.float32,
-                },
-                scale=True,
-            ),
+            torch_transforms.ToDtype(torch.float32, scale=True),
             torch_transforms.Normalize(
                 mean=self._mean,
                 std=self._std,
