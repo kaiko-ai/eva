@@ -1,19 +1,18 @@
 """Segmentation datasets related data loggers."""
 
-from typing import Iterable, List, Tuple
+from typing import List, Tuple
 
 import torch
 import torchvision
 from lightning import pytorch as pl
 from lightning.pytorch.utilities.types import STEP_OUTPUT
-from torchvision.transforms.v2 import functional
 from typing_extensions import override
 
 from eva.core.loggers import log
 from eva.core.models.modules.typings import INPUT_TENSOR_BATCH
 from eva.core.utils import to_cpu
 from eva.vision.callbacks.loggers.batch import base
-from eva.vision.utils import colormap
+from eva.vision.utils import colormap, convert
 
 
 class SemanticSegmentationLogger(base.BatchLogger):
@@ -22,9 +21,9 @@ class SemanticSegmentationLogger(base.BatchLogger):
     def __init__(
         self,
         max_samples: int = 10,
-        number_of_rows: int | None = None,
-        mean: Tuple[float, ...] = (0.5, 0.5, 0.5),
-        std: Tuple[float, ...] = (0.5, 0.5, 0.5),
+        number_of_images_per_subgrid_row: int = 2,
+        mean: Tuple[float, ...] = (0.0, 0.0, 0.0),
+        std: Tuple[float, ...] = (1.0, 1.0, 1.0),
         log_every_n_epochs: int | None = 10,
         log_every_n_steps: int | None = None,
     ) -> None:
@@ -32,10 +31,10 @@ class SemanticSegmentationLogger(base.BatchLogger):
 
         Args:
             max_samples: The maximum number of images displayed in the grid.
-            number_of_rows: Number of images displayed in each row of the grid.
-                If `None`, it is the sqrt(total_images).
-            mean: The mean of the input images.
-            std: The std of the input images.
+            number_of_images_per_subgrid_row: Number of images displayed in each row
+                of each sub-grid (that is images, targets and predictions).
+            mean: The mean of the input images to de-normalize from.
+            std: The std of the input images to de-normalize from.
             log_every_n_epochs: Epoch-wise logging frequency.
             log_every_n_steps: Step-wise logging frequency.
         """
@@ -45,7 +44,7 @@ class SemanticSegmentationLogger(base.BatchLogger):
         )
 
         self._max_samples = max_samples
-        self._number_of_rows = number_of_rows
+        self._number_of_images_per_subgrid_row = number_of_images_per_subgrid_row
         self._mean = mean
         self._std = std
 
@@ -68,10 +67,12 @@ class SemanticSegmentationLogger(base.BatchLogger):
         images, targets, predictions = to_cpu([images, targets, predictions])
         predictions = torch.argmax(predictions, dim=1)
 
-        images = list(map(self._denomalize_image, images))
+        images = list(map(self._format_image, images))
         targets = list(map(_draw_semantic_mask, targets))
         predictions = list(map(_draw_semantic_mask, predictions))
-        image_grid = _make_grid_from_outputs(images, targets, predictions)
+        image_grid = _make_grid_from_image_groups(
+            [images, targets, predictions], self._number_of_images_per_subgrid_row
+        )
 
         log.log_image(
             trainer.loggers,
@@ -80,9 +81,9 @@ class SemanticSegmentationLogger(base.BatchLogger):
             step=trainer.global_step,
         )
 
-    def _denomalize_image(self, image: torch.Tensor) -> torch.Tensor:
-        """De-normalizes an image tensor to (0., 1.) range."""
-        return _denormalize_image(image, mean=self._mean, std=self._std)
+    def _format_image(self, image: torch.Tensor) -> torch.Tensor:
+        """Descaled an image tensor to (0, 255) uint8 tensor."""
+        return convert.descale_and_denorm_image(image, mean=self._mean, std=self._std)
 
 
 def _subsample_tensors(
@@ -104,34 +105,6 @@ def _subsample_tensors(
     return tensors_stack
 
 
-def _denormalize_image(
-    tensor: torch.Tensor,
-    mean: Iterable[float] = (0.5, 0.5, 0.5),
-    std: Iterable[float] = (0.5, 0.5, 0.5),
-    inplace: bool = True,
-) -> torch.Tensor:
-    """De-normalizes an image tensor to (0., 1.) range.
-
-    Args:
-        tensor: An image float tensor.
-        mean: The normalized channels mean values.
-        std: The normalized channels std values.
-        inplace: Whether to perform the operation in-place.
-            Defaults to `True`.
-
-    Returns:
-        The de-normalized image tensor of range (0., 1.).
-    """
-    if not inplace:
-        tensor = tensor.clone()
-
-    return functional.normalize(
-        tensor,
-        mean=[-cmean / cstd for cmean, cstd in zip(mean, std, strict=False)],
-        std=[1 / cstd for cstd in std],
-    )
-
-
 def _draw_semantic_mask(tensor: torch.Tensor) -> torch.Tensor:
     """Draws a semantic mask to an image RGB tensor.
 
@@ -142,7 +115,7 @@ def _draw_semantic_mask(tensor: torch.Tensor) -> torch.Tensor:
         tensor: An image tensor of range [0., 1.].
 
     Returns:
-        The image as a numpy tensor in the range of [0., 255.].
+        The image as a tensor of range [0., 255.].
     """
     tensor = torch.squeeze(tensor)
     height, width = tensor.shape[-2], tensor.shape[-1]
@@ -153,24 +126,27 @@ def _draw_semantic_mask(tensor: torch.Tensor) -> torch.Tensor:
     return torch.stack([red, green, blue])
 
 
-def _make_grid_from_outputs(
-    images: List[torch.Tensor],
-    targets: List[torch.Tensor],
-    predictions: List[torch.Tensor],
-    nrows: int = 2,
+def _make_grid_from_image_groups(
+    image_groups: List[List[torch.Tensor]],
+    number_of_images_per_subgrid_row: int = 2,
 ) -> torch.Tensor:
-    """Creates a single image grid from the batch output.
+    """Creates a single image grid from image groups.
 
-    It combines the input images, targets predictions into a single image.
+    For example, it can combine the input images, targets predictions into a single image.
+
+    Args:
+        image_groups: A list of lists of image tensors of shape (C x H x W)
+            all of the same size.
+        number_of_images_per_subgrid_row: Number of images displayed in each
+            row of the sub-grid.
 
     Returns:
         An image grid as a `torch.Tensor`.
     """
     return torchvision.utils.make_grid(
         [
-            torchvision.utils.make_grid(images, nrow=nrows),
-            torchvision.utils.make_grid(targets, nrow=nrows),
-            torchvision.utils.make_grid(predictions, nrow=nrows),
+            torchvision.utils.make_grid(image_group, nrow=number_of_images_per_subgrid_row)
+            for image_group in image_groups
         ],
-        nrow=3,
+        nrow=len(image_groups),
     )

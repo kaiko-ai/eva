@@ -173,3 +173,9 @@ cython_debug/
 
 # ignore local data
 /data/
+
+# numpy data
+*.npy
+
+# NiFti data
+*.nii.gz

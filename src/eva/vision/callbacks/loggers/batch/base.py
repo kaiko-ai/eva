@@ -43,22 +43,6 @@ class BatchLogger(pl.Callback, abc.ABC):
         self._log_every_n_steps = log_every_n_steps
 
     @override
-    def on_sanity_check_start(
-        self,
-        trainer: pl.Trainer,
-        pl_module: pl.LightningModule,
-    ) -> None:
-        self._force_log = False
-
-    @override
-    def on_sanity_check_end(
-        self,
-        trainer: pl.Trainer,
-        pl_module: pl.LightningModule,
-    ) -> None:
-        self._force_log = False
-
-    @override
     def on_train_batch_end(
         self,
         trainer: pl.Trainer,
