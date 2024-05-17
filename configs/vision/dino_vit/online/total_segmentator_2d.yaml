@@ -7,7 +7,7 @@ trainer:
     callbacks:
       - class_path: eva.vision.callbacks.SemanticSegmentationLogger
         init_args:
-          log_every_n_steps: 50
+          log_every_n_steps: 1000
           mean: &NORMALIZE_MEAN [0.5, 0.5, 0.5]
           std: &NORMALIZE_STD [0.5, 0.5, 0.5]
     logger:

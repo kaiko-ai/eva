@@ -2,6 +2,7 @@
 
 from typing import Tuple
 
+import sys
 import torch
 
 
@@ -23,5 +24,5 @@ def rescale_intensity(
     """
     imin, imax = in_range or (image.min(), image.max())
     omin, omax = out_range
-    image_scaled = (image - imin) / (imax - imin)
+    image_scaled = (image - imin) / (imax - imin + sys.float_info.epsilon)
     return image_scaled * (omax - omin) + omin
