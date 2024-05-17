@@ -7,7 +7,7 @@ trainer:
     callbacks:
       - class_path: eva.vision.callbacks.SemanticSegmentationLogger
         init_args:
-          log_every_n_epochs: 1
+          log_every_n_steps: 1
           mean: &NORMALIZE_MEAN [0.5, 0.5, 0.5]
           std: &NORMALIZE_STD [0.5, 0.5, 0.5]
     logger:
@@ -47,11 +47,11 @@ model:
       init_args:
         total_iters: *MAX_STEPS
         power: 0.9
-    postprocess:
-      targets_transforms:
-        - class_path: torchvision.transforms.v2.ToDtype
-          init_args:
-            dtype: torch.int64
+    # postprocess:
+    #   targets_transforms:
+    #     - class_path: torchvision.transforms.v2.ToDtype
+    #       init_args:
+    #         dtype: torch.int64
     metrics:
       common:
         - class_path: eva.metrics.AverageLoss
@@ -84,10 +84,7 @@ data:
           # "Creative Commons Attribution 4.0 International"
           # (see: https://creativecommons.org/licenses/by/4.0/deed.en)
           transforms:
-            class_path: eva.vision.data.transforms.common.ResizeAndCrop
-            init_args:
-              mean: *NORMALIZE_MEAN
-              std: *NORMALIZE_STD
+            class_path: eva.vision.data.transforms.common.CTScanTransforms
       val:
         class_path: eva.vision.datasets.TotalSegmentator2D
         init_args:
