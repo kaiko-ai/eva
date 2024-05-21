@@ -26,31 +26,56 @@ class Mask:
 def get_mask(
     wsi: Wsi,
     mask_level_idx: int,
-    kernel_size: Tuple[int, int] = (7, 7),
-    gray_threshold: int = 220,
+    saturation_threshold: int = 20,
+    median_blur_threshold: int | None = 7,
     fill_holes: bool = False,
+    kernel_size: Tuple[int, int] = (7, 7),
+    use_otsu: bool = False,
 ) -> Mask:
-    """Extracts a binary mask from an image.
+    """Generates a binary foreground mask for a given WSI.
+
+    The is a simplified version of the algorithm proposed in [1] (CLAM):
+    1. Convert the image to the HSV color space (easier to seperate specific colors with RGB).
+    2. (optional) Apply a median blur to the saturation channel to reduce noise
+        & closing small gaps in the mask. While yields cleaner masks, this step is the most
+        computationally expensive.
+    3. Calculate binary mask by thresholding accross the saturation channel.
+
+    [1] Lu, Ming Y., et al. "Data-efficient and weakly supervised computational
+        pathology on whole-slide images." Nature biomedical engineering 5.6 (2021): 555-570.
+        https://github.com/mahmoodlab/CLAM
 
     Args:
         wsi: The WSI object.
         mask_level_idx: The level index of the WSI at which we want to extract the mask.
-        kernel_size: The size of the kernel for morphological operations.
-        gray_threshold: The threshold for the gray scale image.
+        saturation_threshold: The threshold value for the saturation channel.
+        median_blur_threshold: The threshold value for the median blur operation.
+        kernel_size: The size of the kernel for morphological operations to fill holes.
         fill_holes: Whether to fill holes in the mask.
+        use_otsu: Whether to use Otsu's method for the thresholding operation. If False,
+            a fixed threshold value is used.
+
+    Returns: A Mask object instance.
     """
     image = wsi.read_region((0, 0), mask_level_idx, wsi.level_dimensions[mask_level_idx])
+    image = cv2.cvtColor(image, cv2.COLOR_RGB2HSV)
+    image = (
+        cv2.medianBlur(image[:, :, 1], median_blur_threshold)
+        if median_blur_threshold
+        else image[:, :, 1]
+    )
 
-    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, kernel_size)
-    gray = np.array(cv2.cvtColor(image, cv2.COLOR_RGB2GRAY), dtype=np.uint8)
-    mask_array = np.where(gray < gray_threshold, 1, 0).astype(np.uint8)
+    threshold_type = cv2.THRESH_BINARY + cv2.THRESH_OTSU if use_otsu else cv2.THRESH_BINARY
+    _, mask_array = cv2.threshold(image, saturation_threshold, 1, threshold_type)
 
     if fill_holes:
+        kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, kernel_size)
         mask_array = cv2.dilate(mask_array, kernel, iterations=1)
         contour, _ = cv2.findContours(mask_array, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_SIMPLE)
         for cnt in contour:
             cv2.drawContours(mask_array, [cnt], 0, (1,), -1)
 
+    mask_array = mask_array.astype(np.uint8)
     scale_factors = (
         wsi.level_dimensions[0][0] / wsi.level_dimensions[mask_level_idx][0],
         wsi.level_dimensions[0][1] / wsi.level_dimensions[mask_level_idx][1],
