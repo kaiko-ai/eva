@@ -70,10 +70,13 @@ class PANDA(wsi.MultiWsiDataset, base.ImageClassification):
         self._target_mpp = target_mpp
         self._seed = seed
 
+        self._download_resources()
+        self._file_paths = self._load_file_paths(split)
+
         wsi.MultiWsiDataset.__init__(
             self,
             root=root,
-            file_paths=self._load_file_paths(split),
+            file_paths=self._file_paths,
             width=width,
             height=height,
             sampler=sampler,
@@ -95,7 +98,6 @@ class PANDA(wsi.MultiWsiDataset, base.ImageClassification):
 
     @override
     def prepare_data(self) -> None:
-        self._download_resources()
         _validators.check_dataset_exists(self._root, True)
 
         if not os.path.isdir(os.path.join(self._root, "train_images")):
@@ -116,6 +118,10 @@ class PANDA(wsi.MultiWsiDataset, base.ImageClassification):
             n_classes=6,
             first_and_last_labels=("0", "5"),
         )
+        if len(self._file_paths) != len(self.annotations):
+            raise ValueError(
+                f"Expected {len(self.annotations)} images, found {len(self._file_paths)}."
+            )
 
     @override
     def filename(self, index: int) -> str:
@@ -142,8 +148,6 @@ class PANDA(wsi.MultiWsiDataset, base.ImageClassification):
         """Loads the file paths of the corresponding dataset split."""
         image_dir = os.path.join(self._root, "train_images")
         file_paths = sorted(glob.glob(os.path.join(image_dir, "*.tiff")))
-        if len(file_paths) != len(self.annotations):
-            raise ValueError(f"Expected {len(self.annotations)} images, found {len(file_paths)}.")
         file_paths = self._filter_noisy_labels(file_paths)
         targets = [self._path_to_target(file_path) for file_path in file_paths]
 
