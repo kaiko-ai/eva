@@ -9,7 +9,7 @@
 #### Slide-level
 | Dataset                            | #Slides  | Slide Size                | Magnification (μm/px)  | Task                       | Cancer Type      |
 |------------------------------------|----------|---------------------------|------------------------|----------------------------|------------------|
-| [Camelyon16](camelyon16.md)        | 3,152    | ~100-250k x ~100-250k x 3 |  40x (0.25)            | Classification (2 classes) | Breast         |
+| [Camelyon16](camelyon16.md)        | 400      | ~100-250k x ~100-250k x 3 |  40x (0.25)            | Classification (2 classes) | Breast           |
 | [PANDA](panda.md)                  | 3,152    | ~20k x 20k x 3            |  20x (0.5)             | Classification (6 classes) | Prostate         |
 
 
