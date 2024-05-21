@@ -21,8 +21,7 @@ __all__ = [
     "ImageSegmentation",
     "PatchCamelyon",
     "PANDA",
-    "Camelyon16"
-    "TotalSegmentatorClassification",
+    "Camelyon16" "TotalSegmentatorClassification",
     "TotalSegmentator2D",
     "VisionDataset",
     "WsiDataset",
