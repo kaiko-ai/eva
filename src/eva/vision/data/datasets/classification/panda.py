@@ -33,6 +33,7 @@ class PANDA(wsi.MultiWsiDataset, base.ImageClassification):
         structs.DownloadResource(
             filename="train_with_noisy_labels.csv",
             url="https://raw.githubusercontent.com/analokmaus/kaggle-panda-challenge-public/master/train.csv",
+            md5="5e4bfc78bda9603d2e2faf3ed4b21dfa",
         )
     ]
     """Download resources."""
@@ -96,7 +97,7 @@ class PANDA(wsi.MultiWsiDataset, base.ImageClassification):
 
     @override
     def prepare_data(self) -> None:
-        _validators.check_dataset_exists(self._root, True)
+        _validators.check_dataset_exists(self._root, False)
 
         if not os.path.isdir(os.path.join(self._root, "train_images")):
             raise FileNotFoundError("'train_images' directory not found in the root folder.")
@@ -106,7 +107,7 @@ class PANDA(wsi.MultiWsiDataset, base.ImageClassification):
     def _download_resources(self) -> None:
         """Downloads the dataset resources."""
         for resource in self._resources:
-            utils.download_url(resource.url, self._root, resource.filename)
+            utils.download_url(resource.url, self._root, resource.filename, resource.md5)
 
     @override
     def validate(self) -> None:

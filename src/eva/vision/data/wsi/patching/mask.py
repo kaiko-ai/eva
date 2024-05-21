@@ -27,7 +27,7 @@ def get_mask(
     wsi: Wsi,
     mask_level_idx: int,
     saturation_threshold: int = 20,
-    median_blur_threshold: int | None = 7,
+    median_blur_threshold: int | None = None,
     fill_holes: bool = False,
     kernel_size: Tuple[int, int] = (7, 7),
     use_otsu: bool = False,
@@ -38,7 +38,7 @@ def get_mask(
     1. Convert the image to the HSV color space (easier to seperate specific colors with RGB).
     2. (optional) Apply a median blur to the saturation channel to reduce noise
         & closing small gaps in the mask. While yields cleaner masks, this step is the most
-        computationally expensive.
+        computationally expensive and thus disabled by default.
     3. Calculate binary mask by thresholding accross the saturation channel.
 
     [1] Lu, Ming Y., et al. "Data-efficient and weakly supervised computational

@@ -125,7 +125,7 @@ class MultiWsiDataset(torch_datasets.ConcatDataset):
         super().__init__(self._load_datasets())
 
     def _load_datasets(self) -> list[WsiDataset]:
-        logger.info(f"Initializing {len(self._file_paths)} WSI datasets ...")
+        logger.info(f"Initializing dataset with {len(self._file_paths)} WSIs ...")
         wsi_datasets = []
         for file_path in self._file_paths:
             file_path = os.path.join(self._root, file_path) if self._root else file_path
