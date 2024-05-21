@@ -97,7 +97,7 @@ class PANDA(wsi.MultiWsiDataset, base.ImageClassification):
 
     @override
     def prepare_data(self) -> None:
-        _validators.check_dataset_exists(self._root, True)
+        _validators.check_dataset_exists(self._root, False)
 
         if not os.path.isdir(os.path.join(self._root, "train_images")):
             raise FileNotFoundError("'train_images' directory not found in the root folder.")
@@ -143,8 +143,10 @@ class PANDA(wsi.MultiWsiDataset, base.ImageClassification):
         """Loads the file paths of the corresponding dataset split."""
         image_dir = os.path.join(self._root, "train_images")
         file_paths = sorted(glob.glob(os.path.join(image_dir, "*.tiff")))
-        if len(self._file_paths) != len(self.annotations):
-            raise ValueError(f"Expected {len(self.annotations)} images, found {len(file_paths)}.")
+        if len(file_paths) != len(self.annotations):
+            raise ValueError(
+                f"Expected {len(self.annotations)} images, found {len(file_paths)} in {image_dir}."
+            )
         file_paths = self._filter_noisy_labels(file_paths)
         targets = [self._path_to_target(file_path) for file_path in file_paths]
 

@@ -1,7 +1,8 @@
 """PANDA dataset tests."""
 
 import os
-from typing import Any
+from typing import Any, Literal
+from unittest.mock import patch
 
 import numpy as np
 import pytest
@@ -40,6 +41,18 @@ def test_split_and_expected_shapes(root: str):
     _check_batch_shape(train_dataset[0])
     _check_batch_shape(val_dataset[0])
     _check_batch_shape(test_dataset[0])
+
+
+@pytest.mark.parametrize("split", ["train", "val", "test", None])
+def test_filenames(root: str, split: Literal["train", "val", "test"]):
+    """Tests that the number of filenames matches the dataset size."""
+    dataset = datasets.PANDA(root=root, split=split, **DEFAULT_ARGS)
+
+    filenames = set()
+    for i in range(len(dataset)):
+        filenames.add(dataset.filename(i))
+
+    assert len(filenames) == len(dataset.datasets)
 
 
 def test_same_split_same_seed(root: str):
@@ -82,3 +95,10 @@ def _check_batch_shape(batch: Any):
 def root(assets_path: str) -> str:
     """Fixture returning the root directory of the dataset."""
     return os.path.join(assets_path, "vision/datasets/panda")
+
+
+@pytest.fixture(autouse=True)
+def mock_download():
+    """Mocks the download function to avoid downloading resources when running tests."""
+    with patch.object(datasets.PANDA, "_download_resources", return_value=None):
+        yield

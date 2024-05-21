@@ -6,6 +6,13 @@
 
 ### Whole Slide (WSI) and microscopy image datasets
 
+#### Slide-level
+| Dataset                            | #Slides  | Slide Size        | Magnification (μm/px)  | Task                       | Cancer Type      |
+|------------------------------------|----------|------------|------------------------|----------------------------|------------------|
+| [PANDA](panda.md)                  | 3,152    | ~20k x 20k x 3    |  20x (0.5)             | Classification (6 classes) | Prostate         |
+
+
+#### Patch-level
 | Dataset                            | #Patches | Patch Size | Magnification (μm/px)  | Task                       | Cancer Type      |
 |------------------------------------|----------|------------|------------------------|----------------------------|------------------|
 | [BACH](bach.md)                    | 400      | 2048x1536  | 20x (0.5)              | Classification (4 classes) | Breast           |
