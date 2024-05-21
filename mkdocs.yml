@@ -79,12 +79,13 @@ nav:
   - Datasets: 
     - datasets/index.md
     - WSI:
-      - PANDA: datasets/panda.md
-    - WSI (patches):
-      - BACH: datasets/bach.md
-      - CRC: datasets/crc.md
-      - MHIST: datasets/mhist.md
-      - PatchCamelyon: datasets/patch_camelyon.md
+      - Slide-level:
+        - PANDA: datasets/panda.md
+      - Patch-level:
+        - BACH: datasets/bach.md
+        - CRC: datasets/crc.md
+        - MHIST: datasets/mhist.md
+        - PatchCamelyon: datasets/patch_camelyon.md
     - Radiology:
       - TotalSegmentator: datasets/total_segmentator.md
   - Reference API:

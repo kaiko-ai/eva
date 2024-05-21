@@ -17,7 +17,7 @@ Source: https://www.kaggle.com/competitions/prostate-cancer-grade-assessment
 | **Task**                  | Multiclass classification (6 classes)                    |
 | **Cancer type**           | Prostate                                                 |
 | **Data size**             | 347 GB                                                   |
-| **Image dimension**       | ~20-25k x ~20-25k x 3                                          |
+| **Image dimension**       | ~20k x 20k x 3                                           |
 | **Magnification (μm/px)** | 20x (0.5) - Level 0                                      |
 | **Files format**          | `.tiff`                                                  |
 | **Number of images**      | 10616 (9555 after removing noisy labels)                 |
@@ -44,7 +44,7 @@ prostate-cancer-grade-assessment
 
 The `PANDA` dataset class doesn't download the data during runtime and must be downloaded manually from [kaggle](https://www.kaggle.com/competitions/prostate-cancer-grade-assessment/data).
 
-As done in other studies<sup>1</sup>, we exclude ~10% of the samples with noisy labels according to kaggle's [6th place solution](https://www.kaggle.com/competitions/prostate-cancer-grade-assessment/discussion/169230)  resulting in a total dataset size of 9555 WSIs.
+As done in other studies<sup>1</sup> we exclude ~10% of the samples with noisy labels according to kaggle's [6th place solution](https://www.kaggle.com/competitions/prostate-cancer-grade-assessment/discussion/169230) resulting in a total dataset size of 9555 WSIs.
 
 We then generate random stratified train / validation and test splits using a 0.7 / 0.15 / 0.15 ratio:
 
