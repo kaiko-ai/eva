@@ -78,7 +78,9 @@ nav:
         - user-guide/advanced/model_wrappers.md
   - Datasets: 
     - datasets/index.md
-    - WSI-patches:
+    - WSI:
+      - PANDA: datasets/panda.md
+    - WSI (patches):
       - BACH: datasets/bach.md
       - CRC: datasets/crc.md
       - MHIST: datasets/mhist.md
