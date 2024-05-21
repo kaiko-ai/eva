@@ -51,7 +51,7 @@ We then generate random stratified train / validation and test splits using a 0.
 
 | Splits   | Train       | Validation  | Test       |  
 |----------|-------------|-------------|------------|
-| #Samples | 6685 (70%)  | 1419 (15%)  | 1451 (15%) |
+| #Samples | 6686 (70%)  | 1430 (15%)  | 1439 (15%) |
 
 
 ## Relevant links

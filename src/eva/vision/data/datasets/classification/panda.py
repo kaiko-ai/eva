@@ -33,7 +33,6 @@ class PANDA(wsi.MultiWsiDataset, base.ImageClassification):
         structs.DownloadResource(
             filename="train_with_noisy_labels.csv",
             url="https://raw.githubusercontent.com/analokmaus/kaggle-panda-challenge-public/master/train.csv",
-            md5="5e4bfc78bda9603d2e2faf3ed4b21dfa",
         )
     ]
     """Download resources."""
@@ -107,7 +106,7 @@ class PANDA(wsi.MultiWsiDataset, base.ImageClassification):
     def _download_resources(self) -> None:
         """Downloads the dataset resources."""
         for resource in self._resources:
-            utils.download_url(resource.url, self._root, resource.filename, resource.md5)
+            utils.download_url(resource.url, self._root, resource.filename)
 
     @override
     def validate(self) -> None:
@@ -143,7 +142,7 @@ class PANDA(wsi.MultiWsiDataset, base.ImageClassification):
         """Loads the file paths of the corresponding dataset split."""
         image_dir = os.path.join(self._root, "train_images")
         file_paths = sorted(glob.glob(os.path.join(image_dir, "*.tiff")))
-        if len(self._file_paths) != len(self.annotations):
+        if len(file_paths) != len(self.annotations):
             raise ValueError(f"Expected {len(self.annotations)} images, found {len(file_paths)}.")
         file_paths = self._filter_noisy_labels(file_paths)
         targets = [self._path_to_target(file_path) for file_path in file_paths]
