@@ -7,7 +7,7 @@ trainer:
     limit_train_batches: 2
     limit_val_batches: 2
     callbacks:
-      - class_path: eva.callbacks.EmbeddingsWriter
+      - class_path: eva.callbacks.ClassificationEmbeddingsWriter
         init_args:
           output_dir: &DATASET_EMBEDDINGS_ROOT ${oc.env:EMBEDDINGS_ROOT}/patch_camelyon
           dataloader_idx_map:
