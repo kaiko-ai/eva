@@ -7,6 +7,7 @@ from typing import Any, Callable, Dict, List, Literal, Tuple
 
 import numpy as np
 import numpy.typing as npt
+import torch
 import tqdm
 from torchvision import tv_tensors
 from torchvision.datasets import utils
@@ -174,7 +175,7 @@ class TotalSegmentator2D(base.ImageSegmentation):
         """Loads and builds the segmentation mask from NifTi files."""
         sample_index, slice_index = self._indices[index]
         semantic_labels = self._load_masks_as_semantic_label(sample_index, slice_index)
-        return tv_tensors.Mask(semantic_labels)
+        return tv_tensors.Mask(semantic_labels, dtype=torch.int64)  # type: ignore[reportCallIssue]
 
     def _load_semantic_label_mask(self, index: int) -> tv_tensors.Mask:
         """Loads the segmentation mask from a semantic label NifTi file."""
@@ -182,7 +183,7 @@ class TotalSegmentator2D(base.ImageSegmentation):
         masks_dir = self._get_masks_dir(sample_index)
         filename = os.path.join(masks_dir, "semantic_labels", "masks.nii.gz")
         semantic_labels = io.read_nifti(filename, slice_index)
-        return tv_tensors.Mask(semantic_labels.squeeze())
+        return tv_tensors.Mask(semantic_labels.squeeze(), dtype=torch.int64)  # type: ignore[reportCallIssue]
 
     def _load_masks_as_semantic_label(
         self, sample_index: int, slice_index: int | None = None
@@ -202,18 +203,21 @@ class TotalSegmentator2D(base.ImageSegmentation):
     def _export_semantic_label_masks(self) -> None:
         """Exports the segmentation binary masks (one-hot) to semantic labels."""
         total_samples = len(self._samples_dirs)
-        for sample_index in tqdm.trange(
-            total_samples, desc=">> Exporting optimized semantic masks"
+        filenames = map(self._get_semantic_labels_filename, range(total_samples))
+        semantic_labels_to_export = [
+            (sample_index, filename)
+            for sample_index, filename in enumerate(filenames)
+            if not os.path.isfile(filename)
+        ]
+        if len(semantic_labels_to_export) == 0:
+            return
+
+        for sample_index, filename in tqdm.tqdm(
+            semantic_labels_to_export, desc=">> Exporting optimized semantic label masks"
         ):
-            masks_dir = self._get_masks_dir(sample_index)
-            filename = os.path.join(masks_dir, "semantic_labels", "masks.nii.gz")
-            if os.path.isfile(filename):
-                continue
-
             semantic_labels = self._load_masks_as_semantic_label(sample_index)
-
             os.makedirs(os.path.dirname(filename), exist_ok=True)
-            io.save_array_as_nifti(semantic_labels.astype(np.uint8), filename)
+            io.save_array_as_nifti(semantic_labels, filename)
 
     def _get_image_path(self, sample_index: int) -> str:
         """Returns the corresponding image path."""
@@ -224,6 +228,11 @@ class TotalSegmentator2D(base.ImageSegmentation):
         """Returns the directory of the corresponding masks."""
         sample_dir = self._samples_dirs[sample_index]
         return os.path.join(self._root, sample_dir, "segmentations")
+
+    def _get_semantic_labels_filename(self, sample_index: int) -> str:
+        """Returns the semantic label filename."""
+        masks_dir = self._get_masks_dir(sample_index)
+        return os.path.join(masks_dir, "semantic_labels", "masks.nii.gz")
 
     def _get_number_of_slices_per_sample(self, sample_index: int) -> int:
         """Returns the total amount of slices of a sample."""
