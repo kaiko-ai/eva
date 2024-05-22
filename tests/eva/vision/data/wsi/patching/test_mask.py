@@ -9,7 +9,7 @@ from eva.vision.data import wsi as eva_wsi
 
 DEFAULT_ARGS = {
     "saturation_threshold": 20,
-    "median_blur_threshold": 7,
+    "median_blur_kernel_size": 7,
     "fill_holes": False,
     "use_otsu": False,
     "kernel_size": (7, 7),
@@ -21,7 +21,7 @@ DEFAULT_ARGS = {
     [
         (0, DEFAULT_ARGS),
         (1, DEFAULT_ARGS),
-        (0, DEFAULT_ARGS | {"median_blur_threshold": None}),
+        (0, DEFAULT_ARGS | {"median_blur_kernel_size": None}),
         (0, DEFAULT_ARGS | {"fill_holes": True}),
         (0, DEFAULT_ARGS | {"use_otsu": True}),
         (0, DEFAULT_ARGS | {"fill_holes": True, "use_otsu": True}),
