@@ -65,9 +65,6 @@ class PANDA(wsi.MultiWsiDataset, base.ImageClassification):
         """
         self._split = split
         self._root = root
-        self._width = width
-        self._height = height
-        self._target_mpp = target_mpp
         self._seed = seed
 
         self._download_resources()
@@ -143,6 +140,7 @@ class PANDA(wsi.MultiWsiDataset, base.ImageClassification):
         """Loads the file paths of the corresponding dataset split."""
         image_dir = os.path.join(self._root, "train_images")
         file_paths = sorted(glob.glob(os.path.join(image_dir, "*.tiff")))
+        file_paths = [os.path.relpath(path, self._root) for path in file_paths]
         if len(file_paths) != len(self.annotations):
             raise ValueError(
                 f"Expected {len(self.annotations)} images, found {len(file_paths)} in {image_dir}."
