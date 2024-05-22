@@ -7,6 +7,7 @@ from typing import Any, Callable, Dict, List, Literal, Tuple
 
 import numpy as np
 import numpy.typing as npt
+import torch
 import tqdm
 from torchvision import tv_tensors
 from torchvision.datasets import utils
@@ -174,7 +175,7 @@ class TotalSegmentator2D(base.ImageSegmentation):
         """Loads and builds the segmentation mask from NifTi files."""
         sample_index, slice_index = self._indices[index]
         semantic_labels = self._load_masks_as_semantic_label(sample_index, slice_index)
-        return tv_tensors.Mask(semantic_labels)
+        return tv_tensors.Mask(semantic_labels, dtype=torch.int64)  # type: ignore[reportCallIssue]
 
     def _load_semantic_label_mask(self, index: int) -> tv_tensors.Mask:
         """Loads the segmentation mask from a semantic label NifTi file."""
@@ -182,7 +183,7 @@ class TotalSegmentator2D(base.ImageSegmentation):
         masks_dir = self._get_masks_dir(sample_index)
         filename = os.path.join(masks_dir, "semantic_labels", "masks.nii.gz")
         semantic_labels = io.read_nifti(filename, slice_index)
-        return tv_tensors.Mask(semantic_labels.squeeze())
+        return tv_tensors.Mask(semantic_labels.squeeze(), dtype=torch.int64)  # type: ignore[reportCallIssue]
 
     def _load_masks_as_semantic_label(
         self, sample_index: int, slice_index: int | None = None
@@ -213,7 +214,7 @@ class TotalSegmentator2D(base.ImageSegmentation):
             semantic_labels = self._load_masks_as_semantic_label(sample_index)
 
             os.makedirs(os.path.dirname(filename), exist_ok=True)
-            io.save_array_as_nifti(semantic_labels.astype(np.uint8), filename)
+            io.save_array_as_nifti(semantic_labels, filename)
 
     def _get_image_path(self, sample_index: int) -> str:
         """Returns the corresponding image path."""

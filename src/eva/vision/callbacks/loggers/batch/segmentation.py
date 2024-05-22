@@ -24,7 +24,7 @@ class SemanticSegmentationLogger(base.BatchLogger):
         number_of_images_per_subgrid_row: int = 2,
         mean: Tuple[float, ...] = (0.0, 0.0, 0.0),
         std: Tuple[float, ...] = (1.0, 1.0, 1.0),
-        log_every_n_epochs: int | None = 10,
+        log_every_n_epochs: int | None = None,
         log_every_n_steps: int | None = None,
     ) -> None:
         """Initializes the callback object.
