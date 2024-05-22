@@ -87,9 +87,8 @@ class EmbeddingsWriter(callbacks.BasePredictionWriter):
             raise ValueError(f"Targets ({type(targets)}) should be `torch.Tensor`.")
 
         for local_idx, global_idx in enumerate(batch_indices[: len(embeddings)]):
-            input_name, save_as = self._construct_save_name(
-                dataset.filename(global_idx), metadata, local_idx
-            )
+            data_name = dataset.filename(global_idx)
+            save_as = self._construct_save_name(data_name, metadata, local_idx)
             embeddings_buffer, target_buffer = _as_io_buffers(
                 embeddings[local_idx], targets[local_idx]
             )
@@ -97,7 +96,7 @@ class EmbeddingsWriter(callbacks.BasePredictionWriter):
                 obj=QUEUE_ITEM(
                     embeddings_buffer,
                     target_buffer,
-                    input_name=input_name,
+                    input_name=data_name,
                     save_name=save_as,
                     split=batch_split,
                 )
@@ -124,11 +123,12 @@ class EmbeddingsWriter(callbacks.BasePredictionWriter):
         return self._backbone(tensor) if self._backbone else tensor
 
     def _construct_save_name(self, input_name, metadata, local_idx):
+        """Constructs the output filename for the embedding."""
         group_name = metadata[self._group_key][local_idx] if self._group_key else None
         save_as = os.path.splitext(input_name)[0] + ".pt"
         if group_name:
             save_as = os.path.join(group_name, save_as)
-        return input_name, save_as
+        return save_as
 
     @staticmethod
     @abc.abstractmethod
@@ -139,6 +139,7 @@ class EmbeddingsWriter(callbacks.BasePredictionWriter):
 
 
 def _as_io_buffers(*items: torch.Tensor) -> Sequence[io.BytesIO]:
+    """Loads torch tensors as io buffers."""
     buffers = [io.BytesIO() for _ in range(len(items))]
     for tensor, buffer in zip(items, buffers, strict=False):
         torch.save(tensor.clone(), buffer)

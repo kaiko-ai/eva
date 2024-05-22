@@ -34,13 +34,6 @@ class ClassificationEmbeddingsWriter(base.EmbeddingsWriter):
         manifest_file.close()
 
 
-def _save_embedding(embeddings_buffer: io.BytesIO, save_name: str, output_dir: str) -> None:
-    save_path = os.path.join(output_dir, save_name)
-    prediction = torch.load(io.BytesIO(embeddings_buffer.getbuffer()), map_location="cpu")
-    os.makedirs(os.path.dirname(save_path), exist_ok=True)
-    torch.save(prediction, save_path)
-
-
 def _init_manifest(output_dir: str, overwrite: bool = False) -> tuple[io.TextIOWrapper, Any]:
     manifest_path = os.path.join(output_dir, "manifest.csv")
     if os.path.exists(manifest_path) and not overwrite:
@@ -53,6 +46,13 @@ def _init_manifest(output_dir: str, overwrite: bool = False) -> tuple[io.TextIOW
     manifest_writer = csv.writer(manifest_file)
     manifest_writer.writerow(["origin", "embeddings", "target", "split"])
     return manifest_file, manifest_writer
+
+
+def _save_embedding(embeddings_buffer: io.BytesIO, save_name: str, output_dir: str) -> None:
+    save_path = os.path.join(output_dir, save_name)
+    prediction = torch.load(io.BytesIO(embeddings_buffer.getbuffer()), map_location="cpu")
+    os.makedirs(os.path.dirname(save_path), exist_ok=True)
+    torch.save(prediction, save_path)
 
 
 def _update_manifest(
