@@ -16,7 +16,7 @@ class INPUT_BATCH(NamedTuple):
     data: torch.Tensor
     """The data batch."""
 
-    targets: torch.Tensor | Dict[str, Any] | None = None
+    targets: torch.Tensor | None = None
     """The target batch."""
 
     metadata: Dict[str, Any] | None = None
