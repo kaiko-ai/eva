@@ -28,8 +28,10 @@ class SegmentationEmbeddingsWriter(base.EmbeddingsWriter):
                 break
 
             embeddings_buffer, target_buffer, input_name, save_name, split = QUEUE_ITEM(*item)
+            target_filename = save_name.replace(".pt", "-mask.pt")
             _save_embedding(embeddings_buffer, save_name, output_dir)
-            _update_manifest(target_buffer, input_name, save_name, split, manifest_writer)
+            _save_embedding(target_buffer, target_filename, output_dir)
+            _update_manifest(target_filename, input_name, save_name, split, manifest_writer)
 
         manifest_file.close()
 
@@ -56,12 +58,10 @@ def _save_embedding(embeddings_buffer: io.BytesIO, save_name: str, output_dir: s
 
 
 def _update_manifest(
-    target_buffer: io.BytesIO,
+    target_filename: str,
     input_name: str,
     save_name: str,
     split: str | None,
     manifest_writer,
 ) -> None:
-    buffer = io.BytesIO(target_buffer.getbuffer())
-    target = torch.load(buffer, map_location="cpu")
-    manifest_writer.writerow([input_name, save_name, target.item(), split])
+    manifest_writer.writerow([input_name, save_name, target_filename, split])
