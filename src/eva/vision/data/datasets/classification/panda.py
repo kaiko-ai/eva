@@ -1,4 +1,4 @@
-"""Dataset classes for whole-slide image classification."""
+"""PANDA dataset class."""
 
 import functools
 import glob
@@ -65,9 +65,6 @@ class PANDA(wsi.MultiWsiDataset, base.ImageClassification):
         """
         self._split = split
         self._root = root
-        self._width = width
-        self._height = height
-        self._target_mpp = target_mpp
         self._seed = seed
 
         self._download_resources()
@@ -133,7 +130,7 @@ class PANDA(wsi.MultiWsiDataset, base.ImageClassification):
     @override
     def load_target(self, index: int) -> np.ndarray:
         file_path = self._file_paths[self._get_dataset_idx(index)]
-        return np.asarray(self._path_to_target(file_path))
+        return np.asarray(self._get_target_from_path(file_path))
 
     @override
     def load_metadata(self, index: int) -> Dict[str, Any]:
@@ -143,12 +140,13 @@ class PANDA(wsi.MultiWsiDataset, base.ImageClassification):
         """Loads the file paths of the corresponding dataset split."""
         image_dir = os.path.join(self._root, "train_images")
         file_paths = sorted(glob.glob(os.path.join(image_dir, "*.tiff")))
+        file_paths = [os.path.relpath(path, self._root) for path in file_paths]
         if len(file_paths) != len(self.annotations):
             raise ValueError(
                 f"Expected {len(self.annotations)} images, found {len(file_paths)} in {image_dir}."
             )
         file_paths = self._filter_noisy_labels(file_paths)
-        targets = [self._path_to_target(file_path) for file_path in file_paths]
+        targets = [self._get_target_from_path(file_path) for file_path in file_paths]
 
         train_indices, val_indices, test_indices = splitting.stratified_split(
             samples=file_paths,
@@ -181,7 +179,7 @@ class PANDA(wsi.MultiWsiDataset, base.ImageClassification):
         ]
         return filtered_file_paths
 
-    def _path_to_target(self, file_path: str) -> int:
+    def _get_target_from_path(self, file_path: str) -> int:
         return self.annotations.loc[self._get_id_from_path(file_path), "isup_grade"]
 
     def _get_id_from_path(self, file_path: str) -> str:

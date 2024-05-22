@@ -27,9 +27,9 @@ def get_mask(
     wsi: Wsi,
     mask_level_idx: int,
     saturation_threshold: int = 20,
-    median_blur_threshold: int | None = None,
+    median_blur_kernel_size: int | None = None,
     fill_holes: bool = False,
-    kernel_size: Tuple[int, int] = (7, 7),
+    holes_kernel_size: Tuple[int, int] = (7, 7),
     use_otsu: bool = False,
 ) -> Mask:
     """Generates a binary foreground mask for a given WSI.
@@ -37,8 +37,8 @@ def get_mask(
     The is a simplified version of the algorithm proposed in [1] (CLAM):
     1. Convert the image to the HSV color space (easier to seperate specific colors with RGB).
     2. (optional) Apply a median blur to the saturation channel to reduce noise
-        & closing small gaps in the mask. While yields cleaner masks, this step is the most
-        computationally expensive and thus disabled by default.
+        & closing small gaps in the mask. While this yields cleaner masks, this step is the most
+        computationally expensive and thus disabled by default (CLAM uses a value of 7).
     3. Calculate binary mask by thresholding accross the saturation channel.
 
     [1] Lu, Ming Y., et al. "Data-efficient and weakly supervised computational
@@ -49,8 +49,8 @@ def get_mask(
         wsi: The WSI object.
         mask_level_idx: The level index of the WSI at which we want to extract the mask.
         saturation_threshold: The threshold value for the saturation channel.
-        median_blur_threshold: The threshold value for the median blur operation.
-        kernel_size: The size of the kernel for morphological operations to fill holes.
+        median_blur_kernel_size: Kernel size for the median blur operation.
+        holes_kernel_size: The size of the kernel for morphological operations to fill holes.
         fill_holes: Whether to fill holes in the mask.
         use_otsu: Whether to use Otsu's method for the thresholding operation. If False,
             a fixed threshold value is used.
@@ -60,8 +60,8 @@ def get_mask(
     image = wsi.read_region((0, 0), mask_level_idx, wsi.level_dimensions[mask_level_idx])
     image = cv2.cvtColor(image, cv2.COLOR_RGB2HSV)
     image = (
-        cv2.medianBlur(image[:, :, 1], median_blur_threshold)
-        if median_blur_threshold
+        cv2.medianBlur(image[:, :, 1], median_blur_kernel_size)
+        if median_blur_kernel_size
         else image[:, :, 1]
     )
 
@@ -69,7 +69,7 @@ def get_mask(
     _, mask_array = cv2.threshold(image, saturation_threshold, 1, threshold_type)
 
     if fill_holes:
-        kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, kernel_size)
+        kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, holes_kernel_size)
         mask_array = cv2.dilate(mask_array, kernel, iterations=1)
         contour, _ = cv2.findContours(mask_array, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_SIMPLE)
         for cnt in contour:
