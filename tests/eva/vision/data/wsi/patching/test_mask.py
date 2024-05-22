@@ -12,7 +12,7 @@ DEFAULT_ARGS = {
     "median_blur_kernel_size": 7,
     "fill_holes": False,
     "use_otsu": False,
-    "kernel_size": (7, 7),
+    "holes_kernel_size": (7, 7),
 }
 
 
