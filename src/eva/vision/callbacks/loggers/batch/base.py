@@ -17,7 +17,7 @@ class BatchLogger(pl.Callback, abc.ABC):
 
     def __init__(
         self,
-        log_every_n_epochs: int | None = 10,
+        log_every_n_epochs: int | None = None,
         log_every_n_steps: int | None = None,
     ) -> None:
         """Initializes the callback object.
@@ -51,7 +51,7 @@ class BatchLogger(pl.Callback, abc.ABC):
         batch: INPUT_TENSOR_BATCH,
         batch_idx: int,
     ) -> None:
-        if self._skip_logging(trainer, batch_idx):
+        if self._skip_logging(trainer):
             return
 
         self._log_batch(
@@ -101,7 +101,7 @@ class BatchLogger(pl.Callback, abc.ABC):
     def _skip_logging(
         self,
         trainer: pl.Trainer,
-        batch_idx: int,
+        batch_idx: int | None = None,
     ) -> bool:
         """Determines whether skip the logging step or not.
 
@@ -125,6 +125,6 @@ class BatchLogger(pl.Callback, abc.ABC):
         conditions = [
             skip_due_frequency,
             not trainer.is_global_zero,
-            batch_idx != self._batch_idx_to_log,
+            batch_idx != self._batch_idx_to_log if batch_idx else False,
         ]
         return any(conditions)
