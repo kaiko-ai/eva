@@ -54,6 +54,12 @@ class EmbeddingsClassificationDataset(base.EmbeddingsDataset):
         filename = self.filename(index)
         embeddings_path = os.path.join(self._root, filename)
         tensor = torch.load(embeddings_path, map_location="cpu")
+        if isinstance(tensor, list):
+            if len(tensor) > 1:
+                raise ValueError(
+                    f"Expected a single tensor in the .pt file, but found {len(tensor)}."
+                )
+            tensor = tensor[0]
         return tensor.squeeze(0)
 
     @override
