@@ -11,7 +11,6 @@ import pandas as pd
 import pyaml
 import yaml
 from lightning_fabric.utilities import cloud_io
-from loguru import logger
 from loguru import logger as cli_logger
 from omegaconf import OmegaConf
 from typing_extensions import TypeGuard, override
@@ -59,8 +58,7 @@ class ConfigurationLogger(pl.Callback):
 
         if self._verbose:
             config_as_text = pyaml.dump(configuration, vspacing=False)
-            print("\n")
-            logger.log("CONFIG", f"\n\n{config_as_text}\n")
+            print(f"Configuration:\033[94m\n---\n{config_as_text}\033[0m")
 
         save_as = os.path.join(log_dir, self._save_as)
         fs = cloud_io.get_filesystem(log_dir)
