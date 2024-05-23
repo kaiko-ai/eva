@@ -61,6 +61,7 @@ def _initialize_logger() -> None:
         colorize=True,
         level="INFO",
     )
+    logger.level(name="CONFIG", no=33)
 
 
 def _suppress_warnings() -> None:
