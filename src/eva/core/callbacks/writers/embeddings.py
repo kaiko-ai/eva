@@ -219,7 +219,7 @@ def _save_items(
 def _save_predictions(
     prediction_buffers: List[io.BytesIO], save_path: str, is_first_save: bool
 ) -> None:
-    """Saves the embedding tensors to .pt files.
+    """Saves the embedding tensors as list to .pt files.
 
     If it's not the first save to this save_path, the new predictions are concatenated
     with the existing ones and saved to the same file.
@@ -230,10 +230,12 @@ def _save_predictions(
         torch.load(io.BytesIO(buffer.getbuffer()), map_location="cpu")
         for buffer in prediction_buffers
     ]
-    predictions = torch.stack(predictions, dim=0)
 
     if not is_first_save:
-        predictions = torch.cat([torch.load(save_path), predictions], dim=0)
+        previous_predictions = torch.load(save_path, map_location="cpu")
+        if not isinstance(previous_predictions, list):
+            raise ValueError("Previous predictions should be a list of tensors.")
+        predictions = predictions + previous_predictions
 
     os.makedirs(os.path.dirname(save_path), exist_ok=True)
     torch.save(predictions, save_path)

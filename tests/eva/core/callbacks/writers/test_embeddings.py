@@ -106,13 +106,16 @@ def _check_embedding_dimensions(output_dir: str, grouping_enabled: bool):
     embedding_paths = Path(output_dir).glob("*.pt")
 
     for path in embedding_paths:
-        tensor = torch.load(path)
-        assert tensor.ndim == 2
+        tensor_list = torch.load(path)
+        assert isinstance(tensor_list, list)
+        for t in tensor_list:
+            assert isinstance(t, torch.Tensor)
+            assert t.ndim == 1
 
         if grouping_enabled:
-            assert tensor.shape[0] > 1
+            assert len(tensor_list) > 1
         else:
-            assert tensor.shape[0] == 1
+            assert len(tensor_list) == 1
 
 
 def _check_expected_n_files(output_dir: str, expected_file_count: int):
