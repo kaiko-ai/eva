@@ -32,9 +32,9 @@ class MultiEmbeddingsClassificationDataset(base.EmbeddingsDataset):
         The manifest must have a `column_mapping["multi_id"]` column that contains the
         unique identifier group of embeddings. For oncology datasets, this would be usually
         the slide id. Each row in the manifest file points to a .pt file that can contain
-        one or multiple embeddings. There can also be multiple rows for the same `multi_id`,
-        in which case the embeddings from the different .pt files corresponding to that same
-        `multi_id` will be stacked along the first dimension.
+        one or multiple embeddings (either as a list or stacked tensors). There can also be
+        multiple rows for the same `multi_id`, in which case the embeddings from the different
+        .pt files corresponding to that same `multi_id` will be stacked along the first dimension.
 
         Args:
             root: Root directory of the dataset.
