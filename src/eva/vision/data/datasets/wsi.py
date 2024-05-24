@@ -3,6 +3,7 @@
 import bisect
 import os
 from typing import Callable, List
+import tqdm
 
 import numpy as np
 from loguru import logger
@@ -127,7 +128,7 @@ class MultiWsiDataset(torch_datasets.ConcatDataset):
     def _load_datasets(self) -> list[WsiDataset]:
         logger.info(f"Initializing dataset with {len(self._file_paths)} WSIs ...")
         wsi_datasets = []
-        for file_path in self._file_paths:
+        for file_path in tqdm.tqdm(self._file_paths):
             file_path = os.path.join(self._root, file_path) if self._root else file_path
             if not os.path.exists(file_path):
                 raise FileNotFoundError(f"File not found: {file_path}")
