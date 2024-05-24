@@ -132,9 +132,7 @@ class MultiWsiDataset(torch_datasets.ConcatDataset):
             file_path = os.path.join(self._root, file_path) if self._root else file_path
             if not os.path.exists(file_path):
                 raise FileNotFoundError(f"File not found: {file_path}")
-
-            wsi_datasets.append(
-                WsiDataset(
+            ds = WsiDataset(
                     file_path=file_path,
                     width=self._width,
                     height=self._height,
@@ -142,8 +140,10 @@ class MultiWsiDataset(torch_datasets.ConcatDataset):
                     sampler=self._sampler,
                     backend=self._backend,
                     image_transforms=self._image_transforms,
-                )
             )
+
+            assert len(ds) > 0
+            wsi_datasets.append(ds)
         return wsi_datasets
 
     def _get_dataset_idx(self, index: int) -> int:
