@@ -9,16 +9,31 @@ from eva.vision.data.wsi.backends.base import Wsi
 LRU_CACHE_SIZE = 32
 
 
-def is_openslide_available() -> bool:
+def _is_openslide_available() -> bool:
     """Whether the OpenSlide library is available."""
     return importlib.util.find_spec("openslide") is not None
+
+
+def _is_tiffslide_available() -> bool:
+    """Whether the TiffSlide library is available."""
+    return importlib.util.find_spec("tiffslide") is not None
+
+
+def is_backend_available(backend: str) -> bool:
+    """Whether the specified backend is available."""
+    match backend:
+        case "openslide":
+            return _is_openslide_available()
+        case "tiffslide":
+            return _is_tiffslide_available()
+    return False
 
 
 def wsi_backend(backend: str = "openslide") -> Callable[..., Wsi]:
     """Returns the backend to use for reading the whole-slide images."""
     match backend:
         case "openslide":
-            if is_openslide_available():
+            if _is_openslide_available():
                 from eva.vision.data.wsi.backends.openslide import WsiOpenslide
 
                 return WsiOpenslide
@@ -26,6 +41,16 @@ def wsi_backend(backend: str = "openslide") -> Callable[..., Wsi]:
                 raise ValueError(
                     "Missing optional dependency: openslide.\n"
                     "Please install using `pip install openslide-python`."
+                )
+        case "tiffslide":
+            if _is_tiffslide_available():
+                from eva.vision.data.wsi.backends.tiffslide import WsiTiffslide
+
+                return WsiTiffslide
+            else:
+                raise ValueError(
+                    "Missing optional dependency: tiffslide.\n"
+                    "Please install using `pip install tiffslide`."
                 )
         case _:
             raise ValueError(f"Unknown WSI backend selected: {backend}")
@@ -37,4 +62,4 @@ def get_cached_wsi(file_path: str, backend: str) -> Wsi:
     return wsi_backend(backend)(file_path)
 
 
-__all__ = ["Wsi", "wsi_backend", "get_cached_wsi", "is_openslide_available"]
+__all__ = ["Wsi", "wsi_backend", "get_cached_wsi", "_is_openslide_available"]

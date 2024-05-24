@@ -55,27 +55,10 @@ class WsiOpenslide(base.Wsi):
         return (x_mpp + y_mpp) / 2.0
 
     @override
-    def read_region(
+    def _read_region(
         self, location: Tuple[int, int], level: int, size: Tuple[int, int]
     ) -> np.ndarray:
-        x_max, y_max = self.level_dimensions[0]
-
-        x_scale = x_max / self._wsi.level_dimensions[level][0]
-        y_scale = y_max / self._wsi.level_dimensions[level][1]
-
-        if (
-            int(location[0] + x_scale * size[0]) > x_max
-            or int(location[1] + y_scale * size[1]) > y_max
-        ):
-            raise ValueError(f"Out of bounds region: {location}, {size}, {level}")
-
-        data = np.array(self._wsi.read_region(location, level, size))
-
-        if data.shape[2] == 4:
-            # Change color to white where the alpha channel is 0
-            data[data[:, :, 3] == 0] = 255
-
-        return data[:, :, :3]
+        return np.array(self._wsi.read_region(location, level, size))
 
 
 _conversion_factor_to_micrometer = {
