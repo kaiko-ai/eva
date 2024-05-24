@@ -41,6 +41,11 @@ class Wsi(abc.ABC):
         """Microns per pixel at the highest resolution (level 0)."""
 
     @abc.abstractmethod
+    def _read_region(
+        self, location: Tuple[int, int], level: int, size: Tuple[int, int]
+    ) -> np.ndarray:
+        """Abstract method to read a region at a specified zoom level."""
+
     def read_region(
         self, location: Tuple[int, int], level: int, size: Tuple[int, int]
     ) -> np.ndarray:
@@ -52,6 +57,9 @@ class Wsi(abc.ABC):
             size: Region size as (width, height) in pixels at the selected read level.
                 Remember to scale the size correctly.
         """
+        self._verify_location(location, size)
+        data = self._read_region(location, level, size)
+        return self._read_postprocess(data)
 
     def get_closest_level(self, target_mpp: float) -> int:
         """Calculate the slide level that is closest to the target mpp.
@@ -74,3 +82,32 @@ class Wsi(abc.ABC):
             level_idx = np.argmax(level_mpps_filtered)
 
         return int(level_idx)
+
+    def _verify_location(self, location: Tuple[int, int], size: Tuple[int, int]) -> None:
+        """Verifies that the requested region is within the slide dimensions.
+
+        Args:
+            location: Top-left corner (x, y) to start reading at level 0.
+            size: Region size as (width, height) in pixels at the selected read level.
+        """
+        x_max, y_max = self.level_dimensions[0]
+        x_scale = x_max / self.level_dimensions[0][0]
+        y_scale = y_max / self.level_dimensions[0][1]
+
+        if (
+            int(location[0] + x_scale * size[0]) > x_max
+            or int(location[1] + y_scale * size[1]) > y_max
+        ):
+            raise ValueError(f"Out of bounds region: {location}, {size}")
+
+    def _read_postprocess(self, data: np.ndarray) -> np.ndarray:
+        """Post-processes the read region data.
+
+        Args:
+            data: The read region data as a numpy array of shape (height, width, channels).
+        """
+        # Change color to white where the alpha channel is 0
+        if data.shape[2] == 4:
+            data[data[:, :, 3] == 0] = 255
+
+        return data[:, :, :3]
