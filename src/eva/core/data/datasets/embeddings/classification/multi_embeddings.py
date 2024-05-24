@@ -32,9 +32,9 @@ class MultiEmbeddingsClassificationDataset(base.EmbeddingsDataset):
         The manifest must have a `column_mapping["multi_id"]` column that contains the
         unique identifier group of embeddings. For oncology datasets, this would be usually
         the slide id. Each row in the manifest file points to a .pt file that can contain
-        one or multiple embeddings. There can also be multiple rows for the same `multi_id`,
-        in which case the embeddings from the different .pt files corresponding to that same
-        `multi_id` will be stacked along the first dimension.
+        one or multiple embeddings (either as a list or stacked tensors). There can also be
+        multiple rows for the same `multi_id`, in which case the embeddings from the different
+        .pt files corresponding to that same `multi_id` will be stacked along the first dimension.
 
         Args:
             root: Root directory of the dataset.
@@ -42,6 +42,8 @@ class MultiEmbeddingsClassificationDataset(base.EmbeddingsDataset):
                 the `root` argument.
             split: The dataset split to use. The `split` column of the manifest
                 file will be splitted based on this value.
+            n_embeddings: Expected number of embeddings per sample. If less, the embeddings
+                will be padded with zeros.
             column_mapping: Defines the map between the variables and the manifest
                 columns. It will overwrite the `default_column_mapping` with
                 the provided values, so that `column_mapping` can contain only the
@@ -73,10 +75,14 @@ class MultiEmbeddingsClassificationDataset(base.EmbeddingsDataset):
         embedding_paths = self._data.loc[
             self._data[self._column_mapping["multi_id"]] == multi_id, self._column_mapping["path"]
         ].to_list()
-        embedding_paths = [os.path.join(self._root, path) for path in embedding_paths]
 
         # Load embeddings and stack them accross the first dimension
-        embeddings = [torch.load(path, map_location="cpu") for path in embedding_paths]
+        embeddings = []
+        for path in embedding_paths:
+            embedding = torch.load(os.path.join(self._root, path), map_location="cpu")
+            if isinstance(embedding, list):
+                embedding = torch.stack(embedding, dim=0)
+            embeddings.append(embedding.unsqueeze(0) if embedding.ndim == 1 else embedding)
         embeddings = torch.cat(embeddings, dim=0)
 
         if not embeddings.ndim == 2:
@@ -103,4 +109,4 @@ class MultiEmbeddingsClassificationDataset(base.EmbeddingsDataset):
 
     @override
     def __len__(self) -> int:
-        return len(self._data)
+        return len(self._multi_ids)
