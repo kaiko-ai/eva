@@ -8,7 +8,6 @@ from typing import Any, Dict, List
 
 import lightning.pytorch as pl
 import pandas as pd
-import pyaml
 import yaml
 from lightning_fabric.utilities import cloud_io
 from loguru import logger as cli_logger
@@ -26,7 +25,7 @@ class ConfigurationLogger(pl.Callback):
     def __init__(
         self,
         normalized: bool = False,
-        verbose: bool = False,
+        verbose: bool = True,
     ) -> None:
         """Initializes the callback.
 
@@ -57,7 +56,7 @@ class ConfigurationLogger(pl.Callback):
             configuration = _normalize_json(configuration)
 
         if self._verbose:
-            config_as_text = pyaml.dump(configuration, vspacing=False)
+            config_as_text = yaml.dump(configuration, sort_keys=False)
             print(f"Configuration:\033[94m\n---\n{config_as_text}\033[0m")
 
         save_as = os.path.join(log_dir, self._save_as)
