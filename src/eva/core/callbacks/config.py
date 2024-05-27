@@ -1,5 +1,6 @@
 """Configuration logger callback."""
 
+import ast
 import os
 import sys
 from types import BuiltinFunctionType
@@ -140,7 +141,7 @@ def _type_resolver(mapping: Dict[str, Any]) -> Dict[str, Any]:
             formatted_value = [_type_resolver(subvalue) for subvalue in value]
         else:
             try:
-                parsed_value = eval(value)  # type: ignore # nosec
+                parsed_value = ast.literal_eval(value)  # type: ignore
                 formatted_value = (
                     value if isinstance(parsed_value, BuiltinFunctionType) else parsed_value
                 )
