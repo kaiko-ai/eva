@@ -29,6 +29,7 @@ def test_split_and_expected_shapes(root: str):
     train_dataset = datasets.PANDA(root=root, split="train", **DEFAULT_ARGS)
     val_dataset = datasets.PANDA(root=root, split="val", **DEFAULT_ARGS)
     test_dataset = datasets.PANDA(root=root, split="test", **DEFAULT_ARGS)
+    _setup_datasets(train_dataset, val_dataset, test_dataset)
 
     assert len(train_dataset.datasets) == 6
     assert len(val_dataset.datasets) == 2
@@ -47,6 +48,7 @@ def test_split_and_expected_shapes(root: str):
 def test_filenames(root: str, split: Literal["train", "val", "test"]):
     """Tests that the number of filenames matches the dataset size."""
     dataset = datasets.PANDA(root=root, split=split, **DEFAULT_ARGS)
+    _setup_datasets(dataset)
 
     filenames = set()
     for i in range(len(dataset)):
@@ -59,6 +61,7 @@ def test_same_split_same_seed(root: str):
     """Test that the generated split is deterministic when using the same seed."""
     dataset1 = datasets.PANDA(root=root, split="train", seed=42, **DEFAULT_ARGS)
     dataset2 = datasets.PANDA(root=root, split="train", seed=42, **DEFAULT_ARGS)
+    _setup_datasets(dataset1, dataset2)
 
     assert len(dataset1) == len(dataset2)
     assert dataset1._file_paths == dataset2._file_paths
@@ -71,6 +74,7 @@ def test_different_seed_different_split(root: str):
     """Test that the generated split is different when using a different seed."""
     dataset1 = datasets.PANDA(root=root, split="train", seed=42, **DEFAULT_ARGS)
     dataset2 = datasets.PANDA(root=root, split="train", seed=43, **DEFAULT_ARGS)
+    _setup_datasets(dataset1, dataset2)
 
     assert len(dataset1) == len(dataset2)
     assert dataset1._file_paths != dataset2._file_paths
@@ -102,3 +106,8 @@ def mock_download():
     """Mocks the download function to avoid downloading resources when running tests."""
     with patch.object(datasets.PANDA, "_download_resources", return_value=None):
         yield
+
+
+def _setup_datasets(*datasets: datasets.PANDA):
+    for dataset in datasets:
+        dataset.setup()

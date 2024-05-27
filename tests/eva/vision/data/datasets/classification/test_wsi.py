@@ -39,10 +39,12 @@ def test_pickleable(dataset: datasets.WsiClassificationDataset):
 def test_split(root: str):
     """Test loading the dataset with different splits."""
     dataset = datasets.WsiClassificationDataset(root=root, split=None, **DEFAULT_ARGS)
+    dataset.setup()
     assert len(dataset) == 192
     _check_batch_shape(dataset[0])
 
     train_dataset = datasets.WsiClassificationDataset(root=root, split="train", **DEFAULT_ARGS)
+    train_dataset.setup()
     assert len(train_dataset) == 64
     _check_batch_shape(train_dataset[0])
 
@@ -82,7 +84,9 @@ def _check_batch_shape(batch: Any):
 @pytest.fixture
 def dataset(root: str) -> datasets.WsiClassificationDataset:
     """Fixture returning a dataset instance."""
-    return datasets.WsiClassificationDataset(root=root, **DEFAULT_ARGS)
+    dataset = datasets.WsiClassificationDataset(root=root, **DEFAULT_ARGS)
+    dataset.setup()
+    return dataset
 
 
 @pytest.fixture
