@@ -99,10 +99,15 @@ class HeadModule(module.ModelModule):
         """
         data, targets, metadata = INPUT_BATCH(*batch)
         predictions = self(data)
-        loss = self.criterion(predictions, targets.to(dtype=torch.float32))
+
+        # for binary classification, targets are expected to be floating point type:
+        if predictions.shape == targets.shape:
+            targets = targets.to(dtype=torch.float32)
+
+        loss = self.criterion(predictions, targets)
         return {
             "loss": loss,
-            "targets": targets.to(dtype=torch.int64),
+            "targets": targets,
             "predictions": predictions,
             "metadata": metadata,
         }
