@@ -19,60 +19,60 @@ class Camelyon16(wsi.MultiWsiDataset, base.ImageClassification):
     """Dataset class for Camelyon16 images and corresponding targets."""
 
     _val_slides = [
-        'normal_010',
-        'normal_013',
-        'normal_016',
-        'normal_017',
-        'normal_019',
-        'normal_020',
-        'normal_025',
-        'normal_030',
-        'normal_031',
-        'normal_032',
-        'normal_052',
-        'normal_056',
-        'normal_057',
-        'normal_067',
-        'normal_076',
-        'normal_079',
-        'normal_085',
-        'normal_095',
-        'normal_098',
-        'normal_099',
-        'normal_101',
-        'normal_102',
-        'normal_105',
-        'normal_106',
-        'normal_109',
-        'normal_129',
-        'normal_132',
-        'normal_137',
-        'normal_142',
-        'normal_143',
-        'normal_148',
-        'normal_152',
-        'tumor_001',
-        'tumor_005',
-        'tumor_011',
-        'tumor_012',
-        'tumor_013',
-        'tumor_019',
-        'tumor_031',
-        'tumor_037',
-        'tumor_043',
-        'tumor_046',
-        'tumor_057',
-        'tumor_065',
-        'tumor_069',
-        'tumor_071',
-        'tumor_073',
-        'tumor_079',
-        'tumor_080',
-        'tumor_081',
-        'tumor_082',
-        'tumor_085',
-        'tumor_097',
-        'tumor_109',
+        "normal_010",
+        "normal_013",
+        "normal_016",
+        "normal_017",
+        "normal_019",
+        "normal_020",
+        "normal_025",
+        "normal_030",
+        "normal_031",
+        "normal_032",
+        "normal_052",
+        "normal_056",
+        "normal_057",
+        "normal_067",
+        "normal_076",
+        "normal_079",
+        "normal_085",
+        "normal_095",
+        "normal_098",
+        "normal_099",
+        "normal_101",
+        "normal_102",
+        "normal_105",
+        "normal_106",
+        "normal_109",
+        "normal_129",
+        "normal_132",
+        "normal_137",
+        "normal_142",
+        "normal_143",
+        "normal_148",
+        "normal_152",
+        "tumor_001",
+        "tumor_005",
+        "tumor_011",
+        "tumor_012",
+        "tumor_013",
+        "tumor_019",
+        "tumor_031",
+        "tumor_037",
+        "tumor_043",
+        "tumor_046",
+        "tumor_057",
+        "tumor_065",
+        "tumor_069",
+        "tumor_071",
+        "tumor_073",
+        "tumor_079",
+        "tumor_080",
+        "tumor_081",
+        "tumor_082",
+        "tumor_085",
+        "tumor_097",
+        "tumor_109",
     ]
     """Validation slide names, same as the ones in patch camelyon."""
 
@@ -184,9 +184,15 @@ class Camelyon16(wsi.MultiWsiDataset, base.ImageClassification):
             glob.glob(os.path.join(self._root, "training/tumor/*.tif"))
         )
         train_images_paths_all = train_images_paths_normal + train_images_paths_tumor
-        
-        val_images_paths = [path for path in train_images_paths_all if self._get_id_from_path(path) in self._val_slides]
-        train_images_paths = [path for path in train_images_paths_all if path not in val_images_paths]
+
+        val_images_paths = [
+            path
+            for path in train_images_paths_all
+            if self._get_id_from_path(path) in self._val_slides
+        ]
+        train_images_paths = [
+            path for path in train_images_paths_all if path not in val_images_paths
+        ]
         test_file_paths = sorted(glob.glob(os.path.join(self._root, "testing/images", "*.tif")))
 
         match split:
