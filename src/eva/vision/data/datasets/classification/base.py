@@ -3,13 +3,14 @@
 import abc
 from typing import Any, Callable, Dict, List, Tuple
 
-import numpy as np
+import torch
+from torchvision import tv_tensors
 from typing_extensions import override
 
 from eva.vision.data.datasets import vision
 
 
-class ImageClassification(vision.VisionDataset[Tuple[np.ndarray, np.ndarray]], abc.ABC):
+class ImageClassification(vision.VisionDataset[Tuple[tv_tensors.Image, torch.Tensor]], abc.ABC):
     """Image classification abstract dataset."""
 
     def __init__(
@@ -24,6 +25,8 @@ class ImageClassification(vision.VisionDataset[Tuple[np.ndarray, np.ndarray]], a
                 and returns a transformed version.
             target_transforms: A function/transform that takes in the target
                 and transforms it.
+            transforms: A function/transform which returns a
+                transformed version of the raw data samples.
         """
         super().__init__()
 
@@ -50,7 +53,7 @@ class ImageClassification(vision.VisionDataset[Tuple[np.ndarray, np.ndarray]], a
         """
 
     @abc.abstractmethod
-    def load_image(self, index: int) -> np.ndarray:
+    def load_image(self, index: int) -> tv_tensors.Image:
         """Returns the `index`'th image sample.
 
         Args:
@@ -61,7 +64,7 @@ class ImageClassification(vision.VisionDataset[Tuple[np.ndarray, np.ndarray]], a
         """
 
     @abc.abstractmethod
-    def load_target(self, index: int) -> np.ndarray:
+    def load_target(self, index: int) -> torch.Tensor:
         """Returns the `index`'th target sample.
 
         Args:
@@ -77,14 +80,14 @@ class ImageClassification(vision.VisionDataset[Tuple[np.ndarray, np.ndarray]], a
         raise NotImplementedError
 
     @override
-    def __getitem__(self, index: int) -> Tuple[np.ndarray, np.ndarray]:
+    def __getitem__(self, index: int) -> Tuple[tv_tensors.Image, torch.Tensor]:
         image = self.load_image(index)
         target = self.load_target(index)
         return self._apply_transforms(image, target)
 
     def _apply_transforms(
-        self, image: np.ndarray, target: np.ndarray
-    ) -> Tuple[np.ndarray, np.ndarray]:
+        self, image: tv_tensors.Image, target: torch.Tensor
+    ) -> Tuple[tv_tensors.Image, torch.Tensor]:
         """Applies the transforms to the provided data and returns them.
 
         Args:

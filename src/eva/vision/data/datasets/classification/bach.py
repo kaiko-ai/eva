@@ -3,7 +3,8 @@
 import os
 from typing import Callable, Dict, List, Literal, Tuple
 
-import numpy as np
+import torch
+from torchvision import tv_tensors
 from torchvision.datasets import folder, utils
 from typing_extensions import override
 
@@ -130,14 +131,15 @@ class BACH(base.ImageClassification):
         )
 
     @override
-    def load_image(self, index: int) -> np.ndarray:
+    def load_image(self, index: int) -> tv_tensors.Image:
         image_path, _ = self._samples[self._indices[index]]
-        return io.read_image(image_path)
+        image_array = io.read_image(image_path)
+        return tv_tensors.Image(image_array)
 
     @override
-    def load_target(self, index: int) -> np.ndarray:
+    def load_target(self, index: int) -> torch.Tensor:
         _, target = self._samples[self._indices[index]]
-        return np.asarray(target, dtype=np.int64)
+        return torch.tensor(target, dtype=torch.long)
 
     @override
     def __len__(self) -> int:
