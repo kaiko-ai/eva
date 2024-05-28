@@ -6,27 +6,34 @@ from typing import Tuple
 import pytest
 
 from eva.vision.data import datasets
+from eva.vision.data.wsi.backends import is_backend_available
 from eva.vision.data.wsi.patching import samplers
 
 
 @pytest.mark.parametrize(
-    "width, height, overlap",
+    "width, height, overlap, backend",
     [
-        (4, 4, (0, 0)),
-        (4, 4, (2, 2)),
-        (33, 33, (0, 0)),
-        (224, 224, (0, 0)),
+        (4, 4, (0, 0), "openslide"),
+        (4, 4, (2, 2), "openslide"),
+        (33, 33, (0, 0), "openslide"),
+        (224, 224, (0, 0), "openslide"),
+        (4, 4, (0, 0), "tiffslide"),
+        (4, 4, (2, 2), "tiffslide"),
+        (33, 33, (0, 0), "tiffslide"),
+        (224, 224, (0, 0), "tiffslide"),
     ],
 )
-def test_len(width: int, height: int, root: str, overlap: Tuple[int, int]):
+def test_len(width: int, height: int, root: str, overlap: Tuple[int, int], backend: str):
     """Test the length of the dataset using different patch dimensions."""
+    if not is_backend_available(backend):
+        pytest.skip(f"{backend} backend is not available.")
     dataset = datasets.WsiDataset(
         file_path=os.path.join(root, "0/a.tiff"),
         width=width,
         height=height,
         target_mpp=0.25,
         sampler=samplers.GridSampler(max_samples=None, overlap=overlap),
-        backend="openslide",
+        backend=backend,
     )
 
     layer_shape = dataset._wsi.level_dimensions[0]
@@ -34,18 +41,25 @@ def test_len(width: int, height: int, root: str, overlap: Tuple[int, int]):
 
 
 @pytest.mark.parametrize(
-    "width, height, target_mpp",
-    [(4, 4, 0.25), (4, 4, 1.3)],
+    "width, height, target_mpp, backend",
+    [
+        (4, 4, 0.25, "openslide"),
+        (4, 4, 1.3, "openslide"),
+        (4, 4, 0.25, "tiffslide"),
+        (4, 4, 1.3, "tiffslide"),
+    ],
 )
-def test_patch_shape(width: int, height: int, target_mpp: float, root: str):
+def test_patch_shape(width: int, height: int, target_mpp: float, root: str, backend: str):
     """Test the shape of the extracted patches."""
+    if not is_backend_available(backend):
+        pytest.skip(f"{backend} backend is not available.")
     dataset = datasets.WsiDataset(
         file_path=os.path.join(root, "0/a.tiff"),
         width=width,
         height=height,
         target_mpp=target_mpp,
         sampler=samplers.GridSampler(max_samples=None),
-        backend="openslide",
+        backend=backend,
     )
 
     mpp_ratio = target_mpp / (
