@@ -98,12 +98,11 @@ class HeadModule(module.ModelModule):
             The batch step output.
         """
         data, targets, metadata = INPUT_BATCH(*batch)
-        targets = targets.to(dtype=torch.float32)
         predictions = self(data)
-        loss = self.criterion(predictions, targets)
+        loss = self.criterion(predictions, targets.to(dtype=torch.float32))
         return {
             "loss": loss,
-            "targets": targets,
+            "targets": targets.to(dtype=torch.int64),
             "predictions": predictions,
             "metadata": metadata,
         }
