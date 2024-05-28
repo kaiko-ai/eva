@@ -1,6 +1,6 @@
 # Camelyon16
 
-The Camelyon16 dataset consists of 400 WSIs of lymph nodes for breast cancer metastasis classification. The dataset is a combination of data from two independent datasets, collected from two separate medical centers in the Netherlands (Radboud University Medical Center and University Medical Center Utrecht). 
+The Camelyon16 dataset consists of 400 WSIs of lymph nodes for breast cancer metastasis classification. The dataset is a combination of data from two independent datasets, collected from two separate medical centers in the Netherlands (Radboud University Medical Center and University Medical Center Utrecht). The dataset contains the slides from which [PatchCamelyon](patch_camelyon.md)-patches were extracted.
 
 The dataset is divided in a train set (270 slides) and test set (130 slides), both containing images from both centers.
 
@@ -17,7 +17,7 @@ Source: https://camelyon16.grand-challenge.org
 | **Modality**              | Vision (Slide-level)                                     |
 | **Task**                  | Binary classification                                    |
 | **Cancer type**           | Breast                                                   |
-| **Data size**             | ~530 GB                                                  |
+| **Data size**             | ~700 GB                                                  |
 | **Image dimension**       | ~100-250k x ~100-250k x 3                                |
 | **Magnification (μm/px)** | 40x (0.25) - Level 0                                     |
 | **Files format**          | `.tif`                                                   |
