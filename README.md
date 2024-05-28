@@ -11,7 +11,8 @@ _Oncology FM Evaluation Framework by kaiko.ai_
 
 [![PyPI](https://img.shields.io/pypi/v/kaiko-eva.svg?logo=python)](https://pypi.python.org/pypi/kaiko-eva)
 [![docs](https://img.shields.io/badge/docs-latest-green)](https://kaiko-ai.github.io/eva/latest)
-[![license](https://img.shields.io/badge/License-Apache%202.0-blue.svg?labelColor=gray)](https://github.com/kaiko-ai/eva#license)
+[![license](https://img.shields.io/badge/License-Apache%202.0-blue.svg?labelColor=gray)](https://github.com/kaiko-ai/eva#license)<br>
+[![paper](http://img.shields.io/badge/OpenReview-MIDL_2024-B31B1B.svg)](https://openreview.net/forum?id=FNBQOPj18N&noteId=FNBQOPj18N)
 
 <p align="center">
   <a href="https://github.com/kaiko-ai/eva#installation">Installation</a> •
@@ -132,11 +133,11 @@ over 5 runs, with an average standard deviation of ±0.003._
 <br />
 
 _References_:
-1. _"Emerging properties in self-supervised vision transformers”_
-2. _"Benchmarking self-supervised learning on diverse pathology datasets”_
-3. _"Scaling self-supervised learning for histopathology with masked image modeling”_
-4. _"A General-Purpose Self-Supervised Model for Computational Pathology”_
-5. _"Towards Training Large-Scale Pathology Foundation Models: from TCGA to Hospital Scale”_
+1. _"Emerging properties in self-supervised vision transformers”_, [arXiv](https://arxiv.org/abs/2104.14294)
+2. _"Benchmarking self-supervised learning on diverse pathology datasets”_, [arXiv](https://arxiv.org/abs/2212.04690)
+3. _"Scaling self-supervised learning for histopathology with masked image modeling”_, [medRxiv](https://www.medrxiv.org/content/10.1101/2023.07.21.23292757v1)
+4. _"A General-Purpose Self-Supervised Model for Computational Pathology”_, [arXiv](https://arxiv.org/abs/2308.15474)
+5. _"Towards Training Large-Scale Pathology Foundation Models: from TCGA to Hospital Scale”_, [arXiv](https://arxiv.org/pdf/2404.15217)
 
 ## Contributing
 
@@ -165,7 +166,24 @@ Our codebase is built using multiple opensource contributions
 
 </div>
 
----
+
+## Citation
+
+If you find this repository useful, please consider giving a star ⭐ and adding the following citation:
+
+```
+@inproceedings{
+kaiko.ai2024eva,
+title={eva: Evaluation framework for pathology foundation models},
+author={kaiko.ai and Ioannis Gatopoulos and Nicolas K{\"a}nzig and Roman Moser and Sebastian Ot{\'a}lora},
+booktitle={Medical Imaging with Deep Learning},
+year={2024},
+url={https://openreview.net/forum?id=FNBQOPj18N}
+}
+```
+
+<br />
+
 <div align="center">
   <img src="https://github.com/kaiko-ai/eva/blob/main/docs/images/kaiko-logo.png?raw=true" width="200">
 </div>
