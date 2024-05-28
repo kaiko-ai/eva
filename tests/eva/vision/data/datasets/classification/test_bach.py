@@ -3,8 +3,9 @@
 import os
 from typing import Literal
 
-import numpy as np
 import pytest
+import torch
+from torchvision import tv_tensors
 
 from eva.vision.data import datasets
 
@@ -35,9 +36,9 @@ def test_sample(bach_dataset: datasets.BACH, index: int) -> None:
     assert len(sample) == 2
     # assert the format of the `image` and `target`
     image, target = sample
-    assert isinstance(image, np.ndarray)
-    assert image.shape == (16, 16, 3)
-    assert isinstance(target, np.ndarray)
+    assert isinstance(image, tv_tensors.Image)
+    assert image.shape == (3, 16, 16)
+    assert isinstance(target, torch.Tensor)
     assert target in [0, 1, 2, 3]
 
 

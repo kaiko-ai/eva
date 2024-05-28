@@ -15,23 +15,17 @@ class ImageClassification(vision.VisionDataset[Tuple[tv_tensors.Image, torch.Ten
 
     def __init__(
         self,
-        image_transforms: Callable | None = None,
-        target_transforms: Callable | None = None,
+        transforms: Callable | None = None,
     ) -> None:
         """Initializes the image classification dataset.
 
         Args:
-            image_transforms: A function/transform that takes in an image
-                and returns a transformed version.
-            target_transforms: A function/transform that takes in the target
-                and transforms it.
-            transforms: A function/transform which returns a
-                transformed version of the raw data samples.
+            transforms: A function/transform which returns a transformed
+                version of the raw data samples.
         """
         super().__init__()
 
-        self._image_transforms = image_transforms
-        self._target_transforms = target_transforms
+        self._transforms = transforms
 
     @property
     def classes(self) -> List[str] | None:
@@ -97,10 +91,6 @@ class ImageClassification(vision.VisionDataset[Tuple[tv_tensors.Image, torch.Ten
         Returns:
             A tuple with the image and the target transformed.
         """
-        if self._image_transforms is not None:
-            image = self._image_transforms(image)
-
-        if self._target_transforms is not None:
-            target = self._target_transforms(target)
-
+        if self._transforms is not None:
+            image, target = self._transforms(image, target)
         return image, target

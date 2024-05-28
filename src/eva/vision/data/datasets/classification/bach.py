@@ -53,8 +53,7 @@ class BACH(base.ImageClassification):
         root: str,
         split: Literal["train", "val"] | None = None,
         download: bool = False,
-        image_transforms: Callable | None = None,
-        target_transforms: Callable | None = None,
+        transforms: Callable | None = None,
     ) -> None:
         """Initialize the dataset.
 
@@ -69,15 +68,10 @@ class BACH(base.ImageClassification):
                 Note that the download will be executed only by additionally
                 calling the :meth:`prepare_data` method and if the data does
                 not yet exist on disk.
-            image_transforms: A function/transform that takes in an image
-                and returns a transformed version.
-            target_transforms: A function/transform that takes in the target
-                and transforms it.
+            transforms: A function/transform which returns a transformed
+                version of the raw data samples.
         """
-        super().__init__(
-            image_transforms=image_transforms,
-            target_transforms=target_transforms,
-        )
+        super().__init__(transforms=transforms)
 
         self._root = root
         self._split = split
@@ -133,8 +127,7 @@ class BACH(base.ImageClassification):
     @override
     def load_image(self, index: int) -> tv_tensors.Image:
         image_path, _ = self._samples[self._indices[index]]
-        image_array = io.read_image(image_path)
-        return tv_tensors.Image(image_array)
+        return io.read_image_as_tensor(image_path)
 
     @override
     def load_target(self, index: int) -> torch.Tensor:
