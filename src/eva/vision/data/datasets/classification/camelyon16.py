@@ -126,7 +126,7 @@ class Camelyon16(wsi.MultiWsiDataset, base.ImageClassification):
         return ["0", "1"]
 
     @functools.cached_property
-    def test_annotations(self) -> pd.DataFrame:
+    def test_annotations(self) -> Dict[str, str]:
         """Loads the dataset labels."""
         path = os.path.join(self._root, "testing/reference.csv")
         reference_df = pd.read_csv(path, header=None)
