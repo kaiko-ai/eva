@@ -63,7 +63,7 @@ eva --version
 
 ## How To Use
 
-_eva_ can be used directly from the terminal as a CLI tool as follows:
+_`eva`_ can be used directly from the terminal as a CLI tool as follows:
 ```sh
 eva {fit,predict,predict_fit} --config url/or/path/to/the/config.yaml 
 ```
@@ -141,7 +141,7 @@ _References_:
 
 ## Contributing
 
-_eva_ is an open source project and welcomes contributions of all kinds. Please checkout the [developer](./docs/DEVELOPER_GUIDE.md)
+_`eva`_ is an open source project and welcomes contributions of all kinds. Please checkout the [developer](./docs/DEVELOPER_GUIDE.md)
 and [contributing guide](./docs/CONTRIBUTING.md) for help on how to do so.
 
 All contributors must follow the [code of conduct](./docs/CODE_OF_CONDUCT.md).
