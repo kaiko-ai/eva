@@ -101,7 +101,7 @@ class HeadModule(module.ModelModule):
         predictions = self(data)
 
         # for binary classification, targets are expected to be floating point type:
-        if predictions.shape == targets.shape:
+        if isinstance(targets, torch.Tensor) and predictions.shape == targets.shape:
             targets = targets.to(dtype=torch.float32)
 
         loss = self.criterion(predictions, targets)
