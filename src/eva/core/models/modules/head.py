@@ -99,7 +99,6 @@ class HeadModule(module.ModelModule):
         """
         data, targets, metadata = INPUT_BATCH(*batch)
         predictions = self(data)
-
         loss = self.criterion(predictions, targets)
         return {
             "loss": loss,
