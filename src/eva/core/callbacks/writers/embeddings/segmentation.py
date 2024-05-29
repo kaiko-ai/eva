@@ -1,4 +1,4 @@
-"""Classification embeddings writer."""
+"""Segmentation embeddings writer."""
 
 import csv
 import io
