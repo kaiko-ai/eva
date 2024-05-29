@@ -77,7 +77,8 @@ def _save_items(
             if is_first_save:
                 _, target, input_name, _, split, metadata = QUEUE_ITEM(*entry.items[0])
                 target = torch.load(io.BytesIO(target.getbuffer()), map_location="cpu").item()
-                manifest_manager.update_manifest(input_name, save_name, target, split, metadata)
+                manifest_manager.update(input_name, save_name, target, split, metadata)
+
             prediction_buffers = [item.prediction_buffer for item in entry.items]
             _save_predictions(prediction_buffers, save_path, is_first_save)
             name_to_items[save_name].save_count += 1
@@ -94,7 +95,7 @@ def _save_predictions(
     If it's not the first save to this save_path, the new predictions are appended to
     the existing ones and saved to the same file.
 
-    Example Usecase: Save all patch embeddings corresponding to the same WSI to a single file.
+    Example use-case: Save all patch embeddings corresponding to the same WSI to a single file.
     """
     predictions = [
         torch.load(io.BytesIO(buffer.getbuffer()), map_location="cpu")
