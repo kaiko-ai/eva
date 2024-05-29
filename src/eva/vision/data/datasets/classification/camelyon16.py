@@ -203,7 +203,7 @@ class Camelyon16(wsi.MultiWsiDataset, base.ImageClassification):
             case "test":
                 paths = test_file_paths
             case None:
-                paths = train_images_paths + test_file_paths
+                paths = train_images_paths_all + test_file_paths
             case _:
                 raise ValueError("Invalid split. Use 'train', 'val' or `None`.")
         return [os.path.relpath(path, self._root) for path in paths]
