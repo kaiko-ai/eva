@@ -9,6 +9,7 @@ from loguru import logger
 from torch.utils.data import dataset as torch_datasets
 from typing_extensions import override
 
+from eva.core.data.datasets import base
 from eva.vision.data import wsi
 from eva.vision.data.datasets import vision
 from eva.vision.data.wsi.patching import samplers
@@ -83,7 +84,7 @@ class WsiDataset(vision.VisionDataset):
         return image
 
 
-class MultiWsiDataset(torch_datasets.ConcatDataset):
+class MultiWsiDataset(torch_datasets.ConcatDataset, base.Dataset):
     """Dataset class for reading patches from multiple whole-slide images."""
 
     def __init__(
@@ -108,10 +109,6 @@ class MultiWsiDataset(torch_datasets.ConcatDataset):
             sampler: The sampler to use for sampling patch coordinates.
             backend: The backend to use for reading the whole-slide images.
             image_transforms: Transforms to apply to the extracted image patches.
-            column_mapping: Defines the map between the variables and the manifest
-                columns. It will overwrite the `default_column_mapping` with
-                the provided values, so that `column_mapping` can contain only the
-                values which are altered or missing.
         """
         self._root = root
         self._file_paths = file_paths
@@ -122,6 +119,8 @@ class MultiWsiDataset(torch_datasets.ConcatDataset):
         self._backend = backend
         self._image_transforms = image_transforms
 
+    @override
+    def setup(self):
         super().__init__(self._load_datasets())
 
     def _load_datasets(self) -> list[WsiDataset]:
