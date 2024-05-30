@@ -3,7 +3,7 @@
 In this tutorial we run *eva* with the three subcommands `predict`, `fit` and `predict_fit`, and take a look at the difference between *offline* and *online* workflows.
 
 ### Before you start
-If you haven't downloaded the config files yet, please download them from [GitHub](https://github.com/kaiko-ai/eva/tree/main/configs).
+If you haven't downloaded the config files yet, please download them from [GitHub](https://github.com/kaiko-ai/eva/releases/tag/0.0.1) (scroll to the bottom of the page).
 
 For this tutorial we use the [BACH](../../datasets/bach.md) classification task which is available on [Zenodo](https://zenodo.org/records/3632035) and is distributed under [*Attribution-NonCommercial-ShareAlike 4.0 International*](https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode) license.
 
