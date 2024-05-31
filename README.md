@@ -171,14 +171,13 @@ Our codebase is built using multiple opensource contributions
 
 If you find this repository useful, please consider giving a star ⭐ and adding the following citation:
 
-```
-@inproceedings{
-kaiko.ai2024eva,
-title={eva: Evaluation framework for pathology foundation models},
-author={kaiko.ai and Ioannis Gatopoulos and Nicolas K{\"a}nzig and Roman Moser and Sebastian Ot{\'a}lora},
-booktitle={Medical Imaging with Deep Learning},
-year={2024},
-url={https://openreview.net/forum?id=FNBQOPj18N}
+```bibtex
+@inproceedings{kaiko.ai2024eva,
+    title={eva: Evaluation framework for pathology foundation models},
+    author={kaiko.ai and Ioannis Gatopoulos and Nicolas K{\"a}nzig and Roman Moser and Sebastian Ot{\'a}lora},
+    booktitle={Medical Imaging with Deep Learning},
+    year={2024},
+    url={https://openreview.net/forum?id=FNBQOPj18N}
 }
 ```
 
