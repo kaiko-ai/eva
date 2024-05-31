@@ -24,9 +24,6 @@ import os
 
 import nox
 
-PACKAGE = "eva"
-"""The name of the library."""
-
 PYTHON_VERSIONS = ["3.10"]
 """The python versions to test on."""
 
