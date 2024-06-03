@@ -7,10 +7,10 @@ import numpy as np
 import torch
 from typing_extensions import override
 
-from eva.core.data.datasets.embeddings import base
+from eva.core.data.datasets import embeddings as embeddings_base
 
 
-class MultiEmbeddingsClassificationDataset(base.EmbeddingsDataset):
+class MultiEmbeddingsClassificationDataset(embeddings_base.EmbeddingsDataset[torch.Tensor]):
     """Dataset class for where a sample corresponds to multiple embeddings.
 
     Example use case: Slide level dataset where each slide has multiple patch embeddings.
@@ -21,7 +21,7 @@ class MultiEmbeddingsClassificationDataset(base.EmbeddingsDataset):
         root: str,
         manifest_file: str,
         split: Literal["train", "val", "test"],
-        column_mapping: Dict[str, str] = base.default_column_mapping,
+        column_mapping: Dict[str, str] = embeddings_base.default_column_mapping,
         embeddings_transforms: Callable | None = None,
         target_transforms: Callable | None = None,
     ):
