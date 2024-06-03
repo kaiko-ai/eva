@@ -74,8 +74,6 @@ data:
           root: *EMBEDDINGS_DIR
           manifest_file: manifest.csv
           split: train
-          column_mapping:
-            path: embedding
           target_transforms:
             class_path: eva.core.data.transforms.ArrayToFloatTensor
       val:
