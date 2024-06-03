@@ -1,13 +1,12 @@
 """Configuration logger callback."""
 
+import ast
 import os
 import sys
 from types import BuiltinFunctionType
 from typing import Any, Dict, List
 
 import lightning.pytorch as pl
-import pandas as pd
-import pyaml
 import yaml
 from lightning_fabric.utilities import cloud_io
 from loguru import logger as cli_logger
@@ -22,22 +21,15 @@ class ConfigurationLogger(pl.Callback):
 
     _save_as: str = "config.yaml"
 
-    def __init__(
-        self,
-        normalized: bool = False,
-        verbose: bool = False,
-    ) -> None:
+    def __init__(self, verbose: bool = True) -> None:
         """Initializes the callback.
 
         Args:
-            normalized: Whether to normalize the configuration data
-                into a flat structure.
             verbose: Whether to print the configurations to print the
                 configuration to the terminal.
         """
         super().__init__()
 
-        self._normalized = normalized
         self._verbose = verbose
 
     @override
@@ -52,17 +44,15 @@ class ConfigurationLogger(pl.Callback):
             return
 
         configuration = _load_submitted_config()
-        if self._normalized:
-            configuration = _normalize_json(configuration)
 
         if self._verbose:
-            config_as_text = pyaml.dump(configuration, vspacing=False)
+            config_as_text = yaml.dump(configuration, sort_keys=False)
             print(f"Configuration:\033[94m\n---\n{config_as_text}\033[0m")
 
         save_as = os.path.join(log_dir, self._save_as)
         fs = cloud_io.get_filesystem(log_dir)
         with fs.open(save_as, "w") as output_file:
-            yaml.dump(configuration, output_file)
+            yaml.dump(configuration, output_file, sort_keys=False)
 
         loggers.log_parameters(trainer.loggers, tag="configuration", parameters=configuration)
 
@@ -140,7 +130,7 @@ def _type_resolver(mapping: Dict[str, Any]) -> Dict[str, Any]:
             formatted_value = [_type_resolver(subvalue) for subvalue in value]
         else:
             try:
-                parsed_value = eval(value)  # type: ignore # nosec
+                parsed_value = ast.literal_eval(value)  # type: ignore
                 formatted_value = (
                     value if isinstance(parsed_value, BuiltinFunctionType) else parsed_value
                 )
@@ -151,19 +141,3 @@ def _type_resolver(mapping: Dict[str, Any]) -> Dict[str, Any]:
         mapping[key] = formatted_value
 
     return mapping
-
-
-def _normalize_json(data: Dict[Any, Any]) -> Dict[Any, Any]:
-    """Normalize semi-structured JSON data into a flat structure.
-
-    Args:
-        data: The un-serialized JSON object.
-
-    Returns:
-        The json data normalized into a flat structure.
-    """
-    normalized = pd.json_normalize(data).to_dict()
-    for key, value in normalized.items():
-        if isinstance(value, dict) and value.keys() == {0}:
-            normalized[key] = value[0]
-    return normalized

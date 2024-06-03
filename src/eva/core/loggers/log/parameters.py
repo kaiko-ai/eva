@@ -3,7 +3,7 @@
 import functools
 from typing import Any, Dict
 
-import pyaml
+import yaml
 
 from eva.core.loggers import experimental_loggers as loggers_lib
 from eva.core.loggers.log import utils
@@ -60,5 +60,5 @@ def _yaml_to_markdown(data: Dict[str, Any]) -> str:
     Returns:
         A string markdown friendly formatted.
     """
-    text = pyaml.dump(data, vspacing=False)
+    text = yaml.dump(data, sort_keys=False)
     return f"```yaml\n{text}```"

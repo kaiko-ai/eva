@@ -76,7 +76,7 @@ data:
           # Set `download: true` to download the dataset from https://zenodo.org/records/1214456
           # The CRC dataset is distributed under the following license: "CC BY 4.0 LEGAL CODE"
           # (see: https://creativecommons.org/licenses/by/4.0/legalcode)
-          image_transforms:
+          transforms:
             class_path: eva.vision.data.transforms.common.ResizeAndCrop
             init_args:
               mean: ${oc.env:NORMALIZE_MEAN, [0.485, 0.456, 0.406]}
