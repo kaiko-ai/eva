@@ -63,6 +63,10 @@ jobs:
         uses: wntrblm/nox@5656fcedc31a1ea37d016e4d94d00185330cc528 # 2024.04.15
         with:
           python-versions: "3.10"
+      - name: Configure Git Credentials
+        run: |
+          git config user.email "action@github.com"
+          git config user.name "GitHub Action"
       - name: Building docs
         run: nox -s docs -- deploy --update-aliases dev
   security:
