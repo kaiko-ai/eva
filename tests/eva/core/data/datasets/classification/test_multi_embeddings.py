@@ -9,7 +9,7 @@ import torch
 import torch.nn
 
 from eva.core.data import transforms
-from eva.core.data.datasets.embeddings import classification
+from eva.core.data.datasets import classification
 
 
 @pytest.mark.parametrize(

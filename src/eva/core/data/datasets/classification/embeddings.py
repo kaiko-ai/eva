@@ -3,14 +3,13 @@
 import os
 from typing import Callable, Dict, Literal
 
-import numpy as np
 import torch
 from typing_extensions import override
 
-from eva.core.data.datasets.embeddings import base
+from eva.core.data.datasets import embeddings as embeddings_base
 
 
-class EmbeddingsClassificationDataset(base.EmbeddingsDataset):
+class EmbeddingsClassificationDataset(embeddings_base.EmbeddingsDataset[torch.Tensor]):
     """Embeddings dataset class for classification tasks."""
 
     def __init__(
@@ -18,7 +17,7 @@ class EmbeddingsClassificationDataset(base.EmbeddingsDataset):
         root: str,
         manifest_file: str,
         split: Literal["train", "val", "test"] | None = None,
-        column_mapping: Dict[str, str] = base.default_column_mapping,
+        column_mapping: Dict[str, str] = embeddings_base.default_column_mapping,
         embeddings_transforms: Callable | None = None,
         target_transforms: Callable | None = None,
     ) -> None:
@@ -63,9 +62,9 @@ class EmbeddingsClassificationDataset(base.EmbeddingsDataset):
         return tensor.squeeze(0)
 
     @override
-    def _load_target(self, index: int) -> np.ndarray:
+    def _load_target(self, index: int) -> torch.Tensor:
         target = self._data.at[index, self._column_mapping["target"]]
-        return np.asarray(target, dtype=np.int64)
+        return torch.tensor(target, dtype=torch.int64)
 
     @override
     def __len__(self) -> int:

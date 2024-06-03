@@ -2,15 +2,18 @@
 
 import abc
 import os
-from typing import Callable, Dict, Literal, Tuple
+from typing import Callable, Dict, Generic, Literal, Tuple, TypeVar
 
-import numpy as np
 import pandas as pd
 import torch
 from typing_extensions import override
 
 from eva.core.data.datasets import base
 from eva.core.utils import io
+
+TargetType = TypeVar("TargetType")
+"""The target data type."""
+
 
 default_column_mapping: Dict[str, str] = {
     "path": "embeddings",
@@ -21,7 +24,7 @@ default_column_mapping: Dict[str, str] = {
 """The default column mapping of the variables to the manifest columns."""
 
 
-class EmbeddingsDataset(base.Dataset):
+class EmbeddingsDataset(base.Dataset, Generic[TargetType]):
     """Abstract base class for embedding datasets."""
 
     def __init__(
@@ -62,32 +65,6 @@ class EmbeddingsDataset(base.Dataset):
 
         self._data: pd.DataFrame
 
-    @abc.abstractmethod
-    def _load_embeddings(self, index: int) -> torch.Tensor:
-        """Returns the `index`'th embedding sample.
-
-        Args:
-            index: The index of the data sample to load.
-
-        Returns:
-            The embedding sample as a tensor.
-        """
-
-    @abc.abstractmethod
-    def _load_target(self, index: int) -> np.ndarray:
-        """Returns the `index`'th target sample.
-
-        Args:
-            index: The index of the data sample to load.
-
-        Returns:
-            The sample target as an array.
-        """
-
-    @abc.abstractmethod
-    def __len__(self) -> int:
-        """Returns the total length of the data."""
-
     def filename(self, index: int) -> str:
         """Returns the filename of the `index`'th data sample.
 
@@ -105,7 +82,11 @@ class EmbeddingsDataset(base.Dataset):
     def setup(self):
         self._data = self._load_manifest()
 
-    def __getitem__(self, index) -> Tuple[torch.Tensor, np.ndarray]:
+    @abc.abstractmethod
+    def __len__(self) -> int:
+        """Returns the total length of the data."""
+
+    def __getitem__(self, index) -> Tuple[torch.Tensor, TargetType]:
         """Returns the `index`'th data sample.
 
         Args:
@@ -117,6 +98,28 @@ class EmbeddingsDataset(base.Dataset):
         embeddings = self._load_embeddings(index)
         target = self._load_target(index)
         return self._apply_transforms(embeddings, target)
+
+    @abc.abstractmethod
+    def _load_embeddings(self, index: int) -> torch.Tensor:
+        """Returns the `index`'th embedding sample.
+
+        Args:
+            index: The index of the data sample to load.
+
+        Returns:
+            The embedding sample as a tensor.
+        """
+
+    @abc.abstractmethod
+    def _load_target(self, index: int) -> TargetType:
+        """Returns the `index`'th target sample.
+
+        Args:
+            index: The index of the data sample to load.
+
+        Returns:
+            The sample target as an array.
+        """
 
     def _load_manifest(self) -> pd.DataFrame:
         """Loads manifest file and filters the data based on the split column.
@@ -132,8 +135,8 @@ class EmbeddingsDataset(base.Dataset):
         return data
 
     def _apply_transforms(
-        self, embeddings: torch.Tensor, target: np.ndarray
-    ) -> Tuple[torch.Tensor, np.ndarray]:
+        self, embeddings: torch.Tensor, target: TargetType
+    ) -> Tuple[torch.Tensor, TargetType]:
         """Applies the transforms to the provided data and returns them.
 
         Args:
