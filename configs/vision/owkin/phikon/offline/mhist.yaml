@@ -6,6 +6,7 @@ trainer:
     default_root_dir: &OUTPUT_ROOT ${oc.env:OUTPUT_ROOT, logs/${oc.env:DINO_BACKBONE, owkin/phikon}/offline/mhist}
     max_steps: &MAX_STEPS ${oc.env:MAX_STEPS, 12500}
     callbacks:
+      - class_path: eva.callbacks.ConfigurationLogger
       - class_path: lightning.pytorch.callbacks.LearningRateMonitor
         init_args:
           logging_interval: epoch
@@ -87,7 +88,7 @@ data:
           init_args: &PREDICT_DATASET_ARGS
             root: ${oc.env:DATA_ROOT, ./data}/mhist
             split: train
-            image_transforms:
+            transforms:
               class_path: eva.vision.data.transforms.common.ResizeAndCrop
               init_args:
                 size: ${oc.env:RESIZE_DIM, 224}

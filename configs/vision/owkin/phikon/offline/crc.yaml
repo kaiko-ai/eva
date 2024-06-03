@@ -6,6 +6,7 @@ trainer:
     default_root_dir: &OUTPUT_ROOT ${oc.env:OUTPUT_ROOT, logs/${oc.env:DINO_BACKBONE, owkin/phikon}/offline/crc}
     max_steps: &MAX_STEPS ${oc.env:MAX_STEPS, 12500}
     callbacks:
+      - class_path: eva.callbacks.ConfigurationLogger
       - class_path: lightning.pytorch.callbacks.LearningRateMonitor
         init_args:
           logging_interval: epoch
@@ -91,7 +92,7 @@ data:
             # Set `download: true` to download the dataset from https://zenodo.org/records/1214456
             # The CRC dataset is distributed under the following license: "CC BY 4.0 LEGAL CODE"
             # (see: https://creativecommons.org/licenses/by/4.0/legalcode)
-            image_transforms:
+            transforms:
               class_path: eva.vision.data.transforms.common.ResizeAndCrop
               init_args:
                 mean: ${oc.env:NORMALIZE_MEAN, [0.485, 0.456, 0.406]}
