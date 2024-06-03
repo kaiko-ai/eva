@@ -32,7 +32,7 @@ def test_embeddings_writer(datamodule: datamodules.DataModule, model: modules.He
     with tempfile.TemporaryDirectory() as output_dir:
         trainer = pl.Trainer(
             logger=False,
-            callbacks=writers.EmbeddingsWriter(
+            callbacks=writers.ClassificationEmbeddingsWriter(
                 output_dir=output_dir,
                 dataloader_idx_map={0: "train", 1: "val", 2: "test"},
                 backbone=nn.Flatten(),

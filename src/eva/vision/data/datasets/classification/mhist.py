@@ -3,7 +3,8 @@
 import os
 from typing import Callable, Dict, List, Literal, Tuple
 
-import numpy as np
+import torch
+from torchvision import tv_tensors
 from typing_extensions import override
 
 from eva.vision.data.datasets import _validators
@@ -18,23 +19,17 @@ class MHIST(base.ImageClassification):
         self,
         root: str,
         split: Literal["train", "test"],
-        image_transforms: Callable | None = None,
-        target_transforms: Callable | None = None,
+        transforms: Callable | None = None,
     ) -> None:
         """Initialize the dataset.
 
         Args:
             root: Path to the root directory of the dataset.
             split: Dataset split to use.
-            image_transforms: A function/transform that takes in an image
-                and returns a transformed version.
-            target_transforms: A function/transform that takes in the target
-                and transforms it.
+            transforms: A function/transform which returns a transformed
+                version of the raw data samples.
         """
-        super().__init__(
-            image_transforms=image_transforms,
-            target_transforms=target_transforms,
-        )
+        super().__init__(transforms=transforms)
 
         self._root = root
         self._split = split
@@ -74,16 +69,16 @@ class MHIST(base.ImageClassification):
         )
 
     @override
-    def load_image(self, index: int) -> np.ndarray:
+    def load_image(self, index: int) -> tv_tensors.Image:
         image_filename, _ = self._samples[index]
         image_path = os.path.join(self._dataset_path, image_filename)
-        return io.read_image(image_path)
+        return io.read_image_as_tensor(image_path)
 
     @override
-    def load_target(self, index: int) -> np.ndarray:
+    def load_target(self, index: int) -> torch.Tensor:
         _, label = self._samples[index]
         target = self.class_to_idx[label]
-        return np.asarray(target, dtype=np.int64)
+        return torch.tensor(target, dtype=torch.float32)
 
     @override
     def __len__(self) -> int:

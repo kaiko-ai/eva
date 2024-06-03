@@ -23,7 +23,7 @@ trainer:
           patience: 24
           monitor: *MONITOR_METRIC
           mode: *MONITOR_METRIC_MODE
-      - class_path: eva.callbacks.EmbeddingsWriter
+      - class_path: eva.callbacks.ClassificationEmbeddingsWriter
         init_args:
           output_dir: &EMBEDDINGS_DIR ${oc.env:EMBEDDINGS_ROOT, ./data/embeddings}/${oc.env:DINO_BACKBONE, owkin/phikon}/crc
           dataloader_idx_map:
@@ -90,7 +90,7 @@ data:
             # Set `download: true` to download the dataset from https://zenodo.org/records/1214456
             # The CRC dataset is distributed under the following license: "CC BY 4.0 LEGAL CODE"
             # (see: https://creativecommons.org/licenses/by/4.0/legalcode)
-            image_transforms:
+            transforms:
               class_path: eva.vision.data.transforms.common.ResizeAndCrop
               init_args:
                 mean: ${oc.env:NORMALIZE_MEAN, [0.485, 0.456, 0.406]}

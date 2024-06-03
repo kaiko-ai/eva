@@ -23,7 +23,7 @@ trainer:
           patience: 9
           monitor: *MONITOR_METRIC
           mode: *MONITOR_METRIC_MODE
-      - class_path: eva.callbacks.EmbeddingsWriter
+      - class_path: eva.callbacks.ClassificationEmbeddingsWriter
         init_args:
           output_dir: &EMBEDDINGS_DIR ${oc.env:EMBEDDINGS_ROOT, ./data/embeddings}/${oc.env:DINO_BACKBONE, owkin/phikon}/patch_camelyon
           dataloader_idx_map:
@@ -97,7 +97,7 @@ data:
             # The PatchCamelyon dataset is distributed under the following license: 
             # "Creative Commons Zero v1.0 Universal"
             # (see: https://choosealicense.com/licenses/cc0-1.0/)
-            image_transforms:
+            transforms:
               class_path: eva.vision.data.transforms.common.ResizeAndCrop
               init_args:
                 size: ${oc.env:RESIZE_DIM, 224}  
