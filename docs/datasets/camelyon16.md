@@ -1,6 +1,6 @@
 # Camelyon16
 
-The Camelyon16 dataset consists of 400 WSIs of lymph nodes for breast cancer metastasis classification. The dataset is a combination of data from two independent datasets, collected from two separate medical centers in the Netherlands (Radboud University Medical Center and University Medical Center Utrecht). The dataset contains the slides from which [PatchCamelyon](patch_camelyon.md)-patches were extracted.
+The Camelyon16 dataset consists of 400 WSIs of lymph nodes for breast cancer metastasis classification. The dataset is a combination of two independent datasets, collected from two separate medical centers in the Netherlands (Radboud University Medical Center and University Medical Center Utrecht). The dataset contains the slides from which [PatchCamelyon](patch_camelyon.md)-patches were extracted.
 
 The dataset is divided in a train set (270 slides) and test set (130 slides), both containing images from both centers.
 
@@ -51,11 +51,11 @@ CAMELYON16
 
 The `Camelyon16` dataset class doesn't download the data during runtime and must be downloaded manually from links provided [here](https://camelyon17.grand-challenge.org/Data/).
 
-The dataset is split into train / test. As in [1], we additionally split the train set into a stratified 90:10 train/val split.
+The dataset is split into train / test. Additionally, we split the train set into train/val using the same splits as [PatchCamelyon](patch_camelyon.md) (see metadata CSV files on [Zenodo](https://zenodo.org/records/2546921)).
 
 | Splits   | Train       | Validation  | Test       |  
 |----------|-------------|-------------|------------|
-| #Samples | 243 (60.75%)  | 27 (6.75%)  | 130 (32.5%) |
+| #Samples | 216 (54%)  | 54 (13.5%)  | 130 (32.5%) |
 
 
 ## Relevant links

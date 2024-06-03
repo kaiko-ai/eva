@@ -123,10 +123,15 @@ class Camelyon16(wsi.MultiWsiDataset, base.ImageClassification):
     @property
     @override
     def classes(self) -> List[str]:
-        return ["0", "1"]
+        return ["normal", "tumor"]
+
+    @property
+    @override
+    def class_to_idx(self) -> Dict[str, int]:
+        return {"normal": 0, "tumor": 1}
 
     @functools.cached_property
-    def test_annotations(self) -> Dict[str, str]:
+    def annotations_test_set(self) -> Dict[str, str]:
         """Loads the dataset labels."""
         path = os.path.join(self._root, "testing/reference.csv")
         reference_df = pd.read_csv(path, header=None)
@@ -136,22 +141,31 @@ class Camelyon16(wsi.MultiWsiDataset, base.ImageClassification):
     def prepare_data(self) -> None:
         _validators.check_dataset_exists(self._root, True)
 
-        if not os.path.isdir(os.path.join(self._root, "training/normal")):
-            raise FileNotFoundError("'training/normal' directory not found in the root folder.")
-        if not os.path.isdir(os.path.join(self._root, "training/tumor")):
-            raise FileNotFoundError("'training/tumor' directory not found in the root folder.")
-        if not os.path.isdir(os.path.join(self._root, "testing/images")):
-            raise FileNotFoundError("'testing/images' directory not found in the root folder.")
+        expected_directories = ["training/normal", "training/tumor", "testing/images"]
+        for resource in expected_directories:
+            if not os.path.isdir(os.path.join(self._root, resource)):
+                raise FileNotFoundError(f"'{resource}' not found in the root folder.")
+
         if not os.path.isfile(os.path.join(self._root, "testing/reference.csv")):
             raise FileNotFoundError("'reference.csv' file not found in the testing folder.")
 
     @override
     def validate(self) -> None:
+
+        expected_n_files = {
+            "train": 216,
+            "val": 54,
+            "test": 129,
+            None: 399,
+        }
+        length = expected_n_files.get(self._split, 0)
+        _validators.check_number_of_files(self._file_paths, length, self._split)
+
         _validators.check_dataset_integrity(
             self,
             length=None,
             n_classes=2,
-            first_and_last_labels=("0", "1"),
+            first_and_last_labels=("normal", "tumor"),
         )
 
     @override
@@ -177,33 +191,23 @@ class Camelyon16(wsi.MultiWsiDataset, base.ImageClassification):
 
     def _load_file_paths(self, split: Literal["train", "val", "test"] | None = None) -> List[str]:
         """Loads the file paths of the corresponding dataset split."""
-        train_images_paths_normal = sorted(
-            glob.glob(os.path.join(self._root, "training/normal/*.tif"))
-        )
-        train_images_paths_tumor = sorted(
-            glob.glob(os.path.join(self._root, "training/tumor/*.tif"))
-        )
-        train_images_paths_all = train_images_paths_normal + train_images_paths_tumor
-
-        val_images_paths = [
-            path
-            for path in train_images_paths_all
-            if self._get_id_from_path(path) in self._val_slides
-        ]
-        train_images_paths = [
-            path for path in train_images_paths_all if path not in val_images_paths
-        ]
-        test_file_paths = sorted(glob.glob(os.path.join(self._root, "testing/images", "*.tif")))
+        train_paths, val_paths = [], []
+        for path in glob.glob(os.path.join(self._root, "training/**/*.tif")):
+            if self._get_id_from_path(path) in self._val_slides:
+                val_paths.append(path)
+            else:
+                train_paths.append(path)
+        test_paths = sorted(glob.glob(os.path.join(self._root, "testing/images", "*.tif")))
 
         match split:
             case "train":
-                paths = train_images_paths
+                paths = train_paths
             case "val":
-                paths = val_images_paths
+                paths = val_paths
             case "test":
-                paths = test_file_paths
+                paths = test_paths
             case None:
-                paths = train_images_paths_all + test_file_paths
+                paths = train_paths + val_paths + test_paths
             case _:
                 raise ValueError("Invalid split. Use 'train', 'val' or `None`.")
         return [os.path.relpath(path, self._root) for path in paths]
@@ -211,13 +215,13 @@ class Camelyon16(wsi.MultiWsiDataset, base.ImageClassification):
     def _get_target_from_path(self, file_path: str) -> int:
         """Returns the target label based on the file path."""
         slide_id = self._get_id_from_path(file_path)
-        test_annotation = self.test_annotations.get(slide_id, "")
-        if "normal" in file_path or "normal" in test_annotation:
-            return 0
-        elif "tumor" in file_path or "tumor" in test_annotation:
-            return 1
-        else:
-            raise ValueError(f"Invalid file path: {file_path}")
+        test_annotations = self.annotations_test_set.get(slide_id, "")
+
+        for class_name in self.classes:
+            if class_name in file_path or class_name in test_annotations:
+                return self.class_to_idx[class_name]
+
+        raise ValueError(f"Invalid file path: {file_path}")
 
     def _get_id_from_path(self, file_path: str) -> str:
         """Extracts the slide ID from the file path."""
