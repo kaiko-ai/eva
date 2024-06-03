@@ -93,7 +93,7 @@ data:
             # The BACH dataset is distributed under the following license
             # Attribution-NonCommercial-NoDerivs 4.0 International license
             # (see: https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode)
-            image_transforms:
+            transforms:
               class_path: eva.vision.data.transforms.common.ResizeAndCrop
               init_args:
                 size: ${oc.env:RESIZE_DIM, 224}  

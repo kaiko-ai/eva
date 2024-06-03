@@ -99,7 +99,7 @@ data:
             # The PatchCamelyon dataset is distributed under the following license: 
             # "Creative Commons Zero v1.0 Universal"
             # (see: https://choosealicense.com/licenses/cc0-1.0/)
-            image_transforms:
+            transforms:
               class_path: eva.vision.data.transforms.common.ResizeAndCrop
               init_args:
                 size: ${oc.env:RESIZE_DIM, 224}  

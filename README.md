@@ -10,8 +10,8 @@
 _Oncology FM Evaluation Framework by kaiko.ai_
 
 [![PyPI](https://img.shields.io/pypi/v/kaiko-eva.svg?logo=python)](https://pypi.python.org/pypi/kaiko-eva)
-[![docs](https://img.shields.io/badge/docs-latest-green)](https://kaiko-ai.github.io/eva/latest)
-[![license](https://img.shields.io/badge/License-Apache%202.0-blue.svg?labelColor=gray)](https://github.com/kaiko-ai/eva#license)<br>
+[![docs](https://img.shields.io/badge/📚_docs-latest-green)](https://kaiko-ai.github.io/eva/latest)
+[![license](https://img.shields.io/badge/⚖️_License-Apache%202.0-blue.svg?labelColor=gray)](https://github.com/kaiko-ai/eva#license)<br>
 [![paper](http://img.shields.io/badge/OpenReview-MIDL_2024-B31B1B.svg)](https://openreview.net/forum?id=FNBQOPj18N&noteId=FNBQOPj18N)
 
 <p align="center">
@@ -171,14 +171,13 @@ Our codebase is built using multiple opensource contributions
 
 If you find this repository useful, please consider giving a star ⭐ and adding the following citation:
 
-```
-@inproceedings{
-kaiko.ai2024eva,
-title={eva: Evaluation framework for pathology foundation models},
-author={kaiko.ai and Ioannis Gatopoulos and Nicolas K{\"a}nzig and Roman Moser and Sebastian Ot{\'a}lora},
-booktitle={Medical Imaging with Deep Learning},
-year={2024},
-url={https://openreview.net/forum?id=FNBQOPj18N}
+```bibtex
+@inproceedings{kaiko.ai2024eva,
+    title={eva: Evaluation framework for pathology foundation models},
+    author={kaiko.ai and Ioannis Gatopoulos and Nicolas K{\"a}nzig and Roman Moser and Sebastian Ot{\'a}lora},
+    booktitle={Medical Imaging with Deep Learning},
+    year={2024},
+    url={https://openreview.net/forum?id=FNBQOPj18N}
 }
 ```
 
