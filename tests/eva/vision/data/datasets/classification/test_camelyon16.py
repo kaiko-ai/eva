@@ -29,9 +29,9 @@ def test_split_and_expected_shapes(root: str):
     val_dataset = datasets.Camelyon16(root=root, split="val", **DEFAULT_ARGS)
     test_dataset = datasets.Camelyon16(root=root, split="test", **DEFAULT_ARGS)
 
-    assert len(train_dataset.datasets) == 3
-    assert len(val_dataset.datasets) == 1
-    assert len(test_dataset.datasets) == 2
+    assert len(train_dataset) == 192
+    assert len(val_dataset) == 64
+    assert len(test_dataset) == 128
 
     _check_batch_shape(train_dataset[0])
     _check_batch_shape(val_dataset[0])

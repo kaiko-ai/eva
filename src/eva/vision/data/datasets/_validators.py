@@ -59,7 +59,7 @@ def check_dataset_exists(dataset_dir: str, download_available: bool) -> None:
         raise FileNotFoundError(error_message)
 
 
-def check_number_of_files(file_paths: List[str], expected_length: int, split: str) -> None:
+def check_number_of_files(file_paths: List[str], expected_length: int, split: str | None) -> None:
     """Verifies the number of files in the dataset.
 
     Raise:
