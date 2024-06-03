@@ -42,8 +42,6 @@ class MultiEmbeddingsClassificationDataset(base.EmbeddingsDataset):
                 the `root` argument.
             split: The dataset split to use. The `split` column of the manifest
                 file will be splitted based on this value.
-            n_embeddings: Expected number of embeddings per sample. If less, the embeddings
-                will be padded with zeros.
             column_mapping: Defines the map between the variables and the manifest
                 columns. It will overwrite the `default_column_mapping` with
                 the provided values, so that `column_mapping` can contain only the
