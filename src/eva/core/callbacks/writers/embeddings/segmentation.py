@@ -27,7 +27,7 @@ class SegmentationEmbeddingsWriter(base.EmbeddingsWriter):
             if item is None:
                 break
 
-            embeddings_buffer, target_buffer, input_name, save_name, split = QUEUE_ITEM(*item)
+            embeddings_buffer, target_buffer, input_name, save_name, split, _ = QUEUE_ITEM(*item)
             target_filename = save_name.replace(".pt", "-mask.pt")
             _save_embedding(embeddings_buffer, save_name, output_dir)
             _save_embedding(target_buffer, target_filename, output_dir)

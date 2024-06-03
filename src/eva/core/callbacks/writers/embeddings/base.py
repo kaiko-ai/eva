@@ -42,7 +42,7 @@ class EmbeddingsWriter(callbacks.BasePredictionWriter, abc.ABC):
                 names (e.g. train, val, test).
             metadata_keys: An optional list of keys to extract from the batch metadata and store
                 as additional columns in the manifest file.
-            overwrite: Whether to overwrite the output directory. Defaults to True.
+            overwrite: Whether to overwrite the output directory.
             save_every_n: Interval for number of iterations to save the embeddings to disk.
                 During this interval, the embeddings are accumulated in memory.
         """
@@ -57,6 +57,21 @@ class EmbeddingsWriter(callbacks.BasePredictionWriter, abc.ABC):
 
         self._write_queue: multiprocessing.Queue
         self._write_process: eva_multiprocessing.Process
+
+    @staticmethod
+    @abc.abstractmethod
+    def _process_write_queue(
+        write_queue: multiprocessing.Queue,
+        output_dir: str,
+        metadata_keys: List[str],
+        save_every_n: int,
+        overwrite: bool = False,
+    ) -> None:
+        """This function receives and processes items added by the main process to the queue.
+
+        Queue items contain the embedding tensors, targets and metadata which need to be
+        saved to disk (.pt files and manifest).
+        """
 
     @override
     def on_predict_start(self, trainer: pl.Trainer, pl_module: pl.LightningModule) -> None:
@@ -147,21 +162,6 @@ class EmbeddingsWriter(callbacks.BasePredictionWriter, abc.ABC):
             item_metadata[key] = metadata[key][local_idx]
 
         return item_metadata
-
-    @staticmethod
-    @abc.abstractmethod
-    def _process_write_queue(
-        write_queue: multiprocessing.Queue,
-        output_dir: str,
-        metadata_keys: List[str],
-        save_every_n: int,
-        overwrite: bool = False,
-    ) -> None:
-        """This function receives and processes items added by the main process to the queue.
-
-        Queue items contain the embedding tensors, targets and metadata which need to be
-        saved to disk (.pt files and manifest).
-        """
 
 
 def _as_io_buffers(*items: torch.Tensor) -> Sequence[io.BytesIO]:
