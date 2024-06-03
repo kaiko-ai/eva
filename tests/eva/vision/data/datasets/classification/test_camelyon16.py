@@ -23,7 +23,7 @@ DEFAULT_ARGS = {
 }
 
 
-def test_split_and_expected_shapes(root: str):
+def test_split_and_expected_shapes_camelyon16(root: str):
     """Test loading the dataset with different splits."""
     train_dataset = datasets.Camelyon16(root=root, split="train", **DEFAULT_ARGS)
     val_dataset = datasets.Camelyon16(root=root, split="val", **DEFAULT_ARGS)
@@ -39,7 +39,7 @@ def test_split_and_expected_shapes(root: str):
 
 
 @pytest.mark.parametrize("split", ["train", "val", "test", None])
-def test_filenames(root: str, split: Literal["train", "val", "test"]):
+def test_filenames_camelyon16(root: str, split: Literal["train", "val", "test"]):
     """Tests that the number of filenames matches the dataset size."""
     dataset = datasets.Camelyon16(root=root, split=split, **DEFAULT_ARGS)
 
