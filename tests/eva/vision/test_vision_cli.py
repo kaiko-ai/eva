@@ -23,6 +23,7 @@ from tests.eva import _cli
         "configs/vision/dino_vit/offline/mhist.yaml",
         "configs/vision/dino_vit/offline/patch_camelyon.yaml",
         "configs/vision/dino_vit/offline/panda.yaml",
+        "configs/vision/dino_vit/offline/camelyon16.yaml",
         "configs/vision/owkin/phikon/offline/bach.yaml",
         "configs/vision/owkin/phikon/offline/crc.yaml",
         "configs/vision/owkin/phikon/offline/mhist.yaml",
