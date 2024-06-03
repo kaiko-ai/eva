@@ -3,7 +3,7 @@
 import csv
 import io
 import os
-from typing import Any
+from typing import Any, List
 
 import torch
 from torch import multiprocessing
@@ -19,7 +19,11 @@ class SegmentationEmbeddingsWriter(base.EmbeddingsWriter):
     @staticmethod
     @override
     def _process_write_queue(
-        write_queue: multiprocessing.Queue, output_dir: str, overwrite: bool = False
+        write_queue: multiprocessing.Queue,
+        output_dir: str,
+        metadata_keys: List[str],
+        save_every_n: int,
+        overwrite: bool = False,
     ) -> None:
         manifest_file, manifest_writer = _init_manifest(output_dir, overwrite)
         while True:
