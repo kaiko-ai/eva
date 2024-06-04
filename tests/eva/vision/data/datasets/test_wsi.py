@@ -87,6 +87,7 @@ def test_multi_dataset(root: str):
         sampler=samplers.GridSampler(max_samples=None),
         backend="openslide",
     )
+    dataset.setup()
 
     assert isinstance(dataset.datasets[0], datasets.WsiDataset)
     layer_shape = dataset.datasets[0]._wsi.level_dimensions[0]
