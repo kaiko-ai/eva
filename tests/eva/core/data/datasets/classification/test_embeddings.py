@@ -3,11 +3,10 @@
 import os
 from typing import Literal
 
-import numpy as np
 import pytest
 import torch
 
-from eva.core.data.datasets.embeddings import classification
+from eva.core.data.datasets import classification
 
 
 @pytest.mark.parametrize("split", ["train", "val"])
@@ -21,7 +20,7 @@ def test_embedding_dataset(embeddings_dataset: classification.EmbeddingsClassifi
     embeddings, target = sample
     assert isinstance(embeddings, torch.Tensor)
     assert embeddings.shape == (8,)
-    assert isinstance(target, np.ndarray)
+    assert isinstance(target, torch.Tensor)
     assert target in [0, 1]
 
 

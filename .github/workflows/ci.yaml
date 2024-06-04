@@ -7,25 +7,6 @@ on:
     branches:
 
 jobs:
-  security:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4
-      - name: Perform gitleaks checks
-        run: |
-          # Download and check
-          curl -LJO https://github.com/gitleaks/gitleaks/releases/download/v8.18.2/gitleaks_8.18.2_linux_x64.tar.gz
-          curl -LJO https://github.com/gitleaks/gitleaks/releases/download/v8.18.2/gitleaks_8.18.2_checksums.txt
-          shasum -a 256 --ignore-missing --quiet -c gitleaks_8.18.2_checksums.txt
-          if [ $? != 0 ]; then exit 1; fi
-          # Extract gitleaks
-          tar -zxvf gitleaks_8.18.2_linux_x64.tar.gz gitleaks
-          # Run gitleaks
-          ./gitleaks detect \
-            --config .gitleaks.toml \
-            --gitleaks-ignore-path .gitleaksignore \
-            --no-git
   quality:
     runs-on: ubuntu-latest
     steps:
@@ -68,3 +49,42 @@ jobs:
           python-versions: ${{ matrix.python-version }}
       - name: Executing unit tests
         run: nox -s test
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4
+      - name: Setting up PDM
+        uses: pdm-project/setup-pdm@568ddd69406b30de1774ec0044b73ae06e716aa4 # v4
+        with:
+          python-version: "3.10"
+          architecture: x64
+      - name: Setting up nox
+        uses: wntrblm/nox@5656fcedc31a1ea37d016e4d94d00185330cc528 # 2024.04.15
+        with:
+          python-versions: "3.10"
+      - name: Configure Git Credentials
+        run: |
+          git config user.email "action@github.com"
+          git config user.name "GitHub Action"
+      - name: Building docs
+        run: nox -s docs -- deploy --update-aliases dev
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4
+      - name: Perform gitleaks checks
+        run: |
+          # Download and check
+          curl -LJO https://github.com/gitleaks/gitleaks/releases/download/v8.18.2/gitleaks_8.18.2_linux_x64.tar.gz
+          curl -LJO https://github.com/gitleaks/gitleaks/releases/download/v8.18.2/gitleaks_8.18.2_checksums.txt
+          shasum -a 256 --ignore-missing --quiet -c gitleaks_8.18.2_checksums.txt
+          if [ $? != 0 ]; then exit 1; fi
+          # Extract gitleaks
+          tar -zxvf gitleaks_8.18.2_linux_x64.tar.gz gitleaks
+          # Run gitleaks
+          ./gitleaks detect \
+            --config .gitleaks.toml \
+            --gitleaks-ignore-path .gitleaksignore \
+            --no-git
