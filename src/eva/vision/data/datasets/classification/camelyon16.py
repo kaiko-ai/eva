@@ -137,6 +137,26 @@ class Camelyon16(wsi.MultiWsiDataset, base.ImageClassification):
         reference_df = pd.read_csv(path, header=None)
         return {k: v.lower() for k, v in reference_df[[0, 1]].itertuples(index=False)}
 
+    @functools.cached_property
+    def annotations(self) -> Dict[str, str]:
+        """Loads the dataset labels."""
+        annotations = {}
+        if self._split in ["test", None]:
+            path = os.path.join(self._root, "testing/reference.csv")
+            reference_df = pd.read_csv(path, header=None)
+            annotations.update(
+                {k: v.lower() for k, v in reference_df[[0, 1]].itertuples(index=False)}
+            )
+
+        if self._split in ["train", "val", None]:
+            annotations.update(
+                {
+                    self._get_id_from_path(file_path): self._get_class_from_path(file_path)
+                    for file_path in self._file_paths
+                }
+            )
+        return annotations
+
     @override
     def prepare_data(self) -> None:
         _validators.check_dataset_exists(self._root, True)
@@ -158,9 +178,8 @@ class Camelyon16(wsi.MultiWsiDataset, base.ImageClassification):
             "test": 129,
             None: 399,
         }
-        length = expected_n_files.get(self._split, 0)
+        length = expected_n_files[self._split]
         _validators.check_number_of_files(self._file_paths, length, self._split)
-
         _validators.check_dataset_integrity(
             self,
             length=None,
@@ -183,7 +202,8 @@ class Camelyon16(wsi.MultiWsiDataset, base.ImageClassification):
     @override
     def load_target(self, index: int) -> np.ndarray:
         file_path = self._file_paths[self._get_dataset_idx(index)]
-        return np.asarray(self._get_target_from_path(file_path))
+        class_name = self.annotations[self._get_id_from_path(file_path)]
+        return np.asarray(self.class_to_idx[class_name], dtype=np.int64)
 
     @override
     def load_metadata(self, index: int) -> Dict[str, Any]:
@@ -197,7 +217,7 @@ class Camelyon16(wsi.MultiWsiDataset, base.ImageClassification):
                 val_paths.append(path)
             else:
                 train_paths.append(path)
-        test_paths = sorted(glob.glob(os.path.join(self._root, "testing/images", "*.tif")))
+        test_paths = glob.glob(os.path.join(self._root, "testing/images", "*.tif"))
 
         match split:
             case "train":
@@ -210,19 +230,15 @@ class Camelyon16(wsi.MultiWsiDataset, base.ImageClassification):
                 paths = train_paths + val_paths + test_paths
             case _:
                 raise ValueError("Invalid split. Use 'train', 'val' or `None`.")
-        return [os.path.relpath(path, self._root) for path in paths]
-
-    def _get_target_from_path(self, file_path: str) -> int:
-        """Returns the target label based on the file path."""
-        slide_id = self._get_id_from_path(file_path)
-        test_annotations = self.annotations_test_set.get(slide_id, "")
-
-        for class_name in self.classes:
-            if class_name in file_path or class_name in test_annotations:
-                return self.class_to_idx[class_name]
-
-        raise ValueError(f"Invalid file path: {file_path}")
+        return sorted([os.path.relpath(path, self._root) for path in paths])
 
     def _get_id_from_path(self, file_path: str) -> str:
         """Extracts the slide ID from the file path."""
         return os.path.basename(file_path).replace(".tif", "")
+
+    def _get_class_from_path(self, file_path: str) -> str:
+        """Extracts the class name from the file path."""
+        class_name = self._get_id_from_path(file_path).split("_")[0]
+        if class_name not in self.classes:
+            raise ValueError(f"Invalid class name '{class_name}' in file path '{file_path}'.")
+        return class_name
