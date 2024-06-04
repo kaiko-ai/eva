@@ -1,4 +1,4 @@
 # Callbacks
 
 ## Writers
-::: eva.core.callbacks.writers.EmbeddingsWriter
+::: eva.core.callbacks.writers.ClassificationEmbeddingsWriter
