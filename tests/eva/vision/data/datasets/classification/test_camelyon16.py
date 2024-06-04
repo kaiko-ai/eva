@@ -23,11 +23,17 @@ DEFAULT_ARGS = {
 }
 
 
-def test_split_and_expected_shapes_camelyon16(root: str):
+def test_split_and_expected_shapes(root: str):
     """Test loading the dataset with different splits."""
     train_dataset = datasets.Camelyon16(root=root, split="train", **DEFAULT_ARGS)
     val_dataset = datasets.Camelyon16(root=root, split="val", **DEFAULT_ARGS)
     test_dataset = datasets.Camelyon16(root=root, split="test", **DEFAULT_ARGS)
+
+    _setup_datasets(train_dataset, val_dataset, test_dataset)
+
+    assert len(train_dataset.datasets) == 3
+    assert len(val_dataset.datasets) == 1
+    assert len(test_dataset.datasets) == 2
 
     assert len(train_dataset) == 192
     assert len(val_dataset) == 64
@@ -39,9 +45,10 @@ def test_split_and_expected_shapes_camelyon16(root: str):
 
 
 @pytest.mark.parametrize("split", ["train", "val", "test", None])
-def test_filenames_camelyon16(root: str, split: Literal["train", "val", "test"]):
+def test_filenames(root: str, split: Literal["train", "val", "test"]):
     """Tests that the number of filenames matches the dataset size."""
     dataset = datasets.Camelyon16(root=root, split=split, **DEFAULT_ARGS)
+    _setup_datasets(dataset)
 
     filenames = set()
     for i in range(len(dataset)):
@@ -69,3 +76,8 @@ def _check_batch_shape(batch: Any):
 def root(assets_path: str) -> str:
     """Fixture returning the root directory of the dataset."""
     return os.path.join(assets_path, "vision/datasets/camelyon16")
+
+
+def _setup_datasets(*datasets: datasets.Camelyon16):
+    for dataset in datasets:
+        dataset.setup()
