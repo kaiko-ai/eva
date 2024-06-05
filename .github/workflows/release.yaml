@@ -4,6 +4,8 @@ name: Release
 on:
   workflow_dispatch:
   push:
+    pull_request:
+      branches:
     branches:
       - main
     tags:
