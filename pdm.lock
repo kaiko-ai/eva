@@ -5,7 +5,7 @@
 groups = ["default", "dev", "docs", "all", "typecheck", "lint", "vision", "test"]
 strategy = ["cross_platform", "inherit_metadata"]
 lock_version = "4.4.1"
-content_hash = "sha256:0eada25803c4ccab62b3b9d11881c46185c564f29a81541ddc3cb0c651fe254e"
+content_hash = "sha256:47819e7b5d862035583b2e4875a803df88f257f4efa5a2ceb8b3d04a159eb67e"
 
 [[package]]
 name = "absl-py"
@@ -429,13 +429,13 @@ files = [
 
 [[package]]
 name = "filelock"
-version = "3.13.1"
+version = "3.14.0"
 requires_python = ">=3.8"
 summary = "A platform independent file lock."
 groups = ["all", "default", "dev", "typecheck", "vision"]
 files = [
-    {file = "filelock-3.13.1-py3-none-any.whl", hash = "sha256:57dbda9b35157b05fb3e58ee91448612eb674172fab98ee235ccb0b5bee19a1c"},
-    {file = "filelock-3.13.1.tar.gz", hash = "sha256:521f5f56c50f8426f5e03ad3b281b490a87ef15bc6c526f168290f0c7148d44e"},
+    {file = "filelock-3.14.0-py3-none-any.whl", hash = "sha256:43339835842f110ca7ae60f1e1c160714c5a6afd15a2873419ab185334975c0f"},
+    {file = "filelock-3.14.0.tar.gz", hash = "sha256:6ea72da3be9b8c82afd3edcf99f2fffbb5076335a5ae4d03248bb5b6c3eae78a"},
 ]
 
 [[package]]
@@ -506,29 +506,29 @@ files = [
 
 [[package]]
 name = "fsspec"
-version = "2024.3.0"
+version = "2024.6.0"
 requires_python = ">=3.8"
 summary = "File-system specification"
 groups = ["all", "default", "vision"]
 files = [
-    {file = "fsspec-2024.3.0-py3-none-any.whl", hash = "sha256:779001bd0122c9c4975cf03827d5e86c3afb914a3ae27040f15d341ab506a693"},
-    {file = "fsspec-2024.3.0.tar.gz", hash = "sha256:f13a130c0ed07e15c4e1aeb0472a823e9c426b0b5792a1f40d902b0a71972d43"},
+    {file = "fsspec-2024.6.0-py3-none-any.whl", hash = "sha256:58d7122eb8a1a46f7f13453187bfea4972d66bf01618d37366521b1998034cee"},
+    {file = "fsspec-2024.6.0.tar.gz", hash = "sha256:f579960a56e6d8038a9efc8f9c77279ec12e6299aa86b0769a7e9c46b94527c2"},
 ]
 
 [[package]]
 name = "fsspec"
-version = "2024.3.0"
+version = "2024.6.0"
 extras = ["http"]
 requires_python = ">=3.8"
 summary = "File-system specification"
 groups = ["default"]
 dependencies = [
     "aiohttp!=4.0.0a0,!=4.0.0a1",
-    "fsspec==2024.3.0",
+    "fsspec==2024.6.0",
 ]
 files = [
-    {file = "fsspec-2024.3.0-py3-none-any.whl", hash = "sha256:779001bd0122c9c4975cf03827d5e86c3afb914a3ae27040f15d341ab506a693"},
-    {file = "fsspec-2024.3.0.tar.gz", hash = "sha256:f13a130c0ed07e15c4e1aeb0472a823e9c426b0b5792a1f40d902b0a71972d43"},
+    {file = "fsspec-2024.6.0-py3-none-any.whl", hash = "sha256:58d7122eb8a1a46f7f13453187bfea4972d66bf01618d37366521b1998034cee"},
+    {file = "fsspec-2024.6.0.tar.gz", hash = "sha256:f579960a56e6d8038a9efc8f9c77279ec12e6299aa86b0769a7e9c46b94527c2"},
 ]
 
 [[package]]
@@ -728,7 +728,7 @@ files = [
 
 [[package]]
 name = "jinja2"
-version = "3.1.3"
+version = "3.1.4"
 requires_python = ">=3.7"
 summary = "A very fast and expressive template engine."
 groups = ["all", "default", "dev", "docs", "vision"]
@@ -736,8 +736,8 @@ dependencies = [
     "MarkupSafe>=2.0",
 ]
 files = [
-    {file = "Jinja2-3.1.3-py3-none-any.whl", hash = "sha256:7d6d50dd97d52cbc355597bd845fabfbac3f551e1f99619e39a35ce8c370b5fa"},
-    {file = "Jinja2-3.1.3.tar.gz", hash = "sha256:ac8bd6544d4bb2c9792bf3a159e80bba8fda7f07e81bc3aed565432d5925ba90"},
+    {file = "jinja2-3.1.4-py3-none-any.whl", hash = "sha256:bc5dd2abb727a5319567b7a813e6a2e7318c39f4f487cfe6c89c6f9c7d25197d"},
+    {file = "jinja2-3.1.4.tar.gz", hash = "sha256:4a3aee7acbbe7303aede8e9648d13b8bf88a429282aa6122a993f0ac800cb369"},
 ]
 
 [[package]]
@@ -1212,13 +1212,13 @@ files = [
 
 [[package]]
 name = "networkx"
-version = "3.2.1"
-requires_python = ">=3.9"
+version = "3.3"
+requires_python = ">=3.10"
 summary = "Python package for creating and manipulating graphs and networks"
 groups = ["all", "default", "vision"]
 files = [
-    {file = "networkx-3.2.1-py3-none-any.whl", hash = "sha256:f18c69adc97877c42332c170849c96cefa91881c99a7cb3e95b7c659ebdc1ec2"},
-    {file = "networkx-3.2.1.tar.gz", hash = "sha256:9f1bb5cf3409bf324e0a722c20bdb4c20ee39bf1c30ce8ae499c8502b0b5e0c6"},
+    {file = "networkx-3.3-py3-none-any.whl", hash = "sha256:28575580c6ebdaf4505b22c6256a2b9de86b316dc63ba9e93abde3d78dfdbcf2"},
+    {file = "networkx-3.3.tar.gz", hash = "sha256:0c127d8b2f4865f59ae9cb8aafcd60b5c70f3241ebd66f7defad7c4ab90126c9"},
 ]
 
 [[package]]
@@ -1437,15 +1437,14 @@ files = [
 
 [[package]]
 name = "nvidia-nvjitlink-cu12"
-version = "12.4.99"
+version = "12.5.40"
 requires_python = ">=3"
 summary = "Nvidia JIT LTO Library"
 groups = ["all", "default", "vision"]
 marker = "platform_system == \"Linux\" and platform_machine == \"x86_64\""
 files = [
-    {file = "nvidia_nvjitlink_cu12-12.4.99-py3-none-manylinux2014_aarch64.whl", hash = "sha256:75d6498c96d9adb9435f2bbdbddb479805ddfb97b5c1b32395c694185c20ca57"},
-    {file = "nvidia_nvjitlink_cu12-12.4.99-py3-none-manylinux2014_x86_64.whl", hash = "sha256:c6428836d20fe7e327191c175791d38570e10762edc588fb46749217cd444c74"},
-    {file = "nvidia_nvjitlink_cu12-12.4.99-py3-none-win_amd64.whl", hash = "sha256:991905ffa2144cb603d8ca7962d75c35334ae82bf92820b6ba78157277da1ad2"},
+    {file = "nvidia_nvjitlink_cu12-12.5.40-py3-none-manylinux2014_x86_64.whl", hash = "sha256:d9714f27c1d0f0895cd8915c07a87a1d0029a0aa36acaf9156952ec2a8a12189"},
+    {file = "nvidia_nvjitlink_cu12-12.5.40-py3-none-win_amd64.whl", hash = "sha256:c3401dc8543b52d3a8158007a0c1ab4e9c768fcbd24153a48c86972102197ddd"},
 ]
 
 [[package]]
@@ -1512,7 +1511,7 @@ groups = ["default"]
 dependencies = [
     "coloredlogs",
     "flatbuffers",
-    "numpy>=1.21.6",
+    "numpy>=1.26.0",
     "packaging",
     "protobuf",
     "sympy",
@@ -2160,16 +2159,16 @@ files = [
 
 [[package]]
 name = "sympy"
-version = "1.12"
+version = "1.12.1"
 requires_python = ">=3.8"
 summary = "Computer algebra system (CAS) in Python"
 groups = ["all", "default", "vision"]
 dependencies = [
-    "mpmath>=0.19",
+    "mpmath<1.4.0,>=1.1.0",
 ]
 files = [
-    {file = "sympy-1.12-py3-none-any.whl", hash = "sha256:c3588cd4295d0c0f603d0f2ae780587e64e2efeedb3521e46b9bb1d08d184fa5"},
-    {file = "sympy-1.12.tar.gz", hash = "sha256:ebf595c8dac3e0fdc4152c51878b498396ec7f30e7a914d6071e674d49420fb8"},
+    {file = "sympy-1.12.1-py3-none-any.whl", hash = "sha256:9b2cbc7f1a640289430e13d2a56f02f867a1da0190f2f99d8968c2f74da0e515"},
+    {file = "sympy-1.12.1.tar.gz", hash = "sha256:2877b03f998cd8c08f07cd0de5b767119cd3ef40d09f41c30d722f6686b0fb88"},
 ]
 
 [[package]]
@@ -2337,7 +2336,7 @@ files = [
 
 [[package]]
 name = "torch"
-version = "2.3.0"
+version = "2.3.1"
 requires_python = ">=3.8.0"
 summary = "Tensors and Dynamic neural networks in Python with strong GPU acceleration"
 groups = ["all", "default", "vision"]
@@ -2359,22 +2358,22 @@ dependencies = [
     "nvidia-nccl-cu12==2.20.5; platform_system == \"Linux\" and platform_machine == \"x86_64\"",
     "nvidia-nvtx-cu12==12.1.105; platform_system == \"Linux\" and platform_machine == \"x86_64\"",
     "sympy",
-    "triton==2.3.0; platform_system == \"Linux\" and platform_machine == \"x86_64\" and python_version < \"3.12\"",
+    "triton==2.3.1; platform_system == \"Linux\" and platform_machine == \"x86_64\" and python_version < \"3.12\"",
     "typing-extensions>=4.8.0",
 ]
 files = [
-    {file = "torch-2.3.0-cp310-cp310-manylinux1_x86_64.whl", hash = "sha256:d8ea5a465dbfd8501f33c937d1f693176c9aef9d1c1b0ca1d44ed7b0a18c52ac"},
-    {file = "torch-2.3.0-cp310-cp310-manylinux2014_aarch64.whl", hash = "sha256:09c81c5859a5b819956c6925a405ef1cdda393c9d8a01ce3851453f699d3358c"},
-    {file = "torch-2.3.0-cp310-cp310-win_amd64.whl", hash = "sha256:1bf023aa20902586f614f7682fedfa463e773e26c58820b74158a72470259459"},
-    {file = "torch-2.3.0-cp310-none-macosx_11_0_arm64.whl", hash = "sha256:758ef938de87a2653bba74b91f703458c15569f1562bf4b6c63c62d9c5a0c1f5"},
-    {file = "torch-2.3.0-cp311-cp311-manylinux1_x86_64.whl", hash = "sha256:493d54ee2f9df100b5ce1d18c96dbb8d14908721f76351e908c9d2622773a788"},
-    {file = "torch-2.3.0-cp311-cp311-manylinux2014_aarch64.whl", hash = "sha256:bce43af735c3da16cc14c7de2be7ad038e2fbf75654c2e274e575c6c05772ace"},
-    {file = "torch-2.3.0-cp311-cp311-win_amd64.whl", hash = "sha256:729804e97b7cf19ae9ab4181f91f5e612af07956f35c8b2c8e9d9f3596a8e877"},
-    {file = "torch-2.3.0-cp311-none-macosx_11_0_arm64.whl", hash = "sha256:d24e328226d8e2af7cf80fcb1d2f1d108e0de32777fab4aaa2b37b9765d8be73"},
-    {file = "torch-2.3.0-cp312-cp312-manylinux1_x86_64.whl", hash = "sha256:b0de2bdc0486ea7b14fc47ff805172df44e421a7318b7c4d92ef589a75d27410"},
-    {file = "torch-2.3.0-cp312-cp312-manylinux2014_aarch64.whl", hash = "sha256:a306c87a3eead1ed47457822c01dfbd459fe2920f2d38cbdf90de18f23f72542"},
-    {file = "torch-2.3.0-cp312-cp312-win_amd64.whl", hash = "sha256:f9b98bf1a3c8af2d4c41f0bf1433920900896c446d1ddc128290ff146d1eb4bd"},
-    {file = "torch-2.3.0-cp312-none-macosx_11_0_arm64.whl", hash = "sha256:dca986214267b34065a79000cee54232e62b41dff1ec2cab9abc3fc8b3dee0ad"},
+    {file = "torch-2.3.1-cp310-cp310-manylinux1_x86_64.whl", hash = "sha256:605a25b23944be5ab7c3467e843580e1d888b8066e5aaf17ff7bf9cc30001cc3"},
+    {file = "torch-2.3.1-cp310-cp310-manylinux2014_aarch64.whl", hash = "sha256:f2357eb0965583a0954d6f9ad005bba0091f956aef879822274b1bcdb11bd308"},
+    {file = "torch-2.3.1-cp310-cp310-win_amd64.whl", hash = "sha256:32b05fe0d1ada7f69c9f86c14ff69b0ef1957a5a54199bacba63d22d8fab720b"},
+    {file = "torch-2.3.1-cp310-none-macosx_11_0_arm64.whl", hash = "sha256:7c09a94362778428484bcf995f6004b04952106aee0ef45ff0b4bab484f5498d"},
+    {file = "torch-2.3.1-cp311-cp311-manylinux1_x86_64.whl", hash = "sha256:b2ec81b61bb094ea4a9dee1cd3f7b76a44555375719ad29f05c0ca8ef596ad39"},
+    {file = "torch-2.3.1-cp311-cp311-manylinux2014_aarch64.whl", hash = "sha256:490cc3d917d1fe0bd027057dfe9941dc1d6d8e3cae76140f5dd9a7e5bc7130ab"},
+    {file = "torch-2.3.1-cp311-cp311-win_amd64.whl", hash = "sha256:5802530783bd465fe66c2df99123c9a54be06da118fbd785a25ab0a88123758a"},
+    {file = "torch-2.3.1-cp311-none-macosx_11_0_arm64.whl", hash = "sha256:a7dd4ed388ad1f3d502bf09453d5fe596c7b121de7e0cfaca1e2017782e9bbac"},
+    {file = "torch-2.3.1-cp312-cp312-manylinux1_x86_64.whl", hash = "sha256:a486c0b1976a118805fc7c9641d02df7afbb0c21e6b555d3bb985c9f9601b61a"},
+    {file = "torch-2.3.1-cp312-cp312-manylinux2014_aarch64.whl", hash = "sha256:224259821fe3e4c6f7edf1528e4fe4ac779c77addaa74215eb0b63a5c474d66c"},
+    {file = "torch-2.3.1-cp312-cp312-win_amd64.whl", hash = "sha256:e5fdccbf6f1334b2203a61a0e03821d5845f1421defe311dabeae2fc8fbeac2d"},
+    {file = "torch-2.3.1-cp312-none-macosx_11_0_arm64.whl", hash = "sha256:3c333dc2ebc189561514eda06e81df22bf8fb64e2384746b2cb9f04f96d1d4c8"},
 ]
 
 [[package]]
@@ -2396,28 +2395,28 @@ files = [
 
 [[package]]
 name = "torchvision"
-version = "0.18.0"
+version = "0.18.1"
 requires_python = ">=3.8"
 summary = "image and video datasets and models for torch deep learning"
 groups = ["all", "vision"]
 dependencies = [
     "numpy",
     "pillow!=8.3.*,>=5.3.0",
-    "torch==2.3.0",
+    "torch==2.3.1",
 ]
 files = [
-    {file = "torchvision-0.18.0-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:dd61628a3d189c6852a12dc5ed4cd2eece66d2d67f35a866cb16f1dcb06c8c62"},
-    {file = "torchvision-0.18.0-cp310-cp310-manylinux1_x86_64.whl", hash = "sha256:493c45f9937dad37aa1b64b14da17c7a589c72b91adc4837d431009cfe29bd53"},
-    {file = "torchvision-0.18.0-cp310-cp310-manylinux2014_aarch64.whl", hash = "sha256:5337f6acfa1fe959d5cb340d01a00614d6b31ce7a4824ccb95435a85c5273b95"},
-    {file = "torchvision-0.18.0-cp310-cp310-win_amd64.whl", hash = "sha256:bd8e6f3b5beb49965f15c461302488edfa3d8c2d01d3bb79b150d6fb62711e3a"},
-    {file = "torchvision-0.18.0-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:6896a52168befe1105fb3c9335287390ed227e71d1e4ec4d68b62e8a3099fc09"},
-    {file = "torchvision-0.18.0-cp311-cp311-manylinux1_x86_64.whl", hash = "sha256:3d7955398d4ceaad77c487c2c44f6f7813112402c9bab8cd906d346005891048"},
-    {file = "torchvision-0.18.0-cp311-cp311-manylinux2014_aarch64.whl", hash = "sha256:e5a24d620cea14a4bb89f24aa2b506230c0a16a3ada57fc53ad80cfd256a2128"},
-    {file = "torchvision-0.18.0-cp311-cp311-win_amd64.whl", hash = "sha256:6ad70ddfa879bda5ed886b2518fe562640e0059787cbd65cb2bffa7674541410"},
-    {file = "torchvision-0.18.0-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:eb9d83c0e1dbb54ecb0fb04c87f786333e3a6fb8b9c400aca7c31081f9aa5707"},
-    {file = "torchvision-0.18.0-cp312-cp312-manylinux1_x86_64.whl", hash = "sha256:b657d052d146f24cb3b2a78219bfc82ae70a9706671c50f632528907d10cccec"},
-    {file = "torchvision-0.18.0-cp312-cp312-manylinux2014_aarch64.whl", hash = "sha256:a964afbc7ddf50a46b941477f6c35729b416deedd139756befd488245e2e226d"},
-    {file = "torchvision-0.18.0-cp312-cp312-win_amd64.whl", hash = "sha256:7c770f0f748e0b17f57c0297508d7254f686cdf03fc2e2949f422b20574f4c0f"},
+    {file = "torchvision-0.18.1-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:3e694e54b0548dad99c12af6bf0c8e4f3350137d391dcd19af22a1c5f89322b3"},
+    {file = "torchvision-0.18.1-cp310-cp310-manylinux1_x86_64.whl", hash = "sha256:0b3bda0aa5b416eeb547143b8eeaf17720bdba9cf516dc991aacb81811aa96a5"},
+    {file = "torchvision-0.18.1-cp310-cp310-manylinux2014_aarch64.whl", hash = "sha256:573ff523c739405edb085f65cb592f482d28a30e29b0be4c4ba08040b3ae785f"},
+    {file = "torchvision-0.18.1-cp310-cp310-win_amd64.whl", hash = "sha256:ef7bbbc60b38e831a75e547c66ca1784f2ac27100f9e4ddbe9614cef6cbcd942"},
+    {file = "torchvision-0.18.1-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:80b5d794dd0fdba787adc22f1a367a5ead452327686473cb260dd94364bc56a6"},
+    {file = "torchvision-0.18.1-cp311-cp311-manylinux1_x86_64.whl", hash = "sha256:9077cf590cdb3a5e8fdf5cdb71797f8c67713f974cf0228ecb17fcd670ab42f9"},
+    {file = "torchvision-0.18.1-cp311-cp311-manylinux2014_aarch64.whl", hash = "sha256:ceb993a882f1ae7ae373ed39c28d7e3e802205b0e59a7ed84ef4028f0bba8d7f"},
+    {file = "torchvision-0.18.1-cp311-cp311-win_amd64.whl", hash = "sha256:52f7436140045dc2239cdc502aa76b2bd8bd676d64244ff154d304aa69852046"},
+    {file = "torchvision-0.18.1-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:2be6f0bf7c455c89a51a1dbb6f668d36c6edc479f49ac912d745d10df5715657"},
+    {file = "torchvision-0.18.1-cp312-cp312-manylinux1_x86_64.whl", hash = "sha256:f118d887bfde3a948a41d56587525401e5cac1b7db2eaca203324d6ed2b1caca"},
+    {file = "torchvision-0.18.1-cp312-cp312-manylinux2014_aarch64.whl", hash = "sha256:13d24d904f65e62d66a1e0c41faec630bc193867b8a4a01166769e8a8e8df8e9"},
+    {file = "torchvision-0.18.1-cp312-cp312-win_amd64.whl", hash = "sha256:ed6340b69a63a625e512a66127210d412551d9c5f2ad2978130c6a45bf56cd4a"},
 ]
 
 [[package]]
@@ -2459,7 +2458,7 @@ files = [
 
 [[package]]
 name = "triton"
-version = "2.3.0"
+version = "2.3.1"
 summary = "A language and compiler for custom Deep Learning operations"
 groups = ["all", "default", "vision"]
 marker = "platform_system == \"Linux\" and platform_machine == \"x86_64\" and python_version < \"3.12\""
@@ -2467,20 +2466,20 @@ dependencies = [
     "filelock",
 ]
 files = [
-    {file = "triton-2.3.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:5ce4b8ff70c48e47274c66f269cce8861cf1dc347ceeb7a67414ca151b1822d8"},
-    {file = "triton-2.3.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:3c3d9607f85103afdb279938fc1dd2a66e4f5999a58eb48a346bd42738f986dd"},
-    {file = "triton-2.3.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:218d742e67480d9581bafb73ed598416cc8a56f6316152e5562ee65e33de01c0"},
+    {file = "triton-2.3.1-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:3c84595cbe5e546b1b290d2a58b1494df5a2ef066dd890655e5b8a8a92205c33"},
+    {file = "triton-2.3.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:c9d64ae33bcb3a7a18081e3a746e8cf87ca8623ca13d2c362413ce7a486f893e"},
+    {file = "triton-2.3.1-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:eaf80e8761a9e3498aa92e7bf83a085b31959c61f5e8ac14eedd018df6fccd10"},
 ]
 
 [[package]]
 name = "typing-extensions"
-version = "4.10.0"
+version = "4.12.1"
 requires_python = ">=3.8"
 summary = "Backported and Experimental Type Hints for Python 3.8+"
 groups = ["all", "default", "dev", "lint", "vision"]
 files = [
-    {file = "typing_extensions-4.10.0-py3-none-any.whl", hash = "sha256:69b1a937c3a517342112fb4c6df7e72fc39a38e7891a5730ed4985b5214b5475"},
-    {file = "typing_extensions-4.10.0.tar.gz", hash = "sha256:b0abd7c89e8fb96f98db18d86106ff1d90ab692004eb746cf6eda2682f91b3cb"},
+    {file = "typing_extensions-4.12.1-py3-none-any.whl", hash = "sha256:6024b58b69089e5a89c347397254e35f1bf02a907728ec7fee9bf0fe837d203a"},
+    {file = "typing_extensions-4.12.1.tar.gz", hash = "sha256:915f5e35ff76f56588223f15fdd5938f9a1cf9195c0de25130c627e4d597f6d1"},
 ]
 
 [[package]]
