@@ -121,9 +121,9 @@ class TotalSegmentator2D(base.ImageSegmentation):
 
     @override
     def filename(self, index: int) -> str:
-        sample_idx, _ = self._indices[index]
+        sample_idx, slice_index = self._indices[index]
         sample_dir = self._samples_dirs[sample_idx]
-        return os.path.join(sample_dir, "ct.nii.gz")
+        return os.path.join(sample_dir, f"{slice_index}-ct.nii.gz")
 
     @override
     def prepare_data(self) -> None:

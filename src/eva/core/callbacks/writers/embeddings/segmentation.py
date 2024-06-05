@@ -39,6 +39,11 @@ class SegmentationEmbeddingsWriter(base.EmbeddingsWriter):
 
         manifest_file.close()
 
+    @torch.no_grad()
+    def _get_embeddings(self, tensor: torch.Tensor) -> torch.Tensor:
+        """Returns the embeddings from predictions."""
+        embeddings = self._backbone(tensor) if self._backbone else tensor
+        return embeddings[-1]
 
 def _init_manifest(output_dir: str, overwrite: bool = False) -> tuple[io.TextIOWrapper, Any]:
     manifest_path = os.path.join(output_dir, "manifest.csv")
