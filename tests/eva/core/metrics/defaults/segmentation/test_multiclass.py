@@ -5,21 +5,29 @@ import torch
 
 from eva.core.metrics import defaults
 
-NUM_CLASSES_ONE = 5
+NUM_CLASSES_ONE = 3
 PREDS_ONE = torch.tensor(
     [
-        [0.70, 0.05, 0.05, 0.05, 0.05],
-        [0.05, 0.70, 0.05, 0.05, 0.05],
-        [0.05, 0.05, 0.70, 0.05, 0.05],
-        [0.05, 0.05, 0.05, 0.70, 0.05],
-    ]
+        [1, 1, 1, 1],
+        [0, 0, 1, 1],
+        [0, 0, 2, 2],
+        [0, 0, 2, 2],
+    ],
 )
-TARGET_ONE = torch.tensor([0, 1, 3, 2])
+TARGET_ONE = torch.tensor(
+    [
+        [1, 1, 0, 0],
+        [1, 1, 2, 2],
+        [0, 0, 2, 2],
+        [0, 0, 2, 2],
+    ],
+    dtype=torch.int32,
+)
 EXPECTED_ONE = {
-    "MulticlassJaccardIndex": torch.tensor(0.5),
-    "MulticlassPrecision": torch.tensor(0.0),
-    "MulticlassRecall": torch.tensor(0.0),
-    "MulticlassF1Score": torch.tensor(0.0),
+    "MulticlassJaccardIndex": torch.tensor(0.4722222089767456),
+    "MulticlassF1Score": torch.tensor(0.6222222447395325),
+    "MulticlassPrecision": torch.tensor(0.6666666865348816),
+    "MulticlassRecall": torch.tensor(0.611011104490899),
 }
 """Test features."""
 

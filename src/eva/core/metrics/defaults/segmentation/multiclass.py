@@ -35,6 +35,11 @@ class MulticlassSegmentationMetrics(structs.MetricCollection):
                     average=average,
                     ignore_index=ignore_index,
                 ),
+                classification.MulticlassF1Score(
+                    num_classes=num_classes,
+                    average=average,
+                    ignore_index=ignore_index,
+                ),
                 classification.MulticlassPrecision(
                     num_classes=num_classes,
                     average=average,
@@ -45,20 +50,17 @@ class MulticlassSegmentationMetrics(structs.MetricCollection):
                     average=average,
                     ignore_index=ignore_index,
                 ),
-                classification.MulticlassF1Score(
-                    num_classes=num_classes,
-                    average=average,
-                    ignore_index=ignore_index,
-                ),
             ],
             prefix=prefix,
             postfix=postfix,
             compute_groups=[
                 [
                     "MulticlassJaccardIndex",
+                ],
+                [
+                    "MulticlassF1Score",
                     "MulticlassPrecision",
                     "MulticlassRecall",
-                    "MulticlassF1Score",
                 ],
             ],
         )
