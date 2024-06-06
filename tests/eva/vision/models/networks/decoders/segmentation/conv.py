@@ -29,6 +29,12 @@ from eva.vision.models.networks.decoders import segmentation
             (224, 224),
             torch.Size([2, 5, 224, 224]),
         ),
+        (
+            nn.Conv2d(768, 5, kernel_size=(1, 1)),
+            [torch.Tensor(2, 384, 14, 14), torch.Tensor(2, 384, 14, 14)],
+            (224, 224),
+            torch.Size([2, 5, 224, 224]),
+        ),
     ],
 )
 def test_conv_decoder(
