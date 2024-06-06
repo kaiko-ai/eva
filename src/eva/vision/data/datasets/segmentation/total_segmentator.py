@@ -15,7 +15,7 @@ from typing_extensions import override
 
 from eva.vision.data.datasets import _utils, _validators, structs
 from eva.vision.data.datasets.segmentation import base
-from eva.vision.utils import io
+from eva.vision.utils import convert, io
 
 
 class TotalSegmentator2D(base.ImageSegmentation):

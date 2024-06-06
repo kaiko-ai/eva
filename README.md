@@ -1,14 +1,18 @@
 <div align="center">
 
-<img src="https://github.com/kaiko-ai/eva/blob/main/docs/images/eva-logo.png?raw=true" width="400">
+<br />
 
+<img src="https://github.com/kaiko-ai/eva/blob/main/docs/images/eva-logo.png?raw=true" width="340">
+
+<br />
 <br />
 
 _Oncology FM Evaluation Framework by kaiko.ai_
 
 [![PyPI](https://img.shields.io/pypi/v/kaiko-eva.svg?logo=python)](https://pypi.python.org/pypi/kaiko-eva)
-[![docs](https://img.shields.io/badge/docs-latest-green)](https://kaiko-ai.github.io/eva/latest)
-[![license](https://img.shields.io/badge/License-Apache%202.0-blue.svg?labelColor=gray)](https://github.com/kaiko-ai/eva#license)
+[![docs](https://img.shields.io/badge/📚_docs-latest-green)](https://kaiko-ai.github.io/eva/latest)
+[![license](https://img.shields.io/badge/⚖️_License-Apache%202.0-blue.svg?labelColor=gray)](https://github.com/kaiko-ai/eva#license)<br>
+[![paper](http://img.shields.io/badge/OpenReview-MIDL_2024-B31B1B.svg)](https://openreview.net/forum?id=FNBQOPj18N&noteId=FNBQOPj18N)
 
 <p align="center">
   <a href="https://github.com/kaiko-ai/eva#installation">Installation</a> •
@@ -59,12 +63,12 @@ eva --version
 
 ## How To Use
 
-_eva_ can be used directly from the terminal as a CLI tool as follows:
+_`eva`_ can be used directly from the terminal as a CLI tool as follows:
 ```sh
 eva {fit,predict,predict_fit} --config url/or/path/to/the/config.yaml 
 ```
 
-When used as a CLI tool, `_eva_` supports configuration files (`.yaml`) as an argument to define its functionality.
+When used as a CLI tool, _`eva`_ supports configuration files (`.yaml`) as an argument to define its functionality.
 Native supported configs can be found at the [configs](https://github.com/kaiko-ai/eva/tree/main/configs) directory
 of the repo. Apart from cloning the repo, you can download the latest config folder as `.zip` from your browser from
 [here](https://download-directory.github.io/?url=https://github.com/kaiko-ai/eva/tree/main/configs). Alternatively,
@@ -98,7 +102,7 @@ and [tutorials](https://kaiko-ai.github.io/eva/dev/user-guide/advanced/replicate
 
 ## Benchmarks
 
-In this section you will find model benchmarks which were generated with `_eva_`.
+In this section you will find model benchmarks which were generated with _`eva`_.
 
 ### Table I: WSI patch-level benchmark
 
@@ -129,15 +133,15 @@ over 5 runs, with an average standard deviation of ±0.003._
 <br />
 
 _References_:
-1. _"Emerging properties in self-supervised vision transformers”_
-2. _"Benchmarking self-supervised learning on diverse pathology datasets”_
-3. _"Scaling self-supervised learning for histopathology with masked image modeling”_
-4. _"A General-Purpose Self-Supervised Model for Computational Pathology”_
-5. _"Towards Training Large-Scale Pathology Foundation Models: from TCGA to Hospital Scale”_
+1. _"Emerging properties in self-supervised vision transformers”_, [arXiv](https://arxiv.org/abs/2104.14294)
+2. _"Benchmarking self-supervised learning on diverse pathology datasets”_, [arXiv](https://arxiv.org/abs/2212.04690)
+3. _"Scaling self-supervised learning for histopathology with masked image modeling”_, [medRxiv](https://www.medrxiv.org/content/10.1101/2023.07.21.23292757v1)
+4. _"A General-Purpose Self-Supervised Model for Computational Pathology”_, [arXiv](https://arxiv.org/abs/2308.15474)
+5. _"Towards Training Large-Scale Pathology Foundation Models: from TCGA to Hospital Scale”_, [arXiv](https://arxiv.org/pdf/2404.15217)
 
 ## Contributing
 
-_eva_ is an open source project and welcomes contributions of all kinds. Please checkout the [developer](./docs/DEVELOPER_GUIDE.md)
+_`eva`_ is an open source project and welcomes contributions of all kinds. Please checkout the [developer](./docs/DEVELOPER_GUIDE.md)
 and [contributing guide](./docs/CONTRIBUTING.md) for help on how to do so.
 
 All contributors must follow the [code of conduct](./docs/CODE_OF_CONDUCT.md).
@@ -162,7 +166,23 @@ Our codebase is built using multiple opensource contributions
 
 </div>
 
----
+
+## Citation
+
+If you find this repository useful, please consider giving a star ⭐ and adding the following citation:
+
+```bibtex
+@inproceedings{kaiko.ai2024eva,
+    title={eva: Evaluation framework for pathology foundation models},
+    author={kaiko.ai and Ioannis Gatopoulos and Nicolas K{\"a}nzig and Roman Moser and Sebastian Ot{\'a}lora},
+    booktitle={Medical Imaging with Deep Learning},
+    year={2024},
+    url={https://openreview.net/forum?id=FNBQOPj18N}
+}
+```
+
+<br />
+
 <div align="center">
   <img src="https://github.com/kaiko-ai/eva/blob/main/docs/images/kaiko-logo.png?raw=true" width="200">
 </div>

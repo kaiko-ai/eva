@@ -7,7 +7,8 @@ trainer:
     limit_train_batches: 2
     limit_val_batches: 2
     callbacks:
-      - class_path: eva.callbacks.EmbeddingsWriter
+      - class_path: eva.callbacks.ConfigurationLogger
+      - class_path: eva.callbacks.ClassificationEmbeddingsWriter
         init_args:
           output_dir: &DATASET_EMBEDDINGS_ROOT ${oc.env:EMBEDDINGS_ROOT}/patch_camelyon
           dataloader_idx_map:
@@ -71,7 +72,9 @@ data:
           manifest_file: manifest.csv
           split: train
           target_transforms:
-            class_path: eva.core.data.transforms.ArrayToFloatTensor
+            class_path: torchvision.transforms.v2.ToDtype
+            init_args:
+              dtype: torch.float32
       val:
         class_path: eva.datasets.EmbeddingsClassificationDataset
         init_args:
@@ -83,7 +86,7 @@ data:
             root: ${oc.env:TESTS_ROOT, tests/eva}/assets/vision/datasets/patch_camelyon
             split: train
             download: false
-            image_transforms:
+            transforms:
               class_path: eva.vision.data.transforms.common.ResizeAndCrop
               init_args:
                 mean: ${oc.env:NORMALIZE_MEAN, [0.485, 0.456, 0.406]} 

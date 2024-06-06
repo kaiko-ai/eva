@@ -5,6 +5,7 @@ trainer:
     default_root_dir: &OUTPUT_ROOT ${oc.env:OUTPUT_ROOT, logs/${oc.env:DINO_BACKBONE, dino_vits16}/online/bach}
     max_steps: &MAX_STEPS ${oc.env:MAX_STEPS, 12500}
     callbacks:
+      - class_path: eva.callbacks.ConfigurationLogger
       - class_path: lightning.pytorch.callbacks.LearningRateMonitor
         init_args:
           logging_interval: epoch
@@ -76,7 +77,7 @@ data:
           # The BACH dataset is distributed under the following license
           # Attribution-NonCommercial-NoDerivs 4.0 International license
           # (see: https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode)
-          image_transforms:
+          transforms:
             class_path: eva.vision.data.transforms.common.ResizeAndCrop
             init_args:
               size: ${oc.env:RESIZE_DIM, 224}  
