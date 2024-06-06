@@ -1,24 +1,36 @@
-"""TotalSegmentator 2D segmentation dataset class."""
+"""Embeddings based semantic segmentation dataset."""
 
-import functools
 import os
-from glob import glob
-from typing import Any, Callable, Dict, List, Literal, Tuple
+from typing import List
 
-import numpy as np
-import numpy.typing as npt
 import torch
-import tqdm
 from torchvision import tv_tensors
-from torchvision.datasets import utils
 from typing_extensions import override
-
-from eva.vision.data.datasets import _utils, _validators, structs
-from eva.vision.data.datasets.segmentation import base
-from eva.vision.utils import io
 
 from eva.core.data.datasets import embeddings as embeddings_base
 
 
-class EmbeddingsSegmentation(base.ImageSegmentation, embeddings_base.EmbeddingsDataset[torch.Tensor]):
+class EmbeddingsSegmentationDataset(embeddings_base.EmbeddingsDataset[tv_tensors.Mask]):
     """Embeddings segmentation dataset."""
+
+    @override
+    def _load_embeddings(self, index: int) -> List[torch.Tensor]:
+        filename = self.filename(index)
+        embeddings_path = os.path.join(self._root, filename)
+        tensor = torch.load(embeddings_path, map_location="cpu")
+        if isinstance(tensor, list) and len(tensor) > 1:
+            raise ValueError(f"Expected a single tensor in the .pt file, but found {len(tensor)}.")
+        if isinstance(tensor, torch.Tensor):
+            tensor = [tensor]
+        return [embeddings.squeeze(0) for embeddings in tensor]
+
+    @override
+    def _load_target(self, index: int) -> tv_tensors.Mask:
+        filename = self._data.at[index, self._column_mapping["target"]]
+        mask_path = os.path.join(self._root, filename)
+        semantic_labels = torch.load(mask_path, map_location="cpu")
+        return tv_tensors.Mask(semantic_labels, dtype=torch.int64)  # type: ignore[reportCallIssue]
+
+    @override
+    def __len__(self) -> int:
+        return len(self._data)

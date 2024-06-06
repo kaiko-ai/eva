@@ -77,7 +77,7 @@ class SemanticSegmentationModule(module.ModelModule):
     def forward(
         self,
         tensor: torch.Tensor,
-        image_size: Tuple[int, int] | None = None,
+        to_size: Tuple[int, int] | None = None,
         *args: Any,
         **kwargs: Any,
     ) -> torch.Tensor:
@@ -85,16 +85,16 @@ class SemanticSegmentationModule(module.ModelModule):
 
         If `tensor` is image tensor, then the `self.encoder`
         should be implemented, otherwise it will be interpreted
-        as embeddings, where the `image_size` should be given.
+        as embeddings, where the `to_size` should be given.
         """
-        if self.encoder is None and image_size is None:
+        if self.encoder is None and to_size is None:
             raise ValueError(
                 "Please provide the expected `image_size` that the "
                 "decoder should map the embeddings (`tensor`) to."
             )
 
         patch_embeddings = self.encoder(tensor) if self.encoder else tensor
-        return self.decoder(patch_embeddings, image_size or tensor.shape[-2:])
+        return self.decoder(patch_embeddings, to_size or tensor.shape[-2:])
 
     @override
     def training_step(self, batch: INPUT_TENSOR_BATCH, *args: Any, **kwargs: Any) -> STEP_OUTPUT:
@@ -142,7 +142,7 @@ class SemanticSegmentationModule(module.ModelModule):
             The batch step output.
         """
         data, targets, metadata = INPUT_TENSOR_BATCH(*batch)
-        predictions = self(data, targets.shape[-2:])
+        predictions = self(data, to_size=targets.shape[-2:])
         loss = self.criterion(predictions, targets)
         return {
             "loss": loss,

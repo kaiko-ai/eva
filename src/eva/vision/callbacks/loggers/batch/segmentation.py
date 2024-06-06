@@ -60,14 +60,15 @@ class SemanticSegmentationLogger(base.BatchLogger):
         if predictions is None:
             raise ValueError("Key `predictions` is missing from the output.")
 
-        images, targets, predictions = _subsample_tensors(
-            tensors_stack=[batch[0], batch[1], predictions],
+        data_batch, target_batch = batch[0], batch[1]
+        data, targets, predictions = _subsample_tensors(
+            tensors_stack=[data_batch, target_batch, predictions],
             max_samples=self._max_samples,
         )
-        images, targets, predictions = to_cpu([images, targets, predictions])
+        data, targets, predictions = to_cpu([data, targets, predictions])
         predictions = torch.argmax(predictions, dim=1)
 
-        images = list(map(self._format_image, images))
+        images = list(map(self._format_image, data))
         targets = list(map(_draw_semantic_mask, targets))
         predictions = list(map(_draw_semantic_mask, predictions))
         image_grid = _make_grid_from_image_groups(

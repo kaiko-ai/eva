@@ -5,9 +5,9 @@ trainer:
     default_root_dir: &OUTPUT_ROOT ${oc.env:OUTPUT_ROOT, logs/total_segmentator_2d/${oc.env:TIMM_MODEL_NAME, vit_small_patch16_224}}
     max_steps: &MAX_STEPS ${oc.env:MAX_STEPS, 12500}
     callbacks:
-      - class_path: eva.vision.callbacks.SemanticSegmentationLogger
-        init_args:
-          log_every_n_epochs: 1
+      # - class_path: eva.vision.callbacks.SemanticSegmentationLogger
+      #   init_args:
+      #     log_every_n_epochs: 1
       - class_path: eva.callbacks.SegmentationEmbeddingsWriter
         init_args:
           output_dir: &DATASET_EMBEDDINGS_ROOT ${oc.env:EMBEDDINGS_ROOT, ./data/embeddings}/${oc.env:DINO_BACKBONE, dino_vits16}/total_segmentator_2d
@@ -67,13 +67,13 @@ data:
   init_args:
     datasets:
       train:
-        class_path: eva.datasets.EmbeddingsClassificationDataset
+        class_path: eva.vision.datasets.EmbeddingsSegmentationDataset
         init_args: &DATASET_ARGS
           root: *DATASET_EMBEDDINGS_ROOT
           manifest_file: manifest.csv
           split: train
       val:
-        class_path: eva.datasets.EmbeddingsClassificationDataset
+        class_path: eva.vision.datasets.EmbeddingsSegmentationDataset
         init_args:
           <<: *DATASET_ARGS
           split: val
@@ -95,9 +95,9 @@ data:
             split: val
     dataloaders:
       train:
-        batch_size: &BATCH_SIZE ${oc.env:BATCH_SIZE, 16}
+        batch_size: &BATCH_SIZE ${oc.env:BATCH_SIZE, 256}
         shuffle: true
       val:
         batch_size: *BATCH_SIZE
       predict:
-        batch_size: &PREDICT_BATCH_SIZE ${oc.env:PREDICT_BATCH_SIZE, 16}
+        batch_size: &PREDICT_BATCH_SIZE ${oc.env:PREDICT_BATCH_SIZE, 64}
