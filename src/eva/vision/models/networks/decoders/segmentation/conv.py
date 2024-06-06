@@ -34,9 +34,9 @@ class ConvDecoder(decoder.Decoder):
         on the dimension axis of the hidden size.
 
         Example:
-            features = [torch.Size([16, 384, 14, 14]), torch.Size([16, 384, 14, 14])]
-            output = self._forward_features(features)
-            assert output.shape == torch.Size([16, 768, 14, 14])
+            >>> features = [torch.Tensor(16, 384, 14, 14), torch.Size(16, 384, 14, 14)]
+            >>> output = self._forward_features(features)
+            >>> assert output.shape == torch.Size([16, 768, 14, 14])
 
         Args:
             features: List of multi-level image features of shape (batch_size,
