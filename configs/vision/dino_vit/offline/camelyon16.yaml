@@ -52,9 +52,9 @@ model:
       class_path: eva.vision.models.networks.ABMIL
       init_args:
         input_size: ${oc.env:IN_FEATURES, 768}
-        output_size: &NUM_CLASSES 1 #2
+        output_size: &NUM_CLASSES 1
         projected_input_size: 128
-    criterion: torch.nn.CrossEntropyLoss
+    criterion: torch.nn.BCEWithLogitsLoss
     optimizer:
       class_path: torch.optim.AdamW
       init_args:
@@ -102,7 +102,7 @@ data:
             sampler:
               class_path: eva.vision.data.wsi.patching.samplers.ForegroundGridSampler
               init_args:
-                max_samples: 1000 #10_000
+                max_samples: 10_000
             width: 224
             height: 224
             target_mpp: 0.25
