@@ -5,6 +5,10 @@ trainer:
     default_root_dir: &OUTPUT_ROOT ${oc.env:OUTPUT_ROOT, logs/total_segmentator_2d/${oc.env:TIMM_MODEL_NAME, vit_small_patch16_224}}
     max_steps: &MAX_STEPS ${oc.env:MAX_STEPS, 20000}
     callbacks:
+      - class_path: eva.vision.callbacks.SemanticSegmentationLogger
+        init_args:
+          log_every_n_steps: 1000
+          log_images: false
       - class_path: eva.callbacks.SegmentationEmbeddingsWriter
         init_args:
           output_dir: &DATASET_EMBEDDINGS_ROOT ${oc.env:EMBEDDINGS_ROOT, ./data/embeddings}/${oc.env:DINO_BACKBONE, dino_vits16}/total_segmentator_2d

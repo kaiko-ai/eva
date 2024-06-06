@@ -22,6 +22,7 @@ class SemanticSegmentationLogger(base.BatchLogger):
         self,
         max_samples: int = 10,
         number_of_images_per_subgrid_row: int = 2,
+        log_images: bool = True,
         mean: Tuple[float, ...] = (0.0, 0.0, 0.0),
         std: Tuple[float, ...] = (1.0, 1.0, 1.0),
         log_every_n_epochs: int | None = None,
@@ -33,6 +34,7 @@ class SemanticSegmentationLogger(base.BatchLogger):
             max_samples: The maximum number of images displayed in the grid.
             number_of_images_per_subgrid_row: Number of images displayed in each row
                 of each sub-grid (that is images, targets and predictions).
+            log_images: Weather to log the input batch images.
             mean: The mean of the input images to de-normalize from.
             std: The std of the input images to de-normalize from.
             log_every_n_epochs: Epoch-wise logging frequency.
@@ -45,6 +47,7 @@ class SemanticSegmentationLogger(base.BatchLogger):
 
         self._max_samples = max_samples
         self._number_of_images_per_subgrid_row = number_of_images_per_subgrid_row
+        self._log_images = log_images
         self._mean = mean
         self._std = std
 
@@ -68,11 +71,15 @@ class SemanticSegmentationLogger(base.BatchLogger):
         data, targets, predictions = to_cpu([data, targets, predictions])
         predictions = torch.argmax(predictions, dim=1)
 
-        images = list(map(self._format_image, data))
         targets = list(map(_draw_semantic_mask, targets))
         predictions = list(map(_draw_semantic_mask, predictions))
+        image_groups = [targets, predictions]
+        if self._log_images:
+            images = list(map(self._format_image, data))
+            image_groups = [images] + image_groups
+
         image_grid = _make_grid_from_image_groups(
-            [images, targets, predictions], self._number_of_images_per_subgrid_row
+            image_groups, self._number_of_images_per_subgrid_row
         )
 
         log.log_image(
