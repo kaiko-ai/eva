@@ -30,6 +30,14 @@ class LinearDecoder(decoder.Decoder):
     def _forward_features(self, features: List[torch.Tensor]) -> torch.Tensor:
         """Forward function for multi-level feature maps to a single one.
 
+        It will interpolate the features and concat them into a single tensor
+        on the dimension axis of the hidden size.
+
+        Example:
+            >>> features = [torch.Tensor(16, 384, 14, 14), torch.Size(16, 384, 14, 14)]
+            >>> output = self._forward_features(features)
+            >>> assert output.shape == torch.Size([16, 768, 14, 14])
+
         Args:
             features: List of multi-level image features of shape (batch_size,
                 hidden_size, n_patches_height, n_patches_width).
@@ -44,7 +52,16 @@ class LinearDecoder(decoder.Decoder):
                 "shape (batch_size, hidden_size, n_patches_height, n_patches_width)."
             )
 
-        return features[-1]
+        upsampled_features = [
+            functional.interpolate(
+                input=embeddings,
+                size=features[0].shape[2:],
+                mode="bilinear",
+                align_corners=False,
+            )
+            for embeddings in features
+        ]
+        return torch.cat(upsampled_features, dim=1)
 
     def _forward_head(self, patch_embeddings: torch.Tensor) -> torch.Tensor:
         """Forward of the decoder head.

@@ -23,7 +23,7 @@ model:
       init_args:
         model_name: ${oc.env:TIMM_MODEL_NAME, vit_small_patch16_224}
         pretrained: true
-        out_indices: 1
+        out_indices: ${oc.env:TIMM_MODEL_OUT_INDICES, 1}
         model_arguments:
           dynamic_img_size: true
     decoder:
@@ -32,7 +32,7 @@ model:
         layers:
           class_path: torch.nn.Conv2d
           init_args:
-            in_channels: ${oc.env:IN_FEATURES, 384}
+            in_channels: ${oc.env:DECODER_IN_FEATURES, 384}
             out_channels:  &NUM_CLASSES 118
             kernel_size: [1, 1]
     criterion: torch.nn.CrossEntropyLoss

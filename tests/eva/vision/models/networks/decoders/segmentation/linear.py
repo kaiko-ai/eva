@@ -18,6 +18,12 @@ from eva.vision.models.networks.decoders import segmentation
             (224, 224),
             torch.Size([2, 5, 224, 224]),
         ),
+        (
+            nn.Linear(768, 5),
+            [torch.Tensor(2, 384, 14, 14), torch.Tensor(2, 384, 14, 14)],
+            (224, 224),
+            torch.Size([2, 5, 224, 224]),
+        ),
     ],
 )
 def test_linear_decoder(
