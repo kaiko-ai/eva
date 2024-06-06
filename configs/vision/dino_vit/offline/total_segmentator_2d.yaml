@@ -5,9 +5,6 @@ trainer:
     default_root_dir: &OUTPUT_ROOT ${oc.env:OUTPUT_ROOT, logs/total_segmentator_2d/${oc.env:TIMM_MODEL_NAME, vit_small_patch16_224}}
     max_steps: &MAX_STEPS ${oc.env:MAX_STEPS, 12500}
     callbacks:
-      # - class_path: eva.vision.callbacks.SemanticSegmentationLogger
-      #   init_args:
-      #     log_every_n_epochs: 1
       - class_path: eva.callbacks.SegmentationEmbeddingsWriter
         init_args:
           output_dir: &DATASET_EMBEDDINGS_ROOT ${oc.env:EMBEDDINGS_ROOT, ./data/embeddings}/${oc.env:DINO_BACKBONE, dino_vits16}/total_segmentator_2d
@@ -40,7 +37,6 @@ model:
             out_channels:  &NUM_CLASSES 118
             kernel_size: [1, 1]
     criterion: torch.nn.CrossEntropyLoss
-    lr_multiplier_encoder: 0.0
     optimizer:
       class_path: torch.optim.AdamW
       init_args:
@@ -51,17 +47,23 @@ model:
       init_args:
         total_iters: *MAX_STEPS
         power: 0.9
-    postprocess:
-      targets_transforms:
-        - class_path: torchvision.transforms.v2.ToDtype
-          init_args:
-            dtype: torch.int64
     metrics:
       common:
         - class_path: eva.metrics.AverageLoss
-        - class_path: torchmetrics.Dice
+        - class_path: torchmetrics.classification.MulticlassF1Score
           init_args:
             num_classes: *NUM_CLASSES
+      evaluation:
+        - class_path: eva.core.metrics.defaults.MulticlassSegmentationMetrics
+          init_args:
+            num_classes: *NUM_CLASSES
+        - class_path: eva.core.metrics.wrappers.ClasswiseWrapper
+          init_args:
+            metric:
+              class_path: torchmetrics.classification.MulticlassF1Score
+              init_args:
+                num_classes: *NUM_CLASSES
+                average: null
 data:
   class_path: eva.DataModule
   init_args:
@@ -95,7 +97,7 @@ data:
             split: val
     dataloaders:
       train:
-        batch_size: &BATCH_SIZE ${oc.env:BATCH_SIZE, 256}
+        batch_size: &BATCH_SIZE ${oc.env:BATCH_SIZE, 64}
         shuffle: true
       val:
         batch_size: *BATCH_SIZE
