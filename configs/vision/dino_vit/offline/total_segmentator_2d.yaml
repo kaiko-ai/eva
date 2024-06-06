@@ -54,9 +54,6 @@ model:
     metrics:
       common:
         - class_path: eva.metrics.AverageLoss
-        - class_path: torchmetrics.classification.MulticlassF1Score
-          init_args:
-            num_classes: *NUM_CLASSES
       evaluation:
         - class_path: eva.core.metrics.defaults.MulticlassSegmentationMetrics
           init_args:

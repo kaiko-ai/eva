@@ -76,7 +76,7 @@ class SemanticSegmentationModule(module.ModelModule):
     @override
     def forward(
         self,
-        tensor: torch.Tensor,
+        inputs: torch.Tensor,
         to_size: Tuple[int, int] | None = None,
         *args: Any,
         **kwargs: Any,
@@ -93,8 +93,8 @@ class SemanticSegmentationModule(module.ModelModule):
                 "decoder should map the embeddings (`tensor`) to."
             )
 
-        patch_embeddings = self.encoder(tensor) if self.encoder else tensor
-        return self.decoder(patch_embeddings, to_size or tensor.shape[-2:])
+        patch_embeddings = self.encoder(inputs) if self.encoder else inputs
+        return self.decoder(patch_embeddings, to_size or inputs.shape[-2:])
 
     @override
     def training_step(self, batch: INPUT_TENSOR_BATCH, *args: Any, **kwargs: Any) -> STEP_OUTPUT:
