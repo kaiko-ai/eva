@@ -152,7 +152,7 @@ class Camelyon16(wsi.MultiWsiDataset, base.ImageClassification):
             annotations.update(
                 {
                     self._get_id_from_path(file_path): self._get_class_from_path(file_path)
-                    for file_path in self._file_paths
+                    for file_path in self._file_paths if "test" not in file_path
                 }
             )
         return annotations
