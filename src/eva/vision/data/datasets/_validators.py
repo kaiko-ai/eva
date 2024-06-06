@@ -57,3 +57,16 @@ def check_dataset_exists(dataset_dir: str, download_available: bool) -> None:
         if download_available:
             error_message += " You can set `download=True` to download the dataset automatically."
         raise FileNotFoundError(error_message)
+
+
+def check_number_of_files(file_paths: List[str], expected_length: int, split: str | None) -> None:
+    """Verifies the number of files in the dataset.
+
+    Raise:
+        ValueError: If the number of files in the dataset does not match the expected one.
+    """
+    if len(file_paths) != expected_length:
+        raise ValueError(
+            f"Expected {expected_length} files, for split '{split}' found {len(file_paths)}. "
+            f"{_SUFFIX_ERROR_MESSAGE}"
+        )
