@@ -86,6 +86,6 @@ def _setup_datasets(*datasets: datasets.Camelyon16):
 
 @pytest.fixture(autouse=True)
 def mock_validate():
-    """Mocks the download function to avoid downloading resources when running tests."""
+    """Mocks the data validation function to avoid expecting all input images."""
     with patch.object(datasets.Camelyon16, "validate", return_value=None):
         yield
