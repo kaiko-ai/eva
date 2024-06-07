@@ -2,6 +2,7 @@
 
 import os
 from typing import Any, Literal
+from unittest.mock import patch
 
 import numpy as np
 import pytest
@@ -81,3 +82,10 @@ def root(assets_path: str) -> str:
 def _setup_datasets(*datasets: datasets.Camelyon16):
     for dataset in datasets:
         dataset.setup()
+
+
+@pytest.fixture(autouse=True)
+def mock_validate():
+    """Mocks the download function to avoid downloading resources when running tests."""
+    with patch.object(datasets.Camelyon16, "validate", return_value=None):
+        yield
