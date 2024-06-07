@@ -24,7 +24,7 @@ trainer:
           mode: *MONITOR_METRIC_MODE
       - class_path: eva.callbacks.EmbeddingsWriter
         init_args:
-          output_dir: &DATASET_EMBEDDINGS_ROOT ${oc.env:EMBEDDINGS_ROOT, ./data/embeddings}
+          output_dir: &DATASET_EMBEDDINGS_ROOT ${oc.env:EMBEDDINGS_ROOT, ./data/embeddings/${oc.env:DINO_BACKBONE, dino_vits16}/panda}
           dataloader_idx_map:
             0: train
             1: val
@@ -131,5 +131,4 @@ data:
         batch_size: *BATCH_SIZE
       predict:
         batch_size: &PREDICT_BATCH_SIZE ${oc.env:PREDICT_BATCH_SIZE, 64}
-        num_workers: ${oc.env:NUM_WORKERS, 12}
         prefetch_factor: 2

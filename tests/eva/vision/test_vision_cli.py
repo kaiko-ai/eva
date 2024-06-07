@@ -28,6 +28,8 @@ from tests.eva import _cli
         "configs/vision/owkin/phikon/offline/crc.yaml",
         "configs/vision/owkin/phikon/offline/mhist.yaml",
         "configs/vision/owkin/phikon/offline/patch_camelyon.yaml",
+        "configs/vision/owkin/phikon/offline/panda.yaml",
+        "configs/vision/owkin/phikon/offline/camelyon16.yaml",
     ],
 )
 def test_configuration_initialization(configuration_file: str, lib_path: str) -> None:

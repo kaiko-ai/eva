@@ -127,5 +127,4 @@ data:
         batch_size: *BATCH_SIZE
       predict:
         batch_size: &PREDICT_BATCH_SIZE ${oc.env:PREDICT_BATCH_SIZE, 64}
-        num_workers: ${oc.env:NUM_WORKERS, 12}
         prefetch_factor: 2
