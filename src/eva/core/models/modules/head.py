@@ -15,8 +15,6 @@ from eva.core.models.modules import module
 from eva.core.models.modules.typings import INPUT_BATCH, MODEL_TYPE
 from eva.core.models.modules.utils import batch_postprocess, grad
 
-torch.nn.Linear
-
 
 class HeadModule(module.ModelModule):
     """Neural Net Head Module for training on features.
