@@ -51,7 +51,7 @@ class BatchLogger(pl.Callback, abc.ABC):
         batch: INPUT_TENSOR_BATCH,
         batch_idx: int,
     ) -> None:
-        if self._skip_logging(trainer):
+        if self._skip_logging(trainer, batch_idx):
             return
 
         self._log_batch(

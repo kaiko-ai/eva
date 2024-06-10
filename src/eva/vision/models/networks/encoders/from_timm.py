@@ -43,11 +43,13 @@ class TimmEncoder(encoder.Encoder):
         self._out_indices = out_indices
         self._model_arguments = model_arguments or {}
 
-        self._feature_extractor = self._load_model()
+        self._feature_extractor: nn.Module
 
-    def _load_model(self) -> nn.Module:
-        """Builds, loads and returns the timm model as feature extractor."""
-        return timm.create_model(
+        self.configure_model()
+
+    def configure_model(self) -> None:
+        """Builds and loads the timm model as feature extractor."""
+        self._feature_extractor = timm.create_model(
             model_name=self._model_name,
             pretrained=self._pretrained,
             checkpoint_path=self._checkpoint_path,
