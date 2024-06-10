@@ -10,6 +10,19 @@ trainer:
           log_every_n_epochs: 1
           mean: &NORMALIZE_MEAN [0.5, 0.5, 0.5]
           std: &NORMALIZE_STD [0.5, 0.5, 0.5]
+      - class_path: lightning.pytorch.callbacks.ModelCheckpoint
+        init_args:
+          filename: best
+          save_last: true
+          save_top_k: 1
+          monitor: &MONITOR_METRIC ${oc.env:MONITOR_METRIC, val/MulticlassJaccardIndex}
+          mode: &MONITOR_METRIC_MODE ${oc.env:MONITOR_METRIC_MODE, max}
+      - class_path: lightning.pytorch.callbacks.EarlyStopping
+        init_args:
+          min_delta: 0
+          patience: 5
+          monitor: *MONITOR_METRIC
+          mode: *MONITOR_METRIC_MODE
     logger:
       - class_path: lightning.pytorch.loggers.TensorBoardLogger
         init_args:
