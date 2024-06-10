@@ -7,6 +7,7 @@ import torch
 from torch import nn
 
 from eva.vision.models.networks.decoders import segmentation
+from eva.vision.models.networks.decoders.segmentation import common
 
 
 @pytest.mark.parametrize(
@@ -20,6 +21,18 @@ from eva.vision.models.networks.decoders import segmentation
         ),
         (
             nn.Linear(768, 5),
+            [torch.Tensor(2, 384, 14, 14), torch.Tensor(2, 384, 14, 14)],
+            (224, 224),
+            torch.Size([2, 5, 224, 224]),
+        ),
+        (
+            common.SingleLinearDecoder(384, 5),
+            [torch.Tensor(2, 384, 14, 14)],
+            (224, 224),
+            torch.Size([2, 5, 224, 224]),
+        ),
+        (
+            common.SingleLinearDecoder(768, 5),
             [torch.Tensor(2, 384, 14, 14), torch.Tensor(2, 384, 14, 14)],
             (224, 224),
             torch.Size([2, 5, 224, 224]),
