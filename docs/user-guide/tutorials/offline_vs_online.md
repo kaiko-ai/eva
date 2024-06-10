@@ -7,7 +7,7 @@ If you haven't downloaded the config files yet, please download them from [GitHu
 
 For this tutorial we use the [BACH](../../datasets/bach.md) classification task which is available on [Zenodo](https://zenodo.org/records/3632035) and is distributed under [*Attribution-NonCommercial-ShareAlike 4.0 International*](https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode) license.
 
-To let *eva* automatically handle the dataset download, set `download: true` in `configs/vision/dino_vit/offline/bach.yaml` (you may also enable automatic download by setting the environment variable DOWNLOAD=true) Before doing so, please make sure that your use case is compliant with the dataset license.
+To let *eva* automatically handle the dataset download, set `download: true` in `configs/vision/dino_vit/offline/bach.yaml` (you may also enable automatic download by setting the environment variable DOWNLOAD=true). Before doing so, please make sure that your use case is compliant with the dataset license.
 
 ## *Offline* evaluations
 
