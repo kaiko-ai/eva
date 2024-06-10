@@ -48,6 +48,12 @@ class TotalSegmentator2D(base.ImageSegmentation):
     ]
     """Resources for the small dataset version."""
 
+    _license: str = (
+        "Creative Commons Attribution 4.0 International "
+        "(https://creativecommons.org/licenses/by/4.0/deed.en)"
+    )
+    """Dataset license."""
+
     def __init__(
         self,
         root: str,
@@ -282,6 +288,7 @@ class TotalSegmentator2D(base.ImageSegmentation):
                 f"Can't download data version '{self._version}'. Use 'small' or 'full'."
             )
 
+        self._print_license()
         for resource in resources:
             if os.path.isdir(self._root):
                 continue
@@ -292,3 +299,7 @@ class TotalSegmentator2D(base.ImageSegmentation):
                 filename=resource.filename,
                 remove_finished=True,
             )
+
+    def _print_license(self) -> None:
+        """Prints the dataset license."""
+        print(f"Dataset license: {self._license}")
