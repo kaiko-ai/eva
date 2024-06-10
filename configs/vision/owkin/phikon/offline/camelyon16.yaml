@@ -3,7 +3,7 @@ trainer:
   class_path: eva.Trainer
   init_args:
     n_runs: &N_RUNS ${oc.env:N_RUNS, 5}
-    default_root_dir: &OUTPUT_ROOT ${oc.env:OUTPUT_ROOT, logs/${oc.env:DINO_BACKBONE, dino_vits16}/offline/camelyon16}
+    default_root_dir: &OUTPUT_ROOT ${oc.env:OUTPUT_ROOT, logs/owkin/phikon/offline/camelyon16}
     max_epochs: &MAX_EPOCHS ${oc.env:MAX_EPOCHS, 100}
     callbacks:
       - class_path: lightning.pytorch.callbacks.LearningRateMonitor
@@ -24,22 +24,18 @@ trainer:
           mode: *MONITOR_METRIC_MODE
       - class_path: eva.callbacks.EmbeddingsWriter
         init_args:
-          output_dir: &DATASET_EMBEDDINGS_ROOT ${oc.env:EMBEDDINGS_ROOT, ./data/embeddings/${oc.env:DINO_BACKBONE, dino_vits16}/camelyon16}
+          output_dir: &DATASET_EMBEDDINGS_ROOT ${oc.env:EMBEDDINGS_ROOT, ./data/embeddings/owkin/phikon/camelyon16}
           dataloader_idx_map:
             0: train
             1: val
             2: test
           metadata_keys: ["wsi_id"]
           backbone:
-            class_path: eva.models.ModelFromFunction
+            class_path: eva.models.HuggingFaceModel
             init_args:
-              path: torch.hub.load
-              arguments:
-                repo_or_dir: ${oc.env:REPO_OR_DIR, facebookresearch/dino:main}
-                model: ${oc.env:DINO_BACKBONE, dino_vits16}
-                pretrained: ${oc.env:PRETRAINED, true}
-                force_reload: ${oc.env:FORCE_RELOAD, false}
-              checkpoint_path: ${oc.env:CHECKPOINT_PATH, null}
+              model_name_or_path: owkin/phikon
+              tensor_transforms: 
+                class_path: eva.core.models.networks.transforms.ExtractCLSFeatures
     logger:
       - class_path: lightning.pytorch.loggers.TensorBoardLogger
         init_args:
@@ -51,7 +47,7 @@ model:
     head:
       class_path: eva.vision.models.networks.ABMIL
       init_args:
-        input_size: ${oc.env:IN_FEATURES, 384}
+        input_size: ${oc.env:IN_FEATURES, 768}
         output_size: &NUM_CLASSES 1
         projected_input_size: 128
     criterion: torch.nn.BCEWithLogitsLoss
