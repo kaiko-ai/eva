@@ -128,7 +128,7 @@ class SemanticSegmentationModule(module.ModelModule):
         )
 
     def _freeze_encoder(self) -> None:
-        """If initialized, Freezes the encoder network."""
+        """If initialized, it freezes the encoder network."""
         if self.encoder is not None and self.lr_multiplier_encoder == 0:
             grad.deactivate_requires_grad(self.encoder)
 
