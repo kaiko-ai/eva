@@ -17,6 +17,7 @@ from tests.eva import _cli
         "configs/vision/dino_vit/online/crc.yaml",
         "configs/vision/dino_vit/online/mhist.yaml",
         "configs/vision/dino_vit/online/patch_camelyon.yaml",
+        "configs/vision/dino_vit/online/total_segmentator_2d.yaml",
         "configs/vision/dino_vit/offline/bach.yaml",
         "configs/vision/dino_vit/offline/crc.yaml",
         "configs/vision/dino_vit/offline/mhist.yaml",

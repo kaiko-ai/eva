@@ -27,14 +27,10 @@ model:
         model_arguments:
           dynamic_img_size: true
     decoder:
-      class_path: eva.vision.models.networks.decoders.segmentation.ConvDecoder
+      class_path: eva.vision.models.networks.decoders.segmentation.ConvDecoderMS
       init_args:
-        layers:
-          class_path: torch.nn.Conv2d
-          init_args:
-            in_channels: ${oc.env:DECODER_IN_FEATURES, 384}
-            out_channels:  &NUM_CLASSES 118
-            kernel_size: [1, 1]
+        in_features: ${oc.env:DECODER_IN_FEATURES, 384}
+        num_classes:  &NUM_CLASSES 118
     criterion: torch.nn.CrossEntropyLoss
     lr_multiplier_encoder: 0.0
     optimizer:
@@ -50,9 +46,6 @@ model:
     metrics:
       common:
         - class_path: eva.metrics.AverageLoss
-        - class_path: torchmetrics.classification.MulticlassF1Score
-          init_args:
-            num_classes: *NUM_CLASSES
       evaluation:
         - class_path: eva.core.metrics.defaults.MulticlassSegmentationMetrics
           init_args:

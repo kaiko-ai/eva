@@ -127,9 +127,9 @@ class TotalSegmentator2D(base.ImageSegmentation):
 
     @override
     def filename(self, index: int) -> str:
-        sample_idx, _ = self._indices[index]
+        sample_idx, slice_index = self._indices[index]
         sample_dir = self._samples_dirs[sample_idx]
-        return os.path.join(sample_dir, "ct.nii.gz")
+        return os.path.join(sample_dir, f"{slice_index}-ct.nii.gz")
 
     @override
     def prepare_data(self) -> None:
@@ -209,16 +209,19 @@ class TotalSegmentator2D(base.ImageSegmentation):
     def _export_semantic_label_masks(self) -> None:
         """Exports the segmentation binary masks (one-hot) to semantic labels."""
         total_samples = len(self._samples_dirs)
-        for sample_index in tqdm.trange(
-            total_samples, desc=">> Exporting optimized semantic masks"
+        masks_dirs = map(self._get_masks_dir, range(total_samples))
+        semantic_labels = [
+            (index, os.path.join(directory, "semantic_labels", "masks.nii.gz"))
+            for index, directory in enumerate(masks_dirs)
+        ]
+        to_export = filter(lambda x: not os.path.isfile(x[1]), semantic_labels)
+
+        for sample_index, filename in tqdm.tqdm(
+            to_export,
+            desc=">> Exporting optimized semantic masks",
+            leave=False,
         ):
-            masks_dir = self._get_masks_dir(sample_index)
-            filename = os.path.join(masks_dir, "semantic_labels", "masks.nii.gz")
-            if os.path.isfile(filename):
-                continue
-
             semantic_labels = self._load_masks_as_semantic_label(sample_index)
-
             os.makedirs(os.path.dirname(filename), exist_ok=True)
             io.save_array_as_nifti(semantic_labels, filename)
 
