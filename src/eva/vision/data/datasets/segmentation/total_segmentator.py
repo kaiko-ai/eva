@@ -127,9 +127,9 @@ class TotalSegmentator2D(base.ImageSegmentation):
 
     @override
     def filename(self, index: int) -> str:
-        sample_idx, _ = self._indices[index]
+        sample_idx, slice_index = self._indices[index]
         sample_dir = self._samples_dirs[sample_idx]
-        return os.path.join(sample_dir, "ct.nii.gz")
+        return os.path.join(sample_dir, f"{slice_index}-ct.nii.gz")
 
     @override
     def prepare_data(self) -> None:
@@ -231,6 +231,11 @@ class TotalSegmentator2D(base.ImageSegmentation):
         """Returns the directory of the corresponding masks."""
         sample_dir = self._samples_dirs[sample_index]
         return os.path.join(self._root, sample_dir, "segmentations")
+
+    def _get_semantic_labels_filename(self, sample_index: int) -> str:
+        """Returns the semantic label filename."""
+        masks_dir = self._get_masks_dir(sample_index)
+        return os.path.join(masks_dir, "semantic_labels", "masks.nii.gz")
 
     def _get_number_of_slices_per_sample(self, sample_index: int) -> int:
         """Returns the total amount of slices of a sample."""
