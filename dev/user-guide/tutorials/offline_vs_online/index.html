@@ -2233,7 +2233,7 @@
 <h3 id="before-you-start">Before you start</h3>
 <p>If you haven't downloaded the config files yet, please download them from <a href="https://github.com/kaiko-ai/eva/tree/0.0.2">GitHub</a>.</p>
 <p>For this tutorial we use the <a href="../../../datasets/bach/">BACH</a> classification task which is available on <a href="https://zenodo.org/records/3632035">Zenodo</a> and is distributed under <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode"><em>Attribution-NonCommercial-ShareAlike 4.0 International</em></a> license.</p>
-<p>To let <em>eva</em> automatically handle the dataset download, you can open <code>configs/vision/dino_vit/offline/bach.yaml</code> and set <code>download: true</code>. Before doing so, please make sure that your use case is compliant with the dataset license.</p>
+<p>To let <em>eva</em> automatically handle the dataset download, set <code>download: true</code> in <code>configs/vision/dino_vit/offline/bach.yaml</code> (you may also enable automatic download by setting the environment variable DOWNLOAD=true). Before doing so, please make sure that your use case is compliant with the dataset license.</p>
 <h2 id="offline-evaluations"><em>Offline</em> evaluations</h2>
 <h3 id="1-compute-the-embeddings">1. Compute the embeddings</h3>
 <p>First, let's use the <code>predict</code>-command to download the data and compute embeddings. In this example we use a randomly initialized <code>dino_vits16</code> as backbone.</p>
