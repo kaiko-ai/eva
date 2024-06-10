@@ -71,7 +71,7 @@ model:
         - class_path: eva.metrics.AverageLoss
         - class_path: eva.metrics.MulticlassClassificationMetrics
           init_args:
-            num_classes: 4 #*NUM_CLASSES
+            num_classes: *NUM_CLASSES
 data:
   class_path: eva.DataModule
   init_args:
