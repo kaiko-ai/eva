@@ -1,6 +1,6 @@
 """Helper function from models defined with a function."""
 
-from typing import Any, Callable, Dict
+from typing import Any, Callable, Dict, Type
 
 import jsonargparse
 import torch
@@ -19,7 +19,7 @@ class ModelFromFunction(base.BaseModel):
 
     def __init__(
         self,
-        path: Callable[..., nn.Module],
+        path: Type[nn.Module] | Callable[..., nn.Module],
         arguments: Dict[str, Any] | None = None,
         checkpoint_path: str | None = None,
         tensor_transforms: Callable | None = None,
@@ -43,15 +43,15 @@ class ModelFromFunction(base.BaseModel):
         self._checkpoint_path = checkpoint_path
         self._tensor_transforms = tensor_transforms
 
-        self._model = self.load_model()
+        self.load_model()
 
     @override
-    def load_model(self) -> nn.Module:
+    def load_model(self) -> None:
         class_path = jsonargparse.class_from_function(self._path, func_return=nn.Module)
         model = class_path(**self._arguments or {})
         if self._checkpoint_path is not None:
             _utils.load_model_weights(model, self._checkpoint_path)
-        return model
+        self._model = model
 
     @override
     def model_forward(self, tensor: torch.Tensor) -> torch.Tensor:

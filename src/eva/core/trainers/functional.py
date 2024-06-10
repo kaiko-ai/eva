@@ -35,6 +35,7 @@ def run_evaluation_session(
     """
     recorder = _recorder.SessionRecorder(output_dir=base_trainer.default_log_dir, verbose=verbose)
     for run_index in range(n_runs):
+        base_model.load_head()
         validation_scores, test_scores = run_evaluation(
             base_trainer,
             base_model,

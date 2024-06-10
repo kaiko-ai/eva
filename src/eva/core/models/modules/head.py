@@ -5,6 +5,7 @@ from typing import Any, Callable
 import torch
 from lightning.pytorch.cli import LRSchedulerCallable, OptimizerCallable
 from lightning.pytorch.utilities.types import STEP_OUTPUT
+from loguru import logger
 from torch import optim
 from torch.optim import lr_scheduler
 from typing_extensions import override
@@ -13,6 +14,8 @@ from eva.core.metrics import structs as metrics_lib
 from eva.core.models.modules import module
 from eva.core.models.modules.typings import INPUT_BATCH, MODEL_TYPE
 from eva.core.models.modules.utils import batch_postprocess, grad
+
+torch.nn.Linear
 
 
 class HeadModule(module.ModelModule):
@@ -53,6 +56,14 @@ class HeadModule(module.ModelModule):
         self.backbone = backbone
         self.optimizer = optimizer
         self.lr_scheduler = lr_scheduler
+
+    def load_head(self) -> None:
+        if hasattr(self.head, "load_model"):
+            self.head.load_model()
+        else:
+            logger.warning(
+                "The head model does not have a load_model method. Weights are not re-initialized."
+            )
 
     @override
     def configure_model(self) -> Any:
