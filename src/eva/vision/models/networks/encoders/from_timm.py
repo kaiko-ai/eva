@@ -57,6 +57,7 @@ class TimmEncoder(encoder.Encoder):
             features_only=True,
             **self._model_arguments,
         )
+        TimmEncoder.__name__ = self._model_name
 
     @override
     def forward(self, tensor: torch.Tensor) -> List[torch.Tensor]:
