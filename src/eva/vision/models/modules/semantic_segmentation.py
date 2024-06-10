@@ -76,25 +76,25 @@ class SemanticSegmentationModule(module.ModelModule):
     @override
     def forward(
         self,
-        tensor: torch.Tensor,
-        image_size: Tuple[int, int] | None = None,
+        inputs: torch.Tensor,
+        to_size: Tuple[int, int] | None = None,
         *args: Any,
         **kwargs: Any,
     ) -> torch.Tensor:
         """Maps the input tensor (image tensor or embeddings) to masks.
 
-        If `tensor` is image tensor, then the `self.encoder`
+        If `inputs` is image tensor, then the `self.encoder`
         should be implemented, otherwise it will be interpreted
-        as embeddings, where the `image_size` should be given.
+        as embeddings, where the `to_size` should be given.
         """
-        if self.encoder is None and image_size is None:
+        if self.encoder is None and to_size is None:
             raise ValueError(
-                "Please provide the expected `image_size` that the "
-                "decoder should map the embeddings (`tensor`) to."
+                "Please provide the expected `to_size` that the "
+                "decoder should map the embeddings (`inputs`) to."
             )
 
-        patch_embeddings = self.encoder(tensor) if self.encoder else tensor
-        return self.decoder(patch_embeddings, image_size or tensor.shape[-2:])
+        patch_embeddings = self.encoder(inputs) if self.encoder else inputs
+        return self.decoder(patch_embeddings, to_size or inputs.shape[-2:])
 
     @override
     def training_step(self, batch: INPUT_TENSOR_BATCH, *args: Any, **kwargs: Any) -> STEP_OUTPUT:
@@ -111,7 +111,7 @@ class SemanticSegmentationModule(module.ModelModule):
     @override
     def predict_step(self, batch: INPUT_BATCH, *args: Any, **kwargs: Any) -> torch.Tensor:
         tensor = INPUT_BATCH(*batch).data
-        return tensor if self.backbone is None else self.backbone(tensor)
+        return tensor if self.encoder is None else self.encoder(tensor)
 
     @property
     def _base_lr(self) -> float:
@@ -128,7 +128,7 @@ class SemanticSegmentationModule(module.ModelModule):
         )
 
     def _freeze_encoder(self) -> None:
-        """If initialized, Freezes the encoder network."""
+        """If initialized, it freezes the encoder network."""
         if self.encoder is not None and self.lr_multiplier_encoder == 0:
             grad.deactivate_requires_grad(self.encoder)
 
@@ -142,7 +142,7 @@ class SemanticSegmentationModule(module.ModelModule):
             The batch step output.
         """
         data, targets, metadata = INPUT_TENSOR_BATCH(*batch)
-        predictions = self(data, targets.shape[-2:])
+        predictions = self(data, to_size=targets.shape[-2:])
         loss = self.criterion(predictions, targets)
         return {
             "loss": loss,
