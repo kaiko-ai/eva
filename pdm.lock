@@ -5,7 +5,7 @@
 groups = ["default", "dev", "docs", "all", "typecheck", "lint", "vision", "test"]
 strategy = ["cross_platform", "inherit_metadata"]
 lock_version = "4.4.1"
-content_hash = "sha256:0eada25803c4ccab62b3b9d11881c46185c564f29a81541ddc3cb0c651fe254e"
+content_hash = "sha256:32860036df1d64f8d69cd1a8db14dc5f2f8d1a42171ef1668207de6932ec141c"
 
 [[package]]
 name = "absl-py"
@@ -2222,6 +2222,9 @@ files = [
 name = "timm"
 version = "1.0.3"
 requires_python = ">=3.8"
+git = "https://github.com/huggingface/pytorch-image-models.git"
+ref = "main"
+revision = "f8979d4f50b7920c78511746f7315df8f1857bc5"
 summary = "PyTorch Image Models"
 groups = ["all", "vision"]
 dependencies = [
@@ -2230,10 +2233,6 @@ dependencies = [
     "safetensors",
     "torch",
     "torchvision",
-]
-files = [
-    {file = "timm-1.0.3-py3-none-any.whl", hash = "sha256:d1ec86f7765aa79fbc7491508fa6e285d38a38f10bf4fe44ba2e9c70f91f0f5b"},
-    {file = "timm-1.0.3.tar.gz", hash = "sha256:83920a7efe2cfd503b2a1257dc8808d6ff7dcd18a4b79f451c283e7d71497329"},
 ]
 
 [[package]]

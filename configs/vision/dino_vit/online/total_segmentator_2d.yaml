@@ -1,0 +1,96 @@
+trainer:
+  class_path: eva.Trainer
+  init_args:
+    n_runs: &N_RUNS ${oc.env:N_RUNS, 1}
+    default_root_dir: &OUTPUT_ROOT ${oc.env:OUTPUT_ROOT, logs/total_segmentator_2d/${oc.env:TIMM_MODEL_NAME, vit_small_patch16_224}}
+    max_steps: &MAX_STEPS ${oc.env:MAX_STEPS, 20000}
+    callbacks:
+      - class_path: eva.vision.callbacks.SemanticSegmentationLogger
+        init_args:
+          log_every_n_steps: 1000
+          mean: &NORMALIZE_MEAN [0.5, 0.5, 0.5]
+          std: &NORMALIZE_STD [0.5, 0.5, 0.5]
+    logger:
+      - class_path: lightning.pytorch.loggers.TensorBoardLogger
+        init_args:
+          save_dir: *OUTPUT_ROOT
+          name: ""
+model:
+  class_path: eva.vision.models.modules.SemanticSegmentationModule
+  init_args:
+    encoder:
+      class_path: eva.vision.models.networks.encoders.TimmEncoder
+      init_args:
+        model_name: ${oc.env:TIMM_MODEL_NAME, vit_small_patch16_224}
+        pretrained: true
+        out_indices: ${oc.env:TIMM_MODEL_OUT_INDICES, 1}
+        model_arguments:
+          dynamic_img_size: true
+    decoder:
+      class_path: eva.vision.models.networks.decoders.segmentation.ConvDecoder
+      init_args:
+        layers:
+          class_path: torch.nn.Conv2d
+          init_args:
+            in_channels: ${oc.env:DECODER_IN_FEATURES, 384}
+            out_channels:  &NUM_CLASSES 118
+            kernel_size: [1, 1]
+    criterion: torch.nn.CrossEntropyLoss
+    lr_multiplier_encoder: 0.0
+    optimizer:
+      class_path: torch.optim.AdamW
+      init_args:
+        lr: 0.0001
+        weight_decay: 0.05
+    lr_scheduler:
+      class_path: torch.optim.lr_scheduler.PolynomialLR
+      init_args:
+        total_iters: *MAX_STEPS
+        power: 0.9
+    metrics:
+      common:
+        - class_path: eva.metrics.AverageLoss
+        - class_path: torchmetrics.classification.MulticlassF1Score
+          init_args:
+            num_classes: *NUM_CLASSES
+      evaluation:
+        - class_path: eva.core.metrics.defaults.MulticlassSegmentationMetrics
+          init_args:
+            num_classes: *NUM_CLASSES
+        - class_path: eva.core.metrics.wrappers.ClasswiseWrapper
+          init_args:
+            metric:
+              class_path: torchmetrics.classification.MulticlassF1Score
+              init_args:
+                num_classes: *NUM_CLASSES
+                average: null
+data:
+  class_path: eva.DataModule
+  init_args:
+    datasets:
+      train:
+        class_path: eva.vision.datasets.TotalSegmentator2D
+        init_args: &DATASET_ARGS
+          root: ${oc.env:DATA_ROOT, ./data}/total_segmentator
+          split: train
+          download: false
+          # Set `download: true` to download the dataset from https://zenodo.org/records/10047292
+          # The TotalSegmentator dataset is distributed under the following license: 
+          # "Creative Commons Attribution 4.0 International"
+          # (see: https://creativecommons.org/licenses/by/4.0/deed.en)
+          transforms:
+            class_path: eva.vision.data.transforms.common.ResizeAndClamp
+            init_args:
+              mean: *NORMALIZE_MEAN
+              std: *NORMALIZE_STD
+      val:
+        class_path: eva.vision.datasets.TotalSegmentator2D
+        init_args:
+          <<: *DATASET_ARGS
+          split: val
+    dataloaders:
+      train:
+        batch_size: &BATCH_SIZE ${oc.env:BATCH_SIZE, 16}
+        shuffle: true
+      val:
+        batch_size: *BATCH_SIZE
