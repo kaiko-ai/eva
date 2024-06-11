@@ -5,6 +5,8 @@ from typing import Any, Callable, Dict, Literal, Tuple
 
 import numpy as np
 import pandas as pd
+import torch
+from torchvision import tv_tensors
 from typing_extensions import override
 
 from eva.vision.data.datasets import wsi
@@ -72,7 +74,7 @@ class WsiClassificationDataset(wsi.MultiWsiDataset, base.ImageClassification):
         return os.path.basename(path) if os.path.isabs(path) else path
 
     @override
-    def __getitem__(self, index: int) -> Tuple[np.ndarray, np.ndarray, Dict[str, Any]]:
+    def __getitem__(self, index: int) -> Tuple[tv_tensors.Image, torch.Tensor, Dict[str, Any]]:
         return base.ImageClassification.__getitem__(self, index)
 
     @override
