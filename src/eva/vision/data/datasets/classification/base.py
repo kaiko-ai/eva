@@ -73,7 +73,7 @@ class ImageClassification(vision.VisionDataset[Tuple[tv_tensors.Image, torch.Ten
         raise NotImplementedError
 
     @override
-    def __getitem__(self, index: int) -> Tuple[tv_tensors.Image, torch.Tensor]:
+    def __getitem__(self, index: int) -> Tuple[tv_tensors.Image, torch.Tensor, Dict[str, Any]]:
         image = self.load_image(index)
         target = self.load_target(index)
         image, target = self._apply_transforms(image, target)
