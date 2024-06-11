@@ -22,7 +22,7 @@ trainer:
           patience: ${oc.env:PATIENCE, 10}
           monitor: *MONITOR_METRIC
           mode: *MONITOR_METRIC_MODE
-      - class_path: eva.callbacks.EmbeddingsWriter
+      - class_path: eva.callbacks.ClassificationEmbeddingsWriter
         init_args:
           output_dir: &DATASET_EMBEDDINGS_ROOT ${oc.env:EMBEDDINGS_ROOT, ./data/embeddings/owkin/phikon/camelyon16}
           dataloader_idx_map:
@@ -94,7 +94,7 @@ data:
       predict:
         - class_path: eva.vision.datasets.Camelyon16
           init_args: &PREDICT_DATASET_ARGS
-            root: ${oc.env:DATA_ROOT, ./data}/camelyon16
+            root: ${oc.env:DATA_ROOT, ./data/camelyon16}
             sampler:
               class_path: eva.vision.data.wsi.patching.samplers.ForegroundGridSampler
               init_args:

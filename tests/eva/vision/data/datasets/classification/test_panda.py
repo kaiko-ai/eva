@@ -8,6 +8,7 @@ import numpy as np
 import pytest
 import torch
 import torchvision.transforms.v2 as torch_transforms
+from torchvision import tv_tensors
 
 from eva.vision.data import datasets
 from eva.vision.data import transforms as eva_transforms
@@ -85,12 +86,10 @@ def _check_batch_shape(batch: Any):
     assert len(batch) == 3
 
     image, target, metadata = batch
-    assert isinstance(image, torch.Tensor)
+    assert isinstance(image, tv_tensors.Image)
     assert image.shape == (3, TARGET_SIZE, TARGET_SIZE)
 
-    assert isinstance(target, np.ndarray)
-    assert target.size == 1
-
+    assert isinstance(target, torch.Tensor)
     assert isinstance(metadata, dict)
     assert "wsi_id" in metadata
 

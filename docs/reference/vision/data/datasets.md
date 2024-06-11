@@ -6,7 +6,6 @@
 ## Classification datasets
 ::: eva.vision.data.datasets.BACH
 ::: eva.vision.data.datasets.PatchCamelyon
-::: eva.vision.data.datasets.TotalSegmentatorClassification
 
 ## Segmentation datasets
 ::: eva.vision.data.datasets.ImageSegmentation

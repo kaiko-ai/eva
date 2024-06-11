@@ -5,9 +5,10 @@ import glob
 import os
 from typing import Any, Callable, Dict, List, Literal, Tuple
 
-import numpy as np
 import pandas as pd
 import torch
+from torchvision import tv_tensors
+from torchvision.transforms.v2 import functional
 from typing_extensions import override
 
 from eva.vision.data.datasets import _validators, wsi
@@ -193,18 +194,19 @@ class Camelyon16(wsi.MultiWsiDataset, base.ImageClassification):
         return os.path.basename(self._file_paths[self._get_dataset_idx(index)])
 
     @override
-    def __getitem__(self, index: int) -> Tuple[np.ndarray, np.ndarray, Dict[str, Any]]:
+    def __getitem__(self, index: int) -> Tuple[tv_tensors.Image, torch.Tensor, Dict[str, Any]]:
         return base.ImageClassification.__getitem__(self, index)
 
     @override
-    def load_image(self, index: int) -> torch.Tensor:
-        return wsi.MultiWsiDataset.__getitem__(self, index)
+    def load_image(self, index: int) -> tv_tensors.Image:
+        image_array = wsi.MultiWsiDataset.__getitem__(self, index)
+        return functional.to_image(image_array)
 
     @override
-    def load_target(self, index: int) -> np.ndarray:
+    def load_target(self, index: int) -> torch.Tensor:
         file_path = self._file_paths[self._get_dataset_idx(index)]
         class_name = self.annotations[self._get_id_from_path(file_path)]
-        return np.asarray(self.class_to_idx[class_name], dtype=np.int64)
+        return torch.tensor(self.class_to_idx[class_name], dtype=torch.int64)
 
     @override
     def load_metadata(self, index: int) -> Dict[str, Any]:

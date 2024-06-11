@@ -7,7 +7,6 @@ from eva.vision.data.datasets.classification import (
     PANDA,
     Camelyon16,
     PatchCamelyon,
-    TotalSegmentatorClassification,
     WsiClassificationDataset,
 )
 from eva.vision.data.datasets.segmentation import ImageSegmentation, TotalSegmentator2D
@@ -22,7 +21,6 @@ __all__ = [
     "PatchCamelyon",
     "PANDA",
     "Camelyon16",
-    "TotalSegmentatorClassification",
     "TotalSegmentator2D",
     "VisionDataset",
     "WsiDataset",

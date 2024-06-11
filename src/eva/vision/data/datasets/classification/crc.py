@@ -3,7 +3,8 @@
 import os
 from typing import Callable, Dict, List, Literal, Tuple
 
-import numpy as np
+import torch
+from torchvision import tv_tensors
 from torchvision.datasets import folder, utils
 from typing_extensions import override
 
@@ -37,8 +38,7 @@ class CRC(base.ImageClassification):
         root: str,
         split: Literal["train", "val"],
         download: bool = False,
-        image_transforms: Callable | None = None,
-        target_transforms: Callable | None = None,
+        transforms: Callable | None = None,
     ) -> None:
         """Initializes the dataset.
 
@@ -56,15 +56,10 @@ class CRC(base.ImageClassification):
                 Note that the download will be executed only by additionally
                 calling the :meth:`prepare_data` method and if the data does
                 not yet exist on disk.
-            image_transforms: A function/transform that takes in an image
-                and returns a transformed version.
-            target_transforms: A function/transform that takes in the target
-                and transforms it.
+            transforms: A function/transform which returns a transformed
+                version of the raw data samples.
         """
-        super().__init__(
-            image_transforms=image_transforms,
-            target_transforms=target_transforms,
-        )
+        super().__init__(transforms=transforms)
 
         self._root = root
         self._split = split
@@ -122,14 +117,14 @@ class CRC(base.ImageClassification):
         )
 
     @override
-    def load_image(self, index: int) -> np.ndarray:
+    def load_image(self, index: int) -> tv_tensors.Image:
         image_path, _ = self._samples[index]
-        return io.read_image(image_path)
+        return io.read_image_as_tensor(image_path)
 
     @override
-    def load_target(self, index: int) -> np.ndarray:
+    def load_target(self, index: int) -> torch.Tensor:
         _, target = self._samples[index]
-        return np.asarray(target, dtype=np.int64)
+        return torch.tensor(target, dtype=torch.long)
 
     @override
     def __len__(self) -> int:
