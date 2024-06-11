@@ -42,7 +42,7 @@ def test_embeddings_writer(datamodule: datamodules.DataModule, model: modules.He
         metadata_keys = datamodule.datasets.predict[0]._metadata_keys  # type: ignore
         expected_filenames = datamodule.datasets.predict[0]._filenames  # type: ignore
         grouping_enabled = expected_filenames is not None
-        callback = writers.EmbeddingsWriter(
+        callback = writers.ClassificationEmbeddingsWriter(
             output_dir=output_dir,
             dataloader_idx_map={0: "train", 1: "val", 2: "test"},
             backbone=nn.Flatten(),

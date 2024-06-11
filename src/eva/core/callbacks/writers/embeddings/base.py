@@ -12,7 +12,7 @@ from loguru import logger
 from torch import multiprocessing, nn
 from typing_extensions import override
 
-from eva.core.callbacks.writers.typings import ITEM_DICT_ENTRY, QUEUE_ITEM
+from eva.core.callbacks.writers.embeddings.typings import ITEM_DICT_ENTRY, QUEUE_ITEM
 from eva.core.models.modules.typings import INPUT_BATCH
 from eva.core.utils import multiprocessing as eva_multiprocessing
 

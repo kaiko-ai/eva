@@ -14,8 +14,8 @@ class QUEUE_ITEM(NamedTuple):
     target_buffer: io.BytesIO
     """IO buffer containing the target tensor."""
 
-    input_name: str
-    """Name of the original input file that was used to generate the embedding."""
+    data_name: str
+    """Name of the input data that was used to generate the embedding."""
 
     save_name: str
     """Name to store the generated embedding."""

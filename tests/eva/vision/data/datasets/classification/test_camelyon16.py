@@ -62,6 +62,7 @@ def _check_batch_shape(batch: Any):
     assert len(batch) == 3
 
     image, target, metadata = batch
+    print(type(image))
     assert isinstance(image, torch.Tensor)
     assert image.shape == (3, TARGET_SIZE, TARGET_SIZE)
 

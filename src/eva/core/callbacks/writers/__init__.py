@@ -1,5 +1,5 @@
 """Callbacks API."""
 
-from eva.core.callbacks.writers.embeddings import EmbeddingsWriter
+from eva.core.callbacks.writers.embeddings import ClassificationEmbeddingsWriter
 
-__all__ = ["EmbeddingsWriter"]
+__all__ = ["ClassificationEmbeddingsWriter"]

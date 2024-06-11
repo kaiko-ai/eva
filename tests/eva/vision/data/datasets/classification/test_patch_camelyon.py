@@ -3,8 +3,9 @@
 import os
 from typing import Literal
 
-import numpy as np
 import pytest
+import torch
+from torchvision import tv_tensors
 
 from eva.vision.data import datasets
 
@@ -29,10 +30,10 @@ def test_sample(patch_camelyon_dataset: datasets.PatchCamelyon) -> None:
     assert isinstance(sample, tuple)
     assert len(sample) == 3
     # assert the format of the `image` and `target`
-    image, target, _ = sample
-    assert isinstance(image, np.ndarray)
-    assert image.shape == (96, 96, 3)
-    assert isinstance(target, np.ndarray)
+    image, target = sample
+    assert isinstance(image, tv_tensors.Image)
+    assert image.shape == (3, 96, 96)
+    assert isinstance(target, torch.Tensor)
     assert target in [0, 1]
 
 

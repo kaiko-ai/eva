@@ -6,6 +6,7 @@ trainer:
     default_root_dir: &OUTPUT_ROOT ${oc.env:OUTPUT_ROOT, logs/${oc.env:DINO_BACKBONE, dino_vits16}/offline/patch_camelyon}
     max_steps: &MAX_STEPS ${oc.env:MAX_STEPS, 12500}
     callbacks:
+      - class_path: eva.callbacks.ConfigurationLogger
       - class_path: lightning.pytorch.callbacks.LearningRateMonitor
         init_args:
           logging_interval: epoch
@@ -22,7 +23,7 @@ trainer:
           patience: 9
           monitor: *MONITOR_METRIC
           mode: *MONITOR_METRIC_MODE
-      - class_path: eva.callbacks.EmbeddingsWriter
+      - class_path: eva.callbacks.ClassificationEmbeddingsWriter
         init_args:
           output_dir: &DATASET_EMBEDDINGS_ROOT ${oc.env:EMBEDDINGS_ROOT, ./data/embeddings}/${oc.env:DINO_BACKBONE, dino_vits16}/patch_camelyon
           dataloader_idx_map:
@@ -79,7 +80,9 @@ data:
           manifest_file: manifest.csv
           split: train
           target_transforms:
-            class_path: eva.core.data.transforms.ArrayToFloatTensor
+            class_path: torchvision.transforms.v2.ToDtype
+            init_args:
+              dtype: torch.float32
       val:
         class_path: eva.datasets.EmbeddingsClassificationDataset
         init_args:
@@ -95,12 +98,12 @@ data:
           init_args: &PREDICT_DATASET_ARGS
             root: ${oc.env:DATA_ROOT, ./data}/patch_camelyon
             split: train
-            download: false
+            download: ${oc.env:DOWNLOAD, false}
             # Set `download: true` to download the dataset from https://zenodo.org/records/1494286
             # The PatchCamelyon dataset is distributed under the following license: 
             # "Creative Commons Zero v1.0 Universal"
             # (see: https://choosealicense.com/licenses/cc0-1.0/)
-            image_transforms:
+            transforms:
               class_path: eva.vision.data.transforms.common.ResizeAndCrop
               init_args:
                 size: ${oc.env:RESIZE_DIM, 224}
