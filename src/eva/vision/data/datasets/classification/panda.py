@@ -143,10 +143,10 @@ class PANDA(wsi.MultiWsiDataset, base.ImageClassification):
         image_dir = os.path.join(self._root, "train_images")
         file_paths = sorted(glob.glob(os.path.join(image_dir, "*.tiff")))
         file_paths = [os.path.relpath(path, self._root) for path in file_paths]
-        # if len(file_paths) != len(self.annotations):
-        #     raise ValueError(
-        #         f"Expected {len(self.annotations)} images, found {len(file_paths)} in {image_dir}."
-        #     )
+        if len(file_paths) != len(self.annotations):
+            raise ValueError(
+                f"Expected {len(self.annotations)} images, found {len(file_paths)} in {image_dir}."
+            )
         file_paths = self._filter_noisy_labels(file_paths)
         targets = [self._get_target_from_path(file_path) for file_path in file_paths]
 
