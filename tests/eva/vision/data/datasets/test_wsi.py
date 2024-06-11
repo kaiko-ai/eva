@@ -66,7 +66,7 @@ def test_patch_shape(width: int, height: int, target_mpp: float, root: str, back
         dataset._wsi.mpp * dataset._wsi.level_downsamples[dataset._coords.level_idx]
     )
     scaled_width, scaled_height = int(mpp_ratio * width), int(mpp_ratio * height)
-    assert dataset[0].shape == (scaled_width, scaled_height, 3)
+    assert dataset[0].shape == (3, scaled_width, scaled_height)
 
 
 def test_multi_dataset(root: str):

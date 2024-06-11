@@ -22,7 +22,7 @@ trainer:
           patience: ${oc.env:PATIENCE, 8}
           monitor: *MONITOR_METRIC
           mode: *MONITOR_METRIC_MODE
-      - class_path: eva.callbacks.EmbeddingsWriter
+      - class_path: eva.callbacks.ClassificationEmbeddingsWriter
         init_args:
           output_dir: &DATASET_EMBEDDINGS_ROOT ${oc.env:EMBEDDINGS_ROOT, ./data/embeddings/owkin/phikon/panda}
           dataloader_idx_map:
@@ -93,7 +93,7 @@ data:
       predict:
         - class_path: eva.vision.datasets.PANDA
           init_args: &PREDICT_DATASET_ARGS
-            root: ${oc.env:DATA_ROOT, ./data}/panda/prostate-cancer-grade-assessment
+            root: ${oc.env:DATA_ROOT, ./data/panda/prostate-cancer-grade-assessment}
             sampler:
               class_path: eva.vision.data.wsi.patching.samplers.ForegroundGridSampler
               init_args:

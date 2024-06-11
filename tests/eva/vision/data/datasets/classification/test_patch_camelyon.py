@@ -30,7 +30,7 @@ def test_sample(patch_camelyon_dataset: datasets.PatchCamelyon) -> None:
     assert isinstance(sample, tuple)
     assert len(sample) == 3
     # assert the format of the `image` and `target`
-    image, target = sample
+    image, target, _ = sample
     assert isinstance(image, tv_tensors.Image)
     assert image.shape == (3, 96, 96)
     assert isinstance(target, torch.Tensor)

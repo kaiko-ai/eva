@@ -4,9 +4,10 @@ import bisect
 import os
 from typing import Callable, List
 
-import numpy as np
 from loguru import logger
 from torch.utils.data import dataset as torch_datasets
+from torchvision import tv_tensors
+from torchvision.transforms.v2 import functional
 from typing_extensions import override
 
 from eva.core.data.datasets import base
@@ -71,14 +72,15 @@ class WsiDataset(vision.VisionDataset):
         )
 
     @override
-    def __getitem__(self, index: int) -> np.ndarray:
+    def __getitem__(self, index: int) -> tv_tensors.Image:
         x, y = self._coords.x_y[index]
         width, height, level_idx = self._coords.width, self._coords.height, self._coords.level_idx
         patch = self._wsi.read_region((x, y), level_idx, (width, height))
+        patch = functional.to_image(patch)
         patch = self._apply_transforms(patch)
         return patch
 
-    def _apply_transforms(self, image: np.ndarray) -> np.ndarray:
+    def _apply_transforms(self, image: tv_tensors.Image) -> tv_tensors.Image:
         if self._image_transforms is not None:
             image = self._image_transforms(image)
         return image

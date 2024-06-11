@@ -26,7 +26,7 @@ def test_sample(crc_dataset: datasets.CRC, index: int) -> None:
     assert isinstance(sample, tuple)
     assert len(sample) == 3
     # assert the format of the `image` and `target`
-    image, target = sample
+    image, target, _ = sample
     assert isinstance(image, tv_tensors.Image)
     assert image.shape == (3, 16, 16)
     assert isinstance(target, torch.Tensor)
