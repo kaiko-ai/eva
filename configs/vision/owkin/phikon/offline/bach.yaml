@@ -86,7 +86,7 @@ data:
           init_args: &PREDICT_DATASET_ARGS
             root: ${oc.env:DATA_ROOT, ./data}/bach
             split: train
-            download: ${oc.env:DOWNLOAD, false}
+            download: ${oc.env:DOWNLOAD_DATA, false}
             # Set `download: true` to download the dataset from https://zenodo.org/records/3632035
             # The BACH dataset is distributed under the following license
             # Attribution-NonCommercial-NoDerivs 4.0 International license
