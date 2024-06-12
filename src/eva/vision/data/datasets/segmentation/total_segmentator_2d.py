@@ -13,7 +13,7 @@ from torchvision import tv_tensors
 from torchvision.datasets import utils
 from typing_extensions import override
 
-from eva.vision.data.datasets import _utils, _validators, structs
+from eva.vision.data.datasets import _validators, structs
 from eva.vision.data.datasets.segmentation import base
 from eva.vision.utils import io
 
@@ -22,8 +22,11 @@ class TotalSegmentator2D(base.ImageSegmentation):
     """TotalSegmentator 2D segmentation dataset."""
 
     _expected_dataset_lengths: Dict[str, int] = {
-        "train_small": 29892,
-        "val_small": 6480,
+        "train_small": 35089,
+        "val_small": 1283,
+        "train_full": 278190,
+        "val_full": 14095,
+        "test_full": 25578,
     }
     """Dataset version and split to the expected size."""
 
@@ -57,8 +60,8 @@ class TotalSegmentator2D(base.ImageSegmentation):
     def __init__(
         self,
         root: str,
-        split: Literal["train", "val"] | None,
-        version: Literal["small", "full"] | None = "small",
+        split: Literal["train", "val", "test"] | None,
+        version: Literal["small", "full"] | None = "full",
         download: bool = False,
         classes: List[str] | None = None,
         optimize_mask_loading: bool = True,
@@ -145,7 +148,7 @@ class TotalSegmentator2D(base.ImageSegmentation):
 
     @override
     def validate(self) -> None:
-        if self._version is None:
+        if self._version is None or self._sample_every_n_slices is not None:
             return
 
         _validators.check_dataset_integrity(
@@ -217,7 +220,7 @@ class TotalSegmentator2D(base.ImageSegmentation):
         to_export = filter(lambda x: not os.path.isfile(x[1]), semantic_labels)
 
         for sample_index, filename in tqdm.tqdm(
-            to_export,
+            list(to_export),
             desc=">> Exporting optimized semantic masks",
             leave=False,
         ):
@@ -252,16 +255,20 @@ class TotalSegmentator2D(base.ImageSegmentation):
 
     def _get_split_indices(self) -> List[int]:
         """Returns the samples indices that corresponding the dataset split and version."""
-        key = f"{self._split}_{self._version}"
-        match key:
-            case "train_small":
-                index_ranges = [(0, 83)]
-            case "val_small":
-                index_ranges = [(83, 102)]
-            case _:
-                index_ranges = [(0, len(self._samples_dirs))]
+        metadata_file = os.path.join(self._root, "meta.csv")
+        metadata = io.read_csv(metadata_file, delimiter=";", encoding="utf-8-sig")
 
-        return _utils.ranges_to_indices(index_ranges)
+        match self._split:
+            case "train":
+                image_ids = [item["image_id"] for item in metadata if item["split"] == "train"]
+            case "val":
+                image_ids = [item["image_id"] for item in metadata if item["split"] == "val"]
+            case "test":
+                image_ids = [item["image_id"] for item in metadata if item["split"] == "test"]
+            case _:
+                image_ids = self._samples_dirs
+
+        return sorted(map(self._samples_dirs.index, image_ids))
 
     def _create_indices(self) -> List[Tuple[int, int]]:
         """Builds the dataset indices for the specified split.
