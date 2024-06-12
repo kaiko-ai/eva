@@ -98,7 +98,7 @@ data:
           init_args: &PREDICT_DATASET_ARGS
             root: ${oc.env:DATA_ROOT, ./data}/patch_camelyon
             split: train
-            download: ${oc.env:DOWNLOAD, false}
+            download: ${oc.env:DOWNLOAD_DATA, false}
             # Set `download: true` to download the dataset from https://zenodo.org/records/1494286
             # The PatchCamelyon dataset is distributed under the following license: 
             # "Creative Commons Zero v1.0 Universal"
