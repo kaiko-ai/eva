@@ -94,6 +94,11 @@ data:
         init_args:
           <<: *DATASET_ARGS
           split: val
+      test:
+        class_path: eva.vision.datasets.TotalSegmentator2D
+        init_args:
+          <<: *DATASET_ARGS
+          split: test
     dataloaders:
       train:
         batch_size: &BATCH_SIZE ${oc.env:BATCH_SIZE, 16}
