@@ -4,7 +4,7 @@ To produce the evaluation results presented [here](../../index.md#evaluation-res
 
 Make sure to replace `<task>` in the commands below with `bach`, `crc`, `mhist` or `patch_camelyon`.
 
-Note that to run the commands below you will need to first download the data. [BACH](../../datasets/bach.md), [CRC](../../datasets/crc.md) and [PatchCamelyon](../../datasets/patch_camelyon.md) provide automatic download by setting the argument `download: true` (either modify the config-files or set the environment variable `DOWNLOAD=true`). In the case of MHIST you will need to download the data manually by following the instructions provided [here](../../datasets/mhist.md#download-and-preprocessing).*
+*Note that to run the commands below you will need to first download the data. [BACH](../../datasets/bach.md), [CRC](../../datasets/crc.md) and [PatchCamelyon](../../datasets/patch_camelyon.md) provide automatic download by setting the argument `download: true` (either modify the config-files or set the environment variable `DOWNLOAD=true`). In the case of MHIST you will need to download the data manually by following the instructions provided [here](../../datasets/mhist.md#download-and-preprocessing).*
 
 ## DINO ViT-S16 (random weights)
 
