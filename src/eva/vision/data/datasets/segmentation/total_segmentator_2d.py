@@ -24,6 +24,8 @@ class TotalSegmentator2D(base.ImageSegmentation):
     _expected_dataset_lengths: Dict[str, int] = {
         "train_small": 29892,
         "val_small": 6480,
+        "train_full": 257650,
+        "val_full": 60213,
     }
     """Dataset version and split to the expected size."""
 
@@ -258,6 +260,10 @@ class TotalSegmentator2D(base.ImageSegmentation):
                 index_ranges = [(0, 83)]
             case "val_small":
                 index_ranges = [(83, 102)]
+            case "train_full":
+                index_ranges = [(0, 1000)]
+            case "val_full":
+                index_ranges = [(1000, 1228)]
             case _:
                 index_ranges = [(0, len(self._samples_dirs))]
 
