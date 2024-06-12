@@ -11,7 +11,7 @@ We evaluated the following FMs on the 6 supported WSI-classification tasks. We r
 
 <center>
 
-| FM-backbone                 | pretraining |  BACH    | CRC       | MHIST     | PCam     |Camelyon16| PANDA    |
+| Vision FM                  | pretraining |  BACH    | CRC       | MHIST     | PCam     |Camelyon16| PANDA    |
 |-----------------------------|-------------|--------- |-----------|-----------|----------|----------|----------|
 | [DINO ViT-S16](https://arxiv.org/abs/2104.14294) | N/A         | 0.410    | 0.617     | 0.501     | 0.728    | TBD      | TBD      |
 | [DINO ViT-S16](https://arxiv.org/abs/2104.14294) | ImageNet    | 0.695    | 0.935     | 0.831     | 0.849    | TBD      | TBD      |
