@@ -60,7 +60,7 @@ class TotalSegmentator2D(base.ImageSegmentation):
         self,
         root: str,
         split: Literal["train", "val"] | None,
-        version: Literal["small", "full"] | None = "small",
+        version: Literal["small", "full"] | None = "full",
         download: bool = False,
         classes: List[str] | None = None,
         optimize_mask_loading: bool = True,

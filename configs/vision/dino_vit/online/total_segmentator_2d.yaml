@@ -79,7 +79,6 @@ data:
         init_args: &DATASET_ARGS
           root: ${oc.env:DATA_ROOT, ./data}/total_segmentator
           split: train
-          version: full
           download: ${oc.env:DOWNLOAD_DATA, false}
           # Set `download: true` to download the dataset from https://zenodo.org/records/10047292
           # The TotalSegmentator dataset is distributed under the following license: 
