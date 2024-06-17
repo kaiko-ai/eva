@@ -25,29 +25,6 @@ EMBEDDINGS_ROOT="./data/embeddings/dino_vits16_imagenet" \
 eva predict_fit --config configs/vision/dino_vit/offline/<task>.yaml
 ```
 
-## DINO ViT-B8 (ImageNet)
-
-To evaluate performance on the larger ViT-B8 backbone pretrained on ImageNet, run:
-```
-EMBEDDINGS_ROOT="./data/embeddings/dino_vitb8_imagenet" \
-DINO_BACKBONE=dino_vitb8 \
-IN_FEATURES=768 \
-eva predict_fit --config configs/vision/dino_vit/offline/<task>.yaml
-```
-
-## DINOv2 ViT-L14 (ImageNet)
-
-To evaluate performance on Dino v2 ViT-L14 backbone pretrained on ImageNet, run:
-```
-PRETRAINED=true \
-EMBEDDINGS_ROOT="./data/embeddings/dinov2_vitl14_kaiko" \
-REPO_OR_DIR=facebookresearch/dinov2:main \
-DINO_BACKBONE=dinov2_vitl14_reg \
-FORCE_RELOAD=true \
-IN_FEATURES=1024 \
-eva predict_fit --config configs/vision/dino_vit/offline/<task>.yaml
-```
-
 ## Lunit - DINO ViT-S16 (TCGA)
 
 [Lunit](https://www.lunit.io/en), released the weights for a DINO ViT-S16 backbone, pretrained on TCGA data
@@ -110,12 +87,13 @@ eva predict_fit --config path/to/<task>.yaml
 ## kaiko.ai - DINO ViT-S16 (TCGA)
 
 To evaluate [kaiko.ai's](https://www.kaiko.ai/) FM with DINO ViT-S16 backbone, pretrained on TCGA data 
-on [GitHub](https://github.com/lunit-io/benchmark-ssl-pathology/releases/), run:
+and available on [GitHub](https://github.com/kaiko-ai/towards_large_pathology_fms), run:
 
 ```
 PRETRAINED=false \
 EMBEDDINGS_ROOT="./data/embeddings/dino_vits16_kaiko" \
-CHECKPOINT_PATH=[TBD*] \
+REPO_OR_DIR="kaiko-ai/towards_large_pathology_fms" \
+DINO_BACKBONE=="vits16" \
 NORMALIZE_MEAN=[0.5,0.5,0.5] \
 NORMALIZE_STD=[0.5,0.5,0.5] \
 eva predict_fit --config configs/vision/dino_vit/offline/<task>.yaml
@@ -126,13 +104,13 @@ eva predict_fit --config configs/vision/dino_vit/offline/<task>.yaml
 ## kaiko.ai - DINO ViT-S8 (TCGA)
 
 To evaluate [kaiko.ai's](https://www.kaiko.ai/) FM with DINO ViT-S8 backbone, pretrained on TCGA data 
-on [GitHub](https://github.com/lunit-io/benchmark-ssl-pathology/releases/), run:
+and available on [GitHub](https://github.com/kaiko-ai/towards_large_pathology_fms), run:
 
 ```
 PRETRAINED=false \
 EMBEDDINGS_ROOT="./data/embeddings/dino_vits8_kaiko" \
-DINO_BACKBONE=dino_vits8 \
-CHECKPOINT_PATH=[TBD*] \
+REPO_OR_DIR="kaiko-ai/towards_large_pathology_fms" \
+DINO_BACKBONE=="vits8" \
 NORMALIZE_MEAN=[0.5,0.5,0.5] \
 NORMALIZE_STD=[0.5,0.5,0.5] \
 eva predict_fit --config configs/vision/dino_vit/offline/<task>.yaml
@@ -142,14 +120,14 @@ eva predict_fit --config configs/vision/dino_vit/offline/<task>.yaml
 
 ## kaiko.ai - DINO ViT-B16 (TCGA)
 
-To evaluate [kaiko.ai's](https://www.kaiko.ai/) FM with the larger DINO ViT-B16 backbone, pretrained on TCGA data,
-run:
+To evaluate [kaiko.ai's](https://www.kaiko.ai/) FM with DINO ViT-B16 backbone, pretrained on TCGA data 
+and available on [GitHub](https://github.com/kaiko-ai/towards_large_pathology_fms), run:
 
 ```
 PRETRAINED=false \
 EMBEDDINGS_ROOT="./data/embeddings/dino_vitb16_kaiko" \
-DINO_BACKBONE=dino_vitb16 \
-CHECKPOINT_PATH=[TBD*] \
+REPO_OR_DIR="kaiko-ai/towards_large_pathology_fms" \
+DINO_BACKBONE=="vitb16" \
 IN_FEATURES=768 \
 NORMALIZE_MEAN=[0.5,0.5,0.5] \
 NORMALIZE_STD=[0.5,0.5,0.5] \
@@ -160,14 +138,14 @@ eva predict_fit --config configs/vision/dino_vit/offline/<task>.yaml
 
 ## kaiko.ai - DINO ViT-B8 (TCGA)
 
-To evaluate [kaiko.ai's](https://www.kaiko.ai/) FM with the larger DINO ViT-B8 backbone, pretrained on TCGA data,
-run:
+To evaluate [kaiko.ai's](https://www.kaiko.ai/) FM with DINO ViT-B8 backbone, pretrained on TCGA data 
+and available on [GitHub](https://github.com/kaiko-ai/towards_large_pathology_fms), run:
 
 ```
 PRETRAINED=false \
 EMBEDDINGS_ROOT="./data/embeddings/dino_vitb8_kaiko" \
-DINO_BACKBONE=dino_vitb8 \
-CHECKPOINT_PATH=[TBD*] \
+REPO_OR_DIR="kaiko-ai/towards_large_pathology_fms" \
+DINO_BACKBONE=="vitb8" \
 IN_FEATURES=768 \
 NORMALIZE_MEAN=[0.5,0.5,0.5] \
 NORMALIZE_STD=[0.5,0.5,0.5] \
@@ -178,14 +156,14 @@ eva predict_fit --config configs/vision/dino_vit/offline/<task>.yaml
 
 ## kaiko.ai - DINOv2 ViT-L14 (TCGA)
 
-To evaluate [kaiko.ai's](https://www.kaiko.ai/) FM with the larger DINOv2 ViT-L14 backbone, pretrained on TCGA data,
-run:
+To evaluate [kaiko.ai's](https://www.kaiko.ai/) FM with DINOv2 ViT-L14 backbone, pretrained on TCGA data 
+and available on [GitHub](https://github.com/kaiko-ai/towards_large_pathology_fms), run:
 
 ```
 PRETRAINED=false \
 EMBEDDINGS_ROOT="./data/embeddings/dinov2_vitl14_kaiko" \
-REPO_OR_DIR=facebookresearch/dinov2:main \
-DINO_BACKBONE=dinov2_vitl14_reg \
+REPO_OR_DIR="kaiko-ai/towards_large_pathology_fms" \
+DINO_BACKBONE=="vitbl14" \
 FORCE_RELOAD=true \
 CHECKPOINT_PATH=[TBD*] \
 IN_FEATURES=1024 \
