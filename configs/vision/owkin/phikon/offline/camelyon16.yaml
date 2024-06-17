@@ -25,6 +25,7 @@ trainer:
       - class_path: eva.callbacks.ClassificationEmbeddingsWriter
         init_args:
           output_dir: &DATASET_EMBEDDINGS_ROOT ${oc.env:EMBEDDINGS_ROOT, ./data/embeddings/owkin/phikon/camelyon16}
+          save_every_n: 10_000
           dataloader_idx_map:
             0: train
             1: val
