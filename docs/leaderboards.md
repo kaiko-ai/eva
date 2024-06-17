@@ -11,18 +11,18 @@ We evaluated the following FMs on the 6 supported WSI-classification tasks. We r
 
 <center>
 
-| Vision FM                  | pretraining |  BACH    | CRC       | MHIST     | PCam     |Camelyon16| PANDA    |
+| Vision FM                  | pretraining |  [BACH](datasets/bach.md)    | [CRC](datasets/crc.md)       | [MHIST](datasets/mhist.md)     | [PCam](datasets/patch_camelyon.md)     |[Camelyon16](datasets/camelyon16.md)| [PANDA](datasets/panda.md)    |
 |-----------------------------|-------------|--------- |-----------|-----------|----------|----------|----------|
-| [DINO ViT-S16](https://arxiv.org/abs/2104.14294) | N/A         | 0.410    | 0.617     | 0.501     | 0.728    | TBD      | TBD      |
-| [DINO ViT-S16](https://arxiv.org/abs/2104.14294) | ImageNet    | 0.695    | 0.935     | 0.831     | 0.849    | TBD      | TBD      |
-| [Lunit - ViT-S16](https://github.com/lunit-io/benchmark-ssl-pathology/releases/) | TCGA        | 0.801    | 0.934     | 0.768     | 0.895    | TBD      | TBD      |
-| [Owkin (Phikon) - iBOT ViT-B16](https://huggingface.co/owkin/phikon) | TCGA        | 0.725    | 0.935     | 0.777     | 0.915    | TBD      | TBD      |
-| [UNI - DINOv2 ViT-L16](https://huggingface.co/MahmoodLab/UNI) | Mass-100k   | 0.814    | 0.950     | **0.837** | **0.938**| TBD      | TBD      |
-| [kaiko.ai - DINO ViT-S16](https://github.com/kaiko-ai/towards_large_pathology_fms) | TCGA        | 0.797    | 0.943     | 0.828     | 0.893    | TBD      | TBD      |
-| [kaiko.ai - DINO ViT-S8](https://github.com/kaiko-ai/towards_large_pathology_fms)	| TCGA        | 0.834    | 0.946     | 0.832     | 0.887    | TBD      | TBD      |
-| [kaiko.ai - DINO ViT-B16](https://github.com/kaiko-ai/towards_large_pathology_fms) | TCGA        | 0.810    | **0.960** | 0.826     | 0.898    | TBD      | TBD      |
-| [kaiko.ai - DINO ViT-B8](https://github.com/kaiko-ai/towards_large_pathology_fms) | TCGA        | 0.865    | 0.956     | 0.809     | 0.921    | TBD      | TBD      |
-| [kaiko.ai - DINOv2 ViT-L14](https://github.com/kaiko-ai/towards_large_pathology_fms) | TCGA        | **0.870**| 0.930     | 0.809     | 0.898    | TBD      | TBD      |
+| [DINO ViT-S16](https://arxiv.org/abs/2104.14294) | N/A         | 0.410    | 0.617     | 0.501     | 0.728    | 0.532      | 0.350      |
+| [DINO ViT-S16](https://arxiv.org/abs/2104.14294) | ImageNet    | 0.695    | 0.935     | 0.831     | 0.849    | 0.759      | 0.678      |
+| [Lunit - ViT-S16](https://github.com/lunit-io/benchmark-ssl-pathology/releases/) | TCGA        | 0.801    | 0.934     | 0.768     | 0.895    | 0.890      | 0.753      |
+| [Owkin (Phikon) - iBOT ViT-B16](https://huggingface.co/owkin/phikon) | TCGA        | 0.725    | 0.935     | 0.777     | 0.915    | 0.916      | 0.771      |
+| [UNI - DINOv2 ViT-L16](https://huggingface.co/MahmoodLab/UNI) | Mass-100k   | 0.814    | 0.950     | **0.837** | **0.938**| **0.942**| **0.775**|
+| [kaiko.ai - DINO ViT-S16](https://github.com/kaiko-ai/towards_large_pathology_fms) | TCGA        | 0.797    | 0.943     | 0.828     | 0.893    | 0.915      | 0.770      |
+| [kaiko.ai - DINO ViT-S8](https://github.com/kaiko-ai/towards_large_pathology_fms)	| TCGA        | 0.834    | 0.946     | 0.832     | 0.887    | 0.903      | 0.744      |
+| [kaiko.ai - DINO ViT-B16](https://github.com/kaiko-ai/towards_large_pathology_fms) | TCGA        | 0.810    | **0.960** | 0.826     | 0.898    | 0.889      | 0.753      |
+| [kaiko.ai - DINO ViT-B8](https://github.com/kaiko-ai/towards_large_pathology_fms) | TCGA        | 0.865    | 0.956     | 0.809     | 0.921    | 0.922      | 0.759      |
+| [kaiko.ai - DINOv2 ViT-L14](https://github.com/kaiko-ai/towards_large_pathology_fms) | TCGA        | **0.870**| 0.930     | 0.809     | 0.898    | 0.931      | 0.774      |
 
 </center>
 
@@ -30,7 +30,7 @@ The runs use the default setup described in the section below.
 
 *eva* trains the decoder on the "train" split and uses the "validation" split for monitoring, early stopping and checkpoint selection. Evaluation results are reported on the "test" split if available and otherwise on the "validation" split.
 
-For details on the FM-backbones and instructions to replicate the results, check out [Replicate evaluations](user-guide/advanced/replicate_evaluations.md).
+For details on the FM-backbones and instructions to replicate the results, check out [Replicate evaluations](user-guide/advanced/replicate_evaluations.md). For information on the tasks, check out [Datasets](datasets/index.md).
 
 ## Evaluation protocol
 
