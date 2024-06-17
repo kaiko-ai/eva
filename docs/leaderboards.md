@@ -11,7 +11,7 @@ We evaluated the following FMs on the 6 supported WSI-classification tasks. We r
 
 <center>
 
-| Vision FM                  | pretraining |  BACH    | CRC       | MHIST     | PCam     |Camelyon16| PANDA    |
+| Vision FM                  | pretraining |  [BACH](datasets/bach.md)    | [CRC](datasets/crc.md)       | [MHIST](datasets/mhist.md)     | [PCam](datasets/patch_camelyon.md)     |[Camelyon16](datasets/camelyon16.md)| [PANDA](datasets/panda.md)    |
 |-----------------------------|-------------|--------- |-----------|-----------|----------|----------|----------|
 | [DINO ViT-S16](https://arxiv.org/abs/2104.14294) | N/A         | 0.410    | 0.617     | 0.501     | 0.728    | 0.532      | 0.350      |
 | [DINO ViT-S16](https://arxiv.org/abs/2104.14294) | ImageNet    | 0.695    | 0.935     | 0.831     | 0.849    | 0.759      | 0.678      |
@@ -30,7 +30,7 @@ The runs use the default setup described in the section below.
 
 *eva* trains the decoder on the "train" split and uses the "validation" split for monitoring, early stopping and checkpoint selection. Evaluation results are reported on the "test" split if available and otherwise on the "validation" split.
 
-For details on the FM-backbones and instructions to replicate the results, check out [Replicate evaluations](user-guide/advanced/replicate_evaluations.md).
+For details on the FM-backbones and instructions to replicate the results, check out [Replicate evaluations](user-guide/advanced/replicate_evaluations.md). For information on the tasks, check out [Datasets](datasets/index.md).
 
 ## Evaluation protocol
 
