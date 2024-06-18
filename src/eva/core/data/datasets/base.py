@@ -26,10 +26,6 @@ class Dataset(dataset.TorchDataset):
         """
         self.configure()
         self.validate()
-        self._setup()
-
-    def _setup(self) -> None:
-        """Setups the datasets. This method should be overridden by the subclasses."""
 
     def configure(self):
         """Configures the dataset.
