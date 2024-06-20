@@ -110,18 +110,18 @@ In this section you will find model benchmarks which were generated with _`eva`_
 
 <div align="center">
 
-| Model                                            | BACH  | CRC   | MHIST | PCam   | Camelyon16 | PANDA |
-|--------------------------------------------------|-------|-------|-------|--------|------------|-------|
-| ViT-S/16 _(random)_	<sup>[1]</sup>               | 0.410 | 0.617 | 0.501 |  0.728 | 0.532      | 0.350 |
-| ViT-S/16 _(ImageNet)_ <sup>[1]</sup>             | 0.695 | 0.935 | 0.831 |  0.849 | 0.759      | 0.678 |
-| DINO<sub>(p=16)</sub> <sup>[2]</sup>             | 0.801 | 0.934 | 0.768 |  0.895 | 0.890      | 0.753 |
-| Phikon <sup>[3]</sup>                            | 0.725 | 0.935 | 0.777 |  0.915 | 0.916      | 0.771 |
-| UNI <sup>[4]</sup>                               | 0.814 | 0.950 | 0.837 |  0.938 | 0.942      | 0.775 |
-| ViT-S/16 _(kaiko.ai)_ <sup>[5]</sup>             | 0.797 | 0.943 | 0.828 |  0.893 | 0.915      | 0.770 |
-| ViT-S/8 _(kaiko.ai)_ <sup>[5]</sup>              | 0.834 | 0.946 | 0.832 |  0.887 | 0.903      | 0.744 |
-| ViT-B/16 _(kaiko.ai)_	<sup>[5]</sup>             | 0.810 | 0.960 | 0.826 |  0.898 | 0.889      | 0.753 |
-| ViT-B/8 _(kaiko.ai)_ <sup>[5]</sup>              | 0.865 | 0.956 | 0.809 |  0.921 | 0.922      | 0.759 |
-| ViT-L/14 _(kaiko.ai)_ <sup>[5]</sup>             | 0.870 | 0.930 | 0.809 |  0.898 | 0.931      | 0.774 |
+| Model   | BACH  | CRC   | MHIST | PCam   | Camelyon16 | PANDA |
+|---------|-------|-------|-------|--------|------------|-------|
+| ViT-S/16 _(random)_	<sup>[1]</sup> | 0.411|0.613|0.5|0.752|0.551|0.347|
+| ViT-S/16 _(ImageNet)_ <sup>[1]</sup> | 0.675|0.936|0.827|0.861|0.751|0.676|
+| DINO<sub>(p=16)</sub> <sup>[2]</sup> | 0.77|0.936|0.751|0.905|0.869|0.737|
+| Phikon <sup>[3]</sup>                | 0.715|0.942|0.766|0.925|0.879|0.784|
+| UNI <sup>[4]</sup>                   | 0.797|0.95|0.835|0.939|0.933|0.774|
+| ViT-S/16 _(kaiko.ai)_ <sup>[5]</sup> | 0.8|0.949|0.831|0.902|0.897|0.77|
+| ViT-S/8 _(kaiko.ai)_ <sup>[5]</sup>  | 0.825|0.948|0.826|0.887|0.879|0.741|
+| ViT-B/16 _(kaiko.ai)_	<sup>[5]</sup> | 0.846|0.959|0.839|0.906|0.891|0.753|
+| ViT-B/8 _(kaiko.ai)_ <sup>[5]</sup>  | 0.867|0.952|0.814|0.921|0.939|0.761|
+| ViT-L/14 _(kaiko.ai)_ <sup>[5]</sup> | 0.862|0.935|0.822|0.907|0.941|0.769|
 
 _Table I: Linear probing evaluation of FMs on patch-level downstream datasets.<br> We report averaged balanced accuracy
 over 5 runs. Results are reported on the "test" split if available and otherwise on the "validation" split.
