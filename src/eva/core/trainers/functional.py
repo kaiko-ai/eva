@@ -69,6 +69,7 @@ def run_evaluation(
         A tuple of with the validation and the test metrics (if exists).
     """
     trainer, model = _utils.clone(base_trainer, base_model)
+    model.configure_model()
     trainer.setup_log_dirs(run_id or "")
     return fit_and_validate(trainer, model, datamodule, verbose=verbose)
 

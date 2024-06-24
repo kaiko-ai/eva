@@ -1,7 +1,8 @@
 """mat I/O related functions."""
 
-import scipy.io
 from typing import Any, Dict
+
+import scipy.io
 
 from eva.vision.utils.io import _utils
 

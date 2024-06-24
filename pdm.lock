@@ -5,7 +5,7 @@
 groups = ["default", "dev", "docs", "all", "typecheck", "lint", "vision", "test"]
 strategy = ["cross_platform", "inherit_metadata"]
 lock_version = "4.4.1"
-content_hash = "sha256:719ab57e051a45b8f80a378e8e26fd1d7f880de8b61d4b9b384694fa8f576325"
+content_hash = "sha256:2687f9041f9a7d870b69beb95b96c3ed06b2e71293bbd3117b0a20fff3386233"
 
 [[package]]
 name = "absl-py"
@@ -1049,6 +1049,7 @@ dependencies = [
 ]
 files = [
     {file = "mkdocs-redirects-1.2.1.tar.gz", hash = "sha256:9420066d70e2a6bb357adf86e67023dcdca1857f97f07c7fe450f8f1fb42f861"},
+    {file = "mkdocs_redirects-1.2.1-py3-none-any.whl", hash = "sha256:497089f9e0219e7389304cffefccdfa1cac5ff9509f2cb706f4c9b221726dffb"},
 ]
 
 [[package]]
@@ -1537,7 +1538,7 @@ files = [
 
 [[package]]
 name = "opencv-python-headless"
-version = "4.9.0.80"
+version = "4.10.0.82"
 requires_python = ">=3.6"
 summary = "Wrapper package for OpenCV python bindings."
 groups = ["all", "vision"]
@@ -1552,13 +1553,32 @@ dependencies = [
     "numpy>=1.26.0; python_version >= \"3.12\"",
 ]
 files = [
-    {file = "opencv-python-headless-4.9.0.80.tar.gz", hash = "sha256:71a4cd8cf7c37122901d8e81295db7fb188730e33a0e40039a4e59c1030b0958"},
-    {file = "opencv_python_headless-4.9.0.80-cp37-abi3-macosx_10_16_x86_64.whl", hash = "sha256:2ea8a2edc4db87841991b2fbab55fc07b97ecb602e0f47d5d485bd75cee17c1a"},
-    {file = "opencv_python_headless-4.9.0.80-cp37-abi3-macosx_11_0_arm64.whl", hash = "sha256:e0ee54e27be493e8f7850847edae3128e18b540dac1d7b2e4001b8944e11e1c6"},
-    {file = "opencv_python_headless-4.9.0.80-cp37-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:57ce2865e8fec431c6f97a81e9faaf23fa5be61011d0a75ccf47a3c0d65fa73d"},
-    {file = "opencv_python_headless-4.9.0.80-cp37-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:976656362d68d9f40a5c66f83901430538002465f7db59142784f3893918f3df"},
-    {file = "opencv_python_headless-4.9.0.80-cp37-abi3-win32.whl", hash = "sha256:11e3849d83e6651d4e7699aadda9ec7ed7c38957cbbcb99db074f2a2d2de9670"},
-    {file = "opencv_python_headless-4.9.0.80-cp37-abi3-win_amd64.whl", hash = "sha256:a8056c2cb37cd65dfcdf4153ca16f7362afcf3a50d600d6bb69c660fc61ee29c"},
+    {file = "opencv-python-headless-4.10.0.82.tar.gz", hash = "sha256:de9e742c1b9540816fbd115b0b03841d41ed0c65566b0d7a5371f98b131b7e6d"},
+    {file = "opencv_python_headless-4.10.0.82-cp37-abi3-macosx_11_0_arm64.whl", hash = "sha256:a09ed50ba21cc5bf5d436cb0e784ad09c692d6b1d1454252772f6c8f2c7b4088"},
+    {file = "opencv_python_headless-4.10.0.82-cp37-abi3-macosx_12_0_x86_64.whl", hash = "sha256:977a5fd21e1fe0d3d2134887db4441f8725abeae95150126302f31fcd9f548fa"},
+    {file = "opencv_python_headless-4.10.0.82-cp37-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:db4ec6755838b0be12510bfc9ffb014779c612418f11f4f7e6f505c36124a3aa"},
+    {file = "opencv_python_headless-4.10.0.82-cp37-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:10a37fa5276967ecf6eb297295b16b28b7a2eb3b568ca0ee469fb1a5954de298"},
+    {file = "opencv_python_headless-4.10.0.82-cp37-abi3-win32.whl", hash = "sha256:94736e9b322d13db4768fd35588ad5e8995e78e207263076bfbee18aac835ad5"},
+    {file = "opencv_python_headless-4.10.0.82-cp37-abi3-win_amd64.whl", hash = "sha256:c1822fa23d1641c0249ed5eb906f4c385f7959ff1bd601a776d56b0c18914af4"},
+]
+
+[[package]]
+name = "openslide-python"
+version = "1.3.1"
+requires_python = ">=3.8"
+summary = "Python interface to OpenSlide"
+groups = ["all", "vision"]
+dependencies = [
+    "Pillow",
+]
+files = [
+    {file = "openslide-python-1.3.1.tar.gz", hash = "sha256:0909c6257cd8decfbbd0082e8c0cd94bbe3a89ad31e142cfa9accc8bb959294e"},
+    {file = "openslide_python-1.3.1-cp310-cp310-win32.whl", hash = "sha256:7a5c0c5bddb518f3e643d0ce2e8d5dfe6b3a374a966ca2c316ef56196dd3c602"},
+    {file = "openslide_python-1.3.1-cp310-cp310-win_amd64.whl", hash = "sha256:d208e53d3da82313213303058b2ca9fc66c2d98365b9338e27ecc46ab8b07e9d"},
+    {file = "openslide_python-1.3.1-cp311-cp311-win32.whl", hash = "sha256:c4720598ba39e7b879e757eff31195f8b80d4638dcb0fbb297ca9823039724ae"},
+    {file = "openslide_python-1.3.1-cp311-cp311-win_amd64.whl", hash = "sha256:53a468cd92bdd17cf5b56592242709519c0c7d7028b2f466d20d75264471cc6d"},
+    {file = "openslide_python-1.3.1-cp312-cp312-win32.whl", hash = "sha256:d10caf1a1c1e1f598d80e7a5e1a266979ed9bccf9ba8bf45aa34cf04639d9f9e"},
+    {file = "openslide_python-1.3.1-cp312-cp312-win_amd64.whl", hash = "sha256:d834fbca0824b902da9d8541f7c34a3e62496823a42de5ac7bf6c35e4c799678"},
 ]
 
 [[package]]
@@ -1722,18 +1742,18 @@ files = [
 
 [[package]]
 name = "protobuf"
-version = "5.26.0"
+version = "4.25.3"
 requires_python = ">=3.8"
 summary = ""
 groups = ["default"]
 files = [
-    {file = "protobuf-5.26.0-cp310-abi3-win32.whl", hash = "sha256:f9ecc8eb6f18037e0cbf43256db0325d4723f429bca7ef5cd358b7c29d65f628"},
-    {file = "protobuf-5.26.0-cp310-abi3-win_amd64.whl", hash = "sha256:dfd29f6eb34107dccf289a93d44fb6b131e68888d090b784b691775ac84e8213"},
-    {file = "protobuf-5.26.0-cp37-abi3-macosx_10_9_universal2.whl", hash = "sha256:7e47c57303466c867374a17b2b5e99c5a7c8b72a94118e2f28efb599f19b4069"},
-    {file = "protobuf-5.26.0-cp37-abi3-manylinux2014_aarch64.whl", hash = "sha256:e184175276edc222e2d5e314a72521e10049938a9a4961fe4bea9b25d073c03f"},
-    {file = "protobuf-5.26.0-cp37-abi3-manylinux2014_x86_64.whl", hash = "sha256:6ee9d1aa02f951c5ce10bf8c6cfb7604133773038e33f913183c8b5201350600"},
-    {file = "protobuf-5.26.0-py3-none-any.whl", hash = "sha256:a49b6c5359bf34fb7bf965bf21abfab4476e4527d822ab5289ee3bf73f291159"},
-    {file = "protobuf-5.26.0.tar.gz", hash = "sha256:82f5870d74c99addfe4152777bdf8168244b9cf0ac65f8eccf045ddfa9d80d9b"},
+    {file = "protobuf-4.25.3-cp310-abi3-win32.whl", hash = "sha256:d4198877797a83cbfe9bffa3803602bbe1625dc30d8a097365dbc762e5790faa"},
+    {file = "protobuf-4.25.3-cp310-abi3-win_amd64.whl", hash = "sha256:209ba4cc916bab46f64e56b85b090607a676f66b473e6b762e6f1d9d591eb2e8"},
+    {file = "protobuf-4.25.3-cp37-abi3-macosx_10_9_universal2.whl", hash = "sha256:f1279ab38ecbfae7e456a108c5c0681e4956d5b1090027c1de0f934dfdb4b35c"},
+    {file = "protobuf-4.25.3-cp37-abi3-manylinux2014_aarch64.whl", hash = "sha256:e7cb0ae90dd83727f0c0718634ed56837bfeeee29a5f82a7514c03ee1364c019"},
+    {file = "protobuf-4.25.3-cp37-abi3-manylinux2014_x86_64.whl", hash = "sha256:7c8daa26095f82482307bc717364e7c13f4f1c99659be82890dcfc215194554d"},
+    {file = "protobuf-4.25.3-py3-none-any.whl", hash = "sha256:f0700d54bcf45424477e46a9f0944155b46fb0639d69728739c0e47bab83f2b9"},
+    {file = "protobuf-4.25.3.tar.gz", hash = "sha256:25b5d0b42fd000320bd7830b349e3b696435f3b329810427a6bcce6a5492cc5c"},
 ]
 
 [[package]]
@@ -2218,7 +2238,7 @@ files = [
 
 [[package]]
 name = "tensorboard"
-version = "2.16.2"
+version = "2.17.0"
 requires_python = ">=3.9"
 summary = "TensorBoard lets you watch Tensors Flow"
 groups = ["default"]
@@ -2227,14 +2247,14 @@ dependencies = [
     "grpcio>=1.48.2",
     "markdown>=2.6.8",
     "numpy>=1.12.0",
-    "protobuf!=4.24.0,>=3.19.6",
+    "protobuf!=4.24.0,<5.0.0,>=3.19.6",
     "setuptools>=41.0.0",
     "six>1.9",
     "tensorboard-data-server<0.8.0,>=0.7.0",
     "werkzeug>=1.0.1",
 ]
 files = [
-    {file = "tensorboard-2.16.2-py3-none-any.whl", hash = "sha256:9f2b4e7dad86667615c0e5cd072f1ea8403fc032a299f0072d6f74855775cc45"},
+    {file = "tensorboard-2.17.0-py3-none-any.whl", hash = "sha256:859a499a9b1fb68a058858964486627100b71fcb21646861c61d31846a6478fb"},
 ]
 
 [[package]]
