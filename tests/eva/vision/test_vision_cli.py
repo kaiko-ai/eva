@@ -3,6 +3,7 @@
 import os
 import tempfile
 from unittest import mock
+from unittest.mock import patch
 
 import pytest
 
@@ -22,10 +23,14 @@ from tests.eva import _cli
         "configs/vision/dino_vit/offline/crc.yaml",
         "configs/vision/dino_vit/offline/mhist.yaml",
         "configs/vision/dino_vit/offline/patch_camelyon.yaml",
+        "configs/vision/dino_vit/offline/panda.yaml",
+        "configs/vision/dino_vit/offline/camelyon16.yaml",
         "configs/vision/owkin/phikon/offline/bach.yaml",
         "configs/vision/owkin/phikon/offline/crc.yaml",
         "configs/vision/owkin/phikon/offline/mhist.yaml",
         "configs/vision/owkin/phikon/offline/patch_camelyon.yaml",
+        "configs/vision/owkin/phikon/offline/panda.yaml",
+        "configs/vision/owkin/phikon/offline/camelyon16.yaml",
     ],
 )
 def test_configuration_initialization(configuration_file: str, lib_path: str) -> None:
@@ -62,6 +67,7 @@ def test_fit_from_configuration(configuration_file: str, lib_path: str) -> None:
     "configuration_file",
     [
         "configs/vision/tests/offline/patch_camelyon.yaml",
+        "configs/vision/tests/offline/panda.yaml",
     ],
 )
 def test_predict_fit_from_configuration(configuration_file: str, lib_path: str) -> None:
@@ -81,3 +87,10 @@ def test_predict_fit_from_configuration(configuration_file: str, lib_path: str) 
 def _skip_dataset_validation() -> None:
     """Mocks the validation step of the datasets."""
     datasets.PatchCamelyon.validate = mock.MagicMock(return_value=None)
+
+
+@pytest.fixture(autouse=True)
+def mock_download():
+    """Mocks the download functions to avoid downloading resources when running tests."""
+    with patch.object(datasets.PANDA, "_download_resources", return_value=None):
+        yield

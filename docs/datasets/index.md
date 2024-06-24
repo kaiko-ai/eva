@@ -6,6 +6,7 @@
 
 ### Whole Slide (WSI) and microscopy image datasets
 
+#### Patch-level
 | Dataset                            | #Patches | Patch Size | Magnification (μm/px)  | Task                       | Cancer Type      |
 |------------------------------------|----------|------------|------------------------|----------------------------|------------------|
 | [BACH](bach.md)                    | 400      | 2048x1536  | 20x (0.5)              | Classification (4 classes) | Breast           |
@@ -14,6 +15,13 @@
 | [MHIST](mhist.md)                  | 3,152    | 224x224    |  5x (2.0) \*           | Classification (2 classes) | Colorectal Polyp |
 
 \* Downsampled from 40x (0.25 μm/px) to increase the field of view.
+
+#### Slide-level
+| Dataset                            | #Slides  | Slide Size                | Magnification (μm/px)  | Task                       | Cancer Type      |
+|------------------------------------|----------|---------------------------|------------------------|----------------------------|------------------|
+| [Camelyon16](camelyon16.md)        | 400      | ~100-250k x ~100-250k x 3 |  40x (0.25)            | Classification (2 classes) | Breast           |
+| [PANDA](panda.md)                  | 10,616    | ~20k x 20k x 3            |  20x (0.5)             | Classification (6 classes) | Prostate         |
+
 
 ### Radiology datasets
 

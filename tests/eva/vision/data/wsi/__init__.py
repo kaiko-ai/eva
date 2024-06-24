@@ -1,0 +1,1 @@
+"""WSI module tests."""

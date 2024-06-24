@@ -30,12 +30,12 @@ def test_length(mhist_dataset: datasets.BACH, expected_length: int) -> None:
 )
 def test_sample(mhist_dataset: datasets.MHIST, index: int) -> None:
     """Tests the format of a dataset sample."""
-    # assert data sample is a tuple
     sample = mhist_dataset[index]
+    # assert data sample is a tuple
     assert isinstance(sample, tuple)
-    assert len(sample) == 2
+    assert len(sample) == 3
     # assert the format of the `image` and `target`
-    image, target = sample
+    image, target, _ = sample
     assert isinstance(image, tv_tensors.Image)
     assert image.shape == (3, 224, 224)
     assert isinstance(target, torch.Tensor)

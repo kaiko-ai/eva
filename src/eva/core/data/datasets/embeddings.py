@@ -19,7 +19,7 @@ default_column_mapping: Dict[str, str] = {
     "path": "embeddings",
     "target": "target",
     "split": "split",
-    "multi_id": "slide_id",
+    "multi_id": "wsi_id",
 }
 """The default column mapping of the variables to the manifest columns."""
 
