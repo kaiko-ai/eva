@@ -22,7 +22,6 @@ class Consep(base.ImageSegmentation):
     }
     """Dataset split to the expected size."""
 
-
     def __init__(
         self,
         root: str,
@@ -57,7 +56,7 @@ class Consep(base.ImageSegmentation):
             "dysplastic/malignant epithelial",
             "fibroblast",
             "muscle",
-	        "endothelial",
+            "endothelial",
         ]
 
     @property
@@ -85,9 +84,7 @@ class Consep(base.ImageSegmentation):
             self,
             length=self._expected_dataset_lengths.get(self._split),
             n_classes=len(self.classes),
-            first_and_last_labels=(
-                (self.classes[0], self.classes[-1])
-            ),
+            first_and_last_labels=((self.classes[0], self.classes[-1])),
         )
 
     @override
@@ -95,7 +92,7 @@ class Consep(base.ImageSegmentation):
         return len(self._samples_names)
 
     @override
-    def load_image(self, index: int) -> tv_tensors.Image:        
+    def load_image(self, index: int) -> tv_tensors.Image:
         image_path = self._get_image_path(index)
         image = io.read_image_as_tensor(image_path)
         return tv_tensors.Image(image, dtype=torch.float32)
@@ -103,9 +100,9 @@ class Consep(base.ImageSegmentation):
     @override
     def load_mask(self, index: int) -> tv_tensors.Mask:
         ground_truth = io.read_mat(self._get_mask_path(index))
-        mask = ground_truth['type_map']
+        mask = ground_truth["type_map"]
         return tv_tensors.Mask(mask, dtype=torch.int64)
-    
+
     def get_file_path(self, index: int, image_or_label: str, format: str) -> str:
         """Returns the corresponding image path."""
         sample_name = self._samples_names[index]
@@ -119,7 +116,7 @@ class Consep(base.ImageSegmentation):
             else:
                 split = "Test"
         return os.path.join(self._root, split, image_or_label, sample_name + format)
-    
+
     def _get_image_path(self, sample_index: int) -> str:
         """Returns the corresponding image path."""
         return self.get_file_path(sample_index, "Images", ".png")
@@ -136,6 +133,7 @@ class Consep(base.ImageSegmentation):
 
     def _fetch_samples_names(self) -> List[str]:
         """Returns the name of all the samples of the selected dataset split."""
+
         def _samples_dirs_split(split: str) -> List[str]:
             split_dir = os.path.join(self._root, f"{split}/Images")
             return [
@@ -143,6 +141,7 @@ class Consep(base.ImageSegmentation):
                 for item in os.listdir(split_dir)
                 if os.path.isfile(os.path.join(split_dir, item))
             ]
+
         sample_filenames = []
         if self._split in ["train", None]:
             sample_filenames += _samples_dirs_split("Train")
