@@ -103,7 +103,7 @@ class Consep(base.ImageSegmentation):
         mask = ground_truth["type_map"]
         return tv_tensors.Mask(mask, dtype=torch.int64)
 
-    def get_file_path(self, index: int, image_or_label: str, format: str) -> str:
+    def get_file_path(self, index: int, image_or_label: str, file_extension: str) -> str:
         """Returns the corresponding image path."""
         sample_name = self._samples_names[index]
         if self._split == "train":
@@ -115,7 +115,7 @@ class Consep(base.ImageSegmentation):
                 split = "Train"
             else:
                 split = "Test"
-        return os.path.join(self._root, split, image_or_label, sample_name + format)
+        return os.path.join(self._root, split, image_or_label, sample_name + file_extension)
 
     def _get_image_path(self, sample_index: int) -> str:
         """Returns the corresponding image path."""
