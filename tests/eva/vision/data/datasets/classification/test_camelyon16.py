@@ -81,6 +81,7 @@ def _setup_datasets(*datasets: datasets.Camelyon16):
     for dataset in datasets:
         dataset.setup()
 
+
 @pytest.fixture(autouse=True)
 def mock_validate():
     """Mocks the data validation function to avoid expecting all input images."""
