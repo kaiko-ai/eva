@@ -2,6 +2,7 @@
 
 import os
 from typing import Any, Literal
+from unittest.mock import patch
 
 import pytest
 import torch
@@ -79,3 +80,9 @@ def root(assets_path: str) -> str:
 def _setup_datasets(*datasets: datasets.Camelyon16):
     for dataset in datasets:
         dataset.setup()
+
+@pytest.fixture(autouse=True)
+def mock_validate():
+    """Mocks the data validation function to avoid expecting all input images."""
+    with patch.object(datasets.Camelyon16, "validate", return_value=None):
+        yield
