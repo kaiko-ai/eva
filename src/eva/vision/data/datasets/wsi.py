@@ -24,8 +24,9 @@ class WsiDataset(vision.VisionDataset):
         file_path: str,
         width: int,
         height: int,
-        target_mpp: float,
         sampler: samplers.Sampler,
+        target_mpp: float,
+        overwrite_mpp: float | None = None,
         backend: str = "openslide",
         image_transforms: Callable | None = None,
     ):
@@ -35,16 +36,18 @@ class WsiDataset(vision.VisionDataset):
             file_path: Path to the whole-slide image file.
             width: Width of the patches to be extracted, in pixels.
             height: Height of the patches to be extracted, in pixels.
-            target_mpp: Target microns per pixel (mpp) for the patches.
             sampler: The sampler to use for sampling patch coordinates.
+            target_mpp: Target microns per pixel (mpp) for the patches.
+            overwrite_mpp: The microns per pixel (mpp) value to use when missing in WSI metadata.
             backend: The backend to use for reading the whole-slide images.
             image_transforms: Transforms to apply to the extracted image patches.
         """
         self._file_path = file_path
         self._width = width
         self._height = height
-        self._target_mpp = target_mpp
         self._sampler = sampler
+        self._target_mpp = target_mpp
+        self._overwrite_mpp = overwrite_mpp
         self._backend = backend
         self._image_transforms = image_transforms
 
@@ -58,7 +61,7 @@ class WsiDataset(vision.VisionDataset):
 
     @property
     def _wsi(self) -> wsi.Wsi:
-        return wsi.get_cached_wsi(self._file_path, self._backend)
+        return wsi.get_cached_wsi(self._file_path, self._backend, self._overwrite_mpp)
 
     @property
     def _coords(self) -> wsi.PatchCoordinates:
@@ -67,6 +70,7 @@ class WsiDataset(vision.VisionDataset):
             width=self._width,
             height=self._height,
             target_mpp=self._target_mpp,
+            overwrite_mpp=self._overwrite_mpp,
             sampler=self._sampler,
             backend=self._backend,
         )
@@ -95,8 +99,9 @@ class MultiWsiDataset(torch_datasets.ConcatDataset, base.Dataset):
         file_paths: List[str],
         width: int,
         height: int,
-        target_mpp: float,
         sampler: samplers.Sampler,
+        target_mpp: float,
+        overwrite_mpp: float | None = None,
         backend: str = "openslide",
         image_transforms: Callable | None = None,
     ):
@@ -108,6 +113,7 @@ class MultiWsiDataset(torch_datasets.ConcatDataset, base.Dataset):
             width: Width of the patches to be extracted, in pixels.
             height: Height of the patches to be extracted, in pixels.
             target_mpp: Target microns per pixel (mpp) for the patches.
+            overwrite_mpp: The microns per pixel (mpp) value to use when missing in WSI metadata.
             sampler: The sampler to use for sampling patch coordinates.
             backend: The backend to use for reading the whole-slide images.
             image_transforms: Transforms to apply to the extracted image patches.
@@ -117,6 +123,7 @@ class MultiWsiDataset(torch_datasets.ConcatDataset, base.Dataset):
         self._width = width
         self._height = height
         self._target_mpp = target_mpp
+        self._overwrite_mpp = overwrite_mpp
         self._sampler = sampler
         self._backend = backend
         self._image_transforms = image_transforms
@@ -138,8 +145,9 @@ class MultiWsiDataset(torch_datasets.ConcatDataset, base.Dataset):
                     file_path=file_path,
                     width=self._width,
                     height=self._height,
-                    target_mpp=self._target_mpp,
                     sampler=self._sampler,
+                    target_mpp=self._target_mpp,
+                    overwrite_mpp=self._overwrite_mpp,
                     backend=self._backend,
                     image_transforms=self._image_transforms,
                 )

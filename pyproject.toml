@@ -45,6 +45,7 @@ dependencies = [
     "onnx>=1.16.0",
     "toolz>=0.12.1",
     "rich>=13.7.1",
+    "scipy>=1.14.0",
 ]
 
 [project.urls]

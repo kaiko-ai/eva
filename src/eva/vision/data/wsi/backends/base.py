@@ -9,13 +9,15 @@ import numpy as np
 class Wsi(abc.ABC):
     """Base class for loading data from Whole Slide Image (WSI) files."""
 
-    def __init__(self, file_path: str):
+    def __init__(self, file_path: str, overwrite_mpp: float | None = None):
         """Initializes a Wsi object.
 
         Args:
             file_path: The path to the WSI file.
+            overwrite_mpp: The microns per pixel (mpp) value to use when missing in WSI metadata.
         """
         self._wsi = self.open_file(file_path)
+        self._overwrite_mpp = overwrite_mpp
 
     @abc.abstractmethod
     def open_file(self, file_path: str) -> Any:
