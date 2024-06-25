@@ -152,4 +152,4 @@ class CoNSeP(wsi.MultiWsiDataset, base.ImageSegmentation):
 
     def _read_mask_patch(self, index: int, mask: npt.NDArray[Any]) -> npt.NDArray[Any]:
         (x, y), width, height = self._get_coords(index)
-        return mask[: x + width, y : y + height]
+        return mask[x: x + width, y : y + height]
