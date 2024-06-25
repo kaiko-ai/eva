@@ -20,14 +20,6 @@ class MulticlassClassificationMetrics(structs.MetricCollection):
     ) -> None:
         """Initializes the multi-class classification metrics.
 
-        The metrics instantiated here are:
-
-        - MulticlassAccuracy
-        - MulticlassPrecision
-        - MulticlassRecall
-        - MulticlassF1Score
-        - MulticlassAUROC
-
         Args:
             num_classes: Integer specifying the number of classes.
             average: Defines the reduction that is applied over labels.

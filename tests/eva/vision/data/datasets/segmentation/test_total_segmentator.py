@@ -11,7 +11,7 @@ from eva.vision.data import datasets
 
 @pytest.mark.parametrize(
     "split, expected_length",
-    [("train", 9), ("val", 9), (None, 9)],
+    [("train", 6), ("val", 3), (None, 9)],
 )
 def test_length(
     total_segmentator_dataset: datasets.TotalSegmentator2D, expected_length: int
