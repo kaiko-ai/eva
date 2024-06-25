@@ -75,7 +75,7 @@ data:
   init_args:
     datasets:
       train:
-        class_path: eva.vision.datasets.Consep
+        class_path: eva.vision.datasets.CoNSeP
         init_args: &DATASET_ARGS
           root: ${oc.env:DATA_ROOT, ./data}/consep
           split: train
@@ -85,7 +85,7 @@ data:
               mean: *NORMALIZE_MEAN
               std: *NORMALIZE_STD
       val:
-        class_path: eva.vision.datasets.Consep
+        class_path: eva.vision.datasets.CoNSeP
         init_args:
           <<: *DATASET_ARGS
           split: val

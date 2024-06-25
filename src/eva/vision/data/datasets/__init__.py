@@ -9,7 +9,7 @@ from eva.vision.data.datasets.classification import (
     PatchCamelyon,
     WsiClassificationDataset,
 )
-from eva.vision.data.datasets.segmentation import Consep, ImageSegmentation, TotalSegmentator2D
+from eva.vision.data.datasets.segmentation import CoNSeP, ImageSegmentation, TotalSegmentator2D
 from eva.vision.data.datasets.vision import VisionDataset
 from eva.vision.data.datasets.wsi import MultiWsiDataset, WsiDataset
 
@@ -19,7 +19,7 @@ __all__ = [
     "MHIST",
     "ImageSegmentation",
     "PatchCamelyon",
-    "Consep",
+    "CoNSeP",
     "PANDA",
     "Camelyon16",
     "TotalSegmentator2D",

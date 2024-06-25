@@ -1,5 +1,6 @@
-"""Consep segmentation dataset class."""
+"""CoNSeP segmentation dataset class."""
 
+import glob
 import os
 from typing import Callable, Dict, List, Literal, Tuple
 
@@ -12,8 +13,8 @@ from eva.vision.data.datasets.segmentation import base
 from eva.vision.utils import io
 
 
-class Consep(base.ImageSegmentation):
-    """Consep segmentation dataset."""
+class CoNSeP(base.ImageSegmentation):
+    """CoNSeP segmentation dataset."""
 
     _expected_dataset_lengths: Dict[str | None, int] = {
         "train": 27,
@@ -66,9 +67,7 @@ class Consep(base.ImageSegmentation):
 
     @override
     def filename(self, index: int) -> str:
-        sample_idx, slice_index = self._indices[index]
-        sample_dir = self._samples_names[sample_idx]
-        return os.path.join(sample_dir, f"{slice_index}-ct.nii.gz")
+        return self._samples_names[index]
 
     @override
     def prepare_data(self) -> None:
@@ -125,22 +124,12 @@ class Consep(base.ImageSegmentation):
         """Returns the directory of the corresponding masks."""
         return self.get_file_path(sample_index, "Labels", ".mat")
 
-    def _get_number_of_slices_per_sample(self, sample_index: int) -> int:
-        """Returns the total amount of slices of a sample."""
-        image_path = self._get_image_path(sample_index)
-        image_shape = io.fetch_nifti_shape(image_path)
-        return image_shape[-1]
-
     def _fetch_samples_names(self) -> List[str]:
         """Returns the name of all the samples of the selected dataset split."""
 
         def _samples_dirs_split(split: str) -> List[str]:
             split_dir = os.path.join(self._root, f"{split}/Images")
-            return [
-                item.split(".")[0]
-                for item in os.listdir(split_dir)
-                if os.path.isfile(os.path.join(split_dir, item))
-            ]
+            return [os.path.basename(f).split(".")[0] for f in glob.glob(f"{split_dir}/*.png")]
 
         sample_filenames = []
         if self._split in ["train", None]:
