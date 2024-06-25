@@ -21,3 +21,16 @@ class INPUT_BATCH(NamedTuple):
 
     metadata: Dict[str, Any] | None = None
     """The associated metadata."""
+
+
+class INPUT_TENSOR_BATCH(NamedTuple):
+    """Tensor based input batch data scheme."""
+
+    data: torch.Tensor
+    """The data batch."""
+
+    targets: torch.Tensor
+    """The target batch."""
+
+    metadata: Dict[str, Any] | None = None
+    """The associated metadata."""
