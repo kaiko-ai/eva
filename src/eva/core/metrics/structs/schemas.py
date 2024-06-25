@@ -44,4 +44,6 @@ class MetricsSchema:
         if metrics is None or self.common is None:
             return self.common or metrics
 
-        return [self.common, metrics]  # type: ignore
+        metrics = metrics if isinstance(metrics, list) else [metrics]  # type: ignore
+        common = self.common if isinstance(self.common, list) else [self.common]
+        return common + metrics  # type: ignore
