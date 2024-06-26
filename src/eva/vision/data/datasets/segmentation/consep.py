@@ -4,6 +4,7 @@ import glob
 import os
 from typing import Any, Callable, Dict, List, Literal, Tuple
 
+import numpy as np
 import numpy.typing as npt
 import scipy.io
 import torch
@@ -17,7 +18,12 @@ from eva.vision.data.wsi.patching import samplers
 
 
 class CoNSeP(wsi.MultiWsiDataset, base.ImageSegmentation):
-    """Dataset class for CoNSep semantic segmentation task."""
+    """Dataset class for CoNSep semantic segmentation task.
+
+    We combine classes 3 (healthy epithelial) & 4 (dysplastic/malignant epithelial)
+    into the epithelial class and 5 (fibroblast), 6 (muscle) & 7 (endothelial) into
+    the spindle-shaped class.
+    """
 
     _expected_dataset_lengths: Dict[str | None, int] = {
         "train": 27,
@@ -71,15 +77,12 @@ class CoNSeP(wsi.MultiWsiDataset, base.ImageSegmentation):
     @property
     @override
     def classes(self) -> List[str]:
-        # TODO: summarize classes
         return [
+            "background",
             "other",
             "inflammatory",
-            "healthyepithelial",
-            "dysplastic/malignant epithelial",
-            "fibroblast",
-            "muscle",
-            "endothelial",
+            "epithelial",
+            "spindle-shaped",
         ]
 
     @property
@@ -101,7 +104,7 @@ class CoNSeP(wsi.MultiWsiDataset, base.ImageSegmentation):
         _validators.check_dataset_integrity(
             self,
             length=self._expected_dataset_lengths.get(self._split),
-            n_classes=len(self.classes),
+            n_classes=4,
             first_and_last_labels=((self.classes[0], self.classes[-1])),
         )
 
@@ -123,6 +126,7 @@ class CoNSeP(wsi.MultiWsiDataset, base.ImageSegmentation):
         path = self._get_mask_path(index)
         mask = scipy.io.loadmat(path)["type_map"]
         mask_patch = self._read_mask_patch(index, mask)  # type: ignore
+        # mask_patch = self._map_classes(mask_patch)
         return tv_tensors.Mask(mask_patch, dtype=torch.int64)  # type: ignore[reportCallIssue]
 
     def _load_file_paths(self, split: Literal["train", "val"] | None = None) -> List[str]:
@@ -146,10 +150,18 @@ class CoNSeP(wsi.MultiWsiDataset, base.ImageSegmentation):
         return coords.x_y[patch_index], coords.width, coords.height
 
     def _get_mask_path(self, index):
+        """Returns the path to the mask file corresponding to the patch at the given index."""
         filename = self.filename(index).split(".")[0]
         mask_dir = "Train/Labels" if filename.startswith("train") else "Test/Labels"
         return os.path.join(self._root, mask_dir, f"{filename}.mat")
 
     def _read_mask_patch(self, index: int, mask: npt.NDArray[Any]) -> npt.NDArray[Any]:
+        """Reads the mask patch at the coordinates corresponding to the given patch index."""
         (x, y), width, height = self._get_coords(index)
         return mask[x : x + width, y : y + height]
+
+    def _map_classes(self, array: npt.NDArray[Any]) -> npt.NDArray[Any]:
+        """Summarizes classes 3 & 4, and 5, 6."""
+        array = np.where(array == 4, 3, array)
+        array = np.where(array > 4, 4, array)
+        return array
