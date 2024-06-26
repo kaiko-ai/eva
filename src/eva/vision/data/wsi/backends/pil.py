@@ -1,4 +1,4 @@
-"""Module for loading data from WSI files using the OpenSlide library."""
+"""Module for loading data from standard image file formats PIL library."""
 
 from typing import Sequence, Tuple
 
@@ -10,7 +10,7 @@ from eva.vision.data.wsi.backends import base
 
 
 class PILImage(base.Wsi):
-    """Class for loading data from WSI files using the OpenSlide library."""
+    """Class for loading data from standard image file formats using PIL library."""
 
     _wsi: PIL.Image.Image
 

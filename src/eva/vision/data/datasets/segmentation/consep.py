@@ -18,7 +18,7 @@ from eva.vision.data.wsi.patching import samplers
 
 
 class CoNSeP(wsi.MultiWsiDataset, base.ImageSegmentation):
-    """Dataset class for CoNSep semantic segmentation task.
+    """Dataset class for CoNSeP semantic segmentation task.
 
     We combine classes 3 (healthy epithelial) & 4 (dysplastic/malignant epithelial)
     into the epithelial class and 5 (fibroblast), 6 (muscle) & 7 (endothelial) into
