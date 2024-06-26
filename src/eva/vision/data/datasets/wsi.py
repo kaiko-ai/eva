@@ -136,7 +136,7 @@ class MultiWsiDataset(torch_datasets.ConcatDataset, base.Dataset):
         logger.info(f"Initializing dataset with {len(self._file_paths)} WSIs ...")
         wsi_datasets = []
         for file_path in self._file_paths:
-            file_path = os.path.join(self._root, file_path) if self._root else file_path
+            file_path = os.path.join(self._root, file_path) if self._root not in file_path else file_path
             if not os.path.exists(file_path):
                 raise FileNotFoundError(f"File not found: {file_path}")
 
