@@ -13,6 +13,7 @@
 | [CRC](crc.md)                      | 107,180  | 224x224    | 20x (0.5)              | Classification (9 classes) | Colorectal       |
 | [PatchCamelyon](patch_camelyon.md) | 327,680  | 96x96      | 10x (1.0) \*           | Classification (2 classes) | Breast           |
 | [MHIST](mhist.md)                  | 3,152    | 224x224    |  5x (2.0) \*           | Classification (2 classes) | Colorectal Polyp |
+| [CoNSeP](consep.md)                  | 41    | 1000x1000    |  40x (0.25) \*           | Segmentation (8 classes) | Colorectal |
 
 \* Downsampled from 40x (0.25 μm/px) to increase the field of view.
 
