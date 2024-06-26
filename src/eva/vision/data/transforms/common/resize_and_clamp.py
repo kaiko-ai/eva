@@ -40,7 +40,7 @@ class ResizeAndClamp(torch_transforms.Compose):
         transforms = [
             v2.Resize(size=self._size),
             v2.CenterCrop(size=self._size),
-            v2.ToDtype(torch.float32, scale=True),
+            v2.ToDtype(torch.float32),
             normalization.Clamp(out_range=self._clamp_range),
             normalization.RescaleIntensity(
                 in_range=self._clamp_range,
