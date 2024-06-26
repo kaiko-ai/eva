@@ -84,8 +84,9 @@ data:
             init_args:
               max_samples: 25
           transforms:
-            class_path: eva.vision.data.transforms.common.ResizeAndClamp
+            class_path: eva.vision.data.transforms.common.ResizeAndCrop
             init_args:
+              size: ${oc.env:RESIZE_DIM, 224}  
               mean: *NORMALIZE_MEAN
               std: *NORMALIZE_STD
       val:
