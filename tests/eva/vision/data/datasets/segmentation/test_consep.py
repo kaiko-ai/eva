@@ -2,7 +2,7 @@
 
 import os
 from typing import Literal
-from unittest.mock import PropertyMock, patch
+from unittest.mock import PropertyMock
 
 import pytest
 from torchvision import tv_tensors
@@ -49,22 +49,27 @@ def root(assets_path: str) -> str:
     return os.path.join(assets_path, "vision/datasets/consep")
 
 
+@pytest.fixture(autouse=True)
+def mock_size(monkeypatch):
+    """Mock the expected dataset sizes."""
+    monkeypatch.setattr(
+        datasets.CoNSeP,
+        "_expected_dataset_lengths",
+        PropertyMock(return_value={None: 7, "train": 4, "val": 3}),
+    )
+
+
 @pytest.fixture(scope="function")
 def dataset(split: Literal["train", "val"] | None, root: str) -> datasets.CoNSeP:
     """CoNSeP dataset fixture."""
-    with patch.object(
-        datasets.CoNSeP,
-        "_expected_dataset_lengths",
-        new_callable=PropertyMock(return_value={None: 7, "train": 4, "val": 3}),
-    ):
-        dataset = datasets.CoNSeP(
-            root=root,
-            split=split,
-            width=10,
-            height=10,
-            target_mpp=0.25,
-            sampler=samplers.GridSampler(),
-        )
-        dataset.prepare_data()
-        dataset.setup()
-        return dataset
+    dataset = datasets.CoNSeP(
+        root=root,
+        split=split,
+        width=10,
+        height=10,
+        target_mpp=0.25,
+        sampler=samplers.GridSampler(),
+    )
+    dataset.prepare_data()
+    dataset.setup()
+    return dataset
