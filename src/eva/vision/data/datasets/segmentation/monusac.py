@@ -159,12 +159,12 @@ class MoNuSAC(base.ImageSegmentation):
             Semantic label mask as a numpy array.
         """
         image_path = self._image_files[index]
-        image_size = imagesize.get(image_path)
+        width, height = imagesize.get(image_path)
         annotation_path = image_path.replace(".tif", ".xml")
         element_tree = ElementTree.parse(annotation_path)  # nosec
         root = element_tree.getroot()
 
-        semantic_labels = np.zeros(image_size, "uint8")
+        semantic_labels = np.zeros((height, width), "uint8")
         for level in range(len(root)):
             label = [item.attrib["Name"] for item in root[level][0]][0]
             for child in root[level]:
@@ -177,9 +177,9 @@ class MoNuSAC(base.ImageSegmentation):
                         fill_row_coords, fill_col_coords = draw.polygon(
                             vertices[:, 0],
                             vertices[:, 1],
-                            image_size,
+                            (width, height),
                         )
-                        semantic_labels[fill_row_coords, fill_col_coords] = self.class_to_idx[label] + 1
+                        semantic_labels[fill_col_coords, fill_row_coords] = self.class_to_idx[label] + 1
 
         return semantic_labels
 
