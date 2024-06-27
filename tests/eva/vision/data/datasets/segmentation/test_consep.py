@@ -2,7 +2,7 @@
 
 import os
 from typing import Literal
-from unittest.mock import PropertyMock
+from unittest.mock import PropertyMock, patch
 
 import pytest
 from torchvision import tv_tensors
@@ -15,10 +15,10 @@ from eva.vision.data.wsi.patching import samplers
     "split, expected_length",
     [("train", 4), ("val", 3), (None, 7)],
 )
-def test_length(dataset: datasets.CoNSeP, expected_length: int) -> None:
+def test_length(consep_dataset: datasets.CoNSeP, expected_length: int) -> None:
     """Tests the length of the dataset."""
     # 16 patches (10x10) per slide (40x40)
-    assert len(dataset) == expected_length * 16
+    assert len(consep_dataset) == expected_length * 16
 
 
 @pytest.mark.parametrize(
@@ -29,10 +29,10 @@ def test_length(dataset: datasets.CoNSeP, expected_length: int) -> None:
         ("val", 0),
     ],
 )
-def test_sample(dataset: datasets.CoNSeP, index: int) -> None:
+def test_sample(consep_dataset: datasets.CoNSeP, index: int) -> None:
     """Tests the format of a dataset sample."""
     # assert data sample is a tuple
-    sample = dataset[index]
+    sample = consep_dataset[index]
     assert isinstance(sample, tuple)
     assert len(sample) == 2
     # assert the format of the `image` and `mask`
@@ -49,27 +49,22 @@ def root(assets_path: str) -> str:
     return os.path.join(assets_path, "vision/datasets/consep")
 
 
-@pytest.fixture(autouse=True)
-def mock_size(monkeypatch):
-    """Mock the expected dataset sizes."""
-    monkeypatch.setattr(
+@pytest.fixture(scope="function")
+def consep_dataset(split: Literal["train", "val"] | None, root: str) -> datasets.CoNSeP:
+    """CoNSeP dataset fixture."""
+    with patch.object(
         datasets.CoNSeP,
         "_expected_dataset_lengths",
-        PropertyMock(return_value={None: 7, "train": 4, "val": 3}),
-    )
-
-
-@pytest.fixture(scope="function")
-def dataset(split: Literal["train", "val"] | None, root: str) -> datasets.CoNSeP:
-    """CoNSeP dataset fixture."""
-    dataset = datasets.CoNSeP(
-        root=root,
-        split=split,
-        width=10,
-        height=10,
-        target_mpp=0.25,
-        sampler=samplers.GridSampler(),
-    )
-    dataset.prepare_data()
-    dataset.setup()
-    return dataset
+        new_callable=PropertyMock(return_value={None: 7, "train": 4, "val": 3}),
+    ):
+        dataset = datasets.CoNSeP(
+            root=root,
+            split=split,
+            width=10,
+            height=10,
+            target_mpp=0.25,
+            sampler=samplers.GridSampler(),
+        )
+        dataset.prepare_data()
+        dataset.setup()
+        return dataset
