@@ -21,7 +21,7 @@ trainer:
       - class_path: lightning.pytorch.callbacks.EarlyStopping
         init_args:
           min_delta: 0
-          patience: 50
+          patience: 100
           monitor: *MONITOR_METRIC
           mode: *MONITOR_METRIC_MODE
     logger:
@@ -45,7 +45,10 @@ model:
       init_args:
         in_features: ${oc.env:DECODER_IN_FEATURES, 384}
         num_classes:  &NUM_CLASSES 5
-    criterion: torch.nn.CrossEntropyLoss
+    criterion:
+      class_path: torch.nn.CrossEntropyLoss
+      init_args:
+        ignore_index: &IGNORE_INDEX 255
     lr_multiplier_encoder: 0.0
     optimizer:
       class_path: torch.optim.AdamW
@@ -64,12 +67,14 @@ model:
         - class_path: eva.core.metrics.defaults.MulticlassSegmentationMetrics
           init_args:
             num_classes: *NUM_CLASSES
+            ignore_index: *IGNORE_INDEX
         - class_path: eva.core.metrics.wrappers.ClasswiseWrapper
           init_args:
             metric:
               class_path: torchmetrics.classification.MulticlassF1Score
               init_args:
                 num_classes: *NUM_CLASSES
+                ignore_index: *IGNORE_INDEX
                 average: null
 data:
   class_path: eva.DataModule

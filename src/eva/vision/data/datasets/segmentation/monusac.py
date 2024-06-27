@@ -202,9 +202,9 @@ class MoNuSAC(base.ImageSegmentation):
         semantic_labels = np.zeros((height, width), "uint8")  # type: ignore[reportCallIssue]
         for level in range(len(root)):
             label = [item.attrib["Name"] for item in root[level][0]][0]
-            class_id = self.class_to_idx.get(label, -1) + 1
+            class_id = self.class_to_idx.get(label, 254) + 1
             # for the test dataset an additional class 'Ambiguous' was added for
-            # difficult regions with fuzzy boundaries - we treat them as background
+            # difficult regions with fuzzy boundaries - we return it as 255
             regions = [item for child in root[level] for item in child if item.tag == "Region"]
             for region in regions:
                 vertices = np.array(
