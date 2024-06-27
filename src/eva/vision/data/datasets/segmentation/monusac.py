@@ -167,18 +167,19 @@ class MoNuSAC(base.ImageSegmentation):
         semantic_labels = np.zeros(image_size, "uint8")
         for level in range(len(root)):
             label = [item.attrib["Name"] for item in root[level][0]][0]
-            regions = [item for child in root[level] for item in child if item.tag == "Region"]
-            for region in regions:
-                vertices = np.array(
-                    [(vertex.attrib["X"], vertex.attrib["Y"]) for vertex in region[1]],
-                    dtype=np.dtype(int),
-                )
-                fill_row_coords, fill_col_coords = draw.polygon(
-                    vertices[:, 0],
-                    vertices[:, 1],
-                    (image_size[-1], image_size[0]),
-                )
-                semantic_labels[fill_col_coords, fill_row_coords] = self.class_to_idx[label] + 1
+            for child in root[level]:
+                for item in child:
+                    if item.tag == "Region":
+                        vertices = np.array(
+                            [(vertex.attrib["X"], vertex.attrib["Y"]) for vertex in item[1]],
+                            dtype=np.dtype(int),
+                        )
+                        fill_row_coords, fill_col_coords = draw.polygon(
+                            vertices[:, 0],
+                            vertices[:, 1],
+                            image_size,
+                        )
+                        semantic_labels[fill_row_coords, fill_col_coords] = self.class_to_idx[label] + 1
 
         return semantic_labels
 
