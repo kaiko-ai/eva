@@ -6,7 +6,6 @@ from typing import Any, Callable, Dict, List, Literal, Tuple
 
 import numpy as np
 import numpy.typing as npt
-import scipy.io
 import torch
 from torchvision import tv_tensors
 from torchvision.transforms.v2 import functional
@@ -15,6 +14,7 @@ from typing_extensions import override
 from eva.vision.data.datasets import _validators, wsi
 from eva.vision.data.datasets.segmentation import base
 from eva.vision.data.wsi.patching import samplers
+from eva.vision.utils import io
 
 
 class CoNSeP(wsi.MultiWsiDataset, base.ImageSegmentation):
@@ -124,9 +124,9 @@ class CoNSeP(wsi.MultiWsiDataset, base.ImageSegmentation):
     @override
     def load_mask(self, index: int) -> tv_tensors.Mask:
         path = self._get_mask_path(index)
-        mask = scipy.io.loadmat(path)["type_map"]
-        mask_patch = self._read_mask_patch(index, mask)  # type: ignore
-        # mask_patch = self._map_classes(mask_patch)
+        mask = io.read_mat(path)["type_map"]
+        mask_patch = self._extract_mask_patch(index, mask)
+        mask_patch = self._map_classes(mask_patch)
         return tv_tensors.Mask(mask_patch, dtype=torch.int64)  # type: ignore[reportCallIssue]
 
     def _load_file_paths(self, split: Literal["train", "val"] | None = None) -> List[str]:
@@ -155,7 +155,7 @@ class CoNSeP(wsi.MultiWsiDataset, base.ImageSegmentation):
         mask_dir = "Train/Labels" if filename.startswith("train") else "Test/Labels"
         return os.path.join(self._root, mask_dir, f"{filename}.mat")
 
-    def _read_mask_patch(self, index: int, mask: npt.NDArray[Any]) -> npt.NDArray[Any]:
+    def _extract_mask_patch(self, index: int, mask: npt.NDArray[Any]) -> npt.NDArray[Any]:
         """Reads the mask patch at the coordinates corresponding to the given patch index."""
         (x, y), width, height = self._get_coords(index)
         return mask[x : x + width, y : y + height]
