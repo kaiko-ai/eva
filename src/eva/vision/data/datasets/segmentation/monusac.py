@@ -10,6 +10,7 @@ import imagesize
 import numpy as np
 import numpy.typing as npt
 import torch
+import tqdm
 from skimage import draw
 from torchvision import tv_tensors
 from torchvision.datasets import utils
@@ -43,6 +44,7 @@ class MoNuSAC(base.ImageSegmentation):
     def __init__(
         self,
         root: str,
+        export_masks: bool = True,
         download: bool = False,
         transforms: Callable | None = None,
     ) -> None:
@@ -51,6 +53,8 @@ class MoNuSAC(base.ImageSegmentation):
         Args:
             root: Path to the root directory of the dataset. The dataset will
                 be downloaded and extracted here, if it does not already exist.
+            export_masks: Whether to export, save and use the semantic label masks
+                from disk.
             download: Whether to download the data for the specified split.
                 Note that the download will be executed only by additionally
                 calling the :meth:`prepare_data` method and if the data does not
@@ -61,6 +65,7 @@ class MoNuSAC(base.ImageSegmentation):
         super().__init__(transforms=transforms)
 
         self._root = root
+        self._export_masks = export_masks
         self._download = download
 
     @property
@@ -83,6 +88,11 @@ class MoNuSAC(base.ImageSegmentation):
             self._download_dataset()
 
     @override
+    def setup(self) -> None:
+        if self._export_masks:
+            self._export_semantic_label_masks()
+
+    @override
     def load_image(self, index: int) -> tv_tensors.Image:
         image_path = self._image_files[index]
         image_rgb_array = io.read_image(image_path)
@@ -90,7 +100,11 @@ class MoNuSAC(base.ImageSegmentation):
 
     @override
     def load_mask(self, index: int) -> tv_tensors.Mask:
-        semantic_labels = self._export_semantic_label_mask(index)
+        semantic_labels = (
+            self._load_semantic_mask_file(index)
+            if self._export_masks
+            else self._get_semantic_mask(index)
+        )
         return tv_tensors.Mask(semantic_labels.squeeze(), dtype=torch.int64)
 
     @override
@@ -103,7 +117,26 @@ class MoNuSAC(base.ImageSegmentation):
         image_files = glob.glob(files_pattern, recursive=True)
         return sorted(image_files)
 
-    def _export_semantic_label_mask(self, index) -> npt.NDArray[Any]:
+    def _export_semantic_label_masks(self) -> None:
+        mask_files = [
+            (index, filename.replace(".tif", ".npy"))
+            for index, filename in enumerate(self._image_files)
+        ]
+        to_export = filter(lambda x: not os.path.isfile(x[1]), mask_files)
+        for sample_index, filename in tqdm.tqdm(
+            list(to_export),
+            desc=">> Exporting semantic masks",
+            leave=False,
+        ):
+            semantic_labels = self._get_semantic_label_mask(sample_index)
+            np.save(filename, semantic_labels)
+
+    def _load_semantic_mask_file(self, index: int) -> npt.NDArray[Any]:
+        mask_filename = self._image_files[index].replace(".tif", ".npy")
+        return np.load(mask_filename)
+
+    def _get_semantic_mask(self, index: int) -> npt.NDArray[Any]:
+        """Builds and returns a semantic label mask from the XML annotations."""
         image_path = self._image_files[index]
         image_size = imagesize.get(image_path)
         annotation_path = image_path.replace(".tif", ".xml")
@@ -122,26 +155,9 @@ class MoNuSAC(base.ImageSegmentation):
                 fill_row_coords, fill_col_coords = draw.polygon(
                     vertices[:, 0],
                     vertices[:, 1],
-                    image_size,
+                    (image_size[-1], image_size[0]),
                 )
-                semantic_labels[fill_row_coords, fill_col_coords] = self.class_to_idx[label] + 1
-
-
-            # for child in root[level]:
-            #     for item in child:
-            #         if item.tag != "Region":
-            #             continue
-
-            #         vertices = np.array(
-            #             [(vertex.attrib["X"], vertex.attrib["Y"]) for vertex in item[1]],
-            #             dtype=np.dtype(int),
-            #         )
-            #         fill_row_coords, fill_col_coords = draw.polygon(
-            #             vertices[:, 0],
-            #             vertices[:, 1],
-            #             image_size,
-            #         )
-            #         semantic_labels[fill_row_coords, fill_col_coords] = self.class_to_idx[label] + 1
+                semantic_labels[fill_col_coords, fill_row_coords] = self.class_to_idx[label] + 1
 
         return semantic_labels
 
