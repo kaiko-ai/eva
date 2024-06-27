@@ -58,14 +58,13 @@ class CoNSeP(wsi.MultiWsiDataset, base.ImageSegmentation):
         self._split = split
         self._root = root
         self._seed = seed
-        self._file_paths = self._load_file_paths(split)
 
         self.datasets: List[wsi.WsiDataset]  # type: ignore
 
         wsi.MultiWsiDataset.__init__(
             self,
             root=root,
-            file_paths=self._file_paths,
+            file_paths=self._load_file_paths(split),
             width=width,
             height=height,
             sampler=sampler,
@@ -104,8 +103,8 @@ class CoNSeP(wsi.MultiWsiDataset, base.ImageSegmentation):
     def validate(self) -> None:
         _validators.check_dataset_integrity(
             self,
-            length=len(self._file_paths),
-            n_classes=4,
+            length=None,
+            n_classes=5,
             first_and_last_labels=((self.classes[0], self.classes[-1])),
         )
 

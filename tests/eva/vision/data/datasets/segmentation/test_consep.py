@@ -15,10 +15,10 @@ from eva.vision.data.wsi.patching import samplers
     "split, expected_length",
     [("train", 4), ("val", 3), (None, 7)],
 )
-def test_length(consep_dataset: datasets.CoNSeP, expected_length: int) -> None:
+def test_length(dataset: datasets.CoNSeP, expected_length: int) -> None:
     """Tests the length of the dataset."""
     # 16 patches (10x10) per slide (40x40)
-    assert len(consep_dataset) == expected_length * 16
+    assert len(dataset) == expected_length * 16
 
 
 @pytest.mark.parametrize(
@@ -29,10 +29,10 @@ def test_length(consep_dataset: datasets.CoNSeP, expected_length: int) -> None:
         ("val", 0),
     ],
 )
-def test_sample(consep_dataset: datasets.CoNSeP, index: int) -> None:
+def test_sample(dataset: datasets.CoNSeP, index: int) -> None:
     """Tests the format of a dataset sample."""
     # assert data sample is a tuple
-    sample = consep_dataset[index]
+    sample = dataset[index]
     assert isinstance(sample, tuple)
     assert len(sample) == 2
     # assert the format of the `image` and `mask`
@@ -50,7 +50,7 @@ def root(assets_path: str) -> str:
 
 
 @pytest.fixture(scope="function")
-def consep_dataset(split: Literal["train", "val"] | None, root: str) -> datasets.CoNSeP:
+def dataset(split: Literal["train", "val"] | None, root: str) -> datasets.CoNSeP:
     """CoNSeP dataset fixture."""
     with patch.object(
         datasets.CoNSeP,
