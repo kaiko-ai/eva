@@ -5,3 +5,5 @@ tests/eva/assets/**/*.tif filter=lfs diff=lfs merge=lfs -text
 tests/eva/assets/**/*.tiff filter=lfs diff=lfs merge=lfs -text
 tests/eva/assets/**/*.csv filter=lfs diff=lfs merge=lfs -text
 tests/eva/assets/**/*.pt filter=lfs diff=lfs merge=lfs -text
+tests/eva/assets/**/*.npy filter=lfs diff=lfs merge=lfs -text
+tests/eva/assets/**/*.xml filter=lfs diff=lfs merge=lfs -text

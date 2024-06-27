@@ -3,7 +3,7 @@
 import functools
 import glob
 import os
-from typing import Any, Callable, Dict, List, Tuple
+from typing import Any, Callable, Dict, List, Literal
 from xml.etree import ElementTree  # nosec
 
 import imagesize
@@ -16,7 +16,7 @@ from torchvision import tv_tensors
 from torchvision.datasets import utils
 from typing_extensions import override
 
-from eva.vision.data.datasets import structs
+from eva.vision.data.datasets import _validators, structs
 from eva.vision.data.datasets.segmentation import base
 from eva.vision.utils import io
 
@@ -27,10 +27,20 @@ class MoNuSAC(base.ImageSegmentation):
     Webpage: https://monusac-2020.grand-challenge.org/
     """
 
+    _expected_dataset_lengths: Dict[str, int] = {
+        "train": 209,
+        "test": 85,
+    }
+    """Dataset version and split to the expected size."""
+
     _resources: List[structs.DownloadResource] = [
         structs.DownloadResource(
             filename="MoNuSAC_images_and_annotations.zip",
             url="https://drive.google.com/file/d/1lxMZaAPSpEHLSxGA9KKMt_r-4S8dwLhq/view?usp=sharing",
+        ),
+        structs.DownloadResource(
+            filename="MoNuSAC Testing Data and Annotations.zip",
+            url="https://drive.google.com/file/d/1G54vsOdxWY1hG7dzmkeK3r0xz9s-heyQ/view?usp=sharing",
         ),
     ]
     """Resources for the full dataset version."""
@@ -44,6 +54,7 @@ class MoNuSAC(base.ImageSegmentation):
     def __init__(
         self,
         root: str,
+        split: Literal["train", "test"],
         export_masks: bool = True,
         download: bool = False,
         transforms: Callable | None = None,
@@ -53,6 +64,7 @@ class MoNuSAC(base.ImageSegmentation):
         Args:
             root: Path to the root directory of the dataset. The dataset will
                 be downloaded and extracted here, if it does not already exist.
+            split: Dataset split to use.
             export_masks: Whether to export, save and use the semantic label masks
                 from disk.
             download: Whether to download the data for the specified split.
@@ -65,6 +77,7 @@ class MoNuSAC(base.ImageSegmentation):
         super().__init__(transforms=transforms)
 
         self._root = root
+        self._split = split
         self._export_masks = export_masks
         self._download = download
 
@@ -88,9 +101,18 @@ class MoNuSAC(base.ImageSegmentation):
             self._download_dataset()
 
     @override
-    def setup(self) -> None:
+    def configure(self) -> None:
         if self._export_masks:
             self._export_semantic_label_masks()
+
+    @override
+    def validate(self) -> None:
+        _validators.check_dataset_integrity(
+            self,
+            length=self._expected_dataset_lengths.get(self._split, 0),
+            n_classes=4,
+            first_and_last_labels=("Epithelial", "Macrophage"),
+        )
 
     @override
     def load_image(self, index: int) -> tv_tensors.Image:
@@ -105,7 +127,7 @@ class MoNuSAC(base.ImageSegmentation):
             if self._export_masks
             else self._get_semantic_mask(index)
         )
-        return tv_tensors.Mask(semantic_labels.squeeze(), dtype=torch.int64)
+        return tv_tensors.Mask(semantic_labels.squeeze(), dtype=torch.int64)  # type: ignore[reportCallIssue]
 
     @override
     def __len__(self) -> int:
@@ -118,9 +140,22 @@ class MoNuSAC(base.ImageSegmentation):
         Returns:
             List of image file paths.
         """
-        files_pattern = os.path.join(self._root, "MoNuSAC_images_and_annotations", "**", "*.tif")
+        files_pattern = os.path.join(self._data_directory, "**", "*.tif")
         image_files = glob.glob(files_pattern, recursive=True)
         return sorted(image_files)
+
+    @functools.cached_property
+    def _data_directory(self) -> str:
+        """Returns the data directory of the dataset."""
+        match self._split:
+            case "train":
+                directory = "MoNuSAC_images_and_annotations"
+            case "test":
+                directory = "MoNuSAC Testing Data and Annotations"
+            case _:
+                raise ValueError(f"Invalid 'split' value '{self._split}'.")
+
+        return os.path.join(self._root, directory)
 
     def _export_semantic_label_masks(self) -> None:
         """Export semantic label masks to disk."""
@@ -164,22 +199,24 @@ class MoNuSAC(base.ImageSegmentation):
         element_tree = ElementTree.parse(annotation_path)  # nosec
         root = element_tree.getroot()
 
-        semantic_labels = np.zeros((height, width), "uint8")
+        semantic_labels = np.zeros((height, width), "uint8")  # type: ignore[reportCallIssue]
         for level in range(len(root)):
             label = [item.attrib["Name"] for item in root[level][0]][0]
-            for child in root[level]:
-                for item in child:
-                    if item.tag == "Region":
-                        vertices = np.array(
-                            [(vertex.attrib["X"], vertex.attrib["Y"]) for vertex in item[1]],
-                            dtype=np.dtype(int),
-                        )
-                        fill_row_coords, fill_col_coords = draw.polygon(
-                            vertices[:, 0],
-                            vertices[:, 1],
-                            (width, height),
-                        )
-                        semantic_labels[fill_col_coords, fill_row_coords] = self.class_to_idx[label] + 1
+            class_id = self.class_to_idx.get(label, -1) + 1
+            # for the test dataset an additional class 'Ambiguous' was added for
+            # difficult regions with fuzzy boundaries - we treat them as background
+            regions = [item for child in root[level] for item in child if item.tag == "Region"]
+            for region in regions:
+                vertices = np.array(
+                    [(vertex.attrib["X"], vertex.attrib["Y"]) for vertex in region[1]],
+                    dtype=np.dtype(float),
+                )
+                fill_row_coords, fill_col_coords = draw.polygon(
+                    vertices[:, 0],
+                    vertices[:, 1],
+                    (width, height),
+                )
+                semantic_labels[fill_col_coords, fill_row_coords] = class_id
 
         return semantic_labels
 
