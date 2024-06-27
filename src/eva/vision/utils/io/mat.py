@@ -1,5 +1,6 @@
 """mat I/O related functions."""
 
+import os
 from typing import Any, Dict
 
 import numpy.typing as npt
@@ -22,3 +23,14 @@ def read_mat(path: str) -> Dict[str, npt.NDArray[Any]]:
     """
     _utils.check_file(path)
     return scipy.io.loadmat(path)
+
+
+def save_mat(path: str, data: Dict[str, npt.NDArray[Any]]) -> None:
+    """Saves a mat file.
+
+    Args:
+        path: The path to save the mat file.
+        data: The dictionary containing the data to save.
+    """
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    scipy.io.savemat(path, data)
