@@ -3,7 +3,7 @@
 import functools
 import glob
 import os
-from typing import Any, Callable, Dict, List
+from typing import Any, Callable, Dict, List, Tuple
 from xml.etree import ElementTree  # nosec
 
 import imagesize
@@ -113,11 +113,17 @@ class MoNuSAC(base.ImageSegmentation):
 
     @functools.cached_property
     def _image_files(self) -> List[str]:
+        """Return the list of image files in the dataset.
+
+        Returns:
+            List of image file paths.
+        """
         files_pattern = os.path.join(self._root, "MoNuSAC_images_and_annotations", "**", "*.tif")
         image_files = glob.glob(files_pattern, recursive=True)
         return sorted(image_files)
 
     def _export_semantic_label_masks(self) -> None:
+        """Export semantic label masks to disk."""
         mask_files = [
             (index, filename.replace(".tif", ".npy"))
             for index, filename in enumerate(self._image_files)
@@ -128,15 +134,30 @@ class MoNuSAC(base.ImageSegmentation):
             desc=">> Exporting semantic masks",
             leave=False,
         ):
-            semantic_labels = self._get_semantic_label_mask(sample_index)
+            semantic_labels = self._get_semantic_mask(sample_index)
             np.save(filename, semantic_labels)
 
     def _load_semantic_mask_file(self, index: int) -> npt.NDArray[Any]:
+        """Load a semantic mask file from disk.
+
+        Args:
+            index: Index of the mask file to load.
+
+        Returns:
+            Loaded mask as a numpy array.
+        """
         mask_filename = self._image_files[index].replace(".tif", ".npy")
         return np.load(mask_filename)
 
     def _get_semantic_mask(self, index: int) -> npt.NDArray[Any]:
-        """Builds and returns a semantic label mask from the XML annotations."""
+        """Builds and loads the semantic label mask from the XML annotations.
+
+        Args:
+            index: Index of the image file.
+
+        Returns:
+            Semantic label mask as a numpy array.
+        """
         image_path = self._image_files[index]
         image_size = imagesize.get(image_path)
         annotation_path = image_path.replace(".tif", ".xml")
