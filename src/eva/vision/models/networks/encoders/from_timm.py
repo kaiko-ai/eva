@@ -52,11 +52,15 @@ class TimmEncoder(encoder.Encoder):
         self._feature_extractor = timm.create_model(
             model_name=self._model_name,
             pretrained=self._pretrained,
-            checkpoint_path=self._checkpoint_path,
+            # checkpoint_path=self._checkpoint_path,
             out_indices=self._out_indices,
             features_only=True,
             **self._model_arguments,
         )
+
+        from timm.models import _helpers
+
+        _helpers.load_checkpoint(self._feature_extractor.model, self._checkpoint_path)
         TimmEncoder.__name__ = self._model_name
 
     @override
