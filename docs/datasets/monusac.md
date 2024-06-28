@@ -44,17 +44,14 @@ The dataset class `MoNuSAC` supports downloading the data during runtime by sett
 > [!NOTE]
 > In the provided `MoNuSAC`-config files the download argument is set to `false`. To enable automatic download you will need to open the config and set `download: true`.
 
+
 ### Splits
 
-We work with the splits provided by the data source.
+We work with the splits provided by the data source. Since no "validation" split is provided, we use the "test" split as validation split.
 
-| Splits   | Train           | Test         | 
+| Splits   | Train           | Validation   | 
 |----------|-----------------|--------------|
 | #Samples | 209 (71%)       | 85 (29%)     | 
-
-
-> [!NOTE]
-> For benchmarking, since no "validation" split is provided, we use the "test" split as validation split.
 
 
 ## Relevant links
