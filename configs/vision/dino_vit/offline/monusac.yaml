@@ -9,8 +9,7 @@ trainer:
       - class_path: eva.vision.callbacks.SemanticSegmentationLogger
         init_args:
           log_every_n_epochs: 1
-          mean: &NORMALIZE_MEAN ${oc.env:NORMALIZE_MEAN, [0.485, 0.456, 0.406]} 
-          std: &NORMALIZE_STD ${oc.env:NORMALIZE_STD, [0.229, 0.224, 0.225]}  
+          log_images: false
       - class_path: lightning.pytorch.callbacks.ModelCheckpoint
         init_args:
           filename: best
@@ -24,6 +23,20 @@ trainer:
           patience: 100
           monitor: *MONITOR_METRIC
           mode: *MONITOR_METRIC_MODE
+      - class_path: eva.callbacks.SegmentationEmbeddingsWriter
+        init_args:
+          output_dir: &DATASET_EMBEDDINGS_ROOT ${oc.env:EMBEDDINGS_ROOT, ./data/embeddings}/${oc.env:DINO_BACKBONE, dino_vits16}/monusac
+          dataloader_idx_map:
+            0: train
+            1: test
+          backbone:
+            class_path: eva.vision.models.networks.encoders.TimmEncoder
+            init_args:
+              model_name: ${oc.env:TIMM_MODEL_NAME, vit_small_patch16_224}
+              pretrained: true
+              out_indices: ${oc.env:TIMM_MODEL_OUT_INDICES, 1}
+              model_arguments:
+                dynamic_img_size: true
     logger:
       - class_path: lightning.pytorch.loggers.TensorBoardLogger
         init_args:
@@ -32,14 +45,6 @@ trainer:
 model:
   class_path: eva.vision.models.modules.SemanticSegmentationModule
   init_args:
-    encoder:
-      class_path: eva.vision.models.networks.encoders.TimmEncoder
-      init_args:
-        model_name: ${oc.env:TIMM_MODEL_NAME, vit_small_patch16_224}
-        pretrained: true
-        out_indices: ${oc.env:TIMM_MODEL_OUT_INDICES, 1}
-        model_arguments:
-          dynamic_img_size: true
     decoder:
       class_path: eva.vision.models.networks.decoders.segmentation.ConvDecoderMS
       init_args:
@@ -49,7 +54,6 @@ model:
       class_path: torch.nn.CrossEntropyLoss
       init_args:
         ignore_index: &IGNORE_INDEX 255
-    lr_multiplier_encoder: 0.0
     optimizer:
       class_path: torch.optim.AdamW
       init_args:
@@ -81,44 +85,41 @@ data:
   init_args:
     datasets:
       train:
-        class_path: eva.vision.datasets.MoNuSAC
+        class_path: eva.vision.datasets.EmbeddingsSegmentationDataset
         init_args: &DATASET_ARGS
-          root: ${oc.env:DATA_ROOT, ./data}/monusac
+          root: *DATASET_EMBEDDINGS_ROOT
+          manifest_file: manifest.csv
           split: train
-          download: ${oc.env:DOWNLOAD_DATA, false}
-          # Set `download: true` to download the dataset from https://monusac-2020.grand-challenge.org/Data/
-          # The MoNuSAC dataset is distributed under the following license: 
-          # "Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International"
-          # (see: https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode)
-          transforms:
-            class_path: torchvision.transforms.v2.Compose
-            init_args:
-              transforms:
-                - class_path: torchvision.transforms.v2.RandomResizedCrop
-                  init_args:
-                    size: ${oc.env:IMAGE_SIZE, 224}                    
-                - class_path: torchvision.transforms.v2.ToDtype
-                  init_args:
-                    dtype: torch.float32
-                    scale: true
-                - class_path: torchvision.transforms.v2.Normalize
-                  init_args:
-                    mean: *NORMALIZE_MEAN
-                    std: *NORMALIZE_STD
       val:
-        class_path: eva.vision.datasets.MoNuSAC
+        class_path: eva.vision.datasets.EmbeddingsSegmentationDataset
         init_args:
           <<: *DATASET_ARGS
           split: test
-          transforms:
-            class_path: eva.vision.data.transforms.common.ResizeAndCrop
-            init_args:
-              size: ${oc.env:RESIZE_DIM, 224}
-              mean: *NORMALIZE_MEAN
-              std: *NORMALIZE_STD
+      predict:
+        - class_path: eva.vision.datasets.MoNuSAC
+          init_args: &PREDICT_DATASET_ARGS
+            root: ${oc.env:DATA_ROOT, ./data}/monusac
+            split: train
+            download: ${oc.env:DOWNLOAD_DATA, false}
+            # Set `download: true` to download the dataset from https://monusac-2020.grand-challenge.org/Data/
+            # The MoNuSAC dataset is distributed under the following license: 
+            # "Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International"
+            # (see: https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode)
+            transforms:
+              class_path: eva.vision.data.transforms.common.ResizeAndCrop
+              init_args:
+                size: ${oc.env:RESIZE_DIM, 224}
+                mean: ${oc.env:NORMALIZE_MEAN, [0.485, 0.456, 0.406]} 
+                std: ${oc.env:NORMALIZE_STD, [0.229, 0.224, 0.225]}  
+        - class_path: eva.vision.datasets.MoNuSAC
+          init_args:
+            <<: *PREDICT_DATASET_ARGS
+            split: test
     dataloaders:
       train:
-        batch_size: &BATCH_SIZE ${oc.env:BATCH_SIZE, 16}
+        batch_size: &BATCH_SIZE ${oc.env:BATCH_SIZE, 64}
         shuffle: true
       val:
         batch_size: *BATCH_SIZE
+      predict:
+        batch_size: &PREDICT_BATCH_SIZE ${oc.env:PREDICT_BATCH_SIZE, 64}
