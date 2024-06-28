@@ -6,7 +6,7 @@
 
 ### Whole Slide (WSI) and microscopy image datasets
 
-#### Patch-level Classification Datasets
+#### Patch-level
 | Dataset                            | #Patches | Patch Size | Magnification (μm/px)  | Task                       |   Tissue Type   |
 |------------------------------------|----------|------------|------------------------|----------------------------|------------------|
 | [BACH](bach.md)                    | 400      | 2048x1536  | 20x (0.5)              | Classification (4 classes) | Breast Cancer |
