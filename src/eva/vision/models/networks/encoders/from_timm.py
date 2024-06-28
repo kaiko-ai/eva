@@ -65,7 +65,4 @@ class TimmEncoder(encoder.Encoder):
 
     @property
     def _pretrained_cfg(self) -> Dict[str, Any]:
-        if not self._checkpoint_path:
-            return {}
-
-        return {"url": self._checkpoint_path, "num_classes": 0}
+        return {"url": self._checkpoint_path, "num_classes": 0} if self._checkpoint_path else {}
