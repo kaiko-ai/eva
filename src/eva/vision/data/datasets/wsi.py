@@ -129,7 +129,7 @@ class MultiWsiDataset(torch_datasets.ConcatDataset, base.Dataset):
         self._image_transforms = image_transforms
 
     @override
-    def setup(self):
+    def configure(self) -> None:
         super().__init__(self._load_datasets())
 
     def _load_datasets(self) -> list[WsiDataset]:

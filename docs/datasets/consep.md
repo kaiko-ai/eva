@@ -64,4 +64,4 @@ We work with the splits provided by the data source. Since no "validation" split
 
 ## License
 
-[TBD]
+The CoNSeP dataset are held under the [Apache 2.0 License](https://www.apache.org/licenses/LICENSE-2.0)
