@@ -3,12 +3,12 @@
 from typing import Callable, Sequence, Tuple
 
 import torch
-import torchvision.transforms.v2 as torch_transforms
+from torchvision.transforms import v2
 
 from eva.vision.data.transforms import normalization
 
 
-class ResizeAndClamp(torch_transforms.Compose):
+class ResizeAndClamp(v2.Compose):
     """Resizes, crops, clamps and normalizes an input image."""
 
     def __init__(
@@ -37,15 +37,15 @@ class ResizeAndClamp(torch_transforms.Compose):
     def _build_transforms(self) -> Sequence[Callable]:
         """Builds and returns the list of transforms."""
         transforms = [
-            torch_transforms.Resize(size=self._size),
-            torch_transforms.CenterCrop(size=self._size),
+            v2.Resize(size=self._size),
+            v2.CenterCrop(size=self._size),
             normalization.Clamp(out_range=self._clamp_range),
-            torch_transforms.ToDtype(torch.float32),
+            v2.ToDtype(torch.float32),
             normalization.RescaleIntensity(
                 in_range=self._clamp_range,
                 out_range=(0.0, 1.0),
             ),
-            torch_transforms.Normalize(
+            v2.Normalize(
                 mean=self._mean,
                 std=self._std,
             ),

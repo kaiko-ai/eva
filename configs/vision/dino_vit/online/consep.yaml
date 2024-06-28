@@ -2,9 +2,9 @@ trainer:
   class_path: eva.Trainer
   init_args:
     n_runs: &N_RUNS ${oc.env:N_RUNS, 1}
-    default_root_dir: &OUTPUT_ROOT ${oc.env:OUTPUT_ROOT, logs/monusac/${oc.env:TIMM_MODEL_NAME, vit_small_patch16_224}}
-    max_steps: &MAX_STEPS ${oc.env:MAX_STEPS, 20000}
-    log_every_n_steps: 4
+    default_root_dir: &OUTPUT_ROOT ${oc.env:OUTPUT_ROOT, logs/${oc.env:TIMM_MODEL_NAME, vit_small_patch16_224}/consep}
+    max_steps: &MAX_STEPS ${oc.env:MAX_STEPS, 513}
+    log_every_n_steps: 6
     callbacks:
       - class_path: eva.vision.callbacks.SemanticSegmentationLogger
         init_args:
@@ -45,11 +45,8 @@ model:
       class_path: eva.vision.models.networks.decoders.segmentation.ConvDecoderMS
       init_args:
         in_features: ${oc.env:DECODER_IN_FEATURES, 384}
-        num_classes:  &NUM_CLASSES 5
-    criterion:
-      class_path: torch.nn.CrossEntropyLoss
-      init_args:
-        ignore_index: &IGNORE_INDEX 255
+        num_classes:  &NUM_CLASSES 8
+    criterion: torch.nn.CrossEntropyLoss
     lr_multiplier_encoder: 0.0
     optimizer:
       class_path: torch.optim.AdamW
@@ -68,55 +65,37 @@ model:
         - class_path: eva.core.metrics.defaults.MulticlassSegmentationMetrics
           init_args:
             num_classes: *NUM_CLASSES
-            ignore_index: *IGNORE_INDEX
         - class_path: eva.core.metrics.wrappers.ClasswiseWrapper
           init_args:
             metric:
               class_path: torchmetrics.classification.MulticlassF1Score
               init_args:
                 num_classes: *NUM_CLASSES
-                ignore_index: *IGNORE_INDEX
                 average: null
 data:
   class_path: eva.DataModule
   init_args:
     datasets:
       train:
-        class_path: eva.vision.datasets.MoNuSAC
+        class_path: eva.vision.datasets.CoNSeP
         init_args: &DATASET_ARGS
-          root: ${oc.env:DATA_ROOT, ./data}/monusac
+          root: ${oc.env:DATA_ROOT, ./data}/consep
           split: train
-          download: ${oc.env:DOWNLOAD_DATA, false}
-          # Set `download: true` to download the dataset from https://monusac-2020.grand-challenge.org/Data/
-          # The MoNuSAC dataset is distributed under the following license: 
-          # "Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International"
-          # (see: https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode)
-          transforms:
-            class_path: torchvision.transforms.v2.Compose
+          sampler:
+            class_path: eva.vision.data.wsi.patching.samplers.ForegroundGridSampler
             init_args:
-              transforms:
-                - class_path: torchvision.transforms.v2.RandomResizedCrop
-                  init_args:
-                    size: ${oc.env:IMAGE_SIZE, 224}                    
-                - class_path: torchvision.transforms.v2.ToDtype
-                  init_args:
-                    dtype: torch.float32
-                    scale: true
-                - class_path: torchvision.transforms.v2.Normalize
-                  init_args:
-                    mean: *NORMALIZE_MEAN
-                    std: *NORMALIZE_STD
-      val:
-        class_path: eva.vision.datasets.MoNuSAC
-        init_args:
-          <<: *DATASET_ARGS
-          split: test
+              max_samples: 25
           transforms:
             class_path: eva.vision.data.transforms.common.ResizeAndCrop
             init_args:
-              size: ${oc.env:RESIZE_DIM, 224}
+              size: ${oc.env:RESIZE_DIM, 224}  
               mean: *NORMALIZE_MEAN
               std: *NORMALIZE_STD
+      val:
+        class_path: eva.vision.datasets.CoNSeP
+        init_args:
+          <<: *DATASET_ARGS
+          split: val
     dataloaders:
       train:
         batch_size: &BATCH_SIZE ${oc.env:BATCH_SIZE, 64}

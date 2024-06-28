@@ -86,6 +86,7 @@ nav:
         - MHIST: datasets/mhist.md
         - PatchCamelyon: datasets/patch_camelyon.md
         - MoNuSAC: datasets/monusac.md
+        - CoNSeP: datasets/consep.md
       - Slide-level:
         - Camelyon16: datasets/camelyon16.md
         - PANDA: datasets/panda.md

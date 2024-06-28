@@ -52,6 +52,7 @@ Supported datasets & tasks include:
 -	**[CRC](datasets/crc.md)**: multiclass colorectal cancer classification
 -	**[MHIST](datasets/mhist.md)**: binary colorectal polyp cancer classification
 - **[MoNuSAC](datasets/monusac.md)**: multi-organ nuclei segmentation
+- **[CoNSeP](datasets/consep.md)**: segmentation colorectal nuclei and phenotypes
 
 *WSI slide-level pathology datasets*
 
