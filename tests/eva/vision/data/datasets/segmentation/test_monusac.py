@@ -11,7 +11,7 @@ from eva.vision.data import datasets
 
 @pytest.mark.parametrize(
     "split, expected_length",
-    [("train", 7), ("test", 6)],
+    [("train", 5), ("test", 4)],
 )
 def test_length(monusac_dataset: datasets.MoNuSAC, expected_length: int) -> None:
     """Tests the length of the dataset."""
@@ -21,7 +21,7 @@ def test_length(monusac_dataset: datasets.MoNuSAC, expected_length: int) -> None
 @pytest.mark.parametrize(
     "split, index, expected_height,  expected_width",
     [
-        ("train", 0, 1024, 1024),
+        ("train", 0, 512, 512),
         ("test", 0, 142, 115),
     ],
 )
