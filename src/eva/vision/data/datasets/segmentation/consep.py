@@ -40,7 +40,6 @@ class CoNSeP(wsi.MultiWsiDataset, base.ImageSegmentation):
         height: int = 224,
         target_mpp: float = 0.25,
         transforms: Callable | None = None,
-        seed: int = 42,
     ) -> None:
         """Initializes the dataset.
 
