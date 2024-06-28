@@ -9,25 +9,25 @@
       
       
       
-        <link rel="prev" href="../replicate_evaluations/">
+        <link rel="prev" href="../monusac/">
       
       
-        <link rel="next" href="../../../datasets/">
+        <link rel="next" href="../camelyon16/">
       
       
-      <link rel="icon" href="../../../images/eva-stripes.png">
+      <link rel="icon" href="../../images/eva-stripes.png">
       <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.27">
     
     
       
-        <title>Model Wrappers - eva</title>
+        <title>CoNSeP - eva</title>
       
     
     
-      <link rel="stylesheet" href="../../../assets/stylesheets/main.6543a935.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.6543a935.min.css">
       
         
-        <link rel="stylesheet" href="../../../assets/stylesheets/palette.06af60db.min.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
       
       
 
@@ -46,9 +46,9 @@
       
     
     
-      <link rel="stylesheet" href="../../../assets/_mkdocstrings.css">
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
     
-    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -74,7 +74,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#model-wrappers" class="md-skip">
+        <a href="#consep" class="md-skip">
           Skip to content
         </a>
       
@@ -92,9 +92,9 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../.." title="eva" class="md-header__button md-logo" aria-label="eva" data-md-component="logo">
+    <a href="../.." title="eva" class="md-header__button md-logo" aria-label="eva" data-md-component="logo">
       
-  <img src="../../../images/eva-stripes.png" alt="logo">
+  <img src="../../images/eva-stripes.png" alt="logo">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -111,7 +111,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Model Wrappers
+              CoNSeP
             
           </span>
         </div>
@@ -220,7 +220,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../../.." class="md-tabs__link">
+      <a href="../.." class="md-tabs__link">
         
   
     
@@ -237,7 +237,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../../../leaderboards/" class="md-tabs__link">
+      <a href="../../leaderboards/" class="md-tabs__link">
         
   
     
@@ -252,13 +252,11 @@
         
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="../../" class="md-tabs__link">
+      <li class="md-tabs__item">
+        <a href="../../user-guide/" class="md-tabs__link">
           
   
     
@@ -274,11 +272,13 @@
         
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="../../../datasets/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../" class="md-tabs__link">
           
   
     
@@ -298,7 +298,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../../reference/" class="md-tabs__link">
+        <a href="../../reference/" class="md-tabs__link">
           
   
     
@@ -333,9 +333,9 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../.." title="eva" class="md-nav__button md-logo" aria-label="eva" data-md-component="logo">
+    <a href="../.." title="eva" class="md-nav__button md-logo" aria-label="eva" data-md-component="logo">
       
-  <img src="../../../images/eva-stripes.png" alt="logo">
+  <img src="../../images/eva-stripes.png" alt="logo">
 
     </a>
     eva
@@ -362,7 +362,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../.." class="md-nav__link">
+      <a href="../.." class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -382,7 +382,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../leaderboards/" class="md-nav__link">
+      <a href="../../leaderboards/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -399,8 +399,6 @@
       
   
   
-    
-  
   
   
     
@@ -419,22 +417,21 @@
     
     
       
-        
-        
-      
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
         
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../" class="md-nav__link ">
+            <a href="../../user-guide/" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
@@ -445,13 +442,13 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="">
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="0">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
             User Guide
@@ -513,7 +510,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../getting-started/installation/" class="md-nav__link">
+      <a href="../../user-guide/getting-started/installation/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -534,7 +531,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../getting-started/how_to_use/" class="md-nav__link">
+      <a href="../../user-guide/getting-started/how_to_use/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -609,7 +606,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../tutorials/offline_vs_online/" class="md-nav__link">
+      <a href="../../user-guide/tutorials/offline_vs_online/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -630,7 +627,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../tutorials/evaluate_resnet/" class="md-nav__link">
+      <a href="../../user-guide/tutorials/evaluate_resnet/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -650,6 +647,172 @@
     </li>
   
 
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Advanced user guide
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_4">
+            <span class="md-nav__icon md-icon"></span>
+            Advanced user guide
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user-guide/advanced/replicate_evaluations/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Replicate evaluations
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user-guide/advanced/model_wrappers/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Model Wrappers
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../" class="md-nav__link ">
+              
+  
+  <span class="md-ellipsis">
+    Datasets
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Datasets
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
               
             
               
@@ -677,24 +840,78 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_4" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_2" checked>
         
           
-          <label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_2" id="__nav_4_2_label" tabindex="0">
             
   
   <span class="md-ellipsis">
-    Advanced user guide
+    WSI
   </span>
   
 
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_3_4">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4_2">
             <span class="md-nav__icon md-icon"></span>
-            Advanced user guide
+            WSI
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_2_1" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4_2_1" id="__nav_4_2_1_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Patch-level
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_2_1_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4_2_1">
+            <span class="md-nav__icon md-icon"></span>
+            Patch-level
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -705,11 +922,95 @@
   
   
     <li class="md-nav__item">
-      <a href="../replicate_evaluations/" class="md-nav__link">
+      <a href="../bach/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Replicate evaluations
+    BACH
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../crc/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    CRC
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mhist/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    MHIST
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../patch_camelyon/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    PatchCamelyon
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../monusac/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    MoNuSAC
   </span>
   
 
@@ -739,7 +1040,7 @@
           
   
   <span class="md-ellipsis">
-    Model Wrappers
+    CoNSeP
   </span>
   
 
@@ -750,7 +1051,7 @@
         
   
   <span class="md-ellipsis">
-    Model Wrappers
+    CoNSeP
   </span>
   
 
@@ -772,36 +1073,36 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#loading-pytorch-models" class="md-nav__link">
+  <a href="#raw-data" class="md-nav__link">
     <span class="md-ellipsis">
-      Loading PyTorch models
+      Raw data
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#loading-models-from-huggingface-hub" class="md-nav__link">
+  <a href="#download-and-preprocessing" class="md-nav__link">
     <span class="md-ellipsis">
-      Loading models from HuggingFace Hub
+      Download and preprocessing
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#loading-onnx-models" class="md-nav__link">
+  <a href="#relevant-links" class="md-nav__link">
     <span class="md-ellipsis">
-      Loading ONNX models
+      Relevant links
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#implementing-custom-model-wrappers" class="md-nav__link">
+  <a href="#license" class="md-nav__link">
     <span class="md-ellipsis">
-      Implementing custom model wrappers
+      License
     </span>
   </a>
   
@@ -811,307 +1112,6 @@
   
 </nav>
       
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    
-    
-      
-        
-          
-        
-      
-        
-      
-        
-      
-    
-    
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
-        
-          
-          
-          <div class="md-nav__link md-nav__container">
-            <a href="../../../datasets/" class="md-nav__link ">
-              
-  
-  <span class="md-ellipsis">
-    Datasets
-  </span>
-  
-
-            </a>
-            
-              
-              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="0">
-                <span class="md-nav__icon md-icon"></span>
-              </label>
-            
-          </div>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4">
-            <span class="md-nav__icon md-icon"></span>
-            Datasets
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-            
-              
-                
-  
-  
-  
-  
-    
-    
-      
-        
-      
-        
-      
-    
-    
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_2" >
-        
-          
-          <label class="md-nav__link" for="__nav_4_2" id="__nav_4_2_label" tabindex="0">
-            
-  
-  <span class="md-ellipsis">
-    WSI
-  </span>
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_2_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_2">
-            <span class="md-nav__icon md-icon"></span>
-            WSI
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    
-    
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-    
-    
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_2_1" >
-        
-          
-          <label class="md-nav__link" for="__nav_4_2_1" id="__nav_4_2_1_label" tabindex="0">
-            
-  
-  <span class="md-ellipsis">
-    Patch-level
-  </span>
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_2_1_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_2_1">
-            <span class="md-nav__icon md-icon"></span>
-            Patch-level
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../datasets/bach/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    BACH
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../datasets/crc/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    CRC
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../datasets/mhist/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    MHIST
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../datasets/patch_camelyon/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    PatchCamelyon
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../datasets/monusac/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    MoNuSAC
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../datasets/consep/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    CoNSeP
-  </span>
-  
-
-      </a>
     </li>
   
 
@@ -1178,7 +1178,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../datasets/camelyon16/" class="md-nav__link">
+      <a href="../camelyon16/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1199,7 +1199,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../datasets/panda/" class="md-nav__link">
+      <a href="../panda/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1280,7 +1280,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../datasets/total_segmentator/" class="md-nav__link">
+      <a href="../total_segmentator/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1343,7 +1343,7 @@
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../../reference/" class="md-nav__link ">
+            <a href="../../reference/" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
@@ -1434,7 +1434,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reference/core/interface/" class="md-nav__link">
+      <a href="../../reference/core/interface/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1455,7 +1455,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reference/core/callbacks/" class="md-nav__link">
+      <a href="../../reference/core/callbacks/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1526,7 +1526,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reference/core/data/dataloaders/" class="md-nav__link">
+      <a href="../../reference/core/data/dataloaders/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1547,7 +1547,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reference/core/data/datamodules/" class="md-nav__link">
+      <a href="../../reference/core/data/datamodules/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1568,7 +1568,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reference/core/data/datasets/" class="md-nav__link">
+      <a href="../../reference/core/data/datasets/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1589,7 +1589,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reference/core/data/transforms/" class="md-nav__link">
+      <a href="../../reference/core/data/transforms/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1649,7 +1649,7 @@
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../../reference/core/metrics/" class="md-nav__link ">
+            <a href="../../reference/core/metrics/" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
@@ -1682,7 +1682,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reference/core/metrics/core/" class="md-nav__link">
+      <a href="../../reference/core/metrics/core/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1703,7 +1703,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reference/core/metrics/defaults/" class="md-nav__link">
+      <a href="../../reference/core/metrics/defaults/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1724,7 +1724,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reference/core/metrics/average_loss/" class="md-nav__link">
+      <a href="../../reference/core/metrics/average_loss/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1745,7 +1745,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reference/core/metrics/binary_balanced_accuracy/" class="md-nav__link">
+      <a href="../../reference/core/metrics/binary_balanced_accuracy/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1820,7 +1820,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reference/core/models/modules/" class="md-nav__link">
+      <a href="../../reference/core/models/modules/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1841,7 +1841,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reference/core/models/networks/" class="md-nav__link">
+      <a href="../../reference/core/models/networks/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1916,7 +1916,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reference/core/trainers/trainer/" class="md-nav__link">
+      <a href="../../reference/core/trainers/trainer/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1937,7 +1937,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reference/core/trainers/functional/" class="md-nav__link">
+      <a href="../../reference/core/trainers/functional/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1966,7 +1966,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reference/core/loggers/loggers/" class="md-nav__link">
+      <a href="../../reference/core/loggers/loggers/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2033,7 +2033,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reference/core/utils/multiprocessing/" class="md-nav__link">
+      <a href="../../reference/core/utils/multiprocessing/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2054,7 +2054,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reference/core/utils/workers/" class="md-nav__link">
+      <a href="../../reference/core/utils/workers/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2120,7 +2120,7 @@
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../../reference/vision/" class="md-nav__link ">
+            <a href="../../reference/vision/" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
@@ -2180,7 +2180,7 @@
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../../reference/vision/data/" class="md-nav__link ">
+            <a href="../../reference/vision/data/" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
@@ -2213,7 +2213,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reference/vision/data/datasets/" class="md-nav__link">
+      <a href="../../reference/vision/data/datasets/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2234,7 +2234,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reference/vision/data/transforms/" class="md-nav__link">
+      <a href="../../reference/vision/data/transforms/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2307,7 +2307,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reference/vision/models/networks/" class="md-nav__link">
+      <a href="../../reference/vision/models/networks/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2380,7 +2380,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../reference/vision/utils/io/" class="md-nav__link">
+      <a href="../../reference/vision/utils/io/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2444,36 +2444,36 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#loading-pytorch-models" class="md-nav__link">
+  <a href="#raw-data" class="md-nav__link">
     <span class="md-ellipsis">
-      Loading PyTorch models
+      Raw data
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#loading-models-from-huggingface-hub" class="md-nav__link">
+  <a href="#download-and-preprocessing" class="md-nav__link">
     <span class="md-ellipsis">
-      Loading models from HuggingFace Hub
+      Download and preprocessing
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#loading-onnx-models" class="md-nav__link">
+  <a href="#relevant-links" class="md-nav__link">
     <span class="md-ellipsis">
-      Loading ONNX models
+      Relevant links
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#implementing-custom-model-wrappers" class="md-nav__link">
+  <a href="#license" class="md-nav__link">
     <span class="md-ellipsis">
-      Implementing custom model wrappers
+      License
     </span>
   </a>
   
@@ -2497,65 +2497,101 @@
   
 
 
-<h1 id="model-wrappers">Model Wrappers</h1>
-<p>This document shows how to use <em>eva</em>'s <a href="../../../reference/core/models/networks/#wrappers">Model Wrapper API</a> (<code>eva.models.networks.wrappers</code>) to load different model formats from a series of sources such as PyTorch Hub, HuggingFace Model Hub and ONNX. </p>
-<h2 id="loading-pytorch-models">Loading PyTorch models</h2>
-<p>The <em>eva</em> framework is built on top of PyTorch Lightning and thus naturally supports loading PyTorch models.
-You just need to specify the class path of your model in the backbone section of the <code>.yaml</code> config file.</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>backbone:
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>  class_path: path.to.your.ModelClass
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>  init_args:
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    arg_1: ...
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    arg_2: ...
+<h1 id="consep">CoNSeP</h1>
+<p>CoNSep (Colorectal Nuclear Segmentation and Phenotypes) consists of 41 1000x1000 tiles extracted from 16 WSIs of unique patients. Labels are segmentation masks which indicate if a pixel belongs to one of 7 categories of cell nuclei. In total 24,319 unique nuclei are present.</p>
+<h2 id="raw-data">Raw data</h2>
+<h3 id="key-stats">Key stats</h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Modality</strong></td>
+<td>Vision (WSI patches)</td>
+</tr>
+<tr>
+<td><strong>Task</strong></td>
+<td>Segmentation - 8 classes (non-"cell nucleus" + 7 categories)</td>
+</tr>
+<tr>
+<td><strong>Data size</strong></td>
+<td>total: ~800MB</td>
+</tr>
+<tr>
+<td><strong>Image dimension</strong></td>
+<td>1000 x 1000 x 3</td>
+</tr>
+<tr>
+<td><strong>Magnification (μm/px)</strong></td>
+<td>40x (0.25)</td>
+</tr>
+<tr>
+<td><strong>Files format</strong></td>
+<td><code>.png</code> images / <code>.mat</code> segmentation masks</td>
+</tr>
+<tr>
+<td><strong>Number of images</strong></td>
+<td>41</td>
+</tr>
+<tr>
+<td><strong>Splits in use</strong></td>
+<td>Train and Test</td>
+</tr>
+</tbody>
+</table>
+<h3 id="organization">Organization</h3>
+<p>The data is organized as follows:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>consep
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>├── Train
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>│   ├── Images                 # raw training input images
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>│   │   ├── train_1.png
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>│   │   └── ...
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>│   ├── Labels                 # train segmentation labels        
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>│   │   ├── train_1.mat
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>│   │   └── ...
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>│   ├── Overlay                # train images with bounding boxes, not in use
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>├── Test
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>│   ├── Images                 # raw test input images
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>│   │   ├── test_1.png
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>│   │   └── ...
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>│   ├── Labels                 # test segmentation labels        
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>│   │   ├── test_1.mat
+</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>│   │   └── ...
+</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>│   ├── Overlay                # test images with bounding boxes, not in use
+</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>└── README.txt                 # data description
 </span></code></pre></div>
-<p>Note that your <code>ModelClass</code> should subclass <code>torch.nn.Module</code> and implement the <code>forward()</code> method to return embedding tensors of shape <code>[embedding_dim]</code>.</p>
-<h3 id="pytorch-hub">PyTorch Hub</h3>
-<p>To load models from PyTorch Hub or other torch model providers, the easiest way is to use the <code>ModelFromFunction</code> wrapper class:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>backbone:
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>  class_path: eva.models.networks.wrappers.ModelFromFunction
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>  init_args:
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    path: torch.hub.load
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    arguments:
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>      repo_or_dir: facebookresearch/dino:main
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>      model: dino_vits16
-</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>      pretrained: false
-</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>    checkpoint_path: path/to/your/checkpoint.torch
-</span></code></pre></div>
-<p>Note that if a <code>checkpoint_path</code> is provided, <code>ModelFromFunction</code> will automatically initialize the specified model using the provided weights from that checkpoint file.</p>
-<h3 id="timm">timm</h3>
-<p>Similar to the above example, we can easily load models using the common vision library <code>timm</code>:
-<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>backbone:
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>  class_path: eva.models.networks.wrappers.ModelFromFunction
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>  init_args:
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    path: timm.create_model
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    arguments:
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>      model_name: resnet18
-</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>      pretrained: true
-</span></code></pre></div></p>
-<h2 id="loading-models-from-huggingface-hub">Loading models from HuggingFace Hub</h2>
-<p>For loading models from HuggingFace Hub, <em>eva</em> provides a custom wrapper class <code>HuggingFaceModel</code> which can be used as follows:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>backbone:
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>  class_path: eva.models.networks.wrappers.HuggingFaceModel
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>  init_args:
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    model_name_or_path: owkin/phikon
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    tensor_transforms: 
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>      class_path: eva.models.networks.transforms.ExtractCLSFeatures
-</span></code></pre></div>
-<p>In the above example, the forward pass implemented by the <code>owkin/phikon</code> model returns an output tensor containing the hidden states of all input tokens. In order to extract the state corresponding to the CLS token only, we can specify a transformation via the <code>tensor_transforms</code> argument which will be applied to the model output.</p>
-<h2 id="loading-onnx-models">Loading ONNX models</h2>
-<p><code>.onnx</code> model checkpoints can be loaded using the <code>ONNXModel</code> wrapper class as follows:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>class_path: eva.models.networks.wrappers.ONNXModel
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>init_args:
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>  path: path/to/model.onnx
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>  device: cuda
-</span></code></pre></div>
-<h2 id="implementing-custom-model-wrappers">Implementing custom model wrappers</h2>
-<p>You can also implement your own model wrapper classes, in case your model format is not supported by the wrapper classes that <em>eva</em> already provides. To do so, you need to subclass <code>eva.models.networks.wrappers.BaseModel</code> and implement the following abstract methods: </p>
+<h2 id="download-and-preprocessing">Download and preprocessing</h2>
+<p><em>Note that the CoNSeP dataset is currently not available for download. As soon as it becomes availble we will add support &amp; instructions (monitor <a href="https://github.com/vqdang/hover_net/issues/267#issuecomment-2161334382">this issue</a> for updates)</em></p>
+<h3 id="splits">Splits</h3>
+<p>We work with the splits provided by the data source. Since no "validation" split is provided, we use the "test" split as validation split.</p>
+<table>
+<thead>
+<tr>
+<th>Splits</th>
+<th>Train</th>
+<th>Validation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>#Samples</td>
+<td>27 (66%)</td>
+<td>14 (34%)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="relevant-links">Relevant links</h2>
 <ul>
-<li><code>load_model</code>: Returns an instantiated model object &amp; loads pre-trained model weights from a checkpoint if available. </li>
-<li><code>model_forward</code>: Implements the forward pass of the model and returns the output as a <code>torch.Tensor</code> of shape <code>[embedding_dim]</code></li>
+<li><a href="https://paperswithcode.com/dataset/consep">CoNSeP Dataset description</a></li>
+<li><a href="https://warwick.ac.uk/TIA/data/hovernet/">Data download</a> (currently not available)</li>
+<li><a href="https://github.com/vqdang/hover_net/issues/267#issuecomment-2161334382">GitHub issue for data availability</a></li>
 </ul>
-<p>You can take the implementations of <code>ModelFromFunction</code>, <code>HuggingFaceModel</code> and <code>ONNXModel</code> wrappers as a reference.</p>
+<h2 id="license">License</h2>
+<p>The CoNSeP dataset are held under the <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 License</a></p>
 
 
 
@@ -2602,10 +2638,10 @@ You just need to specify the class path of your model in the backbone section of
     </div>
     
     
-    <script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.tabs", "navigation.indexes", "navigation.expand", "search.suggest", "search.highlight", "content.code.copy"], "search": "../../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": ["latest", "dev"], "provider": "mike"}}</script>
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tabs", "navigation.indexes", "navigation.expand", "search.suggest", "search.highlight", "content.code.copy"], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": ["latest", "dev"], "provider": "mike"}}</script>
     
     
-      <script src="../../../assets/javascripts/bundle.ad660dcc.min.js"></script>
+      <script src="../../assets/javascripts/bundle.ad660dcc.min.js"></script>
       
     
   </body>
