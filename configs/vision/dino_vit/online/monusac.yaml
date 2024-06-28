@@ -110,6 +110,21 @@ data:
         init_args:
           <<: *DATASET_ARGS
           split: test
+          transforms:
+            class_path: torchvision.transforms.v2.Compose
+            init_args:
+              transforms:
+                - class_path: torchvision.transforms.v2.CenterCrop
+                  init_args:
+                    size: ${oc.env:IMAGE_SIZE, 224}                    
+                - class_path: torchvision.transforms.v2.ToDtype
+                  init_args:
+                    dtype: torch.float32
+                    scale: true
+                - class_path: torchvision.transforms.v2.Normalize
+                  init_args:
+                    mean: *NORMALIZE_MEAN
+                    std: *NORMALIZE_STD
     dataloaders:
       train:
         batch_size: &BATCH_SIZE ${oc.env:BATCH_SIZE, 16}
