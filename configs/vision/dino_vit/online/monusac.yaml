@@ -54,8 +54,8 @@ model:
     optimizer:
       class_path: torch.optim.AdamW
       init_args:
-        lr: 0.0001
-        weight_decay: 0.05
+        lr: 0.001
+        weight_decay: 0.01
     lr_scheduler:
       class_path: torch.optim.lr_scheduler.PolynomialLR
       init_args:
