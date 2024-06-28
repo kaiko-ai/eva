@@ -4,13 +4,13 @@ trainer:
     n_runs: &N_RUNS ${oc.env:N_RUNS, 1}
     default_root_dir: &OUTPUT_ROOT ${oc.env:OUTPUT_ROOT, logs/monusac/${oc.env:TIMM_MODEL_NAME, vit_small_patch16_224}}
     max_steps: &MAX_STEPS ${oc.env:MAX_STEPS, 20000}
-    log_every_n_steps: 14
+    log_every_n_steps: 4
     callbacks:
       - class_path: eva.vision.callbacks.SemanticSegmentationLogger
         init_args:
           log_every_n_epochs: 1
-          mean: &NORMALIZE_MEAN [0.5, 0.5, 0.5]
-          std: &NORMALIZE_STD [0.5, 0.5, 0.5]
+          mean: &NORMALIZE_MEAN ${oc.env:NORMALIZE_MEAN, [0.485, 0.456, 0.406]} 
+          std: &NORMALIZE_STD ${oc.env:NORMALIZE_STD, [0.229, 0.224, 0.225]}
       - class_path: lightning.pytorch.callbacks.ModelCheckpoint
         init_args:
           filename: best
@@ -119,7 +119,7 @@ data:
               std: *NORMALIZE_STD
     dataloaders:
       train:
-        batch_size: &BATCH_SIZE ${oc.env:BATCH_SIZE, 16}
+        batch_size: &BATCH_SIZE ${oc.env:BATCH_SIZE, 64}
         shuffle: true
       val:
         batch_size: *BATCH_SIZE
