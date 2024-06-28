@@ -224,7 +224,7 @@ class MoNuSAC(base.ImageSegmentation):
         """Downloads the dataset."""
         self._print_license()
         for resource in self._resources:
-            if os.path.isdir(self._root):
+            if os.path.isdir(self._data_directory):
                 continue
 
             utils.download_and_extract_archive(
