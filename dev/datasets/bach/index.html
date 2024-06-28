@@ -880,6 +880,8 @@
       
         
       
+        
+      
     
     
       
@@ -1062,6 +1064,27 @@
   
   <span class="md-ellipsis">
     PatchCamelyon
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../monusac/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    MoNuSAC
   </span>
   
 
@@ -2520,7 +2543,10 @@
 </span></code></pre></div>
 <h2 id="download-and-preprocessing">Download and preprocessing</h2>
 <p>The <code>BACH</code> dataset class supports downloading the data during runtime by setting the init argument <code>download=True</code>.</p>
-<p><em>Note that in the provided <code>BACH</code>-config files the download argument is set to <code>false</code>. To enable automatic download you will need to open the config and set <code>download: true</code>.</em></p>
+<blockquote>
+<p>[!NOTE]
+In the provided <code>BACH</code>-config files the download argument is set to <code>false</code>. To enable automatic download you will need to open the config and set <code>download: true</code>.</p>
+</blockquote>
 <p>The splits are created from the indices specified in the BACH dataset class. These indices were picked to prevent data 
 leakage due to images belonging to the same patient. Because the small dataset in combination with the patient ID constraint 
 does not allow to split the data three-ways with sufficient amount of data in each split, we only create a train and val 
