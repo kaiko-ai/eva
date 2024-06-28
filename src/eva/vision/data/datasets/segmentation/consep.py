@@ -52,11 +52,9 @@ class CoNSeP(wsi.MultiWsiDataset, base.ImageSegmentation):
             target_mpp: Target microns per pixel (mpp) for the patches.
             backend: The backend to use for reading the whole-slide images.
             transforms: Transforms to apply to the extracted image & mask patches.
-            seed: Random seed for reproducibility.
         """
         self._split = split
         self._root = root
-        self._seed = seed
 
         self.datasets: List[wsi.WsiDataset]  # type: ignore
 
