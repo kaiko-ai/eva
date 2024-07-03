@@ -7,9 +7,28 @@ trainer:
     callbacks:
       - class_path: eva.vision.callbacks.SemanticSegmentationLogger
         init_args:
+<<<<<<< HEAD
           log_every_n_steps: 1000
           mean: &NORMALIZE_MEAN [0.5, 0.5, 0.5]
           std: &NORMALIZE_STD [0.5, 0.5, 0.5]
+=======
+          log_every_n_epochs: 1
+          mean: &NORMALIZE_MEAN [0.5, 0.5, 0.5]
+          std: &NORMALIZE_STD [0.5, 0.5, 0.5]
+      - class_path: lightning.pytorch.callbacks.ModelCheckpoint
+        init_args:
+          filename: best
+          save_last: true
+          save_top_k: 1
+          monitor: &MONITOR_METRIC ${oc.env:MONITOR_METRIC, val/MulticlassJaccardIndex}
+          mode: &MONITOR_METRIC_MODE ${oc.env:MONITOR_METRIC_MODE, max}
+      - class_path: lightning.pytorch.callbacks.EarlyStopping
+        init_args:
+          min_delta: 0
+          patience: 5
+          monitor: *MONITOR_METRIC
+          mode: *MONITOR_METRIC_MODE
+>>>>>>> main
     logger:
       - class_path: lightning.pytorch.loggers.TensorBoardLogger
         init_args:
@@ -27,6 +46,7 @@ model:
         model_arguments:
           dynamic_img_size: true
     decoder:
+<<<<<<< HEAD
       class_path: eva.vision.models.networks.decoders.segmentation.ConvDecoder
       init_args:
         layers:
@@ -35,6 +55,12 @@ model:
             in_channels: ${oc.env:DECODER_IN_FEATURES, 384}
             out_channels:  &NUM_CLASSES 118
             kernel_size: [1, 1]
+=======
+      class_path: eva.vision.models.networks.decoders.segmentation.ConvDecoderMS
+      init_args:
+        in_features: ${oc.env:DECODER_IN_FEATURES, 384}
+        num_classes:  &NUM_CLASSES 118
+>>>>>>> main
     criterion: torch.nn.CrossEntropyLoss
     lr_multiplier_encoder: 0.0
     optimizer:
@@ -70,7 +96,11 @@ data:
         init_args: &DATASET_ARGS
           root: ${oc.env:DATA_ROOT, ./data}/total_segmentator
           split: train
+<<<<<<< HEAD
           download: ${oc.env:DOWNLOAD, false}
+=======
+          download: ${oc.env:DOWNLOAD_DATA, false}
+>>>>>>> main
           # Set `download: true` to download the dataset from https://zenodo.org/records/10047292
           # The TotalSegmentator dataset is distributed under the following license: 
           # "Creative Commons Attribution 4.0 International"
@@ -85,9 +115,25 @@ data:
         init_args:
           <<: *DATASET_ARGS
           split: val
+<<<<<<< HEAD
     dataloaders:
       train:
         batch_size: &BATCH_SIZE ${oc.env:BATCH_SIZE, 64}
         shuffle: true
       val:
         batch_size: *BATCH_SIZE
+=======
+      test:
+        class_path: eva.vision.datasets.TotalSegmentator2D
+        init_args:
+          <<: *DATASET_ARGS
+          split: test
+    dataloaders:
+      train:
+        batch_size: &BATCH_SIZE ${oc.env:BATCH_SIZE, 16}
+        shuffle: true
+      val:
+        batch_size: *BATCH_SIZE
+      test:
+        batch_size: *BATCH_SIZE
+>>>>>>> main

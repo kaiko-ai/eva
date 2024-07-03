@@ -83,14 +83,23 @@ class SemanticSegmentationModule(module.ModelModule):
     ) -> torch.Tensor:
         """Maps the input tensor (image tensor or embeddings) to masks.
 
+<<<<<<< HEAD
         If `tensor` is image tensor, then the `self.encoder`
+=======
+        If `inputs` is image tensor, then the `self.encoder`
+>>>>>>> main
         should be implemented, otherwise it will be interpreted
         as embeddings, where the `to_size` should be given.
         """
         if self.encoder is None and to_size is None:
             raise ValueError(
+<<<<<<< HEAD
                 "Please provide the expected `image_size` that the "
                 "decoder should map the embeddings (`tensor`) to."
+=======
+                "Please provide the expected `to_size` that the "
+                "decoder should map the embeddings (`inputs`) to."
+>>>>>>> main
             )
 
         patch_embeddings = self.encoder(inputs) if self.encoder else inputs
@@ -128,7 +137,11 @@ class SemanticSegmentationModule(module.ModelModule):
         )
 
     def _freeze_encoder(self) -> None:
+<<<<<<< HEAD
         """If initialized, Freezes the encoder network."""
+=======
+        """If initialized, it freezes the encoder network."""
+>>>>>>> main
         if self.encoder is not None and self.lr_multiplier_encoder == 0:
             grad.deactivate_requires_grad(self.encoder)
 
