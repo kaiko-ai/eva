@@ -2,7 +2,6 @@
 
 from typing import Callable, Sequence, Tuple
 
-import torch
 from torchvision.transforms import v2
 
 from eva.vision.data.transforms import normalization
@@ -40,7 +39,6 @@ class ResizeAndClamp(v2.Compose):
             v2.Resize(size=self._size),
             v2.CenterCrop(size=self._size),
             normalization.Clamp(out_range=self._clamp_range),
-            v2.ToDtype(torch.float32),
             normalization.RescaleIntensity(
                 in_range=self._clamp_range,
                 out_range=(0.0, 1.0),
