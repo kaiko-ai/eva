@@ -1,3 +1,4 @@
+---
 trainer:
   class_path: eva.Trainer
   init_args:
@@ -6,6 +7,7 @@ trainer:
     max_steps: &MAX_STEPS ${oc.env:MAX_STEPS, 513}
     log_every_n_steps: 6
     callbacks:
+      - class_path: eva.callbacks.ConfigurationLogger
       - class_path: eva.vision.callbacks.SemanticSegmentationLogger
         init_args:
           log_every_n_epochs: 1
