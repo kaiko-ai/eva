@@ -212,18 +212,6 @@ class TotalSegmentator2D(base.ImageSegmentation):
     def _export_semantic_label_masks(self) -> None:
         """Exports the segmentation binary masks (one-hot) to semantic labels."""
         total_samples = len(self._samples_dirs)
-<<<<<<< HEAD:src/eva/vision/data/datasets/segmentation/total_segmentator.py
-        for sample_index in tqdm.trange(
-            total_samples, desc=">> Exporting optimized semantic masks"
-        ):
-            masks_dir = self._get_masks_dir(sample_index)
-            filename = os.path.join(masks_dir, "semantic_labels", "masks.nii.gz")
-            if os.path.isfile(filename):
-                continue
-
-            semantic_labels = self._load_masks_as_semantic_label(sample_index)
-
-=======
         masks_dirs = map(self._get_masks_dir, range(total_samples))
         semantic_labels = [
             (index, os.path.join(directory, "semantic_labels", "masks.nii.gz"))
@@ -237,7 +225,6 @@ class TotalSegmentator2D(base.ImageSegmentation):
             leave=False,
         ):
             semantic_labels = self._load_masks_as_semantic_label(sample_index)
->>>>>>> main:src/eva/vision/data/datasets/segmentation/total_segmentator_2d.py
             os.makedirs(os.path.dirname(filename), exist_ok=True)
             io.save_array_as_nifti(semantic_labels, filename)
 
