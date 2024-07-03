@@ -2,7 +2,6 @@
 
 from typing import Callable, Sequence, Tuple
 
-import torch
 from torchvision.transforms import v2
 
 from eva.vision.data.transforms import normalization
