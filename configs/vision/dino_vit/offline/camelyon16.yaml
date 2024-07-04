@@ -41,6 +41,7 @@ trainer:
                 pretrained: ${oc.env:PRETRAINED, true}
                 force_reload: ${oc.env:FORCE_RELOAD, false}
               checkpoint_path: ${oc.env:CHECKPOINT_PATH, null}
+          overwrite: false
     logger:
       - class_path: lightning.pytorch.loggers.TensorBoardLogger
         init_args:
