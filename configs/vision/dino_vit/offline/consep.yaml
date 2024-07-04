@@ -36,7 +36,7 @@ trainer:
             init_args:
               model_name: ${oc.env:TIMM_MODEL_NAME, vit_small_patch16_224_dino}
               pretrained: ${oc.env:MODEL_PRETRAINED, true}
-              out_indices: ${oc.env:TIMM_MODEL_OUT_INDICES, 1}
+              out_indices: ${oc.env:TIMM_MODEL_OUT_INDICES, 3}
               checkpoint_path: &CHECKPOINT_PATH ${oc.env:CHECKPOINT_PATH, null}
               model_arguments:
                 dynamic_img_size: true
@@ -51,7 +51,7 @@ model:
     decoder:
       class_path: eva.vision.models.networks.decoders.segmentation.ConvDecoderMS
       init_args:
-        in_features: ${oc.env:DECODER_IN_FEATURES, 384}
+        in_features: ${oc.env:DECODER_IN_FEATURES, 1152}
         num_classes:  &NUM_CLASSES 8
     criterion: torch.nn.CrossEntropyLoss
     lr_multiplier_encoder: 0.0
@@ -119,3 +119,5 @@ data:
         shuffle: true
       val:
         batch_size: *BATCH_SIZE
+      predict:
+        batch_size: &PREDICT_BATCH_SIZE ${oc.env:PREDICT_BATCH_SIZE, 64}

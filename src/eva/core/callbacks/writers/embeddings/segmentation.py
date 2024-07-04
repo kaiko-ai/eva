@@ -39,12 +39,22 @@ class SegmentationEmbeddingsWriter(base.EmbeddingsWriter):
 
         manifest_file.close()
 
-    @torch.no_grad()
-    def _get_embeddings(self, tensor: torch.Tensor) -> torch.Tensor:
+    @override
+    def _get_embeddings(self, tensor: torch.Tensor) -> torch.Tensor | List[torch.Tensor]:
         """Returns the embeddings from predictions."""
+
+        def _get_grouped_embeddings(embeddings: List[torch.Tensor]) -> List[List[torch.Tensor]]:
+            """"""
+            batch_size = embeddings[0].shape[0]
+            grouped_embeddings = []
+            for batch_idx in range(batch_size):
+                batch_list = [layer_embeddings[batch_idx] for layer_embeddings in embeddings]
+                grouped_embeddings.append(batch_list)
+            return grouped_embeddings
+
         embeddings = self._backbone(tensor) if self._backbone else tensor
-        if len(embeddings) > 1:
-            raise ValueError("Multiple-level embeddings are not currently supported.")
+        if isinstance(embeddings, list):
+            embeddings = _get_grouped_embeddings(embeddings)
         return embeddings
 
 

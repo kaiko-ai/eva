@@ -56,6 +56,11 @@ class ClassificationEmbeddingsWriter(base.EmbeddingsWriter):
 
         manifest_manager.close()
 
+    @override
+    def _get_embeddings(self, tensor: torch.Tensor) -> torch.Tensor:
+        """Returns the embeddings from predictions."""
+        return self._backbone(tensor) if self._backbone else tensor
+
 
 def _save_items(
     name_to_items: Dict[str, ITEM_DICT_ENTRY],
