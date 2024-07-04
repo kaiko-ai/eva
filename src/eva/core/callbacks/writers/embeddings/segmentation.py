@@ -40,11 +40,17 @@ class SegmentationEmbeddingsWriter(base.EmbeddingsWriter):
         manifest_file.close()
 
     @override
-    def _get_embeddings(self, tensor: torch.Tensor) -> torch.Tensor | List[torch.Tensor]:
+    def _get_embeddings(self, tensor: torch.Tensor) -> torch.Tensor | List[List[torch.Tensor]]:
         """Returns the embeddings from predictions."""
 
         def _get_grouped_embeddings(embeddings: List[torch.Tensor]) -> List[List[torch.Tensor]]:
-            """"""
+            """Casts a list of multi-leveled batched embeddings to grouped per batch.
+
+            That is, for embeddings to be a list of shape (batch_size, hidden_dim, height, width),
+            such as `[(2, 192, 16, 16), (2, 192, 16, 16)]`, to be reshaped as a list of lists of
+            per batch multi-level embeddings, thus
+            `[ [(192, 16, 16), (192, 16, 16)], [(192, 16, 16), (192, 16, 16)] ]`.
+            """
             batch_size = embeddings[0].shape[0]
             grouped_embeddings = []
             for batch_idx in range(batch_size):

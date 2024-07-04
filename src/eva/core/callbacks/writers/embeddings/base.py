@@ -12,10 +12,10 @@ from loguru import logger
 from torch import multiprocessing, nn
 from typing_extensions import override
 
+from eva.core import utils
 from eva.core.callbacks.writers.embeddings.typings import QUEUE_ITEM
 from eva.core.models.modules.typings import INPUT_BATCH
 from eva.core.utils import multiprocessing as eva_multiprocessing
-from eva.core import utils
 
 
 class EmbeddingsWriter(callbacks.BasePredictionWriter, abc.ABC):
@@ -143,7 +143,7 @@ class EmbeddingsWriter(callbacks.BasePredictionWriter, abc.ABC):
         )
 
     @abc.abstractmethod
-    def _get_embeddings(self, tensor: torch.Tensor) -> torch.Tensor | List[torch.Tensor]:
+    def _get_embeddings(self, tensor: torch.Tensor) -> torch.Tensor | List[List[torch.Tensor]]:
         """Returns the embeddings from predictions."""
 
     def _get_item_metadata(
@@ -165,7 +165,7 @@ class EmbeddingsWriter(callbacks.BasePredictionWriter, abc.ABC):
         return item_metadata
 
 
-def _as_io_buffers(*items: torch.Tensor) -> Sequence[io.BytesIO]:
+def _as_io_buffers(*items: torch.Tensor | List[torch.Tensor]) -> Sequence[io.BytesIO]:
     """Loads torch tensors as io buffers."""
     buffers = [io.BytesIO() for _ in range(len(items))]
     for tensor, buffer in zip(items, buffers, strict=False):

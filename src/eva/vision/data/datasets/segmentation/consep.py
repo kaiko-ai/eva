@@ -34,7 +34,7 @@ class CoNSeP(wsi.MultiWsiDataset, base.ImageSegmentation):
     def __init__(
         self,
         root: str,
-        sampler: samplers.Sampler,
+        sampler: samplers.Sampler | None = None,
         split: Literal["train", "val"] | None = None,
         width: int = 224,
         height: int = 224,
@@ -46,6 +46,7 @@ class CoNSeP(wsi.MultiWsiDataset, base.ImageSegmentation):
         Args:
             root: Root directory of the dataset.
             sampler: The sampler to use for sampling patch coordinates.
+                If `None`, it will use the ::class::`ForegroundGridSampler` sampler.
             split: Dataset split to use. If `None`, the entire dataset is used.
             width: Width of the patches to be extracted, in pixels.
             height: Height of the patches to be extracted, in pixels.
@@ -64,7 +65,7 @@ class CoNSeP(wsi.MultiWsiDataset, base.ImageSegmentation):
             file_paths=self._load_file_paths(split),
             width=width,
             height=height,
-            sampler=sampler,
+            sampler=sampler or samplers.ForegroundGridSampler(max_samples=25),
             target_mpp=target_mpp,
             overwrite_mpp=0.25,
             backend="pil",
@@ -106,8 +107,13 @@ class CoNSeP(wsi.MultiWsiDataset, base.ImageSegmentation):
         )
 
     @override
-    def filename(self, index: int) -> str:
-        return os.path.basename(self._file_paths[self._get_dataset_idx(index)])
+    def filename(self, index: int, segmented: bool = True) -> str:
+        (x, y), width, height = self._get_coords(index)
+        image_path = self._file_paths[self._get_dataset_idx(index)]
+        filename, filetype = os.path.basename(image_path).rsplit(".", 1)
+        if segmented:
+            filename += f"-{x}_{y}_{width}_{height}"
+        return f"{filename}.{filetype}"
 
     @override
     def __getitem__(self, index: int) -> Tuple[tv_tensors.Image, tv_tensors.Mask]:
@@ -146,9 +152,9 @@ class CoNSeP(wsi.MultiWsiDataset, base.ImageSegmentation):
         coords = self.datasets[image_index]._coords
         return coords.x_y[patch_index], coords.width, coords.height
 
-    def _get_mask_path(self, index):
+    def _get_mask_path(self, index: int) -> str:
         """Returns the path to the mask file corresponding to the patch at the given index."""
-        filename = self.filename(index).split(".")[0]
+        filename = self.filename(index, segmented=False).split(".")[0]
         mask_dir = "Train/Labels" if filename.startswith("train") else "Test/Labels"
         return os.path.join(self._root, mask_dir, f"{filename}.mat")
 
