@@ -167,7 +167,7 @@ class EmbeddingsWriter(callbacks.BasePredictionWriter, abc.ABC):
         return item_metadata
 
     def _check_if_exists(self) -> None:
-        """Checks if a file or directory exists."""
+        """Checks if the output directory already exists and if it should be overwritten."""
         exists = (
             os.path.isdir(self._output_dir) and len(list(Path(self._output_dir).rglob("*.pt"))) > 0
         )
