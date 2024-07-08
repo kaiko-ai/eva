@@ -1,35 +1,43 @@
-"""CoNSeP dataset."""
+"""BCSS dataset."""
 
 import glob
 import os
-from typing import Any, Callable, Dict, List, Literal, Tuple
+from typing import Callable, Dict, List, Literal, Tuple
 
-import numpy as np
-import numpy.typing as npt
 import torch
 from torchvision import tv_tensors
 from torchvision.transforms.v2 import functional
 from typing_extensions import override
 
+from eva.core.data import splitting
 from eva.vision.data.datasets import _validators, wsi
 from eva.vision.data.datasets.segmentation import _utils, base
 from eva.vision.data.wsi.patching import samplers
 from eva.vision.utils import io
 
 
-class CoNSeP(wsi.MultiWsiDataset, base.ImageSegmentation):
-    """Dataset class for CoNSeP semantic segmentation task.
+class BCSS(wsi.MultiWsiDataset, base.ImageSegmentation):
+    """Dataset class for BCSS semantic segmentation task.
 
-    We combine classes 3 (healthy epithelial) & 4 (dysplastic/malignant epithelial)
-    into the epithelial class and 5 (fibroblast), 6 (muscle) & 7 (endothelial) into
-    the spindle-shaped class.
+    Source: https://github.com/PathologyDataScience/BCSS
+
+    Todo:
+    - Please be aware that zero pixels represent regions outside the region of interest
+    (“don’t care” class) and should be assigned zero-weight during model training;
+    they do NOT represent an “other” class.
     """
 
-    _expected_dataset_lengths: Dict[str | None, int] = {
-        "train": 27,
-        "val": 14,
-        None: 41,
-    }
+    _train_split_ratio: float = 0.6
+    """Train split ratio."""
+
+    _val_split_ratio: float = 0.2
+    """Validation split ratio."""
+
+    _test_split_ratio: float = 0.2
+    """Test split ratio."""
+
+    _license: str = "CC0 1.0 UNIVERSAL " "(https://creativecommons.org/publicdomain/zero/1.0/)"
+    """Dataset license."""
 
     def __init__(
         self,
@@ -38,8 +46,9 @@ class CoNSeP(wsi.MultiWsiDataset, base.ImageSegmentation):
         split: Literal["train", "val"] | None = None,
         width: int = 224,
         height: int = 224,
-        target_mpp: float = 0.25,
+        target_mpp: float = 0.5,
         transforms: Callable | None = None,
+        seed: int = 42,
     ) -> None:
         """Initializes the dataset.
 
@@ -52,9 +61,11 @@ class CoNSeP(wsi.MultiWsiDataset, base.ImageSegmentation):
             target_mpp: Target microns per pixel (mpp) for the patches.
             backend: The backend to use for reading the whole-slide images.
             transforms: Transforms to apply to the extracted image & mask patches.
+            seed: Random seed for reproducibility.
         """
         self._split = split
         self._root = root
+        self._seed = seed
 
         self.datasets: List[wsi.WsiDataset]  # type: ignore
 
@@ -74,34 +85,53 @@ class CoNSeP(wsi.MultiWsiDataset, base.ImageSegmentation):
     @property
     @override
     def classes(self) -> List[str]:
-        return [
-            "background",
-            "other",
-            "inflammatory",
-            "epithelial",
-            "spindle-shaped",
-        ]
+        return list(self.class_to_idx.keys())
 
     @property
     @override
     def class_to_idx(self) -> Dict[str, int]:
-        return {label: index for index, label in enumerate(self.classes)}
+        return {
+            "outside_roi": 0,
+            "tumor": 1,
+            "stroma": 2,
+            "lymphocytic_infiltrate": 3,
+            "necrosis_or_debris": 4,
+            "glandular_secretions": 5,
+            "blood": 6,
+            "exclude": 7,
+            "metaplasia_NOS": 8,
+            "fat": 9,
+            "plasma_cells": 10,
+            "other_immune_infiltrate": 11,
+            "mucoid_material": 12,
+            "normal_acinus_or_duct": 13,
+            "lymphatics": 14,
+            "undetermined": 15,
+            "nerve": 16,
+            "skin_adnexa": 17,
+            "blood_vessel": 18,
+            "angioinvasion": 19,
+            "dcis": 20,
+            "other": 21,
+        }
 
     @override
     def prepare_data(self) -> None:
         _validators.check_dataset_exists(self._root, True)
 
-        if not os.path.isdir(os.path.join(self._root, "Train")):
-            raise FileNotFoundError(f"Train directory not found in {self._root}.")
-        if not os.path.isdir(os.path.join(self._root, "Test")):
-            raise FileNotFoundError(f"Test directory not found in {self._root}.")
+        if not os.path.isdir(os.path.join(self._root, "masks")):
+            raise FileNotFoundError(f"'masks' directory not found in {self._root}.")
+        if not os.path.isdir(os.path.join(self._root, "meta")):
+            raise FileNotFoundError(f"'meta' directory not found in {self._root}.")
+        if not os.path.isdir(os.path.join(self._root, "rgbs_colorNormalized")):
+            raise FileNotFoundError(f"'rgbs_colorNormalized' directory not found in {self._root}.")
 
     @override
     def validate(self) -> None:
         _validators.check_dataset_integrity(
             self,
             length=None,
-            n_classes=5,
+            n_classes=22,
             first_and_last_labels=((self.classes[0], self.classes[-1])),
         )
 
@@ -121,32 +151,37 @@ class CoNSeP(wsi.MultiWsiDataset, base.ImageSegmentation):
     @override
     def load_mask(self, index: int) -> tv_tensors.Mask:
         path = self._get_mask_path(index)
-        mask = np.array(io.read_mat(path)["type_map"])
+        mask = io.read_image_as_array(path)
         mask_patch = _utils.extract_mask_patch(mask, self, index)
-        mask_patch = self._map_classes(mask_patch)
         return tv_tensors.Mask(mask_patch, dtype=torch.int64)  # type: ignore[reportCallIssue]
 
     def _load_file_paths(self, split: Literal["train", "val"] | None = None) -> List[str]:
         """Loads the file paths of the corresponding dataset split."""
-        paths = list(glob.glob(os.path.join(self._root, "**/Images/*.png"), recursive=True))
-        n_expected = self._expected_dataset_lengths[None]
+        paths = sorted(glob.glob(os.path.join(self._root, "rgbs_colorNormalized/*.png")))
+        n_expected = 67
         if len(paths) != n_expected:
             raise ValueError(f"Expected {n_expected} images, found {len(paths)} in {self._root}.")
 
-        if split is not None:
-            split_to_folder = {"train": "Train", "val": "Test"}
-            paths = filter(lambda p: split_to_folder[split] == p.split("/")[-3], paths)
+        train_indices, val_indices, test_indices = splitting.random_split(
+            samples=paths,
+            train_ratio=self._train_split_ratio,
+            val_ratio=self._val_split_ratio,
+            test_ratio=self._test_split_ratio,
+            seed=self._seed,
+        )
 
-        return sorted(paths)
+        match split:
+            case "train":
+                return [paths[i] for i in train_indices]
+            case "val":
+                return [paths[i] for i in val_indices]
+            case "test":
+                return [paths[i] for i in test_indices or []]
+            case None:
+                return paths
+            case _:
+                raise ValueError("Invalid split. Use 'train', 'val', 'test' or `None`.")
 
     def _get_mask_path(self, index):
         """Returns the path to the mask file corresponding to the patch at the given index."""
-        filename = self.filename(index).split(".")[0]
-        mask_dir = "Train/Labels" if filename.startswith("train") else "Test/Labels"
-        return os.path.join(self._root, mask_dir, f"{filename}.mat")
-
-    def _map_classes(self, array: npt.NDArray[Any]) -> npt.NDArray[Any]:
-        """Summarizes classes 3 & 4, and 5, 6."""
-        array = np.where(array == 4, 3, array)
-        array = np.where(array > 4, 4, array)
-        return array
+        return os.path.join(self._root, "masks", self.filename(index))

@@ -169,7 +169,7 @@ class PANDA(wsi.MultiWsiDataset, base.ImageClassification):
             case None:
                 return file_paths
             case _:
-                raise ValueError("Invalid split. Use 'train', 'val' or `None`.")
+                raise ValueError("Invalid split. Use 'train', 'val', 'test' or `None`.")
 
     def _filter_noisy_labels(self, file_paths: List[str]):
         is_noisy_filter = self.annotations["noise_ratio_10"] == 0
