@@ -70,15 +70,15 @@ model:
         - class_path: eva.core.metrics.defaults.MulticlassSegmentationMetrics
           init_args:
             num_classes: *NUM_CLASSES
-            ignore_index: *IGNORE_INDEX
-        - class_path: eva.core.metrics.wrappers.ClasswiseWrapper
+        - class_path: torchmetrics.ClasswiseWrapper
           init_args:
             metric:
-              class_path: torchmetrics.classification.MulticlassF1Score
+              class_path: torchmetrics.segmentation.GeneralizedDiceScore
               init_args:
                 num_classes: *NUM_CLASSES
-                ignore_index: *IGNORE_INDEX
-                average: null
+                input_format: index
+                weight_type: simple
+                per_class: true
 data:
   class_path: eva.DataModule
   init_args:

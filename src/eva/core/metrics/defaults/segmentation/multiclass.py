@@ -2,7 +2,7 @@
 
 from typing import Literal
 
-from torchmetrics import classification
+from torchmetrics import segmentation
 
 from eva.core.metrics import structs
 
@@ -13,8 +13,8 @@ class MulticlassSegmentationMetrics(structs.MetricCollection):
     def __init__(
         self,
         num_classes: int,
-        average: Literal["macro", "weighted", "none"] = "macro",
-        ignore_index: int | None = None,
+        include_background: bool = True,
+        input_format: Literal["one-hot", "index"] = "index",
         prefix: str | None = None,
         postfix: str | None = None,
     ) -> None:
@@ -22,45 +22,31 @@ class MulticlassSegmentationMetrics(structs.MetricCollection):
 
         Args:
             num_classes: Integer specifying the number of classes.
-            average: Defines the reduction that is applied over labels.
-            ignore_index: Specifies a target value that is ignored and
-                does not contribute to the metric calculation.
+            include_background: Whether to include the background class in the metrics computation.
+            input_format: What kind of input the metrics should expect.
             prefix: A string to add before the keys in the output dictionary.
             postfix: A string to add after the keys in the output dictionary.
         """
         super().__init__(
             metrics=[
-                classification.MulticlassJaccardIndex(
+                segmentation.GeneralizedDiceScore(
                     num_classes=num_classes,
-                    average=average,
-                    ignore_index=ignore_index,
+                    include_background=include_background,
+                    input_format=input_format,
+                    weight_type="simple",
                 ),
-                classification.MulticlassF1Score(
+                segmentation.MeanIoU(
                     num_classes=num_classes,
-                    average=average,
-                    ignore_index=ignore_index,
-                ),
-                classification.MulticlassPrecision(
-                    num_classes=num_classes,
-                    average=average,
-                    ignore_index=ignore_index,
-                ),
-                classification.MulticlassRecall(
-                    num_classes=num_classes,
-                    average=average,
-                    ignore_index=ignore_index,
+                    include_background=include_background,
+                    input_format=input_format,
                 ),
             ],
             prefix=prefix,
             postfix=postfix,
             compute_groups=[
                 [
-                    "MulticlassJaccardIndex",
-                ],
-                [
-                    "MulticlassF1Score",
-                    "MulticlassPrecision",
-                    "MulticlassRecall",
+                    "GeneralizedDiceScore",
+                    "MeanIoU",
                 ],
             ],
         )
