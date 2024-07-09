@@ -13,7 +13,7 @@ from eva.vision.data.wsi.patching import samplers
 
 @pytest.mark.parametrize(
     "split, expected_length",
-    [("train", 80), ("val", 28), ("test", 16), (None, 124)],
+    [("train", 72), ("val", 12), ("test", 40), (None, 124)],
 )
 def test_length(dataset: datasets.BCSS, expected_length: int) -> None:
     """Tests the length of the dataset."""

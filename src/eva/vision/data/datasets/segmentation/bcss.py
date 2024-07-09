@@ -2,6 +2,7 @@
 
 import glob
 import os
+from pathlib import Path
 from typing import Callable, Dict, List, Literal, Tuple
 
 import torch
@@ -27,16 +28,13 @@ class BCSS(wsi.MultiWsiDataset, base.ImageSegmentation):
     they do NOT represent an “other” class.
     """
 
-    _train_split_ratio: float = 0.6
+    _train_split_ratio: float = 0.8
     """Train split ratio."""
 
     _val_split_ratio: float = 0.2
     """Validation split ratio."""
 
-    _test_split_ratio: float = 0.2
-    """Test split ratio."""
-
-    _expected_length: int = 67
+    _expected_length: int = 151
     """Expected dataset length."""
 
     def __init__(
@@ -151,29 +149,37 @@ class BCSS(wsi.MultiWsiDataset, base.ImageSegmentation):
 
     def _load_file_paths(self, split: Literal["train", "val", "test"] | None = None) -> List[str]:
         """Loads the file paths of the corresponding dataset split."""
-        paths = sorted(glob.glob(os.path.join(self._root, "rgbs_colorNormalized/*.png")))
-        if len(paths) != self._expected_length:
+        file_paths = sorted(glob.glob(os.path.join(self._root, "rgbs_colorNormalized/*.png")))
+        if len(file_paths) != self._expected_length:
             raise ValueError(
-                f"Expected {self._expected_length} images, found {len(paths)} in {self._root}."
+                f"Expected {self._expected_length} images, found {len(file_paths)} in {self._root}."
             )
 
-        train_indices, val_indices, test_indices = splitting.random_split(
-            samples=paths,
+        test_institutes = {"OL", "LL", "E2", "EW", "GM", "S3"}
+
+        test_indices, train_val_indices = [], []
+        for i, path in enumerate(file_paths):
+            if Path(path).stem.split("-")[1] in test_institutes:
+                test_indices.append(i)
+            else:
+                train_val_indices.append(i)
+
+        train_sub_indices, val_sub_indices, _ = splitting.random_split(
+            samples=train_val_indices,
             train_ratio=self._train_split_ratio,
             val_ratio=self._val_split_ratio,
-            test_ratio=self._test_split_ratio,
             seed=self._seed,
         )
 
         match split:
             case "train":
-                return [paths[i] for i in train_indices]
+                return [file_paths[train_val_indices[i]] for i in train_sub_indices]
             case "val":
-                return [paths[i] for i in val_indices]
+                return [file_paths[train_val_indices[i]] for i in val_sub_indices]
             case "test":
-                return [paths[i] for i in test_indices or []]
+                return [file_paths[i] for i in test_indices or []]
             case None:
-                return paths
+                return file_paths
             case _:
                 raise ValueError("Invalid split. Use 'train', 'val', 'test' or `None`.")
 

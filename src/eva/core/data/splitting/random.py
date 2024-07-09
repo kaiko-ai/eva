@@ -22,7 +22,7 @@ def random_split(
         seed: The seed for reproducibility.
 
     Returns:
-        The indices of the train, validation, and test sets.
+        The indices of the train, validation, and test sets as lists.
     """
     if train_ratio + val_ratio + (test_ratio or 0) != 1:
         raise ValueError("The sum of the ratios must be equal to 1.")
@@ -32,7 +32,7 @@ def random_split(
     indices = np.random.permutation(n_samples)
 
     n_train = int(np.floor(train_ratio * n_samples))
-    n_val = int(np.floor(val_ratio * n_samples))
+    n_val = n_samples - n_train if test_ratio == 0.0 else int(np.floor(val_ratio * n_samples)) or 1
 
     train_indices = list(indices[:n_train])
     val_indices = list(indices[n_train : n_train + n_val])
