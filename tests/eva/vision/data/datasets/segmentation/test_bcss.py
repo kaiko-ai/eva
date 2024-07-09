@@ -40,6 +40,7 @@ def test_sample(dataset: datasets.BCSS, index: int) -> None:
     assert image.shape == (3, 10, 10)
     assert isinstance(mask, tv_tensors.Mask)
     assert mask.shape == (10, 10)
+    assert (0 <= mask).all() and (mask <= 5).all()
 
 
 @pytest.fixture

@@ -3,8 +3,10 @@
 import glob
 import os
 from pathlib import Path
-from typing import Callable, Dict, List, Literal, Tuple
+from typing import Any, Callable, Dict, List, Literal, Tuple
 
+import numpy as np
+import numpy.typing as npt
 import torch
 from torchvision import tv_tensors
 from torchvision.transforms.v2 import functional
@@ -22,10 +24,17 @@ class BCSS(wsi.MultiWsiDataset, base.ImageSegmentation):
 
     Source: https://github.com/PathologyDataScience/BCSS
 
-    Todo:
-    - Please be aware that zero pixels represent regions outside the region of interest
-    (“don’t care” class) and should be assigned zero-weight during model training;
-    they do NOT represent an “other” class.
+    We apply the the class grouping proposed by the challenge baseline:
+    https://bcsegmentation.grand-challenge.org/Baseline/
+
+    outside_roi: outside_roi
+    tumor: angioinvasion, dcis
+    stroma: stroma
+    inflammatory: lymphocytic_infiltrate, plasma_cells, other_immune_infiltrate
+    necrosis: necrosis_or_debris
+    other: remaining
+
+    Be aware that outside_roi should be assigned zero-weight during model training.
     """
 
     _train_split_ratio: float = 0.8
@@ -92,25 +101,9 @@ class BCSS(wsi.MultiWsiDataset, base.ImageSegmentation):
             "outside_roi": 0,
             "tumor": 1,
             "stroma": 2,
-            "lymphocytic_infiltrate": 3,
-            "necrosis_or_debris": 4,
-            "glandular_secretions": 5,
-            "blood": 6,
-            "exclude": 7,
-            "metaplasia_NOS": 8,
-            "fat": 9,
-            "plasma_cells": 10,
-            "other_immune_infiltrate": 11,
-            "mucoid_material": 12,
-            "normal_acinus_or_duct": 13,
-            "lymphatics": 14,
-            "undetermined": 15,
-            "nerve": 16,
-            "skin_adnexa": 17,
-            "blood_vessel": 18,
-            "angioinvasion": 19,
-            "dcis": 20,
-            "other": 21,
+            "inflammatory": 3,
+            "necrosis": 4,
+            "other": 5,
         }
 
     @override
@@ -127,7 +120,7 @@ class BCSS(wsi.MultiWsiDataset, base.ImageSegmentation):
         _validators.check_dataset_integrity(
             self,
             length=None,
-            n_classes=22,
+            n_classes=6,
             first_and_last_labels=((self.classes[0], self.classes[-1])),
         )
 
@@ -145,6 +138,7 @@ class BCSS(wsi.MultiWsiDataset, base.ImageSegmentation):
         path = self._get_mask_path(index)
         mask = io.read_image_as_array(path)
         mask_patch = _utils.extract_mask_patch(mask, self, index)
+        mask_patch = self._map_classes(mask_patch)
         return tv_tensors.Mask(mask_patch, dtype=torch.int64)  # type: ignore[reportCallIssue]
 
     def _load_file_paths(self, split: Literal["train", "val", "test"] | None = None) -> List[str]:
@@ -186,3 +180,51 @@ class BCSS(wsi.MultiWsiDataset, base.ImageSegmentation):
     def _get_mask_path(self, index):
         """Returns the path to the mask file corresponding to the patch at the given index."""
         return os.path.join(self._root, "masks", self.filename(index))
+
+    def _map_classes(self, array: npt.NDArray[Any]) -> npt.NDArray[Any]:
+        """Maps the classes of the mask array to the grouped tissue type classes."""
+        original_to_grouped_class_mapping = {
+            "outside_roi": "outside_roi",
+            "angioinvasion": "tumor",
+            "dcis": "tumor",
+            "stroma": "stroma",
+            "lymphocytic_infiltrate": "inflammatory",
+            "plasma_cells": "inflammatory",
+            "other_immune_infiltrate": "inflammatory",
+            "necrosis_or_debris": "necrosis",
+        }
+
+        mapped_array = np.full_like(array, fill_value=self.class_to_idx["other"], dtype=int)
+
+        for original_class, grouped_class in original_to_grouped_class_mapping.items():
+            original_class_idx = _original_class_to_idx[original_class]
+            grouped_class_idx = self.class_to_idx[grouped_class]
+            mapped_array[array == original_class_idx] = grouped_class_idx
+
+        return mapped_array
+
+
+_original_class_to_idx = {
+    "outside_roi": 0,
+    "tumor": 1,
+    "stroma": 2,
+    "lymphocytic_infiltrate": 3,
+    "necrosis_or_debris": 4,
+    "glandular_secretions": 5,
+    "blood": 6,
+    "exclude": 7,
+    "metaplasia_NOS": 8,
+    "fat": 9,
+    "plasma_cells": 10,
+    "other_immune_infiltrate": 11,
+    "mucoid_material": 12,
+    "normal_acinus_or_duct": 13,
+    "lymphatics": 14,
+    "undetermined": 15,
+    "nerve": 16,
+    "skin_adnexa": 17,
+    "blood_vessel": 18,
+    "angioinvasion": 19,
+    "dcis": 20,
+    "other": 21,
+}
