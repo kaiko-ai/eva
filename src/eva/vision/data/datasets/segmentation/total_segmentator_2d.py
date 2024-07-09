@@ -133,10 +133,6 @@ class TotalSegmentator2D(base.ImageSegmentation):
         sample_idx, _ = self._indices[index]
         sample_dir = self._samples_dirs[sample_idx]
         return os.path.join(sample_dir, "ct.nii.gz")
-        # sample_idx, slice_index = self._indices[index]
-        # sample_dir = self._samples_dirs[sample_idx]
-        # suffix = f"{slice_index}-ct.nii.gz" if segmented else "ct.nii.gz"
-        # return os.path.join(sample_dir, suffix)
 
     @override
     def prepare_data(self) -> None:
