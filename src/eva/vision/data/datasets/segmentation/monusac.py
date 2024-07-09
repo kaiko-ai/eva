@@ -92,7 +92,7 @@ class MoNuSAC(base.ImageSegmentation):
         return {label: index for index, label in enumerate(self.classes)}
 
     @override
-    def filename(self, index: int, segmented: bool = True) -> str:
+    def filename(self, index: int) -> str:
         return os.path.relpath(self._image_files[index], self._root)
 
     @override

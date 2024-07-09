@@ -34,13 +34,15 @@ def test_sample(dataset: datasets.CoNSeP, index: int) -> None:
     # assert data sample is a tuple
     sample = dataset[index]
     assert isinstance(sample, tuple)
-    assert len(sample) == 2
+    assert len(sample) == 3
     # assert the format of the `image` and `mask`
-    image, mask = sample
+    image, mask, metadata = sample
     assert isinstance(image, tv_tensors.Image)
     assert image.shape == (3, 10, 10)
     assert isinstance(mask, tv_tensors.Mask)
     assert mask.shape == (10, 10)
+    assert isinstance(metadata, dict)
+    assert "coords" in metadata
 
 
 @pytest.fixture

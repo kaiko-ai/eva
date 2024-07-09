@@ -130,10 +130,13 @@ class TotalSegmentator2D(base.ImageSegmentation):
 
     @override
     def filename(self, index: int, segmented: bool = True) -> str:
-        sample_idx, slice_index = self._indices[index]
+        sample_idx, _ = self._indices[index]
         sample_dir = self._samples_dirs[sample_idx]
-        suffix = f"{slice_index}-ct.nii.gz" if segmented else "ct.nii.gz"
-        return os.path.join(sample_dir, suffix)
+        return os.path.join(sample_dir, "ct.nii.gz")
+        # sample_idx, slice_index = self._indices[index]
+        # sample_dir = self._samples_dirs[sample_idx]
+        # suffix = f"{slice_index}-ct.nii.gz" if segmented else "ct.nii.gz"
+        # return os.path.join(sample_dir, suffix)
 
     @override
     def prepare_data(self) -> None:
@@ -180,6 +183,11 @@ class TotalSegmentator2D(base.ImageSegmentation):
         if self._optimize_mask_loading:
             return self._load_semantic_label_mask(index)
         return self._load_mask(index)
+
+    @override
+    def load_metadata(self, index: int) -> Dict[str, Any]:
+        _, slice_index = self._indices[index]
+        return {"slice_index": slice_index}
 
     def _load_mask(self, index: int) -> tv_tensors.Mask:
         """Loads and builds the segmentation mask from NifTi files."""

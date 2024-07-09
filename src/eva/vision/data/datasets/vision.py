@@ -13,16 +13,13 @@ class VisionDataset(base.Dataset, abc.ABC, Generic[DataSample]):
     """Base dataset class for vision tasks."""
 
     @abc.abstractmethod
-    def filename(self, index: int, segmented: bool = True) -> str:
+    def filename(self, index: int) -> str:
         """Returns the filename of the `index`'th data sample.
 
         Note that this is the relative file path to the root.
 
         Args:
             index: The index of the data-sample to select.
-            segmented: Whether to return the filename encoded
-                for a segmented portion of an image. That is useful
-                when the same filename produces multiple samples.
 
         Returns:
             The filename of the `index`'th data sample.

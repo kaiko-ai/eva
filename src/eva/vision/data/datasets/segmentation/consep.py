@@ -107,16 +107,11 @@ class CoNSeP(wsi.MultiWsiDataset, base.ImageSegmentation):
         )
 
     @override
-    def filename(self, index: int, segmented: bool = True) -> str:
-        (x, y), width, height = self._get_coords(index)
-        image_path = self._file_paths[self._get_dataset_idx(index)]
-        filename, filetype = os.path.basename(image_path).rsplit(".", 1)
-        if segmented:
-            filename += f"-{x}_{y}_{width}_{height}"
-        return f"{filename}.{filetype}"
+    def filename(self, index: int) -> str:
+        return os.path.basename(self._file_paths[self._get_dataset_idx(index)])
 
     @override
-    def __getitem__(self, index: int) -> Tuple[tv_tensors.Image, tv_tensors.Mask]:
+    def __getitem__(self, index: int) -> Tuple[tv_tensors.Image, tv_tensors.Mask, Dict[str, Any]]:
         return base.ImageSegmentation.__getitem__(self, index)
 
     @override
@@ -131,6 +126,11 @@ class CoNSeP(wsi.MultiWsiDataset, base.ImageSegmentation):
         mask_patch = self._extract_mask_patch(index, mask)
         mask_patch = self._map_classes(mask_patch)
         return tv_tensors.Mask(mask_patch, dtype=torch.int64)  # type: ignore[reportCallIssue]
+
+    @override
+    def load_metadata(self, index: int) -> Dict[str, Any]:
+        (x, y), width, height = self._get_coords(index)
+        return {"coords": f"{x},{y},{width},{height}"}
 
     def _load_file_paths(self, split: Literal["train", "val"] | None = None) -> List[str]:
         """Loads the file paths of the corresponding dataset split."""
@@ -154,9 +154,9 @@ class CoNSeP(wsi.MultiWsiDataset, base.ImageSegmentation):
 
     def _get_mask_path(self, index: int) -> str:
         """Returns the path to the mask file corresponding to the patch at the given index."""
-        filename = self.filename(index, segmented=False).split(".")[0]
-        mask_dir = "Train/Labels" if filename.startswith("train") else "Test/Labels"
-        return os.path.join(self._root, mask_dir, f"{filename}.mat")
+        filename = self.filename(index).split(".")[0]
+        mask_dir = "Train" if filename.startswith("train") else "Test"
+        return os.path.join(self._root, mask_dir, "Labels", f"{filename}.mat")
 
     def _extract_mask_patch(self, index: int, mask: npt.NDArray[Any]) -> npt.NDArray[Any]:
         """Reads the mask patch at the coordinates corresponding to the given patch index."""

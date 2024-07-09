@@ -16,6 +16,7 @@ trainer:
           dataloader_idx_map:
             0: train
             1: val
+          metadata_keys: ["slice_index"]
           backbone:
             class_path: eva.vision.models.networks.encoders.TimmEncoder
             init_args:

@@ -31,6 +31,7 @@ trainer:
           dataloader_idx_map:
             0: train
             1: val
+          metadata_keys: ["coords"]
           backbone:
             class_path: eva.vision.models.networks.encoders.TimmEncoder
             init_args:

@@ -10,6 +10,7 @@ from torch import multiprocessing
 from typing_extensions import override
 
 from eva.core.callbacks.writers.embeddings import base
+from eva.core.callbacks.writers.embeddings._manifest import ManifestManager
 from eva.core.callbacks.writers.embeddings.typings import QUEUE_ITEM
 
 
@@ -25,19 +26,28 @@ class SegmentationEmbeddingsWriter(base.EmbeddingsWriter):
         save_every_n: int,
         overwrite: bool = False,
     ) -> None:
-        manifest_file, manifest_writer = _init_manifest(output_dir, overwrite)
+        manifest_manager = ManifestManager(output_dir, metadata_keys, overwrite)
+        item_names = set()
+        counter = 0
         while True:
             item = write_queue.get()
             if item is None:
                 break
 
-            embeddings_buffer, target_buffer, input_name, save_name, split, _ = QUEUE_ITEM(*item)
+            embeddings_buffer, target_buffer, input_name, save_name, split, metadata = QUEUE_ITEM(
+                *item
+            )
+            counter = counter if save_name in item_names else 0
+            item_names.add(save_name)
+            save_name = save_name.replace(".pt", f"-{counter}.pt")
             target_filename = save_name.replace(".pt", "-mask.pt")
+
             _save_embedding(embeddings_buffer, save_name, output_dir)
             _save_embedding(target_buffer, target_filename, output_dir)
-            _update_manifest(target_filename, input_name, save_name, split, manifest_writer)
+            manifest_manager.update(input_name, save_name, target_filename, split, metadata)
+            counter += 1
 
-        manifest_file.close()
+        manifest_manager.close()
 
     @override
     def _get_embeddings(self, tensor: torch.Tensor) -> torch.Tensor | List[List[torch.Tensor]]:
