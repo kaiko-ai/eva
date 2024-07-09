@@ -45,7 +45,7 @@ The authors of the dataset propose a train / test. Additionally, we split the tr
 TODO:
 | Splits   | Train       | Validation  | Test       |  
 |----------|-------------|-------------|------------|
-| #Samples | 84 (55.6%)  | 22 (14.6%)  | 129 (29.8%)|
+| #Samples | 84 (55.6%)  | 22 (14.6%)  | 45 (29.8%)|
 
 
 ## Relevant links
