@@ -52,14 +52,18 @@ def wsi_backend(backend: str = "openslide") -> Callable[..., Wsi]:
                     "Missing optional dependency: tiffslide.\n"
                     "Please install using `pip install tiffslide`."
                 )
+        case "pil":
+            from eva.vision.data.wsi.backends.pil import PILImage
+
+            return PILImage
         case _:
             raise ValueError(f"Unknown WSI backend selected: {backend}")
 
 
 @functools.lru_cache(LRU_CACHE_SIZE)
-def get_cached_wsi(file_path: str, backend: str) -> Wsi:
+def get_cached_wsi(file_path: str, backend: str, overwrite_mpp: float | None = None) -> Wsi:
     """Returns a cached instance of the whole-slide image backend reader."""
-    return wsi_backend(backend)(file_path)
+    return wsi_backend(backend)(file_path, overwrite_mpp)
 
 
 __all__ = ["Wsi", "wsi_backend", "get_cached_wsi", "_is_openslide_available"]

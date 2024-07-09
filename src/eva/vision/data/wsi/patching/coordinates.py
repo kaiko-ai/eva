@@ -35,8 +35,9 @@ class PatchCoordinates:
         wsi_path: str,
         width: int,
         height: int,
-        target_mpp: float,
         sampler: samplers.Sampler,
+        target_mpp: float,
+        overwrite_mpp: float | None = None,
         backend: str = "openslide",
     ) -> "PatchCoordinates":
         """Create a new instance of PatchCoordinates from a whole-slide image file.
@@ -48,10 +49,11 @@ class PatchCoordinates:
             width: The width of the patches to be extracted, in pixels.
             height: The height of the patches to be extracted, in pixels.
             target_mpp: The target microns per pixel (mpp) for the patches.
+            overwrite_mpp: The microns per pixel (mpp) value to use when missing in WSI metadata.
             sampler: The sampler to use for sampling patch coordinates.
             backend: The backend to use for reading the whole-slide images.
         """
-        wsi = backends.wsi_backend(backend)(wsi_path)
+        wsi = backends.wsi_backend(backend)(wsi_path, overwrite_mpp)
 
         # Sample patch coordinates at level 0
         mpp_ratio_0 = target_mpp / wsi.mpp
@@ -80,6 +82,7 @@ def get_cached_coords(
     width: int,
     height: int,
     target_mpp: float,
+    overwrite_mpp: float | None,
     sampler: samplers.Sampler,
     backend: str,
 ) -> PatchCoordinates:
@@ -89,6 +92,7 @@ def get_cached_coords(
         width=width,
         height=height,
         target_mpp=target_mpp,
+        overwrite_mpp=overwrite_mpp,
         backend=backend,
         sampler=sampler,
     )
