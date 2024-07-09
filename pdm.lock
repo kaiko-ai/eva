@@ -5,7 +5,7 @@
 groups = ["default", "dev", "docs", "all", "typecheck", "lint", "vision", "test"]
 strategy = ["cross_platform", "inherit_metadata"]
 lock_version = "4.4.1"
-content_hash = "sha256:ad2c7a962e545c8b7cf3ac902459e7aca1c7ea2ad7100b5d38050752d018fff7"
+content_hash = "sha256:44b863e81c456423af6b2829ea2f423783d8e02d41b3282306ba75ee882cd078"
 
 [[package]]
 name = "absl-py"
@@ -799,7 +799,7 @@ files = [
 
 [[package]]
 name = "jsonargparse"
-version = "4.28.0"
+version = "4.30.0"
 requires_python = ">=3.7"
 summary = "Implement minimal boilerplate CLIs derived from type hints and parse from command line, config files and environment variables."
 groups = ["default"]
@@ -807,24 +807,24 @@ dependencies = [
     "PyYAML>=3.13",
 ]
 files = [
-    {file = "jsonargparse-4.28.0-py3-none-any.whl", hash = "sha256:9dcda241349547e8035c630d51de73b8b4ba67bdc2b014d7f76734d404e82518"},
-    {file = "jsonargparse-4.28.0.tar.gz", hash = "sha256:ac835a290ef18cc2a5309e6bfa8ada9c5d63f46ff18701583fc8f3e95314679c"},
+    {file = "jsonargparse-4.30.0-py3-none-any.whl", hash = "sha256:1856c76c32bc1c94d323916ec75bb3cec49bbc2072a4e2fe9fe9ba6a7ec2343f"},
+    {file = "jsonargparse-4.30.0.tar.gz", hash = "sha256:de3502c5852546c57b9d3dac6fd2a28fe312bc70df3ea877d2435944eebeea46"},
 ]
 
 [[package]]
 name = "jsonargparse"
-version = "4.28.0"
+version = "4.30.0"
 extras = ["omegaconf"]
 requires_python = ">=3.7"
 summary = "Implement minimal boilerplate CLIs derived from type hints and parse from command line, config files and environment variables."
 groups = ["default"]
 dependencies = [
-    "jsonargparse==4.28",
+    "jsonargparse==4.30.0",
     "omegaconf>=2.1.1",
 ]
 files = [
-    {file = "jsonargparse-4.28.0-py3-none-any.whl", hash = "sha256:9dcda241349547e8035c630d51de73b8b4ba67bdc2b014d7f76734d404e82518"},
-    {file = "jsonargparse-4.28.0.tar.gz", hash = "sha256:ac835a290ef18cc2a5309e6bfa8ada9c5d63f46ff18701583fc8f3e95314679c"},
+    {file = "jsonargparse-4.30.0-py3-none-any.whl", hash = "sha256:1856c76c32bc1c94d323916ec75bb3cec49bbc2072a4e2fe9fe9ba6a7ec2343f"},
+    {file = "jsonargparse-4.30.0.tar.gz", hash = "sha256:de3502c5852546c57b9d3dac6fd2a28fe312bc70df3ea877d2435944eebeea46"},
 ]
 
 [[package]]
