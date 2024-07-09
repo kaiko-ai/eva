@@ -30,6 +30,7 @@ class CoNSeP(wsi.MultiWsiDataset, base.ImageSegmentation):
         "val": 14,
         None: 41,
     }
+    """Expected dataset lengths for the splits and complete dataset."""
 
     def __init__(
         self,

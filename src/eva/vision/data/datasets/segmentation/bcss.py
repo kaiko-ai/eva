@@ -36,14 +36,14 @@ class BCSS(wsi.MultiWsiDataset, base.ImageSegmentation):
     _test_split_ratio: float = 0.2
     """Test split ratio."""
 
-    _license: str = "CC0 1.0 UNIVERSAL " "(https://creativecommons.org/publicdomain/zero/1.0/)"
-    """Dataset license."""
+    _expected_length: int = 67
+    """Expected dataset length."""
 
     def __init__(
         self,
         root: str,
         sampler: samplers.Sampler,
-        split: Literal["train", "val"] | None = None,
+        split: Literal["train", "val", "test"] | None = None,
         width: int = 224,
         height: int = 224,
         target_mpp: float = 0.5,
@@ -79,8 +79,8 @@ class BCSS(wsi.MultiWsiDataset, base.ImageSegmentation):
             target_mpp=target_mpp,
             overwrite_mpp=0.25,
             backend="pil",
-            image_transforms=transforms,
         )
+        base.ImageSegmentation.__init__(self, transforms=transforms)
 
     @property
     @override
@@ -121,8 +121,6 @@ class BCSS(wsi.MultiWsiDataset, base.ImageSegmentation):
 
         if not os.path.isdir(os.path.join(self._root, "masks")):
             raise FileNotFoundError(f"'masks' directory not found in {self._root}.")
-        if not os.path.isdir(os.path.join(self._root, "meta")):
-            raise FileNotFoundError(f"'meta' directory not found in {self._root}.")
         if not os.path.isdir(os.path.join(self._root, "rgbs_colorNormalized")):
             raise FileNotFoundError(f"'rgbs_colorNormalized' directory not found in {self._root}.")
 
@@ -134,10 +132,6 @@ class BCSS(wsi.MultiWsiDataset, base.ImageSegmentation):
             n_classes=22,
             first_and_last_labels=((self.classes[0], self.classes[-1])),
         )
-
-    @override
-    def filename(self, index: int) -> str:
-        return os.path.basename(self._file_paths[self._get_dataset_idx(index)])
 
     @override
     def __getitem__(self, index: int) -> Tuple[tv_tensors.Image, tv_tensors.Mask]:
@@ -155,12 +149,13 @@ class BCSS(wsi.MultiWsiDataset, base.ImageSegmentation):
         mask_patch = _utils.extract_mask_patch(mask, self, index)
         return tv_tensors.Mask(mask_patch, dtype=torch.int64)  # type: ignore[reportCallIssue]
 
-    def _load_file_paths(self, split: Literal["train", "val"] | None = None) -> List[str]:
+    def _load_file_paths(self, split: Literal["train", "val", "test"] | None = None) -> List[str]:
         """Loads the file paths of the corresponding dataset split."""
         paths = sorted(glob.glob(os.path.join(self._root, "rgbs_colorNormalized/*.png")))
-        n_expected = 67
-        if len(paths) != n_expected:
-            raise ValueError(f"Expected {n_expected} images, found {len(paths)} in {self._root}.")
+        if len(paths) != self._expected_length:
+            raise ValueError(
+                f"Expected {self._expected_length} images, found {len(paths)} in {self._root}."
+            )
 
         train_indices, val_indices, test_indices = splitting.random_split(
             samples=paths,
