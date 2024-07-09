@@ -1,4 +1,4 @@
-"""PANDA dataset tests."""
+"""BCSS dataset tests."""
 
 import os
 from typing import Literal

@@ -1,6 +1,9 @@
+"""Tests for the random split function."""
+
 import pytest
-import numpy as np
+
 from eva.core.data import splitting
+
 
 @pytest.mark.parametrize(
     "n_samples, train_ratio, val_ratio, test_ratio",
@@ -17,10 +20,11 @@ def test_split_ratios(n_samples: int, train_ratio: float, val_ratio: float, test
     train_indices, val_indices, test_indices = splitting.random_split(
         samples, train_ratio, val_ratio, test_ratio
     )
-    
+
     assert len(train_indices) == pytest.approx(n_samples * train_ratio, abs=1)
     assert len(val_indices) == pytest.approx(n_samples * val_ratio, abs=1)
     if test_ratio > 0:
+        assert isinstance(test_indices, list)
         assert len(test_indices) == pytest.approx(n_samples * test_ratio, abs=1)
     else:
         assert test_indices is None
@@ -65,7 +69,7 @@ def test_no_test_set():
     """Tests if the function correctly handles the case when test_ratio is 0."""
     samples = list(range(100))
     train_indices, val_indices, test_indices = splitting.random_split(samples, 0.8, 0.2, 0.0)
-    
+
     assert len(train_indices) + len(val_indices) == len(samples)
     assert test_indices is None
 
@@ -74,7 +78,8 @@ def test_all_samples_used():
     """Tests if all samples are used in the split."""
     samples = list(range(100))
     train_indices, val_indices, test_indices = splitting.random_split(samples, 0.6, 0.2, 0.2)
-    
+
+    assert isinstance(test_indices, list)
     all_indices = set(train_indices + val_indices + test_indices)
     assert all_indices == set(samples)
 
@@ -83,7 +88,8 @@ def test_no_overlap():
     """Tests if there's no overlap between train, validation, and test sets."""
     samples = list(range(100))
     train_indices, val_indices, test_indices = splitting.random_split(samples, 0.6, 0.2, 0.2)
-    
+
+    assert isinstance(test_indices, list)
     assert len(set(train_indices) & set(val_indices)) == 0
     assert len(set(train_indices) & set(test_indices)) == 0
     assert len(set(val_indices) & set(test_indices)) == 0
