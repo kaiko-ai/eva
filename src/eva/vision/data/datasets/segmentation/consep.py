@@ -107,10 +107,6 @@ class CoNSeP(wsi.MultiWsiDataset, base.ImageSegmentation):
         )
 
     @override
-    def filename(self, index: int) -> str:
-        return os.path.basename(self._file_paths[self._get_dataset_idx(index)])
-
-    @override
     def __getitem__(self, index: int) -> Tuple[tv_tensors.Image, tv_tensors.Mask]:
         return base.ImageSegmentation.__getitem__(self, index)
 
