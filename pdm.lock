@@ -4,8 +4,8 @@
 [metadata]
 groups = ["default", "dev", "docs", "all", "typecheck", "lint", "vision", "test"]
 strategy = ["cross_platform", "inherit_metadata"]
-lock_version = "4.4.1"
-content_hash = "sha256:ad2c7a962e545c8b7cf3ac902459e7aca1c7ea2ad7100b5d38050752d018fff7"
+lock_version = "4.4.2"
+content_hash = "sha256:3daa2c7f5407a1a4afdcc221045d149531c845af8316333878e33c464a520546"
 
 [[package]]
 name = "absl-py"
@@ -2594,8 +2594,10 @@ files = [
 
 [[package]]
 name = "torchmetrics"
-version = "1.3.2"
+version = "1.5.0.dev0"
 requires_python = ">=3.8"
+git = "https://github.com/Lightning-AI/torchmetrics.git"
+revision = "19c874073e5eed98ca2c4e936907523f53dd181b"
 summary = "PyTorch native Metrics"
 groups = ["default"]
 dependencies = [
@@ -2603,10 +2605,6 @@ dependencies = [
     "numpy>1.20.0",
     "packaging>17.1",
     "torch>=1.10.0",
-]
-files = [
-    {file = "torchmetrics-1.3.2-py3-none-any.whl", hash = "sha256:44ca3a9f86dc050cb3f554836ef291698ea797778457195b4f685fce8e2e64a3"},
-    {file = "torchmetrics-1.3.2.tar.gz", hash = "sha256:0a67694a4c4265eeb54cda741eaf5cb1f3a71da74b7e7e6215ad156c9f2379f6"},
 ]
 
 [[package]]

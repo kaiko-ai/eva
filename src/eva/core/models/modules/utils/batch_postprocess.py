@@ -2,12 +2,14 @@
 
 import dataclasses
 import functools
-from typing import Callable, List
+from typing import Any, Callable, Dict, List
 
 import torch
+from jsonargparse import _util
 from lightning.pytorch.utilities.types import STEP_OUTPUT
+from typing_extensions import override
 
-Transform = Callable[[torch.Tensor], torch.Tensor]
+Transform = Callable[[torch.Tensor], torch.Tensor] | Dict[str, Any]
 """Post-process transform type."""
 
 
@@ -20,6 +22,21 @@ class BatchPostProcess:
 
     predictions_transforms: List[Transform] | None = None
     """Holds the common train and evaluation metrics."""
+
+    @override
+    def __post_init__(self) -> None:
+        self._parse_transforms(self.targets_transforms or [])
+        self._parse_transforms(self.predictions_transforms or [])
+
+    def _parse_transforms(self, inputs: List[Transform]) -> None:
+        """Parses in-place transforms which where passed as functions."""
+        for i, transform in enumerate(inputs):
+            if not isinstance(transform, dict):
+                pass
+
+            inputs[i] = functools.partial(
+                _util.import_object(transform["class_path"]), **transform.get("init_args", {})
+            )
 
     def __call__(self, outputs: STEP_OUTPUT) -> None:
         """Applies the defined list of transforms to the batch output in-place.
