@@ -180,8 +180,9 @@ class Camelyon16(wsi.MultiWsiDataset, base.ImageClassification):
             "test": 129,
             None: 399,
         }
-        length = expected_n_files[self._split]
-        _validators.check_number_of_files(self._file_paths, length, self._split)
+        _validators.check_number_of_files(
+            self._file_paths, expected_n_files[self._split], self._split
+        )
         _validators.check_dataset_integrity(
             self,
             length=None,

@@ -20,7 +20,7 @@ class TimmEncoder(encoder.Encoder):
     def __init__(
         self,
         model_name: str,
-        pretrained: bool = False,
+        pretrained: bool = True,
         checkpoint_path: str = "",
         out_indices: int | Tuple[int, ...] | None = 1,
         model_arguments: Dict[str, Any] | None = None,
@@ -51,8 +51,8 @@ class TimmEncoder(encoder.Encoder):
         """Builds and loads the timm model as feature extractor."""
         self._feature_extractor = timm.create_model(
             model_name=self._model_name,
-            pretrained=self._pretrained,
-            checkpoint_path=self._checkpoint_path,
+            pretrained=True if self._checkpoint_path else self._pretrained,
+            pretrained_cfg=self._pretrained_cfg,
             out_indices=self._out_indices,
             features_only=True,
             **self._model_arguments,
@@ -62,3 +62,7 @@ class TimmEncoder(encoder.Encoder):
     @override
     def forward(self, tensor: torch.Tensor) -> List[torch.Tensor]:
         return self._feature_extractor(tensor)
+
+    @property
+    def _pretrained_cfg(self) -> Dict[str, Any]:
+        return {"url": self._checkpoint_path, "num_classes": 0} if self._checkpoint_path else {}
