@@ -3,7 +3,6 @@
 import abc
 import io
 import os
-from pathlib import Path
 from typing import Any, Dict, List, Sequence
 
 import lightning.pytorch as pl
@@ -176,7 +175,7 @@ class EmbeddingsWriter(callbacks.BasePredictionWriter, abc.ABC):
                 "either means that they have been computed before or that a wrong output "
                 "directory is being used. Consider using `eva fit` instead, selecting a "
                 "different output directory or setting overwrite=True."
-            )
+            ) from e
         os.makedirs(self._output_dir, exist_ok=True)
 
 
