@@ -27,6 +27,21 @@ class ConvDecoder(decoder.Decoder):
 
         self._layers = layers
 
+        from eva.vision.models.networks.decoders.segmentation import densely
+
+        # self._output_layers = densely.DenselyNetwork(in_channels=11, out_channels=8, growth_rate=16, steps=2, blocks=3)
+
+        self._output_layers = densely.DenselyNetwork(in_channels=11, out_channels=8, growth_rate=8, steps=2, blocks=2)
+
+        # nn.Sequential(
+        #     nn.Conv2d(in_channels=11, out_channels=8, kernel_size=3, padding=1)
+        # )
+
+        # self._output_layers = nn.Sequential(
+        #     nn.Conv2d(in_channels=11, out_channels=8, kernel_size=3, padding=1),
+        #     nn.ELU(inplace=True),
+        # )
+
     def _forward_features(self, features: List[torch.Tensor]) -> torch.Tensor:
         """Forward function for multi-level feature maps to a single one.
 
@@ -46,7 +61,7 @@ class ConvDecoder(decoder.Decoder):
             A tensor of shape (batch_size, hidden_size, n_patches_height,
             n_patches_width) which is feature map of the decoder head.
         """
-        if not isinstance(features, list) and features[0].ndim != 4:
+        if not isinstance(features, list) or features[0].ndim != 4:
             raise ValueError(
                 "Input features should be a list of four (4) dimensional inputs of "
                 "shape (batch_size, hidden_size, n_patches_height, n_patches_width)."
@@ -79,6 +94,7 @@ class ConvDecoder(decoder.Decoder):
         self,
         logits: torch.Tensor,
         image_size: Tuple[int, int],
+        images: torch.Tensor | None = None,
     ) -> torch.Tensor:
         """Classify each pixel of the image.
 
@@ -91,12 +107,17 @@ class ConvDecoder(decoder.Decoder):
             Tensor containing scores for all of the classes with shape
             (batch_size, n_classes, image_height, image_width).
         """
-        return functional.interpolate(logits, image_size, mode="bilinear")
+        # return functional.interpolate(logits, image_size, mode="bilinear")
+        out = functional.interpolate(logits, image_size, mode="bilinear")
+        con = torch.cat([out, images], dim=1)
+        logits = self._output_layers(con)
+        return logits
 
     def forward(
         self,
         features: List[torch.Tensor],
         image_size: Tuple[int, int],
+        images: torch.Tensor | None = None,
     ) -> torch.Tensor:
         """Maps the patch embeddings to a segmentation mask of the image size.
 
@@ -111,4 +132,4 @@ class ConvDecoder(decoder.Decoder):
         """
         patch_embeddings = self._forward_features(features)
         logits = self._forward_head(patch_embeddings)
-        return self._cls_seg(logits, image_size)
+        return self._cls_seg(logits, image_size, images)

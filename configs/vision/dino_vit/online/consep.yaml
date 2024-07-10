@@ -43,8 +43,13 @@ model:
         checkpoint_path: &CHECKPOINT_PATH ${oc.env:CHECKPOINT_PATH, null}
         model_arguments:
           dynamic_img_size: true
+    # decoder:
+    #   class_path: eva.vision.models.networks.decoders.segmentation.ConvDecoderMS
+    #   init_args:
+    #     in_features: ${oc.env:DECODER_IN_FEATURES, 1152}
+    #     num_classes:  &NUM_CLASSES 8
     decoder:
-      class_path: eva.vision.models.networks.decoders.segmentation.ConvDecoderMS
+      class_path: eva.vision.models.networks.decoders.segmentation.DenselyDecoder
       init_args:
         in_features: ${oc.env:DECODER_IN_FEATURES, 384}
         num_classes:  &NUM_CLASSES 8

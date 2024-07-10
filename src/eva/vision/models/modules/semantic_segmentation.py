@@ -78,6 +78,7 @@ class SemanticSegmentationModule(module.ModelModule):
         self,
         inputs: torch.Tensor,
         to_size: Tuple[int, int] | None = None,
+        images: torch.Tensor | None = None,
         *args: Any,
         **kwargs: Any,
     ) -> torch.Tensor:
@@ -94,7 +95,7 @@ class SemanticSegmentationModule(module.ModelModule):
             )
 
         patch_embeddings = self.encoder(inputs) if self.encoder else inputs
-        return self.decoder(patch_embeddings, to_size or inputs.shape[-2:])
+        return self.decoder(patch_embeddings, to_size or inputs.shape[-2:], images)
 
     @override
     def training_step(self, batch: INPUT_TENSOR_BATCH, *args: Any, **kwargs: Any) -> STEP_OUTPUT:
@@ -142,7 +143,7 @@ class SemanticSegmentationModule(module.ModelModule):
             The batch step output.
         """
         data, targets, metadata = INPUT_TENSOR_BATCH(*batch)
-        predictions = self(data, to_size=targets.shape[-2:])
+        predictions = self(data, to_size=targets.shape[-2:], images=data)
         loss = self.criterion(predictions, targets)
         return {
             "loss": loss,

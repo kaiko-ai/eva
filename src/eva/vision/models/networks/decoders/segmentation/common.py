@@ -7,7 +7,7 @@ output by an encoder into pixel-wise predictions for segmentation tasks.
 
 from torch import nn
 
-from eva.vision.models.networks.decoders.segmentation import conv2d, linear
+from eva.vision.models.networks.decoders.segmentation import conv2d, densely, linear
 
 
 class ConvDecoder1x1(conv2d.ConvDecoder):
@@ -71,4 +71,32 @@ class SingleLinearDecoder(linear.LinearDecoder):
                 in_features=in_features,
                 out_features=num_classes,
             ),
+        )
+
+
+class DenselyDecoder(conv2d.ConvDecoder):
+    """A multi-stage convolutional decoder with upsampling and convolutional layers.
+
+    This decoder applies a series of upsampling and convolutional layers to transform
+    the input features into output predictions with the desired spatial resolution.
+
+    This decoder is based on the `+ms` segmentation decoder from DINOv2
+    (https://arxiv.org/pdf/2304.07193)
+    """
+
+    def __init__(self, in_features: int, num_classes: int) -> None:
+        """Initializes the decoder.
+
+        Args:
+            in_features: The hidden dimension size of the embeddings.
+            num_classes: Number of output classes as channels.
+        """
+        super().__init__(
+            layers=densely.DenselyDecoder(
+                in_channels=in_features,
+                out_channels=num_classes,
+                growth_rate=16,
+                steps=3,
+                scale_factor=2,
+            )
         )

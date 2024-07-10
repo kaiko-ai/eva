@@ -9,7 +9,7 @@ from jsonargparse import _util
 from lightning.pytorch.utilities.types import STEP_OUTPUT
 from typing_extensions import override
 
-Transform = Callable[[torch.Tensor], torch.Tensor] | Dict[str, Any]
+Transform = Callable[[torch.Tensor], torch.Tensor]
 """Post-process transform type."""
 
 
@@ -17,10 +17,10 @@ Transform = Callable[[torch.Tensor], torch.Tensor] | Dict[str, Any]
 class BatchPostProcess:
     """Batch post-processes transform schema."""
 
-    targets_transforms: List[Transform] | None = None
+    targets_transforms: List[Transform | Dict[str, Any]] | None = None
     """Holds the common train and evaluation metrics."""
 
-    predictions_transforms: List[Transform] | None = None
+    predictions_transforms: List[Transform | Dict[str, Any]] | None = None
     """Holds the common train and evaluation metrics."""
 
     @override
@@ -31,12 +31,10 @@ class BatchPostProcess:
     def _parse_transforms(self, inputs: List[Transform]) -> None:
         """Parses in-place transforms which where passed as functions."""
         for i, transform in enumerate(inputs):
-            if not isinstance(transform, dict):
-                pass
-
-            inputs[i] = functools.partial(
-                _util.import_object(transform["class_path"]), **transform.get("init_args", {})
-            )
+            if isinstance(transform, dict):
+                inputs[i] = functools.partial(
+                    _util.import_object(transform["class_path"]), **transform.get("init_args", {})
+                )
 
     def __call__(self, outputs: STEP_OUTPUT) -> None:
         """Applies the defined list of transforms to the batch output in-place.
