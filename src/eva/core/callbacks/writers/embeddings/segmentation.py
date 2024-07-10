@@ -1,9 +1,8 @@
 """Segmentation embeddings writer."""
 
-import csv
 import io
 import os
-from typing import Any, List
+from typing import List
 
 import torch
 from torch import multiprocessing
