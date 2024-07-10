@@ -58,6 +58,11 @@ model:
       init_args:
         total_iters: *MAX_STEPS
         power: 0.9
+    postprocess:
+      predictions_transforms:
+        - class_path: torch.argmax
+          init_args:
+            dim: 1
     metrics:
       common:
         - class_path: eva.metrics.AverageLoss
@@ -65,15 +70,7 @@ model:
         - class_path: eva.core.metrics.defaults.MulticlassSegmentationMetrics
           init_args:
             num_classes: *NUM_CLASSES
-        - class_path: torchmetrics.ClasswiseWrapper
-          init_args:
-            metric:
-              class_path: torchmetrics.segmentation.GeneralizedDiceScore
-              init_args:
-                num_classes: *NUM_CLASSES
-                input_format: index
-                weight_type: simple
-                per_class: true
+            include_background: false
 data:
   class_path: eva.DataModule
   init_args:

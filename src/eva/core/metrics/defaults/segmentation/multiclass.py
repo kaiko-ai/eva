@@ -13,7 +13,7 @@ class MulticlassSegmentationMetrics(structs.MetricCollection):
     def __init__(
         self,
         num_classes: int,
-        include_background: bool = False,
+        include_background: bool = True,
         input_format: Literal["one-hot", "index"] = "index",
         prefix: str | None = None,
         postfix: str | None = None,

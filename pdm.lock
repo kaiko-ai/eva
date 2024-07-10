@@ -5,7 +5,7 @@
 groups = ["default", "dev", "docs", "all", "typecheck", "lint", "vision", "test"]
 strategy = ["cross_platform", "inherit_metadata"]
 lock_version = "4.4.2"
-content_hash = "sha256:3daa2c7f5407a1a4afdcc221045d149531c845af8316333878e33c464a520546"
+content_hash = "sha256:289d017e71a7a3c8da7b3e26568756ebb159dbf38f53dae2a8e0d364bf986f1a"
 
 [[package]]
 name = "absl-py"
@@ -2597,7 +2597,7 @@ name = "torchmetrics"
 version = "1.5.0.dev0"
 requires_python = ">=3.8"
 git = "https://github.com/Lightning-AI/torchmetrics.git"
-revision = "19c874073e5eed98ca2c4e936907523f53dd181b"
+revision = "7fd82d3aabe58549da22d22e49a0efe0eadce0fa"
 summary = "PyTorch native Metrics"
 groups = ["default"]
 dependencies = [
