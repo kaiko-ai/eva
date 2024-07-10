@@ -1,5 +1,6 @@
 """Segmentation embeddings writer."""
 
+import collections
 import io
 import os
 from typing import List
@@ -7,7 +8,6 @@ from typing import List
 import torch
 from torch import multiprocessing
 from typing_extensions import override
-import collections
 
 from eva.core.callbacks.writers.embeddings import base
 from eva.core.callbacks.writers.embeddings._manifest import ManifestManager
