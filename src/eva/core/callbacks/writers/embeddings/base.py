@@ -168,18 +168,16 @@ class EmbeddingsWriter(callbacks.BasePredictionWriter, abc.ABC):
 
     def _check_if_exists(self) -> None:
         """Checks if the output directory already exists and if it should be overwritten."""
-        exists = (
-            os.path.isdir(self._output_dir) and len(list(Path(self._output_dir).rglob("*.pt"))) > 0
-        )
-        if exists and not self._overwrite:
+        try:
+            os.makedirs(self._output_dir, exist_ok=self._overwrite)
+        except FileExistsError as e:
             raise FileExistsError(
-                f"Embeddings already exists in {self._output_dir}. This either means that they "
-                "have been computed before or that a wrong output directory is being used. "
-                "Consider using `eva fit` instead, selecting a different output directory or "
-                "setting overwrite=True."
+                f"The embeddings output directory already exists: {self._output_dir}. This "
+                "either means that they have been computed before or that a wrong output "
+                "directory is being used. Consider using `eva fit` instead, selecting a "
+                "different output directory or setting overwrite=True."
             )
-        else:
-            os.makedirs(self._output_dir, exist_ok=True)
+        os.makedirs(self._output_dir, exist_ok=True)
 
 
 def _as_io_buffers(*items: torch.Tensor) -> Sequence[io.BytesIO]:
