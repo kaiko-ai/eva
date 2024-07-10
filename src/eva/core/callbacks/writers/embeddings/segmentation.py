@@ -7,6 +7,7 @@ from typing import List
 import torch
 from torch import multiprocessing
 from typing_extensions import override
+import collections
 
 from eva.core.callbacks.writers.embeddings import base
 from eva.core.callbacks.writers.embeddings._manifest import ManifestManager
@@ -26,8 +27,7 @@ class SegmentationEmbeddingsWriter(base.EmbeddingsWriter):
         overwrite: bool = False,
     ) -> None:
         manifest_manager = ManifestManager(output_dir, metadata_keys, overwrite)
-        item_names = set()
-        counter = 0
+        counter = collections.defaultdict(int)
         while True:
             item = write_queue.get()
             if item is None:
@@ -36,15 +36,13 @@ class SegmentationEmbeddingsWriter(base.EmbeddingsWriter):
             embeddings_buffer, target_buffer, input_name, save_name, split, metadata = QUEUE_ITEM(
                 *item
             )
-            counter = counter if save_name in item_names else 0
-            item_names.add(save_name)
-            save_name = save_name.replace(".pt", f"-{counter}.pt")
+            save_name = save_name.replace(".pt", f"-{counter[save_name]}.pt")
             target_filename = save_name.replace(".pt", "-mask.pt")
 
             _save_embedding(embeddings_buffer, save_name, output_dir)
             _save_embedding(target_buffer, target_filename, output_dir)
             manifest_manager.update(input_name, save_name, target_filename, split, metadata)
-            counter += 1
+            counter[save_name] += 1
 
         manifest_manager.close()
 
