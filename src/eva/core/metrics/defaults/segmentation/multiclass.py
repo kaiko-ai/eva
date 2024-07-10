@@ -13,7 +13,7 @@ class MulticlassSegmentationMetrics(structs.MetricCollection):
     def __init__(
         self,
         num_classes: int,
-        include_background: bool = True,
+        include_background: bool = False,
         input_format: Literal["one-hot", "index"] = "index",
         prefix: str | None = None,
         postfix: str | None = None,
@@ -33,7 +33,7 @@ class MulticlassSegmentationMetrics(structs.MetricCollection):
                     num_classes=num_classes,
                     include_background=include_background,
                     input_format=input_format,
-                    weight_type="simple",
+                    weight_type="linear",
                 ),
                 segmentation.MeanIoU(
                     num_classes=num_classes,
