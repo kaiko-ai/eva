@@ -42,7 +42,6 @@ class ManifestManager:
                 f"A manifest file already exists at {manifest_path}, which indicates that the "
                 "chosen output directory has been previously used for writing embeddings."
             )
-
         self._manifest_file = open(manifest_path, "w", newline="")
         self._manifest_writer = csv.writer(self._manifest_file)
         self._manifest_writer.writerow(

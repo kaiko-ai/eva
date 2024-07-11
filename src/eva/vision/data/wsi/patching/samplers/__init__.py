@@ -5,4 +5,10 @@ from eva.vision.data.wsi.patching.samplers.foreground_grid import ForegroundGrid
 from eva.vision.data.wsi.patching.samplers.grid import GridSampler
 from eva.vision.data.wsi.patching.samplers.random import RandomSampler
 
-__all__ = ["Sampler", "ForegroundSampler", "RandomSampler", "GridSampler", "ForegroundGridSampler"]
+__all__ = [
+    "ForegroundSampler",
+    "Sampler",
+    "ForegroundGridSampler",
+    "GridSampler",
+    "RandomSampler",
+]

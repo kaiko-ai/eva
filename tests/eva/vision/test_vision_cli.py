@@ -14,24 +14,31 @@ from tests.eva import _cli
 @pytest.mark.parametrize(
     "configuration_file",
     [
+        # dino online
         "configs/vision/dino_vit/online/bach.yaml",
+        "configs/vision/dino_vit/online/consep.yaml",
         "configs/vision/dino_vit/online/crc.yaml",
         "configs/vision/dino_vit/online/mhist.yaml",
+        "configs/vision/dino_vit/online/monusac.yaml",
         "configs/vision/dino_vit/online/patch_camelyon.yaml",
         "configs/vision/dino_vit/online/total_segmentator_2d.yaml",
-        "configs/vision/dino_vit/online/monusac.yaml",
+        # dino offline
         "configs/vision/dino_vit/offline/bach.yaml",
+        "configs/vision/dino_vit/offline/camelyon16.yaml",
+        "configs/vision/dino_vit/offline/consep.yaml",
         "configs/vision/dino_vit/offline/crc.yaml",
         "configs/vision/dino_vit/offline/mhist.yaml",
-        "configs/vision/dino_vit/offline/patch_camelyon.yaml",
+        "configs/vision/dino_vit/offline/monusac.yaml",
         "configs/vision/dino_vit/offline/panda.yaml",
-        "configs/vision/dino_vit/offline/camelyon16.yaml",
+        "configs/vision/dino_vit/offline/patch_camelyon.yaml",
+        "configs/vision/dino_vit/offline/total_segmentator_2d.yaml",
+        # phikon online
         "configs/vision/owkin/phikon/offline/bach.yaml",
+        "configs/vision/owkin/phikon/offline/camelyon16.yaml",
         "configs/vision/owkin/phikon/offline/crc.yaml",
         "configs/vision/owkin/phikon/offline/mhist.yaml",
-        "configs/vision/owkin/phikon/offline/patch_camelyon.yaml",
         "configs/vision/owkin/phikon/offline/panda.yaml",
-        "configs/vision/owkin/phikon/offline/camelyon16.yaml",
+        "configs/vision/owkin/phikon/offline/patch_camelyon.yaml",
     ],
 )
 def test_configuration_initialization(configuration_file: str, lib_path: str) -> None:
