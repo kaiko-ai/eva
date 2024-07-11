@@ -120,7 +120,7 @@ data = core.DataModule(
 
 # perform fit
 pipeline = core.Interface()
-pipeline.fit(trainer, model, data)
+pipeline.fit(trainer, model=model, data=data)
 ```
 </sub>
 <td>
@@ -129,6 +129,7 @@ pipeline.fit(trainer, model, data)
 ```yaml
 # main.yaml
 # execute with: `eva fit --config main.yaml`
+
 ---
 trainer:
   class_path: eva.Trainer
