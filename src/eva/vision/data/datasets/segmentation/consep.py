@@ -126,7 +126,7 @@ class CoNSeP(wsi.MultiWsiDataset, base.ImageSegmentation):
 
     @override
     def load_metadata(self, index: int) -> Dict[str, Any]:
-        (x, y), width, height = self._get_coords(index)
+        (x, y), width, height = _utils.get_coords_at_index(self, index)
         return {"coords": f"{x},{y},{width},{height}"}
 
     def _load_file_paths(self, split: Literal["train", "val"] | None = None) -> List[str]:

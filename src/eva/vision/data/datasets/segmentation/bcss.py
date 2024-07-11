@@ -125,7 +125,7 @@ class BCSS(wsi.MultiWsiDataset, base.ImageSegmentation):
         )
 
     @override
-    def __getitem__(self, index: int) -> Tuple[tv_tensors.Image, tv_tensors.Mask]:
+    def __getitem__(self, index: int) -> Tuple[tv_tensors.Image, tv_tensors.Mask, Dict[str, Any]]:
         return base.ImageSegmentation.__getitem__(self, index)
 
     @override
@@ -140,6 +140,11 @@ class BCSS(wsi.MultiWsiDataset, base.ImageSegmentation):
         mask_patch = _utils.extract_mask_patch(mask, self, index)
         mask_patch = self._map_classes(mask_patch)
         return tv_tensors.Mask(mask_patch, dtype=torch.int64)  # type: ignore[reportCallIssue]
+
+    @override
+    def load_metadata(self, index: int) -> Dict[str, Any]:
+        (x, y), width, height = _utils.get_coords_at_index(self, index)
+        return {"coords": f"{x},{y},{width},{height}"}
 
     def _load_file_paths(self, split: Literal["train", "val", "test"] | None = None) -> List[str]:
         """Loads the file paths of the corresponding dataset split."""
