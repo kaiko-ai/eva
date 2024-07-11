@@ -154,7 +154,8 @@ data:
           root: ./data/bach
           split: train
           download: true
-          transforms: eva.vision.data.transforms.common.ResizeAndCrop
+          transforms:
+            class_path: eva.vision.transforms.ResizeAndCrop
     dataloaders:
       train:
         batch_size: 32
