@@ -27,7 +27,7 @@ class EmbeddingsWriter(callbacks.BasePredictionWriter, abc.ABC):
         backbone: nn.Module | None = None,
         dataloader_idx_map: Dict[int, str] | None = None,
         metadata_keys: List[str] | None = None,
-        overwrite: bool = True,
+        overwrite: bool = False,
         save_every_n: int = 100,
     ) -> None:
         """Initializes a new EmbeddingsWriter instance.
@@ -43,7 +43,9 @@ class EmbeddingsWriter(callbacks.BasePredictionWriter, abc.ABC):
                 names (e.g. train, val, test).
             metadata_keys: An optional list of keys to extract from the batch metadata and store
                 as additional columns in the manifest file.
-            overwrite: Whether to overwrite the output directory.
+            overwrite: Whether to overwrite if embeddings are already present in the specified
+                output directory. If set to `False`, an error will be raised if embeddings are
+                already present (recommended).
             save_every_n: Interval for number of iterations to save the embeddings to disk.
                 During this interval, the embeddings are accumulated in memory.
         """
@@ -76,7 +78,7 @@ class EmbeddingsWriter(callbacks.BasePredictionWriter, abc.ABC):
 
     @override
     def on_predict_start(self, trainer: pl.Trainer, pl_module: pl.LightningModule) -> None:
-        os.makedirs(self._output_dir, exist_ok=self._overwrite)
+        self._check_if_exists()
         self._initialize_write_process()
         self._write_process.start()
 
@@ -163,6 +165,19 @@ class EmbeddingsWriter(callbacks.BasePredictionWriter, abc.ABC):
             item_metadata[key] = metadata[key][local_idx]
 
         return item_metadata
+
+    def _check_if_exists(self) -> None:
+        """Checks if the output directory already exists and if it should be overwritten."""
+        try:
+            os.makedirs(self._output_dir, exist_ok=self._overwrite)
+        except FileExistsError as e:
+            raise FileExistsError(
+                f"The embeddings output directory already exists: {self._output_dir}. This "
+                "either means that they have been computed before or that a wrong output "
+                "directory is being used. Consider using `eva fit` instead, selecting a "
+                "different output directory or setting overwrite=True."
+            ) from e
+        os.makedirs(self._output_dir, exist_ok=True)
 
 
 def _as_io_buffers(*items: torch.Tensor | List[torch.Tensor]) -> Sequence[io.BytesIO]:

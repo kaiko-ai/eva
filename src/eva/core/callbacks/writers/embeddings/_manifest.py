@@ -39,9 +39,8 @@ class ManifestManager:
         manifest_path = os.path.join(self._output_dir, "manifest.csv")
         if os.path.exists(manifest_path) and not self._overwrite:
             raise FileExistsError(
-                f"Manifest file already exists at {manifest_path}. This likely means that the "
-                "embeddings have been computed before. Consider using `eva fit` instead "
-                "of `eva predict_fit` or `eva predict`."
+                f"A manifest file already exists at {manifest_path}, which indicates that the "
+                "chosen output directory has been previously used for writing embeddings."
             )
         self._manifest_file = open(manifest_path, "w", newline="")
         self._manifest_writer = csv.writer(self._manifest_file)
