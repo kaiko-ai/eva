@@ -74,7 +74,12 @@ _`eva`_ employees [jsonargparse](https://jsonargparse.readthedocs.io/en/v4.31.0/
 make it easily configurable by automatically generating command line interfaces (CLIs),
 which allows to call *any* python object from the command line. Moreover, the configuration structure is always in sync with the code. Thus, _`eva`_ can be used either directly from python or as a CLI tool (recommended).
 
-For example, the following interfaces are identical:
+For more information, please refer to the [documentation](https://kaiko-ai.github.io/eva/dev/user-guide/tutorials/offline_vs_online/).
+
+<details>
+  <summary>Learn about Configs</summary>
+
+The following interfaces are identical:
 <table>
 <tr>
 <th>Python interface</th>
@@ -98,24 +103,24 @@ trainer = core.Trainer(max_steps=100)
 
 # initialize model
 model = core.HeadModule(
-    backbone=nn.Flatten(),
-    head=nn.Linear(150528, 4),
-    criterion=nn.CrossEntropyLoss(),
+  backbone=nn.Flatten(),
+  head=nn.Linear(150528, 4),
+  criterion=nn.CrossEntropyLoss(),
 )
 
 # initialize data
 data = core.DataModule(
-    datasets=core.DatasetsSchema(
-        train=datasets.BACH(
-            root="data/bach",
-            split="train",
-            download=True,
-            transforms=transforms.ResizeAndCrop(),
-        ),
+  datasets=core.DatasetsSchema(
+    train=datasets.BACH(
+      root="data/bach",
+      split="train",
+      download=True,
+      transforms=transforms.ResizeAndCrop(),
     ),
-    dataloaders=core.DataloadersSchema(
-        train=core.DataLoader(batch_size=32),
-    ),
+  ),
+  dataloaders=core.DataloadersSchema(
+    train=core.DataLoader(batch_size=32),
+  ),
 )
 
 # perform fit
@@ -165,16 +170,13 @@ data:
 </tr>
 </table>
 
-When used as a CLI tool, _`eva`_ supports configuration files (`.yaml`)
-as an argument to define its functionality. Native supported configs can
-be found at the [configs](https://github.com/kaiko-ai/eva/tree/main/configs) directory of the repo, which can be both locally stored or remote.
+So basically the `.yaml` file defines the functionality of _`eva`_
+by parsing and translating its content to python objects directly.
+Native supported configs can be found at the
+[configs](https://github.com/kaiko-ai/eva/tree/main/configs) directory
+of the repo, which can be both locally stored or remote.
 
-To view all possible commands along with the information, execute:
-```sh
-eva --help
-```
-
-For more information, please refer to the [documentation](https://kaiko-ai.github.io/eva/dev/user-guide/tutorials/offline_vs_online/).
+</details>
 
 ## Quick Start
 
