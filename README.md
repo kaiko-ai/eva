@@ -17,6 +17,7 @@ _Oncology FM Evaluation Framework by kaiko.ai_
 <p align="center">
   <a href="https://github.com/kaiko-ai/eva#installation">Installation</a> •
   <a href="https://github.com/kaiko-ai/eva#how-to-use">How To Use</a> •
+  <a href="https://github.com/kaiko-ai/eva#quick-start">Quick Start</a> •
   <a href="https://kaiko-ai.github.io/eva/">Documentation</a> •
   <a href="https://kaiko-ai.github.io/eva/dev/datasets/">Datasets</a> •
   <a href="https://github.com/kaiko-ai/eva#benchmarks">Benchmarks</a> <br>
@@ -71,7 +72,7 @@ eva {fit,predict,predict_fit} --config url/or/path/to/the/config.yaml
 
 _`eva`_ employees [jsonargparse](https://jsonargparse.readthedocs.io/en/v4.31.0/) to
 make it easily configurable by automatically generating command line interfaces (CLIs),
-which allows to call *any* python object from the command line and the configuration structure is always in sync with the code.
+which allows to call *any* python object from the command line. Moreover, the configuration structure is always in sync with the code. Thus, _`eva`_ can be used either directly from python or as a CLI tool (recommended).
 
 For example, the following interfaces are identical:
 <table>
@@ -83,9 +84,10 @@ For example, the following interfaces are identical:
 <td>
 <sub>
 
-```py3
+```Python
 # main.py
 # execute with: `python main.py`
+
 from torch import nn
 
 from eva import core
@@ -175,10 +177,12 @@ For more information, please refer to the [documentation](https://kaiko-ai.githu
 
 ## Quick Start
 
-We define two types of fit: **online** and **offline**. Online fit involves
+We define two types of training: **online** and **offline**. Online fit involves
 using the backbone (also known as FM) to perform forward passes during the
 fitting process. In contrast, offline fit entails first generating embeddings
-from the backbone and then fitting the model using these embeddings.
+from the backbone and then fitting the model using these embeddings, resulting in a faster evaluation.
+
+Here are some examples to get you started:
 
 - Performs a downstream offline **classification** evaluation of `DINO ViT-S/16`
 on the `BACH` dataset with linear probing by first inferring the embeddings
@@ -225,7 +229,7 @@ In this section you will find model benchmarks which were generated with _`eva`_
 | ViT-L/14 _(kaiko.ai)_ <sup>[5]</sup> | 0.862|0.935|0.822|0.907|0.941|0.769|
 
 _Table I: Linear probing evaluation of FMs on patch-level downstream datasets.<br> We report averaged balanced accuracy
-over 5 runs. Results are reported on the "test" split if available and otherwise on the "validation" split.
+over 5 runs. Results are reported on the "test" split if available and otherwise on the "validation" split._
 
 </div>
 
