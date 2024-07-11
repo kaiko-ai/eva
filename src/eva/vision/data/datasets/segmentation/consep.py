@@ -35,7 +35,7 @@ class CoNSeP(wsi.MultiWsiDataset, base.ImageSegmentation):
     def __init__(
         self,
         root: str,
-        sampler: samplers.Sampler,
+        sampler: samplers.Sampler | None = None,
         split: Literal["train", "val"] | None = None,
         width: int = 224,
         height: int = 224,
@@ -47,6 +47,7 @@ class CoNSeP(wsi.MultiWsiDataset, base.ImageSegmentation):
         Args:
             root: Root directory of the dataset.
             sampler: The sampler to use for sampling patch coordinates.
+                If `None`, it will use the ::class::`ForegroundGridSampler` sampler.
             split: Dataset split to use. If `None`, the entire dataset is used.
             width: Width of the patches to be extracted, in pixels.
             height: Height of the patches to be extracted, in pixels.
@@ -65,7 +66,7 @@ class CoNSeP(wsi.MultiWsiDataset, base.ImageSegmentation):
             file_paths=self._load_file_paths(split),
             width=width,
             height=height,
-            sampler=sampler,
+            sampler=sampler or samplers.ForegroundGridSampler(max_samples=25),
             target_mpp=target_mpp,
             overwrite_mpp=0.25,
             backend="pil",
@@ -107,7 +108,7 @@ class CoNSeP(wsi.MultiWsiDataset, base.ImageSegmentation):
         )
 
     @override
-    def __getitem__(self, index: int) -> Tuple[tv_tensors.Image, tv_tensors.Mask]:
+    def __getitem__(self, index: int) -> Tuple[tv_tensors.Image, tv_tensors.Mask, Dict[str, Any]]:
         return base.ImageSegmentation.__getitem__(self, index)
 
     @override
@@ -123,6 +124,11 @@ class CoNSeP(wsi.MultiWsiDataset, base.ImageSegmentation):
         mask_patch = self._map_classes(mask_patch)
         return tv_tensors.Mask(mask_patch, dtype=torch.int64)  # type: ignore[reportCallIssue]
 
+    @override
+    def load_metadata(self, index: int) -> Dict[str, Any]:
+        (x, y), width, height = self._get_coords(index)
+        return {"coords": f"{x},{y},{width},{height}"}
+
     def _load_file_paths(self, split: Literal["train", "val"] | None = None) -> List[str]:
         """Loads the file paths of the corresponding dataset split."""
         paths = list(glob.glob(os.path.join(self._root, "**/Images/*.png"), recursive=True))
@@ -136,7 +142,7 @@ class CoNSeP(wsi.MultiWsiDataset, base.ImageSegmentation):
 
         return sorted(paths)
 
-    def _get_mask_path(self, index):
+    def _get_mask_path(self, index: int) -> str:
         """Returns the path to the mask file corresponding to the patch at the given index."""
         filename = self.filename(index).split(".")[0]
         mask_dir = "Train/Labels" if filename.startswith("train") else "Test/Labels"

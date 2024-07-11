@@ -12,6 +12,7 @@ from eva.vision.data.datasets.classification import (
 from eva.vision.data.datasets.segmentation import (
     BCSS,
     CoNSeP,
+    EmbeddingsSegmentationDataset,
     ImageSegmentation,
     MoNuSAC,
     TotalSegmentator2D,
@@ -29,6 +30,7 @@ __all__ = [
     "PatchCamelyon",
     "WsiClassificationDataset",
     "CoNSeP",
+    "EmbeddingsSegmentationDataset",
     "ImageSegmentation",
     "MoNuSAC",
     "TotalSegmentator2D",

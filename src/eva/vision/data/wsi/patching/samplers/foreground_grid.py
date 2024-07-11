@@ -7,14 +7,7 @@ from eva.vision.data.wsi.patching.samplers import _utils, base
 
 
 class ForegroundGridSampler(base.ForegroundSampler):
-    """Sample patches based on a grid, only returning patches containing foreground.
-
-    Args:
-        max_samples: The maximum number of samples to return.
-        overlap: The overlap between patches in the grid.
-        min_foreground_ratio: The minimum amount of foreground within a sampled patch.
-        seed: The random seed.
-    """
+    """Sample patches based on a grid, only returning patches containing foreground."""
 
     def __init__(
         self,
@@ -22,8 +15,16 @@ class ForegroundGridSampler(base.ForegroundSampler):
         overlap: Tuple[int, int] = (0, 0),
         min_foreground_ratio: float = 0.35,
         seed: int = 42,
-    ):
-        """Initializes the sampler."""
+    ) -> None:
+        """Initializes the sampler.
+
+        Args:
+            max_samples: The maximum number of samples to return.
+            overlap: The overlap between patches in the grid.
+            min_foreground_ratio: The minimum amount of foreground
+                within a sampled patch.
+            seed: The random seed.
+        """
         self.max_samples = max_samples
         self.overlap = overlap
         self.min_foreground_ratio = min_foreground_ratio
@@ -53,8 +54,14 @@ class ForegroundGridSampler(base.ForegroundSampler):
         for i in indices:
             if count >= self.max_samples:
                 break
+
             if self.is_foreground(
-                mask, x_y[i][0], x_y[i][1], width, height, self.min_foreground_ratio
+                mask=mask,
+                x=x_y[i][0],
+                y=x_y[i][1],
+                width=width,
+                height=height,
+                min_foreground_ratio=self.min_foreground_ratio,
             ):
                 count += 1
                 yield x_y[i]
@@ -83,5 +90,10 @@ class ForegroundGridSampler(base.ForegroundSampler):
         patch_mask = mask.mask_array[y_ : y_ + height_, x_ : x_ + width_]
         return patch_mask.sum() / patch_mask.size >= min_foreground_ratio
 
-    def _scale_coords(self, x: int, y: int, scale_factors: Tuple[float, float]) -> Tuple[int, int]:
+    def _scale_coords(
+        self,
+        x: int,
+        y: int,
+        scale_factors: Tuple[float, float],
+    ) -> Tuple[int, int]:
         return int(x / scale_factors[0]), int(y / scale_factors[1])

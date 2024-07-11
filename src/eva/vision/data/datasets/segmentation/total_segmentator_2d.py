@@ -129,10 +129,10 @@ class TotalSegmentator2D(base.ImageSegmentation):
         return {label: index for index, label in enumerate(self.classes)}
 
     @override
-    def filename(self, index: int) -> str:
-        sample_idx, slice_index = self._indices[index]
+    def filename(self, index: int, segmented: bool = True) -> str:
+        sample_idx, _ = self._indices[index]
         sample_dir = self._samples_dirs[sample_idx]
-        return os.path.join(sample_dir, f"{slice_index}-ct.nii.gz")
+        return os.path.join(sample_dir, "ct.nii.gz")
 
     @override
     def prepare_data(self) -> None:
@@ -179,6 +179,11 @@ class TotalSegmentator2D(base.ImageSegmentation):
         if self._optimize_mask_loading:
             return self._load_semantic_label_mask(index)
         return self._load_mask(index)
+
+    @override
+    def load_metadata(self, index: int) -> Dict[str, Any]:
+        _, slice_index = self._indices[index]
+        return {"slice_index": slice_index}
 
     def _load_mask(self, index: int) -> tv_tensors.Mask:
         """Loads and builds the segmentation mask from NifTi files."""
@@ -237,6 +242,11 @@ class TotalSegmentator2D(base.ImageSegmentation):
         """Returns the directory of the corresponding masks."""
         sample_dir = self._samples_dirs[sample_index]
         return os.path.join(self._root, sample_dir, "segmentations")
+
+    def _get_semantic_labels_filename(self, sample_index: int) -> str:
+        """Returns the semantic label filename."""
+        masks_dir = self._get_masks_dir(sample_index)
+        return os.path.join(masks_dir, "semantic_labels", "masks.nii.gz")
 
     def _get_number_of_slices_per_sample(self, sample_index: int) -> int:
         """Returns the total amount of slices of a sample."""

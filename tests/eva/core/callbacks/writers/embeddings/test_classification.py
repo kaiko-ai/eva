@@ -47,6 +47,7 @@ def test_embeddings_writer(datamodule: datamodules.DataModule, model: modules.He
             dataloader_idx_map={0: "train", 1: "val", 2: "test"},
             backbone=nn.Flatten(),
             metadata_keys=metadata_keys,
+            overwrite=True,
         )
         trainer = _init_and_run_trainer([callback], model, datamodule)
 

@@ -12,10 +12,7 @@ from eva.vision.data.datasets import vision
 class ImageSegmentation(vision.VisionDataset[Tuple[tv_tensors.Image, tv_tensors.Mask]], abc.ABC):
     """Image segmentation abstract dataset."""
 
-    def __init__(
-        self,
-        transforms: Callable | None = None,
-    ) -> None:
+    def __init__(self, transforms: Callable | None = None) -> None:
         """Initializes the image segmentation base class.
 
         Args:
@@ -33,17 +30,6 @@ class ImageSegmentation(vision.VisionDataset[Tuple[tv_tensors.Image, tv_tensors.
     @property
     def class_to_idx(self) -> Dict[str, int] | None:
         """Returns a mapping of the class name to its target index."""
-
-    def load_metadata(self, index: int | None) -> Dict[str, Any] | List[Dict[str, Any]] | None:
-        """Returns the dataset metadata.
-
-        Args:
-            index: The index of the data sample to return the metadata of.
-                If `None`, it will return the metadata of the current dataset.
-
-        Returns:
-            The sample metadata.
-        """
 
     @abc.abstractmethod
     def load_image(self, index: int) -> tv_tensors.Image:
@@ -68,16 +54,29 @@ class ImageSegmentation(vision.VisionDataset[Tuple[tv_tensors.Image, tv_tensors.
             values which represent the pixel class id.
         """
 
+    def load_metadata(self, index: int) -> Dict[str, Any] | None:
+        """Returns the dataset metadata.
+
+        Args:
+            index: The index of the data sample to return the metadata of.
+                If `None`, it will return the metadata of the current dataset.
+
+        Returns:
+            The sample metadata.
+        """
+
     @abc.abstractmethod
     @override
     def __len__(self) -> int:
         raise NotImplementedError
 
     @override
-    def __getitem__(self, index: int) -> Tuple[tv_tensors.Image, tv_tensors.Mask]:
+    def __getitem__(self, index: int) -> Tuple[tv_tensors.Image, tv_tensors.Mask, Dict[str, Any]]:
         image = self.load_image(index)
         mask = self.load_mask(index)
-        return self._apply_transforms(image, mask)
+        metadata = self.load_metadata(index) or {}
+        image_tensor, mask_tensor = self._apply_transforms(image, mask)
+        return image_tensor, mask_tensor, metadata
 
     def _apply_transforms(
         self, image: tv_tensors.Image, mask: tv_tensors.Mask
