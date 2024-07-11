@@ -120,7 +120,7 @@ data = core.DataModule(
 
 # perform fit
 pipeline = core.Interface()
-pipeline.fit(trainer=trainer, model=model, data=data)
+pipeline.fit(trainer, model, data)
 ```
 </sub>
 <td>
