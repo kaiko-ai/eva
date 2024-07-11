@@ -12,6 +12,7 @@ from loguru import logger
 from torch import multiprocessing, nn
 from typing_extensions import override
 
+from eva.core import utils
 from eva.core.callbacks.writers.embeddings.typings import QUEUE_ITEM
 from eva.core.models.modules.typings import INPUT_BATCH
 from eva.core.utils import multiprocessing as eva_multiprocessing
@@ -100,7 +101,8 @@ class EmbeddingsWriter(callbacks.BasePredictionWriter, abc.ABC):
         if not isinstance(targets, torch.Tensor):
             raise ValueError(f"Targets ({type(targets)}) should be `torch.Tensor`.")
 
-        embeddings = self._get_embeddings(prediction)
+        with torch.no_grad():
+            embeddings = self._get_embeddings(prediction)
 
         for local_idx, global_idx in enumerate(batch_indices[: len(embeddings)]):
             data_name = dataset.filename(global_idx)
@@ -140,10 +142,9 @@ class EmbeddingsWriter(callbacks.BasePredictionWriter, abc.ABC):
             ),
         )
 
-    @torch.no_grad()
-    def _get_embeddings(self, tensor: torch.Tensor) -> torch.Tensor:
+    @abc.abstractmethod
+    def _get_embeddings(self, tensor: torch.Tensor) -> torch.Tensor | List[List[torch.Tensor]]:
         """Returns the embeddings from predictions."""
-        return self._backbone(tensor) if self._backbone else tensor
 
     def _get_item_metadata(
         self, metadata: Dict[str, Any] | None, local_idx: int
@@ -164,9 +165,9 @@ class EmbeddingsWriter(callbacks.BasePredictionWriter, abc.ABC):
         return item_metadata
 
 
-def _as_io_buffers(*items: torch.Tensor) -> Sequence[io.BytesIO]:
+def _as_io_buffers(*items: torch.Tensor | List[torch.Tensor]) -> Sequence[io.BytesIO]:
     """Loads torch tensors as io buffers."""
     buffers = [io.BytesIO() for _ in range(len(items))]
     for tensor, buffer in zip(items, buffers, strict=False):
-        torch.save(tensor.clone(), buffer)
+        torch.save(utils.clone(tensor), buffer)
     return buffers

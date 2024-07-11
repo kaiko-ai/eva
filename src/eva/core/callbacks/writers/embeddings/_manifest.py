@@ -43,7 +43,6 @@ class ManifestManager:
                 "embeddings have been computed before. Consider using `eva fit` instead "
                 "of `eva predict_fit` or `eva predict`."
             )
-
         self._manifest_file = open(manifest_path, "w", newline="")
         self._manifest_writer = csv.writer(self._manifest_file)
         self._manifest_writer.writerow(
