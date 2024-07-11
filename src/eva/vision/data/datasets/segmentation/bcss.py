@@ -50,7 +50,7 @@ class BCSS(wsi.MultiWsiDataset, base.ImageSegmentation):
         self,
         root: str,
         sampler: samplers.Sampler,
-        split: Literal["train", "val", "test"] | None = None,
+        split: Literal["train", "val", "trainval", "test"] | None = None,
         width: int = 224,
         height: int = 224,
         target_mpp: float = 0.5,
@@ -146,7 +146,9 @@ class BCSS(wsi.MultiWsiDataset, base.ImageSegmentation):
         (x, y), width, height = _utils.get_coords_at_index(self, index)
         return {"coords": f"{x},{y},{width},{height}"}
 
-    def _load_file_paths(self, split: Literal["train", "val", "test"] | None = None) -> List[str]:
+    def _load_file_paths(
+        self, split: Literal["train", "val", "trainval", "test"] | None = None
+    ) -> List[str]:
         """Loads the file paths of the corresponding dataset split."""
         file_paths = sorted(glob.glob(os.path.join(self._root, "rgbs_colorNormalized/*.png")))
         if len(file_paths) != self._expected_length:
@@ -169,12 +171,15 @@ class BCSS(wsi.MultiWsiDataset, base.ImageSegmentation):
             val_ratio=self._val_split_ratio,
             seed=self._seed,
         )
+        trainval_sub_indices = train_sub_indices + val_sub_indices
 
         match split:
             case "train":
                 return [file_paths[train_val_indices[i]] for i in train_sub_indices]
             case "val":
                 return [file_paths[train_val_indices[i]] for i in val_sub_indices]
+            case "trainval":
+                return [file_paths[train_val_indices[i]] for i in trainval_sub_indices]
             case "test":
                 return [file_paths[i] for i in test_indices or []]
             case None:
