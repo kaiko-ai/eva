@@ -49,7 +49,7 @@ class LiTS(base.ImageSegmentation):
     def __init__(
         self,
         root: str,
-        split: Literal["train", "test"] | None = None,
+        split: Literal["train", "val", "test", "all"] | None = None,
         transforms: Callable | None = None,
     ) -> None:
         """Initialize dataset.
@@ -71,7 +71,7 @@ class LiTS(base.ImageSegmentation):
     @property
     @override
     def classes(self) -> List[str]:
-        return ["no_tumor", "tumor"]
+        return ["liver", "tumor"]
 
     @functools.cached_property
     @override
@@ -97,7 +97,7 @@ class LiTS(base.ImageSegmentation):
             self,
             length=self._expected_dataset_lengths.get(self._split, 0),
             n_classes=2,
-            first_and_last_labels=("no_tumor", "tumor"),
+            first_and_last_labels=("liver", "tumor"),
         )
 
     @override
@@ -163,7 +163,7 @@ class LiTS(base.ImageSegmentation):
             "train": self._train_index_ranges,
             "val": self._val_index_ranges,
             "test": self._test_index_ranges,
-            None: [(0, 131)],
+            None: [(0, len(self._volume_files))],
         }
         index_ranges = split_index_ranges.get(self._split)
         if index_ranges is None:
