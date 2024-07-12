@@ -1,18 +1,34 @@
+---
 trainer:
   class_path: eva.Trainer
   init_args:
     n_runs: &N_RUNS ${oc.env:N_RUNS, 1}
-    default_root_dir: &OUTPUT_ROOT ${oc.env:OUTPUT_ROOT, logs/${oc.env:TIMM_MODEL_NAME, vit_small_patch16_224}/total_segmentator_2d}
-    max_steps: &MAX_STEPS ${oc.env:MAX_STEPS, 20000}
+    default_root_dir: &OUTPUT_ROOT ${oc.env:OUTPUT_ROOT, logs/${oc.env:TIMM_MODEL_NAME, vit_small_patch16_224}/lits}
+    max_steps: &MAX_STEPS ${oc.env:MAX_STEPS, 500000}
+    log_every_n_steps: 6
     callbacks:
       - class_path: eva.callbacks.ConfigurationLogger
       - class_path: eva.vision.callbacks.SemanticSegmentationLogger
         init_args:
-          log_every_n_steps: 1000
-          log_images: false
+          log_every_n_epochs: 1
+          mean: &NORMALIZE_MEAN ${oc.env:NORMALIZE_MEAN, [0.485, 0.456, 0.406]} 
+          std: &NORMALIZE_STD ${oc.env:NORMALIZE_STD, [0.229, 0.224, 0.225]}
+      - class_path: lightning.pytorch.callbacks.ModelCheckpoint
+        init_args:
+          filename: best
+          save_last: true
+          save_top_k: 1
+          monitor: &MONITOR_METRIC ${oc.env:MONITOR_METRIC, val/MulticlassJaccardIndex}
+          mode: &MONITOR_METRIC_MODE ${oc.env:MONITOR_METRIC_MODE, max}
+      - class_path: lightning.pytorch.callbacks.EarlyStopping
+        init_args:
+          min_delta: 0
+          patience: 100
+          monitor: *MONITOR_METRIC
+          mode: *MONITOR_METRIC_MODE
       - class_path: eva.callbacks.SegmentationEmbeddingsWriter
         init_args:
-          output_dir: &DATASET_EMBEDDINGS_ROOT ${oc.env:EMBEDDINGS_ROOT, ./data/embeddings}/${oc.env:TIMM_MODEL_NAME, vit_small_patch16_224_dino}/total_segmentator_2d
+          output_dir: &DATASET_EMBEDDINGS_ROOT ${oc.env:EMBEDDINGS_ROOT, ./data/embeddings}/${oc.env:TIMM_MODEL_NAME, vit_small_patch16_224_dino}/lits
           dataloader_idx_map:
             0: train
             1: val
@@ -35,20 +51,17 @@ model:
   class_path: eva.vision.models.modules.SemanticSegmentationModule
   init_args:
     decoder:
-      class_path: eva.vision.models.networks.decoders.segmentation.ConvDecoder
+      class_path: eva.vision.models.networks.decoders.segmentation.ConvDecoderMS
       init_args:
-        layers:
-          class_path: torch.nn.Conv2d
-          init_args:
-            in_channels: ${oc.env:DECODER_IN_FEATURES, 384}
-            out_channels:  &NUM_CLASSES 118
-            kernel_size: [1, 1]
+        in_features: ${oc.env:DECODER_IN_FEATURES, 384}
+        num_classes:  &NUM_CLASSES 3
     criterion: torch.nn.CrossEntropyLoss
+    lr_multiplier_encoder: 0.0
     optimizer:
       class_path: torch.optim.AdamW
       init_args:
-        lr: 0.0001
-        weight_decay: 0.05
+        lr: 0.001
+        weight_decay: 0.01
     lr_scheduler:
       class_path: torch.optim.lr_scheduler.PolynomialLR
       init_args:
@@ -89,26 +102,21 @@ data:
           <<: *DATASET_ARGS
           split: test
       predict:
-        - class_path: eva.vision.datasets.TotalSegmentator2D
+        - class_path: eva.vision.datasets.LiTS
           init_args: &PREDICT_DATASET_ARGS
-            root: ${oc.env:DATA_ROOT, ./data}/total_segmentator
+            root: ${oc.env:DATA_ROOT, ./data}/lits
             split: train
-            download: ${oc.env:DOWNLOAD_DATA, false}
-            # Set `download: true` to download the dataset from https://zenodo.org/records/10047292
-            # The TotalSegmentator dataset is distributed under the following license: 
-            # "Creative Commons Attribution 4.0 International"
-            # (see: https://creativecommons.org/licenses/by/4.0/deed.en)
             transforms:
               class_path: eva.vision.data.transforms.common.ResizeAndCrop
               init_args:
                 size: ${oc.env:RESIZE_DIM, 224}  
-                mean: &NORMALIZE_MEAN ${oc.env:NORMALIZE_MEAN, [0.485, 0.456, 0.406]} 
-                std: &NORMALIZE_STD ${oc.env:NORMALIZE_STD, [0.229, 0.224, 0.225]}
-        - class_path: eva.vision.datasets.TotalSegmentator2D
+                mean: *NORMALIZE_MEAN
+                std: *NORMALIZE_STD
+        - class_path: eva.vision.datasets.LiTS
           init_args:
             <<: *PREDICT_DATASET_ARGS
             split: val
-        - class_path: eva.vision.datasets.TotalSegmentator2D
+        - class_path: eva.vision.datasets.LiTS
           init_args:
             <<: *PREDICT_DATASET_ARGS
             split: test
