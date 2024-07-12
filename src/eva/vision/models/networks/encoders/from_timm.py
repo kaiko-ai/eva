@@ -1,6 +1,7 @@
 """Encoder wrapper for timm models."""
 
 from typing import Any, Dict, List, Tuple
+from urllib import parse
 
 import timm
 import torch
@@ -65,4 +66,8 @@ class TimmEncoder(encoder.Encoder):
 
     @property
     def _pretrained_cfg(self) -> Dict[str, Any]:
-        return {"url": self._checkpoint_path, "num_classes": 0} if self._checkpoint_path else {}
+        if not self._checkpoint_path:
+            return {}
+
+        key = "file" if parse.urlparse(self._checkpoint_path).scheme in ("file", "") else "url"
+        return {key: self._checkpoint_path, "num_classes": 0}
