@@ -70,9 +70,9 @@ _`eva`_ can be used directly from the terminal as a CLI tool as follows:
 eva {fit,predict,predict_fit} --config url/or/path/to/the/config.yaml 
 ```
 
-_`eva`_ employees [jsonargparse](https://jsonargparse.readthedocs.io/en/v4.31.0/) to
+_`eva`_ uses [jsonargparse](https://jsonargparse.readthedocs.io/en/v4.31.0/) to
 make it easily configurable by automatically generating command line interfaces (CLIs),
-which allows to call *any* python object from the command line. Moreover, the configuration structure is always in sync with the code. Thus, _`eva`_ can be used either directly from python or as a CLI tool (recommended).
+which allows to call *any* Python object from the command line. Moreover, the configuration structure is always in sync with the code. Thus, _`eva`_ can be used either directly from Python or as a CLI tool (recommended).
 
 For more information, please refer to the [documentation](https://kaiko-ai.github.io/eva/dev/user-guide/tutorials/offline_vs_online/).
 
@@ -170,8 +170,8 @@ data:
 </tr>
 </table>
 
-So basically the `.yaml` file defines the functionality of _`eva`_
-by parsing and translating its content to python objects directly.
+The `.yaml` file defines the functionality of _`eva`_
+by parsing and translating its content to Python objects directly.
 Native supported configs can be found at the
 [configs](https://github.com/kaiko-ai/eva/tree/main/configs) directory
 of the repo, which can be both locally stored or remote.
@@ -180,16 +180,17 @@ of the repo, which can be both locally stored or remote.
 
 ## Quick Start
 
-We define two types of training: **online** and **offline**. Online fit involves
-using the backbone (also known as FM) to perform forward passes during the
-fitting process. In contrast, offline fit entails first generating embeddings
-from the backbone and then fitting the model using these embeddings, resulting in a faster evaluation.
+We define two types of evaluations: **online** and **offline**.
+While online fit uses the backbone (FM) to perform forward passes
+during the fitting process, offline fit first generates embeddings
+with the backbone and then fits the model using these embeddings as
+input, resulting in a faster evaluation.
 
 Here are some examples to get you started:
 
 - Performs a downstream offline **classification** evaluation of `DINO ViT-S/16`
 on the `BACH` dataset with linear probing by first inferring the embeddings
-and performing 5 sequential fits:
+and then performing 5 sequential fits:
   ```sh
   export DOWNLOAD_DATA=true
   eva predict_fit --config https://raw.githubusercontent.com/kaiko-ai/eva/main/configs/vision/dino_vit/offline/bach.yaml
@@ -202,7 +203,8 @@ and performing 5 sequential fits:
   eva fit --config https://raw.githubusercontent.com/kaiko-ai/eva/main/configs/vision/dino_vit/online/monusac.yaml
   ```
 
-For more examples, please look at the [configs](https://github.com/kaiko-ai/eva/tree/main/configs) and [tutorials](https://kaiko-ai.github.io/eva/dev/user-guide/advanced/replicate_evaluations/).
+For more examples, take a look at the [configs](https://github.com/kaiko-ai/eva/tree/main/configs)
+and [tutorials](https://kaiko-ai.github.io/eva/dev/user-guide/advanced/replicate_evaluations/).
 
 > [!NOTE]
 > All the datasets that support automatic download in the repo have by default the option to automatically download set to false.
