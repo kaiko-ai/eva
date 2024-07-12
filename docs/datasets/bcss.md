@@ -1,6 +1,6 @@
 # BCSS
 
-The BCSS (Breast Cancer Semantic Segmentation) consists of extracts from 151 WSI images from [TCGA](https://www.cancer.gov/ccg/research/genome-sequencing/tcga), containing over 20.000 segmentation annotations covering 21 different tissue types.
+The BCSS (Breast Cancer Semantic Segmentation) consists of extracts from 151 WSI images from [TCGA](https://www.cancer.gov/ccg/research/genome-sequencing/tcga), containing over 20,000 segmentation annotations covering 21 different tissue types.
 
 
 ## Raw data
