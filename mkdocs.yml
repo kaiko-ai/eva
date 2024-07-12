@@ -92,6 +92,7 @@ nav:
         - PANDA: datasets/panda.md
     - Radiology:
       - TotalSegmentator: datasets/total_segmentator.md
+      - LiTS: datasets/lits.md
   - Reference API:
     - reference/index.md
     - Core:
