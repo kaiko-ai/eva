@@ -3,6 +3,7 @@
 from eva.vision.data.datasets.segmentation.base import ImageSegmentation
 from eva.vision.data.datasets.segmentation.consep import CoNSeP
 from eva.vision.data.datasets.segmentation.embeddings import EmbeddingsSegmentationDataset
+from eva.vision.data.datasets.segmentation.lits import LiTS
 from eva.vision.data.datasets.segmentation.monusac import MoNuSAC
 from eva.vision.data.datasets.segmentation.total_segmentator_2d import TotalSegmentator2D
 
@@ -10,6 +11,7 @@ __all__ = [
     "ImageSegmentation",
     "CoNSeP",
     "EmbeddingsSegmentationDataset",
+    "LiTS",
     "MoNuSAC",
     "TotalSegmentator2D",
 ]
