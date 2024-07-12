@@ -188,7 +188,7 @@ input, resulting in a faster evaluation.
 
 Here are some examples to get you started:
 
-- Performs a downstream offline **classification** evaluation of `DINO ViT-S/16`
+- Perform a downstream offline **classification** evaluation of `DINO ViT-S/16`
 on the `BACH` dataset with linear probing by first inferring the embeddings
 and then performing 5 sequential fits:
   ```sh
@@ -196,7 +196,7 @@ and then performing 5 sequential fits:
   eva predict_fit --config https://raw.githubusercontent.com/kaiko-ai/eva/main/configs/vision/dino_vit/offline/bach.yaml
   ```
 
-- Performs a downstream online **segmentation** evaluation of `DINO ViT-S/16` on the
+- Perform a downstream online **segmentation** evaluation of `DINO ViT-S/16` on the
 `MoNuSAC` dataset with the `ConvDecoderMS` decoder:
   ```sh
   export DOWNLOAD_DATA=true
