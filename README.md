@@ -17,6 +17,7 @@ _Oncology FM Evaluation Framework by kaiko.ai_
 <p align="center">
   <a href="https://github.com/kaiko-ai/eva#installation">Installation</a> •
   <a href="https://github.com/kaiko-ai/eva#how-to-use">How To Use</a> •
+  <a href="https://github.com/kaiko-ai/eva#quick-start">Quick Start</a> •
   <a href="https://kaiko-ai.github.io/eva/">Documentation</a> •
   <a href="https://kaiko-ai.github.io/eva/dev/datasets/">Datasets</a> •
   <a href="https://github.com/kaiko-ai/eva#benchmarks">Benchmarks</a> <br>
@@ -33,6 +34,7 @@ Check out the [documentation](https://kaiko-ai.github.io/eva/) for more informat
 
 ### Highlights:
 - Easy and reliable benchmark of Oncology FMs
+- Supports path-level classification, slide-level classification and semantic segmentation downstream tasks
 - Automatic embedding inference and evaluation of a downstream task
 - Native support of popular medical [datasets](https://kaiko-ai.github.io/eva/dev/datasets/) and models
 - Produce statistics over multiple evaluation fits and multiple metrics
@@ -68,43 +70,151 @@ _`eva`_ can be used directly from the terminal as a CLI tool as follows:
 eva {fit,predict,predict_fit} --config url/or/path/to/the/config.yaml 
 ```
 
-When used as a CLI tool, _`eva`_ supports configuration files (`.yaml`) as an argument to define its functionality.
-Native supported configs can be found at the [configs](https://github.com/kaiko-ai/eva/tree/main/configs) directory
-of the repo. Apart from cloning the repo, you can download the latest config folder as `.zip` from your browser from
-[here](https://download-directory.github.io/?url=https://github.com/kaiko-ai/eva/tree/main/configs). Alternatively,
-from a specific release the configs can be downloaded from the terminal as follows:
-```sh
-curl -LO https://github.com/kaiko-ai/eva/releases/download/0.0.1/configs.zip | unzip configs
+_`eva`_ uses [jsonargparse](https://jsonargparse.readthedocs.io/en/v4.31.0/) to
+make it easily configurable by automatically generating command line interfaces (CLIs),
+which allows to call *any* Python object from the command line. Moreover, the configuration structure is always in sync with the code. Thus, _`eva`_ can be used either directly from Python or as a CLI tool (recommended).
+
+For more information, please refer to the [documentation](https://kaiko-ai.github.io/eva/dev/user-guide/tutorials/offline_vs_online/).
+
+<details>
+  <summary>Learn about Configs</summary>
+
+The following interfaces are identical:
+<table>
+<tr>
+<th>Python interface</th>
+<th>Configuration file</th>
+</tr>
+<tr>
+<td>
+<sub>
+
+```Python
+# main.py
+# execute with: `python main.py`
+
+from torch import nn
+
+from eva import core
+from eva.vision import datasets, transforms
+
+# initialize trainer
+trainer = core.Trainer(max_steps=100)
+
+# initialize model
+model = core.HeadModule(
+  backbone=nn.Flatten(),
+  head=nn.Linear(150528, 4),
+  criterion=nn.CrossEntropyLoss(),
+)
+
+# initialize data
+data = core.DataModule(
+  datasets=core.DatasetsSchema(
+    train=datasets.BACH(
+      root="data/bach",
+      split="train",
+      download=True,
+      transforms=transforms.ResizeAndCrop(),
+    ),
+  ),
+  dataloaders=core.DataloadersSchema(
+    train=core.DataLoader(batch_size=32),
+  ),
+)
+
+# perform fit
+pipeline = core.Interface()
+pipeline.fit(trainer, model=model, data=data)
 ```
+</sub>
+<td>
+<sub>
 
-For example, to perform a downstream evaluation of DINO ViT-S/16 on the BACH dataset with
-linear probing by first inferring the embeddings and performing 5 sequential fits, execute:
-```sh
-# from a locally stored config file
-eva predict_fit --config ./configs/vision/dino_vit/offline/bach.yaml
+```yaml
+# main.yaml
+# execute with: `eva fit --config main.yaml`
 
-# from a remote stored config file
-eva predict_fit --config https://raw.githubusercontent.com/kaiko-ai/eva/main/configs/vision/dino_vit/offline/bach.yaml
+---
+trainer:
+  class_path: eva.Trainer
+  init_args:
+    max_steps: 100
+model:
+  class_path: eva.HeadModule
+  init_args:
+    backbone: torch.nn.Flatten
+    head:
+      class_path: torch.nn.Linear
+      init_args:
+        in_features: 150528
+        out_features: 4
+    criterion: torch.nn.CrossEntropyLoss
+data:
+  class_path: eva.DataModule
+  init_args:
+    datasets:
+      train:
+        class_path: eva.vision.datasets.BACH
+        init_args:
+          root: ./data/bach
+          split: train
+          download: true
+          transforms: eva.vision.transforms.ResizeAndCrop
+    dataloaders:
+      train:
+        batch_size: 32
 ```
+</sub>
+</td>
+</tr>
+</table>
 
-> [!NOTE] 
-> All the datasets that support automatic download in the repo have by default the option to automatically download set to false.
-> For automatic download you have to manually set download=true.
+The `.yaml` file defines the functionality of _`eva`_
+by parsing and translating its content to Python objects directly.
+Native supported configs can be found at the
+[configs](https://github.com/kaiko-ai/eva/tree/main/configs) directory
+of the repo, which can be both locally stored or remote.
 
+</details>
 
-To view all the possibles, execute:
-```sh
-eva --help
-```
+## Quick Start
 
-For more information, please refer to the [documentation](https://kaiko-ai.github.io/eva/dev/user-guide/tutorials/offline_vs_online/)
+We define two types of evaluations: **online** and **offline**.
+While online fit uses the backbone (FM) to perform forward passes
+during the fitting process, offline fit first generates embeddings
+with the backbone and then fits the model using these embeddings as
+input, resulting in a faster evaluation.
+
+Here are some examples to get you started:
+
+- Perform a downstream offline **classification** evaluation of `DINO ViT-S/16`
+on the `BACH` dataset with linear probing by first inferring the embeddings
+and then performing 5 sequential fits:
+  ```sh
+  export DOWNLOAD_DATA=true
+  eva predict_fit --config https://raw.githubusercontent.com/kaiko-ai/eva/main/configs/vision/dino_vit/offline/bach.yaml
+  ```
+
+- Perform a downstream online **segmentation** evaluation of `DINO ViT-S/16` on the
+`MoNuSAC` dataset with the `ConvDecoderMS` decoder:
+  ```sh
+  export DOWNLOAD_DATA=true
+  eva fit --config https://raw.githubusercontent.com/kaiko-ai/eva/main/configs/vision/dino_vit/online/monusac.yaml
+  ```
+
+For more examples, take a look at the [configs](https://github.com/kaiko-ai/eva/tree/main/configs)
 and [tutorials](https://kaiko-ai.github.io/eva/dev/user-guide/advanced/replicate_evaluations/).
 
-## Benchmarks
+> [!NOTE]
+> All the datasets that support automatic download in the repo have by default the option to automatically download set to false.
+> For automatic download you have to manually set the environmental variable `DOWNLOAD_DATA=true` or in the configuration file `download=true`.
+
+## Leaderboards
 
 In this section you will find model benchmarks which were generated with _`eva`_.
 
-### Table I: WSI classification tasks
+### Table I: WSI patch-level classification tasks
 
 <br />
 
@@ -124,7 +234,7 @@ In this section you will find model benchmarks which were generated with _`eva`_
 | ViT-L/14 _(kaiko.ai)_ <sup>[5]</sup> | 0.862|0.935|0.822|0.907|0.941|0.769|
 
 _Table I: Linear probing evaluation of FMs on patch-level downstream datasets.<br> We report averaged balanced accuracy
-over 5 runs. Results are reported on the "test" split if available and otherwise on the "validation" split.
+over 5 runs. Results are reported on the "test" split if available and otherwise on the "validation" split._
 
 </div>
 
