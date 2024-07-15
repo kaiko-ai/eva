@@ -145,8 +145,8 @@ class CoNSeP(wsi.MultiWsiDataset, base.ImageSegmentation):
     def _get_mask_path(self, index: int) -> str:
         """Returns the path to the mask file corresponding to the patch at the given index."""
         filename = self.filename(index).split(".")[0]
-        mask_dir = "Train/Labels" if filename.startswith("train") else "Test/Labels"
-        return os.path.join(self._root, mask_dir, f"{filename}.mat")
+        mask_dir = "Train" if filename.startswith("train") else "Test"
+        return os.path.join(self._root, mask_dir, "Labels", f"{filename}.mat")
 
     def _map_classes(self, array: npt.NDArray[Any]) -> npt.NDArray[Any]:
         """Summarizes classes 3 & 4, and 5, 6."""

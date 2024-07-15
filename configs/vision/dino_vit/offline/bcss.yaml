@@ -104,9 +104,9 @@ data:
             root: ${oc.env:DATA_ROOT, ./data}/bcss
             split: train
             sampler:
-              class_path: eva.vision.data.wsi.patching.samplers.ForegroundGridSampler
+              class_path: eva.vision.data.wsi.patching.samplers.GridSampler
               init_args:
-                max_samples: 25
+                max_samples: 1000
             transforms:
               class_path: eva.vision.data.transforms.common.ResizeAndCrop
               init_args:

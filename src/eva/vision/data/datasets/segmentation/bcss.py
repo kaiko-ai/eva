@@ -62,6 +62,7 @@ class BCSS(wsi.MultiWsiDataset, base.ImageSegmentation):
         Args:
             root: Root directory of the dataset.
             sampler: The sampler to use for sampling patch coordinates.
+                If `None`, it will use the ::class::`GridSampler` sampler.
             split: Dataset split to use. If `None`, the entire dataset is used.
             width: Width of the patches to be extracted, in pixels.
             height: Height of the patches to be extracted, in pixels.
@@ -82,7 +83,7 @@ class BCSS(wsi.MultiWsiDataset, base.ImageSegmentation):
             file_paths=self._load_file_paths(split),
             width=width,
             height=height,
-            sampler=sampler,
+            sampler=sampler or samplers.GridSampler(max_samples=1000),
             target_mpp=target_mpp,
             overwrite_mpp=0.25,
             backend="pil",
