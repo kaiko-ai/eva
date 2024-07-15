@@ -49,7 +49,7 @@ class LiTS(base.ImageSegmentation):
     def __init__(
         self,
         root: str,
-        split: Literal["train", "val", "test", "all"] | None = None,
+        split: Literal["train", "val", "test"] | None = None,
         transforms: Callable | None = None,
     ) -> None:
         """Initialize dataset.
@@ -80,7 +80,9 @@ class LiTS(base.ImageSegmentation):
 
     @override
     def filename(self, index: int) -> str:
-        return os.path.relpath(self._volume_files[index], self._root)
+        sample_index, _ = self._indices[index]
+        volume_file_path = self._volume_files[sample_index]
+        return os.path.relpath(volume_file_path, self._root)
 
     @override
     def configure(self) -> None:
