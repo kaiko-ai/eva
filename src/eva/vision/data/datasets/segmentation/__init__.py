@@ -1,6 +1,7 @@
 """Segmentation datasets API."""
 
 from eva.vision.data.datasets.segmentation.base import ImageSegmentation
+from eva.vision.data.datasets.segmentation.bcss import BCSS
 from eva.vision.data.datasets.segmentation.consep import CoNSeP
 from eva.vision.data.datasets.segmentation.embeddings import EmbeddingsSegmentationDataset
 from eva.vision.data.datasets.segmentation.lits import LiTS
@@ -9,6 +10,7 @@ from eva.vision.data.datasets.segmentation.total_segmentator_2d import TotalSegm
 
 __all__ = [
     "ImageSegmentation",
+    "BCSS",
     "CoNSeP",
     "EmbeddingsSegmentationDataset",
     "LiTS",

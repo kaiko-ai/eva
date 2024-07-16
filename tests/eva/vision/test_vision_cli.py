@@ -16,6 +16,7 @@ from tests.eva import _cli
     [
         # dino online
         "configs/vision/dino_vit/online/bach.yaml",
+        "configs/vision/dino_vit/online/bcss.yaml",
         "configs/vision/dino_vit/online/consep.yaml",
         "configs/vision/dino_vit/online/crc.yaml",
         "configs/vision/dino_vit/online/lits.yaml",

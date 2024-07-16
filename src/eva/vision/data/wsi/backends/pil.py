@@ -39,13 +39,14 @@ class PILImage(base.Wsi):
     def _read_region(
         self, location: Tuple[int, int], level: int, size: Tuple[int, int]
     ) -> np.ndarray:
+        width, height = size[0], size[1]
         patch = self._wsi.crop(
             # (left, upper, right, lower)
             (
-                location[1],
                 location[0],
-                location[1] + size[1],
-                location[0] + size[0],
+                location[1],
+                location[0] + width,
+                location[1] + height,
             )
         )
         return np.array(patch)
