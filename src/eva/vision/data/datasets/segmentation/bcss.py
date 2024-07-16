@@ -12,7 +12,6 @@ from torchvision import tv_tensors
 from torchvision.transforms.v2 import functional
 from typing_extensions import override
 
-from eva.core.data import splitting
 from eva.vision.data.datasets import _validators, wsi
 from eva.vision.data.datasets.segmentation import _utils, base
 from eva.vision.data.wsi.patching import samplers
@@ -46,6 +45,12 @@ class BCSS(wsi.MultiWsiDataset, base.ImageSegmentation):
     _expected_length: int = 151
     """Expected dataset length."""
 
+    _val_institutes = {"BH", "C8", "A8", "A1", "E9"}
+    """Medical institutes to use for the validation split."""
+
+    _test_institutes = {"OL", "LL", "E2", "EW", "GM", "S3"}
+    """Medical institutes to use for the test split."""
+
     def __init__(
         self,
         root: str,
@@ -55,7 +60,6 @@ class BCSS(wsi.MultiWsiDataset, base.ImageSegmentation):
         height: int = 224,
         target_mpp: float = 0.5,
         transforms: Callable | None = None,
-        seed: int = 42,
     ) -> None:
         """Initializes the dataset.
 
@@ -69,11 +73,9 @@ class BCSS(wsi.MultiWsiDataset, base.ImageSegmentation):
             target_mpp: Target microns per pixel (mpp) for the patches.
             backend: The backend to use for reading the whole-slide images.
             transforms: Transforms to apply to the extracted image & mask patches.
-            seed: Random seed for reproducibility.
         """
         self._split = split
         self._root = root
-        self._seed = seed
 
         self.datasets: List[wsi.WsiDataset]  # type: ignore
 
@@ -157,32 +159,25 @@ class BCSS(wsi.MultiWsiDataset, base.ImageSegmentation):
                 f"Expected {self._expected_length} images, found {len(file_paths)} in {self._root}."
             )
 
-        test_institutes = {"OL", "LL", "E2", "EW", "GM", "S3"}
-
-        test_indices, train_val_indices = [], []
+        train_indices, val_indices, test_indices = [], [], []
         for i, path in enumerate(file_paths):
-            if Path(path).stem.split("-")[1] in test_institutes:
+            institute = Path(path).stem.split("-")[1]
+            if institute in self._test_institutes:
                 test_indices.append(i)
+            elif institute in self._val_institutes:
+                val_indices.append(i)
             else:
-                train_val_indices.append(i)
-
-        train_sub_indices, val_sub_indices, _ = splitting.random_split(
-            samples=train_val_indices,
-            train_ratio=self._train_split_ratio,
-            val_ratio=self._val_split_ratio,
-            seed=self._seed,
-        )
-        trainval_sub_indices = train_sub_indices + val_sub_indices
+                train_indices.append(i)
 
         match split:
             case "train":
-                return [file_paths[train_val_indices[i]] for i in train_sub_indices]
+                return [file_paths[i] for i in train_indices]
             case "val":
-                return [file_paths[train_val_indices[i]] for i in val_sub_indices]
+                return [file_paths[i] for i in val_indices]
             case "trainval":
-                return [file_paths[train_val_indices[i]] for i in trainval_sub_indices]
+                return [file_paths[i] for i in train_indices + val_indices]
             case "test":
-                return [file_paths[i] for i in test_indices or []]
+                return [file_paths[i] for i in test_indices]
             case None:
                 return file_paths
             case _:
