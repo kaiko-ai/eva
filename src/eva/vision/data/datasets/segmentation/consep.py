@@ -1,4 +1,4 @@
-"""PANDA dataset class."""
+"""CoNSeP dataset."""
 
 import glob
 import os
@@ -12,7 +12,7 @@ from torchvision.transforms.v2 import functional
 from typing_extensions import override
 
 from eva.vision.data.datasets import _validators, wsi
-from eva.vision.data.datasets.segmentation import base
+from eva.vision.data.datasets.segmentation import _utils, base
 from eva.vision.data.wsi.patching import samplers
 from eva.vision.utils import io
 
@@ -30,6 +30,7 @@ class CoNSeP(wsi.MultiWsiDataset, base.ImageSegmentation):
         "val": 14,
         None: 41,
     }
+    """Expected dataset lengths for the splits and complete dataset."""
 
     def __init__(
         self,
@@ -107,10 +108,6 @@ class CoNSeP(wsi.MultiWsiDataset, base.ImageSegmentation):
         )
 
     @override
-    def filename(self, index: int) -> str:
-        return os.path.basename(self._file_paths[self._get_dataset_idx(index)])
-
-    @override
     def __getitem__(self, index: int) -> Tuple[tv_tensors.Image, tv_tensors.Mask, Dict[str, Any]]:
         return base.ImageSegmentation.__getitem__(self, index)
 
@@ -122,14 +119,14 @@ class CoNSeP(wsi.MultiWsiDataset, base.ImageSegmentation):
     @override
     def load_mask(self, index: int) -> tv_tensors.Mask:
         path = self._get_mask_path(index)
-        mask = io.read_mat(path)["type_map"]
-        mask_patch = self._extract_mask_patch(index, mask)
+        mask = np.array(io.read_mat(path)["type_map"])
+        mask_patch = _utils.extract_mask_patch(mask, self, index)
         mask_patch = self._map_classes(mask_patch)
         return tv_tensors.Mask(mask_patch, dtype=torch.int64)  # type: ignore[reportCallIssue]
 
     @override
     def load_metadata(self, index: int) -> Dict[str, Any]:
-        (x, y), width, height = self._get_coords(index)
+        (x, y), width, height = _utils.get_coords_at_index(self, index)
         return {"coords": f"{x},{y},{width},{height}"}
 
     def _load_file_paths(self, split: Literal["train", "val"] | None = None) -> List[str]:
@@ -145,23 +142,11 @@ class CoNSeP(wsi.MultiWsiDataset, base.ImageSegmentation):
 
         return sorted(paths)
 
-    def _get_coords(self, index: int) -> Tuple[Tuple[int, int], int, int]:
-        """Returns the coordinates ((x,y),width,height) of the patch at the given index."""
-        image_index = self._get_dataset_idx(index)
-        patch_index = index if image_index == 0 else index - self.cumulative_sizes[image_index - 1]
-        coords = self.datasets[image_index]._coords
-        return coords.x_y[patch_index], coords.width, coords.height
-
     def _get_mask_path(self, index: int) -> str:
         """Returns the path to the mask file corresponding to the patch at the given index."""
         filename = self.filename(index).split(".")[0]
         mask_dir = "Train" if filename.startswith("train") else "Test"
         return os.path.join(self._root, mask_dir, "Labels", f"{filename}.mat")
-
-    def _extract_mask_patch(self, index: int, mask: npt.NDArray[Any]) -> npt.NDArray[Any]:
-        """Reads the mask patch at the coordinates corresponding to the given patch index."""
-        (x, y), width, height = self._get_coords(index)
-        return mask[x : x + width, y : y + height]
 
     def _map_classes(self, array: npt.NDArray[Any]) -> npt.NDArray[Any]:
         """Summarizes classes 3 & 4, and 5, 6."""

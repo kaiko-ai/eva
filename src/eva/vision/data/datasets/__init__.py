@@ -10,6 +10,7 @@ from eva.vision.data.datasets.classification import (
     WsiClassificationDataset,
 )
 from eva.vision.data.datasets.segmentation import (
+    BCSS,
     CoNSeP,
     EmbeddingsSegmentationDataset,
     ImageSegmentation,
@@ -21,6 +22,7 @@ from eva.vision.data.datasets.wsi import MultiWsiDataset, WsiDataset
 
 __all__ = [
     "BACH",
+    "BCSS",
     "CRC",
     "MHIST",
     "PANDA",

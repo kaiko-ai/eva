@@ -10,7 +10,6 @@ from torchvision import tv_tensors
 from torchvision.transforms.v2 import functional
 from typing_extensions import override
 
-from eva.core.data.datasets import base
 from eva.vision.data import wsi
 from eva.vision.data.datasets import vision
 from eva.vision.data.wsi.patching import samplers
@@ -42,6 +41,8 @@ class WsiDataset(vision.VisionDataset):
             backend: The backend to use for reading the whole-slide images.
             image_transforms: Transforms to apply to the extracted image patches.
         """
+        super().__init__()
+
         self._file_path = file_path
         self._width = width
         self._height = height
@@ -90,7 +91,7 @@ class WsiDataset(vision.VisionDataset):
         return image
 
 
-class MultiWsiDataset(torch_datasets.ConcatDataset, base.Dataset):
+class MultiWsiDataset(vision.VisionDataset):
     """Dataset class for reading patches from multiple whole-slide images."""
 
     def __init__(
@@ -118,6 +119,8 @@ class MultiWsiDataset(torch_datasets.ConcatDataset, base.Dataset):
             backend: The backend to use for reading the whole-slide images.
             image_transforms: Transforms to apply to the extracted image patches.
         """
+        super().__init__()
+
         self._root = root
         self._file_paths = file_paths
         self._width = width
@@ -128,9 +131,33 @@ class MultiWsiDataset(torch_datasets.ConcatDataset, base.Dataset):
         self._backend = backend
         self._image_transforms = image_transforms
 
+        self._concat_dataset: torch_datasets.ConcatDataset
+
+    @property
+    def datasets(self) -> List[WsiDataset]:
+        """Returns the list of WSI datasets."""
+        return self._concat_dataset.datasets  # type: ignore
+
+    @property
+    def cumulative_sizes(self) -> List[int]:
+        """Returns the cumulative sizes of the WSI datasets."""
+        return self._concat_dataset.cumulative_sizes
+
     @override
     def configure(self) -> None:
-        super().__init__(self._load_datasets())
+        self._concat_dataset = torch_datasets.ConcatDataset(datasets=self._load_datasets())
+
+    @override
+    def __len__(self) -> int:
+        return len(self._concat_dataset)
+
+    @override
+    def __getitem__(self, index: int) -> tv_tensors.Image:
+        return self._concat_dataset[index]
+
+    @override
+    def filename(self, index: int) -> str:
+        return os.path.basename(self._file_paths[self._get_dataset_idx(index)])
 
     def _load_datasets(self) -> list[WsiDataset]:
         logger.info(f"Initializing dataset with {len(self._file_paths)} WSIs ...")

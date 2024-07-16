@@ -117,10 +117,6 @@ class PANDA(wsi.MultiWsiDataset, base.ImageClassification):
         )
 
     @override
-    def filename(self, index: int) -> str:
-        return os.path.basename(self._file_paths[self._get_dataset_idx(index)])
-
-    @override
     def __getitem__(self, index: int) -> Tuple[tv_tensors.Image, torch.Tensor, Dict[str, Any]]:
         return base.ImageClassification.__getitem__(self, index)
 
@@ -169,7 +165,7 @@ class PANDA(wsi.MultiWsiDataset, base.ImageClassification):
             case None:
                 return file_paths
             case _:
-                raise ValueError("Invalid split. Use 'train', 'val' or `None`.")
+                raise ValueError("Invalid split. Use 'train', 'val', 'test' or `None`.")
 
     def _filter_noisy_labels(self, file_paths: List[str]):
         is_noisy_filter = self.annotations["noise_ratio_10"] == 0
