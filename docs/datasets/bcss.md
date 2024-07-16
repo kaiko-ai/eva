@@ -40,12 +40,12 @@ Although the original images have a resolution of 0.25 microns per pixel (mpp), 
 
 ### Splits
 
-The authors of the dataset propose a train / test. Additionally, we split the train set into train/val by using random split using a 0.8 / 0.2 ratio.
+As a test set, we use the images from the medical institues OL, LL, E2, EW, GM, and S3, as proposed by the [authors](https://bcsegmentation.grand-challenge.org/Baseline/). For the validation split, we use images from the institutes BH, C8, A8, A1 and E9, which results in the following dataset sizes:
 
-TODO:
+
 | Splits   | Train       | Validation  | Test       |  
 |----------|-------------|-------------|------------|
-| #Samples | 84 (55.6%)  | 22 (14.6%)  | 45 (29.8%)|
+| #Samples | 76 (50.3%)  | 30 (19.9%)  | 45 (29.8%)|
 
 
 ## Relevant links
