@@ -12,6 +12,7 @@ from loguru import logger
 from torch import multiprocessing, nn
 from typing_extensions import override
 
+from eva.core import utils
 from eva.core.callbacks.writers.embeddings.typings import QUEUE_ITEM
 from eva.core.models.modules.typings import INPUT_BATCH
 from eva.core.utils import multiprocessing as eva_multiprocessing
@@ -26,7 +27,7 @@ class EmbeddingsWriter(callbacks.BasePredictionWriter, abc.ABC):
         backbone: nn.Module | None = None,
         dataloader_idx_map: Dict[int, str] | None = None,
         metadata_keys: List[str] | None = None,
-        overwrite: bool = True,
+        overwrite: bool = False,
         save_every_n: int = 100,
     ) -> None:
         """Initializes a new EmbeddingsWriter instance.
@@ -42,7 +43,9 @@ class EmbeddingsWriter(callbacks.BasePredictionWriter, abc.ABC):
                 names (e.g. train, val, test).
             metadata_keys: An optional list of keys to extract from the batch metadata and store
                 as additional columns in the manifest file.
-            overwrite: Whether to overwrite the output directory.
+            overwrite: Whether to overwrite if embeddings are already present in the specified
+                output directory. If set to `False`, an error will be raised if embeddings are
+                already present (recommended).
             save_every_n: Interval for number of iterations to save the embeddings to disk.
                 During this interval, the embeddings are accumulated in memory.
         """
@@ -75,7 +78,7 @@ class EmbeddingsWriter(callbacks.BasePredictionWriter, abc.ABC):
 
     @override
     def on_predict_start(self, trainer: pl.Trainer, pl_module: pl.LightningModule) -> None:
-        os.makedirs(self._output_dir, exist_ok=self._overwrite)
+        self._check_if_exists()
         self._initialize_write_process()
         self._write_process.start()
 
@@ -100,7 +103,8 @@ class EmbeddingsWriter(callbacks.BasePredictionWriter, abc.ABC):
         if not isinstance(targets, torch.Tensor):
             raise ValueError(f"Targets ({type(targets)}) should be `torch.Tensor`.")
 
-        embeddings = self._get_embeddings(prediction)
+        with torch.no_grad():
+            embeddings = self._get_embeddings(prediction)
 
         for local_idx, global_idx in enumerate(batch_indices[: len(embeddings)]):
             data_name = dataset.filename(global_idx)
@@ -140,10 +144,9 @@ class EmbeddingsWriter(callbacks.BasePredictionWriter, abc.ABC):
             ),
         )
 
-    @torch.no_grad()
-    def _get_embeddings(self, tensor: torch.Tensor) -> torch.Tensor:
+    @abc.abstractmethod
+    def _get_embeddings(self, tensor: torch.Tensor) -> torch.Tensor | List[List[torch.Tensor]]:
         """Returns the embeddings from predictions."""
-        return self._backbone(tensor) if self._backbone else tensor
 
     def _get_item_metadata(
         self, metadata: Dict[str, Any] | None, local_idx: int
@@ -163,10 +166,23 @@ class EmbeddingsWriter(callbacks.BasePredictionWriter, abc.ABC):
 
         return item_metadata
 
+    def _check_if_exists(self) -> None:
+        """Checks if the output directory already exists and if it should be overwritten."""
+        try:
+            os.makedirs(self._output_dir, exist_ok=self._overwrite)
+        except FileExistsError as e:
+            raise FileExistsError(
+                f"The embeddings output directory already exists: {self._output_dir}. This "
+                "either means that they have been computed before or that a wrong output "
+                "directory is being used. Consider using `eva fit` instead, selecting a "
+                "different output directory or setting overwrite=True."
+            ) from e
+        os.makedirs(self._output_dir, exist_ok=True)
 
-def _as_io_buffers(*items: torch.Tensor) -> Sequence[io.BytesIO]:
+
+def _as_io_buffers(*items: torch.Tensor | List[torch.Tensor]) -> Sequence[io.BytesIO]:
     """Loads torch tensors as io buffers."""
     buffers = [io.BytesIO() for _ in range(len(items))]
     for tensor, buffer in zip(items, buffers, strict=False):
-        torch.save(tensor.clone(), buffer)
+        torch.save(utils.clone(tensor), buffer)
     return buffers

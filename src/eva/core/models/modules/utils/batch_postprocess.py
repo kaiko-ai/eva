@@ -7,9 +7,8 @@ from typing import Any, Callable, Dict, List
 import torch
 from jsonargparse import _util
 from lightning.pytorch.utilities.types import STEP_OUTPUT
-from typing_extensions import override
 
-Transform = Callable[[torch.Tensor], torch.Tensor] | Dict[str, Any]
+Transform = Callable[[torch.Tensor], torch.Tensor]
 """Post-process transform type."""
 
 
@@ -17,26 +16,11 @@ Transform = Callable[[torch.Tensor], torch.Tensor] | Dict[str, Any]
 class BatchPostProcess:
     """Batch post-processes transform schema."""
 
-    targets_transforms: List[Transform] | None = None
+    targets_transforms: List[Transform | Dict[str, Any]] | None = None
     """Holds the common train and evaluation metrics."""
 
-    predictions_transforms: List[Transform] | None = None
+    predictions_transforms: List[Transform | Dict[str, Any]] | None = None
     """Holds the common train and evaluation metrics."""
-
-    @override
-    def __post_init__(self) -> None:
-        self._parse_transforms(self.targets_transforms or [])
-        self._parse_transforms(self.predictions_transforms or [])
-
-    def _parse_transforms(self, inputs: List[Transform]) -> None:
-        """Parses in-place transforms which where passed as functions."""
-        for i, transform in enumerate(inputs):
-            if not isinstance(transform, dict):
-                pass
-
-            inputs[i] = functools.partial(
-                _util.import_object(transform["class_path"]), **transform.get("init_args", {})
-            )
 
     def __call__(self, outputs: STEP_OUTPUT) -> None:
         """Applies the defined list of transforms to the batch output in-place.
@@ -52,12 +36,13 @@ class BatchPostProcess:
 
         if "targets" in outputs and self.targets_transforms is not None:
             outputs["targets"] = _apply_transforms(
-                outputs["targets"], transforms=self.targets_transforms
+                outputs["targets"], transforms=_parse_callable_inputs(self.targets_transforms)
             )
 
         if "predictions" in outputs and self.predictions_transforms is not None:
             outputs["predictions"] = _apply_transforms(
-                outputs["predictions"], transforms=self.predictions_transforms
+                outputs["predictions"],
+                transforms=_parse_callable_inputs(self.predictions_transforms),
             )
 
 
@@ -72,3 +57,33 @@ def _apply_transforms(tensor: torch.Tensor, transforms: List[Transform]) -> torc
         The processed tensor.
     """
     return functools.reduce(lambda tensor, transform: transform(tensor), transforms, tensor)
+
+
+def _parse_callable_inputs(inputs: List[Callable | Dict[str, Any]]) -> List[Callable]:
+    """Parses the inputs which where passed as dictionary to callable objects."""
+    parsed = []
+    for item in inputs:
+        if isinstance(item, dict):
+            item = _parse_dict(item)
+        parsed.append(item)
+    return parsed
+
+
+def _parse_dict(item: Dict[str, Any]) -> Callable:
+    """Parses the input dictionary to a partial callable object."""
+    if not _is_valid_dict(item):
+        raise ValueError(
+            "Transform dictionary format is not valid. "
+            "It must contain a key 'class_path' and optionally 'init_args' for "
+            "the function and additional call arguments."
+        )
+
+    return functools.partial(
+        _util.import_object(item["class_path"]),
+        **item.get("init_args", {}),
+    )
+
+
+def _is_valid_dict(item: Dict[str, Any], /) -> bool:
+    """Checks if the input has the valid structure."""
+    return "class_path" in item and set(item.keys()) <= {"class_path", "init_args"}

@@ -17,12 +17,10 @@ class EmbeddingsSegmentationDataset(embeddings_base.EmbeddingsDataset[tv_tensors
     def _load_embeddings(self, index: int) -> List[torch.Tensor]:
         filename = self.filename(index)
         embeddings_path = os.path.join(self._root, filename)
-        tensor = torch.load(embeddings_path, map_location="cpu")
-        if isinstance(tensor, list) and len(tensor) > 1:
-            raise ValueError(f"Expected a single tensor in the .pt file, but found {len(tensor)}.")
-        if isinstance(tensor, torch.Tensor):
-            tensor = [tensor]
-        return [embeddings.squeeze(0) for embeddings in tensor]
+        embeddings = torch.load(embeddings_path, map_location="cpu")
+        if isinstance(embeddings, torch.Tensor):
+            embeddings = [embeddings]
+        return [tensor.squeeze(0) for tensor in embeddings]
 
     @override
     def _load_target(self, index: int) -> tv_tensors.Mask:

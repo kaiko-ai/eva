@@ -191,10 +191,6 @@ class Camelyon16(wsi.MultiWsiDataset, base.ImageClassification):
         )
 
     @override
-    def filename(self, index: int) -> str:
-        return os.path.basename(self._file_paths[self._get_dataset_idx(index)])
-
-    @override
     def __getitem__(self, index: int) -> Tuple[tv_tensors.Image, torch.Tensor, Dict[str, Any]]:
         return base.ImageClassification.__getitem__(self, index)
 

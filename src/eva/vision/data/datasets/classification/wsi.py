@@ -78,7 +78,7 @@ class WsiClassificationDataset(wsi.MultiWsiDataset, base.ImageClassification):
         return base.ImageClassification.__getitem__(self, index)
 
     @override
-    def load_image(self, index: int) -> np.ndarray:
+    def load_image(self, index: int) -> tv_tensors.Image:
         return wsi.MultiWsiDataset.__getitem__(self, index)
 
     @override

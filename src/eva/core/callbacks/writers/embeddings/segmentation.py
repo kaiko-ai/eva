@@ -1,15 +1,16 @@
 """Segmentation embeddings writer."""
 
-import csv
+import collections
 import io
 import os
-from typing import Any, List
+from typing import List
 
 import torch
 from torch import multiprocessing
 from typing_extensions import override
 
 from eva.core.callbacks.writers.embeddings import base
+from eva.core.callbacks.writers.embeddings._manifest import ManifestManager
 from eva.core.callbacks.writers.embeddings.typings import QUEUE_ITEM
 
 
@@ -25,41 +26,49 @@ class SegmentationEmbeddingsWriter(base.EmbeddingsWriter):
         save_every_n: int,
         overwrite: bool = False,
     ) -> None:
-        manifest_file, manifest_writer = _init_manifest(output_dir, overwrite)
+        manifest_manager = ManifestManager(output_dir, metadata_keys, overwrite)
+        counter = collections.defaultdict(int)
         while True:
             item = write_queue.get()
             if item is None:
                 break
 
-            embeddings_buffer, target_buffer, input_name, save_name, split, _ = QUEUE_ITEM(*item)
+            embeddings_buffer, target_buffer, input_name, save_name, split, metadata = QUEUE_ITEM(
+                *item
+            )
+            save_name = save_name.replace(".pt", f"-{counter[save_name]}.pt")
             target_filename = save_name.replace(".pt", "-mask.pt")
+
             _save_embedding(embeddings_buffer, save_name, output_dir)
             _save_embedding(target_buffer, target_filename, output_dir)
-            _update_manifest(target_filename, input_name, save_name, split, manifest_writer)
+            manifest_manager.update(input_name, save_name, target_filename, split, metadata)
+            counter[save_name] += 1
 
-        manifest_file.close()
+        manifest_manager.close()
 
-    @torch.no_grad()
-    def _get_embeddings(self, tensor: torch.Tensor) -> torch.Tensor:
+    @override
+    def _get_embeddings(self, tensor: torch.Tensor) -> torch.Tensor | List[List[torch.Tensor]]:
         """Returns the embeddings from predictions."""
+
+        def _get_grouped_embeddings(embeddings: List[torch.Tensor]) -> List[List[torch.Tensor]]:
+            """Casts a list of multi-leveled batched embeddings to grouped per batch.
+
+            That is, for embeddings to be a list of shape (batch_size, hidden_dim, height, width),
+            such as `[(2, 192, 16, 16), (2, 192, 16, 16)]`, to be reshaped as a list of lists of
+            per batch multi-level embeddings, thus
+            `[ [(192, 16, 16), (192, 16, 16)], [(192, 16, 16), (192, 16, 16)] ]`.
+            """
+            batch_size = embeddings[0].shape[0]
+            grouped_embeddings = []
+            for batch_idx in range(batch_size):
+                batch_list = [layer_embeddings[batch_idx] for layer_embeddings in embeddings]
+                grouped_embeddings.append(batch_list)
+            return grouped_embeddings
+
         embeddings = self._backbone(tensor) if self._backbone else tensor
-        if len(embeddings) > 1:
-            raise ValueError("Multiple-level embeddings are not currently supported.")
+        if isinstance(embeddings, list):
+            embeddings = _get_grouped_embeddings(embeddings)
         return embeddings
-
-
-def _init_manifest(output_dir: str, overwrite: bool = False) -> tuple[io.TextIOWrapper, Any]:
-    manifest_path = os.path.join(output_dir, "manifest.csv")
-    if os.path.exists(manifest_path) and not overwrite:
-        raise FileExistsError(
-            f"Manifest file already exists at {manifest_path}. This likely means that the "
-            "embeddings have been computed before. Consider using `eva fit` instead "
-            "of `eva predict_fit` or `eva predict`."
-        )
-    manifest_file = open(manifest_path, "w", newline="")
-    manifest_writer = csv.writer(manifest_file)
-    manifest_writer.writerow(["origin", "embeddings", "target", "split"])
-    return manifest_file, manifest_writer
 
 
 def _save_embedding(embeddings_buffer: io.BytesIO, save_name: str, output_dir: str) -> None:
@@ -67,13 +76,3 @@ def _save_embedding(embeddings_buffer: io.BytesIO, save_name: str, output_dir: s
     prediction = torch.load(io.BytesIO(embeddings_buffer.getbuffer()), map_location="cpu")
     os.makedirs(os.path.dirname(save_path), exist_ok=True)
     torch.save(prediction, save_path)
-
-
-def _update_manifest(
-    target_filename: str,
-    input_name: str,
-    save_name: str,
-    split: str | None,
-    manifest_writer,
-) -> None:
-    manifest_writer.writerow([input_name, save_name, target_filename, split])

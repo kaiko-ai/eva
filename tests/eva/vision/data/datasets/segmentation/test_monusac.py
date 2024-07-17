@@ -32,13 +32,14 @@ def test_sample(
     # assert data sample is a tuple
     sample = monusac_dataset[index]
     assert isinstance(sample, tuple)
-    assert len(sample) == 2
+    assert len(sample) == 3
     # assert the format of the `image` and `mask`
-    image, mask = sample
+    image, mask, metadata = sample
     assert isinstance(image, tv_tensors.Image)
     assert image.shape == (3, expected_height, expected_width)
     assert isinstance(mask, tv_tensors.Mask)
     assert mask.shape == (expected_height, expected_width)
+    assert isinstance(metadata, dict)
 
 
 @pytest.fixture(scope="function")

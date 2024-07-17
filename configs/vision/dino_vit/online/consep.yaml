@@ -18,7 +18,7 @@ trainer:
           filename: best
           save_last: true
           save_top_k: 1
-          monitor: &MONITOR_METRIC ${oc.env:MONITOR_METRIC, val/MeanIoU}
+          monitor: &MONITOR_METRIC ${oc.env:MONITOR_METRIC, val/GeneralizedDiceScore}
           mode: &MONITOR_METRIC_MODE ${oc.env:MONITOR_METRIC_MODE, max}
       - class_path: lightning.pytorch.callbacks.EarlyStopping
         init_args:
@@ -60,9 +60,6 @@ model:
       init_args:
         total_iters: *MAX_STEPS
         power: 0.9
-    # postprocess:
-    #   predictions_transforms:
-    #     - class_path: eva.core.models.modules.utils.transforms.Argmax
     postprocess:
       predictions_transforms:
         - class_path: torch.argmax
@@ -82,7 +79,7 @@ model:
               init_args:
                 num_classes: *NUM_CLASSES
                 input_format: index
-                weight_type: simple
+                weight_type: linear
                 per_class: true
 data:
   class_path: eva.DataModule
