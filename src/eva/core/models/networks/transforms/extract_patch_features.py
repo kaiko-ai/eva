@@ -8,7 +8,7 @@ from transformers import modeling_outputs
 
 
 class ExtractPatchFeatures:
-    """Extracts the patch features a ViT model output."""
+    """Extracts the patch features from a ViT model output."""
 
     def __call__(
         self, tensor: torch.Tensor | modeling_outputs.BaseModelOutputWithPooling
