@@ -39,18 +39,18 @@ NORMALIZE_STD=[0.21716536,0.26081574,0.20723464] \
 eva predict_fit --config configs/vision/dino_vit/offline/<task>.yaml
 ```
 
-## Owkin - iBOT ViT-B16 (TCGA)
+## Phikon (Owkin) - iBOT ViT-B16 (TCGA)
 
 [Owkin](https://www.owkin.com/) released the weights for "Phikon", an FM trained with iBOT on TCGA data, via
 [HuggingFace](https://huggingface.co/owkin/phikon). To evaluate, run:
 
 ```
 EMBEDDINGS_ROOT="./data/embeddings/dino_vitb16_owkin" \
-eva predict_fit --config configs/vision/owkin/phikon/offline/<task>.yaml
+eva predict_fit --config configs/vision/phikon/offline/<task>.yaml
 ```
 
 Note: since *eva* provides the config files to evaluate tasks with the Phikon FM in 
-"configs/vision/owkin/phikon/offline", it is not necessary to set the environment variables needed for
+"configs/vision/phikon/offline", it is not necessary to set the environment variables needed for
 the runs above.
 
 ## UNI - DINOv2 ViT-L16 (Mass-100k)
