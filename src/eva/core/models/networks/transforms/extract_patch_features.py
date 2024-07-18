@@ -24,9 +24,10 @@ class ExtractPatchFeatures:
         """
         if isinstance(tensor, modeling_outputs.BaseModelOutputWithPooling):
             features = tensor.last_hidden_state[:, 1:, :]
-            batch_size, patch_grid, hidden_size = features.shape
+            reshaped_features = features.permute(0, 2, 1)
+            batch_size, hidden_size, patch_grid = reshaped_features.shape
             height = width = int(math.sqrt(patch_grid))
-            patch_embeddings = features.view(batch_size, hidden_size, height, width)
+            patch_embeddings = reshaped_features.view(batch_size, hidden_size, height, width)
         else:
             raise ValueError(f"Unsupported type {type(tensor)}")
 
