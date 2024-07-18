@@ -17,7 +17,7 @@ trainer:
           filename: best
           save_last: true
           save_top_k: 1
-          monitor: &MONITOR_METRIC ${oc.env:MONITOR_METRIC, val/MulticlassJaccardIndex}
+          monitor: &MONITOR_METRIC ${oc.env:MONITOR_METRIC, val/GeneralizedDiceScore}
           mode: &MONITOR_METRIC_MODE ${oc.env:MONITOR_METRIC_MODE, max}
       - class_path: lightning.pytorch.callbacks.EarlyStopping
         init_args:
@@ -69,6 +69,11 @@ model:
       init_args:
         total_iters: *MAX_STEPS
         power: 0.9
+    postprocess:
+      predictions_transforms:
+        - class_path: torch.argmax
+          init_args:
+            dim: 1
     metrics:
       common:
         - class_path: eva.metrics.AverageLoss
@@ -76,13 +81,15 @@ model:
         - class_path: eva.core.metrics.defaults.MulticlassSegmentationMetrics
           init_args:
             num_classes: *NUM_CLASSES
-        - class_path: eva.core.metrics.wrappers.ClasswiseWrapper
+        - class_path: torchmetrics.ClasswiseWrapper
           init_args:
             metric:
-              class_path: torchmetrics.classification.MulticlassF1Score
+              class_path: torchmetrics.segmentation.GeneralizedDiceScore
               init_args:
                 num_classes: *NUM_CLASSES
-                average: null
+                input_format: index
+                weight_type: linear
+                per_class: true
 data:
   class_path: eva.DataModule
   init_args:
