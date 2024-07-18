@@ -5,16 +5,16 @@ import torch
 
 from eva.core.metrics import defaults
 
-NUM_CLASSES_ONE = 3
 NUM_BATCHES = 2
 BATCH_SIZE = 4
 """Test parameters."""
 
-PREDS_ONE = torch.randint(0, 3, (2, 4, 32, 32))
-TARGET_ONE = torch.randint(0, 3, (2, 4, 32, 32))
+NUM_CLASSES_ONE = 3
+PREDS_ONE = torch.randint(0, NUM_CLASSES_ONE, (NUM_BATCHES, BATCH_SIZE, 32, 32))
+TARGET_ONE = torch.randint(0, NUM_CLASSES_ONE, (NUM_BATCHES, BATCH_SIZE, 32, 32))
 EXPECTED_ONE = {
-    "GeneralizedDiceScore": torch.tensor(0.34827983379364014),
-    "MeanIoU": torch.tensor(0.6965596675872803),
+    "GeneralizedDiceScore": torch.tensor(0.3482658863067627),
+    "MeanIoU": torch.tensor(0.2109210342168808),
 }
 """Test features."""
 
@@ -34,7 +34,8 @@ def test_multiclass_segmentation_metrics(
     """Tests the multiclass_segmentation_metrics metric."""
 
     def _calculate_metric() -> None:
-        multiclass_segmentation_metrics.update(preds=preds, target=target)  # type: ignore
+        for batch_preds, batch_target in zip(preds, target, strict=False):
+            multiclass_segmentation_metrics.update(preds=batch_preds, target=batch_target)  # type: ignore
         actual = multiclass_segmentation_metrics.compute()
         torch.testing.assert_close(actual, expected, rtol=1e-04, atol=1e-04)
 
