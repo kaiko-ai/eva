@@ -160,7 +160,7 @@ class LiTS(base.ImageSegmentation):
         return indices
 
     def _get_split_indices(self) -> List[int]:
-        """Returns the samples indices that corresponding the dataset split and version."""
+        """Returns the sample indices for the specified dataset split."""
         split_index_ranges = {
             "train": self._train_index_ranges,
             "val": self._val_index_ranges,
