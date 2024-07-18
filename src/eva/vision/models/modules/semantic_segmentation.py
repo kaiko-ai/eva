@@ -1,11 +1,11 @@
 """"Neural Network Semantic Segmentation Module."""
 
-from typing import Any, Callable, Iterable, Tuple
+from typing import Any, Callable, Iterable, List, Tuple
 
 import torch
 from lightning.pytorch.cli import LRSchedulerCallable, OptimizerCallable
 from lightning.pytorch.utilities.types import STEP_OUTPUT
-from torch import optim
+from torch import nn, optim
 from torch.optim import lr_scheduler
 from typing_extensions import override
 
@@ -13,7 +13,7 @@ from eva.core.metrics import structs as metrics_lib
 from eva.core.models.modules import module
 from eva.core.models.modules.typings import INPUT_BATCH, INPUT_TENSOR_BATCH
 from eva.core.models.modules.utils import batch_postprocess, grad
-from eva.vision.models.networks import decoders, encoders
+from eva.vision.models.networks import decoders
 
 
 class SemanticSegmentationModule(module.ModelModule):
@@ -23,7 +23,7 @@ class SemanticSegmentationModule(module.ModelModule):
         self,
         decoder: decoders.Decoder,
         criterion: Callable[..., torch.Tensor],
-        encoder: encoders.Encoder | None = None,
+        encoder: Callable[[torch.Tensor], List[torch.Tensor]] | None = None,
         lr_multiplier_encoder: float = 0.0,
         optimizer: OptimizerCallable = optim.AdamW,
         lr_scheduler: LRSchedulerCallable = lr_scheduler.ConstantLR,
@@ -111,7 +111,7 @@ class SemanticSegmentationModule(module.ModelModule):
     @override
     def predict_step(self, batch: INPUT_BATCH, *args: Any, **kwargs: Any) -> torch.Tensor:
         tensor = INPUT_BATCH(*batch).data
-        return tensor if self.encoder is None else self.encoder(tensor)
+        return self.encoder(tensor) if isinstance(self.encoder, nn.Module) else tensor
 
     @property
     def _base_lr(self) -> float:
@@ -123,13 +123,13 @@ class SemanticSegmentationModule(module.ModelModule):
         """Returns the trainable parameters of the encoder."""
         return (
             self.encoder.parameters()
-            if self.encoder is not None and self.lr_multiplier_encoder > 0
+            if isinstance(self.encoder, nn.Module) and self.lr_multiplier_encoder > 0
             else iter(())
         )
 
     def _freeze_encoder(self) -> None:
         """If initialized, it freezes the encoder network."""
-        if self.encoder is not None and self.lr_multiplier_encoder == 0:
+        if isinstance(self.encoder, nn.Module) and self.lr_multiplier_encoder == 0:
             grad.deactivate_requires_grad(self.encoder)
 
     def _batch_step(self, batch: INPUT_TENSOR_BATCH) -> STEP_OUTPUT:

@@ -46,7 +46,7 @@ class LinearDecoder(decoder.Decoder):
             A tensor of shape (batch_size, hidden_size, n_patches_height,
             n_patches_width) which is feature map of the decoder head.
         """
-        if not isinstance(features, list) and features[0].ndim != 4:
+        if not isinstance(features, list) or features[0].ndim != 4:
             raise ValueError(
                 "Input features should be a list of four (4) dimensional inputs of "
                 "shape (batch_size, hidden_size, n_patches_height, n_patches_width)."
