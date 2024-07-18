@@ -1,6 +1,6 @@
 """Tests the BatchPostProcess module."""
 
-from typing import Dict, List
+from typing import Any, Dict, List
 
 import pytest
 import torch
@@ -53,8 +53,8 @@ def test_batch_postprocess_call(
 
 @pytest.fixture(scope="function")
 def processes(
-    targets_transforms: List[batch_postprocess.Transform] | None,
-    predictions_transforms: List[batch_postprocess.Transform] | None,
+    targets_transforms: List[batch_postprocess.Transform | Dict[str, Any]] | None,
+    predictions_transforms: List[batch_postprocess.Transform | Dict[str, Any]] | None,
 ) -> batch_postprocess.BatchPostProcess:
     """Returns a BatchPostProcess fixture."""
     return batch_postprocess.BatchPostProcess(
