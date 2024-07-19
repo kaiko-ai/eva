@@ -16,15 +16,15 @@ class Mask2formerDecoder(decoder.Decoder):
         self,
         in_features: int,
         num_classes: int,
+        embed_dim: int = 256,
         num_queries: int = 100,
         num_attn_heads: int = 8,
         num_blocks: int = 9,
-        embed_dim: int = 256,
     ) -> None:
         """Initializes the decoder.
 
         Args:
-            in_features: Number of input features.
+            in_features: The hidden dimension size of the embeddings.
             num_classes: Number of output classes.
             num_queries: Number of query embeddings.
             num_attn_heads: Number of attention heads.
@@ -33,13 +33,17 @@ class Mask2formerDecoder(decoder.Decoder):
         """
         super().__init__()
 
+        self._in_features = in_features
         self._num_classes = num_classes
+        self._embed_dim = embed_dim
         self._num_queries = num_queries
         self._num_attn_heads = num_attn_heads
         self._num_blocks = num_blocks
-        self._embed_dim = embed_dim
 
-        self.projection_layer = nn.Linear(in_features, self._embed_dim)
+        self.projection_layer = nn.Sequential(
+            nn.Conv2d(self._in_features, self._embed_dim, kernel_size=1),
+            nn.GroupNorm(32, self._embed_dim),
+        )
         self.q = nn.Embedding(self._num_queries, self._embed_dim)
         self.k_embed_pos = modeling_mask2former.Mask2FormerSinePositionEmbedding(
             num_pos_feats=self._embed_dim // 2, normalize=True
@@ -77,22 +81,21 @@ class Mask2formerDecoder(decoder.Decoder):
         attn_mask[torch.where(attn_mask.sum(-1) == attn_mask.shape[-1])] = False
         return attn_mask, mask_logits, class_logits
 
-    def forward(self, tensor: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
+    def forward(self, patch_embeddings: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
         """Forward pass for the Mask2formerDecoder.
 
         Args:
-            tensor: Input tensor of shape (batch_size, in_features, height, width).
+            tensor: Input tensor of shape (batch_size, hidden_size, height, width).
 
         Returns:
             Mask logits and class logits per layer.
         """
-        x = self.projection_layer(tensor)
+        x = self.projection_layer(patch_embeddings)
 
         q = self.q.weight
         q = q[:, None, :].repeat(1, x.shape[0], 1)
+        v = x.view(self._embed_dim, x.shape[0], -1).transpose(0, 2)
 
-        v = x.transpose(0, 1)
-        x = x.transpose(1, 2).reshape(x.shape[0], -1, *self.grid_size)
         k = v + self.k_embed_pos(x).flatten(2).permute(2, 0, 1)
 
         q_pos_embeds = self.q_pos_embed.weight
@@ -120,8 +123,8 @@ class DecoderBlock(nn.Module):
 
     def __init__(
         self,
-        embed_dim: int,
-        num_attn_heads: int,
+        embed_dim: int = 256,
+        num_attn_heads: int = 8,
         decoder_ff_dim: int = 2048,
     ) -> None:
         """Initialize the decoder black.
@@ -192,7 +195,9 @@ class DecoderBlock(nn.Module):
         residual = q
         q, _ = self._self_attn(
             hidden_states=q,
-            position_embeddings=(q_pos_embeds or torch.zeros_like(q)),
+            position_embeddings=(
+                torch.zeros_like(q) if q_pos_embeds is None else q_pos_embeds
+            )
         )
         q = q + residual
         q = self._self_attn_norm(q)
