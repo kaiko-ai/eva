@@ -18,16 +18,19 @@ class MeanIoU(torchmetrics.Metric):
         num_classes: int,
         include_background: bool = True,
         input_format: Literal["one-hot", "index"] = "one-hot",
+        ignore_index: int | None = None,
         per_class: bool = False,
         **kwargs: Any,
     ) -> None:
-        """Initializes the metrics.
+        """Initializes the metric.
 
         Args:
             num_classes: The number of classes in the segmentation problem.
             include_background: Whether to include the background class in the computation
             input_format: What kind of input the function receives. Choose between ``"one-hot"``
                 for one-hot encoded tensors or ``"index"`` for index tensors.
+            ignore_index: Integer specifying a target class to ignore. If given, this class
+                index does not contribute to the returned score, regardless of reduction method.
             per_class: Whether to compute the IoU for each class separately. If set to ``False``,
                 the metric will compute the mean IoU over all classes.
             kwargs: Additional keyword arguments, see :ref:`Metric kwargs` for more info.
@@ -37,6 +40,7 @@ class MeanIoU(torchmetrics.Metric):
         self.num_classes = num_classes
         self.include_background = include_background
         self.input_format = input_format
+        self.ignore_index = ignore_index
         self.per_class = per_class
 
         self.add_state("intersection", default=torch.zeros(num_classes), dist_reduce_fx="sum")
@@ -45,7 +49,12 @@ class MeanIoU(torchmetrics.Metric):
     def update(self, preds: torch.Tensor, target: torch.Tensor) -> None:
         """Update the state with the new data."""
         intersection, union = _compute_intersection_and_union(
-            preds, target, self.num_classes, self.include_background, self.input_format  # type: ignore
+            preds,
+            target,
+            num_classes=self.num_classes,
+            include_background=self.include_background,
+            input_format=self.input_format,  # type: ignore
+            ignore_index=self.ignore_index,
         )
         self.intersection += intersection.sum(0)
         self.union += union.sum(0)
@@ -69,6 +78,7 @@ def _compute_intersection_and_union(
     num_classes: int,
     include_background: bool = False,
     input_format: Literal["one-hot", "index"] = "one-hot",
+    ignore_index: int | None = None,
 ) -> Tuple[torch.Tensor, torch.Tensor]:
     """Compute the intersection and union for semantic segmentation tasks.
 
@@ -79,6 +89,8 @@ def _compute_intersection_and_union(
         num_classes: Number of classes in the segmentation task.
         include_background: Whether to include the background class in the computation.
         input_format: Format of the input tensors.
+        ignore_index: Integer specifying a target class to ignore. If given, this class
+            index does not contribute to the returned score, regardless of reduction method.
 
     Returns:
         Two tensors representing the intersection and union for each class.
@@ -89,6 +101,12 @@ def _compute_intersection_and_union(
         - If include_background is `False`, the background class
           (assumed to be the first channel) is ignored in the computation.
     """
+    if ignore_index is not None:
+        mask = target != ignore_index
+        mask = mask.all(dim=-1, keepdim=True)
+        preds = preds * mask
+        target = target * mask
+
     if input_format == "index":
         preds = torch.nn.functional.one_hot(preds, num_classes=num_classes)
         target = torch.nn.functional.one_hot(target, num_classes=num_classes)

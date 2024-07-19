@@ -52,9 +52,11 @@ model:
       class_path: eva.vision.models.networks.decoders.segmentation.ConvDecoderMS
       init_args:
         in_features: ${oc.env:DECODER_IN_FEATURES, 384}
-        num_classes:  &NUM_CLASSES 8
-    criterion: torch.nn.CrossEntropyLoss
-    lr_multiplier_encoder: 0.0
+        num_classes:  &NUM_CLASSES 5
+    criterion:
+      class_path: torch.nn.CrossEntropyLoss
+      init_args:
+        ignore_index: &IGNORE_INDEX 255
     optimizer:
       class_path: torch.optim.AdamW
       init_args:
@@ -77,15 +79,17 @@ model:
         - class_path: eva.core.metrics.defaults.MulticlassSegmentationMetrics
           init_args:
             num_classes: *NUM_CLASSES
+            ignore_index: *IGNORE_INDEX
         - class_path: torchmetrics.ClasswiseWrapper
           init_args:
             metric:
-              class_path: torchmetrics.segmentation.GeneralizedDiceScore
+              class_path: eva.core.metrics.GeneralizedDiceScore
               init_args:
                 num_classes: *NUM_CLASSES
                 input_format: index
                 weight_type: linear
                 per_class: true
+                ignore_index: *IGNORE_INDEX
 data:
   class_path: eva.DataModule
   init_args:

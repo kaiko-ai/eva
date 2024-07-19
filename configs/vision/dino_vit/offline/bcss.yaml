@@ -84,7 +84,7 @@ model:
         - class_path: torchmetrics.ClasswiseWrapper
           init_args:
             metric:
-              class_path: torchmetrics.segmentation.GeneralizedDiceScore
+              class_path: eva.core.metrics.GeneralizedDiceScore
               init_args:
                 num_classes: *NUM_CLASSES
                 input_format: index
