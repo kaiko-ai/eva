@@ -2440,7 +2440,7 @@ version = "1.0.8.dev0"
 requires_python = ">=3.8"
 git = "https://github.com/huggingface/pytorch-image-models.git"
 ref = "main"
-revision = "7160af4a24915c1670748728506fe41dad4bb199"
+revision = "a1996ec0f43dc7fcc053de7048be6a51cff2ee08"
 summary = "PyTorch Image Models"
 groups = ["all", "vision"]
 dependencies = [
@@ -2597,7 +2597,7 @@ name = "torchmetrics"
 version = "1.5.0.dev0"
 requires_python = ">=3.8"
 git = "https://github.com/Lightning-AI/torchmetrics.git"
-revision = "30b3fd594da431a1584e967cb1c7b602df2859ff"
+revision = "55f036e9f55fdd98a895f743fe18d9d35e96a9b9"
 summary = "PyTorch native Metrics"
 groups = ["default"]
 dependencies = [
