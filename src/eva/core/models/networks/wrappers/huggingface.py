@@ -25,6 +25,7 @@ class HuggingFaceModel(base.BaseModel):
         super().__init__(tensor_transforms=tensor_transforms)
 
         self._model_name_or_path = model_name_or_path
+
         self._model = self.load_model()
 
     @override

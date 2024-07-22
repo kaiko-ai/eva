@@ -36,12 +36,12 @@ from tests.eva import _cli
         "configs/vision/dino_vit/offline/patch_camelyon.yaml",
         "configs/vision/dino_vit/offline/total_segmentator_2d.yaml",
         # phikon online
-        "configs/vision/owkin/phikon/offline/bach.yaml",
-        "configs/vision/owkin/phikon/offline/camelyon16.yaml",
-        "configs/vision/owkin/phikon/offline/crc.yaml",
-        "configs/vision/owkin/phikon/offline/mhist.yaml",
-        "configs/vision/owkin/phikon/offline/panda.yaml",
-        "configs/vision/owkin/phikon/offline/patch_camelyon.yaml",
+        "configs/vision/phikon/offline/bach.yaml",
+        "configs/vision/phikon/offline/camelyon16.yaml",
+        "configs/vision/phikon/offline/crc.yaml",
+        "configs/vision/phikon/offline/mhist.yaml",
+        "configs/vision/phikon/offline/panda.yaml",
+        "configs/vision/phikon/offline/patch_camelyon.yaml",
     ],
 )
 def test_configuration_initialization(configuration_file: str, lib_path: str) -> None:

@@ -3,7 +3,7 @@ trainer:
   class_path: eva.Trainer
   init_args:
     n_runs: &N_RUNS ${oc.env:N_RUNS, 5}
-    default_root_dir: &OUTPUT_ROOT ${oc.env:OUTPUT_ROOT, logs/owkin/phikon/offline/camelyon16}
+    default_root_dir: &OUTPUT_ROOT ${oc.env:OUTPUT_ROOT, logs/phikon/offline/camelyon16}
     max_epochs: &MAX_EPOCHS ${oc.env:MAX_EPOCHS, 100}
     callbacks:
       - class_path: lightning.pytorch.callbacks.LearningRateMonitor
@@ -24,7 +24,7 @@ trainer:
           mode: *MONITOR_METRIC_MODE
       - class_path: eva.callbacks.ClassificationEmbeddingsWriter
         init_args:
-          output_dir: &DATASET_EMBEDDINGS_ROOT ${oc.env:EMBEDDINGS_ROOT, ./data/embeddings/owkin/phikon/camelyon16}
+          output_dir: &DATASET_EMBEDDINGS_ROOT ${oc.env:EMBEDDINGS_ROOT, ./data/embeddings/phikon/camelyon16}
           save_every_n: 10_000
           dataloader_idx_map:
             0: train
