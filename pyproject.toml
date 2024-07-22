@@ -36,7 +36,7 @@ requires-python = ">=3.10"
 dependencies = [
     "torch==2.3.0",
     "lightning>=2.2.2",
-    "jsonargparse[omegaconf]==4.31.0",
+    "jsonargparse[omegaconf]==4.32.0",
     "tensorboard>=2.16.2",
     "loguru>=0.7.2",
     "pandas>=2.2.0",
