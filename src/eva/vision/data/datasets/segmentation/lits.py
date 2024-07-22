@@ -71,7 +71,7 @@ class LiTS(base.ImageSegmentation):
     @property
     @override
     def classes(self) -> List[str]:
-        return ["liver", "tumor"]
+        return ["background", "liver", "tumor"]
 
     @functools.cached_property
     @override
