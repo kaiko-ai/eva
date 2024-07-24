@@ -27,7 +27,7 @@ class SegmentationEmbeddingsWriter(base.EmbeddingsWriter):
         overwrite: bool = False,
     ) -> None:
         manifest_manager = ManifestManager(output_dir, metadata_keys, overwrite)
-        counter = collections.defaultdict(int)
+        counter = collections.defaultdict(lambda: -1)
         while True:
             item = write_queue.get()
             if item is None:
@@ -36,13 +36,13 @@ class SegmentationEmbeddingsWriter(base.EmbeddingsWriter):
             embeddings_buffer, target_buffer, input_name, save_name, split, metadata = QUEUE_ITEM(
                 *item
             )
+            counter[save_name] += 1
             save_name = save_name.replace(".pt", f"-{counter[save_name]}.pt")
             target_filename = save_name.replace(".pt", "-mask.pt")
 
             _save_embedding(embeddings_buffer, save_name, output_dir)
             _save_embedding(target_buffer, target_filename, output_dir)
             manifest_manager.update(input_name, save_name, target_filename, split, metadata)
-            counter[save_name] += 1
 
         manifest_manager.close()
 
