@@ -61,7 +61,8 @@ Supported datasets & tasks include:
 
 *Radiology datasets*
 
--	**[TotalSegmentator](datasets/total_segmentator.md)**: radiology/CT-scan for segmentation of anatomical structures (*support coming soon*)
+-	**[TotalSegmentator](datasets/total_segmentator.md)**: radiology/CT-scan for segmentation of anatomical structures
+-	**[LiTS](datasets/lits.md)**: radiology/CT-scan for segmentation of liver and tumor
 
 To evaluate FMs, *eva* provides support for different model-formats, including models trained with PyTorch, models available on HuggingFace and ONNX-models. For other formats custom wrappers can be implemented.
 

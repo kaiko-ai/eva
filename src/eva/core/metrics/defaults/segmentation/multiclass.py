@@ -2,9 +2,7 @@
 
 from typing import Literal
 
-from torchmetrics import segmentation
-
-from eva.core.metrics import mean_iou, structs
+from eva.core.metrics import generalized_dice, mean_iou, structs
 
 
 class MulticlassSegmentationMetrics(structs.MetricCollection):
@@ -15,6 +13,7 @@ class MulticlassSegmentationMetrics(structs.MetricCollection):
         num_classes: int,
         include_background: bool = False,
         input_format: Literal["one-hot", "index"] = "index",
+        ignore_index: int | None = None,
         prefix: str | None = None,
         postfix: str | None = None,
     ) -> None:
@@ -26,21 +25,25 @@ class MulticlassSegmentationMetrics(structs.MetricCollection):
             input_format: What kind of input the metrics should expect. With `"one-hot"` it would
                 expect a stack of binary masks, one for each class and for with `"index"` a 2D mask
                 where each pixel is annotated with the class ID.
+            ignore_index: Integer specifying a target class to ignore. If given, this class
+                index does not contribute to the returned score, regardless of reduction method.
             prefix: A string to add before the keys in the output dictionary.
             postfix: A string to add after the keys in the output dictionary.
         """
         super().__init__(
             metrics=[
-                segmentation.GeneralizedDiceScore(
+                generalized_dice.GeneralizedDiceScore(
                     num_classes=num_classes,
                     include_background=include_background,
                     input_format=input_format,
                     weight_type="linear",
+                    ignore_index=ignore_index,
                 ),
                 mean_iou.MeanIoU(
                     num_classes=num_classes,
                     include_background=include_background,
                     input_format=input_format,
+                    ignore_index=ignore_index,
                 ),
             ],
             prefix=prefix,
