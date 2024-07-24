@@ -29,6 +29,7 @@
 
 | Dataset | #Images | Image Size | Task  | Download provided
 |---|---|---|---|---|
-| [TotalSegmentator](total_segmentator.md) | 1228 | ~300 x ~300 x ~350 \* |  Multilabel Classification (117 classes) | Yes |
+| [TotalSegmentator](total_segmentator.md) | 1228 | ~300 x ~300 x ~350 \* |  Semantic Segmentation (117 classes) | Yes |
+| [LiTS](lits.md) | 131 (58638) | ~300 x ~300 x ~350 \* |  Semantic Segmentation (2 classes) | No |
 
 \* 3D images of varying sizes
