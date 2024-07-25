@@ -7,10 +7,10 @@ from torch import nn
 from torch.nn import functional
 from transformers.models.mask2former import modeling_mask2former
 
-from eva.vision.models.networks.decoders import decoder
+from eva.vision.models.networks.decoders.segmentation.mask2former import decoder_block
 
 
-class Mask2formerDecoder(decoder.Decoder):
+class Mask2Former(nn.Module):
     """Mask2Former decoder for segmentation tasks using a transformer architecture."""
 
     def __init__(
@@ -50,7 +50,10 @@ class Mask2formerDecoder(decoder.Decoder):
             num_pos_feats=self._embed_dim // 2, normalize=True
         )
         self.transformer_decoder = nn.ModuleList(
-            [DecoderBlock(self._embed_dim, self._num_attn_heads) for _ in range(num_blocks)]
+            [
+                decoder_block.DecoderBlock(self._embed_dim, self._num_attn_heads)
+                for _ in range(num_blocks)
+            ]
         )
         self.q_pos_embed = nn.Embedding(self._num_queries, self._embed_dim)
         self.q_norm = nn.LayerNorm(self._embed_dim)
@@ -107,7 +110,13 @@ class Mask2formerDecoder(decoder.Decoder):
                 (batch_size, hidden_size, n_patches_height, n_patches_width).
 
         Returns:
-            The mask and class logits per layer.
+            The mask and class logits per layer. Specifically:
+                mask_logits_per_layer: A list, of length equal to the number of
+                    output classes, of the mask logits per layer, each of shape
+                    (batch_size, num_queries, patch_height, patch_width).
+                class_logits_per_layer: A list, of length equal to the number of
+                    output classes, of the class logits per layer, each of shape
+                    (batch_size, num_queries, num_classes).
         """
         x = self.projection_layer(patch_embeddings)
 
@@ -154,19 +163,22 @@ class Mask2formerDecoder(decoder.Decoder):
         return attn_mask, mask_logits, class_logits
 
     def forward(
-        self,
-        features: List[torch.Tensor],
-        output_size: Tuple[int, int],
-    ) -> torch.Tensor:
+        self, features: List[torch.Tensor]
+    ) -> Tuple[List[torch.Tensor], List[torch.Tensor]]:
         """Forward pass for the Mask2formerDecoder.
 
         Args:
             features: A list of multi-level patch embeddings of shape
                 (batch_size, hidden_size, path_height, path_width).
-            output_size: The target mask size (height, width).
 
         Returns:
-            Mask logits and class logits per layer.
+            A tuple of the following items:
+                mask_logits_per_layer: A list, of length equal to the number of
+                    output classes, of the mask logits per layer, each of shape
+                    (batch_size, num_queries, patch_height, patch_width).
+                class_logits_per_layer: A list, of length equal to the number of
+                    output classes, of the class logits per layer, each of shape
+                    (batch_size, num_queries, num_classes).
         """
         patch_embeddings = self._forward_features(features)
         return self._forward_head(patch_embeddings)
