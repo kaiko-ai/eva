@@ -53,12 +53,15 @@ model:
       init_args:
         in_features: ${oc.env:DECODER_IN_FEATURES, 384}
         num_classes:  &NUM_CLASSES 3
-    criterion: torch.nn.CrossEntropyLoss
+    criterion:
+      class_path: eva.vision.losses.DiceLoss
+      init_args:
+        softmax: true
+        batch: true
     optimizer:
       class_path: torch.optim.AdamW
       init_args:
-        lr: 0.001
-        weight_decay: 0.01
+        lr: 0.002
     lr_scheduler:
       class_path: torch.optim.lr_scheduler.PolynomialLR
       init_args:
