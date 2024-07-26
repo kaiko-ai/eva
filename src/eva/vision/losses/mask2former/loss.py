@@ -11,27 +11,27 @@ from eva.vision.losses.mask2former import matcher
 class Mask2formerLoss(modeling_mask2former.Mask2FormerLoss):
     def __init__(
         self,
-        num_points: int,
-        oversample_ratio: float,
-        importance_sample_ratio: float,
-        mask_coefficient: float,
-        dice_coefficient: float,
-        class_coefficient: float | None = None,
-        num_labels: int | None = None,
-        no_object_coefficient: float | None = None,
+        num_labels: int,
+        num_points: int = 12544,
+        oversample_ratio: float = 3.0,
+        importance_sample_ratio: float = 0.75,
+        mask_coefficient: float = 5.0,
+        dice_coefficient: float = 5.0,
+        class_coefficient: float | None = 2.0,
+        no_object_coefficient: float | None = 0.1,
     ) -> None:
         nn.Module.__init__(self)
 
+        self.num_labels = num_labels
         self.num_points = num_points
         self.oversample_ratio = oversample_ratio
         self.importance_sample_ratio = importance_sample_ratio
         self.mask_coefficient = mask_coefficient
         self.dice_coefficient = dice_coefficient
         self.class_coefficient = class_coefficient
+        self.no_object_coefficient = self.eos_coef = no_object_coefficient
 
-        if num_labels is not None:
-            self.num_labels = num_labels
-            self.eos_coef = no_object_coefficient
+        if self.num_labels is not None:
             empty_weight = torch.ones(self.num_labels + 1)
             empty_weight[-1] = self.eos_coef  # type: ignore
             self.register_buffer("empty_weight", empty_weight)
@@ -47,11 +47,20 @@ class Mask2formerLoss(modeling_mask2former.Mask2FormerLoss):
     def forward(
         self,
         masks_queries_logits: torch.Tensor,
-        targets: List[dict],
+        mask_labels: List[torch.Tensor],
         class_queries_logits: torch.Tensor | None = None,
+        class_labels: List[torch.Tensor] | None = None,
     ):
-        mask_labels = [target["masks"].half() for target in targets]
-        class_labels = [target["labels"].long() for target in targets]
+        """Smthing.
+
+        Args:
+            masks_queries_logits: A tensor of shape `(batch_size, num_queries, height, width)`.
+            mask_labels: List of mask labels of shape `(labels, height, width)`.
+            class_queries_logits: A tensor of shape `(batch_size, num_queries, num_labels)`.
+            class_labels: List of class labels of shape `(labels)`.
+        """
+        mask_labels = [mask.float() for mask in mask_labels]
+        class_labels = [label.long() for label in class_labels]
 
         indices = self.matcher(
             masks_queries_logits=masks_queries_logits,

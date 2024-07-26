@@ -7,26 +7,51 @@ from transformers.models.mask2former import modeling_mask2former
 
 
 class Mask2formerMatcher(nn.Module):
+    """Compute the matching cost between predicted masks and target masks.
+
+    It is used to find the optimal assignment using the Hungarian algorithm.
+    """
+
     def __init__(
         self,
-        num_points: int,
-        mask_coefficient: float,
-        dice_coefficient: float,
+        num_points: int = 12544,
+        mask_coefficient: float = 5.0,
+        dice_coefficient: float = 5.0,
         class_coefficient: float | None = None,
     ) -> None:
+        """Initializes the Mask2formerMatcher.
+
+        Args:
+            num_points: Number of points to sample from masks.
+            mask_coefficient: Weight for the mask loss component.
+            dice_coefficient: Weight for the dice loss component.
+            class_coefficient: Weight for the class loss component.
+                If `None`, class loss is not used.
+        """
         super().__init__()
-        self.num_points = num_points
-        self.mask_coefficient = mask_coefficient
-        self.dice_coefficient = dice_coefficient
-        self.class_coefficient = class_coefficient
+
+        self._num_points = num_points
+        self._mask_coefficient = mask_coefficient
+        self._dice_coefficient = dice_coefficient
+        self._class_coefficient = class_coefficient
 
     def create_cost_matrix(
         self,
-        pred_mask,
-        target_mask,
-        cost_class=None,
-    ):
-        point_coordinates = torch.rand(1, self.num_points, 2, device=pred_mask.device)
+        pred_mask: torch.Tensor,
+        target_mask: torch.Tensor,
+        cost_class: torch.Tensor | None = None,
+    ) -> torch.Tensor:
+        """Creates the cost matrix for the matching process.
+
+        Args:
+            pred_mask: Predicted masks.
+            target_mask: Ground truth masks.
+            cost_class: Class cost matrix.
+
+        Returns:
+            The computed cost matrix.
+        """
+        point_coordinates = torch.rand(1, self._num_points, 2, device=pred_mask.device)
         target_coordinates = point_coordinates.repeat(target_mask.shape[0], 1, 1)
         target_mask = modeling_mask2former.sample_point(
             target_mask, target_coordinates, align_corners=False
@@ -42,9 +67,9 @@ class Mask2formerMatcher(nn.Module):
         )
         cost_dice = modeling_mask2former.pair_wise_dice_loss(pred_mask, target_mask)
 
-        cost_matrix = self.mask_coefficient * cost_mask + self.dice_coefficient * cost_dice
+        cost_matrix = self._mask_coefficient * cost_mask + self._dice_coefficient * cost_dice
         if cost_class is not None:
-            cost_matrix += self.class_coefficient * cost_class
+            cost_matrix += self._class_coefficient * cost_class
 
         return cost_matrix
 
@@ -56,6 +81,18 @@ class Mask2formerMatcher(nn.Module):
         class_queries_logits: torch.Tensor | None = None,
         class_labels: List[torch.Tensor] | None = None,
     ) -> List[Tuple[torch.Tensor, torch.Tensor]]:
+        """Forward method to compute the optimal matching between predictions and ground truths.
+
+        Args:
+            masks_queries_logits: A tensor of shape `(batch_size, num_queries, height, width)`.
+            mask_labels: List of mask labels of shape `(num_classes, height, width)`.
+            class_queries_logits: A tensor of shape `(batch_size, num_queries, num_labels)`.
+            class_labels: List of target class labels of shape `(labels)`. They identify the
+                labels of `mask_labels`, e.g. the label of `mask_labels[i][j]` if `class_labels[i][j]`.
+
+        Returns:
+            A list of tuples containing matched indices.
+        """
         indices_list = []
         batch_size = masks_queries_logits.shape[0]
 
@@ -70,8 +107,7 @@ class Mask2formerMatcher(nn.Module):
                 cost_class = -pred_probs[:, class_labels[i]]
 
             cost_matrix = self.create_cost_matrix(pred_mask, target_mask, cost_class)
-            cost_matrix = torch.minimum(cost_matrix, torch.tensor(1e10))
-            cost_matrix = torch.maximum(cost_matrix, torch.tensor(-1e10))
+            cost_matrix = torch.clamp(cost_matrix, min=-1e10, max=1e10)
             i_indices, j_indices = linear_sum_assignment(cost_matrix.cpu())
 
             indices_list.append((i_indices, j_indices))

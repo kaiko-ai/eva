@@ -62,7 +62,7 @@ class Mask2Former(nn.Module):
             hidden_dim=self._embed_dim,
             output_dim=self._embed_dim,
         )
-        self.q_class = nn.Linear(self._embed_dim, self._num_classes)
+        self.q_class = nn.Linear(self._embed_dim, self._num_classes + 1)
 
     def _forward_features(self, features: List[torch.Tensor]) -> torch.Tensor:
         """Forward function for multi-level feature maps to a single one.
@@ -100,10 +100,10 @@ class Mask2Former(nn.Module):
         ]
         return torch.cat(upsampled_features, dim=1)
 
-    def _forward_head(
+    def _forward_decoder_layers(
         self, patch_embeddings: torch.Tensor
     ) -> Tuple[List[torch.Tensor], List[torch.Tensor]]:
-        """Forward of the decoder head.
+        """Forward of the decoder head layers.
 
         Args:
             patch_embeddings: The patch embeddings tensor of shape
@@ -131,22 +131,22 @@ class Mask2Former(nn.Module):
 
         mask_logits_per_layer, class_logits_per_layer = [], []
         for block in self.transformer_decoder:
-            attn_mask, mask_logits, class_logits = self._predict(q, x)
+            attn_mask, mask_logits, class_logits = self._compute_logits_and_attention_mask(q, x)
             mask_logits_per_layer.append(mask_logits)
             class_logits_per_layer.append(class_logits)
             q = block(q, k, v, q_pos_embeds, attn_mask)
 
-        _, mask_logits, class_logits = self._predict(q, x)
+        _, mask_logits, class_logits = self._compute_logits_and_attention_mask(q, x)
         mask_logits_per_layer.append(mask_logits)
         class_logits_per_layer.append(class_logits)
         return mask_logits_per_layer, class_logits_per_layer
 
-    def _predict(
+    def _compute_logits_and_attention_mask(
         self,
         q: torch.Tensor,
         x: torch.Tensor,
     ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
-        """Helper function to perform prediction.
+        """Helper building block.
 
         Args:
             q: Query tensor.
@@ -162,8 +162,49 @@ class Mask2Former(nn.Module):
         attn_mask[torch.where(attn_mask.sum(-1) == attn_mask.shape[-1])] = False
         return attn_mask, mask_logits, class_logits
 
+    def _cls_seg(
+        self,
+        mask_logits_per_layer: List[torch.Tensor],
+        class_logits_per_layer: List[torch.Tensor],
+        output_size: Tuple[int, int],
+    ) -> torch.Tensor:
+        """Classify each pixel of the input image.
+
+        Args:
+            mask_logits_per_layer: A list, of length equal to the number of
+                output classes, of the mask logits per layer, each of shape
+                (batch_size, num_queries, patch_height, patch_width).
+            class_logits_per_layer: A list, of length equal to the number of
+                output classes, of the class logits per layer, each of shape
+                (batch_size, num_queries, num_classes).
+            output_size: The target mask size (height, width).
+
+        Returns:
+            Tensor containing scores for all of the classes with shape
+            (batch_size, n_classes, mask_height, mask_width).
+        """
+        semantic_one_hot_mask = torch.zeros(
+            mask_logits_per_layer[0].size(0),
+            self._num_classes,
+            *output_size,
+            device=mask_logits_per_layer[0].device,
+        )
+        for mask_logits, class_logits in zip(
+            mask_logits_per_layer, class_logits_per_layer, strict=True
+        ):
+            pixel_logits_semantic = torch.einsum(
+                "bqhw, bqc -> bchw",
+                mask_logits.sigmoid(),
+                class_logits.softmax(dim=-1)[..., :-1],  # drop the dummy class
+            )
+            semantic_one_hot_mask += functional.interpolate(
+                pixel_logits_semantic, output_size, mode="bilinear", align_corners=False
+            )
+        return semantic_one_hot_mask
+
     def forward(
-        self, features: List[torch.Tensor]
+        self,
+        features: List[torch.Tensor],
     ) -> Tuple[List[torch.Tensor], List[torch.Tensor]]:
         """Forward pass for the Mask2formerDecoder.
 
@@ -181,4 +222,4 @@ class Mask2Former(nn.Module):
                     (batch_size, num_queries, num_classes).
         """
         patch_embeddings = self._forward_features(features)
-        return self._forward_head(patch_embeddings)
+        return self._forward_decoder_layers(patch_embeddings)

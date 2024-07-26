@@ -17,7 +17,7 @@ from eva.vision.models.networks import decoders
 
 
 class Mask2FormerModule(module.ModelModule):
-    """Neural network semantic segmentation module for training on patch embeddings."""
+    """Mask2Former semantic segmentation module."""
 
     def __init__(
         self,
@@ -98,7 +98,15 @@ class Mask2FormerModule(module.ModelModule):
 
     @override
     def training_step(self, batch: INPUT_TENSOR_BATCH, *args: Any, **kwargs: Any) -> STEP_OUTPUT:
-        return self._batch_step(batch)
+        data, targets, metadata = INPUT_TENSOR_BATCH(*batch)
+        predictions = self(data, to_size=targets.shape[-2:])
+        loss = self.criterion(predictions, targets)
+        return {
+            "loss": loss,
+            "targets": targets,
+            "predictions": predictions,
+            "metadata": metadata,
+        }
 
     @override
     def validation_step(self, batch: INPUT_TENSOR_BATCH, *args: Any, **kwargs: Any) -> STEP_OUTPUT:
