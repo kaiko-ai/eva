@@ -40,9 +40,11 @@ matcher = Mask2formerMatcher()
 
 mask_logits_per_layer, class_logits_per_layer = decoder(features)
 
-out = loss.forward(mask_logits_per_layer[0], mask_labels, class_logits_per_layer[0], class_labels)
+out = loss._layer_loss(mask_logits_per_layer[0], mask_labels, class_logits_per_layer[0], class_labels)
 print(out)
 
+out = loss.forward(mask_logits_per_layer, mask_labels, class_logits_per_layer, class_labels)
+print(out)
 
 # semantic label: (h,w)
 # one-hot: (n,h,w)

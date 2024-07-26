@@ -43,15 +43,14 @@ class Mask2formerLoss(modeling_mask2former.Mask2FormerLoss):
             class_coefficient=class_coefficient,
         )
 
-    @torch.compiler.disable
-    def forward(
+    def _layer_loss(
         self,
         masks_queries_logits: torch.Tensor,
         mask_labels: List[torch.Tensor],
         class_queries_logits: torch.Tensor | None = None,
         class_labels: List[torch.Tensor] | None = None,
     ):
-        """Smthing.
+        """Computes the loss of a single layer.
 
         Args:
             masks_queries_logits: A tensor of shape `(batch_size, num_queries, height, width)`.
@@ -90,25 +89,27 @@ class Mask2formerLoss(modeling_mask2former.Mask2FormerLoss):
 
         return {**loss_masks, **loss_classes}
 
-    def loss_total(self, losses_all_layers, log_fn) -> torch.Tensor:
-        loss_total = None
-        for loss_key, loss in losses_all_layers.items():
-            log_fn(f"train_{loss_key}", loss, sync_dist=True)
-
-            if "mask" in loss_key:
-                weighted_loss = loss * self.mask_coefficient
-            elif "dice" in loss_key:
-                weighted_loss = loss * self.dice_coefficient
-            elif "cross_entropy" in loss_key:
-                weighted_loss = loss * self.class_coefficient
+    @torch.compiler.disable
+    def forward(
+        self,
+        masks_queries_logits: List[torch.Tensor],
+        mask_labels: List[torch.Tensor],
+        class_queries_logits: List[torch.Tensor] | None = None,
+        class_labels: List[torch.Tensor] | None = None,
+    ) -> torch.Tensor:
+        total_loss = None
+        for masks_queries, class_queries in zip(masks_queries_logits, class_queries_logits, strict=False):
+            loss = self._layer_loss(
+                masks_queries, mask_labels, class_queries, class_labels
+            )
+            weighted_loss = (
+                loss.get("loss_mask", 0) * self.mask_coefficient
+                + loss.get("loss_dice", 0) * self.dice_coefficient
+                + loss.get("loss_cross_entropy", 0) * self.class_coefficient
+            )
+            if total_loss is None:
+                total_loss = weighted_loss
             else:
-                raise ValueError(f"Unknown loss key: {loss_key}")
+                total_loss = torch.add(total_loss, weighted_loss)
 
-            if loss_total is None:
-                loss_total = weighted_loss
-            else:
-                loss_total = torch.add(loss_total, weighted_loss)
-
-        log_fn("train_loss_total", loss_total, sync_dist=True, prog_bar=True)
-
-        return loss_total  # type: ignore
+        return total_loss
