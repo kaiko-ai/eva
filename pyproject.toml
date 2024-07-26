@@ -68,6 +68,7 @@ vision = [
     "scikit-image>=0.24.0",
     "imagesize>=1.4.1",
     "scipy>=1.14.0",
+    "monai>=1.3.2",
 ]
 all = [
     "h5py>=3.10.0",
@@ -80,6 +81,7 @@ all = [
     "scikit-image>=0.24.0",
     "imagesize>=1.4.1",
     "scipy>=1.14.0",
+    "monai>=1.3.2",
 ]
 
 [project.scripts]
