@@ -43,7 +43,7 @@ class Mask2formerLoss(modeling_mask2former.Mask2FormerLoss):
             class_coefficient=class_coefficient,
         )
 
-    def _layer_loss(
+    def _compute_layer_loss(
         self,
         masks_queries_logits: torch.Tensor,
         mask_labels: List[torch.Tensor],
@@ -89,19 +89,19 @@ class Mask2formerLoss(modeling_mask2former.Mask2FormerLoss):
 
         return {**loss_masks, **loss_classes}
 
-    @torch.compiler.disable
-    def forward(
+    def _compute_total_loss(
         self,
-        masks_queries_logits: List[torch.Tensor],
+        masks_queries_logits: torch.Tensor,
         mask_labels: List[torch.Tensor],
-        class_queries_logits: List[torch.Tensor] | None = None,
+        class_queries_logits: torch.Tensor | None = None,
         class_labels: List[torch.Tensor] | None = None,
     ) -> torch.Tensor:
+        """Computes the loss of a single layer."""
         total_loss = None
-        for masks_queries, class_queries in zip(masks_queries_logits, class_queries_logits, strict=False):
-            loss = self._layer_loss(
-                masks_queries, mask_labels, class_queries, class_labels
-            )
+        for masks_queries, class_queries in zip(
+            masks_queries_logits, class_queries_logits, strict=False
+        ):
+            loss = self._compute_layer_loss(masks_queries, mask_labels, class_queries, class_labels)
             weighted_loss = (
                 loss.get("loss_mask", 0) * self.mask_coefficient
                 + loss.get("loss_dice", 0) * self.dice_coefficient
@@ -113,3 +113,18 @@ class Mask2formerLoss(modeling_mask2former.Mask2FormerLoss):
                 total_loss = torch.add(total_loss, weighted_loss)
 
         return total_loss
+
+    @torch.compiler.disable
+    def forward(
+        self,
+        masks_queries_logits: List[torch.Tensor],
+        mask_labels: List[torch.Tensor],
+        class_queries_logits: List[torch.Tensor] | None = None,
+        class_labels: List[torch.Tensor] | None = None,
+    ) -> torch.Tensor:
+        self._compute_total_loss(
+            masks_queries_logits=masks_queries_logits,
+            mask_labels=mask_labels,
+            class_queries_logits=class_queries_logits,
+            class_labels=class_labels,
+        )
