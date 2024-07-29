@@ -70,8 +70,8 @@ class DenselyDecoderNano(conv2d.ConvDecoder):
             layers=densely.DenselyDecoder(
                 in_channels=in_features,
                 out_channels=num_classes,
-                growth_rate=4,
-                steps=1,
+                growth_rate=3,
+                steps=2,
                 scale_factor=2,
             ),
         )
