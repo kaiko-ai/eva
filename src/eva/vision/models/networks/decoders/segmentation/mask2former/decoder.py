@@ -42,11 +42,10 @@ class Mask2FormerDecoder(decoder.Decoder):
         self._num_attn_heads = num_attn_heads
         self._num_blocks = num_blocks
 
-        # self.projection_layer = nn.Sequential(
-        #     nn.Conv2d(self._in_features, self._embed_dim, kernel_size=1),
-        #     nn.GroupNorm(32, self._embed_dim),
-        # )
-        self.projection_layer = nn.Conv2d(self._in_features, self._embed_dim, kernel_size=1)
+        self.projection_layer = nn.Sequential(
+            nn.Conv2d(self._in_features, self._embed_dim, kernel_size=1),
+            nn.GroupNorm(32, self._embed_dim),
+        )
         self.q = nn.Embedding(self._num_queries, self._embed_dim)
         self.k_embed_pos = modeling_mask2former.Mask2FormerSinePositionEmbedding(
             num_pos_feats=self._embed_dim // 2, normalize=True
@@ -64,8 +63,7 @@ class Mask2FormerDecoder(decoder.Decoder):
             hidden_dim=self._embed_dim,
             output_dim=self._embed_dim,
         )
-        # self.q_class = nn.Linear(self._embed_dim, self._num_classes + 1)
-        self.q_class = nn.Linear(self._embed_dim, self._num_classes)
+        self.q_class = nn.Linear(self._embed_dim, self._num_classes + 1)
 
     def _forward_features(self, features: List[torch.Tensor]) -> torch.Tensor:
         """Forward function for multi-level feature maps to a single one.
@@ -218,14 +216,17 @@ class Mask2FormerDecoder(decoder.Decoder):
         #     semantic_one_hot_mask += functional.interpolate(
         #         pixel_logits_semantic, output_size, mode="bilinear", align_corners=False
         #     )
-        pixel_logits_semantic = torch.einsum(
+        class_queries_logits = class_logits_per_layer[-1]
+        masks_queries_logits = functional.interpolate(
+            mask_logits_per_layer[-1], output_size, mode="bilinear", align_corners=False
+        )
+        binary_class_maps = torch.einsum(
             "bqhw, bqc -> bchw",
-            mask_logits_per_layer[-1],
-            class_logits_per_layer[-1],
+            masks_queries_logits,
+            class_queries_logits[..., :-1],  # drop the dummy class
         )
-        return functional.interpolate(
-            pixel_logits_semantic, output_size, mode="bilinear", align_corners=False
-        )
+        # return binary_class_maps
+        return torch.softmax(binary_class_maps, dim=1)
 
 
     def forward(
