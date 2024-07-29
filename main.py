@@ -39,6 +39,8 @@ matcher = Mask2formerMatcher()
 
 
 mask_logits_per_layer, class_logits_per_layer = decoder(features)
+print(mask_logits_per_layer[0].mean(), class_logits_per_layer[0].mean())
+quit()
 
 out = loss._layer_loss(mask_logits_per_layer[0], mask_labels, class_logits_per_layer[0], class_labels)
 print(out)

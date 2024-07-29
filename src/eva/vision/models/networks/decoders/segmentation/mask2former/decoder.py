@@ -42,10 +42,11 @@ class Mask2FormerDecoder(decoder.Decoder):
         self._num_attn_heads = num_attn_heads
         self._num_blocks = num_blocks
 
-        self.projection_layer = nn.Sequential(
-            nn.Conv2d(self._in_features, self._embed_dim, kernel_size=1),
-            nn.GroupNorm(32, self._embed_dim),
-        )
+        # self.projection_layer = nn.Sequential(
+        #     nn.Conv2d(self._in_features, self._embed_dim, kernel_size=1),
+        #     nn.GroupNorm(32, self._embed_dim),
+        # )
+        self.projection_layer = nn.Conv2d(self._in_features, self._embed_dim, kernel_size=1)
         self.q = nn.Embedding(self._num_queries, self._embed_dim)
         self.k_embed_pos = modeling_mask2former.Mask2FormerSinePositionEmbedding(
             num_pos_feats=self._embed_dim // 2, normalize=True
@@ -63,7 +64,8 @@ class Mask2FormerDecoder(decoder.Decoder):
             hidden_dim=self._embed_dim,
             output_dim=self._embed_dim,
         )
-        self.q_class = nn.Linear(self._embed_dim, self._num_classes + 1)
+        # self.q_class = nn.Linear(self._embed_dim, self._num_classes + 1)
+        self.q_class = nn.Linear(self._embed_dim, self._num_classes)
 
     def _forward_features(self, features: List[torch.Tensor]) -> torch.Tensor:
         """Forward function for multi-level feature maps to a single one.
@@ -184,24 +186,47 @@ class Mask2FormerDecoder(decoder.Decoder):
             Tensor containing scores for all of the classes with shape
             (batch_size, n_classes, mask_height, mask_width).
         """
-        semantic_one_hot_mask = torch.zeros(
-            mask_logits_per_layer[0].size(0),
-            self._num_classes,
-            *output_size,
-            device=mask_logits_per_layer[0].device,
+        # semantic_one_hot_mask = torch.zeros(
+        #     mask_logits_per_layer[0].size(0),
+        #     self._num_classes,
+        #     *output_size,
+        #     device=mask_logits_per_layer[0].device,
+        # )
+        # for mask_logits, class_logits in zip(
+        #     mask_logits_per_layer, class_logits_per_layer, strict=True
+        # ):
+        #     pixel_logits_semantic = torch.einsum(
+        #         "bqhw, bqc -> bchw",
+        #         mask_logits.sigmoid(),
+        #         class_logits.softmax(dim=-1),  # drop the dummy class
+        #         # class_logits.softmax(dim=-1)[..., :-1],  # drop the dummy class
+        #     )
+        #     semantic_one_hot_mask += functional.interpolate(
+        #         pixel_logits_semantic, output_size, mode="bilinear", align_corners=False
+        #     )
+        # return semantic_one_hot_mask
+
+        # for mask_logits, class_logits in zip(
+        #     mask_logits_per_layer, class_logits_per_layer, strict=True
+        # ):
+        #     pixel_logits_semantic = torch.einsum(
+        #         "bqhw, bqc -> bchw",
+        #         mask_logits.sigmoid(),
+        #         class_logits.softmax(dim=-1),  # drop the dummy class
+        #         # class_logits.softmax(dim=-1)[..., :-1],  # drop the dummy class
+        #     )
+        #     semantic_one_hot_mask += functional.interpolate(
+        #         pixel_logits_semantic, output_size, mode="bilinear", align_corners=False
+        #     )
+        pixel_logits_semantic = torch.einsum(
+            "bqhw, bqc -> bchw",
+            mask_logits_per_layer[-1],
+            class_logits_per_layer[-1],
         )
-        for mask_logits, class_logits in zip(
-            mask_logits_per_layer, class_logits_per_layer, strict=True
-        ):
-            pixel_logits_semantic = torch.einsum(
-                "bqhw, bqc -> bchw",
-                mask_logits.sigmoid(),
-                class_logits.softmax(dim=-1)[..., :-1],  # drop the dummy class
-            )
-            semantic_one_hot_mask += functional.interpolate(
-                pixel_logits_semantic, output_size, mode="bilinear", align_corners=False
-            )
-        return semantic_one_hot_mask
+        return functional.interpolate(
+            pixel_logits_semantic, output_size, mode="bilinear", align_corners=False
+        )
+
 
     def forward(
         self,
