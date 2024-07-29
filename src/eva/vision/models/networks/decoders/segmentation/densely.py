@@ -107,7 +107,6 @@ class DenseNetBlock(nn.Module):
             nn.GroupNorm(1, 4 * growth_rate),
             nn.ELU(inplace=True),
             nn.Conv2d(4 * growth_rate, growth_rate, kernel_size=3, stride=1, padding=1),
-            nn.GroupNorm(1, growth_rate),
         )
 
     @override
@@ -199,10 +198,7 @@ class DenselyDecoder(nn.Module):
             growth_rate = growth_rate // 2
 
         layers.append(
-            nn.Sequential(
-                nn.Conv2d(in_channels, out_channels, kernel_size=3, stride=1, padding=1),
-                nn.GroupNorm(1, out_channels),
-            )
+            nn.Conv2d(in_channels, out_channels, kernel_size=3, stride=1, padding=1)
         )
 
         self._layers = nn.Sequential(*layers)
