@@ -29,12 +29,12 @@ class DiceLoss(losses.DiceLoss):  # type: ignore
 
     @override
     def forward(self, inputs: torch.Tensor, targets: torch.Tensor) -> torch.Tensor:  # noqa
-        if targets.ndim == 3:
-            targets = one_hot(targets[:, None, ...], num_classes=inputs.shape[1])
-
         if self.ignore_index is not None:
             mask = targets != self.ignore_index
             targets = targets * mask
-            inputs = inputs * mask.expand(inputs.size())
+            inputs = torch.mul(inputs, mask.unsqueeze(1) if mask.ndim == 3 else mask)
+
+        if targets.ndim == 3:
+            targets = one_hot(targets[:, None, ...], num_classes=inputs.shape[1])
 
         return super().forward(inputs, targets)
