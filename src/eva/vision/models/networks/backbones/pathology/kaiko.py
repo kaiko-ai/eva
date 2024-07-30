@@ -24,7 +24,7 @@ def kaiko_vits16(
         The torch ViTS-16 based foundation model.
     """
     return torch.hub.load(
-        "kaiko-ai/towards_large_pathology_fms",
+        repo_or_dir="kaiko-ai/towards_large_pathology_fms",
         model="vits16",
         trust_repo=True,
         dynamic_img_size=dynamic_img_size,
@@ -48,7 +48,7 @@ def kaiko_vits8(
         The torch ViTS-8 based foundation model.
     """
     return torch.hub.load(
-        "kaiko-ai/towards_large_pathology_fms",
+        repo_or_dir="kaiko-ai/towards_large_pathology_fms",
         model="vits8",
         trust_repo=True,
         dynamic_img_size=dynamic_img_size,
@@ -72,7 +72,7 @@ def kaiko_vitb16(
         The torch ViTB-16 based foundation model.
     """
     return torch.hub.load(
-        "kaiko-ai/towards_large_pathology_fms",
+        repo_or_dir="kaiko-ai/towards_large_pathology_fms",
         model="vitb16",
         trust_repo=True,
         dynamic_img_size=dynamic_img_size,
@@ -96,7 +96,7 @@ def kaiko_vitb8(
         The torch ViTB-8 based foundation model.
     """
     return torch.hub.load(
-        "kaiko-ai/towards_large_pathology_fms",
+        repo_or_dir="kaiko-ai/towards_large_pathology_fms",
         model="vitb8",
         trust_repo=True,
         dynamic_img_size=dynamic_img_size,
@@ -120,7 +120,7 @@ def kaiko_vitl14(
         The torch ViTL-14 based foundation model.
     """
     return torch.hub.load(
-        "kaiko-ai/towards_large_pathology_fms",
+        repo_or_dir="kaiko-ai/towards_large_pathology_fms",
         model="vitl14",
         trust_repo=True,
         dynamic_img_size=dynamic_img_size,
