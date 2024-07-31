@@ -5,7 +5,10 @@ from typing import List
 import timm
 from torch import nn
 
+from eva.vision.models.networks.backbones._registry import BackboneModelRegistry
 
+
+@BackboneModelRegistry.register("vit_small_patch16_224_random")
 def vit_small_patch16_224_random(
     dynamic_img_size: bool = True, out_indices: int | List[int] | None = None
 ) -> nn.Module:
@@ -29,6 +32,7 @@ def vit_small_patch16_224_random(
     )
 
 
+@BackboneModelRegistry.register("vit_small_patch16_224_random")
 def vit_small_patch16_224_dino(
     dynamic_img_size: bool = True, out_indices: int | List[int] | None = None
 ) -> nn.Module:

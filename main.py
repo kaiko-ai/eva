@@ -1,11 +1,5 @@
 """Helper wrapper class for Pathology FMs."""
 
-from typing import Any
+from eva.vision.models.networks.backbones._registry import BackboneModelRegistry
 
-import torch
-from torch import nn
-
-
-from eva.vision.models.networks.backbones.pathology._registry import PathologyModelRegistry
-
-model = PathologyModelRegistry.load_model("kaiko_vits16")
+model = BackboneModelRegistry.load_model("kaiko_vits16")

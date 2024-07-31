@@ -3,7 +3,7 @@ from typing import Any, Callable, Dict, Type
 import torch.nn as nn
 
 
-class PathologyModelRegistry:
+class BackboneModelRegistry:
     _registry: Dict[str, Type[nn.Module]] = {}
 
     @classmethod
@@ -24,5 +24,5 @@ class PathologyModelRegistry:
 
     @staticmethod
     def load_model(model_name: str, **kwargs: Any) -> nn.Module:
-        model_class = PathologyModelRegistry.get(model_name)
+        model_class = BackboneModelRegistry.get(model_name)
         return model_class(**kwargs)
