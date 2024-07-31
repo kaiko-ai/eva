@@ -63,7 +63,9 @@ class SemanticSegmentationModule(module.ModelModule):
         self._freeze_encoder()
 
         if isinstance(self.encoder, dict):
-            self.encoder: Callable[[torch.Tensor], List[torch.Tensor]] = parser.parse_object(self.encoder)
+            self.encoder: Callable[[torch.Tensor], List[torch.Tensor]] = parser.parse_object(
+                self.encoder
+            )
 
     @override
     def configure_optimizers(self) -> Any:
