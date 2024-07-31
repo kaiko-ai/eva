@@ -1,15 +1,12 @@
-"""Baseline FMs."""
+"""Vision Transformers base universal backbones."""
 
 from typing import List
 
-import torch
+import timm
 from torch import nn
 
-from eva.vision.models.networks.backbones.pathology._registry import PathologyModelRegistry
 
-
-@PathologyModelRegistry.register("vits16_random")
-def vits16_random(
+def vit_small_patch16_224_random(
     dynamic_img_size: bool = True, out_indices: int | List[int] | None = None
 ) -> nn.Module:
     """Initializes a ViTS-16 baseline model with random weights.
@@ -23,17 +20,16 @@ def vits16_random(
     Returns:
         The torch ViTS-16 based foundation model.
     """
-    return torch.hub.load(
-        repo_or_dir="facebookresearch/dino:main",
-        model="dino_vits16",
+    return timm.create_model(
+        model_name="vit_small_patch16_224_dino",
         pretrained=False,
-        dynamic_img_size=dynamic_img_size,
+        features_only=out_indices is not None,
         out_indices=out_indices,
+        dynamic_img_size=dynamic_img_size,
     )
 
 
-@PathologyModelRegistry.register("vits16_imagenet")
-def vits16_imagenet(
+def vit_small_patch16_224_dino(
     dynamic_img_size: bool = True, out_indices: int | List[int] | None = None
 ) -> nn.Module:
     """Initializes a ViTS-16 baseline model pretrained on imagenet.
@@ -47,10 +43,10 @@ def vits16_imagenet(
     Returns:
         The torch ViTS-16 based foundation model.
     """
-    return torch.hub.load(
-        repo_or_dir="facebookresearch/dino:main",
-        model="dino_vits16",
+    return timm.create_model(
+        model_name="vit_small_patch16_224_dino",
         pretrained=True,
-        dynamic_img_size=dynamic_img_size,
+        features_only=out_indices is not None,
         out_indices=out_indices,
+        dynamic_img_size=dynamic_img_size,
     )
