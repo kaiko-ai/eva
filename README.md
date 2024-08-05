@@ -214,27 +214,28 @@ and [tutorials](https://kaiko-ai.github.io/eva/dev/user-guide/advanced/replicate
 
 In this section you will find model benchmarks which were generated with _`eva`_.
 
-### Table I: WSI patch-level classification tasks
+### Table I: WSI and microscopy image tasks
 
 <br />
 
 <div align="center">
 
-| Model   | BACH  | CRC   | MHIST | PCam   | Camelyon16 | PANDA |
-|---------|-------|-------|-------|--------|------------|-------|
-| ViT-S/16 _(random)_	<sup>[1]</sup> | 0.411|0.613|0.5|0.752|0.551|0.347|
-| ViT-S/16 _(ImageNet)_ <sup>[1]</sup> | 0.675|0.936|0.827|0.861|0.751|0.676|
-| DINO<sub>(p=16)</sub> <sup>[2]</sup> | 0.77|0.936|0.751|0.905|0.869|0.737|
-| Phikon <sup>[3]</sup>                | 0.715|0.942|0.766|0.925|0.879|0.784|
-| UNI <sup>[4]</sup>                   | 0.797|0.95|0.835|0.939|0.933|0.774|
-| ViT-S/16 _(kaiko.ai)_ <sup>[5]</sup> | 0.8|0.949|0.831|0.902|0.897|0.77|
-| ViT-S/8 _(kaiko.ai)_ <sup>[5]</sup>  | 0.825|0.948|0.826|0.887|0.879|0.741|
-| ViT-B/16 _(kaiko.ai)_	<sup>[5]</sup> | 0.846|0.959|0.839|0.906|0.891|0.753|
-| ViT-B/8 _(kaiko.ai)_ <sup>[5]</sup>  | 0.867|0.952|0.814|0.921|0.939|0.761|
-| ViT-L/14 _(kaiko.ai)_ <sup>[5]</sup> | 0.862|0.935|0.822|0.907|0.941|0.769|
+| Model   | BACH  | CRC   | MHIST | PCam   | Camelyon16 | PANDA | CoNSeP | MoNuSAC |
+|---------|-------|-------|-------|--------|------------|-------|------------|-------|
+| ViT-S/16 _(random)_	<sup>[1]</sup> | 0.411|0.613|0.5|0.752|0.551|0.347|0.489|0.394|
+| ViT-S/16 _(ImageNet)_ <sup>[1]</sup> | 0.675|0.936|0.827|0.861|0.751|0.676|0.54|0.512|
+| DINO<sub>(p=16)</sub> <sup>[2]</sup> | 0.77|0.936|0.751|0.905|0.869|0.737|0.625|0.549|
+| Phikon <sup>[3]</sup>                | 0.715|0.942|0.766|0.925|0.879|0.784|0.68|0.554|
+| UNI <sup>[4]</sup>                   | 0.797|0.95|0.835|0.939|0.933|0.774|0.67|0.575|
+| ViT-S/16 _(kaiko.ai)_ <sup>[5]</sup> | 0.8|0.949|0.831|0.902|0.897|0.77|0.622|0.573|
+| ViT-S/8 _(kaiko.ai)_ <sup>[5]</sup>  | 0.825|0.948|0.826|0.887|0.879|0.741|0.677|0.617|
+| ViT-B/16 _(kaiko.ai)_	<sup>[5]</sup> | 0.846|0.959|0.839|0.906|0.891|0.753|0.647|0.572|
+| ViT-B/8 _(kaiko.ai)_ <sup>[5]</sup>  | 0.867|0.952|0.814|0.921|0.939|0.761|0.706|0.661|
+| ViT-L/14 _(kaiko.ai)_ <sup>[5]</sup> | 0.862|0.935|0.822|0.907|0.941|0.769|0.686|0.599|
 
-_Table I: Linear probing evaluation of FMs on patch-level downstream datasets.<br> We report averaged balanced accuracy
-over 5 runs. Results are reported on the "test" split if available and otherwise on the "validation" split._
+_Table I: Linear probing evaluation of FMs on patch-level downstream datasets.<br> We report balanced accuracy
+ for classification tasks and generalized DICE score for semgetnation tasks, averaged over 5 runs. Results are 
+ reported on the "test" split if available and otherwise on the "validation" split._
 
 </div>
 
