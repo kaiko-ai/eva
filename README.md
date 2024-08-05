@@ -234,7 +234,7 @@ In this section you will find model benchmarks which were generated with _`eva`_
 | ViT-L/14 _(kaiko.ai)_ <sup>[5]</sup> | 0.862|0.935|0.822|0.907|0.941|0.769|0.686|0.599|
 
 _Table I: Linear probing evaluation of FMs on patch-level downstream datasets.<br> We report balanced accuracy
- for classification tasks and generalized DICE score for semgetnation tasks, averaged over 5 runs. Results are 
+ for classification tasks and generalized Dice score for semgetnation tasks, averaged over 5 runs. Results are 
  reported on the "test" split if available and otherwise on the "validation" split._
 
 </div>

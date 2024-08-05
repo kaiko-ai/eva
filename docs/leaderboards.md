@@ -5,7 +5,7 @@ hide:
 
 # Leaderboards
 
-We evaluated the following FMs on the 6 supported WSI-classification tasks. We report *Balanced Accuracy* for binary & multiclass tasks and generalized DICE score (no background) for segmentation tasks. The score shows the average performance over 5 runs.
+We evaluated the following FMs on the 6 supported WSI-classification tasks. We report *Balanced Accuracy* for binary & multiclass tasks and generalized Dice score (no background) for segmentation tasks. The score shows the average performance over 5 runs.
 
 <br/>
 
@@ -60,6 +60,7 @@ We selected this approach to prioritize reliable, robust and fair FM-evaluation 
 | **Weight Decay**               | 0.0                       | n/a                       | n/a                       |
 | **betas**                      | n/a                       | [0.9, 0.999]              | [0.9, 0.999]              |
 | **LR Schedule**                | Cosine without warmup     | Cosine without warmup     | PolynomialLR              |
+| **Loss**                       | Cross entropy             | Cross entropy             | Dice                      |
 | **number of patches per slide**| 1                         | dataset specific (4)      | dataset specific (4)      |
 
 
