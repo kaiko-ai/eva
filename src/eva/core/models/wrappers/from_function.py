@@ -1,18 +1,20 @@
-"""Encoder wrapper for vision models."""
+"""Helper function from models defined with a function."""
 
-from typing import Any, Callable, Dict, List
+from typing import Any, Callable, Dict
 
 import jsonargparse
 import torch
 from torch import nn
 from typing_extensions import override
 
-from eva.core.models.networks import _utils
-from eva.vision.models.networks.encoders import encoder
+from eva.core.models.wrappers import _utils, base
 
 
-class EncoderWrapper(encoder.Encoder):
-    """Encoder wrapper for torchvision vision_transformer models."""
+class ModelFromFunction(base.BaseModel):
+    """Wrapper class for models which are initialized from functions.
+
+    This is helpful for initializing models in a `.yaml` configuration file.
+    """
 
     def __init__(
         self,
@@ -40,19 +42,16 @@ class EncoderWrapper(encoder.Encoder):
         self._checkpoint_path = checkpoint_path
         self._tensor_transforms = tensor_transforms
 
-        self._feature_extractor: nn.Module
-
-        self.configure_model()
-
-    def configure_model(self) -> None:
-        """Builds and loads the model."""
-        class_path = jsonargparse.class_from_function(self._path, func_return=nn.Module)
-        self._feature_extractor = class_path(**self._arguments or {})
-        if self._checkpoint_path is not None:
-            _utils.load_model_weights(self._feature_extractor, self._checkpoint_path)
+        self._model = self.load_model()
 
     @override
-    def forward(self, tensor: torch.Tensor) -> List[torch.Tensor]:
-        outputs = self._model(tensor)
-        features = self._apply_transforms(outputs)
-        return features if isinstance(features, list) else [features]
+    def load_model(self) -> nn.Module:
+        class_path = jsonargparse.class_from_function(self._path, func_return=nn.Module)
+        model = class_path(**self._arguments or {})
+        if self._checkpoint_path is not None:
+            _utils.load_model_weights(model, self._checkpoint_path)
+        return model
+
+    @override
+    def model_forward(self, tensor: torch.Tensor) -> torch.Tensor:
+        return self._model(tensor)

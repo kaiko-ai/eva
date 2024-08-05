@@ -8,7 +8,7 @@ import pytest
 import torch
 from lightning.pytorch.demos import boring_classes
 
-from eva.core.models.networks import wrappers
+from eva.core.models import wrappers
 
 
 @pytest.mark.parametrize(

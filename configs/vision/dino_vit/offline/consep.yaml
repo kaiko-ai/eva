@@ -33,7 +33,7 @@ trainer:
             1: val
           metadata_keys: ["coords"]
           backbone:
-            class_path: eva.vision.models.networks.encoders.TimmEncoder
+            class_path: eva.vision.models.wrappers.TimmModel
             init_args:
               model_name: ${oc.env:TIMM_MODEL_NAME, vit_small_patch16_224_dino}
               pretrained: ${oc.env:MODEL_PRETRAINED, true}

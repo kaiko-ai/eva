@@ -1,11 +1,11 @@
-"""TimmEncoder tests."""
+"""TimmModel tests."""
 
 from typing import Any, Dict, Tuple
 
 import pytest
 import torch
 
-from eva.vision.models.networks import encoders
+from eva.vision.models import wrappers
 
 
 @pytest.mark.parametrize(
@@ -37,14 +37,14 @@ from eva.vision.models.networks import encoders
         ),
     ],
 )
-def test_timm_encoder(
-    timm_encoder: encoders.TimmEncoder,
+def test_timm_model(
+    timm_model: wrappers.TimmModel,
     input_tensor: torch.Tensor,
     expected_len: int,
     expected_shape: torch.Size,
 ) -> None:
-    """Tests the TimmEncoder network."""
-    outputs = timm_encoder(input_tensor)
+    """Tests the TimmModel wrapper."""
+    outputs = timm_model(input_tensor)
     assert isinstance(outputs, list)
     assert len(outputs) == expected_len
     # individual
@@ -53,13 +53,13 @@ def test_timm_encoder(
 
 
 @pytest.fixture(scope="function")
-def timm_encoder(
+def timm_model(
     model_name: str,
     out_indices: int | Tuple[int, ...] | None,
     model_arguments: Dict[str, Any] | None,
-) -> encoders.TimmEncoder:
-    """TimmEncoder fixture."""
-    return encoders.TimmEncoder(
+) -> wrappers.TimmModel:
+    """TimmModel fixture."""
+    return wrappers.TimmModel(
         model_name=model_name,
         out_indices=out_indices,
         model_arguments=model_arguments,
