@@ -25,7 +25,7 @@ class HeadModule(module.ModelModule):
 
     def __init__(
         self,
-        head: Dict[str, Any] | MODEL_TYPE,
+        head: MODEL_TYPE | Dict[str, Any],
         criterion: Callable[..., torch.Tensor],
         backbone: MODEL_TYPE | None = None,
         optimizer: OptimizerCallable = optim.Adam,

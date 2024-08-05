@@ -10,9 +10,8 @@ from torch.optim import lr_scheduler
 from typing_extensions import override
 
 from eva.core.metrics import structs as metrics_lib
-from eva.core.models import wrappers
 from eva.core.models.modules import module
-from eva.core.models.modules.typings import INPUT_BATCH, INPUT_TENSOR_BATCH
+from eva.core.models.modules.typings import INPUT_BATCH, INPUT_TENSOR_BATCH, MODEL_TYPE
 from eva.core.models.modules.utils import batch_postprocess, grad
 from eva.vision.models.networks import decoders
 
@@ -24,7 +23,7 @@ class SemanticSegmentationModule(module.ModelModule):
         self,
         decoder: decoders.Decoder,
         criterion: Callable[..., torch.Tensor],
-        encoder: wrappers.BaseModel | None = None,
+        encoder: MODEL_TYPE | None = None,
         lr_multiplier_encoder: float = 0.0,
         optimizer: OptimizerCallable = optim.AdamW,
         lr_scheduler: LRSchedulerCallable = lr_scheduler.ConstantLR,
