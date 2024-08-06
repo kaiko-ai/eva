@@ -59,7 +59,7 @@ class TimmModel(wrappers.BaseModel):
             pretrained=False if self._checkpoint_path else self._pretrained,
             pretrained_cfg=self._pretrained_cfg,
             out_indices=self._out_indices,
-            features_only=True,
+            features_only=self._out_indices is not None,
             **self._model_arguments,
         )
         TimmModel.__name__ = self._model_name
@@ -72,6 +72,5 @@ class TimmModel(wrappers.BaseModel):
     def _pretrained_cfg(self) -> Dict[str, Any]:
         if not self._checkpoint_path:
             return {}
-
         key = "file" if parse.urlparse(self._checkpoint_path).scheme in ("file", "") else "url"
         return {key: self._checkpoint_path, "num_classes": 0}
