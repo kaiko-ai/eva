@@ -2,7 +2,7 @@
 trainer:
   class_path: eva.Trainer
   init_args:
-    default_root_dir: &OUTPUT_ROOT ${oc.env:OUTPUT_ROOT, logs/${oc.env:DINO_BACKBONE, dino_vits16}/online/crc}
+    default_root_dir: &OUTPUT_ROOT ${oc.env:OUTPUT_ROOT, logs/${oc.env:DINO_BACKBONE, dino_vits16}/online/patch_camelyon}
     max_steps: &MAX_STEPS ${oc.env:MAX_STEPS, 12500}
     callbacks:
       - class_path: eva.callbacks.ConfigurationLogger
@@ -14,12 +14,12 @@ trainer:
           filename: best
           save_last: true
           save_top_k: 1
-          monitor: &MONITOR_METRIC ${oc.env:MONITOR_METRIC, val/MulticlassAccuracy}
+          monitor: &MONITOR_METRIC ${oc.env:MONITOR_METRIC, val/BinaryAccuracy}
           mode: &MONITOR_METRIC_MODE ${oc.env:MONITOR_METRIC_MODE, max}
       - class_path: lightning.pytorch.callbacks.EarlyStopping
         init_args:
           min_delta: 0
-          patience: 24
+          patience: 9
           monitor: *MONITOR_METRIC
           mode: *MONITOR_METRIC_MODE
     logger:
@@ -31,21 +31,15 @@ model:
   class_path: eva.HeadModule
   init_args:
     backbone:
-      class_path: eva.models.ModelFromFunction
+      class_path: eva.vision.models.wrappers.VisionBackbone
       init_args:
-        path: torch.hub.load
-        arguments:
-          repo_or_dir: ${oc.env:REPO_OR_DIR, facebookresearch/dino:main}
-          model: ${oc.env:DINO_BACKBONE, dino_vits16}
-          pretrained: ${oc.env:PRETRAINED, true}
-          force_reload: ${oc.env:FORCE_RELOAD, false}
-        checkpoint_path: &CHECKPOINT_PATH ${oc.env:CHECKPOINT_PATH, null}
+        model_name: ${oc.env:MODEL_NAME, universal/vit_small_patch16_224_imagenet}
     head:
       class_path: torch.nn.Linear
       init_args:
         in_features: ${oc.env:IN_FEATURES, 384}
-        out_features: &NUM_CLASSES 9
-    criterion: torch.nn.CrossEntropyLoss
+        out_features: 1
+    criterion: torch.nn.BCEWithLogitsLoss
     optimizer:
       class_path: torch.optim.SGD
       init_args:
@@ -60,35 +54,42 @@ model:
     metrics:
       common:
         - class_path: eva.metrics.AverageLoss
-        - class_path: eva.metrics.MulticlassClassificationMetrics
-          init_args:
-            num_classes: *NUM_CLASSES
+        - class_path: eva.metrics.BinaryClassificationMetrics
 data:
   class_path: eva.DataModule
   init_args:
     datasets:
       train:
-        class_path: eva.vision.datasets.CRC
+        class_path: eva.vision.datasets.PatchCamelyon
         init_args: &DATASET_ARGS
-          root: ${oc.env:DATA_ROOT, ./data}/crc
+          root: ${oc.env:DATA_ROOT, ./data}/patch_camelyon
           split: train
           download: ${oc.env:DOWNLOAD_DATA, false}
-          # Set `download: true` to download the dataset from https://zenodo.org/records/1214456
-          # The CRC dataset is distributed under the following license: "CC BY 4.0 LEGAL CODE"
-          # (see: https://creativecommons.org/licenses/by/4.0/legalcode)
+          # Set `download: true` to download the dataset from https://zenodo.org/records/1494286
+          # The PatchCamelyon dataset is distributed under the following license: 
+          # "Creative Commons Zero v1.0 Universal"
+          # (see: https://choosealicense.com/licenses/cc0-1.0/)
           transforms:
             class_path: eva.vision.data.transforms.common.ResizeAndCrop
             init_args:
-              mean: ${oc.env:NORMALIZE_MEAN, [0.485, 0.456, 0.406]}
+              size: ${oc.env:RESIZE_DIM, 224}  
+              mean: ${oc.env:NORMALIZE_MEAN, [0.485, 0.456, 0.406]} 
               std: ${oc.env:NORMALIZE_STD, [0.229, 0.224, 0.225]}
       val:
-        class_path: eva.vision.datasets.CRC
+        class_path: eva.vision.datasets.PatchCamelyon
         init_args:
           <<: *DATASET_ARGS
           split: val
+      test:
+        class_path: eva.vision.datasets.PatchCamelyon
+        init_args:
+          <<: *DATASET_ARGS
+          split: test
     dataloaders:
       train:
         batch_size: &BATCH_SIZE ${oc.env:BATCH_SIZE, 4096}
         shuffle: true
       val:
+        batch_size: *BATCH_SIZE
+      test:
         batch_size: *BATCH_SIZE
