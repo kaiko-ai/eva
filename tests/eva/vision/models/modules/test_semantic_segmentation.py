@@ -48,7 +48,7 @@ def model(n_classes: int = 4) -> modules.SemanticSegmentationModule:
             model_name="vit_tiny_patch16_224",
             pretrained=False,
             out_indices=1,
-            model_arguments={
+            model_kwargs={
                 "dynamic_img_size": True,
             },
         ),
