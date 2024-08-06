@@ -1,48 +1,46 @@
 """Vision backbone helper class."""
 
-from typing import Any, Dict
+from typing import Any, Callable, Dict, List
 
 import torch
 from torch import nn
+from typing_extensions import override
 
-from eva.vision.models.networks.backbones._registry import BackboneModelRegistry
+from eva.core.models import wrappers
+from eva.vision.models.networks import BackboneModelRegistry
 
 
-class VisionBackbone(nn.Module):
+class VisionBackbone(wrappers.BaseModel):
     """Vision backbone."""
 
     def __init__(
         self,
         model_name: str,
         arguments: Dict[str, Any] | None = None,
+        tensor_transforms: Callable | None = None,
     ) -> None:
         """Initializes and constructs the model.
 
         Args:
             model_name: The name of the model to load.
             arguments: The arguments used for instantiating the model.
+            tensor_transforms: The transforms to apply to the output tensor
+                produced by the model.
         """
-        super().__init__()
+        super().__init__(tensor_transforms=tensor_transforms)
 
         self._model_name = model_name
         self._arguments = arguments
 
         self._model: nn.Module
 
-        self.configure_model()
+        self.load_model()
 
-    def configure_model(self) -> None:
-        """Builds and loads the backbone."""
+    @override
+    def load_model(self) -> None:
         self._model = BackboneModelRegistry.load_model(self._model_name, **self._arguments or {})
         VisionBackbone.__name__ = self._model_name
 
-    def forward(self, tensor: torch.Tensor) -> torch.Tensor:
-        """Returns the embeddings of the model.
-
-        Args:
-            tensor: The image tensor (batch_size, num_channels, height, width).
-
-        Returns:
-            The image features.
-        """
+    @override
+    def model_forward(self, tensor: torch.Tensor) -> torch.Tensor | List[torch.Tensor]:
         return self._model(tensor)

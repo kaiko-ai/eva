@@ -65,7 +65,7 @@ class TimmModel(wrappers.BaseModel):
         TimmModel.__name__ = self._model_name
 
     @override
-    def model_forward(self, tensor: torch.Tensor) -> List[torch.Tensor]:
+    def model_forward(self, tensor: torch.Tensor) -> torch.Tensor | List[torch.Tensor]:
         return self._feature_extractor(tensor)
 
     @property

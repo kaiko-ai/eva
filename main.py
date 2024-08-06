@@ -1,5 +1,6 @@
 """Helper wrapper class for Pathology FMs."""
 
-from eva.vision.models.networks.backbones._registry import BackboneModelRegistry
+from eva.vision.models import backbones
 
-model = BackboneModelRegistry.load_model("kaiko_vits16")
+model = backbones.BackboneModelRegistry.load_model("pathology/kaiko_vits16")
+print(type(model))

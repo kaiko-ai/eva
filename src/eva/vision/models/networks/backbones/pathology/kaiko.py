@@ -5,11 +5,10 @@ from typing import List
 import torch
 from torch import nn
 
-from eva.vision.models.networks.backbones._registry import BackboneModelRegistry
+from eva.vision.models.networks.backbones.registry import BackboneModelRegistry
 
 
-@BackboneModelRegistry.register("kaiko_vits16")
-# @register_model("pathology")
+@BackboneModelRegistry.register("pathology/kaiko_vits16")
 def kaiko_vits16(
     dynamic_img_size: bool = True, out_indices: int | List[int] | None = None
 ) -> nn.Module:
@@ -33,7 +32,7 @@ def kaiko_vits16(
     )
 
 
-@BackboneModelRegistry.register("kaiko_vits8")
+@BackboneModelRegistry.register("pathology/kaiko_vits8")
 def kaiko_vits8(
     dynamic_img_size: bool = True, out_indices: int | List[int] | None = None
 ) -> nn.Module:
@@ -57,7 +56,7 @@ def kaiko_vits8(
     )
 
 
-@BackboneModelRegistry.register("kaiko_vitb16")
+@BackboneModelRegistry.register("pathology/kaiko_vitb16")
 def kaiko_vitb16(
     dynamic_img_size: bool = True, out_indices: int | List[int] | None = None
 ) -> nn.Module:
@@ -81,7 +80,7 @@ def kaiko_vitb16(
     )
 
 
-@BackboneModelRegistry.register("kaiko_vitb8")
+@BackboneModelRegistry.register("pathology/kaiko_vitb8")
 def kaiko_vitb8(
     dynamic_img_size: bool = True, out_indices: int | List[int] | None = None
 ) -> nn.Module:
@@ -105,7 +104,7 @@ def kaiko_vitb8(
     )
 
 
-@BackboneModelRegistry.register("kaiko_vitl14")
+@BackboneModelRegistry.register("pathology/kaiko_vitl14")
 def kaiko_vitl14(
     dynamic_img_size: bool = True, out_indices: int | List[int] | None = None
 ) -> nn.Module:

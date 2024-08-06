@@ -30,9 +30,9 @@ trainer:
             0: train
             1: val
           backbone:
-            class_path: eva.vision.models.networks.wrappers.PathologyFM
+            class_path: eva.vision.models.wrappers.VisionBackbone
             init_args:
-              model_name: ${oc.env:MODEL_NAME, vits16_imagenet}
+              model_name: ${oc.env:MODEL_NAME, universal/vit_small_patch16_224_imagenet}
           overwrite: false
     logger:
       - class_path: lightning.pytorch.loggers.TensorBoardLogger
