@@ -1,3 +1,5 @@
+"""The matcher module of the Mask2Former loss."""
+
 from typing import List, Tuple
 
 import torch
@@ -6,7 +8,7 @@ from scipy.optimize import linear_sum_assignment
 from transformers.models.mask2former import modeling_mask2former
 
 
-class Mask2formerMatcher(nn.Module):
+class Mask2FormerMatcher(nn.Module):
     """Compute the matching cost between predicted masks and target masks.
 
     It is used to find the optimal assignment using the Hungarian algorithm.
@@ -19,7 +21,7 @@ class Mask2formerMatcher(nn.Module):
         dice_coefficient: float = 5.0,
         class_coefficient: float | None = None,
     ) -> None:
-        """Initializes the Mask2formerMatcher.
+        """Initializes the class.
 
         Args:
             num_points: Number of points to sample from masks.
@@ -88,7 +90,8 @@ class Mask2formerMatcher(nn.Module):
             mask_labels: List of mask labels of shape `(num_classes, height, width)`.
             class_queries_logits: A tensor of shape `(batch_size, num_queries, num_labels)`.
             class_labels: List of target class labels of shape `(labels)`. They identify the
-                labels of `mask_labels`, e.g. the label of `mask_labels[i][j]` if `class_labels[i][j]`.
+                labels of `mask_labels`, e.g. the label of `mask_labels[i][j]` if
+                `class_labels[i][j]`.
 
         Returns:
             A list of tuples containing matched indices.

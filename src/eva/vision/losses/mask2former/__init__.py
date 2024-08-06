@@ -1,3 +1,5 @@
-from eva.vision.losses.mask2former.loss import Mask2formerLoss
+"""The Mask2formerLoss API."""
 
-__all__ = ["Mask2formerLoss"]
+from eva.vision.losses.mask2former.loss import Mask2FormerLoss
+
+__all__ = ["Mask2FormerLoss"]

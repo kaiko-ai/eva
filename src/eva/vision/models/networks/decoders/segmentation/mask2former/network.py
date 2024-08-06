@@ -4,13 +4,12 @@ from typing import List, Tuple
 
 import torch
 from torch import nn
-from torch.nn import functional
 from transformers.models.mask2former import modeling_mask2former
 
-from eva.vision.models.networks.decoders.segmentation.mask2former import decoder_block
+from eva.vision.models.networks.decoders.segmentation.mask2former import nn_layers
 
 
-class Mask2Former(nn.Module):
+class Mask2FormerModel(nn.Module):
     """Mask2Former decoder for segmentation tasks using a transformer architecture."""
 
     def __init__(
@@ -22,7 +21,7 @@ class Mask2Former(nn.Module):
         num_attn_heads: int = 8,
         num_blocks: int = 9,
     ) -> None:
-        """Initializes the decoder.
+        """Initializes the Mask2Former model.
 
         Args:
             in_features: The hidden dimension size of the embeddings.
@@ -51,7 +50,9 @@ class Mask2Former(nn.Module):
         )
         self.transformer_decoder = nn.ModuleList(
             [
-                decoder_block.DecoderBlock(self._embed_dim, self._num_attn_heads)
+                nn_layers.Mask2FormerMaskedAttentionDecoderLayer(
+                    self._embed_dim, self._num_attn_heads
+                )
                 for _ in range(num_blocks)
             ]
         )
@@ -64,46 +65,11 @@ class Mask2Former(nn.Module):
         )
         self.q_class = nn.Linear(self._embed_dim, self._num_classes + 1)
 
-    def _forward_features(self, features: List[torch.Tensor]) -> torch.Tensor:
-        """Forward function for multi-level feature maps to a single one.
-
-        It will interpolate the features and concat them into a single tensor
-        on the dimension axis of the hidden size.
-
-        Example:
-            >>> features = [torch.Tensor(16, 384, 14, 14), torch.Size(16, 384, 14, 14)]
-            >>> output = self._forward_features(features)
-            >>> assert output.shape == torch.Size([16, 768, 14, 14])
-
-        Args:
-            features: List of multi-level image features of shape (batch_size,
-                hidden_size, n_patches_height, n_patches_width).
-
-        Returns:
-            A tensor of shape (batch_size, hidden_size, n_patches_height,
-            n_patches_width) which is feature map of the decoder head.
-        """
-        if not isinstance(features, list) or features[0].ndim != 4:
-            raise ValueError(
-                "Input features should be a list of four (4) dimensional inputs of "
-                "shape (batch_size, hidden_size, n_patches_height, n_patches_width)."
-            )
-
-        upsampled_features = [
-            functional.interpolate(
-                input=embeddings,
-                size=features[0].shape[2:],
-                mode="bilinear",
-                align_corners=False,
-            )
-            for embeddings in features
-        ]
-        return torch.cat(upsampled_features, dim=1)
-
-    def _forward_decoder_layers(
-        self, patch_embeddings: torch.Tensor
+    def forward(
+        self,
+        patch_embeddings: torch.Tensor,
     ) -> Tuple[List[torch.Tensor], List[torch.Tensor]]:
-        """Forward of the decoder head layers.
+        """Forward of the decoder layers.
 
         Args:
             patch_embeddings: The patch embeddings tensor of shape
@@ -161,65 +127,3 @@ class Mask2Former(nn.Module):
         attn_mask = (mask_logits < 0).bool().flatten(-2)
         attn_mask[torch.where(attn_mask.sum(-1) == attn_mask.shape[-1])] = False
         return attn_mask, mask_logits, class_logits
-
-    def _cls_seg(
-        self,
-        mask_logits_per_layer: List[torch.Tensor],
-        class_logits_per_layer: List[torch.Tensor],
-        output_size: Tuple[int, int],
-    ) -> torch.Tensor:
-        """Classify each pixel of the input image.
-
-        Args:
-            mask_logits_per_layer: A list, of length equal to the number of
-                output classes, of the mask logits per layer, each of shape
-                (batch_size, num_queries, patch_height, patch_width).
-            class_logits_per_layer: A list, of length equal to the number of
-                output classes, of the class logits per layer, each of shape
-                (batch_size, num_queries, num_classes).
-            output_size: The target mask size (height, width).
-
-        Returns:
-            Tensor containing scores for all of the classes with shape
-            (batch_size, n_classes, mask_height, mask_width).
-        """
-        semantic_one_hot_mask = torch.zeros(
-            mask_logits_per_layer[0].size(0),
-            self._num_classes,
-            *output_size,
-            device=mask_logits_per_layer[0].device,
-        )
-        for mask_logits, class_logits in zip(
-            mask_logits_per_layer, class_logits_per_layer, strict=True
-        ):
-            pixel_logits_semantic = torch.einsum(
-                "bqhw, bqc -> bchw",
-                mask_logits.sigmoid(),
-                class_logits.softmax(dim=-1)[..., :-1],  # drop the dummy class
-            )
-            semantic_one_hot_mask += functional.interpolate(
-                pixel_logits_semantic, output_size, mode="bilinear", align_corners=False
-            )
-        return semantic_one_hot_mask
-
-    def forward(
-        self,
-        features: List[torch.Tensor],
-    ) -> Tuple[List[torch.Tensor], List[torch.Tensor]]:
-        """Forward pass for the Mask2formerDecoder.
-
-        Args:
-            features: A list of multi-level patch embeddings of shape
-                (batch_size, hidden_size, path_height, path_width).
-
-        Returns:
-            A tuple of the following items:
-                mask_logits_per_layer: A list, of length equal to the number of
-                    output classes, of the mask logits per layer, each of shape
-                    (batch_size, num_queries, patch_height, patch_width).
-                class_logits_per_layer: A list, of length equal to the number of
-                    output classes, of the class logits per layer, each of shape
-                    (batch_size, num_queries, num_classes).
-        """
-        patch_embeddings = self._forward_features(features)
-        return self._forward_decoder_layers(patch_embeddings)

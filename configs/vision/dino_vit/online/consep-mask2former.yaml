@@ -3,7 +3,7 @@ trainer:
   class_path: eva.Trainer
   init_args:
     n_runs: &N_RUNS ${oc.env:N_RUNS, 1}
-    default_root_dir: &OUTPUT_ROOT ${oc.env:OUTPUT_ROOT, logs/${oc.env:TIMM_MODEL_NAME, vit_small_patch16_224}/consep}
+    default_root_dir: &OUTPUT_ROOT ${oc.env:OUTPUT_ROOT, logs/${oc.env:TIMM_MODEL_NAME, vit_small_patch16_224_dino}/consep}
     max_steps: &MAX_STEPS ${oc.env:MAX_STEPS, 513}
     log_every_n_steps: 6
     callbacks:
@@ -32,7 +32,7 @@ trainer:
           save_dir: *OUTPUT_ROOT
           name: ""
 model:
-  class_path: eva.vision.models.modules.SemanticSegmentationModule
+  class_path: eva.vision.models.modules.Mask2FormerModule
   init_args:
     encoder:
       class_path: eva.vision.models.networks.encoders.TimmEncoder
@@ -47,13 +47,11 @@ model:
       class_path: eva.vision.models.networks.decoders.segmentation.Mask2FormerDecoder
       init_args:
         in_features: ${oc.env:DECODER_IN_FEATURES, 384}
-        num_classes:  &NUM_CLASSES 8
-    # criterion: torch.nn.CrossEntropyLoss
+        num_classes: &NUM_CLASSES 8
     criterion:
-      class_path: eva.vision.losses.DiceLoss
+      class_path: eva.vision.losses.Mask2FormerLoss
       init_args:
-        # softmax: true
-        batch: true
+        num_classes: *NUM_CLASSES
     lr_multiplier_encoder: 0.0
     optimizer:
       class_path: torch.optim.AdamW

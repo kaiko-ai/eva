@@ -5,7 +5,7 @@ from torch import nn
 from transformers.models.mask2former import modeling_mask2former
 
 
-class DecoderBlock(nn.Module):
+class Mask2FormerMaskedAttentionDecoderLayer(nn.Module):
     """A Transformer decoder block.
 
     It consisting of cross-attention, self-attention, and

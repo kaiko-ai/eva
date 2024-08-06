@@ -1,3 +1,5 @@
-from eva.vision.models.networks.decoders.segmentation.mask2former.network import Mask2Former
+"""Mask2Former decoder."""
 
-__all__ = ["Mask2Former"]
+from eva.vision.models.networks.decoders.segmentation.mask2former.decoder import Mask2FormerDecoder
+
+__all__ = ["Mask2FormerDecoder"]

@@ -13,7 +13,8 @@ from eva.core.metrics import structs as metrics_lib
 from eva.core.models.modules import module
 from eva.core.models.modules.typings import INPUT_BATCH, INPUT_TENSOR_BATCH
 from eva.core.models.modules.utils import batch_postprocess, grad
-from eva.vision.models.networks import decoders
+from eva.vision import losses
+from eva.vision.models.networks.decoders import segmentation
 
 
 class Mask2FormerModule(module.ModelModule):
@@ -21,8 +22,8 @@ class Mask2FormerModule(module.ModelModule):
 
     def __init__(
         self,
-        decoder: decoders.Decoder,
-        criterion: Callable[..., torch.Tensor],
+        decoder: segmentation.Mask2FormerDecoder,
+        criterion: losses.Mask2FormerLoss,
         encoder: Callable[[torch.Tensor], List[torch.Tensor]] | None = None,
         lr_multiplier_encoder: float = 0.0,
         optimizer: OptimizerCallable = optim.AdamW,
@@ -98,15 +99,7 @@ class Mask2FormerModule(module.ModelModule):
 
     @override
     def training_step(self, batch: INPUT_TENSOR_BATCH, *args: Any, **kwargs: Any) -> STEP_OUTPUT:
-        data, targets, metadata = INPUT_TENSOR_BATCH(*batch)
-        predictions = self(data, to_size=targets.shape[-2:])
-        loss = self.criterion(predictions, targets)
-        return {
-            "loss": loss,
-            "targets": targets,
-            "predictions": predictions,
-            "metadata": metadata,
-        }
+        return self._batch_step(batch)
 
     @override
     def validation_step(self, batch: INPUT_TENSOR_BATCH, *args: Any, **kwargs: Any) -> STEP_OUTPUT:
@@ -150,8 +143,8 @@ class Mask2FormerModule(module.ModelModule):
             The batch step output.
         """
         data, targets, metadata = INPUT_TENSOR_BATCH(*batch)
-        predictions = self(data, to_size=targets.shape[-2:])
-        loss = self.criterion(predictions, targets)
+        predictions, logits = self(data, to_size=targets.shape[-2:])
+        loss = self.criterion(logits, targets)
         return {
             "loss": loss,
             "targets": targets,
