@@ -36,7 +36,7 @@ trainer:
             init_args:
               model_name_or_path: owkin/phikon
               tensor_transforms: 
-                class_path: eva.core.models.networks.transforms.ExtractCLSFeatures
+                class_path: eva.core.models.transforms.ExtractCLSFeatures
     logger:
       - class_path: lightning.pytorch.loggers.TensorBoardLogger
         init_args:

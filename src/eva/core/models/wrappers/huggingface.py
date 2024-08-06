@@ -6,7 +6,7 @@ import torch
 import transformers
 from typing_extensions import override
 
-from eva.core.models.networks.wrappers import base
+from eva.core.models.wrappers import base
 
 
 class HuggingFaceModel(base.BaseModel):

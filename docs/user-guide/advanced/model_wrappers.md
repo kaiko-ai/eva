@@ -1,7 +1,7 @@
 # Model Wrappers
 
 
-This document shows how to use *eva*'s [Model Wrapper API](../../reference/core/models/networks.md#wrappers) (`eva.models.networks.wrappers`) to load different model formats from a series of sources such as PyTorch Hub, HuggingFace Model Hub and ONNX. 
+This document shows how to use *eva*'s [Model Wrapper API](../../reference/core/models/networks.md#wrappers) (`eva.models.wrappers`) to load different model formats from a series of sources such as PyTorch Hub, HuggingFace Model Hub and ONNX. 
 
 ## Loading PyTorch models
 The *eva* framework is built on top of PyTorch Lightning and thus naturally supports loading PyTorch models.
@@ -22,7 +22,7 @@ To load models from PyTorch Hub or other torch model providers, the easiest way 
 
 ```
 backbone:
-  class_path: eva.models.networks.wrappers.ModelFromFunction
+  class_path: eva.models.wrappers.ModelFromFunction
   init_args:
     path: torch.hub.load
     arguments:
@@ -40,7 +40,7 @@ Note that if a `checkpoint_path` is provided, `ModelFromFunction` will automatic
 Similar to the above example, we can easily load models using the common vision library `timm`:
 ```
 backbone:
-  class_path: eva.models.networks.wrappers.ModelFromFunction
+  class_path: eva.models.wrappers.ModelFromFunction
   init_args:
     path: timm.create_model
     arguments:
@@ -54,7 +54,7 @@ For loading models from HuggingFace Hub, *eva* provides a custom wrapper class `
 
 ```
 backbone:
-  class_path: eva.models.networks.wrappers.HuggingFaceModel
+  class_path: eva.models.wrappers.HuggingFaceModel
   init_args:
     model_name_or_path: owkin/phikon
     tensor_transforms: 
@@ -67,7 +67,7 @@ In the above example, the forward pass implemented by the `owkin/phikon` model r
 `.onnx` model checkpoints can be loaded using the `ONNXModel` wrapper class as follows:
 
 ```
-class_path: eva.models.networks.wrappers.ONNXModel
+class_path: eva.models.wrappers.ONNXModel
 init_args:
   path: path/to/model.onnx
   device: cuda
@@ -75,7 +75,7 @@ init_args:
 
 ## Implementing custom model wrappers
 
-You can also implement your own model wrapper classes, in case your model format is not supported by the wrapper classes that *eva* already provides. To do so, you need to subclass `eva.models.networks.wrappers.BaseModel` and implement the following abstract methods: 
+You can also implement your own model wrapper classes, in case your model format is not supported by the wrapper classes that *eva* already provides. To do so, you need to subclass `eva.models.wrappers.BaseModel` and implement the following abstract methods: 
 
 - `load_model`: Returns an instantiated model object & loads pre-trained model weights from a checkpoint if available. 
 - `model_forward`: Implements the forward pass of the model and returns the output as a `torch.Tensor` of shape `[embedding_dim]`

@@ -39,7 +39,7 @@ model:
       init_args:
         model_name_or_path: owkin/phikon
         tensor_transforms: 
-          class_path: eva.core.models.networks.transforms.ExtractPatchFeatures
+          class_path: eva.core.models.transforms.ExtractPatchFeatures
     decoder:
       class_path: eva.vision.models.networks.decoders.segmentation.ConvDecoderMS
       init_args:

@@ -1,6 +1,6 @@
-"""Encoder wrapper for timm models."""
+"""Model wrapper for timm models."""
 
-from typing import Any, Dict, List, Tuple
+from typing import Any, Callable, Dict, List, Tuple
 from urllib import parse
 
 import timm
@@ -8,14 +8,14 @@ import torch
 from torch import nn
 from typing_extensions import override
 
-from eva.vision.models.networks.encoders import encoder
+from eva.core.models import wrappers
 
 
-class TimmEncoder(encoder.Encoder):
-    """Encoder wrapper for `timm` models.
+class TimmModel(wrappers.BaseModel):
+    """Model wrapper for `timm` models.
 
     Note that only models with `forward_intermediates`
-    method are currently only supported.
+    method are currently supported.
     """
 
     def __init__(
@@ -23,8 +23,9 @@ class TimmEncoder(encoder.Encoder):
         model_name: str,
         pretrained: bool = True,
         checkpoint_path: str = "",
-        out_indices: int | Tuple[int, ...] | None = 1,
+        out_indices: int | Tuple[int, ...] | None = None,
         model_arguments: Dict[str, Any] | None = None,
+        tensor_transforms: Callable | None = None,
     ) -> None:
         """Initializes the encoder.
 
@@ -35,8 +36,10 @@ class TimmEncoder(encoder.Encoder):
             out_indices: Returns last n blocks if `int`, all if `None`, select
                 matching indices if sequence.
             model_arguments: Extra model arguments.
+            tensor_transforms: The transforms to apply to the output tensor
+                produced by the model.
         """
-        super().__init__()
+        super().__init__(tensor_transforms=tensor_transforms)
 
         self._model_name = model_name
         self._pretrained = pretrained
@@ -46,22 +49,23 @@ class TimmEncoder(encoder.Encoder):
 
         self._feature_extractor: nn.Module
 
-        self.configure_model()
+        self.load_model()
 
-    def configure_model(self) -> None:
+    @override
+    def load_model(self) -> None:
         """Builds and loads the timm model as feature extractor."""
         self._feature_extractor = timm.create_model(
             model_name=self._model_name,
-            pretrained=True if self._checkpoint_path else self._pretrained,
+            pretrained=False if self._checkpoint_path else self._pretrained,
             pretrained_cfg=self._pretrained_cfg,
             out_indices=self._out_indices,
             features_only=True,
             **self._model_arguments,
         )
-        TimmEncoder.__name__ = self._model_name
+        TimmModel.__name__ = self._model_name
 
     @override
-    def forward(self, tensor: torch.Tensor) -> List[torch.Tensor]:
+    def model_forward(self, tensor: torch.Tensor) -> List[torch.Tensor]:
         return self._feature_extractor(tensor)
 
     @property

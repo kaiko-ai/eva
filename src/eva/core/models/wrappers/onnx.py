@@ -6,7 +6,7 @@ import onnxruntime as ort
 import torch
 from typing_extensions import override
 
-from eva.core.models.networks.wrappers import base
+from eva.core.models.wrappers import base
 
 
 class ONNXModel(base.BaseModel):

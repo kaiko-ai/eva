@@ -24,7 +24,7 @@ class SemanticSegmentationModule(module.ModelModule):
         self,
         decoder: decoders.Decoder,
         criterion: Callable[..., torch.Tensor],
-        encoder: Callable[[torch.Tensor], List[torch.Tensor]] | Dict[str, Any] | None = None,
+        encoder: Dict[str, Any] | Callable[[torch.Tensor], List[torch.Tensor]] | None = None,
         lr_multiplier_encoder: float = 0.0,
         optimizer: OptimizerCallable = optim.AdamW,
         lr_scheduler: LRSchedulerCallable = lr_scheduler.ConstantLR,

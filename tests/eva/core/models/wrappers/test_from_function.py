@@ -6,7 +6,7 @@ import pytest
 import torch
 from torch import nn
 
-from eva.core.models.networks import wrappers
+from eva.core.models import wrappers
 
 
 @pytest.mark.parametrize(
