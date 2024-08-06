@@ -7,6 +7,7 @@ from eva.vision.models.networks.backbones.pathology.kaiko import (
     kaiko_vits8,
     kaiko_vits16,
 )
+from eva.vision.models.networks.backbones.pathology.owkin import owkin_phikon
 
 __all__ = [
     "kaiko_vitb16",
@@ -14,4 +15,5 @@ __all__ = [
     "kaiko_vitl14",
     "kaiko_vits16",
     "kaiko_vits8",
+    "owkin_phikon",
 ]

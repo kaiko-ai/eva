@@ -1,6 +1,6 @@
 """Backbone Model Registry."""
 
-from typing import Any, Callable, Dict, Type
+from typing import Any, Callable, Dict
 
 import torch.nn as nn
 
@@ -8,7 +8,7 @@ import torch.nn as nn
 class BackboneModelRegistry:
     """A model registry for accessing backbone models by name."""
 
-    _registry: Dict[str, Type[nn.Module]] = {}
+    _registry: Dict[str, Callable[..., nn.Module]] = {}
 
     @classmethod
     def register(cls, name: str) -> Callable:
@@ -37,5 +37,5 @@ class BackboneModelRegistry:
 
 
 def register_model(name: str) -> Callable:
-    """Simple decorator to register a model in the BackboneModelRegistry."""
+    """Simple decorator to register a model."""
     return BackboneModelRegistry.register(name)

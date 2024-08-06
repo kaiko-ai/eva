@@ -49,7 +49,7 @@ model:
     decoder:
       class_path: eva.vision.models.networks.decoders.segmentation.ConvDecoderMS
       init_args:
-        in_features: ${oc.env:DECODER_IN_FEATURES, 768}
+        in_features: ${oc.env:IN_FEATURES, 768}
         num_classes:  &NUM_CLASSES 5
     criterion:
       class_path: eva.vision.losses.DiceLoss
