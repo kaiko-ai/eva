@@ -34,7 +34,7 @@ model:
   class_path: eva.vision.models.modules.SemanticSegmentationModule
   init_args:
     encoder:
-      class_path: eva.vision.models.networks.encoders.TimmEncoder
+      class_path: eva.vision.models.wrappers.TimmModel
       init_args:
         model_name: ${oc.env:TIMM_MODEL_NAME, vit_small_patch16_224_dino}
         pretrained: ${oc.env:MODEL_PRETRAINED, true}

@@ -1,6 +1,6 @@
 """"Neural Network Semantic Segmentation Module."""
 
-from typing import Any, Callable, Iterable, List, Tuple
+from typing import Any, Callable, Iterable, Tuple
 
 import torch
 from lightning.pytorch.cli import LRSchedulerCallable, OptimizerCallable
@@ -11,7 +11,7 @@ from typing_extensions import override
 
 from eva.core.metrics import structs as metrics_lib
 from eva.core.models.modules import module
-from eva.core.models.modules.typings import INPUT_BATCH, INPUT_TENSOR_BATCH
+from eva.core.models.modules.typings import INPUT_BATCH, INPUT_TENSOR_BATCH, MODEL_TYPE
 from eva.core.models.modules.utils import batch_postprocess, grad
 from eva.vision.models.networks import decoders
 
@@ -23,7 +23,7 @@ class SemanticSegmentationModule(module.ModelModule):
         self,
         decoder: decoders.Decoder,
         criterion: Callable[..., torch.Tensor],
-        encoder: Callable[[torch.Tensor], List[torch.Tensor]] | None = None,
+        encoder: MODEL_TYPE | None = None,
         lr_multiplier_encoder: float = 0.0,
         optimizer: OptimizerCallable = optim.AdamW,
         lr_scheduler: LRSchedulerCallable = lr_scheduler.ConstantLR,

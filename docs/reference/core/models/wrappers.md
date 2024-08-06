@@ -1,10 +1,7 @@
-# Networks
+# Wrappers
 
-Reference information for the model `Networks` API.
+Reference information for the model `Wrappers` API.
 
-::: eva.models.networks.MLP
-
-## Wrappers
 ::: eva.models.wrappers.BaseModel
 ::: eva.models.wrappers.ModelFromFunction
 ::: eva.models.wrappers.HuggingFaceModel

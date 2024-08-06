@@ -6,7 +6,7 @@ import pytest
 import torch
 from transformers import modeling_outputs
 
-from eva.core.models.networks import transforms, wrappers
+from eva.core.models import transforms, wrappers
 
 
 @pytest.mark.parametrize(

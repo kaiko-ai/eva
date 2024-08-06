@@ -113,6 +113,8 @@ nav:
       - Models: 
         - Modules: reference/core/models/modules.md
         - Networks: reference/core/models/networks.md
+        - Wrappers: reference/core/models/wrappers.md
+        - Transforms: reference/core/models/transforms.md
       - Trainers:
         - Trainer: reference/core/trainers/trainer.md
         - Functional: reference/core/trainers/functional.md
@@ -127,6 +129,7 @@ nav:
         - reference/vision/data/datasets.md
         - reference/vision/data/transforms.md
       - Models:
-        - reference/vision/models/networks.md
+        - Networks: reference/vision/models/networks.md
+        - Wrappers: reference/vision/models/wrappers.md
       - Utils:
         - IO: reference/vision/utils/io.md
