@@ -1826,6 +1826,10 @@
       
         
       
+        
+      
+        
+      
     
     
       
@@ -1892,6 +1896,48 @@
   
   <span class="md-ellipsis">
     Networks
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../reference/core/models/wrappers/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Wrappers
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../reference/core/models/transforms/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Transforms
   </span>
   
 
@@ -2313,6 +2359,8 @@
       
         
       
+        
+      
     
     
       
@@ -2358,6 +2406,27 @@
   
   <span class="md-ellipsis">
     Networks
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../reference/vision/models/wrappers/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Wrappers
   </span>
   
 
@@ -2544,7 +2613,7 @@
 
 
 <h1 id="model-wrappers">Model Wrappers</h1>
-<p>This document shows how to use <em>eva</em>'s <a href="../../../reference/core/models/networks/#wrappers">Model Wrapper API</a> (<code>eva.models.networks.wrappers</code>) to load different model formats from a series of sources such as PyTorch Hub, HuggingFace Model Hub and ONNX. </p>
+<p>This document shows how to use <em>eva</em>'s <a href="../../../reference/core/models/networks/#wrappers">Model Wrapper API</a> (<code>eva.models.wrappers</code>) to load different model formats from a series of sources such as PyTorch Hub, HuggingFace Model Hub and ONNX. </p>
 <h2 id="loading-pytorch-models">Loading PyTorch models</h2>
 <p>The <em>eva</em> framework is built on top of PyTorch Lightning and thus naturally supports loading PyTorch models.
 You just need to specify the class path of your model in the backbone section of the <code>.yaml</code> config file.</p>
@@ -2558,7 +2627,7 @@ You just need to specify the class path of your model in the backbone section of
 <h3 id="pytorch-hub">PyTorch Hub</h3>
 <p>To load models from PyTorch Hub or other torch model providers, the easiest way is to use the <code>ModelFromFunction</code> wrapper class:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>backbone:
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>  class_path: eva.models.networks.wrappers.ModelFromFunction
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>  class_path: eva.models.wrappers.ModelFromFunction
 </span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>  init_args:
 </span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    path: torch.hub.load
 </span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    arguments:
@@ -2571,7 +2640,7 @@ You just need to specify the class path of your model in the backbone section of
 <h3 id="timm">timm</h3>
 <p>Similar to the above example, we can easily load models using the common vision library <code>timm</code>:
 <div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>backbone:
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>  class_path: eva.models.networks.wrappers.ModelFromFunction
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>  class_path: eva.models.wrappers.ModelFromFunction
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>  init_args:
 </span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    path: timm.create_model
 </span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    arguments:
@@ -2581,7 +2650,7 @@ You just need to specify the class path of your model in the backbone section of
 <h2 id="loading-models-from-huggingface-hub">Loading models from HuggingFace Hub</h2>
 <p>For loading models from HuggingFace Hub, <em>eva</em> provides a custom wrapper class <code>HuggingFaceModel</code> which can be used as follows:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>backbone:
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>  class_path: eva.models.networks.wrappers.HuggingFaceModel
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>  class_path: eva.models.wrappers.HuggingFaceModel
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>  init_args:
 </span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    model_name_or_path: owkin/phikon
 </span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    tensor_transforms: 
@@ -2590,13 +2659,13 @@ You just need to specify the class path of your model in the backbone section of
 <p>In the above example, the forward pass implemented by the <code>owkin/phikon</code> model returns an output tensor containing the hidden states of all input tokens. In order to extract the state corresponding to the CLS token only, we can specify a transformation via the <code>tensor_transforms</code> argument which will be applied to the model output.</p>
 <h2 id="loading-onnx-models">Loading ONNX models</h2>
 <p><code>.onnx</code> model checkpoints can be loaded using the <code>ONNXModel</code> wrapper class as follows:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>class_path: eva.models.networks.wrappers.ONNXModel
+<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>class_path: eva.models.wrappers.ONNXModel
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>init_args:
 </span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>  path: path/to/model.onnx
 </span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>  device: cuda
 </span></code></pre></div>
 <h2 id="implementing-custom-model-wrappers">Implementing custom model wrappers</h2>
-<p>You can also implement your own model wrapper classes, in case your model format is not supported by the wrapper classes that <em>eva</em> already provides. To do so, you need to subclass <code>eva.models.networks.wrappers.BaseModel</code> and implement the following abstract methods: </p>
+<p>You can also implement your own model wrapper classes, in case your model format is not supported by the wrapper classes that <em>eva</em> already provides. To do so, you need to subclass <code>eva.models.wrappers.BaseModel</code> and implement the following abstract methods: </p>
 <ul>
 <li><code>load_model</code>: Returns an instantiated model object &amp; loads pre-trained model weights from a checkpoint if available. </li>
 <li><code>model_forward</code>: Implements the forward pass of the model and returns the output as a <code>torch.Tensor</code> of shape <code>[embedding_dim]</code></li>
