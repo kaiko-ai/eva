@@ -27,7 +27,7 @@ trainer:
           mode: *MONITOR_METRIC_MODE
       - class_path: eva.callbacks.SegmentationEmbeddingsWriter
         init_args:
-          output_dir: &DATASET_EMBEDDINGS_ROOT ${oc.env:EMBEDDINGS_ROOT, ./data/embeddings}/${oc.env:TIMM_MODEL_NAME, vit_small_patch16_224_dino}/bcss
+          output_dir: &DATASET_EMBEDDINGS_ROOT ${oc.env:EMBEDDINGS_ROOT, ./data/embeddings}/${oc.env:TIMM_MODEL_NAME, vit_small_patch16_224_imagenet}/bcss
           dataloader_idx_map:
             0: train
             1: val
