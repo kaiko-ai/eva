@@ -4,7 +4,7 @@ trainer:
   init_args:
     n_runs: &N_RUNS ${oc.env:N_RUNS, 1}
     default_root_dir: &OUTPUT_ROOT ${oc.env:OUTPUT_ROOT, logs/${oc.env:TIMM_MODEL_NAME, vit_small_patch16_224}/bcss}
-    max_steps: &MAX_STEPS ${oc.env:MAX_STEPS, 513}
+    max_steps: &MAX_STEPS ${oc.env:MAX_STEPS, 2000}
     log_every_n_steps: 6
     callbacks:
       - class_path: eva.callbacks.ConfigurationLogger
@@ -22,7 +22,7 @@ trainer:
       - class_path: lightning.pytorch.callbacks.EarlyStopping
         init_args:
           min_delta: 0
-          patience: 100
+          patience: 8
           monitor: *MONITOR_METRIC
           mode: *MONITOR_METRIC_MODE
       - class_path: eva.callbacks.SegmentationEmbeddingsWriter
@@ -31,7 +31,9 @@ trainer:
           dataloader_idx_map:
             0: train
             1: val
+            2: test
           metadata_keys: ["coords"]
+          overwrite: true
           backbone:
             class_path: eva.vision.models.networks.encoders.TimmEncoder
             init_args:
@@ -62,7 +64,7 @@ model:
     optimizer:
       class_path: torch.optim.AdamW
       init_args:
-        lr: 0.002
+        lr: 0.0001
     lr_scheduler:
       class_path: torch.optim.lr_scheduler.PolynomialLR
       init_args:
@@ -104,6 +106,11 @@ data:
         init_args:
           <<: *DATASET_ARGS
           split: val
+      test:
+        class_path: eva.vision.datasets.EmbeddingsSegmentationDataset
+        init_args:
+          <<: *DATASET_ARGS
+          split: test
       predict:
         - class_path: eva.vision.datasets.BCSS
           init_args: &PREDICT_DATASET_ARGS
