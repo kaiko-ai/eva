@@ -1,6 +1,6 @@
 """Pathology FMs from kaiko.ai."""
 
-from typing import List
+from typing import Tuple
 
 import torch
 from torch import nn
@@ -10,7 +10,7 @@ from eva.vision.models.networks.backbones.registry import register_model
 
 @register_model("pathology/kaiko_vits16")
 def kaiko_vits16(
-    dynamic_img_size: bool = True, out_indices: int | List[int] | None = None
+    dynamic_img_size: bool = True, out_indices: int | Tuple[int, ...] | None = None
 ) -> nn.Module:
     """Initializes the vision transformer ViTS-16 pathology FM by kaiko.ai.
 
@@ -34,7 +34,7 @@ def kaiko_vits16(
 
 @register_model("pathology/kaiko_vits8")
 def kaiko_vits8(
-    dynamic_img_size: bool = True, out_indices: int | List[int] | None = None
+    dynamic_img_size: bool = True, out_indices: int | Tuple[int, ...] | None = None
 ) -> nn.Module:
     """Initializes the vision transformer ViTS-8 pathology FM by kaiko.ai.
 
@@ -58,7 +58,7 @@ def kaiko_vits8(
 
 @register_model("pathology/kaiko_vitb16")
 def kaiko_vitb16(
-    dynamic_img_size: bool = True, out_indices: int | List[int] | None = None
+    dynamic_img_size: bool = True, out_indices: int | Tuple[int, ...] | None = None
 ) -> nn.Module:
     """Initializes the vision transformer ViTB-16 pathology FM by kaiko.ai.
 
@@ -82,7 +82,7 @@ def kaiko_vitb16(
 
 @register_model("pathology/kaiko_vitb8")
 def kaiko_vitb8(
-    dynamic_img_size: bool = True, out_indices: int | List[int] | None = None
+    dynamic_img_size: bool = True, out_indices: int | Tuple[int, ...] | None = None
 ) -> nn.Module:
     """Initializes the vision transformer ViTB-8 pathology FM by kaiko.ai.
 
@@ -106,7 +106,7 @@ def kaiko_vitb8(
 
 @register_model("pathology/kaiko_vitl14")
 def kaiko_vitl14(
-    dynamic_img_size: bool = True, out_indices: int | List[int] | None = None
+    dynamic_img_size: bool = True, out_indices: int | Tuple[int, ...] | None = None
 ) -> nn.Module:
     """Initializes the vision transformer ViTL-14 pathology FM by kaiko.ai.
 

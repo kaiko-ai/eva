@@ -7,7 +7,7 @@ from torch import nn
 from typing_extensions import override
 
 from eva.core.models import wrappers
-from eva.vision.models.networks import BackboneModelRegistry
+from eva.vision.models.networks.backbones import BackboneModelRegistry
 
 
 class VisionBackbone(wrappers.BaseModel):
