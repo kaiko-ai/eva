@@ -3,7 +3,7 @@ trainer:
   class_path: eva.Trainer
   init_args:
     n_runs: &N_RUNS ${oc.env:N_RUNS, 5}
-    default_root_dir: &OUTPUT_ROOT ${oc.env:OUTPUT_ROOT, logs/${oc.env:DINO_BACKBONE, dino_vits16}/offline/panda}
+    default_root_dir: &OUTPUT_ROOT ${oc.env:OUTPUT_ROOT, logs/${oc.env:MODEL_NAME, dino_vits16}/offline/panda}
     max_epochs: &MAX_EPOCHS ${oc.env:MAX_EPOCHS, 49}
     callbacks:
       - class_path: lightning.pytorch.callbacks.LearningRateMonitor
@@ -24,7 +24,7 @@ trainer:
           mode: *MONITOR_METRIC_MODE
       - class_path: eva.callbacks.ClassificationEmbeddingsWriter
         init_args:
-          output_dir: &DATASET_EMBEDDINGS_ROOT ${oc.env:EMBEDDINGS_ROOT, ./data/embeddings/${oc.env:DINO_BACKBONE, dino_vits16}/panda}
+          output_dir: &DATASET_EMBEDDINGS_ROOT ${oc.env:EMBEDDINGS_ROOT, ./data/embeddings/${oc.env:MODEL_NAME, dino_vits16}/panda}
           dataloader_idx_map:
             0: train
             1: val

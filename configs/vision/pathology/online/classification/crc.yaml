@@ -2,7 +2,7 @@
 trainer:
   class_path: eva.Trainer
   init_args:
-    default_root_dir: &OUTPUT_ROOT ${oc.env:OUTPUT_ROOT, logs/${oc.env:DINO_BACKBONE, dino_vits16}/online/crc}
+    default_root_dir: &OUTPUT_ROOT ${oc.env:OUTPUT_ROOT, logs/${oc.env:MODEL_NAME, dino_vits16}/online/crc}
     max_steps: &MAX_STEPS ${oc.env:MAX_STEPS, 12500}
     callbacks:
       - class_path: eva.callbacks.ConfigurationLogger

@@ -45,8 +45,10 @@ To customize runs, without the need of creating custom config-files, you can ove
 |-------------------------|-------|-------------|
 | `MODEL_NAME`            | `str`   | The name of the backbone model to load from the model registry. (e.g. pathology/kaiko_vitb8) facebookresearch/dino FM is evaluated |
 | `OUT_INDICES`           | `int` \| `tuple[int]` \| `None`   | The indices of the feature maps to select. E.g. `1` outputs last feature map of the backbone, `3` outputs the last three feature maps, and `(-2, -4)` returns the penultimate and the forth before the last maps. Currently this is only used for segmentation tasks.  |
+| `DATA_ROOT`             | `str`   | The location of where the datasets will be downloaded to / loaded from during evaluation. |
+| `DOWNLOAD`              | `bool`  | Whether to automatically download the dataset (make sure to review the license of the dataset first and note that not all datasets support this) . |
 | `OUTPUT_ROOT`           | `str`   | The directory to store logging outputs and evaluation results |
-| `EMBEDDINGS_ROOT`       | `str`   | The directory to store the computed embeddings |
+| `EMBEDDINGS_ROOT`       | `str`   | The directory to store the computed embeddings during `eva predict`. |
 | `IN_FEATURES`           | `int`   | The input feature dimension (embedding) |
 | `N_RUNS`                | `int`   | Number of `fit` runs to perform in a session, defaults to 5 |
 | `MAX_STEPS`             | `int`   | Maximum number of training steps (if early stopping is not triggered) |
