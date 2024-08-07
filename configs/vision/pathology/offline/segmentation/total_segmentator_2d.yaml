@@ -133,7 +133,7 @@ data:
             split: test
     dataloaders:
       train:
-        batch_size: &BATCH_SIZE ${oc.env:BATCH_SIZE, 16}
+        batch_size: &BATCH_SIZE ${oc.env:BATCH_SIZE, 64}
         shuffle: true
       val:
         batch_size: *BATCH_SIZE
