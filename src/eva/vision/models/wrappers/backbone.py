@@ -11,7 +11,12 @@ from eva.vision.models.networks import BackboneModelRegistry
 
 
 class VisionBackbone(wrappers.BaseModel):
-    """Vision backbone."""
+    """Wrapper class for vision backbone models.
+
+    This class can be used by load backbones available in eva's
+    model registry by name. New backbones can be registered by using
+    the `@register_model(model_name)` decorator.
+    """
 
     def __init__(
         self,
@@ -19,7 +24,7 @@ class VisionBackbone(wrappers.BaseModel):
         model_kwargs: Dict[str, Any] | None = None,
         tensor_transforms: Callable | None = None,
     ) -> None:
-        """Initializes and constructs the model.
+        """Initializes the model.
 
         Args:
             model_name: The name of the model to load.
