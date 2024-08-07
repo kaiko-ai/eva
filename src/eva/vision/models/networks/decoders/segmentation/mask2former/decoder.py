@@ -6,7 +6,7 @@ import torch
 from torch.nn import functional
 
 from eva.vision.models.networks.decoders import decoder
-from eva.vision.models.networks.decoders.segmentation.mask2former import network
+from eva.vision.models.networks.decoders.segmentation.mask2former import head
 
 
 class Mask2FormerDecoder(decoder.Decoder):
@@ -37,7 +37,7 @@ class Mask2FormerDecoder(decoder.Decoder):
         """
         super().__init__()
 
-        self._mask2former = network.Mask2FormerModel(
+        self._mask2former = head.Mask2FormerHead(
             in_features=in_features,
             num_classes=num_classes,
             embed_dim=embed_dim,

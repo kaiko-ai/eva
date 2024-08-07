@@ -9,8 +9,8 @@ from transformers.models.mask2former import modeling_mask2former
 from eva.vision.models.networks.decoders.segmentation.mask2former import nn_layers
 
 
-class Mask2FormerModel(nn.Module):
-    """Mask2Former decoder for segmentation tasks using a transformer architecture."""
+class Mask2FormerHead(nn.Module):
+    """Mask2Former head for segmentation tasks."""
 
     def __init__(
         self,
@@ -65,6 +65,20 @@ class Mask2FormerModel(nn.Module):
         )
         self.q_class = nn.Linear(self._embed_dim, self._num_classes + 1)
 
+        self.upsample = nn.Upsample(scale_factor=2)
+
+        # self.upsample_nn = nn.Sequential(
+        #     nn.ConvTranspose2d(
+        #         self._embed_dim,
+        #         self._embed_dim,
+        #         kernel_size=3,
+        #         stride=2,
+        #         padding=1,
+        #         output_padding=1,
+        #     ),
+        #     nn.ELU(inplace=True),
+        # )
+
     def forward(
         self,
         patch_embeddings: torch.Tensor,
@@ -86,14 +100,15 @@ class Mask2FormerModel(nn.Module):
         """
         x = self.projection_layer(patch_embeddings)
 
+        batch_size = x.shape[0]
         q = self.q.weight
-        q = q[:, None, :].repeat(1, x.shape[0], 1)
-        v = x.view(self._embed_dim, x.shape[0], -1).transpose(0, 2)
+        q = q[:, None, :].repeat(1, batch_size, 1)
+        v = x.view(self._embed_dim, batch_size, -1).transpose(0, 2)
 
         k = v + self.k_embed_pos(x).flatten(2).permute(2, 0, 1)
 
         q_pos_embeds = self.q_pos_embed.weight
-        q_pos_embeds = q_pos_embeds[:, None, :].repeat(1, x.shape[0], 1)
+        q_pos_embeds = q_pos_embeds[:, None, :].repeat(1, batch_size, 1)
 
         mask_logits_per_layer, class_logits_per_layer = [], []
         for block in self.transformer_decoder:
