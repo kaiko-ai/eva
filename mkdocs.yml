@@ -73,6 +73,7 @@ nav:
         - user-guide/getting-started/how_to_use.md
       - Tutorials:
         - user-guide/tutorials/offline_vs_online.md
+        - user-guide/tutorials/model_registry.md
         - user-guide/tutorials/evaluate_resnet.md
       - Advanced user guide:
         - user-guide/advanced/replicate_evaluations.md
