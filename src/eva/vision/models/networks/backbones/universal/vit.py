@@ -27,7 +27,7 @@ def vit_small_patch16_224_random(
         The torch ViTS-16 based foundation model.
     """
     return timm.create_model(
-        model_name="vit_small_patch16_224_dino",
+        model_name="vit_small_patch16_224.dino",
         pretrained=False,
         features_only=out_indices is not None,
         out_indices=out_indices,
@@ -51,7 +51,7 @@ def vit_small_patch16_224_imagenet(
         The torch ViTS-16 based foundation model.
     """
     return timm.create_model(
-        model_name="vit_small_patch16_224_dino",
+        model_name="vit_small_patch16_224.dino",
         pretrained=True,
         features_only=out_indices is not None,
         out_indices=out_indices,

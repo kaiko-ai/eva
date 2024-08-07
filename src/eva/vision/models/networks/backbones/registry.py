@@ -1,6 +1,6 @@
 """Backbone Model Registry."""
 
-from typing import Any, Callable, Dict
+from typing import Any, Callable, Dict, List
 
 import torch.nn as nn
 
@@ -34,6 +34,12 @@ class BackboneModelRegistry:
         """Loads & initializes a model class from the registry."""
         model_fn = cls.get(model_name)
         return model_fn(**kwargs)
+    
+    @classmethod
+    def list_models(cls) -> List[str]:
+        """List all models in the registry."""
+        return list(cls._registry.keys())
+        
 
 
 def register_model(name: str) -> Callable:
