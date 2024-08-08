@@ -69,3 +69,12 @@ By using the `MODEL_NAME` environment variable, you can run an evaluation with a
 MODEL_NAME=pathology/kaiko_vits16 \
 eva predict_fit --config configs/vision/pathology/offline/segmentation/consep.yaml
 ```
+
+## Adding new models to the registry
+If you want to add a new FM backbone to *eva*'s registry, you'll need to follow these steps:
+
+1. Implement a python function that returns your model as a `torch.nn.Module`. If it's not a native torch model, or if you have made the model already available in public hubs such as torch.hub or huggingface, our [model wrapper](./model_wrappers.md) classes might come in handy.
+
+2. Add your model function to `eva.vision.models.networks.backbones` together with a `@register_model("your_model_name")` decorator. Then add an import statement to the `__init__` file of the corresponding module.
+
+3. Open a PR 🚀
