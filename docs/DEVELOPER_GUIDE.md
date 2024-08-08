@@ -4,12 +4,12 @@
 ## Setting up a DEV environment
 
 We use [PDM](https://pdm-project.org/latest/) as a package and dependency manager.
-You can set up a local python environment for development as follows: 
+You can set up a local Python environment for development as follows: 
 1. Install package and dependency manager PDM following the instructions [here](https://pdm-project.org/latest/#other-installation-methods).
 2. Install system dependencies
     - For MacOS: `brew install Cmake`
     - For Linux (Debian): `sudo apt-get install build-essential cmake`
-3. Run `pdm install -G dev` to install the python dependencies. This will create a virtual environment in `eva/.venv`.
+3. Run `pdm install -G dev` to install the Python dependencies. This will create a virtual environment in `eva/.venv`.
 
 ## Adding new dependencies 
 

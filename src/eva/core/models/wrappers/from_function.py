@@ -35,12 +35,11 @@ class ModelFromFunction(base.BaseModel):
             tensor_transforms: The transforms to apply to the output tensor
                 produced by the model.
         """
-        super().__init__()
+        super().__init__(tensor_transforms=tensor_transforms)
 
         self._path = path
         self._arguments = arguments
         self._checkpoint_path = checkpoint_path
-        self._tensor_transforms = tensor_transforms
 
         self._model = self.load_model()
 

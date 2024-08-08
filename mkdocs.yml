@@ -76,6 +76,7 @@ nav:
         - user-guide/tutorials/evaluate_resnet.md
       - Advanced user guide:
         - user-guide/advanced/replicate_evaluations.md
+        - user-guide/advanced/model_registry.md
         - user-guide/advanced/model_wrappers.md
   - Datasets: 
     - datasets/index.md

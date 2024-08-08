@@ -7,7 +7,9 @@ If you haven't downloaded the config files yet, please download them from [GitHu
 
 For this tutorial we use the [BACH](../../datasets/bach.md) classification task which is available on [Zenodo](https://zenodo.org/records/3632035) and is distributed under [*Attribution-NonCommercial-ShareAlike 4.0 International*](https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode) license.
 
-To let *eva* automatically handle the dataset download, set `download: true` in `configs/vision/dino_vit/offline/bach.yaml` (you may also enable automatic download by setting the environment variable DOWNLOAD=true). Before doing so, please make sure that your use case is compliant with the dataset license.
+To let *eva* automatically handle the dataset download, set `download: true` in `configs/vision/pathology/offline/classification/bach.yaml` (you may also enable automatic download by setting the environment variable `DOWNLOAD=true`). Additionally, you can set `DATA_ROOT` to configure the location of where the dataset will be downloaded to / loaded from during evaluation (the default is `./data` which will be used in the following examples).
+
+Before doing so, please make sure that your use case is compliant with the dataset license. Note that not all datasets support automatic download.
 
 ## *Offline* evaluations
 
@@ -18,9 +20,9 @@ First, let's use the `predict`-command to download the data and compute embeddin
 Open a terminal in the folder where you installed *eva* and run:
 
 ```
-PRETRAINED=false \
+MODEL_NAME=universal/vit_small_patch16_224_random \
 EMBEDDINGS_ROOT=./data/embeddings/dino_vits16_random \
-eva predict --config configs/vision/dino_vit/offline/bach.yaml
+eva predict --config configs/vision/pathology/offline/classification/bach.yaml
 ```
 
 Executing this command will:
@@ -31,8 +33,8 @@ Executing this command will:
 Once the session is complete, verify that:
 
 - The raw images have been downloaded to `./data/bach/ICIAR2018_BACH_Challenge`
-- The embeddings have been computed and are stored in `./data/embeddings/dino_vits16_random/bach`
-- The `manifest.csv` file that maps the filename to the embedding, target and split has been created in `./data/embeddings/dino_vits16/bach`.
+- The embeddings have been computed and are stored in `$EMBEDDINGS_ROOT/$MODEL_NAME/bach`
+- The `manifest.csv` file that maps the filename to the embedding, target and split has been created in the same embeddings directory.
 
 ### 2. Evaluate the FM 
 
@@ -41,10 +43,12 @@ Now we can use the `fit`-command to evaluate the FM on the precomputed embedding
 To ensure a quick run for the purpose of this exercise, we overwrite some of the default parameters. Run *eva* to fit the decoder classifier with:
 
 ```
+MODEL_NAME=universal/vit_small_patch16_224_random \
+EMBEDDINGS_ROOT=./data/embeddings/dino_vits16_random \
 N_RUNS=2 \
 MAX_STEPS=20 \
 LR_VALUE=0.1 \
-eva fit --config configs/vision/dino_vit/offline/bach.yaml
+eva fit --config configs/vision/pathology/offline/classification/bach.yaml
 ```
 
 Executing this command will:
@@ -54,10 +58,10 @@ Executing this command will:
 
 Once the session is complete:
 
-- Check the evaluation results in `logs/dino_vits16/offline/bach/<session-id>/results.json`. (The `<session-id>` consists of a timestamp and a hash that is based on the run configuration.)
+- Check the evaluation results in `logs/$MODEL_NAME/offline/bach/<session-id>/results.json`. (The `<session-id>` consists of a timestamp and a hash that is based on the run configuration.)
 - Take a look at the training curves with the Tensorboard. Open a new terminal, activate the environment and run:
 ```
-tensorboard --logdir logs/dino_vits16/offline/bach
+tensorboard --logdir logs/$MODEL_NAME/offline/bach
 ```
 
 ### 3. Run a complete *offline*-workflow
@@ -66,12 +70,12 @@ With the `predict_fit`-command, the two steps above can be executed with one com
 
 Go back to the terminal and execute:
 ```
-N_RUNS=1 \
+MODEL_NAME=universal/vit_small_patch16_224_imagenet \
+EMBEDDINGS_ROOT=./data/embeddings/dino_vits16_imagenet \
+N_RUNS=2 \
 MAX_STEPS=20 \
 LR_VALUE=0.1 \
-PRETRAINED=true \
-EMBEDDINGS_ROOT=./data/embeddings/dino_vits16_pretrained \
-eva predict_fit --config configs/vision/dino_vit/offline/bach.yaml
+eva predict_fit --config configs/vision/pathology/offline/classification/bach.yaml
 ```
 
 Once the session is complete, inspect the evaluation results as you did in *Step 2*. Compare the performance metrics and training curves. Can you observe better performance with the ImageNet pretrained encoder?
@@ -84,11 +88,11 @@ As in *Step 3* above, we again use a `dino_vits16` pretrained from ImageNet.
 
 Run a complete online workflow with the following command:
 ```
+MODEL_NAME=universal/vit_small_patch16_224_imagenet \
 N_RUNS=1 \
 MAX_STEPS=20 \
 LR_VALUE=0.1 \
-PRETRAINED=true \
-eva fit --config configs/vision/dino_vit/online/bach.yaml
+eva fit --config configs/vision/pathology/online/classification/bach.yaml
 ```
 
 Executing this command will:
@@ -98,5 +102,5 @@ Executing this command will:
 
 Once the run is complete:
 
-- Check the evaluation results in `logs/dino_vits16/offline/bach/<session-id>/results.json` and compare them to the results of *Step 3*. Do they match?
-- You might have noticed that the *online* run took considerably longer than the *offline* run. Do you understand why that is?
+- Check the evaluation results in `logs/$MODEL_NAME/online/bach/<session-id>/results.json` and compare them to the results of *Step 3*. Do they match?
+- You might have noticed that the *online* run took considerably longer than the *offline* run. That's because in the *offline* mode we compute the embeddings only once in the `predict` step and then store them to disk, while in *online* mode we calculate them in every training epoch of the evaluation again.

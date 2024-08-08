@@ -24,7 +24,7 @@ class TimmModel(wrappers.BaseModel):
         pretrained: bool = True,
         checkpoint_path: str = "",
         out_indices: int | Tuple[int, ...] | None = None,
-        model_arguments: Dict[str, Any] | None = None,
+        model_kwargs: Dict[str, Any] | None = None,
         tensor_transforms: Callable | None = None,
     ) -> None:
         """Initializes the encoder.
@@ -35,7 +35,7 @@ class TimmModel(wrappers.BaseModel):
             checkpoint_path: Path of checkpoint to load.
             out_indices: Returns last n blocks if `int`, all if `None`, select
                 matching indices if sequence.
-            model_arguments: Extra model arguments.
+            model_kwargs: Extra model arguments.
             tensor_transforms: The transforms to apply to the output tensor
                 produced by the model.
         """
@@ -45,7 +45,7 @@ class TimmModel(wrappers.BaseModel):
         self._pretrained = pretrained
         self._checkpoint_path = checkpoint_path
         self._out_indices = out_indices
-        self._model_arguments = model_arguments or {}
+        self._model_kwargs = model_kwargs or {}
 
         self._feature_extractor: nn.Module
 
@@ -56,22 +56,21 @@ class TimmModel(wrappers.BaseModel):
         """Builds and loads the timm model as feature extractor."""
         self._feature_extractor = timm.create_model(
             model_name=self._model_name,
-            pretrained=False if self._checkpoint_path else self._pretrained,
+            pretrained=True if self._checkpoint_path else self._pretrained,
             pretrained_cfg=self._pretrained_cfg,
             out_indices=self._out_indices,
-            features_only=True,
-            **self._model_arguments,
+            features_only=self._out_indices is not None,
+            **self._model_kwargs,
         )
         TimmModel.__name__ = self._model_name
 
     @override
-    def model_forward(self, tensor: torch.Tensor) -> List[torch.Tensor]:
+    def model_forward(self, tensor: torch.Tensor) -> torch.Tensor | List[torch.Tensor]:
         return self._feature_extractor(tensor)
 
     @property
     def _pretrained_cfg(self) -> Dict[str, Any]:
         if not self._checkpoint_path:
             return {}
-
         key = "file" if parse.urlparse(self._checkpoint_path).scheme in ("file", "") else "url"
         return {key: self._checkpoint_path, "num_classes": 0}

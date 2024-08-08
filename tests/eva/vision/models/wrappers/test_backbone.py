@@ -1,6 +1,6 @@
-"""TimmModel tests."""
+"""VisionBackbone tests."""
 
-from typing import Any, Dict, Tuple
+from typing import Any, Dict
 
 import pytest
 import torch
@@ -9,42 +9,39 @@ from eva.vision.models import wrappers
 
 
 @pytest.mark.parametrize(
-    "model_name, out_indices, model_kwargs, input_tensor, expected_len, expected_shape",
+    "model_name, model_kwargs, input_tensor, expected_len, expected_shape",
     [
         (
-            "vit_small_patch16_224",
-            1,
-            None,
+            "universal/vit_small_patch16_224_random",
+            {"out_indices": 1},
             torch.Tensor(2, 3, 224, 224),
             1,
             torch.Size([2, 384, 14, 14]),
         ),
         (
-            "vit_small_patch16_224",
-            3,
-            None,
+            "universal/vit_small_patch16_224_random",
+            {"out_indices": 3},
             torch.Tensor(2, 3, 224, 224),
             3,
             torch.Size([2, 384, 14, 14]),
         ),
         (
-            "vit_small_patch16_224",
-            3,
-            {"dynamic_img_size": True},
+            "universal/vit_small_patch16_224_random",
+            {"dynamic_img_size": True, "out_indices": 3},
             torch.Tensor(2, 3, 512, 512),
             3,
             torch.Size([2, 384, 32, 32]),
         ),
     ],
 )
-def test_timm_model(
-    timm_model: wrappers.TimmModel,
+def test_vision_backbone(
+    backbone_model: wrappers.VisionBackbone,
     input_tensor: torch.Tensor,
     expected_len: int,
     expected_shape: torch.Size,
 ) -> None:
-    """Tests the TimmModel wrapper."""
-    outputs = timm_model(input_tensor)
+    """Tests the VisionBackbone wrapper."""
+    outputs = backbone_model(input_tensor)
     assert isinstance(outputs, list)
     assert len(outputs) == expected_len
     # individual
@@ -53,14 +50,12 @@ def test_timm_model(
 
 
 @pytest.fixture(scope="function")
-def timm_model(
+def backbone_model(
     model_name: str,
-    out_indices: int | Tuple[int, ...] | None,
     model_kwargs: Dict[str, Any] | None,
-) -> wrappers.TimmModel:
-    """TimmModel fixture."""
-    return wrappers.TimmModel(
+) -> wrappers.VisionBackbone:
+    """VisionBackbone fixture."""
+    return wrappers.VisionBackbone(
         model_name=model_name,
-        out_indices=out_indices,
         model_kwargs=model_kwargs,
     )
