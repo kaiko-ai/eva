@@ -15,7 +15,7 @@ This should output a list of the model names such as:
 ['universal/vit_small_patch16_224_random', 'pathology/kaiko_vits16', 'pathology/kaiko_vits8', ...]
 ``` 
 
-A model can then be loaded and instantiated as follows:
+A model can then be loaded and instantiated like this:
 
 ```python
 import torch
