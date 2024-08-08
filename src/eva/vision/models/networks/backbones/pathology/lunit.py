@@ -26,14 +26,9 @@ def lunit_vits16(
 ) -> nn.Module:
     """Initializes the vision transformer ViTS-16 pathology FM by lunit.
 
-    For training the following s
-
     Args:
         dynamic_img_size: Support different input image sizes by allowing to change
             the grid size (interpolate abs and/or ROPE pos) in the forward pass.
-        Whether to allow the interpolation embedding
-            to be interpolated at `forward()` time when image grid changes
-            from original.
         out_indices: Weather and which multi-level patch embeddings to return.
 
     Returns:
@@ -58,9 +53,6 @@ def lunit_vits8(
     Args:
         dynamic_img_size: Support different input image sizes by allowing to change
             the grid size (interpolate abs and/or ROPE pos) in the forward pass.
-        Whether to allow the interpolation embedding
-            to be interpolated at `forward()` time when image grid changes
-            from original.
         out_indices: Weather and which multi-level patch embeddings to return.
 
     Returns:

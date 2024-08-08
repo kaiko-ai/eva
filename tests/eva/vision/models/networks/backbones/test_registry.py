@@ -22,6 +22,13 @@ def test_load_model(model_name: str):
     assert isinstance(model, nn.Module)
 
 
+def test_list_models():
+    """Test listing all models in the registry."""
+    models = BackboneModelRegistry.list_models()
+    assert isinstance(models, list)
+    assert len(models) > 0
+
+
 def test_register_model():
     """Test registering and loading a model."""
     model_name = "test_model_1"

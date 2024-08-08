@@ -17,9 +17,6 @@ def kaiko_vits16(
     Args:
         dynamic_img_size: Support different input image sizes by allowing to change
             the grid size (interpolate abs and/or ROPE pos) in the forward pass.
-        Whether to allow the interpolation embedding
-            to be interpolated at `forward()` time when image grid changes
-            from original.
         out_indices: Weather and which multi-level patch embeddings to return.
 
     Returns:
