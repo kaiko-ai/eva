@@ -126,7 +126,6 @@ IN_FEATURES=768 \
 eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
 ```
 
-
 ### kaiko.ai - DINOv2 ViT-L14 (TCGA) [[4]](#references)
 
 To evaluate [kaiko.ai's](https://www.kaiko.ai/) FM with DINOv2 ViT-L14 backbone, pretrained on TCGA data 
@@ -140,6 +139,16 @@ IN_FEATURES=1024 \
 eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
 ```
 
+### Prov-GigaPath - DINOv2 ViT-G14
+To evaluate the `Prov-Gigapath` model available on [HuggingFace](https://huggingface.co/prov-gigapath/prov-gigapath):
+
+```
+MODEL_NAME=pathology/prov_gigapath \
+IN_FEATURES=1536 \
+eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
+```
+
+
 ## References
 
  [1]: Kang, Mingu, et al. "Benchmarking self-supervised learning on diverse pathology datasets." Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. 2023.
@@ -149,3 +158,5 @@ eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
  [3]: Chen: Chen, Richard J., et al. "A general-purpose self-supervised model for computational pathology." arXiv preprint arXiv:2308.15474 (2023).
 
  [4]: Aben, Nanne, et al. "Towards Large-Scale Training of Pathology Foundation Models." arXiv preprint arXiv:2404.15217 (2024).
+
+ [6]: Xu, Hanwen, et al. "A whole-slide foundation model for digital pathology from real-world data." Nature (2024): 1-8.
