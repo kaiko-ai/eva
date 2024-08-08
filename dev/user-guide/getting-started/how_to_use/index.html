@@ -723,6 +723,8 @@
       
         
       
+        
+      
     
     
       
@@ -768,6 +770,27 @@
   
   <span class="md-ellipsis">
     Replicate evaluations
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../advanced/model_registry/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Backbone Model Registry
   </span>
   
 
@@ -2612,84 +2635,79 @@
 </thead>
 <tbody>
 <tr>
+<td><code>MODEL_NAME</code></td>
+<td><code>str</code></td>
+<td>The name of the backbone model to load from the model registry. (e.g. pathology/kaiko_vitb8) facebookresearch/dino FM is evaluated</td>
+</tr>
+<tr>
+<td><code>OUT_INDICES</code></td>
+<td><code>int</code> | <code>tuple[int]</code> | <code>None</code></td>
+<td>The indices of the feature maps to select. E.g. <code>1</code> outputs last feature map of the backbone, <code>3</code> outputs the last three feature maps, and <code>(-2, -4)</code> returns the penultimate and the forth before the last maps. Currently this is only used for segmentation tasks.</td>
+</tr>
+<tr>
+<td><code>DATA_ROOT</code></td>
+<td><code>str</code></td>
+<td>The location of where the datasets will be downloaded to / loaded from during evaluation.</td>
+</tr>
+<tr>
+<td><code>DOWNLOAD</code></td>
+<td><code>bool</code></td>
+<td>Whether to automatically download the dataset (make sure to review the license of the dataset first and note that not all datasets support this) .</td>
+</tr>
+<tr>
 <td><code>OUTPUT_ROOT</code></td>
-<td>str</td>
+<td><code>str</code></td>
 <td>The directory to store logging outputs and evaluation results</td>
 </tr>
 <tr>
 <td><code>EMBEDDINGS_ROOT</code></td>
-<td>str</td>
-<td>The directory to store the computed embeddings</td>
-</tr>
-<tr>
-<td><code>CHECKPOINT_PATH</code></td>
-<td>str</td>
-<td>Path to the FM-checkpoint to be evaluated</td>
+<td><code>str</code></td>
+<td>The directory to store the computed embeddings during <code>eva predict</code>.</td>
 </tr>
 <tr>
 <td><code>IN_FEATURES</code></td>
-<td>int</td>
+<td><code>int</code></td>
 <td>The input feature dimension (embedding)</td>
 </tr>
 <tr>
-<td><code>NUM_CLASSES</code></td>
-<td>int</td>
-<td>Number of classes for classification tasks</td>
-</tr>
-<tr>
 <td><code>N_RUNS</code></td>
-<td>int</td>
+<td><code>int</code></td>
 <td>Number of <code>fit</code> runs to perform in a session, defaults to 5</td>
 </tr>
 <tr>
 <td><code>MAX_STEPS</code></td>
-<td>int</td>
+<td><code>int</code></td>
 <td>Maximum number of training steps (if early stopping is not triggered)</td>
 </tr>
 <tr>
 <td><code>BATCH_SIZE</code></td>
-<td>int</td>
+<td><code>int</code></td>
 <td>Batch size for a training step</td>
 </tr>
 <tr>
 <td><code>PREDICT_BATCH_SIZE</code></td>
-<td>int</td>
+<td><code>int</code></td>
 <td>Batch size for a predict step</td>
 </tr>
 <tr>
 <td><code>LR_VALUE</code></td>
-<td>float</td>
+<td><code>float</code></td>
 <td>Learning rate for training the decoder</td>
 </tr>
 <tr>
 <td><code>MONITOR_METRIC</code></td>
-<td>str</td>
+<td><code>str</code></td>
 <td>The metric to monitor for early stopping and final model checkpoint loading</td>
 </tr>
 <tr>
 <td><code>MONITOR_METRIC_MODE</code></td>
-<td>str</td>
+<td><code>str</code></td>
 <td>"min" or "max", depending on the <code>MONITOR_METRIC</code> used</td>
 </tr>
 <tr>
 <td><code>REPO_OR_DIR</code></td>
-<td>str</td>
+<td><code>str</code></td>
 <td>GitHub repo with format containing model implementation, e.g. "facebookresearch/dino:main"</td>
-</tr>
-<tr>
-<td><code>DINO_BACKBONE</code></td>
-<td>str</td>
-<td>Backbone model architecture if a facebookresearch/dino FM is evaluated</td>
-</tr>
-<tr>
-<td><code>FORCE_RELOAD</code></td>
-<td>bool</td>
-<td>Whether to force a fresh download of the github repo unconditionally</td>
-</tr>
-<tr>
-<td><code>PRETRAINED</code></td>
-<td>bool</td>
-<td>Whether to load FM-backbone weights from a pretrained model</td>
 </tr>
 </tbody>
 </table>

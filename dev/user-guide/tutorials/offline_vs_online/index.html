@@ -723,6 +723,8 @@
       
         
       
+        
+      
     
     
       
@@ -768,6 +770,27 @@
   
   <span class="md-ellipsis">
     Replicate evaluations
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../advanced/model_registry/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Backbone Model Registry
   </span>
   
 
@@ -2581,14 +2604,15 @@
 <h3 id="before-you-start">Before you start</h3>
 <p>If you haven't downloaded the config files yet, please download them from <a href="https://github.com/kaiko-ai/eva/tree/0.0.2">GitHub</a>.</p>
 <p>For this tutorial we use the <a href="../../../datasets/bach/">BACH</a> classification task which is available on <a href="https://zenodo.org/records/3632035">Zenodo</a> and is distributed under <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode"><em>Attribution-NonCommercial-ShareAlike 4.0 International</em></a> license.</p>
-<p>To let <em>eva</em> automatically handle the dataset download, set <code>download: true</code> in <code>configs/vision/dino_vit/offline/bach.yaml</code> (you may also enable automatic download by setting the environment variable DOWNLOAD=true). Before doing so, please make sure that your use case is compliant with the dataset license.</p>
+<p>To let <em>eva</em> automatically handle the dataset download, set <code>download: true</code> in <code>configs/vision/pathology/offline/classification/bach.yaml</code> (you may also enable automatic download by setting the environment variable <code>DOWNLOAD=true</code>). Additionally, you can set <code>DATA_ROOT</code> to configure the location of where the dataset will be downloaded to / loaded from during evaluation (the default is <code>./data</code> which will be used in the following examples).</p>
+<p>Before doing so, please make sure that your use case is compliant with the dataset license. Note that not all datasets support automatic download.</p>
 <h2 id="offline-evaluations"><em>Offline</em> evaluations</h2>
 <h3 id="1-compute-the-embeddings">1. Compute the embeddings</h3>
 <p>First, let's use the <code>predict</code>-command to download the data and compute embeddings. In this example we use a randomly initialized <code>dino_vits16</code> as backbone.</p>
 <p>Open a terminal in the folder where you installed <em>eva</em> and run:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>PRETRAINED=false \
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>MODEL_NAME=universal/vit_small_patch16_224_random \
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>EMBEDDINGS_ROOT=./data/embeddings/dino_vits16_random \
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>eva predict --config configs/vision/dino_vit/offline/bach.yaml
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>eva predict --config configs/vision/pathology/offline/classification/bach.yaml
 </span></code></pre></div>
 <p>Executing this command will:</p>
 <ul>
@@ -2598,16 +2622,18 @@
 <p>Once the session is complete, verify that:</p>
 <ul>
 <li>The raw images have been downloaded to <code>./data/bach/ICIAR2018_BACH_Challenge</code></li>
-<li>The embeddings have been computed and are stored in <code>./data/embeddings/dino_vits16_random/bach</code></li>
-<li>The <code>manifest.csv</code> file that maps the filename to the embedding, target and split has been created in <code>./data/embeddings/dino_vits16/bach</code>.</li>
+<li>The embeddings have been computed and are stored in <code>$EMBEDDINGS_ROOT/$MODEL_NAME/bach</code></li>
+<li>The <code>manifest.csv</code> file that maps the filename to the embedding, target and split has been created in the same embeddings directory.</li>
 </ul>
 <h3 id="2-evaluate-the-fm">2. Evaluate the FM</h3>
 <p>Now we can use the <code>fit</code>-command to evaluate the FM on the precomputed embeddings.</p>
 <p>To ensure a quick run for the purpose of this exercise, we overwrite some of the default parameters. Run <em>eva</em> to fit the decoder classifier with:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>N_RUNS=2 \
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>MAX_STEPS=20 \
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>LR_VALUE=0.1 \
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>eva fit --config configs/vision/dino_vit/offline/bach.yaml
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>MODEL_NAME=universal/vit_small_patch16_224_random \
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>EMBEDDINGS_ROOT=./data/embeddings/dino_vits16_random \
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>N_RUNS=2 \
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>MAX_STEPS=20 \
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>LR_VALUE=0.1 \
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>eva fit --config configs/vision/pathology/offline/classification/bach.yaml
 </span></code></pre></div>
 <p>Executing this command will:</p>
 <ul>
@@ -2616,31 +2642,31 @@
 </ul>
 <p>Once the session is complete:</p>
 <ul>
-<li>Check the evaluation results in <code>logs/dino_vits16/offline/bach/&lt;session-id&gt;/results.json</code>. (The <code>&lt;session-id&gt;</code> consists of a timestamp and a hash that is based on the run configuration.)</li>
+<li>Check the evaluation results in <code>logs/$MODEL_NAME/offline/bach/&lt;session-id&gt;/results.json</code>. (The <code>&lt;session-id&gt;</code> consists of a timestamp and a hash that is based on the run configuration.)</li>
 <li>Take a look at the training curves with the Tensorboard. Open a new terminal, activate the environment and run:
-<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>tensorboard --logdir logs/dino_vits16/offline/bach
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>tensorboard --logdir logs/$MODEL_NAME/offline/bach
 </span></code></pre></div></li>
 </ul>
 <h3 id="3-run-a-complete-offline-workflow">3. Run a complete <em>offline</em>-workflow</h3>
 <p>With the <code>predict_fit</code>-command, the two steps above can be executed with one command. Let's do this, but this time let's use an FM pretrained from ImageNet.</p>
 <p>Go back to the terminal and execute:
-<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>N_RUNS=1 \
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>MAX_STEPS=20 \
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>LR_VALUE=0.1 \
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>PRETRAINED=true \
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>EMBEDDINGS_ROOT=./data/embeddings/dino_vits16_pretrained \
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>eva predict_fit --config configs/vision/dino_vit/offline/bach.yaml
+<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>MODEL_NAME=universal/vit_small_patch16_224_imagenet \
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>EMBEDDINGS_ROOT=./data/embeddings/dino_vits16_imagenet \
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>N_RUNS=2 \
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>MAX_STEPS=20 \
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>LR_VALUE=0.1 \
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>eva predict_fit --config configs/vision/pathology/offline/classification/bach.yaml
 </span></code></pre></div></p>
 <p>Once the session is complete, inspect the evaluation results as you did in <em>Step 2</em>. Compare the performance metrics and training curves. Can you observe better performance with the ImageNet pretrained encoder?</p>
 <h2 id="online-evaluations"><em>Online</em> evaluations</h2>
 <p>Alternatively to the offline workflow from <em>Step 3</em>, a complete evaluation can also be computed online. In this case we don't save and track embeddings and instead fit the ML model (encoder with frozen layers + trainable decoder) directly on the given task.</p>
 <p>As in <em>Step 3</em> above, we again use a <code>dino_vits16</code> pretrained from ImageNet. </p>
 <p>Run a complete online workflow with the following command:
-<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>N_RUNS=1 \
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>MAX_STEPS=20 \
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>LR_VALUE=0.1 \
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>PRETRAINED=true \
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>eva fit --config configs/vision/dino_vit/online/bach.yaml
+<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>MODEL_NAME=universal/vit_small_patch16_224_imagenet \
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>N_RUNS=1 \
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>MAX_STEPS=20 \
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>LR_VALUE=0.1 \
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>eva fit --config configs/vision/pathology/online/classification/bach.yaml
 </span></code></pre></div></p>
 <p>Executing this command will:</p>
 <ul>
@@ -2649,8 +2675,8 @@
 </ul>
 <p>Once the run is complete:</p>
 <ul>
-<li>Check the evaluation results in <code>logs/dino_vits16/offline/bach/&lt;session-id&gt;/results.json</code> and compare them to the results of <em>Step 3</em>. Do they match?</li>
-<li>You might have noticed that the <em>online</em> run took considerably longer than the <em>offline</em> run. Do you understand why that is?</li>
+<li>Check the evaluation results in <code>logs/$MODEL_NAME/online/bach/&lt;session-id&gt;/results.json</code> and compare them to the results of <em>Step 3</em>. Do they match?</li>
+<li>You might have noticed that the <em>online</em> run took considerably longer than the <em>offline</em> run. That's because in the <em>offline</em> mode we compute the embeddings only once in the <code>predict</code> step and then store them to disk, while in <em>online</em> mode we calculate them in every training epoch of the evaluation again.</li>
 </ul>
 
 

@@ -656,6 +656,8 @@
       
         
       
+        
+      
     
     
       
@@ -701,6 +703,27 @@
   
   <span class="md-ellipsis">
     Replicate evaluations
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-guide/advanced/model_registry/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Backbone Model Registry
   </span>
   
 
@@ -2521,12 +2544,12 @@
 <h1 id="developer-guide">Developer Guide</h1>
 <h2 id="setting-up-a-dev-environment">Setting up a DEV environment</h2>
 <p>We use <a href="https://pdm-project.org/latest/">PDM</a> as a package and dependency manager.
-You can set up a local python environment for development as follows: 
+You can set up a local Python environment for development as follows: 
 1. Install package and dependency manager PDM following the instructions <a href="https://pdm-project.org/latest/#other-installation-methods">here</a>.
 2. Install system dependencies
     - For MacOS: <code>brew install Cmake</code>
     - For Linux (Debian): <code>sudo apt-get install build-essential cmake</code>
-3. Run <code>pdm install -G dev</code> to install the python dependencies. This will create a virtual environment in <code>eva/.venv</code>.</p>
+3. Run <code>pdm install -G dev</code> to install the Python dependencies. This will create a virtual environment in <code>eva/.venv</code>.</p>
 <h2 id="adding-new-dependencies">Adding new dependencies</h2>
 <p>Add a new dependency to the <code>core</code> submodule:<br>
 <code>pdm add &lt;package_name&gt;</code></p>
