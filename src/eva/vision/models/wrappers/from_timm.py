@@ -56,7 +56,7 @@ class TimmModel(wrappers.BaseModel):
         """Builds and loads the timm model as feature extractor."""
         self._feature_extractor = timm.create_model(
             model_name=self._model_name,
-            pretrained=False if self._checkpoint_path else self._pretrained,
+            pretrained=True if self._checkpoint_path else self._pretrained,
             pretrained_cfg=self._pretrained_cfg,
             out_indices=self._out_indices,
             features_only=self._out_indices is not None,
