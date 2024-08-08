@@ -1,11 +1,14 @@
 # Replicate evaluations
 
-To produce the evaluation results presented [here](../../index.md#evaluation-results), you can run *eva* with the settings below.
+To produce the evaluation results presented [here](../../leaderboards.md), you can run *eva* with the settings below.
 
-The `.yaml` config files for the different benchmark datasets can be found [here](https://github.com/kaiko-ai/eva/tree/main/configs/vision).
-In the following commands, you need to replace `<task.yaml>` with the name of the config file you want to use.
+The `.yaml` config files for the different benchmark datasets can be found on [GitHub](https://github.com/kaiko-ai/eva/tree/main/configs/vision).
+You will need to download the config files and then in the following commands replace `<task.yaml>` with the name of the config you want to use.
 
-*Note: Some datasets provide automatic download by setting the argument `download: true` (either modify the `.yaml` config file or set the environment variable `DOWNLOAD=true`), while other datasets you need to download manually beforehand. Please review the instructions in the corresponding dataset [documentation](../../../datasets).*
+Keep in mind:
+
+- Some datasets provide automatic download by setting the argument `download: true` (either modify the `.yaml` config file or set the environment variable `DOWNLOAD=true`), while other datasets need to be downloaded manually beforehand. Please review the instructions in the corresponding dataset [documentation](../../datasets/index.md).
+- The following `eva predict_fit` commands will store the generated embeddings to the `./data/embeddings` directory. To change this location you can alternatively set the `EMBEDDINGS_ROOT` environment variable.
 
 
 ## Pathology FMs
@@ -16,7 +19,6 @@ Evaluating the backbone with randomly initialized weights serves as a baseline t
 
 ```
 MODEL_NAME="universal/vit_small_patch16_224_random" \
-EMBEDDINGS_ROOT="./data/embeddings/$MODEL_NAME" \
 eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
 ```
 
@@ -26,7 +28,6 @@ The next baseline model, uses a pretrained ViT-S16 backbone with ImageNet weight
 
 ```
 MODEL_NAME="universal/vit_small_patch16_224_imagenet" \
-EMBEDDINGS_ROOT="./data/embeddings/$MODEL_NAME" \
 eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
 ```
 
@@ -37,7 +38,6 @@ on [GitHub](https://github.com/lunit-io/benchmark-ssl-pathology/releases/). To e
 
 ```
 MODEL_NAME=pathology/lunit_vits16
-EMBEDDINGS_ROOT="./data/embeddings/$MODEL_NAME" \
 NORMALIZE_MEAN=[0.70322989,0.53606487,0.66096631] \
 NORMALIZE_STD=[0.21716536,0.26081574,0.20723464] \
 eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
@@ -47,7 +47,6 @@ eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
 
 ```
 MODEL_NAME=pathology/lunit_vits8 \
-EMBEDDINGS_ROOT="./data/embeddings/$MODEL_NAME" \
 NORMALIZE_MEAN=[0.70322989,0.53606487,0.66096631] \
 NORMALIZE_STD=[0.21716536,0.26081574,0.20723464] \
 eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
@@ -60,7 +59,6 @@ eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
 
 ```
 MODEL_NAME=pathology/owkin_phikon \
-EMBEDDINGS_ROOT="./data/embeddings/$MODEL_NAME" \
 eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
 ```
 
@@ -71,7 +69,6 @@ be requested.
 
 ```
 MODEL_NAME=pathology/mahmood_uni \
-EMBEDDINGS_ROOT="./data/embeddings/$MODEL_NAME" \
 HF_TOKEN=<your-huggingace-token-for-downloading-the-model> \
 IN_FEATURES=1024 \
 eva predict_fit --config configs/vision/phikon/offline/<task>.yaml
@@ -85,7 +82,6 @@ and available on [GitHub](https://github.com/kaiko-ai/towards_large_pathology_fm
 
 ```
 MODEL_NAME=pathology/kaiko_vits16 \
-EMBEDDINGS_ROOT="./data/embeddings/$MODEL_NAME" \
 NORMALIZE_MEAN=[0.5,0.5,0.5] \
 NORMALIZE_STD=[0.5,0.5,0.5] \
 eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
@@ -98,7 +94,6 @@ and available on [GitHub](https://github.com/kaiko-ai/towards_large_pathology_fm
 
 ```
 MODEL_NAME=pathology/kaiko_vits8 \
-EMBEDDINGS_ROOT="./data/embeddings/$MODEL_NAME" \
 NORMALIZE_MEAN=[0.5,0.5,0.5] \
 NORMALIZE_STD=[0.5,0.5,0.5] \
 eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
@@ -112,9 +107,9 @@ and available on [GitHub](https://github.com/kaiko-ai/towards_large_pathology_fm
 
 ```
 MODEL_NAME=pathology/kaiko_vitb16 \
-EMBEDDINGS_ROOT="./data/embeddings/$MODEL_NAME" \
 NORMALIZE_MEAN=[0.5,0.5,0.5] \
 NORMALIZE_STD=[0.5,0.5,0.5] \
+IN_FEATURES=768 \
 eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
 ```
 
@@ -125,9 +120,9 @@ and available on [GitHub](https://github.com/kaiko-ai/towards_large_pathology_fm
 
 ```
 MODEL_NAME=pathology/kaiko_vitb16 \
-EMBEDDINGS_ROOT="./data/embeddings/$MODEL_NAME" \
 NORMALIZE_MEAN=[0.5,0.5,0.5] \
 NORMALIZE_STD=[0.5,0.5,0.5] \
+IN_FEATURES=768 \
 eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
 ```
 
@@ -139,7 +134,6 @@ and available on [GitHub](https://github.com/kaiko-ai/towards_large_pathology_fm
 
 ```
 MODEL_NAME=pathology/kaiko_vitl14 \
-EMBEDDINGS_ROOT="./data/embeddings/$MODEL_NAME" \
 NORMALIZE_MEAN=[0.5,0.5,0.5] \
 NORMALIZE_STD=[0.5,0.5,0.5] \
 IN_FEATURES=1024 \

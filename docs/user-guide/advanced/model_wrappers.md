@@ -31,7 +31,7 @@ backbone:
 Note that your `ModelClass` should subclass `torch.nn.Module` and implement the `forward()` method to return an embedding tensor of shape `[1, embedding_dim]` for classification tasks or a list feature maps of shape `[1, embedding_dim, patch_dim, patch_dim]` for segmentation.
 
 ## Models from functions
-The wrapper class `eva.models.wrappers.ModelFromFunction` allows you to load models from python functions that return torch model instances (`nn.Module`).
+The wrapper class `eva.models.wrappers.ModelFromFunction` allows you to load models from Python functions that return torch model instances (`nn.Module`).
 
 You can either use this to load models from your own custom functions, or from public providers such as Torch Hub or `timm` that expose model load functions.
 

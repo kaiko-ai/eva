@@ -10,7 +10,7 @@ Here you can find everything you need to install, understand and interact with *
 
 To familiarize yourself with *eva*, try out some of our tutorials.
 
- - Go through [*Offline* vs. *online* evaluations](tutorials/offline_vs_online.md) to run *eva* workflows.
+ - Go through [*offline* vs. *online* evaluations](tutorials/offline_vs_online.md) to run *eva* workflows.
  - Train and [evaluate a ResNet](tutorials/evaluate_resnet.md) model from scratch.
 
 ### Advanced user guide
@@ -18,4 +18,5 @@ To familiarize yourself with *eva*, try out some of our tutorials.
 Get to know *eva* in more depth by studying our advanced user guides.
 
  - See how to [replicate our evaluations](advanced/replicate_evaluations.md) of public FM-checkpoints.
- - Understand how to use *eva*'s [Model Wrapper](advanced/model_wrappers.md) API to load models from different formats and sources.
+ - Learn how to access models in *eva*'s FM backbone [model registry](advanced/model_registry.md).
+ - Understand how to use *eva*'s [model wrapper](advanced/model_wrappers.md) API to load models from different formats and sources.

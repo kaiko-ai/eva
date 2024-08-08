@@ -1,7 +1,7 @@
 # Backbone Model Registry
 *eva* contains a model registry that provides the most popular FM backbones that are publicly available and which we list in the Leaderboard.
 
-## Loading models through the python API
+## Loading models through the Python API
 The available models can be listed as follows after installing the *eva* package:
 ```python
 from eva.vision.models.networks.backbones import BackboneModelRegistry
@@ -47,7 +47,7 @@ for output in outputs:
 # > torch.Size([1, 384, 14, 14])
 ```
 
-The above example returns a `list` of 4D tensors, each representing the feature map from a different level in the backbone. `out_indices=2` means that it returns the last two feature maps. This also supports tuples, for instance `(-2, -4)` would return returns the penultimate and the forth before the last maps.
+The above example returns a `list` of 4D tensors, each representing the feature map from a different level in the backbone. `out_indices=2` means that it returns the last two feature maps. This also supports tuples, for instance `(-2, -4)` returns the penultimate and the forth before the last maps.
 
 
 ## Run evaluations using backbones from the registry
@@ -73,7 +73,7 @@ eva predict_fit --config configs/vision/pathology/offline/segmentation/consep.ya
 ## Adding new models to the registry
 If you want to add a new FM backbone to *eva*'s registry, you'll need to follow these steps:
 
-1. Implement a python function that returns your model as a `torch.nn.Module`. If it's not a native torch model, or if you have made the model already available in public hubs such as torch.hub or huggingface, our [model wrapper](./model_wrappers.md) classes might come in handy.
+1. Implement a Python function that returns your model as a `torch.nn.Module`. If it's not a native PyTorch model, or if you have made the model already available in public hubs such as torch.hub or huggingface, our [model wrapper](./model_wrappers.md) classes might come in handy.
 
 2. Add your model function to `eva.vision.models.networks.backbones` together with a `@register_model("your_model_name")` decorator. Then add an import statement to the `__init__` file of the corresponding module.
 
