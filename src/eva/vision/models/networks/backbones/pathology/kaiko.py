@@ -15,7 +15,9 @@ def kaiko_vits16(
     """Initializes the vision transformer ViTS-16 pathology FM by kaiko.ai.
 
     Args:
-        dynamic_img_size: Whether to allow the interpolation embedding
+        dynamic_img_size: Support different input image sizes by allowing to change
+            the grid size (interpolate abs and/or ROPE pos) in the forward pass.
+        Whether to allow the interpolation embedding
             to be interpolated at `forward()` time when image grid changes
             from original.
         out_indices: Weather and which multi-level patch embeddings to return.
@@ -39,9 +41,8 @@ def kaiko_vits8(
     """Initializes the vision transformer ViTS-8 pathology FM by kaiko.ai.
 
     Args:
-        dynamic_img_size: Whether to allow the interpolation embedding
-            to be interpolated at `forward()` time when image grid changes
-            from original.
+        dynamic_img_size: Support different input image sizes by allowing to change
+            the grid size (interpolate abs and/or ROPE pos) in the forward pass.
         out_indices: Weather and which multi-level patch embeddings to return.
 
     Returns:
@@ -63,9 +64,8 @@ def kaiko_vitb16(
     """Initializes the vision transformer ViTB-16 pathology FM by kaiko.ai.
 
     Args:
-        dynamic_img_size: Whether to allow the interpolation embedding
-            to be interpolated at `forward()` time when image grid changes
-            from original.
+        dynamic_img_size: Support different input image sizes by allowing to change
+            the grid size (interpolate abs and/or ROPE pos) in the forward pass.
         out_indices: Weather and which multi-level patch embeddings to return.
 
     Returns:
@@ -87,9 +87,8 @@ def kaiko_vitb8(
     """Initializes the vision transformer ViTB-8 pathology FM by kaiko.ai.
 
     Args:
-        dynamic_img_size: Whether to allow the interpolation embedding
-            to be interpolated at `forward()` time when image grid changes
-            from original.
+        dynamic_img_size: Support different input image sizes by allowing to change
+            the grid size (interpolate abs and/or ROPE pos) in the forward pass.
         out_indices: Weather and which multi-level patch embeddings to return.
 
     Returns:
@@ -111,9 +110,8 @@ def kaiko_vitl14(
     """Initializes the vision transformer ViTL-14 pathology FM by kaiko.ai.
 
     Args:
-        dynamic_img_size: Whether to allow the interpolation embedding
-            to be interpolated at `forward()` time when image grid changes
-            from original.
+        dynamic_img_size: Support different input image sizes by allowing to change
+            the grid size (interpolate abs and/or ROPE pos) in the forward pass.
         out_indices: Weather and which multi-level patch embeddings to return.
 
     Returns:

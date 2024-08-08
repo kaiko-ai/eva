@@ -18,9 +18,8 @@ def vit_small_patch16_224_random(
     """Initializes a ViTS-16 baseline model with random weights.
 
     Args:
-        dynamic_img_size: Whether to allow the interpolation embedding
-            to be interpolated at `forward()` time when image grid changes
-            from original.
+        dynamic_img_size: Support different input image sizes by allowing to change
+            the grid size (interpolate abs and/or ROPE pos) in the forward pass.
         out_indices: Weather and which multi-level patch embeddings to return.
 
     Returns:
@@ -42,9 +41,8 @@ def vit_small_patch16_224_imagenet(
     """Initializes a ViTS-16 baseline model pretrained on imagenet.
 
     Args:
-        dynamic_img_size: Whether to allow the interpolation embedding
-            to be interpolated at `forward()` time when image grid changes
-            from original.
+        dynamic_img_size: Support different input image sizes by allowing to change
+            the grid size (interpolate abs and/or ROPE pos) in the forward pass.
         out_indices: Weather and which multi-level patch embeddings to return.
 
     Returns:
@@ -79,9 +77,8 @@ def vit_timm(
         checkpoint_path: The path to the checkpoint file. If not specified,
             will load from the environment variable `CHECKPOINT_PATH`.
         pretrained: If set to `True`, load pretrained ImageNet-1k weights.
-        dynamic_img_size: Whether to allow the interpolation embedding
-            to be interpolated at `forward()` time when image grid changes
-            from original.
+        dynamic_img_size: Support different input image sizes by allowing to change
+            the grid size (interpolate abs and/or ROPE pos) in the forward pass.
         out_indices: Weather and which multi-level patch embeddings to return.
 
     Returns:

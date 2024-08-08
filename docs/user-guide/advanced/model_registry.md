@@ -1,4 +1,4 @@
-# Using backbones from *eva*'s Model Registry
+# Backbone Model Registry
 *eva* contains a model registry that provides the most popular FM backbones that are publicly available and which we list in the Leaderboard.
 
 ## Loading models through the python API
@@ -15,26 +15,29 @@ This should output a list of the model names such as:
 ['universal/vit_small_patch16_224_random', 'pathology/kaiko_vits16', 'pathology/kaiko_vits8', ...]
 ``` 
 
-A model can then be instantiated as follows using the `VisionBackbone` model wrapper in python:
+A model can then be loaded and instantiated as follows:
 
 ```python
 import torch
-from eva.vision.models import wrappers
+from eva.vision.models.networks.backbones import BackboneModelRegistry
 
-model = wrappers.VisionBackbone("universal/vit_small_patch16_224_random")
+model = BackboneModelRegistry.load_model(
+    model_name="universal/vit_small_patch16_224_random",
+     **{"out_indices": 2}
+)
 output = model(torch.randn(1, 3, 224, 224))
 print(output.shape)
 # console output:
 # > torch.Size([1, 384])
 ```
 
-In the above example, we load a vit-s model initialized with random weights. The `output` tensor in the above example corresponds to the CLS embedding which for vits is a one dimensional tensor of dimension `384`.
+In the above example, we load a vit-s model initialized with random weights. The `output` tensor corresponds to the CLS embedding which for this backbone is a one dimensional tensor of dimension `384`.
 For segmentation tasks, we need to access not only the CLS embedding, but entire feature maps. This we can achieve by using the `out_indices` argument:
 
 ```python
-model = wrappers.VisionBackbone(
+model = BackboneModelRegistry.load_model(
     model_name="universal/vit_small_patch16_224_random",
-    model_kwargs={"out_indices": 2},
+     **{"out_indices": 2}
 )
 outputs = model(torch.randn(1, 3, 224, 224))
 for output in outputs:
@@ -59,7 +62,9 @@ backbone:
       out_indices: ${oc.env:OUT_INDICES, 1}
 ```
 
-This means that you can run an evaluation with a specific model from the registry by setting the `MODEL_NAME` environment variable:
+Note that `VisionBackbone` is a model wrapper class, which loads the models through `BackboneModelRegistry`.
+
+By using the `MODEL_NAME` environment variable, you can run an evaluation with a specific model from the registry, without modifying the default config files:
 ```bash
 MODEL_NAME=pathology/kaiko_vits16 \
 eva predict_fit --config configs/vision/pathology/offline/segmentation/consep.yaml
