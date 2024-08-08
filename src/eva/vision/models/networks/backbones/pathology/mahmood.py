@@ -28,7 +28,7 @@ def mahmood_uni(
         download_dir: Directory to download the model checkpoint.
 
     Returns:
-        The torch UNI model instance.
+        The model instance.
     """
     token = hf_token or os.environ.get("HF_TOKEN")
     if not token:

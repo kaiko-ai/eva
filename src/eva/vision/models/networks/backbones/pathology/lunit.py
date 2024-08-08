@@ -24,7 +24,7 @@ VITS_URL_PREFIX = (
 def lunit_vits16(
     dynamic_img_size: bool = True, out_indices: int | Tuple[int, ...] | None = None
 ) -> nn.Module:
-    """Initializes the vision transformer ViTS-16 pathology FM by lunit.
+    """Initializes the ViTS-16 pathology FM by lunit.
 
     Args:
         dynamic_img_size: Support different input image sizes by allowing to change
@@ -32,7 +32,7 @@ def lunit_vits16(
         out_indices: Weather and which multi-level patch embeddings to return.
 
     Returns:
-        The torch ViTS-16 based foundation model.
+        The model instance.
     """
     return wrappers.TimmModel(
         model_name="vit_small_patch16_224.dino",
@@ -48,7 +48,7 @@ def lunit_vits16(
 def lunit_vits8(
     dynamic_img_size: bool = True, out_indices: int | Tuple[int, ...] | None = None
 ) -> nn.Module:
-    """Initializes the vision transformer ViTS-8 pathology FM by lunit.
+    """Initializes the ViTS-8 pathology FM by lunit.
 
     Args:
         dynamic_img_size: Support different input image sizes by allowing to change
@@ -56,7 +56,7 @@ def lunit_vits8(
         out_indices: Weather and which multi-level patch embeddings to return.
 
     Returns:
-        The torch ViTS-8 based foundation model.
+        The model instance.
     """
     return wrappers.TimmModel(
         model_name="vit_small_patch8_224.dino",
