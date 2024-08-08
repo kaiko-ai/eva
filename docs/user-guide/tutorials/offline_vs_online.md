@@ -20,8 +20,8 @@ First, let's use the `predict`-command to download the data and compute embeddin
 Open a terminal in the folder where you installed *eva* and run:
 
 ```
-export MODEL_NAME=universal/vit_small_patch16_224_random
-export EMBEDDINGS_ROOT=./data/embeddings/dino_vits16_random
+MODEL_NAME=universal/vit_small_patch16_224_random \
+EMBEDDINGS_ROOT=./data/embeddings/dino_vits16_random \
 eva predict --config configs/vision/pathology/offline/classification/bach.yaml
 ```
 
@@ -43,6 +43,8 @@ Now we can use the `fit`-command to evaluate the FM on the precomputed embedding
 To ensure a quick run for the purpose of this exercise, we overwrite some of the default parameters. Run *eva* to fit the decoder classifier with:
 
 ```
+MODEL_NAME=universal/vit_small_patch16_224_random \
+EMBEDDINGS_ROOT=./data/embeddings/dino_vits16_random \
 N_RUNS=2 \
 MAX_STEPS=20 \
 LR_VALUE=0.1 \
@@ -68,10 +70,9 @@ With the `predict_fit`-command, the two steps above can be executed with one com
 
 Go back to the terminal and execute:
 ```
-export MODEL_NAME=universal/vit_small_patch16_224_imagenet
-export EMBEDDINGS_ROOT=./data/embeddings/dino_vits16_imagenet
-
-N_RUNS=1 \
+MODEL_NAME=universal/vit_small_patch16_224_imagenet \
+EMBEDDINGS_ROOT=./data/embeddings/dino_vits16_imagenet \
+N_RUNS=2 \
 MAX_STEPS=20 \
 LR_VALUE=0.1 \
 eva predict_fit --config configs/vision/pathology/offline/classification/bach.yaml
