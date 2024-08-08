@@ -1,5 +1,6 @@
 """Vision Pathology Model Backbones API."""
 
+from eva.vision.models.networks.backbones.pathology.bioptimus import bioptimus_h_optimus_0
 from eva.vision.models.networks.backbones.pathology.kaiko import (
     kaiko_vitb8,
     kaiko_vitb16,
@@ -21,4 +22,5 @@ __all__ = [
     "lunit_vits16",
     "lunit_vits8",
     "mahmood_uni",
+    "bioptimus_h_optimus_0",
 ]
