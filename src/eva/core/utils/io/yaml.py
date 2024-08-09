@@ -1,32 +1,6 @@
 """YAML related I/O operations."""
 
-import functools
-from pathlib import Path
-from typing import Any
-
 import omegaconf
-
-
-@functools.singledispatch
-def save_yaml(data: Any, save_path: str) -> None:
-    """Save data to a YAML file.
-
-    Args:
-        data: Data to be saved
-        save_path: Path to save the data
-    """
-    raise TypeError(f"Unsupported type: {type(data)}.")
-
-
-@save_yaml.register
-def _(
-    data: omegaconf.DictConfig | omegaconf.ListConfig, save_path: str, resolve: bool = False
-) -> None:
-    """Save OmegaConf DictConfig to a YAML file."""
-    Path(save_path).parent.mkdir(parents=True, exist_ok=True)
-    with open(save_path, "w") as file:
-        data_yaml = omegaconf.OmegaConf.to_yaml(data, resolve=resolve)
-        file.write(data_yaml)
 
 
 def update_keys(

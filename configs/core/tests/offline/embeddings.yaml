@@ -1,4 +1,6 @@
 ---
+backbone:
+  class_path: torch.nn.Flatten
 trainer:
   class_path: eva.Trainer
   init_args:

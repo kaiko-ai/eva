@@ -1,4 +1,13 @@
 ---
+backbone:
+  class_path: eva.models.ModelFromFunction
+  init_args:
+    path: torch.hub.load
+    arguments:
+      repo_or_dir: facebookresearch/dino:main
+      model: dino_vits16
+      pretrained: false
+    checkpoint_path: &CHECKPOINT_PATH ${oc.env:CHECKPOINT_PATH, null}
 trainer:
   class_path: eva.Trainer
   init_args:
@@ -15,15 +24,7 @@ trainer:
             0: train
             1: val
             2: test
-          backbone:
-            class_path: eva.models.ModelFromFunction
-            init_args:
-              path: torch.hub.load
-              arguments:
-                repo_or_dir: facebookresearch/dino:main
-                model: dino_vits16
-                pretrained: false
-              checkpoint_path: &CHECKPOINT_PATH ${oc.env:CHECKPOINT_PATH, null}
+          backbone: ${backbone}
       - class_path: lightning.pytorch.callbacks.ModelCheckpoint
         init_args:
           filename: best

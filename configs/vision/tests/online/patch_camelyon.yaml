@@ -1,4 +1,6 @@
 ---
+backbone:
+  class_path: torch.nn.Flatten
 trainer:
   class_path: eva.Trainer
   init_args:
@@ -9,8 +11,7 @@ trainer:
 model:
   class_path: eva.HeadModule
   init_args:
-    backbone:
-      class_path: torch.nn.Flatten
+    backbone: ${backbone}
     head:
       class_path: torch.nn.Linear
       init_args:
