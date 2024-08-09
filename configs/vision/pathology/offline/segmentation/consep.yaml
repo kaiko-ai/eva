@@ -1,4 +1,13 @@
 ---
+backbone:
+  class_path: eva.vision.models.wrappers.TimmModel
+  init_args:
+    model_name: ${oc.env:MODEL_NAME, vit_small_patch16_224_dino}
+    checkpoint_path: ${oc.env:CHECKPOINT_PATH, null}
+    pretrained: ${oc.env:PRETRAINED, true}
+    out_indices: ${oc.env:OUT_INDICES, 1}
+    model_kwargs:
+      dynamic_img_size: true
 trainer:
   class_path: eva.Trainer
   init_args:
@@ -33,12 +42,7 @@ trainer:
             1: val
           metadata_keys: ["coords"]
           overwrite: true
-          backbone:
-            class_path: eva.vision.models.wrappers.VisionBackbone
-            init_args:
-              model_name: ${oc.env:MODEL_NAME, universal/vit_small_patch16_224_imagenet}
-              model_kwargs:
-                out_indices: ${oc.env:OUT_INDICES, 1}
+          backbone: ${backbone}
     logger:
       - class_path: lightning.pytorch.loggers.TensorBoardLogger
         init_args:

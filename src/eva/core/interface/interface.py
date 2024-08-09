@@ -1,5 +1,7 @@
 """Main interface class."""
 
+from torch import nn
+
 from eva.core import trainers as eva_trainer
 from eva.core.data import datamodules
 from eva.core.models import modules
@@ -14,6 +16,7 @@ class Interface:
 
     def fit(
         self,
+        backbone: nn.Module,
         trainer: eva_trainer.Trainer,
         model: modules.ModelModule,
         data: datamodules.DataModule,
@@ -30,14 +33,16 @@ class Interface:
         - Fitting only the head network using a dataset that loads pre-computed embeddings.
 
         Args:
-            trainer: The base trainer to use but not modify.
-            model: The model module to use but not modify.
+            backbone: The backbone model to use.
+            trainer: The base trainer to use.
+            model: The model module to use.
             data: The data module.
         """
         trainer.run_evaluation_session(model=model, datamodule=data)
 
     def predict(
         self,
+        backbone: nn.Module,
         trainer: eva_trainer.Trainer,
         model: modules.ModelModule,
         data: datamodules.DataModule,
@@ -47,8 +52,9 @@ class Interface:
         This method performs inference with a pre-trained foundation model to compute embeddings.
 
         Args:
-            trainer: The base trainer to use but not modify.
-            model: The model module to use but not modify.
+            backbone: The backbone model to use.
+            trainer: The base trainer to use.
+            model: The model module to use.
             data: The data module.
         """
         eva_trainer.infer_model(
@@ -60,6 +66,7 @@ class Interface:
 
     def predict_fit(
         self,
+        backbone: nn.Module,
         trainer: eva_trainer.Trainer,
         model: modules.ModelModule,
         data: datamodules.DataModule,
@@ -71,9 +78,10 @@ class Interface:
         2. fit: training the head network using the embeddings generated in step 1.
 
         Args:
-            trainer: The base trainer to use but not modify.
-            model: The model module to use but not modify.
+            backbone: The backbone model to use.
+            trainer: The base trainer to use.
+            model: The model module to use.
             data: The data module.
         """
-        self.predict(trainer=trainer, model=model, data=data)
-        self.fit(trainer=trainer, model=model, data=data)
+        self.predict(backbone=backbone, trainer=trainer, model=model, data=data)
+        self.fit(backbone=backbone, trainer=trainer, model=model, data=data)

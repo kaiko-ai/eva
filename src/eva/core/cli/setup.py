@@ -2,13 +2,16 @@
 
 import os
 import sys
+import uuid
 import warnings
+from pathlib import Path
 
 import jsonargparse
 import yaml
 from lightning_fabric.utilities import seed as pl_seed
 from loguru import logger
 
+import eva.core.utils.io.yaml as eva_yaml
 from eva.core.utils import workers
 
 
@@ -79,6 +82,33 @@ def _enable_mps_fallback() -> None:
         os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"
 
 
+def _merge_configs(save_dir: str = os.path.join(str(Path.home()), ".cache/eva/configs")) -> None:
+    """When multiple config files are specified in sys.argv, merges them into one.
+
+    Args:
+        save_dir: Directory to save the merged config file.
+    """
+    config_paths, remaining_args = [], []
+    for arg in sys.argv:
+        if arg.strip().endswith(".yaml"):
+            config_paths.append(arg)
+        elif arg.strip() != "--config":
+            remaining_args.append(arg)
+
+    if len(config_paths) <= 1:
+        return
+    elif len(config_paths) == 2:
+        config = eva_yaml.update_keys(config_paths[0], config_paths[1], merge=False, resolve=False)
+        merged_path = os.path.join(save_dir, str(uuid.uuid4()), Path(config_paths[0]).name)
+        Path(merged_path).parent.mkdir(parents=True, exist_ok=True)
+        with open(merged_path, "w") as file:
+            file.write(config)
+        logger.info(f"Received multiple config files & merged them into {merged_path}.")
+        sys.argv = remaining_args + ["--config", merged_path]
+    else:
+        raise ValueError("More than two --config files are not supported.")
+
+
 @workers.main_worker_only
 def setup() -> None:
     """Sets up the environment before the module is imported."""
@@ -87,3 +117,4 @@ def setup() -> None:
     _initialize_logger()
     _suppress_warnings()
     _enable_mps_fallback()
+    _merge_configs()
