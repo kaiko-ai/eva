@@ -59,7 +59,7 @@ def vit_small_patch16_224_imagenet(
 
 @register_model("universal/vit_timm")
 def vit_timm(
-    model_name: str | None = None,
+    timm_model_name: str | None = None,
     checkpoint_path: str | None = None,
     pretrained: bool = False,
     dynamic_img_size: bool = True,
@@ -72,8 +72,8 @@ def vit_timm(
     the default configuration files.
 
     Args:
-        model_name: The name of the model to load. If not specified, will
-            load from the environment variable `TIMM_MODEL_NAME`.
+        timm_model_name: The name of the model to load from timm. If not specified,
+            will load from the environment variable `TIMM_MODEL_NAME`.
         checkpoint_path: The path to the checkpoint file. If not specified,
             will load from the environment variable `CHECKPOINT_PATH`.
         pretrained: If set to `True`, load pretrained ImageNet-1k weights.
@@ -84,16 +84,16 @@ def vit_timm(
     Returns:
         The VIT model instance.
     """
-    model_name = model_name or os.getenv("TIMM_MODEL_NAME")
+    timm_model_name = timm_model_name or os.getenv("TIMM_MODEL_NAME")
     checkpoint_path = checkpoint_path or os.getenv("CHECKPOINT_PATH")
-    if not model_name:
+    if not timm_model_name:
         raise ValueError("No model_name is set.")
     if checkpoint_path and not os.path.exists(checkpoint_path):
         raise FileNotFoundError(f"Checkpoint file {checkpoint_path} does not exist.")
 
-    logger.info(f"Loading timm model {model_name} from checkpoint {checkpoint_path}")
+    logger.info(f"Loading timm model {timm_model_name} from checkpoint {checkpoint_path}")
     return wrappers.TimmModel(
-        model_name=model_name,
+        model_name=timm_model_name,
         checkpoint_path=checkpoint_path or "",
         pretrained=pretrained,
         out_indices=out_indices,
