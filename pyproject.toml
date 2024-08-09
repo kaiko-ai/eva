@@ -183,7 +183,7 @@ exclude_dirs = [
 ]
 
 [tool.pyright]
-pythonVersion = "3.11"
+pythonVersion = "3.10"
 reportIncompatibleMethodOverride = false
 exclude = [
     "__pypackages__",
