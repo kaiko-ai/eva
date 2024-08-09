@@ -31,7 +31,7 @@ To update the dependencies in a specific group
 To update a specific dependency in a specified group
 `pdm update -G <group_name> <package_name>`
 
-## Re-generate the lock file
+## Regenerate the lock file
 If you want to regenerate the lock file from scratch:
 `pdm lock -G all -G vision -G lint -G typecheck -G test -G dev -G docs`
 
