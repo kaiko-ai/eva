@@ -34,7 +34,7 @@ trainer:
           dataloader_idx_map:
             0: train
             1: test
-          overwrite: true
+          overwrite: false
           backbone:
             class_path: eva.vision.models.ModelFromRegistry
             init_args:

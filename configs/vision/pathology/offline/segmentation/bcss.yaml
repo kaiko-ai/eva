@@ -33,7 +33,7 @@ trainer:
             1: val
             2: test
           metadata_keys: ["coords"]
-          overwrite: true
+          overwrite: false
           backbone:
             class_path: eva.vision.models.ModelFromRegistry
             init_args:
