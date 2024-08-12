@@ -40,6 +40,7 @@ trainer:
               model_name: ${oc.env:MODEL_NAME, universal/vit_small_patch16_224_imagenet}
               model_kwargs:
                 out_indices: ${oc.env:OUT_INDICES, 1}
+              model_extra_kwargs: ${oc.env:MODEL_EXTRA_KWARGS, null}
     logger:
       - class_path: lightning.pytorch.loggers.TensorBoardLogger
         init_args:

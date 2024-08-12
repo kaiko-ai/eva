@@ -35,6 +35,7 @@ trainer:
             class_path: eva.vision.models.ModelFromRegistry
             init_args:
               model_name: ${oc.env:MODEL_NAME, universal/vit_small_patch16_224_imagenet}
+              model_extra_kwargs: ${oc.env:MODEL_EXTRA_KWARGS, null}
           overwrite: false
     logger:
       - class_path: lightning.pytorch.loggers.TensorBoardLogger
