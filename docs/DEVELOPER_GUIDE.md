@@ -9,7 +9,7 @@ You can set up a local Python environment for development as follows:
 2. Install system dependencies
     - For MacOS: `brew install Cmake`
     - For Linux (Debian): `sudo apt-get install build-essential cmake`
-3. Run `pdm install -G all` to install the Python dependencies. This will create a virtual environment in `eva/.venv`.
+3. Run `pdm install -G all, dev` to install the Python dependencies. This will create a virtual environment in `eva/.venv`.
 
 ## Adding new dependencies 
 
