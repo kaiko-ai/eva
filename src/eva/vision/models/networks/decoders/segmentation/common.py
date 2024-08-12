@@ -7,7 +7,7 @@ output by an encoder into pixel-wise predictions for segmentation tasks.
 
 from torch import nn
 
-from eva.vision.models.networks.decoders.segmentation import conv2d, linear
+from eva.vision.models.networks.decoders.segmentation import conv2d, densely, linear
 
 
 class ConvDecoder1x1(conv2d.ConvDecoder):
@@ -52,6 +52,27 @@ class ConvDecoderMS(conv2d.ConvDecoder):
                 nn.Conv2d(in_features, 64, kernel_size=(3, 3), padding=(1, 1)),
                 nn.Upsample(scale_factor=2),
                 nn.Conv2d(64, num_classes, kernel_size=(3, 3), padding=(1, 1)),
+            ),
+        )
+
+
+class DenselyDecoderNano(conv2d.ConvDecoder):
+    """Densely nano convolutional decoder."""
+
+    def __init__(self, in_features: int, num_classes: int) -> None:
+        """Initializes the decoder.
+
+        Args:
+            in_features: The hidden dimension size of the embeddings.
+            num_classes: Number of output classes as channels.
+        """
+        super().__init__(
+            layers=densely.DenselyDecoder(
+                in_channels=in_features,
+                out_channels=num_classes,
+                growth_rate=3,
+                steps=2,
+                scale_factor=2,
             ),
         )
 
