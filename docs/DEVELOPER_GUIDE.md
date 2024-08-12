@@ -9,7 +9,7 @@ You can set up a local Python environment for development as follows:
 2. Install system dependencies
     - For MacOS: `brew install Cmake`
     - For Linux (Debian): `sudo apt-get install build-essential cmake`
-3. Run `pdm install -G dev` to install the Python dependencies. This will create a virtual environment in `eva/.venv`.
+3. Run `pdm install -G all, dev` to install the Python dependencies. This will create a virtual environment in `eva/.venv`.
 
 ## Adding new dependencies 
 
@@ -20,6 +20,20 @@ Add a new dependency to the `vision` submodule:<br>
 `pdm add -G vision -G all <package_name>`
 
 For more information about managing dependencies please look [here](https://pdm-project.org/latest/usage/dependency/#manage-dependencies).
+
+## Update dependencies
+To update all dependencies in the lock file:
+`pdm update`
+
+To update the dependencies in a specific group
+`pdm update -G <group_name>`
+
+To update a specific dependency in a specified group
+`pdm update -G <group_name> <package_name>`
+
+## Regenerate the lock file
+If you want to regenerate the lock file from scratch:
+`pdm lock -G all -G vision -G lint -G typecheck -G test -G dev -G docs`
 
 ## Continuous Integration (CI)
 
