@@ -30,7 +30,7 @@ trainer:
             0: train
             1: test
           backbone:
-            class_path: eva.vision.models.wrappers.VisionBackbone
+            class_path: eva.vision.models.ModelFromRegistry
             init_args:
               model_name: ${oc.env:MODEL_NAME, universal/vit_small_patch16_224_imagenet}
           overwrite: false

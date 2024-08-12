@@ -31,7 +31,7 @@ model:
   class_path: eva.HeadModule
   init_args:
     backbone:
-      class_path: eva.vision.models.wrappers.VisionBackbone
+      class_path: eva.vision.models.ModelFromRegistry
       init_args:
         model_name: ${oc.env:MODEL_NAME, universal/vit_small_patch16_224_imagenet}
     head:

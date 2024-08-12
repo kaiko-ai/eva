@@ -4,11 +4,11 @@
 This document shows how to use *eva*'s [Model Wrapper API](../../reference/core/models/networks.md#wrappers) (`eva.models.wrappers`) to load different model formats from a series of sources such as PyTorch Hub, HuggingFace Model Hub and ONNX.
 
 ## *eva* model registry
-To load models from *eva*'s FM backbone [model registry](./model_registry.md), we provide the `VisionBackbone` wrapper class:
+To load models from *eva*'s FM backbone [model registry](./model_registry.md), we provide the `ModelFromRegistry` wrapper class:
 
 ```
 backbone:
-  class_path: eva.vision.models.wrappers.VisionBackbone
+  class_path: eva.vision.models.wrappers.ModelFromRegistry
   init_args:
     model_name: universal/vit_small_patch16_224_imagenet
     model_kwargs:
