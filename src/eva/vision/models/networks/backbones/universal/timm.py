@@ -1,6 +1,5 @@
 """timm backbones."""
 
-import os
 from typing import Tuple
 
 from loguru import logger
@@ -20,10 +19,6 @@ def timm_model(
 ) -> nn.Module:
     """Initializes any ViT model from timm with weights from a specified checkpoint.
 
-    This class is mainly provided to facilitate experimentation. E.g. to load
-    a model from a local checkpoint file, without having to manually update
-    the default configuration files.
-
     Args:
         model_name: The name of the model to load.
         checkpoint_path: The path to the checkpoint file.
@@ -35,7 +30,10 @@ def timm_model(
     Returns:
         The VIT model instance.
     """
-    logger.info(f"Loading timm model {model_name} from checkpoint {checkpoint_path}")
+    logger.info(
+        f"Loading timm model {model_name}"
+        + (f"using checkpoint {checkpoint_path}" if checkpoint_path else "")
+    )
     return wrappers.TimmModel(
         model_name=model_name,
         checkpoint_path=checkpoint_path or "",

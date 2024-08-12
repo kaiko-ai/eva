@@ -8,7 +8,7 @@ from typing_extensions import override
 
 from eva.core.models import wrappers
 from eva.vision.models.networks.backbones import BackboneModelRegistry
-from loguru import logger
+
 
 class ModelFromRegistry(wrappers.BaseModel):
     """Wrapper class for vision backbone models.
@@ -46,10 +46,11 @@ class ModelFromRegistry(wrappers.BaseModel):
 
     @override
     def load_model(self) -> None:
-        self._model = BackboneModelRegistry.load_model(self._model_name, self._model_kwargs | self._model_extra_kwargs)
+        self._model = BackboneModelRegistry.load_model(
+            self._model_name, self._model_kwargs | self._model_extra_kwargs
+        )
         ModelFromRegistry.__name__ = self._model_name
 
     @override
     def model_forward(self, tensor: torch.Tensor) -> torch.Tensor | List[torch.Tensor]:
         return self._model(tensor)
-
