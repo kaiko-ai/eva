@@ -138,7 +138,7 @@ eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
 ```
 
 ### H-optimus-0 (Bioptimus) - ViT-G14 [[5]](#references)
-Bioptimus released their H-optimus-0 which was trained on a collection of 500,000 H&E slides. The model weights
+[Bioptimus](https://www.bioptimus.com) released their H-optimus-0 which was trained on a collection of 500,000 H&E slides. The model weights
 were released on [HuggingFace](https://huggingface.co/bioptimus/H-optimus-0).
 
 ```
