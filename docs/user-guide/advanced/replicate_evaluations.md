@@ -149,6 +149,16 @@ IN_FEATURES=1024 \
 eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
 ```
 
+### Prov-GigaPath - DINOv2 ViT-G14 [[6]](#references)
+To evaluate the [Prov-Gigapath](https://github.com/prov-gigapath/prov-gigapath) model, available on [HuggingFace](https://huggingface.co/prov-gigapath/prov-gigapath), run:
+
+```
+MODEL_NAME=pathology/prov_gigapath \
+IN_FEATURES=1536 \
+eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
+```
+
+
 ## References
 
  [1]: Kang, Mingu, et al. "Benchmarking self-supervised learning on diverse pathology datasets." Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. 2023.
@@ -160,3 +170,5 @@ eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
  [4]: Aben, Nanne, et al. "Towards Large-Scale Training of Pathology Foundation Models." arXiv preprint arXiv:2404.15217 (2024).
 
  [5]: Saillard, et al. "H-optimus-0" https://github.com/bioptimus/releases/tree/main/models/h-optimus/v0 (2024).
+
+ [6]: Xu, Hanwen, et al. "A whole-slide foundation model for digital pathology from real-world data." Nature (2024): 1-8.
