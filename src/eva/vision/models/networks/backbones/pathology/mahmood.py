@@ -1,6 +1,7 @@
 """Pathology FMs from MahmoodLab."""
 
 import os
+from pathlib import Path
 from typing import Tuple
 
 import huggingface_hub
@@ -16,7 +17,7 @@ def mahmood_uni(
     dynamic_img_size: bool = True,
     out_indices: int | Tuple[int, ...] | None = None,
     hf_token: str | None = None,
-    download_dir: str = "~/.cache/eva",
+    download_dir: str = os.path.join(str(Path.home()), ".cache/eva"),
 ) -> nn.Module:
     """Initializes UNI model from MahmoodLab.
 

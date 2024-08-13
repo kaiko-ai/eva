@@ -62,7 +62,7 @@ MODEL_NAME=pathology/owkin_phikon \
 eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
 ```
 
-### UNI - DINOv2 ViT-L16 (Mass-100k) [[3]](#references)
+### UNI (MahmoodLab) - DINOv2 ViT-L16 (Mass-100k) [[3]](#references)
 
 The UNI FM by MahmoodLab is available on [HuggingFace](https://huggingface.co/MahmoodLab/UNI). Note that access needs to 
 be requested.
@@ -73,7 +73,6 @@ HF_TOKEN=<your-huggingace-token-for-downloading-the-model> \
 IN_FEATURES=1024 \
 eva predict_fit --config configs/vision/phikon/offline/<task>.yaml
 ```
-
 
 ### kaiko.ai - DINO ViT-S16 (TCGA) [[4]](#references)
 
@@ -98,7 +97,6 @@ NORMALIZE_MEAN=[0.5,0.5,0.5] \
 NORMALIZE_STD=[0.5,0.5,0.5] \
 eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
 ```
-
 
 ### kaiko.ai - DINO ViT-B16 (TCGA) [[4]](#references)
 
@@ -139,6 +137,18 @@ IN_FEATURES=1024 \
 eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
 ```
 
+### H-optimus-0 (Bioptimus) - ViT-G14 [[5]](#references)
+[Bioptimus](https://www.bioptimus.com) released their H-optimus-0 which was trained on a collection of 500,000 H&E slides. The model weights
+were released on [HuggingFace](https://huggingface.co/bioptimus/H-optimus-0).
+
+```
+MODEL_NAME=pathology/bioptimus_h_optimus_0 \
+NORMALIZE_MEAN=[0.707223, 0.578729, 0.703617] \
+NORMALIZE_STD=[0.211883, 0.230117, 0.177517] \
+IN_FEATURES=1024 \
+eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
+```
+
 ### Prov-GigaPath - DINOv2 ViT-G14 [[6]](#references)
 To evaluate the [Prov-Gigapath](https://github.com/prov-gigapath/prov-gigapath) model, available on [HuggingFace](https://huggingface.co/prov-gigapath/prov-gigapath), run:
 
@@ -158,5 +168,7 @@ eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
  [3]: Chen: Chen, Richard J., et al. "A general-purpose self-supervised model for computational pathology." arXiv preprint arXiv:2308.15474 (2023).
 
  [4]: Aben, Nanne, et al. "Towards Large-Scale Training of Pathology Foundation Models." arXiv preprint arXiv:2404.15217 (2024).
+
+ [5]: Saillard, et al. "H-optimus-0" https://github.com/bioptimus/releases/tree/main/models/h-optimus/v0 (2024).
 
  [6]: Xu, Hanwen, et al. "A whole-slide foundation model for digital pathology from real-world data." Nature (2024): 1-8.
