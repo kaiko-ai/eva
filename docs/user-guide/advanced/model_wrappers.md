@@ -68,7 +68,7 @@ While you can load `timm` models using the `ModelFromFunction` wrapper class as 
 
 ```
 backbone:
-  class_path: eva.vision.models.wrappers import TimmModel
+  class_path: eva.vision.models.wrappers.TimmModel
   init_args:
     model_name: vit_tiny_patch16_224
     pretrained: true

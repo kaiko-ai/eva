@@ -16,6 +16,7 @@ def timm_model(
     pretrained: bool = False,
     dynamic_img_size: bool = True,
     out_indices: int | Tuple[int, ...] | None = None,
+    **kwargs,
 ) -> nn.Module:
     """Initializes any ViT model from timm with weights from a specified checkpoint.
 
@@ -26,6 +27,7 @@ def timm_model(
         dynamic_img_size: Support different input image sizes by allowing to change
             the grid size (interpolate abs and/or ROPE pos) in the forward pass.
         out_indices: Weather and which multi-level patch embeddings to return.
+        **kwargs: Additional arguments to pass to the model
 
     Returns:
         The VIT model instance.
@@ -41,5 +43,6 @@ def timm_model(
         out_indices=out_indices,
         model_kwargs={
             "dynamic_img_size": dynamic_img_size,
-        },
+        }
+        | kwargs,
     )

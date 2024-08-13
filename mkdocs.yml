@@ -78,6 +78,7 @@ nav:
         - user-guide/advanced/replicate_evaluations.md
         - user-guide/advanced/model_registry.md
         - user-guide/advanced/model_wrappers.md
+        - user-guide/advanced/custom_checkpoints.md
   - Datasets: 
     - datasets/index.md
     - WSI:
