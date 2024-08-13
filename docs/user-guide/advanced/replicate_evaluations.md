@@ -143,7 +143,7 @@ eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
 ### hibou-B (hist.ai) - DINOv2 ViT-B14 (1M Slides) [[7]](#references)
 To evaluate [hist.ai's](https://www.hist.ai/) FM with DINOv2 ViT-B14 backbone, pretrained on
 a proprietary dataset of one million slides, available for download on
-[huggingface](https://huggingface.co/histai/hibou-b), run: 
+[HuggingFace](https://huggingface.co/histai/hibou-b), run: 
 
 ```
 MODEL_NAME=pathology/histai_hibou_b \
@@ -156,7 +156,7 @@ eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
 ### hibou-L (hist.ai) - DINOv2 ViT-L14 (1M Slides) [[7]](#references)
 To evaluate [hist.ai's](https://www.hist.ai/) FM with DINOv2 ViT-L14 backbone, pretrained on
 a proprietary dataset of one million slides, available for download on
-[huggingface](https://huggingface.co/histai/hibou-l), run: 
+[HuggingFace](https://huggingface.co/histai/hibou-l), run: 
 
 ```
 MODEL_NAME=pathology/histai_hibou_l \
