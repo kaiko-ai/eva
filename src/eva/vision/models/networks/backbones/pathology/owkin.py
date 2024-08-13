@@ -13,7 +13,7 @@ def owkin_phikon(out_indices: int | Tuple[int, ...] | None = None) -> nn.Module:
     """Initializes the phikon pathology FM by owkin (https://huggingface.co/owkin/phikon).
 
     Args:
-        out_indices: Weather and which multi-level patch embeddings to return.
+        out_indices: Whether and which multi-level patch embeddings to return.
             Currently only out_indices=1 is supported.
 
     Returns:

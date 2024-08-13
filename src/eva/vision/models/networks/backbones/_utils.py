@@ -18,7 +18,7 @@ def load_hugingface_model(
 
     Args:
         model_name: The model name to load.
-        out_indices: Weather and which multi-level patch embeddings to return.
+        out_indices: Whether and which multi-level patch embeddings to return.
             Currently only out_indices=1 is supported.
         model_kwargs: The arguments used for instantiating the model.
         transform_args: The arguments used for instantiating the transform.

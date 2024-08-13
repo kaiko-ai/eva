@@ -13,7 +13,7 @@ def histai_hibou_b(out_indices: int | Tuple[int, ...] | None = None) -> nn.Modul
     """Initializes the hibou-B pathology FM by hist.ai (https://huggingface.co/histai/hibou-B).
 
     Args:
-        out_indices: Weather and which multi-level patch embeddings to return.
+        out_indices: Whether and which multi-level patch embeddings to return.
             Currently only out_indices=1 is supported.
 
     Returns:
@@ -32,7 +32,7 @@ def histai_hibou_l(out_indices: int | Tuple[int, ...] | None = None) -> nn.Modul
     """Initializes the hibou-L pathology FM by hist.ai (https://huggingface.co/histai/hibou-L).
 
     Args:
-        out_indices: Weather and which multi-level patch embeddings to return.
+        out_indices: Whether and which multi-level patch embeddings to return.
             Currently only out_indices=1 is supported.
 
     Returns:

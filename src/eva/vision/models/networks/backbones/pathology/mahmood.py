@@ -23,7 +23,7 @@ def mahmood_uni(
     Args:
         dynamic_img_size: Support different input image sizes by allowing to change
             the grid size (interpolate abs and/or ROPE pos) in the forward pass.
-        out_indices: Weather and which multi-level patch embeddings to return.
+        out_indices: Whether and which multi-level patch embeddings to return.
         hf_token: HuggingFace token to download the model.
         download_dir: Directory to download the model checkpoint.
 
