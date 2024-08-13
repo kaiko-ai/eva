@@ -30,10 +30,10 @@ class BackboneModelRegistry:
         return cls._registry[model_name]
 
     @classmethod
-    def load_model(cls, model_name: str, **kwargs: Any) -> nn.Module:
+    def load_model(cls, model_name: str, model_kwargs: Dict[str, Any] | None = None) -> nn.Module:
         """Loads & initializes a model class from the registry."""
         model_fn = cls.get(model_name)
-        return model_fn(**kwargs)
+        return model_fn(**(model_kwargs or {}))
 
     @classmethod
     def list_models(cls) -> List[str]:
