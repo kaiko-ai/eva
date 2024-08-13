@@ -139,8 +139,8 @@ IN_FEATURES=1024 \
 eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
 ```
 
-### Prov-GigaPath - DINOv2 ViT-G14
-To evaluate the `Prov-Gigapath` model available on [HuggingFace](https://huggingface.co/prov-gigapath/prov-gigapath):
+### Prov-GigaPath - DINOv2 ViT-G14 [[6]](#references)
+To evaluate the [Prov-Gigapath](https://github.com/prov-gigapath/prov-gigapath) model, available on [HuggingFace](https://huggingface.co/prov-gigapath/prov-gigapath), run:
 
 ```
 MODEL_NAME=pathology/prov_gigapath \
