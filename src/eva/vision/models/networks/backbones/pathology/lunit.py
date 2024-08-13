@@ -1,4 +1,4 @@
-"""Pathology FMs from lunit.
+"""Pathology FMs from Lunit.
 
 Source: https://github.com/lunit-io/benchmark-ssl-pathology/releases
 
