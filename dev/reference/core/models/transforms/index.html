@@ -2631,8 +2631,7 @@
 
 
 <h2 id="eva.models.transforms.ExtractCLSFeatures" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <code>eva.models.transforms.ExtractCLSFeatures</code>
-
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>              <code class="highlight language-python"><span class="n">eva</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">transforms</span><span class="o">.</span><span class="n">ExtractCLSFeatures</span></code>
 
 </h2>
 
@@ -2642,6 +2641,53 @@
 
       <p>Extracts the CLS token from a ViT model output.</p>
 
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>cls_index</code></td>
+            <td>
+                  <code>int</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The index of the CLS token in the output tensor.</p>
+              </div>
+            </td>
+            <td>
+                  <code>0</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+                  <details class="quote">
+                    <summary>Source code in <code>src/eva/core/models/transforms/extract_cls_features.py</code></summary>
+                    <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-10">10</a></span>
+<span class="normal"><a href="#__codelineno-0-11">11</a></span>
+<span class="normal"><a href="#__codelineno-0-12">12</a></span>
+<span class="normal"><a href="#__codelineno-0-13">13</a></span>
+<span class="normal"><a href="#__codelineno-0-14">14</a></span>
+<span class="normal"><a href="#__codelineno-0-15">15</a></span>
+<span class="normal"><a href="#__codelineno-0-16">16</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10"></a><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cls_index</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Initializes the transformation.</span>
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12"></a>
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13"></a><span class="sd">    Args:</span>
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14"></a><span class="sd">        cls_index: The index of the CLS token in the output tensor.</span>
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15"></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_cls_index</span> <span class="o">=</span> <span class="n">cls_index</span>
+</span></code></pre></div></td></tr></table></div>
+                  </details>
 
 
 
@@ -2668,8 +2714,7 @@
 
 
 <h2 id="eva.models.transforms.ExtractPatchFeatures" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <code>eva.models.transforms.ExtractPatchFeatures</code>
-
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>              <code class="highlight language-python"><span class="n">eva</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">transforms</span><span class="o">.</span><span class="n">ExtractPatchFeatures</span></code>
 
 </h2>
 
@@ -2679,6 +2724,56 @@
 
       <p>Extracts the patch features from a ViT model output.</p>
 
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>ignore_remaining_dims</code></td>
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If set to <code>True</code>, ignore the remaining dimensions
+of the patch grid if it is not a square number.</p>
+              </div>
+            </td>
+            <td>
+                  <code>False</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+                  <details class="quote">
+                    <summary>Source code in <code>src/eva/core/models/transforms/extract_patch_features.py</code></summary>
+                    <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-13">13</a></span>
+<span class="normal"><a href="#__codelineno-0-14">14</a></span>
+<span class="normal"><a href="#__codelineno-0-15">15</a></span>
+<span class="normal"><a href="#__codelineno-0-16">16</a></span>
+<span class="normal"><a href="#__codelineno-0-17">17</a></span>
+<span class="normal"><a href="#__codelineno-0-18">18</a></span>
+<span class="normal"><a href="#__codelineno-0-19">19</a></span>
+<span class="normal"><a href="#__codelineno-0-20">20</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13"></a><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ignore_remaining_dims</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Initializes the transformation.</span>
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15"></a>
+</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16"></a><span class="sd">    Args:</span>
+</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17"></a><span class="sd">        ignore_remaining_dims: If set to `True`, ignore the remaining dimensions</span>
+</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18"></a><span class="sd">            of the patch grid if it is not a square number.</span>
+</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19"></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_ignore_remaining_dims</span> <span class="o">=</span> <span class="n">ignore_remaining_dims</span>
+</span></code></pre></div></td></tr></table></div>
+                  </details>
 
 
 
