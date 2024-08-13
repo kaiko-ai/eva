@@ -26,7 +26,7 @@ def timm_model(
         pretrained: If set to `True`, load pretrained ImageNet-1k weights.
         dynamic_img_size: Support different input image sizes by allowing to change
             the grid size (interpolate abs and/or ROPE pos) in the forward pass.
-        out_indices: Weather and which multi-level patch embeddings to return.
+        out_indices: Whether and which multi-level patch embeddings to return.
         **kwargs: Additional arguments to pass to the model
 
     Returns:

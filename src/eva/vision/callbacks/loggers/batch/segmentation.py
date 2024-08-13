@@ -34,7 +34,7 @@ class SemanticSegmentationLogger(base.BatchLogger):
             max_samples: The maximum number of images displayed in the grid.
             number_of_images_per_subgrid_row: Number of images displayed in each row
                 of each sub-grid (that is images, targets and predictions).
-            log_images: Weather to log the input batch images.
+            log_images: Whether to log the input batch images.
             mean: The mean of the input images to de-normalize from.
             std: The std of the input images to de-normalize from.
             log_every_n_epochs: Epoch-wise logging frequency.

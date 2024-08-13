@@ -1,6 +1,6 @@
 """Wrappers for HuggingFace `transformers` models."""
 
-from typing import Any, Callable
+from typing import Any, Callable, Dict
 
 import torch
 import transformers
@@ -12,7 +12,12 @@ from eva.core.models.wrappers import base
 class HuggingFaceModel(base.BaseModel):
     """Wrapper class for loading HuggingFace `transformers` models."""
 
-    def __init__(self, model_name_or_path: str, tensor_transforms: Callable | None = None) -> None:
+    def __init__(
+        self,
+        model_name_or_path: str,
+        tensor_transforms: Callable | None = None,
+        model_kwargs: Dict[str, Any] | None = None,
+    ) -> None:
         """Initializes the model.
 
         Args:
@@ -21,17 +26,20 @@ class HuggingFaceModel(base.BaseModel):
                 model hub.
             tensor_transforms: The transforms to apply to the output tensor
                 produced by the model.
+            model_kwargs: The arguments used for instantiating the model.
         """
         super().__init__(tensor_transforms=tensor_transforms)
 
         self._model_name_or_path = model_name_or_path
+        self._model_kwargs = model_kwargs or {}
 
         self._model = self.load_model()
 
     @override
     def load_model(self) -> Any:
-        config = transformers.AutoConfig.from_pretrained(self._model_name_or_path)
-        return transformers.AutoModel.from_pretrained(self._model_name_or_path, config=config)
+        return transformers.AutoModel.from_pretrained(
+            self._model_name_or_path, **self._model_kwargs
+        )
 
     @override
     def model_forward(self, tensor: torch.Tensor) -> torch.Tensor:

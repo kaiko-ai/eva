@@ -17,7 +17,7 @@ def kaiko_vits16(
     Args:
         dynamic_img_size: Support different input image sizes by allowing to change
             the grid size (interpolate abs and/or ROPE pos) in the forward pass.
-        out_indices: Weather and which multi-level patch embeddings to return.
+        out_indices: Whether and which multi-level patch embeddings to return.
 
     Returns:
         The model instance.
@@ -40,7 +40,7 @@ def kaiko_vits8(
     Args:
         dynamic_img_size: Support different input image sizes by allowing to change
             the grid size (interpolate abs and/or ROPE pos) in the forward pass.
-        out_indices: Weather and which multi-level patch embeddings to return.
+        out_indices: Whether and which multi-level patch embeddings to return.
 
     Returns:
         The model instance.
@@ -63,7 +63,7 @@ def kaiko_vitb16(
     Args:
         dynamic_img_size: Support different input image sizes by allowing to change
             the grid size (interpolate abs and/or ROPE pos) in the forward pass.
-        out_indices: Weather and which multi-level patch embeddings to return.
+        out_indices: Whether and which multi-level patch embeddings to return.
 
     Returns:
         The model instance.
@@ -86,7 +86,7 @@ def kaiko_vitb8(
     Args:
         dynamic_img_size: Support different input image sizes by allowing to change
             the grid size (interpolate abs and/or ROPE pos) in the forward pass.
-        out_indices: Weather and which multi-level patch embeddings to return.
+        out_indices: Whether and which multi-level patch embeddings to return.
 
     Returns:
         The model instance.
@@ -109,7 +109,7 @@ def kaiko_vitl14(
     Args:
         dynamic_img_size: Support different input image sizes by allowing to change
             the grid size (interpolate abs and/or ROPE pos) in the forward pass.
-        out_indices: Weather and which multi-level patch embeddings to return.
+        out_indices: Whether and which multi-level patch embeddings to return.
 
     Returns:
         The model instance.

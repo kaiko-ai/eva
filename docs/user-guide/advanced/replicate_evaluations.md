@@ -137,6 +137,7 @@ IN_FEATURES=1024 \
 eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
 ```
 
+
 ### H-optimus-0 (Bioptimus) - ViT-G14 [[5]](#references)
 [Bioptimus](https://www.bioptimus.com) released their H-optimus-0 which was trained on a collection of 500,000 H&E slides. The model weights
 were released on [HuggingFace](https://huggingface.co/bioptimus/H-optimus-0).
@@ -149,12 +150,40 @@ IN_FEATURES=1024 \
 eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
 ```
 
+
 ### Prov-GigaPath - DINOv2 ViT-G14 [[6]](#references)
 To evaluate the [Prov-Gigapath](https://github.com/prov-gigapath/prov-gigapath) model, available on [HuggingFace](https://huggingface.co/prov-gigapath/prov-gigapath), run:
 
 ```
 MODEL_NAME=pathology/prov_gigapath \
 IN_FEATURES=1536 \
+eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
+```
+
+
+### hibou-B (hist.ai) - DINOv2 ViT-B14 (1M Slides) [[7]](#references)
+To evaluate [hist.ai's](https://www.hist.ai/) FM with DINOv2 ViT-B14 backbone, pretrained on
+a proprietary dataset of one million slides, available for download on
+[HuggingFace](https://huggingface.co/histai/hibou-b), run: 
+
+```
+MODEL_NAME=pathology/histai_hibou_b \
+NORMALIZE_MEAN=[0.7068,0.5755,0.722] \
+NORMALIZE_STD=[0.195,0.2316,0.1816] \
+IN_FEATURES=768 \
+eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
+```
+
+### hibou-L (hist.ai) - DINOv2 ViT-L14 (1M Slides) [[7]](#references)
+To evaluate [hist.ai's](https://www.hist.ai/) FM with DINOv2 ViT-L14 backbone, pretrained on
+a proprietary dataset of one million slides, available for download on
+[HuggingFace](https://huggingface.co/histai/hibou-l), run: 
+
+```
+MODEL_NAME=pathology/histai_hibou_l \
+NORMALIZE_MEAN=[0.7068,0.5755,0.722] \
+NORMALIZE_STD=[0.195,0.2316,0.1816] \
+IN_FEATURES=1024 \
 eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
 ```
 
@@ -172,3 +201,5 @@ eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
  [5]: Saillard, et al. "H-optimus-0" https://github.com/bioptimus/releases/tree/main/models/h-optimus/v0 (2024).
 
  [6]: Xu, Hanwen, et al. "A whole-slide foundation model for digital pathology from real-world data." Nature (2024): 1-8.
+
+ [7]: Nechaev, Dmitry, Alexey Pchelnikov, and Ekaterina Ivanova. "Hibou: A Family of Foundational Vision Transformers for Pathology." arXiv preprint arXiv:2406.05074 (2024).

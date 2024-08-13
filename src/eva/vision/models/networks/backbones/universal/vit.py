@@ -17,7 +17,7 @@ def vit_small_patch16_224_random(
     Args:
         dynamic_img_size: Support different input image sizes by allowing to change
             the grid size (interpolate abs and/or ROPE pos) in the forward pass.
-        out_indices: Weather and which multi-level patch embeddings to return.
+        out_indices: Whether and which multi-level patch embeddings to return.
 
     Returns:
         The torch ViTS-16 based foundation model.
@@ -40,7 +40,7 @@ def vit_small_patch16_224_imagenet(
     Args:
         dynamic_img_size: Support different input image sizes by allowing to change
             the grid size (interpolate abs and/or ROPE pos) in the forward pass.
-        out_indices: Weather and which multi-level patch embeddings to return.
+        out_indices: Whether and which multi-level patch embeddings to return.
 
     Returns:
         The torch ViTS-16 based foundation model.

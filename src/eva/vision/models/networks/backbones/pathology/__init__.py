@@ -2,6 +2,7 @@
 
 from eva.vision.models.networks.backbones.pathology.bioptimus import bioptimus_h_optimus_0
 from eva.vision.models.networks.backbones.pathology.gigapath import prov_gigapath
+from eva.vision.models.networks.backbones.pathology.histai import histai_hibou_b, histai_hibou_l
 from eva.vision.models.networks.backbones.pathology.kaiko import (
     kaiko_vitb8,
     kaiko_vitb16,
@@ -25,4 +26,6 @@ __all__ = [
     "mahmood_uni",
     "bioptimus_h_optimus_0",
     "prov_gigapath",
+    "histai_hibou_b",
+    "histai_hibou_l",
 ]
