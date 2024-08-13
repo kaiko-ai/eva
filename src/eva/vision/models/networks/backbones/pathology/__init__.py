@@ -9,7 +9,7 @@ from eva.vision.models.networks.backbones.pathology.kaiko import (
 )
 from eva.vision.models.networks.backbones.pathology.lunit import lunit_vits8, lunit_vits16
 from eva.vision.models.networks.backbones.pathology.mahmood import mahmood_uni
-from eva.vision.models.networks.backbones.pathology.others import prov_gigapath
+from eva.vision.models.networks.backbones.pathology.gigapath import prov_gigapath
 from eva.vision.models.networks.backbones.pathology.owkin import owkin_phikon
 
 __all__ = [
