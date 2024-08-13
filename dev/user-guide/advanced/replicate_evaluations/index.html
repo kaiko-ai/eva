@@ -2662,7 +2662,7 @@ on <a href="https://github.com/lunit-io/benchmark-ssl-pathology/releases/">GitHu
 <div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>MODEL_NAME=pathology/owkin_phikon \
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>eva predict_fit --config configs/vision/pathology/offline/&lt;task&gt;.yaml
 </span></code></pre></div>
-<h3 id="uni-dinov2-vit-l16-mass-100k-3">UNI - DINOv2 ViT-L16 (Mass-100k) <a href="#references">[3]</a></h3>
+<h3 id="uni-mahmoodlab-dinov2-vit-l16-mass-100k-3">UNI (MahmoodLab) - DINOv2 ViT-L16 (Mass-100k) <a href="#references">[3]</a></h3>
 <p>The UNI FM by MahmoodLab is available on <a href="https://huggingface.co/MahmoodLab/UNI">HuggingFace</a>. Note that access needs to 
 be requested.</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>MODEL_NAME=pathology/mahmood_uni \
@@ -2713,11 +2713,21 @@ and available on <a href="https://github.com/kaiko-ai/towards_large_pathology_fm
 </span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>IN_FEATURES=1024 \
 </span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>eva predict_fit --config configs/vision/pathology/offline/&lt;task&gt;.yaml
 </span></code></pre></div>
+<h3 id="h-optimus-0-bioptimus-vit-g14-5">H-optimus-0 (Bioptimus) - ViT-G14 <a href="#references">[5]</a></h3>
+<p><a href="https://www.bioptimus.com">Bioptimus</a> released their H-optimus-0 which was trained on a collection of 500,000 H&amp;E slides. The model weights
+were released on <a href="https://huggingface.co/bioptimus/H-optimus-0">HuggingFace</a>.</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>MODEL_NAME=pathology/bioptimus_h_optimus_0 \
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>NORMALIZE_MEAN=[0.707223, 0.578729, 0.703617] \
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>NORMALIZE_STD=[0.211883, 0.230117, 0.177517] \
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>IN_FEATURES=1024 \
+</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>eva predict_fit --config configs/vision/pathology/offline/&lt;task&gt;.yaml
+</span></code></pre></div>
 <h2 id="references">References</h2>
 <p>[1]: Kang, Mingu, et al. "Benchmarking self-supervised learning on diverse pathology datasets." Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. 2023.</p>
 <p>[2]: Filiot, Alexandre, et al. "Scaling self-supervised learning for histopathology with masked image modeling." medRxiv (2023): 2023-07.</p>
 <p>[3]: Chen: Chen, Richard J., et al. "A general-purpose self-supervised model for computational pathology." arXiv preprint arXiv:2308.15474 (2023).</p>
 <p>[4]: Aben, Nanne, et al. "Towards Large-Scale Training of Pathology Foundation Models." arXiv preprint arXiv:2404.15217 (2024).</p>
+<p>[5]: Saillard, et al. "H-optimus-0" https://github.com/bioptimus/releases/tree/main/models/h-optimus/v0 (2024).</p>
 
 
 
