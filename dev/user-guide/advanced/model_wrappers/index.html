@@ -12,7 +12,7 @@
         <link rel="prev" href="../model_registry/">
       
       
-        <link rel="next" href="../../../datasets/">
+        <link rel="next" href="../custom_checkpoints/">
       
       
       <link rel="icon" href="../../../images/eva-stripes.png">
@@ -669,6 +669,8 @@
       
         
       
+        
+      
     
     
       
@@ -861,6 +863,27 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../custom_checkpoints/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Evaluations with custom models &amp; checkpoints
+  </span>
+  
+
+      </a>
     </li>
   
 
@@ -2692,9 +2715,9 @@
 <h1 id="model-wrappers">Model Wrappers</h1>
 <p>This document shows how to use <em>eva</em>'s <a href="../../../reference/core/models/networks/#wrappers">Model Wrapper API</a> (<code>eva.models.wrappers</code>) to load different model formats from a series of sources such as PyTorch Hub, HuggingFace Model Hub and ONNX.</p>
 <h2 id="eva-model-registry"><em>eva</em> model registry</h2>
-<p>To load models from <em>eva</em>'s FM backbone <a href="../model_registry/">model registry</a>, we provide the <code>VisionBackbone</code> wrapper class:</p>
+<p>To load models from <em>eva</em>'s FM backbone <a href="../model_registry/">model registry</a>, we provide the <code>ModelFromRegistry</code> wrapper class:</p>
 <p><div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>backbone:
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>  class_path: eva.vision.models.wrappers.VisionBackbone
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>  class_path: eva.vision.models.wrappers.ModelFromRegistry
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>  init_args:
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    model_name: universal/vit_small_patch16_224_imagenet
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    model_kwargs:
@@ -2740,7 +2763,7 @@ You just need to specify the class path of your model in the backbone section of
 <h2 id="timm-models"><code>timm</code> models</h2>
 <p>While you can load <code>timm</code> models using the <code>ModelFromFunction</code> wrapper class as shown in the example above, we also provide a specific wrapper class:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>backbone:
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>  class_path: eva.vision.models.wrappers import TimmModel
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>  class_path: eva.vision.models.wrappers.TimmModel
 </span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>  init_args:
 </span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>    model_name: vit_tiny_patch16_224
 </span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>    pretrained: true

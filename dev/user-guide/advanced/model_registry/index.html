@@ -669,6 +669,8 @@
       
         
       
+        
+      
     
     
       
@@ -821,6 +823,27 @@
   
   <span class="md-ellipsis">
     Model Wrappers
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../custom_checkpoints/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Evaluations with custom models &amp; checkpoints
   </span>
   
 
@@ -2659,13 +2682,13 @@ For segmentation tasks, we need to access not only the CLS embedding, but entire
 <h2 id="run-evaluations-using-backbones-from-the-registry">Run evaluations using backbones from the registry</h2>
 <p>In the default <code>.yaml</code> config files that eva provides, the backbone is specified as follows:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>backbone:
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>  class_path: eva.vision.models.wrappers.VisionBackbone
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>  class_path: eva.vision.models.ModelFromRegistry
 </span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>  init_args:
 </span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>    model_name: ${oc.env:MODEL_NAME, universal/vit_small_patch16_224_imagenet}
 </span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>    model_kwargs:
 </span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>      out_indices: ${oc.env:OUT_INDICES, 1}
 </span></code></pre></div>
-<p>Note that <code>VisionBackbone</code> is a model wrapper class, which loads the models through <code>BackboneModelRegistry</code>.</p>
+<p>Note that <code>ModelFromRegistry</code> is a model wrapper class, which loads the models through <code>BackboneModelRegistry</code>.</p>
 <p>By using the <code>MODEL_NAME</code> environment variable, you can run an evaluation with a specific model from the registry, without modifying the default config files:
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nv">MODEL_NAME</span><span class="o">=</span>pathology/kaiko_vits16<span class="w"> </span><span class="se">\</span>
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>eva<span class="w"> </span>predict_fit<span class="w"> </span>--config<span class="w"> </span>configs/vision/pathology/offline/segmentation/consep.yaml
