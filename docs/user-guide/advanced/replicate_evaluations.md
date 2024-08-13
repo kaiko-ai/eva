@@ -62,7 +62,7 @@ MODEL_NAME=pathology/owkin_phikon \
 eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
 ```
 
-### UNI (MahmoodLab)- DINOv2 ViT-L16 (Mass-100k) [[3]](#references)
+### UNI (MahmoodLab) - DINOv2 ViT-L16 (Mass-100k) [[3]](#references)
 
 The UNI FM by MahmoodLab is available on [HuggingFace](https://huggingface.co/MahmoodLab/UNI). Note that access needs to 
 be requested.
