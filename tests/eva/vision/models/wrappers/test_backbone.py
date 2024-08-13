@@ -1,4 +1,4 @@
-"""VisionBackbone tests."""
+"""ModelFromRegistry tests."""
 
 from typing import Any, Dict
 
@@ -35,12 +35,12 @@ from eva.vision.models import wrappers
     ],
 )
 def test_vision_backbone(
-    backbone_model: wrappers.VisionBackbone,
+    backbone_model: wrappers.ModelFromRegistry,
     input_tensor: torch.Tensor,
     expected_len: int,
     expected_shape: torch.Size,
 ) -> None:
-    """Tests the VisionBackbone wrapper."""
+    """Tests the ModelFromRegistry wrapper."""
     outputs = backbone_model(input_tensor)
     assert isinstance(outputs, list)
     assert len(outputs) == expected_len
@@ -53,9 +53,9 @@ def test_vision_backbone(
 def backbone_model(
     model_name: str,
     model_kwargs: Dict[str, Any] | None,
-) -> wrappers.VisionBackbone:
-    """VisionBackbone fixture."""
-    return wrappers.VisionBackbone(
+) -> wrappers.ModelFromRegistry:
+    """ModelFromRegistry fixture."""
+    return wrappers.ModelFromRegistry(
         model_name=model_name,
         model_kwargs=model_kwargs,
     )
