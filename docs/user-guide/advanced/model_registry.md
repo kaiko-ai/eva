@@ -55,14 +55,14 @@ In the default `.yaml` config files that eva provides, the backbone is specified
 
 ```
 backbone:
-  class_path: eva.vision.models.wrappers.VisionBackbone
+  class_path: eva.vision.models.ModelFromRegistry
   init_args:
     model_name: ${oc.env:MODEL_NAME, universal/vit_small_patch16_224_imagenet}
     model_kwargs:
       out_indices: ${oc.env:OUT_INDICES, 1}
 ```
 
-Note that `VisionBackbone` is a model wrapper class, which loads the models through `BackboneModelRegistry`.
+Note that `ModelFromRegistry` is a model wrapper class, which loads the models through `BackboneModelRegistry`.
 
 By using the `MODEL_NAME` environment variable, you can run an evaluation with a specific model from the registry, without modifying the default config files:
 ```bash

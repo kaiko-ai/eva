@@ -20,3 +20,4 @@ Get to know *eva* in more depth by studying our advanced user guides.
  - See how to [replicate our evaluations](advanced/replicate_evaluations.md) of public FM-checkpoints.
  - Learn how to access models in *eva*'s FM backbone [model registry](advanced/model_registry.md).
  - Understand how to use *eva*'s [model wrapper](advanced/model_wrappers.md) API to load models from different formats and sources.
+ - Running evaluations using [custom models & checkpoints](advanced/custom_checkpoints.md).
