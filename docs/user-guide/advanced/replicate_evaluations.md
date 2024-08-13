@@ -140,6 +140,30 @@ IN_FEATURES=1024 \
 eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
 ```
 
+### hibou-B (hist.ai) - DINOv2 ViT-B14 (1M Slides) [[7]](#references)
+To evaluate [hist.ai's](https://www.hist.ai/) FM with DINOv2 ViT-B14 backbone, pretrained on
+a proprietary dataset of one million slides, run: 
+
+```
+MODEL_NAME=pathology/histai_hibou_b \
+NORMALIZE_MEAN=[0.7068,0.5755,0.722] \
+NORMALIZE_STD=[0.195,0.2316,0.1816] \
+IN_FEATURES=768 \
+eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
+```
+
+### hibou-L (hist.ai) - DINOv2 ViT-L14 (1M Slides) [[7]](#references)
+To evaluate [hist.ai's](https://www.hist.ai/) FM with DINOv2 ViT-L14 backbone, pretrained on
+a proprietary dataset of one million slides, run: 
+
+```
+MODEL_NAME=pathology/histai_hibou_l \
+NORMALIZE_MEAN=[0.7068,0.5755,0.722] \
+NORMALIZE_STD=[0.195,0.2316,0.1816] \
+IN_FEATURES=1024 \
+eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
+```
+
 ## References
 
  [1]: Kang, Mingu, et al. "Benchmarking self-supervised learning on diverse pathology datasets." Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. 2023.
@@ -149,3 +173,5 @@ eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
  [3]: Chen: Chen, Richard J., et al. "A general-purpose self-supervised model for computational pathology." arXiv preprint arXiv:2308.15474 (2023).
 
  [4]: Aben, Nanne, et al. "Towards Large-Scale Training of Pathology Foundation Models." arXiv preprint arXiv:2404.15217 (2024).
+
+ [7]: Nechaev, Dmitry, Alexey Pchelnikov, and Ekaterina Ivanova. "Hibou: A Family of Foundational Vision Transformers for Pathology." arXiv preprint arXiv:2406.05074 (2024).

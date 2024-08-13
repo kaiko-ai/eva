@@ -4,8 +4,7 @@ from typing import Tuple
 
 from torch import nn
 
-from eva import models
-from eva.core.models import transforms
+from eva.vision.models.networks.backbones import _utils
 from eva.vision.models.networks.backbones.registry import register_model
 
 
@@ -20,13 +19,4 @@ def owkin_phikon(out_indices: int | Tuple[int, ...] | None = None) -> nn.Module:
     Returns:
         The model instance.
     """
-    if out_indices is None:
-        tensor_transforms = transforms.ExtractCLSFeatures()
-    elif out_indices == 1:
-        tensor_transforms = transforms.ExtractPatchFeatures()
-    else:
-        raise ValueError(f"out_indices={out_indices} is not supported for phikon")
-
-    return models.HuggingFaceModel(
-        model_name_or_path="owkin/phikon", tensor_transforms=tensor_transforms
-    )
+    return _utils.load_hugingface_model(model_name="owkin/phikon", out_indices=out_indices)
