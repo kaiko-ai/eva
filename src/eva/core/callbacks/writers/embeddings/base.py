@@ -162,7 +162,11 @@ class EmbeddingsWriter(callbacks.BasePredictionWriter, abc.ABC):
         for key in self._metadata_keys:
             if key not in metadata:
                 raise KeyError(f"Metadata key '{key}' not found in the batch metadata.")
-            item_metadata[key] = metadata[key][local_idx]
+            metadata_value = metadata[key][local_idx]
+            try:
+                item_metadata[key] = utils.to_cpu(metadata_value)
+            except TypeError:
+                item_metadata[key] = metadata_value
 
         return item_metadata
 
