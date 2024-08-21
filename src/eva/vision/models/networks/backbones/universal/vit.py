@@ -31,8 +31,8 @@ def vit_small_patch16_224_random(
     )
 
 
-@register_model("universal/vit_small_patch16_224_imagenet")
-def vit_small_patch16_224_imagenet(
+@register_model("universal/vit_small_patch16_224_dino")
+def vit_small_patch16_224_dino(
     dynamic_img_size: bool = True, out_indices: int | Tuple[int, ...] | None = None
 ) -> nn.Module:
     """Initializes a ViTS-16 baseline model pretrained on imagenet.
