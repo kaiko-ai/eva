@@ -2552,8 +2552,8 @@
 <p>The <code>.yaml</code> evaluation config files that <em>eva</em> provides out of the box support loading models from <em>eva</em>'s model registry through the <code>eva.vision.models.ModelFromRegistry</code> wrapper as described in the <a href="../model_wrappers/">Model Wrapper</a> docs.</p>
 <p>For evaluating your own custom models &amp; checkpoints, the most flexible way is to create your own set of configs starting from the default ones and replacing the <code>models:</code> section in the <code>.yaml</code> file.</p>
 <p>However, if your model can be loaded using <code>timm</code>, there is a quicker way using the default configuration files:
-<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>MODEL_NAME=universal/timm_model \
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>MODEL_EXTRA_KWARGS=&#39;{model_name: vit_small_patch16_224.dino, checkpoint_path: path/to/model.ckpt}&#39; \
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>MODEL_NAME=timm/vit_small_patch16_224 \
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>MODEL_EXTRA_KWARGS=&#39;{checkpoint_path: path/to/model.ckpt}&#39; \
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>eva predict_fit --config configs/vision/pathology/offline/segmentation/consep.yaml
 </span></code></pre></div></p>
 <p>Note that <code>MODEL_NAME</code> in the above example refers to a wrapper model function in <em>eva</em>'s model registry which calls <code>timm.create_model</code> and therefore can load any <code>timm</code> model, while <code>MODEL_EXTRA_KWARGS.model_name</code> refers to the name of the model in <em>timm</em>`s model registry to be loaded.</p>

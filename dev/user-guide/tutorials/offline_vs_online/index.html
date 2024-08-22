@@ -2673,7 +2673,7 @@
 <h3 id="3-run-a-complete-offline-workflow">3. Run a complete <em>offline</em>-workflow</h3>
 <p>With the <code>predict_fit</code>-command, the two steps above can be executed with one command. Let's do this, but this time let's use an FM pretrained from ImageNet.</p>
 <p>Go back to the terminal and execute:
-<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>MODEL_NAME=universal/vit_small_patch16_224_imagenet \
+<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>MODEL_NAME=universal/vit_small_patch16_224_dino \
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>EMBEDDINGS_ROOT=./data/embeddings/dino_vits16_imagenet \
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>N_RUNS=2 \
 </span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>MAX_STEPS=20 \
@@ -2685,7 +2685,7 @@
 <p>Alternatively to the offline workflow from <em>Step 3</em>, a complete evaluation can also be computed online. In this case we don't save and track embeddings and instead fit the ML model (encoder with frozen layers + trainable decoder) directly on the given task.</p>
 <p>As in <em>Step 3</em> above, we again use a <code>dino_vits16</code> pretrained from ImageNet. </p>
 <p>Run a complete online workflow with the following command:
-<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>MODEL_NAME=universal/vit_small_patch16_224_imagenet \
+<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>MODEL_NAME=universal/vit_small_patch16_224_dino \
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>N_RUNS=1 \
 </span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>MAX_STEPS=20 \
 </span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>LR_VALUE=0.1 \
