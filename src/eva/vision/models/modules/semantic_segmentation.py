@@ -64,7 +64,8 @@ class SemanticSegmentationModule(module.ModelModule):
 
         if isinstance(self.encoder, dict):
             self.encoder: Callable[[torch.Tensor], List[torch.Tensor]] = parser.parse_object(
-                self.encoder
+                self.encoder,
+                expected_type=nn.Module,
             )
 
     @override

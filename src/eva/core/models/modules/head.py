@@ -5,7 +5,7 @@ from typing import Any, Callable, Dict
 import torch
 from lightning.pytorch.cli import LRSchedulerCallable, OptimizerCallable
 from lightning.pytorch.utilities.types import STEP_OUTPUT
-from torch import optim
+from torch import nn, optim
 from torch.optim import lr_scheduler
 from typing_extensions import override
 
@@ -63,7 +63,7 @@ class HeadModule(module.ModelModule):
             grad.deactivate_requires_grad(self.backbone)
 
         if isinstance(self.head, dict):
-            self.head: MODEL_TYPE = parser.parse_object(self.head)
+            self.head: MODEL_TYPE = parser.parse_object(self.head, expected_type=nn.Module)
 
     @override
     def configure_optimizers(self) -> Any:

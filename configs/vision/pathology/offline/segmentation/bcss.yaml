@@ -27,7 +27,7 @@ trainer:
           mode: *MONITOR_METRIC_MODE
       - class_path: eva.callbacks.SegmentationEmbeddingsWriter
         init_args:
-          output_dir: &DATASET_EMBEDDINGS_ROOT ${oc.env:EMBEDDINGS_ROOT, ./data/embeddings}/${oc.env:MODEL_NAME, vit_small_patch16_224_imagenet}/bcss
+          output_dir: &DATASET_EMBEDDINGS_ROOT ${oc.env:EMBEDDINGS_ROOT, ./data/embeddings}/${oc.env:MODEL_NAME, vit_small_patch16_224_dino}/bcss
           dataloader_idx_map:
             0: train
             1: val
@@ -37,7 +37,7 @@ trainer:
           backbone:
             class_path: eva.vision.models.ModelFromRegistry
             init_args:
-              model_name: ${oc.env:MODEL_NAME, universal/vit_small_patch16_224_imagenet}
+              model_name: ${oc.env:MODEL_NAME, universal/vit_small_patch16_224_dino}
               model_kwargs:
                 out_indices: ${oc.env:OUT_INDICES, 1}
               model_extra_kwargs: ${oc.env:MODEL_EXTRA_KWARGS, null}

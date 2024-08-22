@@ -35,7 +35,7 @@ def vit_small_patch16_224_random(
 def vit_small_patch16_224_dino(
     dynamic_img_size: bool = True, out_indices: int | Tuple[int, ...] | None = None
 ) -> nn.Module:
-    """Initializes a ViTS-16 baseline model pretrained on imagenet.
+    """Initializes a ViTS-16 baseline model pretrained w/ DINO.
 
     Args:
         dynamic_img_size: Support different input image sizes by allowing to change
