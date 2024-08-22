@@ -57,7 +57,7 @@ In the default `.yaml` config files that eva provides, the backbone is specified
 backbone:
   class_path: eva.vision.models.ModelFromRegistry
   init_args:
-    model_name: ${oc.env:MODEL_NAME, universal/vit_small_patch16_224_imagenet}
+    model_name: ${oc.env:MODEL_NAME, universal/vit_small_patch16_224_dino}
     model_kwargs:
       out_indices: ${oc.env:OUT_INDICES, 1}
 ```

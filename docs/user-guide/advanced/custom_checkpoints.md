@@ -5,8 +5,8 @@ For evaluating your own custom models & checkpoints, the most flexible way is to
 
 However, if your model can be loaded using `timm`, there is a quicker way using the default configuration files:
 ```
-MODEL_NAME=universal/timm_model \
-MODEL_EXTRA_KWARGS='{model_name: vit_small_patch16_224.dino, checkpoint_path: path/to/model.ckpt}' \
+MODEL_NAME=timm/vit_small_patch16_224 \
+MODEL_EXTRA_KWARGS='{checkpoint_path: path/to/model.ckpt}' \
 eva predict_fit --config configs/vision/pathology/offline/segmentation/consep.yaml
 ```
 

@@ -10,7 +10,7 @@ To load models from *eva*'s FM backbone [model registry](./model_registry.md), w
 backbone:
   class_path: eva.vision.models.wrappers.ModelFromRegistry
   init_args:
-    model_name: universal/vit_small_patch16_224_imagenet
+    model_name: universal/vit_small_patch16_224_dino
     model_kwargs:
       out_indices: 1
 ```

@@ -70,7 +70,7 @@ With the `predict_fit`-command, the two steps above can be executed with one com
 
 Go back to the terminal and execute:
 ```
-MODEL_NAME=universal/vit_small_patch16_224_imagenet \
+MODEL_NAME=universal/vit_small_patch16_224_dino \
 EMBEDDINGS_ROOT=./data/embeddings/dino_vits16_imagenet \
 N_RUNS=2 \
 MAX_STEPS=20 \
@@ -88,7 +88,7 @@ As in *Step 3* above, we again use a `dino_vits16` pretrained from ImageNet.
 
 Run a complete online workflow with the following command:
 ```
-MODEL_NAME=universal/vit_small_patch16_224_imagenet \
+MODEL_NAME=universal/vit_small_patch16_224_dino \
 N_RUNS=1 \
 MAX_STEPS=20 \
 LR_VALUE=0.1 \

@@ -38,7 +38,8 @@ class BackboneModelRegistry:
     @classmethod
     def list_models(cls) -> List[str]:
         """List all models in the registry."""
-        return list(cls._registry.keys())
+        register_models = [name for name in cls._registry.keys() if not name.startswith("timm")]
+        return register_models + ["timm/<model_name>"]
 
 
 def register_model(name: str) -> Callable:

@@ -27,7 +27,7 @@ eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
 The next baseline model, uses a pretrained ViT-S16 backbone with ImageNet weights. To evaluate, run:
 
 ```
-MODEL_NAME="universal/vit_small_patch16_224_imagenet" \
+MODEL_NAME="universal/vit_small_patch16_224_dino" \
 eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
 ```
 

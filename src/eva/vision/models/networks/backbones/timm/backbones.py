@@ -1,15 +1,16 @@
 """timm backbones."""
 
+import functools
 from typing import Tuple
 
+import timm
 from loguru import logger
 from torch import nn
 
 from eva.vision.models import wrappers
-from eva.vision.models.networks.backbones.registry import register_model
+from eva.vision.models.networks.backbones.registry import BackboneModelRegistry
 
 
-@register_model("universal/timm_model")
 def timm_model(
     model_name: str,
     checkpoint_path: str | None = None,
@@ -46,3 +47,11 @@ def timm_model(
         }
         | kwargs,
     )
+
+
+BackboneModelRegistry._registry.update(
+    {
+        f"timm/{model_name}": functools.partial(timm_model, model_name=model_name)
+        for model_name in timm.list_models()
+    }
+)
