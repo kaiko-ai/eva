@@ -99,9 +99,6 @@ class MoNuSAC(base.ImageSegmentation):
     def prepare_data(self) -> None:
         if self._download:
             self._download_dataset()
-
-    @override
-    def configure(self) -> None:
         if self._export_masks:
             self._export_semantic_label_masks()
 
