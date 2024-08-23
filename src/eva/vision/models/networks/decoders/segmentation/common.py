@@ -6,6 +6,7 @@ output by an encoder into pixel-wise predictions for segmentation tasks.
 """
 
 from torch import nn
+from torchvision.models.segmentation import deeplabv3
 
 from eva.vision.models.networks.decoders.segmentation import conv2d, densely, linear
 
@@ -52,6 +53,25 @@ class ConvDecoderMS(conv2d.ConvDecoder):
                 nn.Conv2d(in_features, 64, kernel_size=(3, 3), padding=(1, 1)),
                 nn.Upsample(scale_factor=2),
                 nn.Conv2d(64, num_classes, kernel_size=(3, 3), padding=(1, 1)),
+            ),
+        )
+
+
+class DeepLabV3(conv2d.ConvDecoder):
+    """DeepLabV3 based decoder."""
+
+    def __init__(self, in_features: int, num_classes: int) -> None:
+        """Initializes the decoder.
+
+        Args:
+            in_features: The hidden dimension size of the embeddings.
+            num_classes: Number of output classes as channels.
+        """
+        super().__init__(
+            layers=deeplabv3.DeepLabHead(
+                in_channels=in_features,
+                num_classes=num_classes,
+                atrous_rates=(12, 24, 36),
             ),
         )
 

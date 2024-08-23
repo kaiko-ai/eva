@@ -197,9 +197,7 @@ class DenselyDecoder(nn.Module):
             in_channels = in_channels // 2
             growth_rate = growth_rate // 2
 
-        layers.append(
-            nn.Conv2d(in_channels, out_channels, kernel_size=3, stride=1, padding=1)
-        )
+        layers.append(nn.Conv2d(in_channels, out_channels, kernel_size=3, stride=1, padding=1))
 
         self._layers = nn.Sequential(*layers)
 
