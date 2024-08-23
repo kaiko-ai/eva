@@ -6,12 +6,13 @@ output by an encoder into pixel-wise predictions for segmentation tasks.
 """
 
 from torch import nn
+from torchvision.models.segmentation import deeplabv3, fcn
 
 from eva.vision.models.networks.decoders.segmentation import conv2d, linear
 
 
-class ConvDecoder1x1(conv2d.ConvDecoder):
-    """A convolutional decoder with a single 1x1 convolutional layer."""
+class DeepLabV3Decoder(conv2d.ConvDecoder):
+    """DeepLabV3 based decoder head."""
 
     def __init__(self, in_features: int, num_classes: int) -> None:
         """Initializes the decoder.
@@ -21,10 +22,28 @@ class ConvDecoder1x1(conv2d.ConvDecoder):
             num_classes: Number of output classes as channels.
         """
         super().__init__(
-            layers=nn.Conv2d(
+            layers=deeplabv3.DeepLabHead(
                 in_channels=in_features,
-                out_channels=num_classes,
-                kernel_size=(1, 1),
+                num_classes=num_classes,
+                atrous_rates=(12, 24, 36),
+            ),
+        )
+
+
+class FCNDecoder(conv2d.ConvDecoder):
+    """Fully Convolutional Networks (FCN) decoder head."""
+
+    def __init__(self, in_features: int, num_classes: int) -> None:
+        """Initializes the decoder.
+
+        Args:
+            in_features: The hidden dimension size of the embeddings.
+            num_classes: Number of output classes as channels.
+        """
+        super().__init__(
+            layers=fcn.FCNHead(
+                in_channels=in_features,
+                channels=num_classes,
             ),
         )
 
@@ -52,6 +71,25 @@ class ConvDecoderMS(conv2d.ConvDecoder):
                 nn.Conv2d(in_features, 64, kernel_size=(3, 3), padding=(1, 1)),
                 nn.Upsample(scale_factor=2),
                 nn.Conv2d(64, num_classes, kernel_size=(3, 3), padding=(1, 1)),
+            ),
+        )
+
+
+class ConvDecoder1x1(conv2d.ConvDecoder):
+    """A convolutional decoder with a single 1x1 convolutional layer."""
+
+    def __init__(self, in_features: int, num_classes: int) -> None:
+        """Initializes the decoder.
+
+        Args:
+            in_features: The hidden dimension size of the embeddings.
+            num_classes: Number of output classes as channels.
+        """
+        super().__init__(
+            layers=nn.Conv2d(
+                in_channels=in_features,
+                out_channels=num_classes,
+                kernel_size=(1, 1),
             ),
         )
 
