@@ -112,7 +112,7 @@ data:
       predict:
         - class_path: eva.vision.datasets.BCSS
           init_args: &PREDICT_DATASET_ARGS
-            root: ${oc.env:DATA_ROOT, ./data}/bcss
+            root: ${oc.env:DATA_ROOT, ./data/bcss}
             split: train
             sampler:
               class_path: eva.vision.data.wsi.patching.samplers.GridSampler

@@ -94,7 +94,7 @@ data:
       predict:
         - class_path: eva.vision.datasets.PANDA
           init_args: &PREDICT_DATASET_ARGS
-            root: ${oc.env:DATA_ROOT, ./data/panda/prostate-cancer-grade-assessment}
+            root: ${oc.env:DATA_ROOT, ./data/panda}
             sampler:
               class_path: eva.vision.data.wsi.patching.samplers.ForegroundGridSampler
               init_args:
