@@ -182,7 +182,8 @@ class MoNuSAC(base.ImageSegmentation):
             Loaded mask as a numpy array.
         """
         mask_filename = self._image_files[index].replace(".tif", ".npy")
-        return np.load(mask_filename)
+        with open(mask_filename, 'rb') as f:
+            np.load(f, allow_pickle=True)
 
     def _get_semantic_mask(self, index: int) -> npt.NDArray[Any]:
         """Builds and loads the semantic label mask from the XML annotations.
