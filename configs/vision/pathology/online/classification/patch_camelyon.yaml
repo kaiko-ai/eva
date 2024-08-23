@@ -63,7 +63,7 @@ data:
       train:
         class_path: eva.vision.datasets.PatchCamelyon
         init_args: &DATASET_ARGS
-          root: ${oc.env:DATA_ROOT, ./data}/patch_camelyon
+          root: ${oc.env:DATA_ROOT, ./data/patch_camelyon}
           split: train
           download: ${oc.env:DOWNLOAD_DATA, false}
           # Set `download: true` to download the dataset from https://zenodo.org/records/1494286

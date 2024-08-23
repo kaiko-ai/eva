@@ -65,7 +65,7 @@ data:
       train:
         class_path: eva.vision.datasets.CRC
         init_args: &DATASET_ARGS
-          root: ${oc.env:DATA_ROOT, ./data}/crc
+          root: ${oc.env:DATA_ROOT, ./data/crc}
           split: train
           download: ${oc.env:DOWNLOAD_DATA, false}
           # Set `download: true` to download the dataset from https://zenodo.org/records/1214456

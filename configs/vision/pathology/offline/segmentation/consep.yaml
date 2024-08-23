@@ -107,7 +107,7 @@ data:
       predict:
         - class_path: eva.vision.datasets.CoNSeP
           init_args: &PREDICT_DATASET_ARGS
-            root: ${oc.env:DATA_ROOT, ./data}/consep
+            root: ${oc.env:DATA_ROOT, ./data/consep}
             split: train
             sampler:
               class_path: eva.vision.data.wsi.patching.samplers.ForegroundGridSampler
