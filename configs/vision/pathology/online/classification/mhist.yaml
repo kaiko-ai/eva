@@ -63,7 +63,7 @@ data:
       train:
         class_path: eva.vision.datasets.MHIST
         init_args: &DATASET_ARGS
-          root: ${oc.env:DATA_ROOT, ./data}/mhist
+          root: ${oc.env:DATA_ROOT, ./data/mhist}
           split: train
           transforms:
             class_path: eva.vision.data.transforms.common.ResizeAndCrop

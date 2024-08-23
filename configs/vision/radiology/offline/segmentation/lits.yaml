@@ -111,7 +111,7 @@ data:
       predict:
         - class_path: eva.vision.datasets.LiTS
           init_args: &PREDICT_DATASET_ARGS
-            root: ${oc.env:DATA_ROOT, ./data}/lits
+            root: ${oc.env:DATA_ROOT, ./data/lits}
             split: train
             transforms:
               class_path: eva.vision.data.transforms.common.ResizeAndClamp
