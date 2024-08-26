@@ -160,7 +160,7 @@ class EmbeddingsDataset(base.Dataset, Generic[TargetType]):
     def _set_multiprocessing_start_method(self):
         """Sets the multiprocessing start method to spawn.
 
-        If the start method is not set expliclitly, the torch data loaders will
+        If the start method is not set explicitly, the torch data loaders will
         use the OS default method, which for some unix systems is `fork` and
         can lead to runtime issues such as deadlocks in this context.
         """
