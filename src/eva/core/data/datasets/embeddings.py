@@ -66,7 +66,7 @@ class EmbeddingsDataset(base.Dataset, Generic[TargetType]):
 
         self._data: pd.DataFrame
 
-        multiprocessing.set_start_method("spawn", force=True)
+        self._set_multiprocessing_start_method()
 
     def filename(self, index: int) -> str:
         """Returns the filename of the `index`'th data sample.
@@ -156,3 +156,12 @@ class EmbeddingsDataset(base.Dataset, Generic[TargetType]):
             target = self._target_transforms(target)
 
         return embeddings, target
+
+    def _set_multiprocessing_start_method(self):
+        """Sets the multiprocessing start method to spawn.
+
+        If the start method is not set expliclitly, the torch data loaders will
+        use the OS default method, which for some unix systems is `fork` and
+        can lead to runtime issues such as deadlocks in this context.
+        """
+        multiprocessing.set_start_method("spawn", force=True)
