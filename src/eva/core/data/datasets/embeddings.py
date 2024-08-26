@@ -1,6 +1,7 @@
 """Base dataset class for Embeddings."""
 
 import abc
+import multiprocessing
 import os
 from typing import Callable, Dict, Generic, Literal, Tuple, TypeVar
 
@@ -64,6 +65,8 @@ class EmbeddingsDataset(base.Dataset, Generic[TargetType]):
         self._target_transforms = target_transforms
 
         self._data: pd.DataFrame
+
+        multiprocessing.set_start_method("spawn", force=True)
 
     def filename(self, index: int) -> str:
         """Returns the filename of the `index`'th data sample.
