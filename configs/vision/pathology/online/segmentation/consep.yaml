@@ -37,14 +37,23 @@ model:
     encoder:
       class_path: eva.vision.models.ModelFromRegistry
       init_args:
-        model_name: ${oc.env:MODEL_NAME, universal/vit_small_patch16_224_dino}
+        # model_name: ${oc.env:MODEL_NAME, timm/resnet18}
+        model_name: ${oc.env:MODEL_NAME, timm/swin_tiny_patch4_window7_224}
         model_kwargs:
-          out_indices: ${oc.env:OUT_INDICES, 1}
+          # out_indices: ${oc.env:OUT_INDICES, 1}
+          # out_indices: ${oc.env:OUT_INDICES, [0, 2, 4]}
+          # out_indices: ${oc.env:OUT_INDICES, [2, 3, 4]}
+          out_indices: ${oc.env:OUT_INDICES, [0, 1, 2]}
         model_extra_kwargs: ${oc.env:MODEL_EXTRA_KWARGS, null}
     decoder:
-      class_path: eva.vision.models.networks.decoders.segmentation.ConvDecoderMS
+      # class_path: eva.vision.models.networks.decoders.segmentation.ConvDecoderMS
+      class_path: eva.vision.models.networks.decoders.segmentation.PVTFormerDecoder
       init_args:
-        in_features: ${oc.env:IN_FEATURES, 384}
+        # in_features: ${oc.env:IN_FEATURES, 384}
+        # in_features: ${oc.env:IN_FEATURES, 704}
+        # in_features: [64, 128, 512]
+        # in_features: [128, 256, 512]
+        in_features: [96, 192, 384]
         num_classes:  &NUM_CLASSES 8
     criterion:
       class_path: eva.vision.losses.DiceLoss
