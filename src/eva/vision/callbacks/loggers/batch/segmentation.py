@@ -21,7 +21,7 @@ class SemanticSegmentationLogger(base.BatchLogger):
     def __init__(
         self,
         max_samples: int = 10,
-        number_of_images_per_subgrid_row: int = 2,
+        number_of_images_per_subgrid_row: int = 1,
         log_images: bool = True,
         mean: Tuple[float, ...] = (0.0, 0.0, 0.0),
         std: Tuple[float, ...] = (1.0, 1.0, 1.0),
