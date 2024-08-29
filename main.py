@@ -1,10 +1,9 @@
-from eva.vision.models.networks.adapters.vit_adapter import ViTAdapter
+from eva.vision.models.networks.adapters import ViTAdapter
 from eva.vision.models import ModelFromRegistry
 import timm.models.vision_transformer
 import torch
 import timm
 from eva.vision.models import TimmModel
-
 
 
 # vit_backbone = timm.models.vision_transformer.VisionTransformer()
