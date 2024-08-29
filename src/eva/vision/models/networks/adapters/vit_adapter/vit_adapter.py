@@ -13,6 +13,7 @@ from timm.models.layers import trunc_normal_
 from torch.nn.init import normal_
 from typing_extensions import override
 
+import eva.core.models
 from eva.vision.models.networks.adapters.vit_adapter._adapter_modules import (
     InteractionBlock,
     SpatialPriorModule,
@@ -26,7 +27,7 @@ class ViTAdapter(nn.Module):
 
     def __init__(
         self,
-        vit_backbone: timm.models.vision_transformer.VisionTransformer,
+        vit_backbone: timm.models.vision_transformer.VisionTransformer | eva.core.models.BaseModel,
         interaction_indexes: List[List[int]],
         pretrain_size=224,
         conv_inplane=64,
@@ -43,6 +44,9 @@ class ViTAdapter(nn.Module):
     ):
         """Initializes the ViTAdapter."""
         super().__init__()
+
+        if isinstance(vit_backbone, eva.core.models.BaseModel):
+            vit_backbone = vit_backbone._model
 
         # TODO: these go to VisionTransformer init, but are not exposed
         self.norm_layer = functools.partial(nn.LayerNorm, eps=1e-6)
