@@ -6,6 +6,7 @@ import torch
 import torchvision
 from lightning import pytorch as pl
 from lightning.pytorch.utilities.types import STEP_OUTPUT
+from torch.nn import functional
 from typing_extensions import override
 
 from eva.core.loggers import log
@@ -21,7 +22,7 @@ class SemanticSegmentationLogger(base.BatchLogger):
     def __init__(
         self,
         max_samples: int = 10,
-        number_of_images_per_subgrid_row: int = 2,
+        number_of_images_per_subgrid_row: int = 1,
         log_images: bool = True,
         mean: Tuple[float, ...] = (0.0, 0.0, 0.0),
         std: Tuple[float, ...] = (1.0, 1.0, 1.0),
@@ -32,8 +33,8 @@ class SemanticSegmentationLogger(base.BatchLogger):
 
         Args:
             max_samples: The maximum number of images displayed in the grid.
-            number_of_images_per_subgrid_row: Number of images displayed in each row
-                of each sub-grid (that is images, targets and predictions).
+            number_of_images_per_subgrid_row: Number of images displayed in each
+                row of each sub-grid (that is images, targets and predictions).
             log_images: Whether to log the input batch images.
             mean: The mean of the input images to de-normalize from.
             std: The std of the input images to de-normalize from.
@@ -71,12 +72,19 @@ class SemanticSegmentationLogger(base.BatchLogger):
         data, targets, predictions = to_cpu([data, targets, predictions])
         predictions = torch.argmax(predictions, dim=1)
 
-        targets = list(map(_draw_semantic_mask, targets))
-        predictions = list(map(_draw_semantic_mask, predictions))
-        image_groups = [targets, predictions]
+        target_images = list(map(_draw_semantic_mask, targets))
+        prediction_images = list(map(_draw_semantic_mask, predictions))
+        image_groups = [target_images, prediction_images]
+
         if self._log_images:
             images = list(map(self._format_image, data))
-            image_groups = [images] + image_groups
+            overlay_targets = [
+                _overlay_mask(image, mask) for image, mask in zip(images, targets, strict=False)
+            ]
+            overlay_predictions = [
+                _overlay_mask(image, mask) for image, mask in zip(images, predictions, strict=False)
+            ]
+            image_groups = [images, overlay_targets, overlay_predictions] + image_groups
 
         image_grid = _make_grid_from_image_groups(
             image_groups, self._number_of_images_per_subgrid_row
@@ -132,6 +140,26 @@ def _draw_semantic_mask(tensor: torch.Tensor) -> torch.Tensor:
         indices = tensor == class_id
         red[indices], green[indices], blue[indices] = color
     return torch.stack([red, green, blue])
+
+
+def _overlay_mask(image: torch.Tensor, mask: torch.Tensor) -> torch.Tensor:
+    """Overlays a segmentation mask onto an image.
+
+    Args:
+        image: A 3D tensor of shape (C, H, W) representing the image.
+        mask: A 2D tensor of shape (H, W) representing the segmentation mask.
+            Each pixel in the mask corresponds to a class label.
+
+    Returns:
+        A tensor of the same shape as the input image (C, H, W) with the
+        segmentation mask overlaid on top. The output image retains the
+        original color channels but with the mask applied, using the colors
+        from the predefined colormap.
+    """
+    binary_masks = functional.one_hot(mask).permute(2, 0, 1).to(dtype=torch.bool)
+    return torchvision.utils.draw_segmentation_masks(
+        image, binary_masks[1:], alpha=0.65, colors=colormap.COLORS[1:]  # type: ignore
+    )
 
 
 def _make_grid_from_image_groups(
