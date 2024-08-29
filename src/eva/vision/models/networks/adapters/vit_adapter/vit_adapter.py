@@ -2,7 +2,7 @@
 
 import functools
 import math
-from typing import List
+from typing import List, Tuple
 
 import timm.models.layers
 import timm.models.vision_transformer
@@ -33,7 +33,7 @@ class ViTAdapter(nn.Module):
         n_points=4,
         deform_num_heads=6,
         init_values=0.0,
-        with_cffn=True,
+        with_cffn=False,  # TODO: set to True
         cffn_ratio=0.25,
         deform_ratio=1.0,
         add_vit_feature=True,
@@ -106,9 +106,9 @@ class ViTAdapter(nn.Module):
             if m.bias is not None:
                 m.bias.data.zero_()
 
-    def _get_pos_embed(self, pos_embed, H, W):
+    def _get_pos_embed(self, pos_embed: torch.Tensor, H: int, W: int, patch_size: Tuple[int, int]):
         pos_embed = pos_embed.reshape(
-            1, self.pretrain_size[0] // 16, self.pretrain_size[1] // 16, -1
+            1, self.pretrain_size[0] // patch_size[0], self.pretrain_size[0] // patch_size[1], -1
         ).permute(0, 3, 1, 2)
         pos_embed = (
             F.interpolate(pos_embed, size=(H, W), mode="bicubic", align_corners=False)
@@ -144,8 +144,9 @@ class ViTAdapter(nn.Module):
         if x.dim() == 4:  # NCHW -> NLC
             x = x.reshape(x.shape[0], -1, x.shape[3])
         H = W = int(math.sqrt(x.shape[1]))
+        patch_size = self.vit_backbone.patch_embed.patch_size
         bs, n, dim = x.shape
-        pos_embed = self._get_pos_embed(self.vit_backbone.pos_embed[:, 1:], H, W)
+        pos_embed = self._get_pos_embed(self.vit_backbone.pos_embed[:, 1:], H, W, patch_size)
         x = self.vit_backbone.pos_drop(x + pos_embed)
 
         # Interaction
