@@ -3,7 +3,6 @@
 from typing import Any, Callable, Dict
 
 import jsonargparse
-import torch
 from torch import nn
 from typing_extensions import override
 
@@ -41,16 +40,12 @@ class ModelFromFunction(base.BaseModel):
         self._arguments = arguments
         self._checkpoint_path = checkpoint_path
 
-        self._model = self.load_model()
+        self.load_model()
 
     @override
-    def load_model(self) -> nn.Module:
+    def load_model(self) -> None:
         class_path = jsonargparse.class_from_function(self._path, func_return=nn.Module)
         model = class_path(**self._arguments or {})
         if self._checkpoint_path is not None:
             _utils.load_model_weights(model, self._checkpoint_path)
-        return model
-
-    @override
-    def model_forward(self, tensor: torch.Tensor) -> torch.Tensor:
-        return self._model(tensor)
+        self._model = model

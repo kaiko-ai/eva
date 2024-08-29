@@ -3,7 +3,6 @@
 from typing import Any, Callable, Dict, List
 
 import torch
-from torch import nn
 from typing_extensions import override
 
 from eva.core.models import wrappers
@@ -39,8 +38,6 @@ class ModelFromRegistry(wrappers.BaseModel):
         self._model_name = model_name
         self._model_kwargs = model_kwargs or {}
         self._model_extra_kwargs = model_extra_kwargs or {}
-
-        self._model: nn.Module
 
         self.load_model()
 

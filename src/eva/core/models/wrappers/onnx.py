@@ -29,14 +29,15 @@ class ONNXModel(base.BaseModel):
 
         self._path = path
         self._device = device
-        self._model = self.load_model()
+
+        self.load_model()
 
     @override
     def load_model(self) -> Any:
         if self._device == "cuda" and not torch.cuda.is_available():
             raise ValueError("Device is set to 'cuda', but CUDA is not available.")
         provider = "CUDAExecutionProvider" if self._device == "cuda" else "CPUExecutionProvider"
-        return ort.InferenceSession(self._path, providers=[provider])
+        self._model = ort.InferenceSession(self._path, providers=[provider])
 
     @override
     def model_forward(self, tensor: torch.Tensor) -> torch.Tensor:

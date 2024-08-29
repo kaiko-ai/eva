@@ -5,7 +5,6 @@ from urllib import parse
 
 import timm
 import torch
-from torch import nn
 from typing_extensions import override
 
 from eva.core.models import wrappers
@@ -47,14 +46,12 @@ class TimmModel(wrappers.BaseModel):
         self._out_indices = out_indices
         self._model_kwargs = model_kwargs or {}
 
-        self._feature_extractor: nn.Module
-
         self.load_model()
 
     @override
     def load_model(self) -> None:
         """Builds and loads the timm model as feature extractor."""
-        self._feature_extractor = timm.create_model(
+        self._model = timm.create_model(
             model_name=self._model_name,
             pretrained=True if self._checkpoint_path else self._pretrained,
             pretrained_cfg=self._pretrained_cfg,
@@ -66,7 +63,7 @@ class TimmModel(wrappers.BaseModel):
 
     @override
     def model_forward(self, tensor: torch.Tensor) -> torch.Tensor | List[torch.Tensor]:
-        return self._feature_extractor(tensor)
+        return self._model(tensor)
 
     @property
     def _pretrained_cfg(self) -> Dict[str, Any]:
