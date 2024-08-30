@@ -2,7 +2,7 @@
 
 import functools
 import math
-from typing import List, Tuple
+from typing import Callable, List, Tuple
 
 import timm.models.layers
 import timm.models.vision_transformer
@@ -39,31 +39,28 @@ class ViTAdapter(nn.Module):
         deform_ratio=1.0,
         add_vit_feature=True,
         use_extra_extractor=True,
-        with_cp=False,  # TODO: that went to VisionTransformer init as well
         freeze_vit=True,
+        norm_layer=functools.partial(nn.LayerNorm, eps=1e-6),
     ):
         """Initializes the ViTAdapter."""
         super().__init__()
 
-        if isinstance(vit_backbone, eva.core.models.BaseModel):
-            vit_backbone = vit_backbone._model
-
-        if freeze_vit:
-            for param in vit_backbone.parameters():
-                param.requires_grad = False
-
-        # TODO: these go to VisionTransformer init, but are not exposed
-        self.norm_layer = functools.partial(nn.LayerNorm, eps=1e-6)
-        self.drop_path_rate = 0.0
-
-        self.vit_backbone = vit_backbone
-        self.cls_token = None
-        self.num_block = len(self.vit_backbone.blocks)
-        self.pretrain_size = (pretrain_size, pretrain_size)
         self.interaction_indexes = interaction_indexes
         self.add_vit_feature = add_vit_feature
-        embed_dim = self.vit_backbone.embed_dim
+        self.freeze_vit = freeze_vit
+        self.cls_token = None
+        self.pretrain_size = (pretrain_size, pretrain_size)
+        self.vit_backbone = (
+            vit_backbone._model
+            if isinstance(vit_backbone, eva.core.models.BaseModel)
+            else vit_backbone
+        )
 
+        self._verify_norm_layer(norm_layer, vit_backbone)
+        self._freeze_backbone()
+
+        embed_dim = self.vit_backbone.embed_dim
+        self.drop_path_rate = self._get_drop_path_rate()
         self.level_embed = nn.Parameter(torch.zeros(3, embed_dim))
         self.spm = SpatialPriorModule(inplanes=conv_inplane, embed_dim=embed_dim, with_cp=False)
         self.interactions = nn.Sequential(
@@ -74,7 +71,7 @@ class ViTAdapter(nn.Module):
                     n_points=n_points,
                     init_values=init_values,
                     drop_path=self.drop_path_rate,
-                    norm_layer=self.norm_layer,
+                    norm_layer=norm_layer,
                     with_cffn=with_cffn,
                     cffn_ratio=cffn_ratio,
                     deform_ratio=deform_ratio,
@@ -82,7 +79,7 @@ class ViTAdapter(nn.Module):
                         (True if i == len(interaction_indexes) - 1 else False)
                         and use_extra_extractor
                     ),
-                    with_cp=with_cp,
+                    with_cp=False,
                 )
                 for i in range(len(interaction_indexes))
             ]
@@ -134,6 +131,25 @@ class ViTAdapter(nn.Module):
         c3 = c3 + self.level_embed[1]
         c4 = c4 + self.level_embed[2]
         return c2, c3, c4
+
+    def _verify_norm_layer(self, norm_layer: Callable, vit_backbone: nn.Module):
+        """Check if the norm layer type matches the one used in the VisionTransformer."""
+        norm_layer_type = (
+            norm_layer.func if isinstance(norm_layer, functools.partial) else norm_layer
+        )
+        if type(vit_backbone.norm) != norm_layer_type:
+            raise ValueError(
+                f"norm_layer type mismatch: {type(vit_backbone.norm)} != {norm_layer_type}"
+            )
+
+    def _freeze_backbone(self):
+        if self.freeze_vit:
+            for param in self.vit_backbone.parameters():
+                param.requires_grad = False
+
+    def _get_drop_path_rate(self):
+        drop_path = self.vit_backbone.blocks[-1].drop_path1
+        return drop_path.drop_prob if isinstance(drop_path, timm.models.layers.DropPath) else 0.0
 
     @override
     def forward(self, x):
