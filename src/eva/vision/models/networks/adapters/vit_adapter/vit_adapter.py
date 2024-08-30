@@ -40,13 +40,17 @@ class ViTAdapter(nn.Module):
         add_vit_feature=True,
         use_extra_extractor=True,
         with_cp=False,  # TODO: that went to VisionTransformer init as well
-        freeze_vit=False,  # TODO: add freeze logic
+        freeze_vit=True,
     ):
         """Initializes the ViTAdapter."""
         super().__init__()
 
         if isinstance(vit_backbone, eva.core.models.BaseModel):
             vit_backbone = vit_backbone._model
+
+        if freeze_vit:
+            for param in vit_backbone.parameters():
+                param.requires_grad = False
 
         # TODO: these go to VisionTransformer init, but are not exposed
         self.norm_layer = functools.partial(nn.LayerNorm, eps=1e-6)
