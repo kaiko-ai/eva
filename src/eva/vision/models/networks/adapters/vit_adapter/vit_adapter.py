@@ -161,14 +161,11 @@ class ViTAdapter(nn.Module):
         c = torch.cat([c2, c3, c4], dim=1)
 
         # Patch Embedding forward
-        assert isinstance(
-            self.vit_backbone.patch_embed, timm.models.layers.PatchEmbed
-        )  # TODO: remove?
         x = self.vit_backbone.patch_embed(x)
         if x.dim() == 4:  # NCHW -> NLC
             x = x.reshape(x.shape[0], -1, x.shape[3])
         H = W = int(math.sqrt(x.shape[1]))
-        patch_size = self.vit_backbone.patch_embed.patch_size
+        patch_size = self.vit_backbone.patch_embed.patch_size  # type: ignore
         bs, n, dim = x.shape
         pos_embed = self._get_pos_embed(self.vit_backbone.pos_embed[:, 1:], H, W, patch_size)
         x = self.vit_backbone.pos_drop(x + pos_embed)
