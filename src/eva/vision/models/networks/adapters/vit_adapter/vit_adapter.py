@@ -34,7 +34,7 @@ class ViTAdapter(nn.Module):
         n_points=4,
         deform_num_heads=6,
         init_values=0.0,
-        with_cffn=False,  # TODO: set to True
+        with_cffn=True,
         cffn_ratio=0.25,
         deform_ratio=1.0,
         add_vit_feature=True,
