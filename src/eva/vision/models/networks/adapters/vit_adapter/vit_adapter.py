@@ -56,7 +56,7 @@ class ViTAdapter(nn.Module):
             else vit_backbone
         )
 
-        self._verify_norm_layer(norm_layer, vit_backbone)
+        self._verify_norm_layer(norm_layer)
         self._freeze_backbone()
 
         embed_dim = self.vit_backbone.embed_dim
@@ -132,14 +132,14 @@ class ViTAdapter(nn.Module):
         c4 = c4 + self.level_embed[2]
         return c2, c3, c4
 
-    def _verify_norm_layer(self, norm_layer: Callable, vit_backbone: nn.Module):
+    def _verify_norm_layer(self, norm_layer: Callable):
         """Check if the norm layer type matches the one used in the VisionTransformer."""
         norm_layer_type = (
             norm_layer.func if isinstance(norm_layer, functools.partial) else norm_layer
         )
-        if type(vit_backbone.norm) != norm_layer_type:
+        if type(self.vit_backbone.norm) != norm_layer_type:  # type: ignore
             raise ValueError(
-                f"norm_layer type mismatch: {type(vit_backbone.norm)} != {norm_layer_type}"
+                f"norm_layer type mismatch: {type(self.vit_backbone.norm)} != {norm_layer_type}"
             )
 
     def _freeze_backbone(self):
