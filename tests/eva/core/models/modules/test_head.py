@@ -35,7 +35,10 @@ def test_head_module_fit(
 
 
 @pytest.fixture(scope="function")
-def model(input_shape: Tuple[int, ...] = (3, 8, 8), n_classes: int = 4) -> modules.HeadModule:
+def model(
+    input_shape: Tuple[int, ...] = (3, 8, 8),
+    n_classes: int = 4,
+) -> modules.HeadModule:
     """Returns a HeadModule model fixture."""
     return modules.HeadModule(
         head=nn.Linear(math.prod(input_shape), n_classes),

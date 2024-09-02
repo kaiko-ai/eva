@@ -11,7 +11,7 @@ from eva.vision.data import datasets
 
 @pytest.mark.parametrize(
     "split, expected_length",
-    [("train", 9), ("val", 9), (None, 9)],
+    [("train", 6), ("val", 3), (None, 9)],
 )
 def test_length(
     total_segmentator_dataset: datasets.TotalSegmentator2D, expected_length: int
@@ -33,13 +33,15 @@ def test_sample(total_segmentator_dataset: datasets.TotalSegmentator2D, index: i
     # assert data sample is a tuple
     sample = total_segmentator_dataset[index]
     assert isinstance(sample, tuple)
-    assert len(sample) == 2
+    assert len(sample) == 3
     # assert the format of the `image` and `mask`
-    image, mask = sample
+    image, mask, metadata = sample
     assert isinstance(image, tv_tensors.Image)
     assert image.shape == (3, 16, 16)
     assert isinstance(mask, tv_tensors.Mask)
     assert mask.shape == (16, 16)
+    assert isinstance(metadata, dict)
+    assert "slice_index" in metadata
 
 
 @pytest.fixture(scope="function")

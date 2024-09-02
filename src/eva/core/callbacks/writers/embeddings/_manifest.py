@@ -6,6 +6,7 @@ import os
 from typing import Any, Dict, List
 
 import _csv
+import torch
 
 
 class ManifestManager:
@@ -39,11 +40,9 @@ class ManifestManager:
         manifest_path = os.path.join(self._output_dir, "manifest.csv")
         if os.path.exists(manifest_path) and not self._overwrite:
             raise FileExistsError(
-                f"Manifest file already exists at {manifest_path}. This likely means that the "
-                "embeddings have been computed before. Consider using `eva fit` instead "
-                "of `eva predict_fit` or `eva predict`."
+                f"A manifest file already exists at {manifest_path}, which indicates that the "
+                "chosen output directory has been previously used for writing embeddings."
             )
-
         self._manifest_file = open(manifest_path, "w", newline="")
         self._manifest_writer = csv.writer(self._manifest_file)
         self._manifest_writer.writerow(
@@ -59,10 +58,14 @@ class ManifestManager:
         metadata: Dict[str, Any] | None = None,
     ) -> None:
         """Adds a new entry to the manifest file."""
-        metadata_entries = list(metadata.values()) if metadata else []
+        metadata_entries = _to_dict_values(metadata or {})
         self._manifest_writer.writerow([input_name, save_name, target, split] + metadata_entries)
 
     def close(self) -> None:
         """Closes the manifest file."""
         if self._manifest_file:
             self._manifest_file.close()
+
+
+def _to_dict_values(data: Dict[str, Any]) -> List[Any]:
+    return [value.item() if isinstance(value, torch.Tensor) else value for value in data.values()]

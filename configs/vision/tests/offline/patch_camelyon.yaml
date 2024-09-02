@@ -16,7 +16,7 @@ trainer:
             1: val
             2: test
           backbone:
-            class_path: eva.core.models.networks.wrappers.ModelFromFunction
+            class_path: eva.models.ModelFromFunction
             init_args:
               path: torch.hub.load
               arguments:
@@ -49,7 +49,7 @@ model:
     optimizer:
       class_path: torch.optim.SGD
       init_args:
-        lr: 0.1
+        lr: ${oc.env:LR_VALUE, 0.1}
         momentum: 0.9
         weight_decay: 0.0
     lr_scheduler:

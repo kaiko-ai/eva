@@ -65,6 +65,7 @@ markdown_extensions:
   - pymdownx.superfences
 nav:
   - Introduction: index.md
+  - Leaderboards: leaderboards.md
   - User Guide:
       - user-guide/index.md
       - Getting started:
@@ -75,16 +76,26 @@ nav:
         - user-guide/tutorials/evaluate_resnet.md
       - Advanced user guide:
         - user-guide/advanced/replicate_evaluations.md
+        - user-guide/advanced/model_registry.md
         - user-guide/advanced/model_wrappers.md
+        - user-guide/advanced/custom_checkpoints.md
   - Datasets: 
     - datasets/index.md
-    - WSI-patches:
-      - BACH: datasets/bach.md
-      - CRC: datasets/crc.md
-      - MHIST: datasets/mhist.md
-      - PatchCamelyon: datasets/patch_camelyon.md
+    - WSI:
+      - Patch-level:
+        - BACH: datasets/bach.md
+        - CRC: datasets/crc.md
+        - MHIST: datasets/mhist.md
+        - PatchCamelyon: datasets/patch_camelyon.md
+        - MoNuSAC: datasets/monusac.md
+        - CoNSeP: datasets/consep.md
+        - BCSS: datasets/bcss.md
+      - Slide-level:
+        - Camelyon16: datasets/camelyon16.md
+        - PANDA: datasets/panda.md
     - Radiology:
       - TotalSegmentator: datasets/total_segmentator.md
+      - LiTS: datasets/lits.md
   - Reference API:
     - reference/index.md
     - Core:
@@ -104,6 +115,8 @@ nav:
       - Models: 
         - Modules: reference/core/models/modules.md
         - Networks: reference/core/models/networks.md
+        - Wrappers: reference/core/models/wrappers.md
+        - Transforms: reference/core/models/transforms.md
       - Trainers:
         - Trainer: reference/core/trainers/trainer.md
         - Functional: reference/core/trainers/functional.md
@@ -118,6 +131,7 @@ nav:
         - reference/vision/data/datasets.md
         - reference/vision/data/transforms.md
       - Models:
-        - reference/vision/models/networks.md
+        - Networks: reference/vision/models/networks.md
+        - Wrappers: reference/vision/models/wrappers.md
       - Utils:
         - IO: reference/vision/utils/io.md
