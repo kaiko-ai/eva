@@ -116,6 +116,13 @@ def ci(session: nox.Session) -> None:
 
 
 @nox.session
+def version(session: nox.Session) -> None:
+    """Fetches and prints the version of the library."""
+    session.run_always("pdm", "self", "add", "pdm-version", external=True)
+    session.run("pdm", "version", external=True)
+
+
+@nox.session
 def bump(session: nox.Session) -> None:
     """Bumps the version of the library.
 
@@ -134,27 +141,6 @@ def bump(session: nox.Session) -> None:
     """
     session.run_always("pdm", "self", "add", "pdm-bump", external=True)
     session.run("pdm", "bump", *session.posargs, external=True)
-
-
-@nox.session
-def version(session: nox.Session) -> None:
-    """Fetches and returns the version of the library.
-
-    Usage:
-      Update patch (0.0.1 -> 0.0.2)
-      >>> nox -s bump -- micro
-
-      Update minor (0.0.1 -> 0.1.0)
-      >>> nox -s bump -- minor
-
-      Update major (0.0.1 -> 1.0.0)
-      >>> nox -s bump -- minor
-
-      Update dev (0.0.1 -> 0.0.1.dev1)
-      >>> nox -s bump -- dev
-    """
-    session.run_always("pdm", "self", "add", "pdm-version", external=True)
-    session.run("pdm", "version", external=True)
 
 
 @nox.session
