@@ -41,8 +41,8 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git fetch origin gh-pages:gh-pages
-          tag="${{ github.ref_name }}"
-          DOC_VERSION=${tag%.*}
+          version="$(nox -s version | tail -1)"
+          DOC_VERSION=${version%.*}
           echo $DOC_VERSION
   # release-pypi:
   #   runs-on: ubuntu-latest
