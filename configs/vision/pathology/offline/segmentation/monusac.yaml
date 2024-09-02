@@ -111,7 +111,7 @@ data:
       predict:
         - class_path: eva.vision.datasets.MoNuSAC
           init_args: &PREDICT_DATASET_ARGS
-            root: ${oc.env:DATA_ROOT, ./data}/monusac
+            root: ${oc.env:DATA_ROOT, ./data/monusac}
             split: train
             download: ${oc.env:DOWNLOAD_DATA, false}
             # Set `download: true` to download the dataset from https://monusac-2020.grand-challenge.org/Data/

@@ -65,7 +65,7 @@ data:
       train:
         class_path: eva.vision.datasets.BACH
         init_args: &DATASET_ARGS
-          root: ${oc.env:DATA_ROOT, ./data}/bach
+          root: ${oc.env:DATA_ROOT, ./data/bach}
           split: train
           download: ${oc.env:DOWNLOAD_DATA, false}
           # Set `download: true` to download the dataset from https://zenodo.org/records/3632035

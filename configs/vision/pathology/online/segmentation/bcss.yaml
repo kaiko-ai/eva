@@ -89,7 +89,7 @@ data:
       train:
         class_path: eva.vision.datasets.BCSS
         init_args: &DATASET_ARGS
-          root: ${oc.env:DATA_ROOT, ./data}/bcss
+          root: ${oc.env:DATA_ROOT, ./data/bcss}
           split: train
           target_mpp: 0.5
           sampler:

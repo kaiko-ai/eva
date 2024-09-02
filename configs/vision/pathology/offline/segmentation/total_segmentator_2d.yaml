@@ -111,7 +111,7 @@ data:
       predict:
         - class_path: eva.vision.datasets.TotalSegmentator2D
           init_args: &PREDICT_DATASET_ARGS
-            root: ${oc.env:DATA_ROOT, ./data}/total_segmentator
+            root: ${oc.env:DATA_ROOT, ./data/total_segmentator}
             split: train
             download: ${oc.env:DOWNLOAD_DATA, false}
             # Set `download: true` to download the dataset from https://zenodo.org/records/10047292
