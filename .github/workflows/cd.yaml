@@ -33,9 +33,17 @@ jobs:
       #   run: |
       #     nox -s bump -- micro
       #     git push origin main
-      - name: Bumping version
+      # - name: Bumping version
+      #   run: |
+      #     nox -s bump -- micro
+      - name: Build Release Docs
         run: |
-          nox -s bump -- micro
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git fetch origin gh-pages:gh-pages
+          tag="${{ github.ref_name }}"
+          DOC_VERSION=${tag%.*}
+          echo $DOC_VERSION
   # release-pypi:
   #   runs-on: ubuntu-latest
   #   steps:
