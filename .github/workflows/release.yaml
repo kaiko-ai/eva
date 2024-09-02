@@ -11,10 +11,13 @@ permissions:
   contents: write
 
 jobs:
-  bump-version:
+  release-pypi:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: write
     steps:
-      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
       - name: Setting up PDM
         uses: pdm-project/setup-pdm@568ddd69406b30de1774ec0044b73ae06e716aa4 # v4
         with:
@@ -32,22 +35,6 @@ jobs:
         run: |
           nox -s bump -- to "${{ github.ref_name }}"
           git push origin main
-  release-pypi:
-    runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-      contents: write
-    steps:
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
-      - name: Setting up PDM
-        uses: pdm-project/setup-pdm@568ddd69406b30de1774ec0044b73ae06e716aa4 # v4
-        with:
-          python-version: "3.10"
-          architecture: x64
-      - name: Setting up nox
-        uses: wntrblm/nox@5656fcedc31a1ea37d016e4d94d00185330cc528 # 2024.04.15
-        with:
-          python-versions: "3.10"
       - name: Build artifacts
         run: |
           nox -s build
@@ -57,8 +44,6 @@ jobs:
           eva --version
       - name: Build Release Docs
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
           git fetch origin gh-pages:gh-pages
           tag="${{ github.ref_name }}"
           DOC_VERSION=${tag%.*}
