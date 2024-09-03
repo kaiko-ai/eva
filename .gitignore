@@ -171,6 +171,9 @@ cython_debug/
 /lightning_logs/
 /logs/
 
+# wandb
+/wandb/
+
 # ignore local data
 /data/
 
