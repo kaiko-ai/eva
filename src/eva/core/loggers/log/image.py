@@ -57,3 +57,15 @@ def _(
         img_tensor=image,
         global_step=step,
     )
+
+
+@log_image.register
+def _(
+    logger: loggers.WandbLogger,
+    tag: str,
+    image: torch.Tensor,
+    caption: str | None = None,
+    step: int = 0,
+) -> None:
+    """Adds a list of images to a Wandb logger."""
+    logger.log_image(key=tag, images=[image.float()], step=step, caption=[caption])
