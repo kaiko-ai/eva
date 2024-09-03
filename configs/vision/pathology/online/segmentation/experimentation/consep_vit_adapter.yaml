@@ -31,6 +31,10 @@ trainer:
         init_args:
           save_dir: *OUTPUT_ROOT
           name: ""
+      - class_path: lightning.pytorch.loggers.WandbLogger
+        init_args:
+          project: ${oc.env:WANDB_PROJECT, "vit-adapter-experiments"}
+          name: ${oc.env:WANDB_RUN_NAME, "consep-vit-s16-vit-adapter"}
 model:
   class_path: eva.vision.models.modules.SemanticSegmentationModule
   init_args:
@@ -41,14 +45,14 @@ model:
           class_path: eva.vision.models.TimmModel
           init_args:
             model_name: vit_small_patch16_224
-            pretrained: false
+            pretrained: true
         interaction_indexes: [[0, 2], [3, 5], [6, 8], [9, 11]]
     decoder:
-      # TODO: change to a compatible decoder (e.g. PVTFormer)
-      class_path: eva.vision.models.networks.decoders.segmentation.ConvDecoderMS
+      class_path: eva.vision.models.networks.decoders.segmentation.PVTFormerDecoder
       init_args:
-        in_features: ${oc.env:IN_FEATURES, 384}
+        in_features: [384, 384, 384]
         num_classes:  &NUM_CLASSES 8
+    freeze_encoder: false
     criterion:
       class_path: eva.vision.losses.DiceLoss
       init_args:
