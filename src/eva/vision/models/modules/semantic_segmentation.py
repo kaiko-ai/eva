@@ -25,6 +25,7 @@ class SemanticSegmentationModule(module.ModelModule):
         decoder: decoders.Decoder,
         criterion: Callable[..., torch.Tensor],
         encoder: Dict[str, Any] | Callable[[torch.Tensor], List[torch.Tensor]] | None = None,
+        freeze_encoder: bool = False,
         lr_multiplier_encoder: float = 0.0,
         optimizer: OptimizerCallable = optim.AdamW,
         lr_scheduler: LRSchedulerCallable = lr_scheduler.ConstantLR,
@@ -40,6 +41,7 @@ class SemanticSegmentationModule(module.ModelModule):
                 that the input batch returns the features directly.
                 If pass as a dictionary, it will be parsed to an object
                 during the `configure_model` step.
+            freeze_encoder: Wether to freeze the encoder parameters.
             lr_multiplier_encoder: The learning rate multiplier for the
                 encoder parameters. If `0`, it will freeze the encoder.
             optimizer: The optimizer to use.
@@ -54,13 +56,15 @@ class SemanticSegmentationModule(module.ModelModule):
         self.decoder = decoder
         self.criterion = criterion
         self.encoder = encoder  # type: ignore
+        self.freeze_encoder = freeze_encoder
         self.lr_multiplier_encoder = lr_multiplier_encoder
         self.optimizer = optimizer
         self.lr_scheduler = lr_scheduler
 
     @override
     def configure_model(self) -> None:
-        self._freeze_encoder()
+        if self.freeze_encoder:
+            self._freeze_encoder()
 
         if isinstance(self.encoder, dict):
             self.encoder: Callable[[torch.Tensor], List[torch.Tensor]] = parser.parse_object(
