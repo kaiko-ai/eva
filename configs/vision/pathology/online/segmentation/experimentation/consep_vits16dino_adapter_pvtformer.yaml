@@ -23,7 +23,7 @@ trainer:
       - class_path: lightning.pytorch.callbacks.EarlyStopping
         init_args:
           min_delta: 0
-          patience: 100
+          patience: 10
           monitor: *MONITOR_METRIC
           mode: *MONITOR_METRIC_MODE
     logger:
@@ -34,7 +34,7 @@ trainer:
       - class_path: lightning.pytorch.loggers.WandbLogger
         init_args:
           project: ${oc.env:WANDB_PROJECT, "vit-adapter-experiments"}
-          name: ${oc.env:WANDB_RUN_NAME, "consep-vit-s16-vit-adapter"}
+          name: ${oc.env:WANDB_RUN_NAME, "consep-vits16dino-adapter-pvtformer"}
 model:
   class_path: eva.vision.models.modules.SemanticSegmentationModule
   init_args:
@@ -42,11 +42,11 @@ model:
       class_path: eva.vision.models.networks.adapters.ViTAdapter
       init_args:
         vit_backbone: 
-          class_path: eva.vision.models.TimmModel
+          class_path: eva.vision.models.ModelFromRegistry
           init_args:
-            model_name: vit_small_patch16_224
-            pretrained: true
+            model_name: ${oc.env:MODEL_NAME, universal/vit_small_patch16_224_dino}
         interaction_indexes: [[0, 2], [3, 5], [6, 8], [9, 11]]
+        freeze_vit: true
     decoder:
       class_path: eva.vision.models.networks.decoders.segmentation.PVTFormerDecoder
       init_args:
