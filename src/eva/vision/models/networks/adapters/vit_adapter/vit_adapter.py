@@ -48,6 +48,7 @@ class ViTAdapter(nn.Module):
         self.interaction_indexes = interaction_indexes
         self.add_vit_feature = add_vit_feature
         self.freeze_vit = freeze_vit
+        self.norm_layer = norm_layer
         self.cls_token = None
         self.pretrain_size = (pretrain_size, pretrain_size)
         self.vit_backbone = (
@@ -56,9 +57,7 @@ class ViTAdapter(nn.Module):
             else vit_backbone
         )
 
-        self._verify_norm_layer(norm_layer)
-        self._freeze_backbone()
-
+        self.configure_model()
         embed_dim = self.vit_backbone.embed_dim
         self.drop_path_rate = self._get_drop_path_rate()
         self.level_embed = nn.Parameter(torch.zeros(3, embed_dim))
@@ -71,7 +70,7 @@ class ViTAdapter(nn.Module):
                     n_points=n_points,
                     init_values=init_values,
                     drop_path=self.drop_path_rate,
-                    norm_layer=norm_layer,
+                    norm_layer=self.norm_layer,
                     with_cffn=with_cffn,
                     cffn_ratio=cffn_ratio,
                     deform_ratio=deform_ratio,
@@ -95,6 +94,11 @@ class ViTAdapter(nn.Module):
         self.interactions.apply(self._init_weights)
         self.apply(self._init_deform_weights)
         normal_(self.level_embed)
+
+    def configure_model(self) -> None:
+        self._verify_norm_layer(self.norm_layer)
+        if self.freeze_vit:
+            self._freeze_backbone()
 
     def _init_weights(self, m):
         if isinstance(m, nn.Linear):
@@ -203,8 +207,9 @@ class ViTAdapter(nn.Module):
             c1, c2, c3, c4 = c1 + x1, c2 + x2, c3 + x3, c4 + x4
 
         # Final Norm
-        f1 = self.norm1(c1)
-        f2 = self.norm2(c2)
-        f3 = self.norm3(c3)
-        f4 = self.norm4(c4)
-        return [f1, f2, f3, f4]
+        f1 = self.norm1(c1)  # 1/4
+        f2 = self.norm2(c2)  # 1/8
+        f3 = self.norm3(c3)  # 1/16
+        f4 = self.norm4(c4)  # 1/32
+
+        return [f1, f2, f3]
