@@ -1,6 +1,6 @@
 """Experimental loggers."""
 
-from lightning.pytorch.loggers import TensorBoardLogger
+from lightning.pytorch.loggers import TensorBoardLogger, WandbLogger
 
-Loggers = TensorBoardLogger
+Loggers = TensorBoardLogger | WandbLogger
 """Supported loggers."""

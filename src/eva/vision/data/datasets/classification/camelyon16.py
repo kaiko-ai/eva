@@ -161,7 +161,7 @@ class Camelyon16(wsi.MultiWsiDataset, base.ImageClassification):
 
     @override
     def prepare_data(self) -> None:
-        _validators.check_dataset_exists(self._root, True)
+        _validators.check_dataset_exists(self._root, False)
 
         expected_directories = ["training/normal", "training/tumor", "testing/images"]
         for resource in expected_directories:
