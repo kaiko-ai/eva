@@ -52,13 +52,9 @@ class ViTAdapter(nn.Module):
         self.norm_layer = norm_layer
         self.cls_token = None
         self.pretrain_size = (pretrain_size, pretrain_size)
-        self.vit_backbone = (
-            vit_backbone._model
-            if isinstance(vit_backbone, eva.core.models.BaseModel)
-            else vit_backbone
-        )
+        self.vit_backbone = self._get_vit_backbone(vit_backbone)
 
-        self.configure_model()
+        self._setup_model()
         embed_dim = self.vit_backbone.embed_dim
         self.drop_path_rate = self._get_drop_path_rate()
         self.level_embed = nn.Parameter(torch.zeros(3, embed_dim))
@@ -96,11 +92,23 @@ class ViTAdapter(nn.Module):
         self.apply(self._init_deform_weights)
         normal_(self.level_embed)
 
-    def configure_model(self) -> None:
+    def _setup_model(self) -> None:
         self._verify_norm_layer(self.norm_layer)
         if self.freeze_vit:
             self._freeze_backbone()
         self._calculate_interactions()
+
+    def _get_vit_backbone(
+        self, vit_backbone: nn.Module
+    ) -> timm.models.vision_transformer.VisionTransformer:
+        if isinstance(vit_backbone, eva.core.models.BaseModel):
+            while hasattr(vit_backbone, "_model"):
+                vit_backbone = vit_backbone._model
+        if not isinstance(vit_backbone, timm.models.vision_transformer.VisionTransformer):
+            raise ValueError(
+                f"ViTAdapter only supports timm.VisionTransformer got {type(vit_backbone)}."
+            )
+        return vit_backbone
 
     def _calculate_interactions(self, n_interactions: int = 4) -> List[List[int]]:
         if self.interaction_indexes is None:

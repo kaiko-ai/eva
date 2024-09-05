@@ -59,4 +59,4 @@ def mahmood_uni(
             "dynamic_img_size": dynamic_img_size,
         },
         checkpoint_path=checkpoint_path,
-    )._model
+    )
