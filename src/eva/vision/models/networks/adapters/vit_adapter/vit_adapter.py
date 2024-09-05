@@ -236,6 +236,3 @@ class ViTAdapter(nn.Module):
         f4 = self.norm4(c4)  # 1/32
 
         return [f1, f2, f3]
-
-
-# we evenly split the transformer encoders of ViT into N blocks, each containing L/N encoder layers
