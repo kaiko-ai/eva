@@ -45,7 +45,6 @@ model:
           class_path: eva.vision.models.ModelFromRegistry
           init_args:
             model_name: ${oc.env:MODEL_NAME, pathology/kaiko_vitb16}
-        interaction_indexes: [[0, 2], [3, 5], [6, 8], [9, 11]]
         freeze_vit: true
     decoder:
       class_path: eva.vision.models.networks.decoders.segmentation.PVTFormerDecoder

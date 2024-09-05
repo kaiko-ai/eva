@@ -45,7 +45,6 @@ model:
           class_path: eva.vision.models.ModelFromRegistry
           init_args:
             model_name: ${oc.env:MODEL_NAME, pathology/mahmood_uni}
-        interaction_indexes: [[0, 2], [3, 5], [6, 8], [9, 11]]
         deform_num_heads: 8
         freeze_vit: true
     decoder:
