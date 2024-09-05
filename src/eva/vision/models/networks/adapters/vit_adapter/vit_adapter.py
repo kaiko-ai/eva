@@ -2,7 +2,7 @@
 
 import functools
 import math
-from typing import Callable, List, Tuple
+from typing import Callable, List
 
 import timm.models.layers
 import timm.models.vision_transformer
@@ -92,6 +92,13 @@ class ViTAdapter(nn.Module):
         self.apply(self._init_deform_weights)
         normal_(self.level_embed)
 
+    @functools.cached_property
+    def patch_size(self) -> int:
+        patch_size = self.vit_backbone.patch_embed.patch_size  # type: ignore
+        if patch_size[0] != patch_size[1]:
+            raise ValueError(f"Patch size must be square, got {patch_size}.")
+        return patch_size[0]
+
     def _setup_model(self) -> None:
         self._verify_norm_layer(self.norm_layer)
         if self.freeze_vit:
@@ -138,9 +145,9 @@ class ViTAdapter(nn.Module):
             if m.bias is not None:
                 m.bias.data.zero_()
 
-    def _get_pos_embed(self, pos_embed: torch.Tensor, H: int, W: int, patch_size: Tuple[int, int]):
+    def _get_pos_embed(self, pos_embed: torch.Tensor, H: int, W: int, patch_size: int):
         pos_embed = pos_embed.reshape(
-            1, self.pretrain_size[0] // patch_size[0], self.pretrain_size[0] // patch_size[1], -1
+            1, self.pretrain_size[0] // patch_size, self.pretrain_size[0] // patch_size, -1
         ).permute(0, 3, 1, 2)
         pos_embed = (
             F.interpolate(pos_embed, size=(H, W), mode="bicubic", align_corners=False)
@@ -180,7 +187,7 @@ class ViTAdapter(nn.Module):
 
     @override
     def forward(self, x):
-        deform_inputs1, deform_inputs2 = deform_inputs(x)
+        deform_inputs1, deform_inputs2 = deform_inputs(x, self.patch_size)
 
         # SPM forward
         c1, c2, c3, c4 = self.spm(x)
@@ -192,12 +199,12 @@ class ViTAdapter(nn.Module):
         if x.dim() == 4:  # NCHW -> NLC
             x = x.reshape(x.shape[0], -1, x.shape[3])
         H = W = int(math.sqrt(x.shape[1]))
-        patch_size = self.vit_backbone.patch_embed.patch_size  # type: ignore
         bs, n, dim = x.shape
-        pos_embed = self._get_pos_embed(self.vit_backbone.pos_embed[:, 1:], H, W, patch_size)
+        pos_embed = self._get_pos_embed(self.vit_backbone.pos_embed[:, 1:], H, W, self.patch_size)
         x = self.vit_backbone.pos_drop(x + pos_embed)
 
         # Interaction
+        H2, W2 = 14, 14  # 1/16 * 224
         outs = []
         for i, layer in enumerate(self.interactions):
             indexes = self.interaction_indexes[i]
@@ -207,8 +214,8 @@ class ViTAdapter(nn.Module):
                 self.vit_backbone.blocks[indexes[0] : indexes[-1] + 1],
                 deform_inputs1,
                 deform_inputs2,
-                H,
-                W,
+                H2,
+                W2,
             )
             outs.append(x.transpose(1, 2).view(bs, dim, H, W).contiguous())
 
@@ -217,16 +224,18 @@ class ViTAdapter(nn.Module):
         c3 = c[:, c2.size(1) : c2.size(1) + c3.size(1), :]
         c4 = c[:, c2.size(1) + c3.size(1) :, :]
 
-        c2 = c2.transpose(1, 2).view(bs, dim, H * 2, W * 2).contiguous()
-        c3 = c3.transpose(1, 2).view(bs, dim, H, W).contiguous()
-        c4 = c4.transpose(1, 2).view(bs, dim, H // 2, W // 2).contiguous()
+        c2 = c2.transpose(1, 2).view(bs, dim, H2 * 2, W2 * 2).contiguous()
+        c3 = c3.transpose(1, 2).view(bs, dim, H2, W2).contiguous()
+        c4 = c4.transpose(1, 2).view(bs, dim, H2 // 2, W2 // 2).contiguous()
         c1 = self.up(c2) + c1
 
         if self.add_vit_feature:
             x1, x2, x3, x4 = outs
-            x1 = F.interpolate(x1, scale_factor=4, mode="bilinear", align_corners=False)
-            x2 = F.interpolate(x2, scale_factor=2, mode="bilinear", align_corners=False)
-            x4 = F.interpolate(x4, scale_factor=0.5, mode="bilinear", align_corners=False)
+            interpolate = functools.partial(F.interpolate, mode="bilinear", align_corners=False)
+            x1 = interpolate(x1, scale_factor=c1.shape[2] / x1.shape[2])
+            x2 = interpolate(x2, scale_factor=c2.shape[2] / x2.shape[2])
+            x3 = interpolate(x3, scale_factor=c3.shape[2] / x3.shape[2])
+            x4 = interpolate(x4, scale_factor=c4.shape[2] / x4.shape[2])
             c1, c2, c3, c4 = c1 + x1, c2 + x2, c3 + x3, c4 + x4
 
         # Final Norm
