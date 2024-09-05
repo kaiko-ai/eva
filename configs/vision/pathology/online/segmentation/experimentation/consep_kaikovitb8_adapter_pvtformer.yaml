@@ -61,7 +61,7 @@ model:
     optimizer:
       class_path: torch.optim.AdamW
       init_args:
-        lr: ${oc.env:LR_VALUE, 0.002}
+        lr: ${oc.env:LR_VALUE, 0.001}
     lr_scheduler:
       class_path: torch.optim.lr_scheduler.PolynomialLR
       init_args:
@@ -114,7 +114,7 @@ data:
           split: val
     dataloaders:
       train:
-        batch_size: &BATCH_SIZE ${oc.env:BATCH_SIZE, 64}
+        batch_size: &BATCH_SIZE ${oc.env:BATCH_SIZE, 32}
         shuffle: true
       val:
         batch_size: *BATCH_SIZE
