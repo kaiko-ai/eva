@@ -9,6 +9,7 @@ import timm.models.vision_transformer
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from loguru import logger
 from timm.models.layers import trunc_normal_
 from torch.nn.init import normal_
 from typing_extensions import override
@@ -28,7 +29,7 @@ class ViTAdapter(nn.Module):
     def __init__(
         self,
         vit_backbone: timm.models.vision_transformer.VisionTransformer | eva.core.models.BaseModel,
-        interaction_indexes: List[List[int]],
+        interaction_indexes: List[List[int]] | None = None,
         pretrain_size=224,
         conv_inplane=64,
         n_points=4,
@@ -75,12 +76,12 @@ class ViTAdapter(nn.Module):
                     cffn_ratio=cffn_ratio,
                     deform_ratio=deform_ratio,
                     extra_extractor=(
-                        (True if i == len(interaction_indexes) - 1 else False)
+                        (True if i == len(self.interaction_indexes) - 1 else False)
                         and use_extra_extractor
                     ),
                     with_cp=False,
                 )
-                for i in range(len(interaction_indexes))
+                for i in range(len(self.interaction_indexes))
             ]
         )
         self.up = nn.ConvTranspose2d(embed_dim, embed_dim, 2, 2)
@@ -99,6 +100,20 @@ class ViTAdapter(nn.Module):
         self._verify_norm_layer(self.norm_layer)
         if self.freeze_vit:
             self._freeze_backbone()
+        self._calculate_interactions()
+
+    def _calculate_interactions(self, n_interactions: int = 4) -> List[List[int]]:
+        if self.interaction_indexes is None:
+            n_blocks = len(self.vit_backbone.blocks)
+            if n_blocks % n_interactions != 0:
+                raise ValueError(f"Number of vit blocks must be divisible by {n_interactions}.")
+            block_size = n_blocks // n_interactions
+            start_indexes = list(range(0, n_blocks, block_size))
+            self.interaction_indexes = [
+                [start_indexes[i], start_indexes[i] + block_size - 1]
+                for i in range(len(start_indexes))
+            ]
+            logger.info(f"Using interactions at {self.interaction_indexes} for {n_blocks} blocks.")
 
     def _init_weights(self, m):
         if isinstance(m, nn.Linear):
@@ -213,3 +228,6 @@ class ViTAdapter(nn.Module):
         f4 = self.norm4(c4)  # 1/32
 
         return [f1, f2, f3]
+
+
+# we evenly split the transformer encoders of ViT into N blocks, each containing L/N encoder layers
