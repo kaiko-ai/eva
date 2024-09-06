@@ -46,14 +46,9 @@ model:
         out_channels: &NUM_CLASSES 8
         channels: [32, 64, 128, 256]
         strides: [2, 2, 2]
-        kernel_size: 3
-        up_kernel_size: 3
         num_res_units: 0
-        act: PRELU
-        norm: INSTANCE
         dropout: 0.0
         bias: true
-        adn_ordering: NDA
     decoder:
       class_path: torch.nn.Identity
     freeze_encoder: false
