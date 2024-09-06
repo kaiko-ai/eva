@@ -43,7 +43,7 @@ model:
       init_args:
         spatial_dims: 2
         in_channels: 3
-        out_channels: &NUM_CLASSES 8
+        out_channels: &NUM_CLASSES 5
         channels: [32, 64, 128, 256]
         strides: [2, 2, 2]
         num_res_units: 0
@@ -53,10 +53,16 @@ model:
       class_path: torch.nn.Identity
     freeze_encoder: false
     criterion:
+      # class_path: eva.vision.losses.GeneralizedDiceLoss
+      # init_args:
+      #   softmax: true
+      #   batch: false
       class_path: eva.vision.losses.DiceLoss
       init_args:
         softmax: true
         batch: true
+        include_background: false
+
     lr_multiplier_encoder: 1.0
     optimizer:
       class_path: torch.optim.AdamW

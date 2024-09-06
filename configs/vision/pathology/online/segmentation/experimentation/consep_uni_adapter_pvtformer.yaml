@@ -51,7 +51,7 @@ model:
       class_path: eva.vision.models.networks.decoders.segmentation.PVTFormerDecoder
       init_args:
         in_features: [1024, 1024, 1024]
-        num_classes:  &NUM_CLASSES 8
+        num_classes:  &NUM_CLASSES 5
     freeze_encoder: false
     criterion:
       class_path: eva.vision.losses.DiceLoss
