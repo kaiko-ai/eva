@@ -1,5 +1,5 @@
-# Run this script with `python scripts/generate_leaderboard.py` to
-# create the image of the leaderboard heatmap displayed in
+# Run this script with `python scripts/generate_leaderboard_plot.py` 
+# to create the image of the leaderboard heatmap displayed in
 # docs/leaderboards.md
 #
 # Note: the code below assumes that the eva results are stored in
