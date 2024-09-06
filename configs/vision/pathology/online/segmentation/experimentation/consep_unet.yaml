@@ -61,8 +61,6 @@ model:
       init_args:
         softmax: true
         batch: true
-        include_background: false
-
     lr_multiplier_encoder: 1.0
     optimizer:
       class_path: torch.optim.AdamW
