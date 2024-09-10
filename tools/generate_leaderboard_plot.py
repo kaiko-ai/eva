@@ -1,4 +1,4 @@
-# Run this script with `python scripts/generate_leaderboard_plot.py` 
+# Run this script with `python tools/generate_leaderboard_plot.py`
 # to create the image of the leaderboard heatmap displayed in
 # docs/leaderboards.md
 #
@@ -7,6 +7,7 @@
 
 import os
 import json
+import argparse
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.colors
@@ -45,18 +46,28 @@ def main():
         "monusac": "MoNuSAC",
     }
 
+    # get log_dit from arg parser
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--logs_dir", type=str, default="logs")
+    parser.add_argument("--output_file", type=str, default="docs/images/leaderboard_new.svg")
+    args = parser.parse_args()
+
     # load results into data frame:
     all_scores = []
     for model in _fm_name_map.keys():
         scores = []
         for task in _tasks_to_metric.keys():
-            results_folder = [d for d in os.listdir(f"logs/{task}/{model}") if d.startswith("20")][
-                0
-            ]
-            with open(os.path.join(f"logs/{task}/{model}/{results_folder}/results.json")) as f:
+            results_folder = [
+                d for d in os.listdir(f"{args.logs_dir}/{task}/{model}") if d.startswith("20")
+            ][0]
+            with open(
+                os.path.join(f"{args.logs_dir}/{task}/{model}/{results_folder}/results.json")
+            ) as f:
                 d = json.load(f)
             split = "test" if d["metrics"]["test"] else "val"
             metric = _tasks_to_metric.get(task)
+            if metric is None:
+                raise Exception(f"no metric defined for task {task}")
             scores.append(d["metrics"][split][0][f"{split}/{metric}"]["mean"])
         all_scores.append(scores)
     df = pd.DataFrame(all_scores, index=_fm_name_map.keys(), columns=_tasks_to_metric.keys())
@@ -88,7 +99,7 @@ def main():
         labeltop=True,
         rotation=20,
     )
-    plt.savefig("leaderboard.svg", format="svg", dpi=1200, bbox_inches="tight")
+    plt.savefig(args.output_file, format="svg", dpi=1200, bbox_inches="tight")
 
 
 if __name__ == "__main__":
