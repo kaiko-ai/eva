@@ -52,6 +52,13 @@ def main():
     parser.add_argument("--output_file", type=str, default="docs/images/leaderboard_new.svg")
     args = parser.parse_args()
 
+    # load existing leaderboard if available:
+    if os.path.isfile("tools/data/leaderboard.csv"):
+        df_existing = pd.read_csv("tools/leaderboard.csv")
+        df_existing = df_existing.set_index("Unnamed: 0", drop=True)
+    else:
+        df_existing = pd.DataFrame()
+
     # load results into data frame:
     all_scores = []
     for model in _fm_name_map.keys():
@@ -68,9 +75,13 @@ def main():
             metric = _tasks_to_metric.get(task)
             if metric is None:
                 raise Exception(f"no metric defined for task {task}")
-            scores.append(d["metrics"][split][0][f"{split}/{metric}"]["mean"])
+            scores.append(round(d["metrics"][split][0][f"{split}/{metric}"]["mean"], 3))
         all_scores.append(scores)
     df = pd.DataFrame(all_scores, index=_fm_name_map.keys(), columns=_tasks_to_metric.keys())
+    
+    # combine existing and new data frame
+    df = pd.concat([df, df_existing]).drop_duplicates()
+    df.to_csv("tools/data/leaderboard.csv", index=True)
 
     # create colormap:
     colors = [[0, "white"], [1, "#0000ff"]]
