@@ -122,7 +122,8 @@ class CoNSeP(wsi.MultiWsiDataset, base.ImageSegmentation):
         mask = np.array(io.read_mat(path)["type_map"])
         mask_patch = _utils.extract_mask_patch(mask, self, index)
         mask_patch = self._map_classes(mask_patch)
-        return tv_tensors.Mask(mask_patch, dtype=torch.int64)  # type: ignore[reportCallIssue]
+        mask_tensor = tv_tensors.Mask(mask_patch, dtype=torch.int64)  # type: ignore[reportCallIssue]
+        return self._image_transforms(mask_tensor) if self._image_transforms else mask_tensor
 
     @override
     def load_metadata(self, index: int) -> Dict[str, Any]:
