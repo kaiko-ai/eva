@@ -3,6 +3,9 @@
 import os
 from typing import Callable, Dict, List, Literal, Tuple
 
+import cv2
+from torchvision.transforms.v2 import functional
+
 import torch
 from torchvision import tv_tensors
 from torchvision.datasets import folder
@@ -67,7 +70,8 @@ class ChestCTScan(base.ImageClassification):
     @override
     def load_image(self, index: int) -> tv_tensors.Image:
         image_path, _ = self._samples[index]
-        return io.read_image_as_tensor(image_path)
+        image_array = io.read_image_as_array(image_path, flags=cv2.IMREAD_GRAYSCALE)
+        return functional.to_image(image_array)
 
     @override
     def load_target(self, index: int) -> torch.Tensor:
