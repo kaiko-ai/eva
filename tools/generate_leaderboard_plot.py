@@ -46,16 +46,15 @@ def main():
         "monusac": "MoNuSAC",
     }
 
-    # get log_dit from arg parser
+    # get log_dir from arg parser
     parser = argparse.ArgumentParser()
     parser.add_argument("--logs_dir", type=str, default="logs")
-    parser.add_argument("--output_file", type=str, default="docs/images/leaderboard_new.svg")
+    parser.add_argument("--output_file", type=str, default="docs/images/leaderboard.svg")
     args = parser.parse_args()
 
     # load existing leaderboard if available:
     if os.path.isfile("tools/data/leaderboard.csv"):
-        df_existing = pd.read_csv("tools/leaderboard.csv")
-        df_existing = df_existing.set_index("Unnamed: 0", drop=True)
+        df_existing = pd.read_csv("tools/data/leaderboard.csv")
     else:
         df_existing = pd.DataFrame()
 
@@ -77,11 +76,13 @@ def main():
                 raise Exception(f"no metric defined for task {task}")
             scores.append(round(d["metrics"][split][0][f"{split}/{metric}"]["mean"], 3))
         all_scores.append(scores)
-    df = pd.DataFrame(all_scores, index=_fm_name_map.keys(), columns=_tasks_to_metric.keys())
-    
+    df = pd.DataFrame(all_scores, columns=_tasks_to_metric.keys())
+    df["model"] = _fm_name_map.keys()
+
     # combine existing and new data frame
     df = pd.concat([df, df_existing]).drop_duplicates()
-    df.to_csv("tools/data/leaderboard.csv", index=True)
+    df.to_csv("tools/data/leaderboard.csv", index=False)
+    df = df.set_index("model", drop=True)
 
     # create colormap:
     colors = [[0, "white"], [1, "#0000ff"]]
@@ -89,7 +90,7 @@ def main():
 
     # prepare data frame:
     df = df[[fm in _fm_name_map.keys() for fm in df.index]]
-    df.index = df.reset_index()["index"].apply(lambda x: _fm_name_map.get(x) or x)
+    df.index = df.reset_index()["model"].apply(lambda x: _fm_name_map.get(x) or x)
     df.index.names = [""]
     df.loc[:, "overall_performance"] = df.mean(axis=1)
     df = df.sort_values(by="overall_performance", ascending=False)
