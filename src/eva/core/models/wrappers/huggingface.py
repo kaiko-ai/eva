@@ -2,7 +2,6 @@
 
 from typing import Any, Callable, Dict
 
-import torch
 import transformers
 from typing_extensions import override
 
@@ -33,14 +32,10 @@ class HuggingFaceModel(base.BaseModel):
         self._model_name_or_path = model_name_or_path
         self._model_kwargs = model_kwargs or {}
 
-        self._model = self.load_model()
+        self.load_model()
 
     @override
-    def load_model(self) -> Any:
-        return transformers.AutoModel.from_pretrained(
+    def load_model(self) -> None:
+        self._model = transformers.AutoModel.from_pretrained(
             self._model_name_or_path, **self._model_kwargs
         )
-
-    @override
-    def model_forward(self, tensor: torch.Tensor) -> torch.Tensor:
-        return self._model(tensor)
