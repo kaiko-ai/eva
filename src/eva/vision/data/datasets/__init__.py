@@ -2,6 +2,7 @@
 
 from eva.vision.data.datasets.classification import (
     BACH,
+    ChestCTScan,
     CRC,
     MHIST,
     PANDA,
@@ -24,6 +25,7 @@ from eva.vision.data.datasets.wsi import MultiWsiDataset, WsiDataset
 __all__ = [
     "BACH",
     "BCSS",
+    "ChestCTScan",
     "CRC",
     "MHIST",
     "PANDA",
