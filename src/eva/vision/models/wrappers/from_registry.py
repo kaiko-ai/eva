@@ -1,9 +1,7 @@
 """Vision backbone helper class."""
 
-from typing import Any, Callable, Dict, List
+from typing import Any, Callable, Dict
 
-import torch
-from torch import nn
 from typing_extensions import override
 
 from eva.core.models import wrappers
@@ -40,8 +38,6 @@ class ModelFromRegistry(wrappers.BaseModel):
         self._model_kwargs = model_kwargs or {}
         self._model_extra_kwargs = model_extra_kwargs or {}
 
-        self._model: nn.Module
-
         self.load_model()
 
     @override
@@ -50,7 +46,3 @@ class ModelFromRegistry(wrappers.BaseModel):
             self._model_name, self._model_kwargs | self._model_extra_kwargs
         )
         ModelFromRegistry.__name__ = self._model_name
-
-    @override
-    def model_forward(self, tensor: torch.Tensor) -> torch.Tensor | List[torch.Tensor]:
-        return self._model(tensor)
