@@ -37,12 +37,14 @@ class ONNXModel(base.BaseModel):
         if self._device == "cuda" and not torch.cuda.is_available():
             raise ValueError("Device is set to 'cuda', but CUDA is not available.")
         provider = "CUDAExecutionProvider" if self._device == "cuda" else "CPUExecutionProvider"
-        self._model = ort.InferenceSession(self._path, providers=[provider])
+        self._model = ort.InferenceSession(self._path, providers=[provider])  # type: ignore
 
     @override
     def model_forward(self, tensor: torch.Tensor) -> torch.Tensor:
         # TODO: Use IO binding to avoid copying the tensor to CPU.
         # https://onnxruntime.ai/docs/api/python/api_summary.html#data-on-device
+        if not isinstance(self._model, ort.InferenceSession):
+            raise ValueError("Model is not loaded.")
         inputs = {self._model.get_inputs()[0].name: tensor.detach().cpu().numpy()}
         outputs = self._model.run(None, inputs)[0]
         return torch.from_numpy(outputs).float().to(tensor.device)

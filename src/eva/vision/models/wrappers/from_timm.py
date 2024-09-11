@@ -1,10 +1,9 @@
 """Model wrapper for timm models."""
 
-from typing import Any, Callable, Dict, List, Tuple
+from typing import Any, Callable, Dict, Tuple
 from urllib import parse
 
 import timm
-import torch
 from typing_extensions import override
 
 from eva.core.models import wrappers
@@ -60,10 +59,6 @@ class TimmModel(wrappers.BaseModel):
             **self._model_kwargs,
         )
         TimmModel.__name__ = self._model_name
-
-    @override
-    def model_forward(self, tensor: torch.Tensor) -> torch.Tensor | List[torch.Tensor]:
-        return self._model(tensor)
 
     @property
     def _pretrained_cfg(self) -> Dict[str, Any]:
