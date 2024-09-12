@@ -1,6 +1,6 @@
 """"Neural Network Semantic Segmentation Module."""
 
-from typing import Any, Callable, Iterable, List, Tuple
+from typing import Any, Callable, Dict, Iterable, List, Tuple
 
 import torch
 from lightning.pytorch.cli import LRSchedulerCallable, OptimizerCallable
@@ -13,6 +13,7 @@ from eva.core.metrics import structs as metrics_lib
 from eva.core.models.modules import module
 from eva.core.models.modules.typings import INPUT_BATCH, INPUT_TENSOR_BATCH
 from eva.core.models.modules.utils import batch_postprocess, grad
+from eva.core.utils import parser
 from eva.vision.models.networks import decoders
 
 
@@ -23,7 +24,7 @@ class SemanticSegmentationModule(module.ModelModule):
         self,
         decoder: decoders.Decoder,
         criterion: Callable[..., torch.Tensor],
-        encoder: Callable[[torch.Tensor], List[torch.Tensor]] | None = None,
+        encoder: Dict[str, Any] | Callable[[torch.Tensor], List[torch.Tensor]] | None = None,
         lr_multiplier_encoder: float = 0.0,
         optimizer: OptimizerCallable = optim.AdamW,
         lr_scheduler: LRSchedulerCallable = lr_scheduler.ConstantLR,
@@ -37,6 +38,8 @@ class SemanticSegmentationModule(module.ModelModule):
             criterion: The loss function to use.
             encoder: The encoder model. If `None`, it will be expected
                 that the input batch returns the features directly.
+                If pass as a dictionary, it will be parsed to an object
+                during the `configure_model` step.
             lr_multiplier_encoder: The learning rate multiplier for the
                 encoder parameters. If `0`, it will freeze the encoder.
             optimizer: The optimizer to use.
@@ -50,7 +53,7 @@ class SemanticSegmentationModule(module.ModelModule):
 
         self.decoder = decoder
         self.criterion = criterion
-        self.encoder = encoder
+        self.encoder = encoder  # type: ignore
         self.lr_multiplier_encoder = lr_multiplier_encoder
         self.optimizer = optimizer
         self.lr_scheduler = lr_scheduler
@@ -58,6 +61,12 @@ class SemanticSegmentationModule(module.ModelModule):
     @override
     def configure_model(self) -> None:
         self._freeze_encoder()
+
+        if isinstance(self.encoder, dict):
+            self.encoder: Callable[[torch.Tensor], List[torch.Tensor]] = parser.parse_object(
+                self.encoder,
+                expected_type=nn.Module,
+            )
 
     @override
     def configure_optimizers(self) -> Any:

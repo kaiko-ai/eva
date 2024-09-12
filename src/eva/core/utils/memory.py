@@ -9,7 +9,7 @@ import torch
 @functools.singledispatch
 def to_cpu(tensor_type: Any) -> Any:
     """Moves tensor objects to `cpu`."""
-    raise TypeError(f"Unsupported input type: {type(input)}.")
+    raise TypeError(f"Unsupported input type: {type(tensor_type)}.")
 
 
 @to_cpu.register

@@ -51,6 +51,16 @@ def _(
     )
 
 
+@log_parameters.register
+def _(
+    logger: loggers_lib.WandbLogger,
+    tag: str,
+    parameters: Dict[str, Any],
+) -> None:
+    """Adds parameters to a Wandb logger."""
+    logger.experiment.config.update(parameters)
+
+
 def _yaml_to_markdown(data: Dict[str, Any]) -> str:
     """Casts yaml data to markdown.
 

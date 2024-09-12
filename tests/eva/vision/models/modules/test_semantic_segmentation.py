@@ -6,8 +6,7 @@ from torch import nn
 
 from eva.core import metrics, trainers
 from eva.core.data import datamodules
-from eva.vision.models import modules
-from eva.vision.models.networks import encoders
+from eva.vision.models import modules, wrappers
 from eva.vision.models.networks.decoders import segmentation
 
 
@@ -45,11 +44,11 @@ def model(n_classes: int = 4) -> modules.SemanticSegmentationModule:
             ),
         ),
         criterion=nn.CrossEntropyLoss(),
-        encoder=encoders.TimmEncoder(
+        encoder=wrappers.TimmModel(
             model_name="vit_tiny_patch16_224",
             pretrained=False,
             out_indices=1,
-            model_arguments={
+            model_kwargs={
                 "dynamic_img_size": True,
             },
         ),
