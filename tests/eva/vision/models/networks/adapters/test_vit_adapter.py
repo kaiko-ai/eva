@@ -61,9 +61,9 @@ def test_expected_output_values(vit_backbone: vision_transformer.VisionTransform
     output_tensors = encoder(input_tensor)
 
     # Use the tensor sum as proxy for the output tensor values
-    pytest.approx(output_tensors[0].sum().item(), abs=1e-6) == -0.0009918212890625
-    pytest.approx(output_tensors[1].sum().item(), abs=1e-6) == 0.000110626220703125
-    pytest.approx(output_tensors[2].sum().item(), abs=1e-6) == -3.24249267578125e-05
+    assert pytest.approx(output_tensors[0].sum().item(), abs=1e-6) == -0.0009918212890625
+    assert pytest.approx(output_tensors[1].sum().item(), abs=1e-6) == 0.000110626220703125
+    assert pytest.approx(output_tensors[2].sum().item(), abs=1e-6) == -3.24249267578125e-05
 
 
 def _extract_hidden_state_shape(hidden_state: torch.Tensor) -> Tuple[int]:
