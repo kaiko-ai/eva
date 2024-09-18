@@ -5,7 +5,7 @@
 groups = ["default", "all", "dev", "docs", "lint", "test", "typecheck", "vision"]
 strategy = ["inherit_metadata"]
 lock_version = "4.5.0"
-content_hash = "sha256:b32df9b6e26bec920c79b78248006da31374cd556577495a6261249fa6888ee2"
+content_hash = "sha256:cc23a9652ade7a78ab86d2663e963e4d41f1c30cdb485f6459f4fefc9fcea7e0"
 
 [[metadata.targets]]
 requires_python = ">=3.10"
@@ -2584,11 +2584,8 @@ files = [
 
 [[package]]
 name = "timm"
-version = "1.0.10.dev0"
+version = "1.0.9"
 requires_python = ">=3.8"
-git = "https://github.com/huggingface/pytorch-image-models.git"
-ref = "main"
-revision = "ee5b1e8217134e9f016a0086b793c34abb721216"
 summary = "PyTorch Image Models"
 groups = ["all", "vision"]
 dependencies = [
@@ -2597,6 +2594,10 @@ dependencies = [
     "safetensors",
     "torch",
     "torchvision",
+]
+files = [
+    {file = "timm-1.0.9-py3-none-any.whl", hash = "sha256:ce5a4bac57a6cbb2be4ee35dc4ce689eede10d647e48dd1836106e2cc199693b"},
+    {file = "timm-1.0.9.tar.gz", hash = "sha256:69523aa2c34820cc6db37005302b5e42ddd60c30f476643f133ead4a8c5b5533"},
 ]
 
 [[package]]
