@@ -9,20 +9,7 @@ We evaluated the following FMs on the 6 supported WSI-classification tasks. We r
 
 <br/>
 
-<center>
-
-| Vision FM | pretraining | [BACH](datasets/bach.md) | [CRC](datasets/crc.md) | [MHIST](datasets/mhist.md) | [PCam](datasets/patch_camelyon.md) |[Camelyon16](datasets/camelyon16.md)| [PANDA](datasets/panda.md)| [CoNSeP](datasets/consep.md)| [MoNuSAC](datasets/monusac.md)|
-|---------|-------------|--------- |-----------|-----------|----------|----------|----------|----------|----------|
-| [DINO ViT-S16](https://arxiv.org/abs/2104.14294) |                                     N/A | 0.411|0.613|0.5|0.752|0.551|0.347|0.489|0.394|
-| [DINO ViT-S16](https://arxiv.org/abs/2104.14294)                                | ImageNet | 0.675|0.936|0.827|0.861|0.751|0.676|0.54|0.512|
-| [Lunit - ViT-S16](https://github.com/lunit-io/benchmark-ssl-pathology/releases/)    | TCGA | 0.77|0.936|0.751|0.905|0.869|0.737|0.625|0.549|
-| [Owkin (Phikon) - iBOT ViT-B16](https://huggingface.co/owkin/phikon)                | TCGA | 0.715|0.942|0.766|0.925|0.879|0.784|0.68|0.554|
-| [UNI - DINOv2 ViT-L16](https://huggingface.co/MahmoodLab/UNI)                  | Mass-100k | 0.797|0.95|0.835|0.939|0.933|0.774|0.67|0.575|
-| [kaiko.ai - DINO ViT-S16](https://github.com/kaiko-ai/towards_large_pathology_fms)  | TCGA | 0.8|0.949|0.831|0.902|0.897|0.77|0.622|0.573|
-| [kaiko.ai - DINO ViT-S8](https://github.com/kaiko-ai/towards_large_pathology_fms)	  | TCGA | 0.825|0.948|0.826|0.887|0.879|0.741|0.677|0.617|
-| [kaiko.ai - DINO ViT-B16](https://github.com/kaiko-ai/towards_large_pathology_fms)  | TCGA | 0.846|0.959|0.839|0.906|0.891|0.753|0.647|0.572|
-| [kaiko.ai - DINO ViT-B8](https://github.com/kaiko-ai/towards_large_pathology_fms)   | TCGA | 0.867|0.952|0.814|0.921|0.939|0.761|0.706|0.661|
-| [kaiko.ai - DINOv2 ViT-L14](https://github.com/kaiko-ai/towards_large_pathology_fms)| TCGA | 0.862|0.935|0.822|0.907|0.941|0.769|0.686|0.599|
+![Screenshot](images/leaderboard.svg)
 
 <br/>
 

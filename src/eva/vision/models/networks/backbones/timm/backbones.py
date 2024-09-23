@@ -42,10 +42,7 @@ def timm_model(
         checkpoint_path=checkpoint_path or "",
         pretrained=pretrained,
         out_indices=out_indices,
-        model_kwargs={
-            "dynamic_img_size": dynamic_img_size,
-        }
-        | kwargs,
+        model_kwargs=kwargs,
     )
 
 
