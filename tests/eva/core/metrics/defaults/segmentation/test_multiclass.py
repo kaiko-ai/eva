@@ -39,8 +39,6 @@ def test_multiclass_segmentation_metrics(
         actual = multiclass_segmentation_metrics.compute()
         torch.testing.assert_close(actual, expected, rtol=1e-04, atol=1e-04)
 
-    print(preds.shape)
-    print(target.shape)
     _calculate_metric()
     multiclass_segmentation_metrics.reset()
     _calculate_metric()
