@@ -2,10 +2,13 @@
 name: Release
 
 on:
-  workflow_dispatch:
   push:
     tags:
       - "*"
+
+permissions:
+  id-token: write
+  contents: write
 
 jobs:
   release-pypi:
@@ -24,6 +27,14 @@ jobs:
         uses: wntrblm/nox@5656fcedc31a1ea37d016e4d94d00185330cc528 # 2024.04.15
         with:
           python-versions: "3.10"
+      - name: Configure Git Credentials
+        run: |
+          git config user.email "action@github.com"
+          git config user.name "GitHub Action"
+      - name: Bumping version
+        run: |
+          nox -s bump -- to "${{ github.ref_name }}"
+          git push origin main
       - name: Build artifacts
         run: |
           nox -s build
@@ -33,8 +44,6 @@ jobs:
           eva --version
       - name: Build Release Docs
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
           git fetch origin gh-pages:gh-pages
           tag="${{ github.ref_name }}"
           DOC_VERSION=${tag%.*}

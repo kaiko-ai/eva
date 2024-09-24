@@ -116,6 +116,13 @@ def ci(session: nox.Session) -> None:
 
 
 @nox.session
+def version(session: nox.Session) -> None:
+    """Fetches and prints the version of the library."""
+    session.run_always("pdm", "self", "add", "pdm-version", external=True)
+    session.run("pdm", "version", external=True)
+
+
+@nox.session
 def bump(session: nox.Session) -> None:
     """Bumps the version of the library.
 
