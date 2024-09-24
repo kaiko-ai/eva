@@ -22,7 +22,7 @@ def kaiko_vits16(
     Returns:
         The model instance.
     """
-    return torch.hub.load(
+    return torch.hub.load(  # type: ignore
         repo_or_dir="kaiko-ai/towards_large_pathology_fms",
         model="vits16",
         trust_repo=True,
@@ -45,7 +45,7 @@ def kaiko_vits8(
     Returns:
         The model instance.
     """
-    return torch.hub.load(
+    return torch.hub.load(  # type: ignore
         repo_or_dir="kaiko-ai/towards_large_pathology_fms",
         model="vits8",
         trust_repo=True,
@@ -68,7 +68,7 @@ def kaiko_vitb16(
     Returns:
         The model instance.
     """
-    return torch.hub.load(
+    return torch.hub.load(  # type: ignore
         repo_or_dir="kaiko-ai/towards_large_pathology_fms",
         model="vitb16",
         trust_repo=True,
@@ -91,7 +91,7 @@ def kaiko_vitb8(
     Returns:
         The model instance.
     """
-    return torch.hub.load(
+    return torch.hub.load(  # type: ignore
         repo_or_dir="kaiko-ai/towards_large_pathology_fms",
         model="vitb8",
         trust_repo=True,
@@ -114,7 +114,7 @@ def kaiko_vitl14(
     Returns:
         The model instance.
     """
-    return torch.hub.load(
+    return torch.hub.load(  # type: ignore
         repo_or_dir="kaiko-ai/towards_large_pathology_fms",
         model="vitl14",
         trust_repo=True,

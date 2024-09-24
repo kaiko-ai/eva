@@ -19,7 +19,6 @@ class GeneralizedDiceScore(segmentation.GeneralizedDiceScore):
         num_classes: int,
         include_background: bool = True,
         weight_type: Literal["square", "simple", "linear"] = "linear",
-        input_format: Literal["one-hot", "index"] = "index",
         ignore_index: int | None = None,
         per_class: bool = False,
         **kwargs: Any,
@@ -43,7 +42,6 @@ class GeneralizedDiceScore(segmentation.GeneralizedDiceScore):
             num_classes=num_classes,
             include_background=include_background,
             weight_type=weight_type,
-            input_format=input_format,
             per_class=per_class,
             **kwargs,
         )
