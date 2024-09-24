@@ -78,7 +78,6 @@ model:
               class_path: eva.core.metrics.GeneralizedDiceScore
               init_args:
                 num_classes: *NUM_CLASSES
-                input_format: index
                 weight_type: linear
                 per_class: true
 data:
