@@ -37,8 +37,8 @@ class CoNSeP(wsi.MultiWsiDataset, base.ImageSegmentation):
         root: str,
         sampler: samplers.Sampler | None = None,
         split: Literal["train", "val"] | None = None,
-        width: int = 224,
-        height: int = 224,
+        width: int = 250,
+        height: int = 250,
         target_mpp: float = 0.25,
         transforms: Callable | None = None,
     ) -> None:
