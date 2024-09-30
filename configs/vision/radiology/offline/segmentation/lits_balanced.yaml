@@ -7,6 +7,9 @@ trainer:
     max_steps: &MAX_STEPS ${oc.env:MAX_STEPS, 500000}
     callbacks:
       - class_path: eva.callbacks.ConfigurationLogger
+      - class_path: lightning.pytorch.callbacks.TQDMProgressBar
+        init_args:
+          refresh_rate: ${oc.env:TQDM_REFRESH_RATE, 1}
       - class_path: eva.vision.callbacks.SemanticSegmentationLogger
         init_args:
           log_every_n_epochs: 1
