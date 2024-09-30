@@ -8,11 +8,11 @@ from typing import Any, Callable, Dict, List, Literal, Tuple
 import numpy as np
 import numpy.typing as npt
 import torch
-import tqdm
 from torchvision import tv_tensors
 from torchvision.datasets import utils
 from typing_extensions import override
 
+from eva.core.utils.progress_bar import tqdm
 from eva.vision.data.datasets import _validators, structs
 from eva.vision.data.datasets.segmentation import base
 from eva.vision.utils import io
@@ -224,7 +224,7 @@ class TotalSegmentator2D(base.ImageSegmentation):
         ]
         to_export = filter(lambda x: not os.path.isfile(x[1]), semantic_labels)
 
-        for sample_index, filename in tqdm.tqdm(
+        for sample_index, filename in tqdm(
             list(to_export),
             desc=">> Exporting optimized semantic masks",
             leave=False,

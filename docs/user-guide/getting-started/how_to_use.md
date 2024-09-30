@@ -58,3 +58,4 @@ To customize runs, without the need of creating custom config-files, you can ove
 | `MONITOR_METRIC`        | `str`   | The metric to monitor for early stopping and final model checkpoint loading |
 | `MONITOR_METRIC_MODE`   | `str`   | "min" or "max", depending on the `MONITOR_METRIC` used |
 | `REPO_OR_DIR`           | `str`   | GitHub repo with format containing model implementation, e.g. "facebookresearch/dino:main" |
+| `TQDM_REFRESH_RATE`     | `str`   | Determines at which rate (in number of batches) the progress bars get updated. Set it to 0 to disable the progress bar. |

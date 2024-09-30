@@ -6,6 +6,10 @@ trainer:
     default_root_dir: &OUTPUT_ROOT ${oc.env:OUTPUT_ROOT, logs/${oc.env:MODEL_NAME, dino_vits16}/offline/panda}
     max_epochs: &MAX_EPOCHS ${oc.env:MAX_EPOCHS, 49}
     callbacks:
+      - class_path: eva.callbacks.ConfigurationLogger
+      - class_path: lightning.pytorch.callbacks.TQDMProgressBar
+        init_args:
+          refresh_rate: ${oc.env:TQDM_REFRESH_RATE, 1}
       - class_path: lightning.pytorch.callbacks.LearningRateMonitor
         init_args:
           logging_interval: epoch
