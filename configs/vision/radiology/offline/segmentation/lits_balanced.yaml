@@ -116,7 +116,7 @@ data:
             root: ${oc.env:DATA_ROOT, ./data/lits}
             split: train
             transforms:
-              class_path: eva.vision.data.transforms.common.ResizeAndCrop
+              class_path: eva.vision.data.transforms.common.ResizeAndClamp
               init_args:
                 size: ${oc.env:RESIZE_DIM, 224}
                 mean: &NORMALIZE_MEAN ${oc.env:NORMALIZE_MEAN, [0.485, 0.456, 0.406]} 
