@@ -15,6 +15,7 @@ from eva.vision.data.datasets.segmentation import (
     EmbeddingsSegmentationDataset,
     ImageSegmentation,
     LiTS,
+    LiTSBalanced,
     MoNuSAC,
     TotalSegmentator2D,
 )
@@ -34,6 +35,7 @@ __all__ = [
     "EmbeddingsSegmentationDataset",
     "ImageSegmentation",
     "LiTS",
+    "LiTSBalanced",
     "MoNuSAC",
     "TotalSegmentator2D",
     "VisionDataset",
