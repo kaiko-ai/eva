@@ -1,6 +1,7 @@
 """Default metric collection for multiclass semantic segmentation tasks."""
 
-from eva.core.metrics import generalized_dice, mean_iou, structs
+from eva.core.metrics import structs
+from eva.vision.metrics.segmentation import generalized_dice, mean_iou
 
 
 class MulticlassSegmentationMetrics(structs.MetricCollection):
