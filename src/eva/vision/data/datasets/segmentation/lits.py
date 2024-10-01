@@ -2,16 +2,15 @@
 
 import functools
 import glob
-import math
 import os
 from typing import Any, Callable, Dict, List, Literal, Tuple
 
-import numpy as np
 import torch
 from torchvision import tv_tensors
 from typing_extensions import override
 
 from eva.core import utils
+from eva.core.data import splitting
 from eva.vision.data.datasets import _validators
 from eva.vision.data.datasets.segmentation import base
 from eva.vision.utils import io
@@ -23,18 +22,18 @@ class LiTS(base.ImageSegmentation):
     Webpage: https://competitions.codalab.org/competitions/17094
     """
 
-    _train_frac: float = 0.7
-    _val_frac: float = 0.15
-    _test_frac: float = 0.15
+    _train_ratio: float = 0.7
+    _val_ratio: float = 0.15
+    _test_ratio: float = 0.15
     """Index ranges per split."""
 
     _sample_every_n_slices: int | None = None
     """The amount of slices to sub-sample per 3D CT scan image."""
 
     _expected_dataset_lengths: Dict[str | None, int] = {
-        "train": 39531,
-        "val": 11191,
-        "test": 7916,
+        "train": 38686,
+        "val": 11192,
+        "test": 8760,
         None: 58638,
     }
     """Dataset version and split to the expected size."""
@@ -67,8 +66,6 @@ class LiTS(base.ImageSegmentation):
         self._root = root
         self._split = split
         self._seed = seed
-        self._random_generator = np.random.default_rng(seed=self._seed)
-
         self._indices: List[Tuple[int, int]] = []
 
     @property
@@ -164,13 +161,14 @@ class LiTS(base.ImageSegmentation):
 
     def _get_split_indices(self) -> List[int]:
         """Returns the sample indices for the specified dataset split."""
-        indices = self._random_generator.permutation(len(self._volume_files))
-        n_train = math.ceil(self._train_frac * len(self._volume_files))
-        n_val = math.ceil(self._val_frac * len(self._volume_files))
+        indices = list(range(len(self._volume_files)))
+        train_indices, val_indices, test_indices = splitting.random_split(
+            indices, self._train_ratio, self._val_ratio, self._test_ratio, seed=self._seed
+        )
         split_indices_dict = {
-            "train": indices[:n_train],
-            "val": indices[n_train : n_train + n_val],
-            "test": indices[n_train + n_val :],
+            "train": train_indices,
+            "val": val_indices,
+            "test": test_indices,
             None: indices,
         }
         if self._split not in split_indices_dict:

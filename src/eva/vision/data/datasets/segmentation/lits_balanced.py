@@ -21,9 +21,9 @@ class LiTSBalanced(lits.LiTS):
     """
 
     _expected_dataset_lengths: Dict[str | None, int] = {
-        "train": 5602,
-        "val": 1516,
-        "test": 1258,
+        "train": 5514,
+        "val": 1332,
+        "test": 1530,
         None: 8376,
     }
     """Dataset version and split to the expected size."""
@@ -58,6 +58,7 @@ class LiTSBalanced(lits.LiTS):
         """
         split_indices = set(self._get_split_indices())
         indices: List[Tuple[int, int]] = []
+        random_generator = np.random.default_rng(seed=self._seed)
 
         for sample_idx in range(len(self._volume_files)):
             if sample_idx not in split_indices:
@@ -79,12 +80,12 @@ class LiTSBalanced(lits.LiTS):
             n_slice_samples = min(liver_and_tumor_filter.sum(), liver_only_filter.sum())
             tumor_indices = list(np.where(liver_and_tumor_filter)[0])
             tumor_indices = list(
-                self._random_generator.choice(tumor_indices, size=n_slice_samples, replace=False)
+                random_generator.choice(tumor_indices, size=n_slice_samples, replace=False)
             )
 
             liver_indices = list(np.where(liver_only_filter)[0])
             liver_indices = list(
-                self._random_generator.choice(liver_indices, size=n_slice_samples, replace=False)
+                random_generator.choice(liver_indices, size=n_slice_samples, replace=False)
             )
 
             indices.extend([(sample_idx, slice_idx) for slice_idx in tumor_indices + liver_indices])
