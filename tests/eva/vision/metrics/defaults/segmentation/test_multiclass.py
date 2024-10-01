@@ -3,7 +3,7 @@
 import pytest
 import torch
 
-from eva.core.metrics import defaults
+from eva.vision.metrics import defaults
 
 NUM_BATCHES = 2
 BATCH_SIZE = 4
