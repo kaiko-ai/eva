@@ -21,9 +21,9 @@ class LiTSBalanced(lits.LiTS):
     """
 
     _expected_dataset_lengths: Dict[str | None, int] = {
-        "train": 6090,
-        "val": 1236,
-        "test": 1050,
+        "train": 5602,
+        "val": 1516,
+        "test": 1258,
         None: 8376,
     }
     """Dataset version and split to the expected size."""
@@ -33,7 +33,7 @@ class LiTSBalanced(lits.LiTS):
         root: str,
         split: Literal["train", "val", "test"] | None = None,
         transforms: Callable | None = None,
-        seed: int = 42,
+        seed: int = 8,
     ) -> None:
         """Initialize dataset.
 
@@ -43,11 +43,9 @@ class LiTSBalanced(lits.LiTS):
             split: Dataset split to use.
             transforms: A function/transforms that takes in an image and a target
                 mask and returns the transformed versions of both.
-            seed: Seed used for sampling of the slices.
+            seed: Seed used for generating the dataset splits and sampling of the slices.
         """
-        super().__init__(root=root, split=split, transforms=transforms)
-
-        self._seed = seed
+        super().__init__(root=root, split=split, transforms=transforms, seed=seed)
 
     @override
     def _create_indices(self) -> List[Tuple[int, int]]:
@@ -59,15 +57,13 @@ class LiTSBalanced(lits.LiTS):
             index.
         """
         split_indices = set(self._get_split_indices())
-        random_generator = np.random.default_rng(seed=self._seed)
-
         indices: List[Tuple[int, int]] = []
 
-        for sample_idx, path in enumerate(self._segmentation_files):
+        for sample_idx in range(len(self._volume_files)):
             if sample_idx not in split_indices:
                 continue
 
-            segmentation = io.read_nifti(path)
+            segmentation = io.read_nifti(self._segmentation_file(sample_idx))
             tumor_filter = segmentation == 2
             tumor_slice_filter = tumor_filter.sum(axis=(0, 1)) > 0
 
@@ -83,14 +79,14 @@ class LiTSBalanced(lits.LiTS):
             n_slice_samples = min(liver_and_tumor_filter.sum(), liver_only_filter.sum())
             tumor_indices = list(np.where(liver_and_tumor_filter)[0])
             tumor_indices = list(
-                random_generator.choice(tumor_indices, size=n_slice_samples, replace=False)
+                self._random_generator.choice(tumor_indices, size=n_slice_samples, replace=False)
             )
 
             liver_indices = list(np.where(liver_only_filter)[0])
             liver_indices = list(
-                random_generator.choice(liver_indices, size=n_slice_samples, replace=False)
+                self._random_generator.choice(liver_indices, size=n_slice_samples, replace=False)
             )
 
             indices.extend([(sample_idx, slice_idx) for slice_idx in tumor_indices + liver_indices])
 
-        return list(random_generator.permutation(indices))
+        return list(indices)
