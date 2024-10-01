@@ -32,6 +32,7 @@ jobs:
           git config user.name "GitHub Action"
       - name: Bumping version
         run: |
+          git fetch origin main:main
           nox -s bump -- micro
           git add .
           git commit -am "Bumping minor version"
