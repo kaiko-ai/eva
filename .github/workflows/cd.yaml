@@ -32,7 +32,6 @@ jobs:
           git config user.name "GitHub Action"
       - name: Bumping version
         run: |
-          git remote add origin https://github.com/kaiko-ai/eva
           nox -s bump -- micro
           git commit -am "Bumping minor version"
           git push origin main
