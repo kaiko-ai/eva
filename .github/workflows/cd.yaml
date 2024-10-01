@@ -33,10 +33,9 @@ jobs:
       - name: Bumping version
         run: |
           nox -s bump -- micro
-          git init
           git add .
           git commit -am "Bumping minor version"
-          git push -u origin ioannis@dev
+          git push -u origin main
       # - name: Build artifacts
       #   run: |
       #     nox -s build
