@@ -25,7 +25,7 @@ We use the following random split:
 
 | Splits         | Train            | Validation        | Test             |
 |----------------|------------------|-------------------|------------------|
-| #Scans; Slices | 92; 39531 (77%) | 20; 11191 (11.5%) | 19; 7916 (11.5%) |
+| #Scans; Slices | 91; 38686 (77%) | 19; 11192 (11.5%) | 21; 8760 (11.5%) |
 
 
 ### Organization
