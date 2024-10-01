@@ -34,8 +34,7 @@ jobs:
         run: |
           git fetch origin main:main
           nox -s bump -- micro
-          git add pyproject.toml
-          git commit -m "Bumping minor version"
+          git commit -a -m "Bumping minor version"
           git push -u origin main
       # - name: Build artifacts
       #   run: |
