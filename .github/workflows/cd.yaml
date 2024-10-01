@@ -4,9 +4,9 @@ name: CD
 on:
   pull_request:
     branches:
-  push:
-    branches:
-      - main
+  # push:
+  #   branches:
+  #     - main
 
 permissions:
   id-token: write
