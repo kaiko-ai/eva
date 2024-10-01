@@ -35,7 +35,7 @@ jobs:
           git fetch origin main
           nox -s bump -- micro
           git commit -am "Bumping minor version"
-          git push origin HEAD
+          git push origin HEAD:main
       # git push -f origin HEAD:main
       # git fetch origin
       # - name: Build artifacts
