@@ -32,10 +32,10 @@ jobs:
           git config user.name "GitHub Action"
       - name: Bumping version
         run: |
-          git fetch origin main:main
+          git fetch origin
           nox -s bump -- micro
-          git commit -a -m "Bumping minor version"
-          git push -u origin main
+          git commit -am "Bumping minor version"
+          git push origin main
       # - name: Build artifacts
       #   run: |
       #     nox -s build
