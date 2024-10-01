@@ -72,13 +72,13 @@ model:
       common:
         - class_path: eva.metrics.AverageLoss
       evaluation:
-        - class_path: eva.core.metrics.defaults.MulticlassSegmentationMetrics
+        - class_path: eva.vision.metrics.defaults.MulticlassSegmentationMetrics
           init_args:
             num_classes: *NUM_CLASSES
         - class_path: torchmetrics.ClasswiseWrapper
           init_args:
             metric:
-              class_path: torchmetrics.segmentation.GeneralizedDiceScore
+              class_path: eva.vision.metrics.GeneralizedDiceScore
               init_args:
                 num_classes: *NUM_CLASSES
                 weight_type: linear
