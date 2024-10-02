@@ -2697,12 +2697,12 @@
 </tr>
 <tr>
 <td><strong>Splits in use</strong></td>
-<td>train (77%) / val (11.5%) / test (11.5%)</td>
+<td>train (70%) / val (15%) / test (15%)</td>
 </tr>
 </tbody>
 </table>
 <h3 id="splits">Splits</h3>
-<p>We use the splits according to the <a href="https://arxiv.org/abs/2010.01663">KiU-Net</a>:</p>
+<p>We use the following random split:</p>
 <table>
 <thead>
 <tr>
@@ -2715,14 +2715,12 @@
 <tbody>
 <tr>
 <td>#Scans; Slices</td>
-<td>101; 39307 (77%)</td>
-<td>15; 12045 (11.5%)</td>
-<td>15; 7286 (11.5%)</td>
+<td>91; 38686 (77%)</td>
+<td>19; 11192 (11.5%)</td>
+<td>21; 8760 (11.5%)</td>
 </tr>
 </tbody>
 </table>
-<p>The split is conducted linearly; the first 101 scans are allocated to the train set,
-the next 15 to validation and the final 15 to test.</p>
 <h3 id="organization">Organization</h3>
 <p>The training data are organized as follows:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Training Batch 1               # Train images part 1
