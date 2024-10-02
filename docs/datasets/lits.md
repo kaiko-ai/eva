@@ -16,19 +16,17 @@ The segmentation classes are: Background, Liver and Tumor.
 | **Image dimension**   | ~300 x ~300 x ~350 (number of slices) x 1 (grey scale) *  |
 | **Files format**      | `.nii` ("NIFTI") images                                   |
 | **Number of scans**   | 131 (58638 slices)                                        |
-| **Splits in use**     | train (77%) / val (11.5%) / test (11.5%)                  |
+| **Splits in use**     | train (70%) / val (15%) / test (15%)                  |
 
 
 ### Splits
 
-We use the splits according to the [KiU-Net](https://arxiv.org/abs/2010.01663):
+We use the following random split:
 
 | Splits         | Train            | Validation        | Test             |
 |----------------|------------------|-------------------|------------------|
-| #Scans; Slices | 101; 39307 (77%) | 15; 12045 (11.5%) | 15; 7286 (11.5%) |
+| #Scans; Slices | 91; 38686 (77%) | 19; 11192 (11.5%) | 21; 8760 (11.5%) |
 
-The split is conducted linearly; the first 101 scans are allocated to the train set,
-the next 15 to validation and the final 15 to test.
 
 ### Organization
 

@@ -27,9 +27,9 @@ def random_split(
     if train_ratio + val_ratio + (test_ratio or 0) != 1:
         raise ValueError("The sum of the ratios must be equal to 1.")
 
-    np.random.seed(seed)
+    random_generator = np.random.default_rng(seed)
     n_samples = len(samples)
-    indices = np.random.permutation(n_samples)
+    indices = random_generator.permutation(n_samples)
 
     n_train = int(np.floor(train_ratio * n_samples))
     n_val = n_samples - n_train if test_ratio == 0.0 else int(np.floor(val_ratio * n_samples)) or 1
