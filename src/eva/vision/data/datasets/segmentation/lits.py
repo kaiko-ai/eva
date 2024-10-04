@@ -29,6 +29,9 @@ class LiTS(base.ImageSegmentation):
     _test_ratio: float = 0.15
     """Index ranges per split."""
 
+    _fix_orientation: bool = True
+    """Whether to fix the orientation of the images to match the default for radiologists."""
+
     _sample_every_n_slices: int | None = None
     """The amount of slices to sub-sample per 3D CT scan image."""
 
@@ -51,7 +54,6 @@ class LiTS(base.ImageSegmentation):
         root: str,
         split: Literal["train", "val", "test"] | None = None,
         transforms: Callable | None = None,
-        fix_orientation: bool = True,
         seed: int = 8,
     ) -> None:
         """Initialize dataset.
@@ -62,8 +64,6 @@ class LiTS(base.ImageSegmentation):
             split: Dataset split to use.
             transforms: A function/transforms that takes in an image and a target
                 mask and returns the transformed versions of both.
-            fix_orientation: Whether to fix the orientation of the images to match the
-                default for radiologists (table on top, looking from the feet).
             seed: Seed used for generating the dataset splits.
         """
         super().__init__(transforms=transforms)
@@ -71,7 +71,6 @@ class LiTS(base.ImageSegmentation):
         self._root = root
         self._split = split
         self._seed = seed
-        self._fix_orientation = fix_orientation
         self._indices: List[Tuple[int, int]] = []
 
     @property
