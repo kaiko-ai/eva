@@ -34,7 +34,7 @@ maintainers = [
 ]
 requires-python = ">=3.10"
 dependencies = [
-    "torch==2.3.0",
+    "torch>=2.3.0",
     "lightning>=2.2.2",
     "jsonargparse[omegaconf]==4.31.0",
     "tensorboard>=2.16.2",
