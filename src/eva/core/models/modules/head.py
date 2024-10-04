@@ -28,7 +28,7 @@ class HeadModule(module.ModelModule):
         head: Dict[str, Any] | MODEL_TYPE,
         criterion: Callable[..., torch.Tensor],
         backbone: MODEL_TYPE | None = None,
-        optimizer: OptimizerCallable = optim.Adam,
+        optimizer: OptimizerCallable = optim.Adam,  # type: ignore
         lr_scheduler: LRSchedulerCallable = lr_scheduler.ConstantLR,
         metrics: metrics_lib.MetricsSchema | None = None,
         postprocess: batch_postprocess.BatchPostProcess | None = None,
