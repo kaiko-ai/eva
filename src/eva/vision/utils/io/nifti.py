@@ -5,6 +5,7 @@ from typing import Any, Tuple
 import nibabel as nib
 import numpy as np
 import numpy.typing as npt
+from nibabel import orientations
 
 from eva.vision.utils.io import _utils
 
@@ -28,13 +29,13 @@ def read_nifti(
         ValueError: If the input channel is invalid for the image.
     """
     _utils.check_file(path)
-    image_data = nib.load(path)  # type: ignore
+    image_data: nib.Nifti1Image = nib.load(path)  # type: ignore
     if slice_index is not None:
-        image_data = image_data.slicer[:, :, slice_index : slice_index + 1]  # type: ignore
+        image_data = image_data.slicer[:, :, slice_index : slice_index + 1]
 
-    image_array = image_data.get_fdata()  # type: ignore
+    image_array = image_data.get_fdata()
     if use_storage_dtype:
-        image_array = image_array.astype(image_data.get_data_dtype())  # type: ignore
+        image_array = image_array.astype(image_data.get_data_dtype())
 
     return image_array
 
@@ -73,3 +74,17 @@ def fetch_nifti_shape(path: str) -> Tuple[int]:
     _utils.check_file(path)
     image = nib.load(path)  # type: ignore
     return image.header.get_data_shape()  # type: ignore
+
+
+def fetch_nifti_axis_direction_code(path: str) -> str:
+    """Fetches the NIfTI axis direction code from a file.
+
+    Args:
+        path: The path to the NIfTI file.
+
+    Returns:
+        The axis direction codes as string (e.g. "LAS").
+    """
+    _utils.check_file(path)
+    image_data: nib.Nifti1Image = nib.load(path)  # type: ignore
+    return "".join(orientations.aff2axcodes(image_data.affine))
