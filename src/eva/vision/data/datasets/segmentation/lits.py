@@ -5,6 +5,8 @@ import glob
 import os
 from typing import Any, Callable, Dict, List, Literal, Tuple
 
+import numpy as np
+import numpy.typing as npt
 import torch
 from torchvision import tv_tensors
 from typing_extensions import override
@@ -49,6 +51,7 @@ class LiTS(base.ImageSegmentation):
         root: str,
         split: Literal["train", "val", "test"] | None = None,
         transforms: Callable | None = None,
+        fix_orientation: bool = True,
         seed: int = 8,
     ) -> None:
         """Initialize dataset.
@@ -59,6 +62,8 @@ class LiTS(base.ImageSegmentation):
             split: Dataset split to use.
             transforms: A function/transforms that takes in an image and a target
                 mask and returns the transformed versions of both.
+            fix_orientation: Whether to fix the orientation of the images to match the
+                default for radiologists (table on top, looking from the feet).
             seed: Seed used for generating the dataset splits.
         """
         super().__init__(transforms=transforms)
@@ -66,6 +71,7 @@ class LiTS(base.ImageSegmentation):
         self._root = root
         self._split = split
         self._seed = seed
+        self._fix_orientation = fix_orientation
         self._indices: List[Tuple[int, int]] = []
 
     @property
@@ -108,6 +114,8 @@ class LiTS(base.ImageSegmentation):
         sample_index, slice_index = self._indices[index]
         volume_path = self._volume_files[sample_index]
         image_array = io.read_nifti(volume_path, slice_index)
+        if self._fix_orientation:
+            image_array = self._orientation(image_array, sample_index)
         return tv_tensors.Image(image_array.transpose(2, 0, 1))
 
     @override
@@ -115,7 +123,17 @@ class LiTS(base.ImageSegmentation):
         sample_index, slice_index = self._indices[index]
         segmentation_path = self._segmentation_file(sample_index)
         semantic_labels = io.read_nifti(segmentation_path, slice_index)
+        if self._fix_orientation:
+            semantic_labels = self._orientation(semantic_labels, sample_index)
         return tv_tensors.Mask(semantic_labels.squeeze(), dtype=torch.int64)  # type: ignore[reportCallIssue]
+
+    def _orientation(self, array: npt.NDArray, sample_index: int) -> npt.NDArray:
+        volume_path = self._volume_files[sample_index]
+        orientation = io.fetch_nifti_axis_direction_code(volume_path)
+        array = np.rot90(array, axes=(0, 1))
+        if orientation == "LPS":
+            array = np.flip(array, axis=0)
+        return array.copy()
 
     @override
     def load_metadata(self, index: int) -> Dict[str, Any]:
