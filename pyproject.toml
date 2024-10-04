@@ -35,7 +35,7 @@ maintainers = [
 requires-python = ">=3.10"
 dependencies = [
     "torch>=2.3.0",
-    "lightning>=2.2.2",
+    "lightning>=2.2.1",
     "jsonargparse[omegaconf]==4.31.0",
     "tensorboard>=2.16.2",
     "loguru>=0.7.2",
@@ -186,6 +186,8 @@ exclude_dirs = [
     ".venv",
     "tests/**",
 ]
+skips = ["B614"]
+
 
 [tool.pyright]
 pythonVersion = "3.10"

@@ -26,7 +26,7 @@ class SemanticSegmentationModule(module.ModelModule):
         criterion: Callable[..., torch.Tensor],
         encoder: Dict[str, Any] | Callable[[torch.Tensor], List[torch.Tensor]] | None = None,
         lr_multiplier_encoder: float = 0.0,
-        optimizer: OptimizerCallable = optim.AdamW,
+        optimizer: OptimizerCallable = optim.AdamW,  # type: ignore
         lr_scheduler: LRSchedulerCallable = lr_scheduler.ConstantLR,
         metrics: metrics_lib.MetricsSchema | None = None,
         postprocess: batch_postprocess.BatchPostProcess | None = None,
