@@ -43,10 +43,11 @@ def test_length(max_samples: int, expected_n_samples: int) -> None:
 )
 def test_same_seed(max_samples: int, seed: int, x_y_expected: list) -> None:
     """Tests if the sampler returns the same samples for the same seed."""
-    sampler = samplers.GridSampler(max_samples=max_samples, seed=seed)
+    sampler_1 = samplers.GridSampler(max_samples=max_samples, seed=seed)
+    sampler_2 = samplers.GridSampler(max_samples=max_samples, seed=seed)
 
-    x_y_1 = list(sampler.sample(**TEST_ARGS))
-    x_y_2 = list(sampler.sample(**TEST_ARGS))
+    x_y_1 = list(sampler_1.sample(**TEST_ARGS))
+    x_y_2 = list(sampler_2.sample(**TEST_ARGS))
 
     assert x_y_1 == x_y_2
     assert x_y_1 == x_y_expected
