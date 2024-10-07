@@ -184,7 +184,7 @@ class PANDA(wsi.MultiWsiDataset, base.ImageClassification):
         return os.path.basename(file_path).replace(".tiff", "")
 
 
-class PANDATiny(PANDA):
+class PANDASmall(PANDA):
     """Tiny version of the PANDA dataset for quicker benchmarking."""
 
     _train_split_ratio: float = 0.1
