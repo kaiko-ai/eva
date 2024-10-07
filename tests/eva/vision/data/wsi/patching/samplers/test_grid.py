@@ -19,8 +19,29 @@ def test_length(max_samples: int, expected_n_samples: int) -> None:
     assert len(x_y) == expected_n_samples
 
 
-@pytest.mark.parametrize("max_samples, seed", [(10, 8), (22, 42)])
-def test_same_seed(max_samples: int, seed: int) -> None:
+@pytest.mark.parametrize(
+    "max_samples, seed, x_y_expected",
+    [
+        (7, 42, [(50, 90), (20, 10), (50, 60), (10, 80), (30, 30), (40, 20), (50, 0)]),
+        (
+            10,
+            8,
+            [
+                (10, 50),
+                (20, 60),
+                (40, 20),
+                (90, 30),
+                (10, 60),
+                (0, 40),
+                (90, 40),
+                (70, 20),
+                (80, 0),
+                (60, 30),
+            ],
+        ),
+    ],
+)
+def test_same_seed(max_samples: int, seed: int, x_y_expected: list) -> None:
     """Tests if the sampler returns the same samples for the same seed."""
     sampler = samplers.GridSampler(max_samples=max_samples, seed=seed)
 
@@ -28,6 +49,7 @@ def test_same_seed(max_samples: int, seed: int) -> None:
     x_y_2 = list(sampler.sample(**TEST_ARGS))
 
     assert x_y_1 == x_y_2
+    assert x_y_1 == x_y_expected
 
 
 @pytest.mark.parametrize("max_samples, seed_1, seed_2", [(3, 1, 2), (5, 3, 4)])
