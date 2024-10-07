@@ -185,7 +185,7 @@ class PANDA(wsi.MultiWsiDataset, base.ImageClassification):
 
 
 class PANDASmall(PANDA):
-    """Tiny version of the PANDA dataset for quicker benchmarking."""
+    """Small version of the PANDA dataset for quicker benchmarking."""
 
     _train_split_ratio: float = 0.1
     """Train split ratio."""
