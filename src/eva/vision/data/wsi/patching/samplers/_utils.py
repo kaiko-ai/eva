@@ -1,12 +1,6 @@
-import random
 from typing import Tuple
 
 import numpy as np
-
-
-def set_seed(seed: int) -> None:
-    random.seed(seed)
-    np.random.seed(seed)
 
 
 def get_grid_coords_and_indices(
@@ -33,8 +27,8 @@ def get_grid_coords_and_indices(
 
     indices = list(range(len(x_y)))
     if shuffle:
-        set_seed(seed)
-        np.random.shuffle(indices)
+        random_generator = np.random.default_rng(seed)
+        random_generator.shuffle(indices)
     return x_y, indices
 
 

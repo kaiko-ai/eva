@@ -18,6 +18,7 @@ class RandomSampler(base.Sampler):
         """Initializes the sampler."""
         self.seed = seed
         self.n_samples = n_samples
+        self.random_generator = random.Random(seed)  # nosec
 
     def sample(
         self,
@@ -33,9 +34,10 @@ class RandomSampler(base.Sampler):
             layer_shape: The shape of the layer.
         """
         _utils.validate_dimensions(width, height, layer_shape)
-        _utils.set_seed(self.seed)
 
         x_max, y_max = layer_shape[0], layer_shape[1]
         for _ in range(self.n_samples):
-            x, y = random.randint(0, x_max - width), random.randint(0, y_max - height)  # nosec
+            x, y = self.random_generator.randint(0, x_max - width), self.random_generator.randint(
+                0, y_max - height
+            )
             yield x, y
