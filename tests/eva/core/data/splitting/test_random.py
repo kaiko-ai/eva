@@ -1,7 +1,8 @@
 """Tests for the random split function."""
 
-import pytest
 from typing import List
+
+import pytest
 
 from eva.core.data import splitting
 
