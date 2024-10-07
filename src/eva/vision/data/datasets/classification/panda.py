@@ -182,3 +182,16 @@ class PANDA(wsi.MultiWsiDataset, base.ImageClassification):
 
     def _get_id_from_path(self, file_path: str) -> str:
         return os.path.basename(file_path).replace(".tiff", "")
+
+
+class PANDATiny(PANDA):
+    """Tiny version of the PANDA dataset for quicker benchmarking."""
+
+    _train_split_ratio: float = 0.1
+    """Train split ratio."""
+
+    _val_split_ratio: float = 0.05
+    """Validation split ratio."""
+
+    _test_split_ratio: float = 0.05
+    """Test split ratio."""
