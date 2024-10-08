@@ -22,7 +22,7 @@ class SemanticSegmentationModule(module.ModelModule):
 
     def __init__(
         self,
-        decoder: decoders.Decoder,
+        decoder: decoders.Decoder | nn.Module,
         criterion: Callable[..., torch.Tensor],
         encoder: Dict[str, Any] | Callable[[torch.Tensor], List[torch.Tensor]] | None = None,
         lr_multiplier_encoder: float = 0.0,
@@ -103,7 +103,10 @@ class SemanticSegmentationModule(module.ModelModule):
             )
 
         patch_embeddings = self.encoder(inputs) if self.encoder else inputs
-        return self.decoder(patch_embeddings, to_size or inputs.shape[-2:])
+        try:
+            return self.decoder(patch_embeddings, to_size or inputs.shape[-2:])
+        except TypeError:
+            return self.decoder(patch_embeddings)
 
     @override
     def training_step(self, batch: INPUT_TENSOR_BATCH, *args: Any, **kwargs: Any) -> STEP_OUTPUT:
