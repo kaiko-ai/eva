@@ -146,7 +146,7 @@ were released on [HuggingFace](https://huggingface.co/bioptimus/H-optimus-0).
 MODEL_NAME=pathology/bioptimus_h_optimus_0 \
 NORMALIZE_MEAN=[0.707223,0.578729,0.703617] \
 NORMALIZE_STD=[0.211883,0.230117,0.177517] \
-IN_FEATURES=1024 \
+IN_FEATURES=1536 \
 eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
 ```
 
