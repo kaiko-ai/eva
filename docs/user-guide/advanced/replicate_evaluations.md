@@ -132,7 +132,7 @@ To evaluate [kaiko.ai's](https://www.kaiko.ai/) FM with DINO ViT-B8 backbone, pr
 and available on [GitHub](https://github.com/kaiko-ai/towards_large_pathology_fms), run:
 
 ```
-MODEL_NAME=pathology/kaiko_vitb16 \
+MODEL_NAME=pathology/kaiko_vitb8 \
 NORMALIZE_MEAN="[0.5,0.5,0.5]" \
 NORMALIZE_STD="[0.5,0.5,0.5]" \
 IN_FEATURES=768 \
