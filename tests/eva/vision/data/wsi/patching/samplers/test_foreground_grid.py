@@ -38,11 +38,17 @@ def test_length(min_foreground_ratio: float, max_samples: int, expected_n_sample
     assert len(x_y) == expected_n_samples
 
 
-@pytest.mark.parametrize("n_samples, seed", [(10, 8), (22, 42)])
-def test_same_seed(n_samples: int, seed: int) -> None:
+@pytest.mark.parametrize(
+    "max_samples, seed, x_y_expected",
+    [
+        (7, 42, [(12, 0), (24, 12), (12, 12), (0, 12), (12, 24)]),
+        (10, 8, [(12, 0), (12, 24), (24, 12), (0, 12), (12, 12)]),
+    ],
+)
+def test_same_seed(max_samples: int, seed: int, x_y_expected: list) -> None:
     """Tests if the sampler returns the same samples for the same seed."""
     sampler = samplers.ForegroundGridSampler(
-        max_samples=n_samples, seed=seed, min_foreground_ratio=0.5
+        max_samples=max_samples, seed=seed, min_foreground_ratio=0.5
     )
 
     x_y_1 = list(sampler.sample(**TEST_ARGS))
@@ -51,11 +57,11 @@ def test_same_seed(n_samples: int, seed: int) -> None:
     assert x_y_1 == x_y_2
 
 
-@pytest.mark.parametrize("n_samples, seed_1, seed_2", [(3, 1, 2), (5, 3, 4)])
-def test_different_seed(n_samples: int, seed_1: int, seed_2: int) -> None:
+@pytest.mark.parametrize("max_samples, seed_1, seed_2", [(3, 1, 2), (5, 3, 4)])
+def test_different_seed(max_samples: int, seed_1: int, seed_2: int) -> None:
     """Tests if the sampler returns different samples for different seeds."""
-    sampler_1 = samplers.ForegroundGridSampler(max_samples=n_samples, seed=seed_1)
-    sampler_2 = samplers.ForegroundGridSampler(max_samples=n_samples, seed=seed_2)
+    sampler_1 = samplers.ForegroundGridSampler(max_samples=max_samples, seed=seed_1)
+    sampler_2 = samplers.ForegroundGridSampler(max_samples=max_samples, seed=seed_2)
 
     x_y_1 = list(sampler_1.sample(**TEST_ARGS))
     x_y_2 = list(sampler_2.sample(**TEST_ARGS))

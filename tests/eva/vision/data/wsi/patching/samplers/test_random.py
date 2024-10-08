@@ -17,13 +17,35 @@ def test_length(n_samples: int) -> None:
     assert len(x_y) == n_samples
 
 
-@pytest.mark.parametrize("n_samples, seed", [(10, 8), (22, 42)])
-def test_same_seed(n_samples: int, seed: int) -> None:
+@pytest.mark.parametrize(
+    "n_samples, seed, x_y_expected",
+    [
+        (7, 42, [(81, 14), (3, 35), (31, 28), (17, 13), (86, 69), (11, 75), (54, 4)]),
+        (
+            10,
+            8,
+            [
+                (29, 47),
+                (48, 16),
+                (24, 90),
+                (5, 10),
+                (17, 31),
+                (64, 26),
+                (51, 82),
+                (3, 58),
+                (62, 58),
+                (49, 63),
+            ],
+        ),
+    ],
+)
+def test_same_seed(n_samples: int, seed: int, x_y_expected: int) -> None:
     """Tests if the sampler returns the same samples for the same seed."""
-    sampler = samplers.RandomSampler(n_samples=n_samples, seed=seed)
+    sampler_1 = samplers.RandomSampler(n_samples=n_samples, seed=seed)
+    sampler_2 = samplers.RandomSampler(n_samples=n_samples, seed=seed)
 
-    x_y_1 = list(sampler.sample(**TEST_ARGS))
-    x_y_2 = list(sampler.sample(**TEST_ARGS))
+    x_y_1 = list(sampler_1.sample(**TEST_ARGS))
+    x_y_2 = list(sampler_2.sample(**TEST_ARGS))
 
     assert x_y_1 == x_y_2
 
