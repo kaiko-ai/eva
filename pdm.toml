@@ -1,2 +1,9 @@
 [install]
 cache_method = "symlink_individual"
+
+[python]
+use_venv = true
+use_pyenv = false
+
+[venv]
+with_pip = true
