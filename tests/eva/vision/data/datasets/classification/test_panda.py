@@ -58,10 +58,16 @@ def test_filenames(root: str, split: Literal["train", "val", "test"]):
     assert len(filenames) == len(dataset.datasets)
 
 
-def test_same_split_same_seed(root: str):
+def test_same_split_same_seed(root: str, seed: int = 42):
     """Test that the generated split is deterministic when using the same seed."""
-    dataset1 = datasets.PANDA(root=root, split="train", seed=42, **DEFAULT_ARGS)
-    dataset2 = datasets.PANDA(root=root, split="train", seed=42, **DEFAULT_ARGS)
+    sampler1 = samplers.GridSampler(seed=seed)
+    sampler2 = samplers.GridSampler(seed=seed)
+    dataset1 = datasets.PANDA(
+        root=root, split="train", seed=seed, **(DEFAULT_ARGS | {"sampler": sampler1})
+    )
+    dataset2 = datasets.PANDA(
+        root=root, split="train", seed=seed, **(DEFAULT_ARGS | {"sampler": sampler2})
+    )
     _setup_datasets(dataset1, dataset2)
 
     assert len(dataset1) == len(dataset2)
@@ -69,6 +75,10 @@ def test_same_split_same_seed(root: str):
 
     for i in range(len(dataset1)):
         assert np.allclose(dataset1[i][1], dataset2[i][1])
+
+    expected_coords = [[(96, 160), (160, 64), (64, 64), (96, 0), (0, 224)]] * len(dataset1.datasets)
+    for i in range(len(dataset1.datasets)):
+        assert dataset1.datasets[i]._coords.x_y[: len(expected_coords[i])] == expected_coords[i]
 
 
 def test_different_seed_different_split(root: str):

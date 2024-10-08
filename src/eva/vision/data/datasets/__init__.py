@@ -6,6 +6,7 @@ from eva.vision.data.datasets.classification import (
     MHIST,
     PANDA,
     Camelyon16,
+    PANDASmall,
     PatchCamelyon,
     WsiClassificationDataset,
 )
@@ -28,6 +29,7 @@ __all__ = [
     "CRC",
     "MHIST",
     "PANDA",
+    "PANDASmall",
     "Camelyon16",
     "PatchCamelyon",
     "WsiClassificationDataset",
