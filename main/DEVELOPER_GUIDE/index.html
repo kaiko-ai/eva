@@ -2590,7 +2590,7 @@ You can set up a local Python environment for development as follows:
 2. Install system dependencies
     - For MacOS: <code>brew install Cmake</code>
     - For Linux (Debian): <code>sudo apt-get install build-essential cmake</code>
-3. Run <code>pdm install -G all, dev</code> to install the Python dependencies. This will create a virtual environment in <code>eva/.venv</code>.</p>
+3. Run <code>PDM_PYTHON=$(pyenv which python) &amp;&amp; pdm install -G all -G dev</code> to install the Python dependencies. This will create a virtual environment in <code>eva/.venv</code>. If you don't use <code>pyenv</code> to manage your python installations, you can replace <code>$(pyenv which python)</code> with the path to your python executable. Note that the python version used should match <code>PYTHON_VERSIONS</code> in <code>noxfile.py</code>, as this is the version is used for running the unit tests.</p>
 <h2 id="adding-new-dependencies">Adding new dependencies</h2>
 <p>Add a new dependency to the <code>core</code> submodule:<br>
 <code>pdm add &lt;package_name&gt;</code></p>
