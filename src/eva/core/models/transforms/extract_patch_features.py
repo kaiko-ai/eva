@@ -37,7 +37,7 @@ class ExtractPatchFeatures:
             height = width = int(math.sqrt(patch_grid))
             if height * width != patch_grid:
                 if self._ignore_remaining_dims:
-                    features = features[:, :, : height * width]
+                    features = features[:, :, -height * width :]
                 else:
                     raise ValueError(f"Patch grid size must be a square number {patch_grid}.")
             patch_embeddings = features.view(batch_size, hidden_size, height, width)
