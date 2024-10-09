@@ -29,7 +29,7 @@ SAMPLE_SHAPE = 32
         (5, 7, None, None),
         (5, 7, ["wsi_id"], None),
         (8, 16, None, None),
-        (8, 32, ["wsi_id", "x", "y"], ["slide_1", "slide_2"]),
+        (8, 32, ["wsi_id"], ["slide_1", "slide_2"]),
     ],
 )
 def test_embeddings_writer(datamodule: datamodules.DataModule, model: modules.HeadModule) -> None:
