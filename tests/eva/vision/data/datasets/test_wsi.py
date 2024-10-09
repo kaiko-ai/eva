@@ -1,8 +1,10 @@
 """WsiDataset & MultiWsiDataset tests."""
 
 import os
+import pathlib
 from typing import Tuple
 
+import pandas as pd
 import pytest
 
 from eva.vision.data import datasets
@@ -69,7 +71,7 @@ def test_patch_shape(width: int, height: int, target_mpp: float, root: str, back
     assert dataset[0].shape == (3, scaled_width, scaled_height)
 
 
-def test_multi_dataset(root: str):
+def test_multi_dataset(root: str, tmp_path: pathlib.Path):
     """Test MultiWsiDataset with multiple whole-slide image paths."""
     file_paths = [
         os.path.join(root, "0/a.tiff"),
@@ -77,6 +79,8 @@ def test_multi_dataset(root: str):
         os.path.join(root, "1/a.tiff"),
     ]
 
+    # get tmp csv file path for coords
+    coords_path = (tmp_path / "coords.csv").as_posix()
     width, height = 32, 32
     dataset = datasets.MultiWsiDataset(
         root=root,
@@ -86,6 +90,7 @@ def test_multi_dataset(root: str):
         target_mpp=0.25,
         sampler=samplers.GridSampler(max_samples=None),
         backend="openslide",
+        coords_path=coords_path,
     )
     dataset.setup()
 
@@ -93,6 +98,11 @@ def test_multi_dataset(root: str):
     layer_shape = dataset.datasets[0]._wsi.level_dimensions[0]
     assert len(dataset) == _expected_n_patches(layer_shape, width, height, (0, 0)) * len(file_paths)
     assert dataset.cumulative_sizes == [64, 128, 192]
+
+    assert os.path.exists(coords_path)
+    df_coords = pd.read_csv(coords_path)
+    assert "file" in df_coords.columns
+    assert "x_y" in df_coords.columns
 
 
 def _expected_n_patches(layer_shape, width, height, overlap):

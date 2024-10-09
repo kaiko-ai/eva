@@ -35,6 +35,7 @@ class WsiClassificationDataset(wsi.MultiWsiDataset, base.ImageClassification):
         split: Literal["train", "val", "test"] | None = None,
         image_transforms: Callable | None = None,
         column_mapping: Dict[str, str] = default_column_mapping,
+        coords_path: str | None = None,
     ):
         """Initializes the dataset.
 
@@ -51,6 +52,7 @@ class WsiClassificationDataset(wsi.MultiWsiDataset, base.ImageClassification):
             split: The split of the dataset to load.
             image_transforms: Transforms to apply to the extracted image patches.
             column_mapping: Mapping of the columns in the manifest file.
+            coords_path: File path to save the patch coordinates as .csv.
         """
         self._split = split
         self._column_mapping = self.default_column_mapping | column_mapping
@@ -66,6 +68,7 @@ class WsiClassificationDataset(wsi.MultiWsiDataset, base.ImageClassification):
             target_mpp=target_mpp,
             backend=backend,
             image_transforms=image_transforms,
+            coords_path=coords_path,
         )
 
     @override
@@ -88,9 +91,7 @@ class WsiClassificationDataset(wsi.MultiWsiDataset, base.ImageClassification):
 
     @override
     def load_metadata(self, index: int) -> Dict[str, Any]:
-        dataset_index, sample_index = self._get_dataset_idx(index), self._get_sample_idx(index)
-        patch_metadata = self.datasets[dataset_index].load_metadata(sample_index)
-        return {"wsi_id": self.filename(index).split(".")[0]} | patch_metadata
+        return wsi.MultiWsiDataset.load_metadata(self, index)
 
     def _load_manifest(self, manifest_path: str) -> pd.DataFrame:
         df = pd.read_csv(manifest_path)

@@ -4,6 +4,7 @@ import bisect
 import os
 from typing import Any, Callable, Dict, List
 
+import pandas as pd
 from loguru import logger
 from torch.utils.data import dataset as torch_datasets
 from torchvision import tv_tensors
@@ -116,6 +117,7 @@ class MultiWsiDataset(vision.VisionDataset):
         overwrite_mpp: float | None = None,
         backend: str = "openslide",
         image_transforms: Callable | None = None,
+        coords_path: str | None = None,
     ):
         """Initializes a new dataset instance.
 
@@ -129,6 +131,7 @@ class MultiWsiDataset(vision.VisionDataset):
             sampler: The sampler to use for sampling patch coordinates.
             backend: The backend to use for reading the whole-slide images.
             image_transforms: Transforms to apply to the extracted image patches.
+            coords_path: File path to save the patch coordinates as .csv.
         """
         super().__init__()
 
@@ -141,6 +144,7 @@ class MultiWsiDataset(vision.VisionDataset):
         self._sampler = sampler
         self._backend = backend
         self._image_transforms = image_transforms
+        self._coords_path = coords_path
 
         self._concat_dataset: torch_datasets.ConcatDataset
 
@@ -157,6 +161,7 @@ class MultiWsiDataset(vision.VisionDataset):
     @override
     def configure(self) -> None:
         self._concat_dataset = torch_datasets.ConcatDataset(datasets=self._load_datasets())
+        self._save_coords_to_file()
 
     @override
     def __len__(self) -> int:
@@ -169,6 +174,12 @@ class MultiWsiDataset(vision.VisionDataset):
     @override
     def filename(self, index: int) -> str:
         return os.path.basename(self._file_paths[self._get_dataset_idx(index)])
+
+    def load_metadata(self, index: int) -> Dict[str, Any]:
+        """Loads the metadata for the patch at the specified index."""
+        dataset_index, sample_index = self._get_dataset_idx(index), self._get_sample_idx(index)
+        patch_metadata = self.datasets[dataset_index].load_metadata(sample_index)
+        return {"wsi_id": self.filename(index).split(".")[0]} | patch_metadata
 
     def _load_datasets(self) -> list[WsiDataset]:
         logger.info(f"Initializing dataset with {len(self._file_paths)} WSIs ...")
@@ -200,3 +211,13 @@ class MultiWsiDataset(vision.VisionDataset):
     def _get_sample_idx(self, index: int) -> int:
         dataset_idx = self._get_dataset_idx(index)
         return index if dataset_idx == 0 else index - self.cumulative_sizes[dataset_idx - 1]
+
+    def _save_coords_to_file(self):
+        if self._coords_path is not None:
+            coords = [
+                {"file": self._file_paths[i]} | dataset._coords.to_dict()
+                for i, dataset in enumerate(self.datasets)
+            ]
+            os.makedirs(os.path.abspath(os.path.join(self._coords_path, os.pardir)), exist_ok=True)
+            pd.DataFrame(coords).to_csv(self._coords_path, index=False)
+            logger.info(f"Saved patch coordinates to: {self._coords_path}")
