@@ -102,6 +102,11 @@ def _check_batch_shape(batch: Any):
     assert isinstance(target, torch.Tensor)
     assert isinstance(metadata, dict)
     assert "wsi_id" in metadata
+    assert "x" in metadata
+    assert "y" in metadata
+    assert "width" in metadata
+    assert "height" in metadata
+    assert "level_idx" in metadata
 
 
 @pytest.fixture
