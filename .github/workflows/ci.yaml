@@ -17,7 +17,7 @@ jobs:
           python-version: "3.10"
           architecture: x64
       - name: Setting up nox
-        uses: wntrblm/nox@5656fcedc31a1ea37d016e4d94d00185330cc528 # 2024.04.15
+        uses: wntrblm/nox@1199ab3892b1a941f80ff052083d0a571abed79d # 2024.10.09
         with:
           python-versions: "3.10"
       - name: Performing lint checks
@@ -49,7 +49,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
           architecture: x64
       - name: Setting up nox
-        uses: wntrblm/nox@5656fcedc31a1ea37d016e4d94d00185330cc528 # 2024.04.15
+        uses: wntrblm/nox@1199ab3892b1a941f80ff052083d0a571abed79d # 2024.10.09
         with:
           python-versions: ${{ matrix.python-version }}
       - name: Executing unit tests
@@ -65,7 +65,7 @@ jobs:
           python-version: "3.10"
           architecture: x64
       - name: Setting up nox
-        uses: wntrblm/nox@5656fcedc31a1ea37d016e4d94d00185330cc528 # 2024.04.15
+        uses: wntrblm/nox@1199ab3892b1a941f80ff052083d0a571abed79d # 2024.10.09
         with:
           python-versions: "3.10"
       - name: Configure Git Credentials
