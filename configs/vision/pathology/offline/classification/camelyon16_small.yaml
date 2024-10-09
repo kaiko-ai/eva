@@ -83,7 +83,7 @@ data:
           embeddings_transforms:
             class_path: eva.core.data.transforms.Pad2DTensor
             init_args:
-              pad_size: &N_PATCHES ${oc.env:N_PATCHES, 500}
+              pad_size: &N_PATCHES ${oc.env:N_PATCHES, 1000}
           target_transforms:
             class_path: eva.core.data.transforms.dtype.ArrayToFloatTensor
       val:
