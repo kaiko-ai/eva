@@ -14,7 +14,7 @@ trainer:
             0: train
             1: val
             2: test
-          metadata_keys: ["wsi_id"]
+          metadata_keys: ["wsi_id", "x", "y", "width", "height", "level_idx"]
           backbone:
             class_path: eva.models.ModelFromFunction
             init_args:
