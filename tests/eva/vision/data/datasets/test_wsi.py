@@ -73,14 +73,12 @@ def test_patch_shape(width: int, height: int, target_mpp: float, root: str, back
 
 def test_multi_dataset(root: str, tmp_path: pathlib.Path):
     """Test MultiWsiDataset with multiple whole-slide image paths."""
+    coords_path = (tmp_path / "coords.csv").as_posix()
     file_paths = [
         os.path.join(root, "0/a.tiff"),
         os.path.join(root, "0/b.tiff"),
         os.path.join(root, "1/a.tiff"),
     ]
-
-    # get tmp csv file path for coords
-    coords_path = (tmp_path / "coords.csv").as_posix()
     width, height = 32, 32
     dataset = datasets.MultiWsiDataset(
         root=root,
