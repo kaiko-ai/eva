@@ -36,7 +36,7 @@ def main():
         "dino_vitl14_kaiko": "kaiko.ai - DINOv2 ViT-L14 | TCGA",
         "bioptimus_h_optimus_0": "Bioptimus - H-optimus-0 | ViT-G14",
         "prov_gigapath": "Prov-GigaPath | DINOv2 ViT-G14",
-        "histai_hibou_l": "hist.ai - hibou-B | DINOv2 ViT-B14",
+        "histai_hibou_l": "hist.ai - hibou-L | DINOv2 ViT-B14",
     }
     _tasks_names_map = {
         "bach": "BACH",
