@@ -132,7 +132,9 @@ class PANDA(wsi.MultiWsiDataset, base.ImageClassification):
 
     @override
     def load_metadata(self, index: int) -> Dict[str, Any]:
-        return {"wsi_id": self.filename(index).split(".")[0]}
+        dataset_index, sample_index = self._get_dataset_idx(index), self._get_sample_idx(index)
+        patch_metadata = self.datasets[dataset_index].load_metadata(sample_index)
+        return {"wsi_id": self.filename(index).split(".")[0]} | patch_metadata
 
     def _load_file_paths(self, split: Literal["train", "val", "test"] | None = None) -> List[str]:
         """Loads the file paths of the corresponding dataset split."""

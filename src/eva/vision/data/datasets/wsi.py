@@ -2,7 +2,7 @@
 
 import bisect
 import os
-from typing import Callable, List
+from typing import Any, Callable, Dict, List
 
 from loguru import logger
 from torch.utils.data import dataset as torch_datasets
@@ -84,6 +84,17 @@ class WsiDataset(vision.VisionDataset):
         patch = functional.to_image(patch)
         patch = self._apply_transforms(patch)
         return patch
+
+    def load_metadata(self, index: int) -> Dict[str, Any]:
+        """Loads the metadata for the patch at the specified index."""
+        x, y = self._coords.x_y[index]
+        return {
+            "x": x,
+            "y": y,
+            "width": self._coords.width,
+            "height": self._coords.height,
+            "level_idx": self._coords.level_idx,
+        }
 
     def _apply_transforms(self, image: tv_tensors.Image) -> tv_tensors.Image:
         if self._image_transforms is not None:
@@ -185,3 +196,7 @@ class MultiWsiDataset(vision.VisionDataset):
 
     def _get_dataset_idx(self, index: int) -> int:
         return bisect.bisect_right(self.cumulative_sizes, index)
+
+    def _get_sample_idx(self, index: int) -> int:
+        dataset_idx = self._get_dataset_idx(index)
+        return index if dataset_idx == 0 else index - self.cumulative_sizes[dataset_idx - 1]
