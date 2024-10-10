@@ -108,6 +108,7 @@ data:
             height: 224
             target_mpp: 0.25
             split: train
+            coords_path: ${data.init_args.datasets.train.init_args.root}/coords_${.split}.csv
             image_transforms:
               class_path: eva.vision.data.transforms.common.ResizeAndCrop
               init_args:
