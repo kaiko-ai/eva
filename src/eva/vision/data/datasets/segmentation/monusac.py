@@ -84,7 +84,7 @@ class MoNuSAC(base.ImageSegmentation):
     @property
     @override
     def classes(self) -> List[str]:
-        return ["Epithelial", "Lymphocyte", "Neutrophil", "Macrophage"]
+        return ["Background", "Epithelial", "Lymphocyte", "Neutrophil", "Macrophage", "Ambiguous"]
 
     @functools.cached_property
     @override
@@ -107,8 +107,8 @@ class MoNuSAC(base.ImageSegmentation):
         _validators.check_dataset_integrity(
             self,
             length=self._expected_dataset_lengths.get(self._split, 0),
-            n_classes=4,
-            first_and_last_labels=("Epithelial", "Macrophage"),
+            n_classes=6,
+            first_and_last_labels=("Background", "Ambiguous"),
         )
 
     @override
@@ -199,9 +199,9 @@ class MoNuSAC(base.ImageSegmentation):
         semantic_labels = np.zeros((height, width), "uint8")  # type: ignore[reportCallIssue]
         for level in range(len(root)):
             label = [item.attrib["Name"] for item in root[level][0]][0]
-            class_id = self.class_to_idx.get(label, 254) + 1
+            class_id = self.class_to_idx.get(label, self.class_to_idx["Ambiguous"])
             # for the test dataset an additional class 'Ambiguous' was added for
-            # difficult regions with fuzzy boundaries - we return it as 255
+            # difficult regions with fuzzy boundaries
             regions = [item for child in root[level] for item in child if item.tag == "Region"]
             for region in regions:
                 vertices = np.array(
