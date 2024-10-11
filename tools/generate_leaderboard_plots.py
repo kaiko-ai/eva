@@ -3,7 +3,7 @@
 # in docs/leaderboards.md
 #
 # Note: the code below assumes that the eva results are stored in
-# `eva/logs/<task>/<fm_identifier>`.
+# `eva/logs/<task>/<fm_identifier>/results`.
 
 import os
 import json
@@ -51,7 +51,6 @@ _tasks_names_map = {
     "monusac": "MoNuSAC",
 }
 _colors_for_startplot = [
-    "#A6A6A6",
     "#7F7F7F",
     "#FFC000",
     "#C1E814",
@@ -80,8 +79,8 @@ def get_leaderboard(logs_dir: Optional[str] = None) -> pd.DataFrame:
     """Get the leaderboard data frame."""
 
     # load existing leaderboard if available:
-    if os.path.isfile("tools/data/leaderboard_Y.csv"):
-        df_existing = pd.read_csv("tools/data/leaderboard_Y.csv")
+    if os.path.isfile("tools/data/leaderboard.csv"):
+        df_existing = pd.read_csv("tools/data/leaderboard.csv")
     else:
         df_existing = pd.DataFrame()
 
@@ -91,11 +90,13 @@ def get_leaderboard(logs_dir: Optional[str] = None) -> pd.DataFrame:
         for model in _fm_name_map.keys():
             scores = []
             for task in _tasks_to_metric.keys():
-                results_folder = [
-                    d for d in os.listdir(f"{logs_dir}/{task}/{model}") if d.startswith("20")
-                ][0]
+                run_folder = [
+                    d
+                    for d in sorted(os.listdir(f"{logs_dir}/{task}/{model}/results"))
+                    if d.startswith("20")
+                ][-1]
                 with open(
-                    os.path.join(f"{logs_dir}/{task}/{model}/{results_folder}/results.json")
+                    os.path.join(f"{logs_dir}/{task}/{model}/results/{run_folder}/results.json")
                 ) as f:
                     d = json.load(f)
                 split = "test" if d["metrics"]["test"] else "val"
@@ -109,7 +110,7 @@ def get_leaderboard(logs_dir: Optional[str] = None) -> pd.DataFrame:
 
         # combine existing and new data frame
         df = pd.concat([df, df_existing]).drop_duplicates()
-        df.to_csv("tools/data/leaderboard_Y.csv", index=False)
+        df.to_csv("tools/data/leaderboard.csv", index=False)
     else:
         df = df_existing
 
@@ -128,7 +129,11 @@ def plot_leaderboard(df: pd.DataFrame, output_file: str = "docs/images/leaderboa
 
     # prepare data frame:
     df.index.names = [""]
-    df.loc[:, "overall_performance"] = df.mean(axis=1)
+
+    # exclude BACH from the average
+    df_for_avg = df[[c for c in df.columns if c != "bach"]]
+
+    df.loc[:, "overall_performance"] = df_for_avg.mean(axis=1)
     df = df.sort_values(by="overall_performance", ascending=False)
     df = df.drop(columns=["overall_performance"])
     df.columns = [_tasks_names_map.get(c) or c for c in df.columns]
@@ -148,7 +153,6 @@ def plot_leaderboard(df: pd.DataFrame, output_file: str = "docs/images/leaderboa
         rotation=20,
     )
     plt.savefig(output_file, format="svg", dpi=1200, bbox_inches="tight")
-    # plt.savefig('docs/images/leaderboard_XXX.svg', format="svg", dpi=1200, bbox_inches="tight")
 
 
 def plot_startplot(df: pd.DataFrame, output_file: str = "docs/images/starplot.png"):
@@ -156,6 +160,7 @@ def plot_startplot(df: pd.DataFrame, output_file: str = "docs/images/starplot.pn
 
     plt.style.use("seaborn-v0_8-ticks")
 
+    df = df[_tasks_to_metric.keys()]
     datasets = _label_offsets_startplot.keys()
     models = df.index.tolist()
     accuracy_values_new = df.to_numpy()
@@ -209,7 +214,7 @@ def plot_startplot(df: pd.DataFrame, output_file: str = "docs/images/starplot.pn
                 verticalalignment="center",
             )
 
-    legend = ax.legend(loc="upper right", bbox_to_anchor=(1.85, 1), title="", fontsize=18)
+    legend = ax.legend(loc="upper right", bbox_to_anchor=(1.95, 1), title="", fontsize=18)
     plt.savefig(output_file, bbox_inches="tight")
 
 
@@ -217,8 +222,8 @@ def main():
     # get log_dir from arg parser
     parser = argparse.ArgumentParser()
     parser.add_argument("--logs_dir", type=str, default="logs")
-    parser.add_argument("--output_leaderboard", type=str, default="docs/images/leaderboard_Y.svg")
-    parser.add_argument("--output_starplot", type=str, default="docs/images/starplot_Y.svg")
+    parser.add_argument("--output_leaderboard", type=str, default="docs/images/leaderboard.svg")
+    parser.add_argument("--output_starplot", type=str, default="docs/images/starplot.png")
     args = parser.parse_args()
 
     leaderboard_df = get_leaderboard(args.logs_dir)
