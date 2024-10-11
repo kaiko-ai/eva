@@ -34,9 +34,9 @@ def main():
         "dino_vitb16_kaiko": "kaiko.ai - DINO ViT-B16 | TCGA",
         "dino_vitb8_kaiko": "kaiko.ai - DINO ViT-B8 | TCGA",
         "dino_vitl14_kaiko": "kaiko.ai - DINOv2 ViT-L14 | TCGA",
-        "bioptimus_h_optimus_0": "Bioptimus - H-optimus-0 | ViT-G14",
-        "prov_gigapath": "Prov-GigaPath | DINOv2 ViT-G14",
-        "histai_hibou_l": "hist.ai - hibou-L | DINOv2 ViT-B14",
+        "bioptimus_h_optimus_0": "H-optimus-0 - ViT-G14 | 500k slides",
+        "prov_gigapath": "Prov-GigaPath - DINOv2 ViT-G14 | 181k slides",
+        "histai_hibou_l": "hibou-L - DINOv2 ViT-B14 | 1M slides",
     }
     _tasks_names_map = {
         "bach": "BACH",
