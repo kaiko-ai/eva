@@ -132,10 +132,14 @@ data:
     dataloaders:
       train:
         batch_size: &BATCH_SIZE ${oc.env:BATCH_SIZE, 64}
+        num_workers: &N_DATA_WORKERS ${oc.env:N_DATA_WORKERS, 8}
         shuffle: true
       val:
         batch_size: *BATCH_SIZE
+        num_workers: *N_DATA_WORKERS
       test:
         batch_size: *BATCH_SIZE
+        num_workers: *N_DATA_WORKERS
       predict:
         batch_size: &PREDICT_BATCH_SIZE ${oc.env:PREDICT_BATCH_SIZE, 64}
+        num_workers: *N_DATA_WORKERS
