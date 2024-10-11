@@ -38,12 +38,6 @@ class DataLoader:
     Mutually exclusive with `batch_size`, `shuffle`, `sampler` and `drop_last`.
     """
 
-    num_workers: int = multiprocessing.cpu_count()
-    """How many workers to use for loading the data.
-
-    By default, it will use the number of CPUs available.
-    """
-
     collate_fn: Callable | None = None
     """The batching process."""
 
@@ -58,6 +52,16 @@ class DataLoader:
 
     prefetch_factor: int | None = 2
     """Number of batches loaded in advance by each worker."""
+
+    num_workers: int | None = dataclasses.field(default=None)
+    """How many workers to use for loading the data.
+
+    By default, it will use the number of CPUs available.
+    """
+
+    def __post_init__(self):
+        if self.num_workers is None:
+            self.num_workers = multiprocessing.cpu_count()
 
     def __call__(self, dataset: datasets.TorchDataset) -> dataloader.DataLoader:
         """Returns the dataloader on the provided dataset.
