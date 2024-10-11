@@ -1179,6 +1179,8 @@
       
         
       
+        
+      
     
     
       
@@ -1245,6 +1247,27 @@
   
   <span class="md-ellipsis">
     PANDA
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../datasets/panda_small/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    PANDASmall
   </span>
   
 
@@ -2615,7 +2638,7 @@
 <p></center></p>
 <p>The runs use the default setup described in the section below.</p>
 <p><em>eva</em> trains the decoder on the "train" split and uses the "validation" split for monitoring, early stopping and checkpoint selection. Evaluation results are reported on the "test" split if available and otherwise on the "validation" split.</p>
-<p>For details on the FM-backbones and instructions to replicate the results, check out <a href="../user-guide/advanced/replicate_evaluations/">Replicate evaluations</a>. For information on the tasks, check out <a href="../datasets/">Datasets</a>.</p>
+<p>For details on the FM-backbones and instructions to replicate the results, check out <a href="../user-guide/advanced/replicate_evaluations/">Replicate evaluations</a>. For information on the tasks, check out <a href="../datasets/">Datasets</a>. For Camelyon16 runtime optimization we use only 1000 foreground patches per slide which impacts the performance on this benchmark accross all models. </p>
 <h2 id="evaluation-protocol">Evaluation protocol</h2>
 <p><em>eva</em> uses a task- &amp; model-independent and fixed default set up which closely follows the standard evaluation protocol proposed by [1] (with adjustments for slide-level tasks to ensure convergence and computational efficiency).</p>
 <p>We selected this approach to prioritize reliable, robust and fair FM-evaluation while being in line with common literature.</p>
