@@ -93,6 +93,7 @@ nav:
       - Slide-level:
         - Camelyon16: datasets/camelyon16.md
         - PANDA: datasets/panda.md
+        - PANDASmall: datasets/panda_small.md
     - Radiology:
       - TotalSegmentator: datasets/total_segmentator.md
       - LiTS: datasets/lits.md
