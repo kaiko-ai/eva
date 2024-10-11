@@ -20,8 +20,8 @@ def main():
         "crc": "MulticlassAccuracy",
         "mhist": "BinaryBalancedAccuracy",
         "patch_camelyon": "BinaryBalancedAccuracy",
-        "camelyon16": "BinaryBalancedAccuracy",
-        "panda": "MulticlassAccuracy",
+        "camelyon16_small": "BinaryBalancedAccuracy",
+        "panda_small": "MulticlassAccuracy",
         "consep": "GeneralizedDiceScore",
         "monusac": "GeneralizedDiceScore",
     }
@@ -34,14 +34,17 @@ def main():
         "dino_vitb16_kaiko": "kaiko.ai - DINO ViT-B16 | TCGA",
         "dino_vitb8_kaiko": "kaiko.ai - DINO ViT-B8 | TCGA",
         "dino_vitl14_kaiko": "kaiko.ai - DINOv2 ViT-L14 | TCGA",
+        "bioptimus_h_optimus_0": "H-optimus-0 - ViT-G14 | 500k slides",
+        "prov_gigapath": "Prov-GigaPath - DINOv2 ViT-G14 | 181k slides",
+        "histai_hibou_l": "hibou-L - DINOv2 ViT-B14 | 1M slides",
     }
     _tasks_names_map = {
         "bach": "BACH",
         "crc": "CRC",
         "mhist": "MHIST",
         "patch_camelyon": "PCam",
-        "camelyon16": "Camelyon16",
-        "panda": "PANDA",
+        "camelyon16_small": "Cam16Small",
+        "panda_small": "PANDASmall",
         "consep": "CoNSeP",
         "monusac": "MoNuSAC",
     }
@@ -59,31 +62,34 @@ def main():
         df_existing = pd.DataFrame()
 
     # load results into data frame:
-    all_scores = []
-    for model in _fm_name_map.keys():
-        scores = []
-        for task in _tasks_to_metric.keys():
-            results_folder = [
-                d for d in os.listdir(f"{args.logs_dir}/{task}/{model}") if d.startswith("20")
-            ][0]
-            with open(
-                os.path.join(f"{args.logs_dir}/{task}/{model}/{results_folder}/results.json")
-            ) as f:
-                d = json.load(f)
-            split = "test" if d["metrics"]["test"] else "val"
-            metric = _tasks_to_metric.get(task)
-            if metric is None:
-                raise Exception(f"no metric defined for task {task}")
-            scores.append(round(d["metrics"][split][0][f"{split}/{metric}"]["mean"], 3))
-        all_scores.append(scores)
-    df = pd.DataFrame(all_scores, columns=_tasks_to_metric.keys())
-    df["model"] = _fm_name_map.keys()
+    if args.logs_dir:
+        all_scores = []
+        for model in _fm_name_map.keys():
+            scores = []
+            for task in _tasks_to_metric.keys():
+                results_folder = [
+                    d for d in os.listdir(f"{args.logs_dir}/{task}/{model}") if d.startswith("20")
+                ][0]
+                with open(
+                    os.path.join(f"{args.logs_dir}/{task}/{model}/{results_folder}/results.json")
+                ) as f:
+                    d = json.load(f)
+                split = "test" if d["metrics"]["test"] else "val"
+                metric = _tasks_to_metric.get(task)
+                if metric is None:
+                    raise Exception(f"no metric defined for task {task}")
+                scores.append(round(d["metrics"][split][0][f"{split}/{metric}"]["mean"], 3))
+            all_scores.append(scores)
+        df = pd.DataFrame(all_scores, columns=_tasks_to_metric.keys())
+        df["model"] = _fm_name_map.keys()
 
-    # combine existing and new data frame
-    df = pd.concat([df, df_existing]).drop_duplicates()
-    df.to_csv("tools/data/leaderboard.csv", index=False)
+        # combine existing and new data frame
+        df = pd.concat([df, df_existing]).drop_duplicates()
+        df.to_csv("tools/data/leaderboard.csv", index=False)
+    else:
+        df = df_existing
+
     df = df.set_index("model", drop=True)
-
     # create colormap:
     colors = [[0, "white"], [1, "#0000ff"]]
     cmap = matplotlib.colors.LinearSegmentedColormap.from_list("", colors)
