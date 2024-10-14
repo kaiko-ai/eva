@@ -5,7 +5,7 @@ hide:
 
 # Leaderboards
 
-We evaluated the following FMs on the 6 supported WSI-classification tasks. We report *Balanced Accuracy* for binary & multiclass tasks and generalized Dice score (no background) for segmentation tasks. The score shows the average performance over 5 runs.
+We evaluated the following FMs on the 6 supported WSI-classification tasks. We report *Balanced Accuracy* for binary & multiclass tasks and generalized Dice score (no background) for segmentation tasks. The score shows the average performance over 5 runs. Note the leaderboard orders from best to worst according to the average performance across all tasks, excluding BACH (not comparable due to much larger patch size).
 
 <br/>
 
