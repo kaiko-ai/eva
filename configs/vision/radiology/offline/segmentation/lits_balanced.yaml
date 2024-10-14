@@ -57,10 +57,9 @@ model:
         in_features: ${oc.env:IN_FEATURES, 384}
         num_classes:  &NUM_CLASSES 3
     criterion:
-      class_path: eva.vision.losses.DiceLoss
+      class_path: eva.core.losses.CrossEntropyLoss
       init_args:
-        softmax: true
-        batch: true
+        weight: [0.05, 0.1, 1.5]
     optimizer:
       class_path: torch.optim.AdamW
       init_args:
