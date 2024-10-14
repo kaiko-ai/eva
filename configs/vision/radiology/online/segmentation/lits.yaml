@@ -51,7 +51,7 @@ model:
     criterion:
       class_path: eva.core.losses.CrossEntropyLoss
       init_args:
-        weight: [0.01, 0.1, 1.5]
+        weight: [0.05, 0.1, 1.5]
     lr_multiplier_encoder: 0.0
     optimizer:
       class_path: torch.optim.AdamW
@@ -95,6 +95,7 @@ data:
             class_path: eva.vision.data.transforms.common.ResizeAndClamp
             init_args:
               size: ${oc.env:RESIZE_DIM, 224}  
+              clamp_range: [-1008, 822]
               mean: *NORMALIZE_MEAN
               std: *NORMALIZE_STD
       val:
