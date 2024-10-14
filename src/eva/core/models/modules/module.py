@@ -50,7 +50,7 @@ class ModelModule(pl.LightningModule):
     @property
     def metrics_device(self) -> torch.device:
         """Returns the device by which the metrics should be calculated."""
-        device = os.getenv("METRICS_DEVICE", None)
+        device = os.getenv("METRICS_DEVICE", "cpu")
         return self.device if device is None else torch.device(device)
 
     @override
