@@ -2841,9 +2841,6 @@ predictions and targets.</p>
     <div class="doc doc-contents ">
 
       <p>Returns the device by which the metrics should be calculated.</p>
-<p>We allocate the metrics to CPU when operating on single device, as
-it is much faster, but to GPU when employing multiple ones, as DDP
-strategy requires the metrics to be allocated to the module's GPU.</p>
     </div>
 
 </div>
