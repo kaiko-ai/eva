@@ -12,7 +12,7 @@ trainer:
           refresh_rate: ${oc.env:TQDM_REFRESH_RATE, 1}
       - class_path: eva.vision.callbacks.SemanticSegmentationLogger
         init_args:
-          log_every_n_steps: 1000
+          log_every_n_epochs: 1
           log_images: false
       - class_path: lightning.pytorch.callbacks.ModelCheckpoint
         init_args:
@@ -57,10 +57,9 @@ model:
         in_features: ${oc.env:IN_FEATURES, 384}
         num_classes:  &NUM_CLASSES 3
     criterion:
-      class_path: eva.vision.losses.DiceLoss
+      class_path: eva.core.losses.CrossEntropyLoss
       init_args:
-        softmax: true
-        batch: true
+        weight: [0.05, 0.1, 1.5]
     optimizer:
       class_path: torch.optim.AdamW
       init_args:
@@ -119,6 +118,7 @@ data:
               class_path: eva.vision.data.transforms.common.ResizeAndClamp
               init_args:
                 size: ${oc.env:RESIZE_DIM, 224}
+                clamp_range: [-1008, 822]
                 mean: &NORMALIZE_MEAN ${oc.env:NORMALIZE_MEAN, [0.485, 0.456, 0.406]} 
                 std: &NORMALIZE_STD ${oc.env:NORMALIZE_STD, [0.229, 0.224, 0.225]}
         - class_path: eva.vision.datasets.LiTS
@@ -137,6 +137,7 @@ data:
       val:
         batch_size: *BATCH_SIZE
         num_workers: *N_DATA_WORKERS
+        shuffle: true
       test:
         batch_size: *BATCH_SIZE
         num_workers: *N_DATA_WORKERS
