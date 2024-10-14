@@ -13,9 +13,6 @@ permissions:
 jobs:
   release-pypi:
     runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-      contents: write
     steps:
       - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
       - name: Setting up PDM
@@ -31,10 +28,6 @@ jobs:
         run: |
           git config user.email "action@github.com"
           git config user.name "GitHub Action"
-      - name: Bumping version
-        run: |
-          nox -s bump -- to "${{ github.ref_name }}"
-          git push origin main
       - name: Build artifacts
         run: |
           nox -s build
