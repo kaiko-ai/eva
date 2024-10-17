@@ -34,11 +34,9 @@ model:
         output_size: &NUM_CLASSES 6
     criterion: torch.nn.CrossEntropyLoss
     optimizer:
-      class_path: torch.optim.SGD
+      class_path: torch.optim.AdamW
       init_args:
-        lr: &LR_VALUE ${oc.env:LR_VALUE, 0.00004}
-        momentum: 0.9
-        weight_decay: 0.0
+        lr: ${oc.env:LR_VALUE, 0.0003}
     lr_scheduler:
       class_path: torch.optim.lr_scheduler.CosineAnnealingLR
       init_args:
