@@ -172,15 +172,14 @@ class EmbeddingsWriter(callbacks.BasePredictionWriter, abc.ABC):
 
     def _check_if_exists(self) -> None:
         """Checks if the output directory already exists and if it should be overwritten."""
-        try:
-            os.makedirs(self._output_dir, exist_ok=self._overwrite)
-        except FileExistsError as e:
+        os.makedirs(self._output_dir, exist_ok=True)
+        if os.path.exists(os.path.join(self._output_dir, "manifest.csv")) and not self._overwrite:
             raise FileExistsError(
                 f"The embeddings output directory already exists: {self._output_dir}. This "
                 "either means that they have been computed before or that a wrong output "
                 "directory is being used. Consider using `eva fit` instead, selecting a "
                 "different output directory or setting overwrite=True."
-            ) from e
+            )
         os.makedirs(self._output_dir, exist_ok=True)
 
 
