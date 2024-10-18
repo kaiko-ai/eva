@@ -212,7 +212,10 @@ and [tutorials](https://kaiko-ai.github.io/eva/dev/user-guide/advanced/replicate
 
 ## Leaderboards
 
-For the latest FM leaderboards please refer to eva's [documentation](https://kaiko-ai.github.io/eva/main/leaderboards/).
+The following table shows the FMs we have evaluated with _`eva`_. For more detailed information about the evaluation process, please refer to eva's [documentation](https://kaiko-ai.github.io/eva/main/leaderboards/).
+
+![Pathology Leaderboard](./docs/images/leaderboard.svg "a title")
+
 
 ## Contributing
 
