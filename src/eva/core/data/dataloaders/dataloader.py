@@ -38,7 +38,7 @@ class DataLoader:
     Mutually exclusive with `batch_size`, `shuffle`, `sampler` and `drop_last`.
     """
 
-    num_workers: int = multiprocessing.cpu_count()
+    num_workers: int | None = None
     """How many workers to use for loading the data.
 
     By default, it will use the number of CPUs available.
@@ -71,7 +71,7 @@ class DataLoader:
             shuffle=self.shuffle,
             sampler=self.sampler,
             batch_sampler=self.batch_sampler,
-            num_workers=self.num_workers,
+            num_workers=self.num_workers or multiprocessing.cpu_count(),
             collate_fn=self.collate_fn,
             pin_memory=self.pin_memory,
             drop_last=self.drop_last,

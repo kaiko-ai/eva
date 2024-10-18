@@ -83,7 +83,7 @@ data:
           embeddings_transforms:
             class_path: eva.core.data.transforms.Pad2DTensor
             init_args:
-              pad_size: &N_PATCHES ${oc.env:N_PATCHES, 500}
+              pad_size: &N_PATCHES ${oc.env:N_PATCHES, 1000}
           target_transforms:
             class_path: eva.core.data.transforms.dtype.ArrayToFloatTensor
       val:
@@ -126,10 +126,14 @@ data:
     dataloaders:
       train:
         batch_size: &BATCH_SIZE ${oc.env:BATCH_SIZE, 32}
+        num_workers: &N_DATA_WORKERS ${oc.env:N_DATA_WORKERS, 4}
         shuffle: true
       val:
         batch_size: *BATCH_SIZE
+        num_workers: *N_DATA_WORKERS
       test:
         batch_size: *BATCH_SIZE
+        num_workers: *N_DATA_WORKERS
       predict:
         batch_size: &PREDICT_BATCH_SIZE ${oc.env:PREDICT_BATCH_SIZE, 64}
+        num_workers: *N_DATA_WORKERS
