@@ -27,7 +27,7 @@ For details on the FM-backbones and instructions to replicate the results, check
 
 ## Evaluation protocol
 
-*eva* uses a task- & model-independent and fixed default set up which closely follows the standard evaluation protocol proposed by [1] (with adjustments for slide-level tasks to ensure convergence and computational efficiency).
+*eva* uses a fixed protocol customized to each category of tasks. The setup has proven to be performant and robust independent of task and model size & architecture and generally prioritizes fairness and comparability over state-of-the-art performance.
 
 We selected this approach to prioritize reliable, robust and fair FM-evaluation while being in line with common literature.
 
@@ -56,6 +56,3 @@ We selected this approach to prioritize reliable, robust and fair FM-evaluation 
 (2) Lower cap at a minimum of 8 epochs.
 
 (3) Number of patches per slide depends on task and slide size. E.g. for `PANDASmall` and `Camelyon16Small` we use a max of 200 and 1000 random patches per slide respectively.
-
-
-- [1]: [Virchow: A Million-Slide Digital Pathology Foundation Model, 2024](https://arxiv.org/pdf/2309.07778.pdf)
