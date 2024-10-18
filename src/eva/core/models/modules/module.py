@@ -50,8 +50,13 @@ class ModelModule(pl.LightningModule):
     @property
     def metrics_device(self) -> torch.device:
         """Returns the device by which the metrics should be calculated."""
-        device = os.getenv("METRICS_DEVICE", "cpu")
-        return self.device if device is None else torch.device(device)
+        device = os.getenv("METRICS_DEVICE", None)
+        if device is not None:
+            return torch.device(device)
+        elif self.device == torch.device("mps"):
+            # mps seems to have compatibility issues with segmentation metrics
+            return torch.device("cpu")
+        return self.device
 
     @override
     def on_fit_start(self) -> None:
