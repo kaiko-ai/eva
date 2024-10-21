@@ -30,6 +30,7 @@ class SemanticSegmentationModule(module.ModelModule):
         lr_scheduler: LRSchedulerCallable = lr_scheduler.ConstantLR,
         metrics: metrics_lib.MetricsSchema | None = None,
         postprocess: batch_postprocess.BatchPostProcess | None = None,
+        use_input_image: bool = False,
     ) -> None:
         """Initializes the neural net head module.
 
@@ -57,6 +58,7 @@ class SemanticSegmentationModule(module.ModelModule):
         self.lr_multiplier_encoder = lr_multiplier_encoder
         self.optimizer = optimizer
         self.lr_scheduler = lr_scheduler
+        self.use_input_image = use_input_image
 
     @override
     def configure_model(self) -> None:
@@ -103,7 +105,10 @@ class SemanticSegmentationModule(module.ModelModule):
             )
 
         patch_embeddings = self.encoder(inputs) if self.encoder else inputs
-        return self.decoder(patch_embeddings, to_size or inputs.shape[-2:])
+        if self.use_input_image:
+            return self.decoder(patch_embeddings, to_size or inputs.shape[-2:], inputs)
+        else:
+            return self.decoder(patch_embeddings, to_size or inputs.shape[-2:])
 
     @override
     def training_step(self, batch: INPUT_TENSOR_BATCH, *args: Any, **kwargs: Any) -> STEP_OUTPUT:
