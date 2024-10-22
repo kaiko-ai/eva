@@ -23,7 +23,7 @@ def histai_hibou_b(out_indices: int | Tuple[int, ...] | None = None) -> nn.Modul
         model_name="histai/hibou-B",
         out_indices=out_indices,
         model_kwargs={"trust_remote_code": True},
-        transform_args={"ignore_remaining_dims": True} if out_indices is not None else None,
+        transform_args={"num_reg_tokens": 4} if out_indices is not None else None,
     )
 
 
@@ -42,5 +42,5 @@ def histai_hibou_l(out_indices: int | Tuple[int, ...] | None = None) -> nn.Modul
         model_name="histai/hibou-L",
         out_indices=out_indices,
         model_kwargs={"trust_remote_code": True},
-        transform_args={"ignore_remaining_dims": True} if out_indices is not None else None,
+        transform_args={"num_reg_tokens": 4} if out_indices is not None else None,
     )

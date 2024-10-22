@@ -14,6 +14,11 @@ from eva.core.models import transforms, wrappers
     [
         ("hf-internal-testing/tiny-random-ViTModel", None, (16, 226, 32)),
         ("hf-internal-testing/tiny-random-ViTModel", transforms.ExtractCLSFeatures(), (16, 32)),
+        (
+            "hf-internal-testing/tiny-random-ViTModel",
+            transforms.ExtractCLSFeatures(include_patch_tokens=True),
+            (16, 64),
+        ),
     ],
 )
 def test_huggingface_model(

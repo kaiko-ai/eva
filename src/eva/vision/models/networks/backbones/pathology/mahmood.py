@@ -9,6 +9,7 @@ from loguru import logger
 from torch import nn
 
 from eva.vision.models import wrappers
+from eva.vision.models.networks.backbones import _utils
 from eva.vision.models.networks.backbones.registry import register_model
 
 
@@ -31,19 +32,11 @@ def mahmood_uni(
     Returns:
         The model instance.
     """
-    token = hf_token or os.environ.get("HF_TOKEN")
-    if not token:
-        raise ValueError(
-            "Please provide a HuggingFace token to download the model. "
-            "You can either pass it as an argument or set the env variable HF_TOKEN."
-        )
-
     checkpoint_path = os.path.join(download_dir, "pytorch_model.bin")
-
     if not os.path.exists(checkpoint_path):
         logger.info(f"Downloading the model checkpoint to {download_dir} ...")
         os.makedirs(download_dir, exist_ok=True)
-        huggingface_hub.login(token=token)
+        _utils.huggingface_login(hf_token)
         huggingface_hub.hf_hub_download(
             "MahmoodLab/UNI",
             filename="pytorch_model.bin",
