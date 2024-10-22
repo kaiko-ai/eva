@@ -53,7 +53,7 @@ class ModelModule(pl.LightningModule):
         device = os.getenv("METRICS_DEVICE", None)
         if device is not None:
             return torch.device(device)
-        elif self.device == torch.device("mps"):
+        elif self.device.type == "mps":
             # mps seems to have compatibility issues with segmentation metrics
             return torch.device("cpu")
         return self.device
