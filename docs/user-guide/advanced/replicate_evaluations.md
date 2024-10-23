@@ -218,6 +218,19 @@ IN_FEATURES=1024 \
 eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
 ```
 
+### Virchow2 (paige.ai) - DINOv2 ViT-H14 (3.1M Slides) [[8]](#references)
+To evaluate [paige.ai's](https://www.paige.ai/) FM with DINOv2 ViT-H14 backbone, pretrained on
+a proprietary dataset of 3.1M million slides, available for download on
+[HuggingFace](https://huggingface.co/paige-ai/Virchow2), run:
+
+```
+MODEL_NAME=paige/virchow2 \
+NORMALIZE_MEAN="[0.485,0.456,0.406]" \
+NORMALIZE_STD="[0.229,0.224,0.225]" \
+IN_FEATURES=1280 \
+eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
+```
+
 
 ## References
 
@@ -234,5 +247,7 @@ eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
  [6]: Xu, Hanwen, et al. "A whole-slide foundation model for digital pathology from real-world data." Nature (2024): 1-8.
 
  [7]: Nechaev, Dmitry, Alexey Pchelnikov, and Ekaterina Ivanova. "Hibou: A Family of Foundational Vision Transformers for Pathology." arXiv preprint arXiv:2406.05074 (2024).
+
+ [8]: Zimmermann, Eric, et al. "Virchow 2: Scaling Self-Supervised Mixed Magnification Models in Pathology." arXiv preprint arXiv:2408.00738 (2024).
 
  [9]: Filiot, Alexandre, et al. "Phikon-v2, A large and public feature extractor for biomarker prediction." arXiv preprint arXiv:2409.09173 (2024).
