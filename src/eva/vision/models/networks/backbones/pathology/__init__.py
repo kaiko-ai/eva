@@ -13,6 +13,7 @@ from eva.vision.models.networks.backbones.pathology.kaiko import (
 from eva.vision.models.networks.backbones.pathology.lunit import lunit_vits8, lunit_vits16
 from eva.vision.models.networks.backbones.pathology.mahmood import mahmood_uni
 from eva.vision.models.networks.backbones.pathology.owkin import owkin_phikon
+from eva.vision.models.networks.backbones.pathology.paige import paige_virchow2
 
 __all__ = [
     "kaiko_vitb16",
@@ -28,4 +29,5 @@ __all__ = [
     "prov_gigapath",
     "histai_hibou_b",
     "histai_hibou_l",
+    "paige_virchow2",
 ]
