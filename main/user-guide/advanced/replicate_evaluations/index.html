@@ -2788,6 +2788,16 @@ a proprietary dataset of one million slides, available for download on
 </span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>IN_FEATURES=1024 \
 </span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>eva predict_fit --config configs/vision/pathology/offline/&lt;task&gt;.yaml
 </span></code></pre></div>
+<h3 id="virchow2-paigeai-dinov2-vit-h14-31m-slides-8">Virchow2 (paige.ai) - DINOv2 ViT-H14 (3.1M Slides) <a href="#references">[8]</a></h3>
+<p>To evaluate <a href="https://www.paige.ai/">paige.ai's</a> FM with DINOv2 ViT-H14 backbone, pretrained on
+a proprietary dataset of 3.1M million slides, available for download on
+<a href="https://huggingface.co/paige-ai/Virchow2">HuggingFace</a>, run:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>MODEL_NAME=paige/virchow2 \
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>NORMALIZE_MEAN=&quot;[0.485,0.456,0.406]&quot; \
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>NORMALIZE_STD=&quot;[0.229,0.224,0.225]&quot; \
+</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>IN_FEATURES=1280 \
+</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>eva predict_fit --config configs/vision/pathology/offline/&lt;task&gt;.yaml
+</span></code></pre></div>
 <h2 id="references">References</h2>
 <p>[1]: Kang, Mingu, et al. "Benchmarking self-supervised learning on diverse pathology datasets." Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. 2023.</p>
 <p>[2]: Filiot, Alexandre, et al. "Scaling self-supervised learning for histopathology with masked image modeling." medRxiv (2023): 2023-07.</p>
@@ -2796,6 +2806,7 @@ a proprietary dataset of one million slides, available for download on
 <p>[5]: Saillard, et al. "H-optimus-0" https://github.com/bioptimus/releases/tree/main/models/h-optimus/v0 (2024).</p>
 <p>[6]: Xu, Hanwen, et al. "A whole-slide foundation model for digital pathology from real-world data." Nature (2024): 1-8.</p>
 <p>[7]: Nechaev, Dmitry, Alexey Pchelnikov, and Ekaterina Ivanova. "Hibou: A Family of Foundational Vision Transformers for Pathology." arXiv preprint arXiv:2406.05074 (2024).</p>
+<p>[8]: Zimmermann, Eric, et al. "Virchow 2: Scaling Self-Supervised Mixed Magnification Models in Pathology." arXiv preprint arXiv:2408.00738 (2024).</p>
 
 
 
