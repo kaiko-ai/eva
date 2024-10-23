@@ -2656,7 +2656,7 @@ You will need to download the config files and then in the following commands re
 </ul>
 <h2 id="pathology-fms">Pathology FMs</h2>
 <h3 id="dino-vit-s16-random-weights">DINO ViT-S16 (random weights)</h3>
-<p>Evaluating the backbone with randomly initialized weights serves as a baseline to compare the pretrained FMs to an FM that produces embeddings without any prior learning on image tasks. To evaluate, run:</p>
+<p>Evaluating the backbone with randomly initialized weights serves as a baseline to compare the pretrained FMs to a FM that produces embeddings without any prior learning on image tasks. To evaluate, run:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>MODEL_NAME=&quot;universal/vit_small_patch16_224_random&quot; \
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>NORMALIZE_MEAN=&quot;[0.485,0.456,0.406]&quot; \
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>NORMALIZE_STD=&quot;[0.229,0.224,0.225]&quot; \
@@ -2688,7 +2688,7 @@ on <a href="https://github.com/lunit-io/benchmark-ssl-pathology/releases/">GitHu
 </span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>eva predict_fit --config configs/vision/pathology/offline/&lt;task&gt;.yaml
 </span></code></pre></div>
 <h3 id="phikon-owkin-ibot-vit-b16-tcga-2">Phikon (Owkin) - iBOT ViT-B16 (TCGA) <a href="#references">[2]</a></h3>
-<p><a href="https://www.owkin.com/">Owkin</a> released the weights for "Phikon", an FM trained with iBOT on TCGA data, via
+<p><a href="https://www.owkin.com/">Owkin</a> released the weights for "Phikon", a FM trained with iBOT on TCGA data, via
 <a href="https://huggingface.co/owkin/phikon">HuggingFace</a>. To evaluate, run:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>MODEL_NAME=pathology/owkin_phikon \
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>NORMALIZE_MEAN=&quot;[0.485,0.456,0.406]&quot; \
@@ -2696,107 +2696,117 @@ on <a href="https://github.com/lunit-io/benchmark-ssl-pathology/releases/">GitHu
 </span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>IN_FEATURES=768 \
 </span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>eva predict_fit --config configs/vision/pathology/offline/&lt;task&gt;.yaml
 </span></code></pre></div>
-<h3 id="uni-mahmoodlab-dinov2-vit-l16-mass-100k-3">UNI (MahmoodLab) - DINOv2 ViT-L16 (Mass-100k) <a href="#references">[3]</a></h3>
-<p>The UNI FM by MahmoodLab is available on <a href="https://huggingface.co/MahmoodLab/UNI">HuggingFace</a>. Note that access needs to 
-be requested.</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>MODEL_NAME=pathology/mahmood_uni \
+<h3 id="phikon-v2-owkin-dinov2-vit-l16-pancan-xl-9">Phikon-v2 (Owkin) - DINOv2 ViT-L16 (PANCAN-XL) <a href="#references">[9]</a></h3>
+<p><a href="https://www.owkin.com/">Owkin</a> released the weights for "Phikon-v2", a FM trained with DINOv2
+on the PANCAN-XL dataset (450M 20x magnification histology images sampled from 60K WSIs), via
+<a href="https://huggingface.co/owkin/phikon-v2">HuggingFace</a>. To evaluate, run:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>MODEL_NAME=pathology/owkin_phikon_v2 \
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>NORMALIZE_MEAN=&quot;[0.485,0.456,0.406]&quot; \
 </span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>NORMALIZE_STD=&quot;[0.229,0.224,0.225]&quot; \
 </span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>IN_FEATURES=1024 \
-</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>HF_TOKEN=&lt;your-huggingace-token-for-downloading-the-model&gt; \
-</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>eva predict_fit --config configs/vision/phikon/offline/&lt;task&gt;.yaml
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>eva predict_fit --config configs/vision/pathology/offline/&lt;task&gt;.yaml
+</span></code></pre></div>
+<h3 id="uni-mahmoodlab-dinov2-vit-l16-mass-100k-3">UNI (MahmoodLab) - DINOv2 ViT-L16 (Mass-100k) <a href="#references">[3]</a></h3>
+<p>The UNI FM by MahmoodLab is available on <a href="https://huggingface.co/MahmoodLab/UNI">HuggingFace</a>. Note that access needs to 
+be requested.</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>MODEL_NAME=pathology/mahmood_uni \
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>NORMALIZE_MEAN=&quot;[0.485,0.456,0.406]&quot; \
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>NORMALIZE_STD=&quot;[0.229,0.224,0.225]&quot; \
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>IN_FEATURES=1024 \
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>HF_TOKEN=&lt;your-huggingace-token-for-downloading-the-model&gt; \
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>eva predict_fit --config configs/vision/phikon/offline/&lt;task&gt;.yaml
 </span></code></pre></div>
 <h3 id="kaikoai-dino-vit-s16-tcga-4">kaiko.ai - DINO ViT-S16 (TCGA) <a href="#references">[4]</a></h3>
 <p>To evaluate <a href="https://www.kaiko.ai/">kaiko.ai's</a> FM with DINO ViT-S16 backbone, pretrained on TCGA data 
 and available on <a href="https://github.com/kaiko-ai/towards_large_pathology_fms">GitHub</a>, run:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>MODEL_NAME=pathology/kaiko_vits16 \
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>NORMALIZE_MEAN=&quot;[0.5,0.5,0.5]&quot; \
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>NORMALIZE_STD=&quot;[0.5,0.5,0.5]&quot; \
-</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>IN_FEATURES=384 \
-</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>eva predict_fit --config configs/vision/pathology/offline/&lt;task&gt;.yaml
-</span></code></pre></div>
-<h3 id="kaikoai-dino-vit-s8-tcga-4">kaiko.ai - DINO ViT-S8 (TCGA) <a href="#references">[4]</a></h3>
-<p>To evaluate <a href="https://www.kaiko.ai/">kaiko.ai's</a> FM with DINO ViT-S8 backbone, pretrained on TCGA data 
-and available on <a href="https://github.com/kaiko-ai/towards_large_pathology_fms">GitHub</a>, run:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>MODEL_NAME=pathology/kaiko_vits8 \
+<div class="language-text highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>MODEL_NAME=pathology/kaiko_vits16 \
 </span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>NORMALIZE_MEAN=&quot;[0.5,0.5,0.5]&quot; \
 </span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>NORMALIZE_STD=&quot;[0.5,0.5,0.5]&quot; \
 </span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>IN_FEATURES=384 \
 </span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>eva predict_fit --config configs/vision/pathology/offline/&lt;task&gt;.yaml
 </span></code></pre></div>
+<h3 id="kaikoai-dino-vit-s8-tcga-4">kaiko.ai - DINO ViT-S8 (TCGA) <a href="#references">[4]</a></h3>
+<p>To evaluate <a href="https://www.kaiko.ai/">kaiko.ai's</a> FM with DINO ViT-S8 backbone, pretrained on TCGA data 
+and available on <a href="https://github.com/kaiko-ai/towards_large_pathology_fms">GitHub</a>, run:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>MODEL_NAME=pathology/kaiko_vits8 \
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>NORMALIZE_MEAN=&quot;[0.5,0.5,0.5]&quot; \
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>NORMALIZE_STD=&quot;[0.5,0.5,0.5]&quot; \
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>IN_FEATURES=384 \
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>eva predict_fit --config configs/vision/pathology/offline/&lt;task&gt;.yaml
+</span></code></pre></div>
 <h3 id="kaikoai-dino-vit-b16-tcga-4">kaiko.ai - DINO ViT-B16 (TCGA) <a href="#references">[4]</a></h3>
 <p>To evaluate <a href="https://www.kaiko.ai/">kaiko.ai's</a> FM with DINO ViT-B16 backbone, pretrained on TCGA data 
 and available on <a href="https://github.com/kaiko-ai/towards_large_pathology_fms">GitHub</a>, run:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>MODEL_NAME=pathology/kaiko_vitb16 \
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>NORMALIZE_MEAN=&quot;[0.5,0.5,0.5]&quot; \
-</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>NORMALIZE_STD=&quot;[0.5,0.5,0.5]&quot; \
-</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>IN_FEATURES=768 \
-</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>eva predict_fit --config configs/vision/pathology/offline/&lt;task&gt;.yaml
-</span></code></pre></div>
-<h3 id="kaikoai-dino-vit-b8-tcga-4">kaiko.ai - DINO ViT-B8 (TCGA) <a href="#references">[4]</a></h3>
-<p>To evaluate <a href="https://www.kaiko.ai/">kaiko.ai's</a> FM with DINO ViT-B8 backbone, pretrained on TCGA data 
-and available on <a href="https://github.com/kaiko-ai/towards_large_pathology_fms">GitHub</a>, run:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>MODEL_NAME=pathology/kaiko_vitb8 \
+<div class="language-text highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>MODEL_NAME=pathology/kaiko_vitb16 \
 </span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>NORMALIZE_MEAN=&quot;[0.5,0.5,0.5]&quot; \
 </span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>NORMALIZE_STD=&quot;[0.5,0.5,0.5]&quot; \
 </span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>IN_FEATURES=768 \
 </span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>eva predict_fit --config configs/vision/pathology/offline/&lt;task&gt;.yaml
 </span></code></pre></div>
+<h3 id="kaikoai-dino-vit-b8-tcga-4">kaiko.ai - DINO ViT-B8 (TCGA) <a href="#references">[4]</a></h3>
+<p>To evaluate <a href="https://www.kaiko.ai/">kaiko.ai's</a> FM with DINO ViT-B8 backbone, pretrained on TCGA data 
+and available on <a href="https://github.com/kaiko-ai/towards_large_pathology_fms">GitHub</a>, run:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>MODEL_NAME=pathology/kaiko_vitb8 \
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>NORMALIZE_MEAN=&quot;[0.5,0.5,0.5]&quot; \
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>NORMALIZE_STD=&quot;[0.5,0.5,0.5]&quot; \
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>IN_FEATURES=768 \
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>eva predict_fit --config configs/vision/pathology/offline/&lt;task&gt;.yaml
+</span></code></pre></div>
 <h3 id="kaikoai-dinov2-vit-l14-tcga-4">kaiko.ai - DINOv2 ViT-L14 (TCGA) <a href="#references">[4]</a></h3>
 <p>To evaluate <a href="https://www.kaiko.ai/">kaiko.ai's</a> FM with DINOv2 ViT-L14 backbone, pretrained on TCGA data 
 and available on <a href="https://github.com/kaiko-ai/towards_large_pathology_fms">GitHub</a>, run:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>MODEL_NAME=pathology/kaiko_vitl14 \
-</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>NORMALIZE_MEAN=&quot;[0.5,0.5,0.5]&quot; \
-</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>NORMALIZE_STD=&quot;[0.5,0.5,0.5]&quot; \
-</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>IN_FEATURES=1024 \
-</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>eva predict_fit --config configs/vision/pathology/offline/&lt;task&gt;.yaml
+<div class="language-text highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>MODEL_NAME=pathology/kaiko_vitl14 \
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>NORMALIZE_MEAN=&quot;[0.5,0.5,0.5]&quot; \
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>NORMALIZE_STD=&quot;[0.5,0.5,0.5]&quot; \
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>IN_FEATURES=1024 \
+</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>eva predict_fit --config configs/vision/pathology/offline/&lt;task&gt;.yaml
 </span></code></pre></div>
 <h3 id="h-optimus-0-bioptimus-vit-g14-5">H-optimus-0 (Bioptimus) - ViT-G14 <a href="#references">[5]</a></h3>
 <p><a href="https://www.bioptimus.com">Bioptimus</a> released their H-optimus-0 which was trained on a collection of 500,000 H&amp;E slides. The model weights
 were released on <a href="https://huggingface.co/bioptimus/H-optimus-0">HuggingFace</a>.</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>MODEL_NAME=pathology/bioptimus_h_optimus_0 \
-</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>NORMALIZE_MEAN=&quot;[0.707223,0.578729,0.703617]&quot; \
-</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>NORMALIZE_STD=&quot;[0.211883,0.230117,0.177517]&quot; \
-</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>IN_FEATURES=1536 \
-</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>eva predict_fit --config configs/vision/pathology/offline/&lt;task&gt;.yaml
+<div class="language-text highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>MODEL_NAME=pathology/bioptimus_h_optimus_0 \
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>NORMALIZE_MEAN=&quot;[0.707223,0.578729,0.703617]&quot; \
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>NORMALIZE_STD=&quot;[0.211883,0.230117,0.177517]&quot; \
+</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>IN_FEATURES=1536 \
+</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>eva predict_fit --config configs/vision/pathology/offline/&lt;task&gt;.yaml
 </span></code></pre></div>
 <h3 id="prov-gigapath-dinov2-vit-g14-6">Prov-GigaPath - DINOv2 ViT-G14 <a href="#references">[6]</a></h3>
 <p>To evaluate the <a href="https://github.com/prov-gigapath/prov-gigapath">Prov-Gigapath</a> model, available on <a href="https://huggingface.co/prov-gigapath/prov-gigapath">HuggingFace</a>, run:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>MODEL_NAME=pathology/prov_gigapath \
-</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>NORMALIZE_MEAN=&quot;[0.485,0.456,0.406]&quot; \
-</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>NORMALIZE_STD=&quot;[0.229,0.224,0.225]&quot; \
-</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>IN_FEATURES=1536 \
-</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>eva predict_fit --config configs/vision/pathology/offline/&lt;task&gt;.yaml
+<div class="language-text highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>MODEL_NAME=pathology/prov_gigapath \
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>NORMALIZE_MEAN=&quot;[0.485,0.456,0.406]&quot; \
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>NORMALIZE_STD=&quot;[0.229,0.224,0.225]&quot; \
+</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>IN_FEATURES=1536 \
+</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>eva predict_fit --config configs/vision/pathology/offline/&lt;task&gt;.yaml
 </span></code></pre></div>
 <h3 id="hibou-b-histai-dinov2-vit-b14-1m-slides-7">hibou-B (hist.ai) - DINOv2 ViT-B14 (1M Slides) <a href="#references">[7]</a></h3>
 <p>To evaluate <a href="https://www.hist.ai/">hist.ai's</a> FM with DINOv2 ViT-B14 backbone, pretrained on
 a proprietary dataset of one million slides, available for download on
 <a href="https://huggingface.co/histai/hibou-b">HuggingFace</a>, run: </p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>MODEL_NAME=pathology/histai_hibou_b \
-</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>NORMALIZE_MEAN=&quot;[0.7068,0.5755,0.722]&quot; \
-</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>NORMALIZE_STD=&quot;[0.195,0.2316,0.1816]&quot; \
-</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>IN_FEATURES=768 \
-</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>eva predict_fit --config configs/vision/pathology/offline/&lt;task&gt;.yaml
+<div class="language-text highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>MODEL_NAME=pathology/histai_hibou_b \
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>NORMALIZE_MEAN=&quot;[0.7068,0.5755,0.722]&quot; \
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>NORMALIZE_STD=&quot;[0.195,0.2316,0.1816]&quot; \
+</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>IN_FEATURES=768 \
+</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>eva predict_fit --config configs/vision/pathology/offline/&lt;task&gt;.yaml
 </span></code></pre></div>
 <h3 id="hibou-l-histai-dinov2-vit-l14-1m-slides-7">hibou-L (hist.ai) - DINOv2 ViT-L14 (1M Slides) <a href="#references">[7]</a></h3>
 <p>To evaluate <a href="https://www.hist.ai/">hist.ai's</a> FM with DINOv2 ViT-L14 backbone, pretrained on
 a proprietary dataset of one million slides, available for download on
 <a href="https://huggingface.co/histai/hibou-l">HuggingFace</a>, run: </p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>MODEL_NAME=pathology/histai_hibou_l \
-</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>NORMALIZE_MEAN=&quot;[0.7068,0.5755,0.722]&quot; \
-</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>NORMALIZE_STD=&quot;[0.195,0.2316,0.1816]&quot; \
-</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>IN_FEATURES=1024 \
-</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>eva predict_fit --config configs/vision/pathology/offline/&lt;task&gt;.yaml
+<div class="language-text highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>MODEL_NAME=pathology/histai_hibou_l \
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>NORMALIZE_MEAN=&quot;[0.7068,0.5755,0.722]&quot; \
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>NORMALIZE_STD=&quot;[0.195,0.2316,0.1816]&quot; \
+</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>IN_FEATURES=1024 \
+</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>eva predict_fit --config configs/vision/pathology/offline/&lt;task&gt;.yaml
 </span></code></pre></div>
 <h3 id="virchow2-paigeai-dinov2-vit-h14-31m-slides-8">Virchow2 (paige.ai) - DINOv2 ViT-H14 (3.1M Slides) <a href="#references">[8]</a></h3>
 <p>To evaluate <a href="https://www.paige.ai/">paige.ai's</a> FM with DINOv2 ViT-H14 backbone, pretrained on
 a proprietary dataset of 3.1M million slides, available for download on
 <a href="https://huggingface.co/paige-ai/Virchow2">HuggingFace</a>, run:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>MODEL_NAME=paige/virchow2 \
-</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>NORMALIZE_MEAN=&quot;[0.485,0.456,0.406]&quot; \
-</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>NORMALIZE_STD=&quot;[0.229,0.224,0.225]&quot; \
-</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>IN_FEATURES=1280 \
-</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>eva predict_fit --config configs/vision/pathology/offline/&lt;task&gt;.yaml
+<div class="language-text highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>MODEL_NAME=paige/virchow2 \
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>NORMALIZE_MEAN=&quot;[0.485,0.456,0.406]&quot; \
+</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>NORMALIZE_STD=&quot;[0.229,0.224,0.225]&quot; \
+</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a>IN_FEATURES=1280 \
+</span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a>eva predict_fit --config configs/vision/pathology/offline/&lt;task&gt;.yaml
 </span></code></pre></div>
 <h2 id="references">References</h2>
 <p>[1]: Kang, Mingu, et al. "Benchmarking self-supervised learning on diverse pathology datasets." Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. 2023.</p>
@@ -2807,6 +2817,7 @@ a proprietary dataset of 3.1M million slides, available for download on
 <p>[6]: Xu, Hanwen, et al. "A whole-slide foundation model for digital pathology from real-world data." Nature (2024): 1-8.</p>
 <p>[7]: Nechaev, Dmitry, Alexey Pchelnikov, and Ekaterina Ivanova. "Hibou: A Family of Foundational Vision Transformers for Pathology." arXiv preprint arXiv:2406.05074 (2024).</p>
 <p>[8]: Zimmermann, Eric, et al. "Virchow 2: Scaling Self-Supervised Mixed Magnification Models in Pathology." arXiv preprint arXiv:2408.00738 (2024).</p>
+<p>[9]: Filiot, Alexandre, et al. "Phikon-v2, A large and public feature extractor for biomarker prediction." arXiv preprint arXiv:2409.09173 (2024).</p>
 
 
 
