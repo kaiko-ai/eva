@@ -12,6 +12,9 @@ from eva.vision.models.networks.backbones.registry import register_model
 def histai_hibou_b(out_indices: int | Tuple[int, ...] | None = None) -> nn.Module:
     """Initializes the hibou-B pathology FM by hist.ai (https://huggingface.co/histai/hibou-B).
 
+    Uses a customized implementation of the DINOv2 architecture from the transformers
+    library to add support for registers, which requires the trust_remote_code=True flag.
+
     Args:
         out_indices: Whether and which multi-level patch embeddings to return.
             Currently only out_indices=1 is supported.
@@ -30,6 +33,9 @@ def histai_hibou_b(out_indices: int | Tuple[int, ...] | None = None) -> nn.Modul
 @register_model("pathology/histai_hibou_l")
 def histai_hibou_l(out_indices: int | Tuple[int, ...] | None = None) -> nn.Module:
     """Initializes the hibou-L pathology FM by hist.ai (https://huggingface.co/histai/hibou-L).
+
+    Uses a customized implementation of the DINOv2 architecture from the transformers
+    library to add support for registers, which requires the trust_remote_code=True flag.
 
     Args:
         out_indices: Whether and which multi-level patch embeddings to return.
