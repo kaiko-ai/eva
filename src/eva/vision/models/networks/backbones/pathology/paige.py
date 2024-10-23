@@ -14,7 +14,7 @@ from eva.vision.models.networks.backbones import _utils
 from eva.vision.models.networks.backbones.registry import register_model
 
 
-@register_model("paige/virchow2")
+@register_model("pathology/paige_virchow2")
 def paige_virchow2(
     dynamic_img_size: bool = True,
     out_indices: int | Tuple[int, ...] | None = None,
