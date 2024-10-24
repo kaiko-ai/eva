@@ -1,7 +1,9 @@
 """Utilis for backbone networks."""
 
+import os
 from typing import Any, Dict, Tuple
 
+import huggingface_hub
 from torch import nn
 
 from eva import models
@@ -37,3 +39,13 @@ def load_hugingface_model(
         tensor_transforms=tensor_transforms,
         model_kwargs=model_kwargs,
     )
+
+
+def huggingface_login(hf_token: str | None = None):
+    token = hf_token or os.environ.get("HF_TOKEN")
+    if not token:
+        raise ValueError(
+            "Please provide a HuggingFace token to download the model. "
+            "You can either pass it as an argument or set the env variable HF_TOKEN."
+        )
+    huggingface_hub.login(token=token)
