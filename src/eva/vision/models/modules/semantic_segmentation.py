@@ -15,6 +15,7 @@ from eva.core.models.modules.typings import INPUT_BATCH, INPUT_TENSOR_BATCH
 from eva.core.models.modules.utils import batch_postprocess, grad
 from eva.core.utils import parser
 from eva.vision.models.networks import decoders
+from eva.vision.models.networks.decoders.segmentation.typings import DecoderInputs
 
 
 class SemanticSegmentationModule(module.ModelModule):
@@ -101,9 +102,9 @@ class SemanticSegmentationModule(module.ModelModule):
                 "Please provide the expected `to_size` that the "
                 "decoder should map the embeddings (`inputs`) to."
             )
-
-        patch_embeddings = self.encoder(inputs) if self.encoder else inputs
-        return self.decoder(patch_embeddings, to_size or inputs.shape[-2:])
+        features = self.encoder(inputs) if self.encoder else inputs
+        decoder_inputs = DecoderInputs(features, inputs.shape[-2:], inputs)  # type: ignore
+        return self.decoder(decoder_inputs)
 
     @override
     def training_step(self, batch: INPUT_TENSOR_BATCH, *args: Any, **kwargs: Any) -> STEP_OUTPUT:

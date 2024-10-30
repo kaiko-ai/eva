@@ -1,11 +1,19 @@
 """Segmentation decoder heads API."""
 
-from eva.vision.models.networks.decoders.segmentation.common import (
+from eva.vision.models.networks.decoders.segmentation.decoder2d import Decoder2D
+from eva.vision.models.networks.decoders.segmentation.linear import LinearDecoder
+from eva.vision.models.networks.decoders.segmentation.semantic import (
     ConvDecoder1x1,
     ConvDecoderMS,
+    ConvDecoderWithImagePrior,
     SingleLinearDecoder,
 )
-from eva.vision.models.networks.decoders.segmentation.conv2d import ConvDecoder
-from eva.vision.models.networks.decoders.segmentation.linear import LinearDecoder
 
-__all__ = ["ConvDecoder1x1", "ConvDecoderMS", "SingleLinearDecoder", "ConvDecoder", "LinearDecoder"]
+__all__ = [
+    "ConvDecoder1x1",
+    "ConvDecoderMS",
+    "SingleLinearDecoder",
+    "ConvDecoderWithImagePrior",
+    "Decoder2D",
+    "LinearDecoder",
+]

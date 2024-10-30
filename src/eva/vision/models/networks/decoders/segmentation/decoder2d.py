@@ -1,19 +1,20 @@
 """Convolutional based semantic segmentation decoder."""
 
-from typing import List, Tuple
+from typing import List, Sequence, Tuple
 
 import torch
 from torch import nn
 from torch.nn import functional
 
-from eva.vision.models.networks.decoders import decoder
+from eva.vision.models.networks.decoders.segmentation import base
+from eva.vision.models.networks.decoders.segmentation.typings import DecoderInputs
 
 
-class ConvDecoder(decoder.Decoder):
-    """Convolutional segmentation decoder."""
+class Decoder2D(base.Decoder):
+    """Segmentation decoder for 2D applications."""
 
-    def __init__(self, layers: nn.Module) -> None:
-        """Initializes the convolutional based decoder head.
+    def __init__(self, layers: nn.Module, combine_features: bool = True) -> None:
+        """Initializes the based decoder head.
 
         Here the input nn layers will be directly applied to the
         features of shape (batch_size, hidden_size, n_patches_height,
@@ -21,13 +22,16 @@ class ConvDecoder(decoder.Decoder):
         Note the n_patches is also known as grid_size.
 
         Args:
-            layers: The convolutional layers to be used as the decoder head.
+            layers: The layers to be used as the decoder head.
+            combine_features: Whether to combine the features from different
+                feature levels into one tensor before applying the decoder head.
         """
         super().__init__()
 
         self._layers = layers
+        self._combine_features = combine_features
 
-    def _forward_features(self, features: List[torch.Tensor]) -> torch.Tensor:
+    def _forward_features(self, features: torch.Tensor | List[torch.Tensor]) -> torch.Tensor:
         """Forward function for multi-level feature maps to a single one.
 
         It will interpolate the features and concat them into a single tensor
@@ -63,7 +67,9 @@ class ConvDecoder(decoder.Decoder):
         ]
         return torch.cat(upsampled_features, dim=1)
 
-    def _forward_head(self, patch_embeddings: torch.Tensor) -> torch.Tensor:
+    def _forward_head(
+        self, patch_embeddings: torch.Tensor | Sequence[torch.Tensor]
+    ) -> torch.Tensor:
         """Forward of the decoder head.
 
         Args:
@@ -75,12 +81,12 @@ class ConvDecoder(decoder.Decoder):
         """
         return self._layers(patch_embeddings)
 
-    def _cls_seg(
+    def _upscale(
         self,
         logits: torch.Tensor,
         image_size: Tuple[int, int],
     ) -> torch.Tensor:
-        """Classify each pixel of the image.
+        """Upscales the calculated logits to the target image size.
 
         Args:
             logits: The decoder outputs of shape (batch_size, n_classes,
@@ -93,22 +99,18 @@ class ConvDecoder(decoder.Decoder):
         """
         return functional.interpolate(logits, image_size, mode="bilinear")
 
-    def forward(
-        self,
-        features: List[torch.Tensor],
-        image_size: Tuple[int, int],
-    ) -> torch.Tensor:
+    def forward(self, decoder_inputs: DecoderInputs) -> torch.Tensor:
         """Maps the patch embeddings to a segmentation mask of the image size.
 
         Args:
-            features: List of multi-level image features of shape (batch_size,
-                hidden_size, n_patches_height, n_patches_width).
-            image_size: The target image size (height, width).
+            decoder_inputs: Inputs required by the decoder.
 
         Returns:
             Tensor containing scores for all of the classes with shape
             (batch_size, n_classes, image_height, image_width).
         """
-        patch_embeddings = self._forward_features(features)
-        logits = self._forward_head(patch_embeddings)
-        return self._cls_seg(logits, image_size)
+        features, image_size, _ = DecoderInputs(*decoder_inputs)
+        if self._combine_features:
+            features = self._forward_features(features)
+        logits = self._forward_head(features)
+        return self._upscale(logits, image_size)

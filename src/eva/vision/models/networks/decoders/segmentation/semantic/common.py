@@ -7,10 +7,10 @@ output by an encoder into pixel-wise predictions for segmentation tasks.
 
 from torch import nn
 
-from eva.vision.models.networks.decoders.segmentation import conv2d, linear
+from eva.vision.models.networks.decoders.segmentation import decoder2d, linear
 
 
-class ConvDecoder1x1(conv2d.ConvDecoder):
+class ConvDecoder1x1(decoder2d.Decoder2D):
     """A convolutional decoder with a single 1x1 convolutional layer."""
 
     def __init__(self, in_features: int, num_classes: int) -> None:
@@ -29,7 +29,7 @@ class ConvDecoder1x1(conv2d.ConvDecoder):
         )
 
 
-class ConvDecoderMS(conv2d.ConvDecoder):
+class ConvDecoderMS(decoder2d.Decoder2D):
     """A multi-stage convolutional decoder with upsampling and convolutional layers.
 
     This decoder applies a series of upsampling and convolutional layers to transform
