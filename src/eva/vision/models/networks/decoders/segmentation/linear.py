@@ -6,10 +6,10 @@ import torch
 from torch import nn
 from torch.nn import functional
 
-from eva.vision.models.networks.decoders import decoder
+from eva.vision.models.networks.decoders.segmentation import base
 
 
-class LinearDecoder(decoder.Decoder):
+class LinearDecoder(base.Decoder):
     """Linear decoder."""
 
     def __init__(self, layers: nn.Module) -> None:

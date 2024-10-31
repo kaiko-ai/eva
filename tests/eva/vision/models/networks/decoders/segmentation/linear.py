@@ -7,7 +7,7 @@ import torch
 from torch import nn
 
 from eva.vision.models.networks.decoders import segmentation
-from eva.vision.models.networks.decoders.segmentation import common
+from eva.vision.models.networks.decoders.segmentation.semantic import common
 
 
 @pytest.mark.parametrize(

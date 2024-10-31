@@ -7,7 +7,7 @@ import torch
 from torch import nn
 
 from eva.vision.models.networks.decoders import segmentation
-from eva.vision.models.networks.decoders.segmentation import common
+from eva.vision.models.networks.decoders.segmentation.semantic import common
 
 
 @pytest.mark.parametrize(
@@ -51,7 +51,7 @@ from eva.vision.models.networks.decoders.segmentation import common
     ],
 )
 def test_conv_decoder(
-    conv_decoder: segmentation.ConvDecoder,
+    conv_decoder: segmentation.Decoder2D,
     features: List[torch.Tensor],
     image_size: Tuple[int, int],
     expected_shape: torch.Size,
@@ -65,6 +65,6 @@ def test_conv_decoder(
 @pytest.fixture(scope="function")
 def conv_decoder(
     layers: nn.Module,
-) -> segmentation.ConvDecoder:
+) -> segmentation.Decoder2D:
     """ConvDecoder fixture."""
-    return segmentation.ConvDecoder(layers=layers)
+    return segmentation.Decoder2D(layers=layers)

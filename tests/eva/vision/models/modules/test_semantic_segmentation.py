@@ -36,7 +36,7 @@ def test_semantic_segmentation_module_fit(
 def model(n_classes: int = 4) -> modules.SemanticSegmentationModule:
     """Returns a SemanticSegmentationModule model fixture."""
     return modules.SemanticSegmentationModule(
-        decoder=segmentation.ConvDecoder(
+        decoder=segmentation.Decoder2D(
             layers=nn.Conv2d(
                 in_channels=192,
                 out_channels=n_classes,
