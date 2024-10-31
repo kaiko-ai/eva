@@ -11,7 +11,7 @@ from eva.vision.models.networks.decoders.segmentation import decoder2d
 from eva.vision.models.networks.decoders.segmentation.typings import DecoderInputs
 
 
-class ConvDecoderWithImagePrior(decoder2d.Decoder2D):
+class ConvDecoderWithImage(decoder2d.Decoder2D):
     """A convolutional that in addition to encoded features, also takes the input image as input.
 
     In a first stage, the input features are upsampled and passed through a convolutional layer,

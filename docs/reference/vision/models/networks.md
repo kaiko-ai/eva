@@ -9,5 +9,5 @@ Reference information for the vision model `Networks` API.
 ::: eva.vision.models.networks.decoders.segmentation.ConvDecoderMS
 ::: eva.vision.models.networks.decoders.segmentation.LinearDecoder
 ::: eva.vision.models.networks.decoders.segmentation.SingleLinearDecoder
-::: eva.vision.models.networks.decoders.segmentation.ConvDecoderWithImagePrior
+::: eva.vision.models.networks.decoders.segmentation.ConvDecoderWithImage
 

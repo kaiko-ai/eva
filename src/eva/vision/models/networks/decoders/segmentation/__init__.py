@@ -5,7 +5,7 @@ from eva.vision.models.networks.decoders.segmentation.linear import LinearDecode
 from eva.vision.models.networks.decoders.segmentation.semantic import (
     ConvDecoder1x1,
     ConvDecoderMS,
-    ConvDecoderWithImagePrior,
+    ConvDecoderWithImage,
     SingleLinearDecoder,
 )
 
@@ -13,7 +13,7 @@ __all__ = [
     "ConvDecoder1x1",
     "ConvDecoderMS",
     "SingleLinearDecoder",
-    "ConvDecoderWithImagePrior",
+    "ConvDecoderWithImage",
     "Decoder2D",
     "LinearDecoder",
 ]

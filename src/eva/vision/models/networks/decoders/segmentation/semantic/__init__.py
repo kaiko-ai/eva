@@ -5,8 +5,8 @@ from eva.vision.models.networks.decoders.segmentation.semantic.common import (
     ConvDecoderMS,
     SingleLinearDecoder,
 )
-from eva.vision.models.networks.decoders.segmentation.semantic.with_image_prior import (
-    ConvDecoderWithImagePrior,
+from eva.vision.models.networks.decoders.segmentation.semantic.with_image import (
+    ConvDecoderWithImage,
 )
 
-__all__ = ["ConvDecoder1x1", "ConvDecoderMS", "SingleLinearDecoder", "ConvDecoderWithImagePrior"]
+__all__ = ["ConvDecoder1x1", "ConvDecoderMS", "SingleLinearDecoder", "ConvDecoderWithImage"]
