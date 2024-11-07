@@ -2,8 +2,8 @@
 trainer:
   class_path: eva.Trainer
   init_args:
-    n_runs: &N_RUNS ${oc.env:N_RUNS, 5}
-    default_root_dir: &LIGHTNING_ROOT ${oc.env:LIGHTNING_ROOT, logs/dino_vits16/online/mhist}
+    n_runs: &N_RUNS ${oc.env:N_RUNS, 1}
+    default_root_dir: &LIGHTNING_ROOT ${oc.env:LIGHTNING_ROOT, logs/dino_vits16/online/organ_a_mnist}
     max_steps: &MAX_STEPS ${oc.env:MAX_STEPS, 12500}
     callbacks:
       - class_path: eva.callbacks.ConfigurationLogger
@@ -28,7 +28,7 @@ trainer:
           mode: *MONITOR_METRIC_MODE
       - class_path: eva.callbacks.ClassificationEmbeddingsWriter
         init_args:
-          output_dir: &DATASET_EMBEDDINGS_ROOT ${oc.env:EMBEDDINGS_ROOT, ./data/embeddings}/${oc.env:MODEL_NAME, dino_vits16}/bach
+          output_dir: &DATASET_EMBEDDINGS_ROOT ${oc.env:EMBEDDINGS_ROOT, ./data/embeddings}/${oc.env:MODEL_NAME, dino_vits16}/organ_a_mnist
           dataloader_idx_map:
             0: train
             1: val
@@ -125,3 +125,5 @@ data:
         batch_size: *BATCH_SIZE
       test:
         batch_size: *BATCH_SIZE
+      predict:
+        batch_size: &PREDICT_BATCH_SIZE ${oc.env:PREDICT_BATCH_SIZE, 64}

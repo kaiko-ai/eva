@@ -28,16 +28,22 @@ trainer:
           mode: *MONITOR_METRIC_MODE
       - class_path: eva.callbacks.ClassificationEmbeddingsWriter
         init_args:
-          output_dir: &DATASET_EMBEDDINGS_ROOT ${oc.env:EMBEDDINGS_ROOT, ./data/embeddings}/${oc.env:MODEL_NAME, dino_vits16}/organ_s_mnist
+          output_dir: &DATASET_EMBEDDINGS_ROOT ${oc.env:EMBEDDINGS_ROOT, ./data/embeddings}/${oc.env:MODEL_NAME, vit_large_patch16_224}/organ_s_mnist
           dataloader_idx_map:
             0: train
             1: val
             2: test
           backbone:
-            class_path: eva.vision.models.ModelFromRegistry
+            class_path: eva.vision.models.TimmModel
             init_args:
-              model_name: ${oc.env:MODEL_NAME, universal/vit_small_patch16_224_dino}
-              model_extra_kwargs: ${oc.env:MODEL_EXTRA_KWARGS, null}
+              model_name: ${oc.env:MODEL_NAME, universal/vit_large_patch16_224}
+              checkpoint_path: /Users/ioangatop/Desktop/eva/nki_vit_large_patch16_224.pth
+              out_indices: ${oc.env:OUT_INDICES, 1}
+              model_kwargs:
+                in_chans: 1
+                init_values: 0.00001
+                no_embed_class: true
+                reg_tokens: 4
           overwrite: false
     logger:
       - class_path: lightning.pytorch.loggers.TensorBoardLogger
@@ -50,7 +56,7 @@ model:
     head:
       class_path: torch.nn.Linear
       init_args:
-        in_features: ${oc.env:IN_FEATURES, 384}
+        in_features: ${oc.env:IN_FEATURES, 1024}
         out_features: &NUM_CLASSES 11
     criterion: torch.nn.CrossEntropyLoss
     optimizer:
@@ -104,8 +110,8 @@ data:
                   - class_path: torchvision.transforms.ToTensor
                   - class_path: torchvision.transforms.v2.Normalize
                     init_args:
-                      mean: ${oc.env:NORMALIZE_MEAN, [0.485, 0.456, 0.406]} 
-                      std: ${oc.env:NORMALIZE_STD, [0.229, 0.224, 0.225]}
+                      mean: ${oc.env:NORMALIZE_MEAN, [0.503383265]} 
+                      std: ${oc.env:NORMALIZE_STD, [0.176303117]}
             target_transform:
               class_path: eva.core.data.transforms.ArraySqueeze
         - class_path: medmnist.OrganSMNIST
