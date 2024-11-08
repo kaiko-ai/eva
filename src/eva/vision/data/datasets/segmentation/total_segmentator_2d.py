@@ -156,6 +156,21 @@ class TotalSegmentator2D(base.ImageSegmentation):
         self._samples_dirs = self._fetch_samples_dirs()
         if self._optimize_mask_loading:
             self._export_semantic_label_masks()
+        if self._decompress:
+            compressed_paths = Path(self._root).rglob("*/ct.nii.gz")
+            with ThreadPoolExecutor(max_workers=self._num_workers) as executor:
+                futures = {
+                    executor.submit(gunzip_file, str(path)): path
+                    for path in compressed_paths
+                }
+                with tqdm(total=len(futures), desc=">> Decompressing .gz files", leave=False) as pbar:
+                    for future in as_completed(futures):
+                        filename = futures[future]
+                        try:
+                            future.result()
+                            pbar.update(1)
+                        except Exception as e:
+                            print(f"Error processing {filename}: {str(e)}")
 
     @override
     def configure(self) -> None:
@@ -185,13 +200,10 @@ class TotalSegmentator2D(base.ImageSegmentation):
     def load_image(self, index: int) -> tv_tensors.Image:
         sample_index, slice_index = self._indices[index]
         image_path = self._get_image_path(sample_index)
-        
+
         if self._decompress:
-            # TODO: move this out, as multiple workers will lead to write conflicts
-            image_path_uncompressed = self._uncompressed_path(image_path)
-            if not os.path.isfile(image_path_uncompressed):
-                gunzip_file(image_path)
-            image_path = image_path_uncompressed
+            # TODO: maybe use file_suffix property instead as before
+            image_path = self._uncompressed_path(image_path)
             
         image_array = io.read_nifti(image_path, slice_index)
         image_rgb_array = image_array.repeat(3, axis=2)
@@ -377,9 +389,10 @@ def gunzip_file(path: str, unpack_dir: str | None = None) -> str:
     """
     unpack_dir = unpack_dir or os.path.dirname(path)
     save_path = os.path.join(unpack_dir, os.path.basename(path).replace(".gz", ""))
-    with gzip.open(path, "rb") as f_in:
-        with open(save_path, "wb") as f_out:
-            f_out.write(f_in.read())
+    if not os.path.isfile(save_path):
+        with gzip.open(path, "rb") as f_in:
+            with open(save_path, "wb") as f_out:
+                f_out.write(f_in.read())
     return save_path
 
 _grouped_class_mappings = {
