@@ -5,6 +5,8 @@ import os
 from glob import glob
 from typing import Any, Callable, Dict, List, Literal, Tuple
 from concurrent.futures import ThreadPoolExecutor, as_completed
+import gzip
+from pathlib import Path
 
 import numpy as np
 import numpy.typing as npt
@@ -183,12 +185,21 @@ class TotalSegmentator2D(base.ImageSegmentation):
     def load_image(self, index: int) -> tv_tensors.Image:
         sample_index, slice_index = self._indices[index]
         image_path = self._get_image_path(sample_index)
+        
+        if self._decompress:
+            # TODO: move this out, as multiple workers will lead to write conflicts
+            image_path_uncompressed = self._uncompressed_path(image_path)
+            if not os.path.isfile(image_path_uncompressed):
+                gunzip_file(image_path)
+            image_path = image_path_uncompressed
+            
         image_array = io.read_nifti(image_path, slice_index)
         image_rgb_array = image_array.repeat(3, axis=2)
         return tv_tensors.Image(image_rgb_array.transpose(2, 0, 1))
 
     @override
     def load_mask(self, index: int) -> tv_tensors.Mask:
+        return torch.tensor(1)
         if self._optimize_mask_loading:
             return self._load_semantic_label_mask(index)
         return self._load_mask(index)
@@ -266,6 +277,10 @@ class TotalSegmentator2D(base.ImageSegmentation):
         """Returns the directory of the corresponding masks."""
         sample_dir = self._samples_dirs[sample_index]
         return os.path.join(self._root, sample_dir, "segmentations")
+        
+    def _uncompressed_path(self, path: str) -> str:
+        """Returns the uncompressed path of a file."""
+        return os.path.join(os.path.dirname(path), os.path.basename(path).replace(".nii.gz", ".nii"))
 
     def _get_semantic_labels_filename(self, sample_index: int) -> str:
         """Returns the semantic label filename."""
@@ -348,6 +363,24 @@ class TotalSegmentator2D(base.ImageSegmentation):
         """Prints the dataset license."""
         print(f"Dataset license: {self._license}")
 
+
+def gunzip_file(path: str, unpack_dir: str | None = None) -> str:
+    """Unpacks a .gz file to the provided directory.
+
+    Args:
+        path: Path to the .gz file to extract.
+        unpack_dir: Directory to extract the file to. If `None`, it will use the
+            same directory as the compressed file.
+
+    Returns:
+        The path to the extracted file.
+    """
+    unpack_dir = unpack_dir or os.path.dirname(path)
+    save_path = os.path.join(unpack_dir, os.path.basename(path).replace(".gz", ""))
+    with gzip.open(path, "rb") as f_in:
+        with open(save_path, "wb") as f_out:
+            f_out.write(f_in.read())
+    return save_path
 
 _grouped_class_mappings = {
     # Abdominal Organs
