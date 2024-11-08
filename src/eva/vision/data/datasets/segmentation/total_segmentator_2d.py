@@ -4,6 +4,7 @@ import functools
 import os
 from glob import glob
 from typing import Any, Callable, Dict, List, Literal, Tuple
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import numpy as np
 import numpy.typing as npt
@@ -65,6 +66,8 @@ class TotalSegmentator2D(base.ImageSegmentation):
         download: bool = False,
         classes: List[str] | None = None,
         optimize_mask_loading: bool = True,
+        decompress: bool = True,
+        num_workers: int = 10,
         transforms: Callable | None = None,
     ) -> None:
         """Initialize dataset.
@@ -85,8 +88,12 @@ class TotalSegmentator2D(base.ImageSegmentation):
                 in order to optimize the loading time. In the `setup` method, it
                 will reformat the binary one-hot masks to a semantic mask and store
                 it on disk.
+            decompress: Whether to decompress the .gz files when preparing the data.
+            num_workers: The number of workers to use for optimizing the masks &
+                decompressing the .gz files.
             transforms: A function/transforms that takes in an image and a target
                 mask and returns the transformed versions of both.
+            
         """
         super().__init__(transforms=transforms)
 
@@ -96,6 +103,8 @@ class TotalSegmentator2D(base.ImageSegmentation):
         self._download = download
         self._classes = classes
         self._optimize_mask_loading = optimize_mask_loading
+        self._decompress = decompress
+        self._num_workers = num_workers
 
         if self._optimize_mask_loading and self._classes is not None:
             raise ValueError(
@@ -128,6 +137,10 @@ class TotalSegmentator2D(base.ImageSegmentation):
     def class_to_idx(self) -> Dict[str, int]:
         return {label: index for index, label in enumerate(self.classes)}
 
+    @property
+    def file_suffix(self) -> str:
+        return ".nii" if self._decompress else ".nii.gz"
+
     @override
     def filename(self, index: int, segmented: bool = True) -> str:
         sample_idx, _ = self._indices[index]
@@ -138,13 +151,13 @@ class TotalSegmentator2D(base.ImageSegmentation):
     def prepare_data(self) -> None:
         if self._download:
             self._download_dataset()
+        self._samples_dirs = self._fetch_samples_dirs()
+        if self._optimize_mask_loading:
+            self._export_semantic_label_masks()
 
     @override
     def configure(self) -> None:
-        self._samples_dirs = self._fetch_samples_dirs()
         self._indices = self._create_indices()
-        if self._optimize_mask_loading:
-            self._export_semantic_label_masks()
 
     @override
     def validate(self) -> None:
@@ -186,10 +199,9 @@ class TotalSegmentator2D(base.ImageSegmentation):
         return {"slice_index": slice_index}
 
     def _load_mask(self, index: int) -> tv_tensors.Mask:
-        """Loads and builds the segmentation mask from NifTi files."""
         sample_index, slice_index = self._indices[index]
         semantic_labels = self._load_masks_as_semantic_label(sample_index, slice_index)
-        return tv_tensors.Mask(semantic_labels, dtype=torch.int64)  # type: ignore[reportCallIssue]
+        return tv_tensors.Mask(semantic_labels.squeeze(), dtype=torch.int64)  # type: ignore[reportCallIssue]
 
     def _load_semantic_label_mask(self, index: int) -> tv_tensors.Mask:
         """Loads the segmentation mask from a semantic label NifTi file."""
@@ -224,14 +236,26 @@ class TotalSegmentator2D(base.ImageSegmentation):
         ]
         to_export = filter(lambda x: not os.path.isfile(x[1]), semantic_labels)
 
-        for sample_index, filename in tqdm(
-            list(to_export),
-            desc=">> Exporting optimized semantic masks",
-            leave=False,
-        ):
+        def _process_mask(sample_index: Any, filename: str) -> None:
+            """Process a single sample with error handling"""
             semantic_labels = self._load_masks_as_semantic_label(sample_index)
             os.makedirs(os.path.dirname(filename), exist_ok=True)
             io.save_array_as_nifti(semantic_labels, filename)
+
+        with ThreadPoolExecutor(max_workers=10) as executor:
+            futures = {
+                executor.submit(_process_mask, sample_index, filename): filename 
+                for sample_index, filename in to_export
+            }
+            
+            with tqdm(total=len(futures), desc=">> Exporting optimized semantic masks", leave=False) as pbar:
+                for future in as_completed(futures):
+                    filename = futures[future]
+                    try:
+                        future.result()
+                        pbar.update(1)
+                    except Exception as e:
+                        print(f"Error processing {filename}: {str(e)}")
 
     def _get_image_path(self, sample_index: int) -> str:
         """Returns the corresponding image path."""
@@ -323,3 +347,102 @@ class TotalSegmentator2D(base.ImageSegmentation):
     def _print_license(self) -> None:
         """Prints the dataset license."""
         print(f"Dataset license: {self._license}")
+
+
+_grouped_class_mappings = {
+    # Abdominal Organs
+    'spleen': 'spleen',
+    'kidney_right': 'kidney',
+    'kidney_left': 'kidney',
+    'gallbladder': 'gallbladder',
+    'liver': 'liver',
+    'stomach': 'stomach',
+    'pancreas': 'pancreas',
+    'small_bowel': 'small_bowel',
+    'duodenum': 'duodenum',
+    'colon': 'colon',
+    
+    # Endocrine System
+    'adrenal_gland_right': 'adrenal_gland',
+    'adrenal_gland_left': 'adrenal_gland',
+    'thyroid_gland': 'thyroid_gland',
+    
+    # Respiratory System
+    'lung_upper_lobe_left': 'lungs',
+    'lung_lower_lobe_left': 'lungs',
+    'lung_upper_lobe_right': 'lungs',
+    'lung_middle_lobe_right': 'lungs',
+    'lung_lower_lobe_right': 'lungs',
+    'trachea': 'trachea',
+    'esophagus': 'esophagus',
+    
+    # Urogenital System
+    'urinary_bladder': 'urogenital_system',
+    'prostate': 'urogenital_system',
+    'kidney_cyst_left': 'kidney_cyst',
+    'kidney_cyst_right': 'kidney_cyst',
+    
+    # Vertebral Column
+    **{f'vertebrae_{v}': 'vertebrae' for v in ['C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7']},
+    **{f'vertebrae_{v}': 'vertebrae' for v in [f'T{i}' for i in range(1, 13)]},
+    **{f'vertebrae_{v}': 'vertebrae' for v in [f'L{i}' for i in range(1, 6)]},
+    'vertebrae_S1': 'vertebrae',
+    'sacrum': 'sacral_spine',
+    
+    # Cardiovascular System
+    'heart': 'heart',
+    'aorta': 'arteries',
+    'pulmonary_vein': 'veins',
+    'brachiocephalic_trunk': 'arteries',
+    'subclavian_artery_right': 'arteries',
+    'subclavian_artery_left': 'arteries',
+    'common_carotid_artery_right': 'arteries',
+    'common_carotid_artery_left': 'arteries',
+    'brachiocephalic_vein_left': 'veins',
+    'brachiocephalic_vein_right': 'veins',
+    'atrial_appendage_left': 'atrial_appendage_left',
+    'superior_vena_cava': 'veins',
+    'inferior_vena_cava': 'veins',
+    'portal_vein_and_splenic_vein': 'veins',
+    'iliac_artery_left': 'arteries',
+    'iliac_artery_right': 'arteries',
+    'iliac_vena_left': 'veins',
+    'iliac_vena_right': 'veins',
+    
+    # Upper Extremity Bones
+    'humerus_left': 'humerus',
+    'humerus_right': 'humerus',
+    'scapula_left': 'scapula',
+    'scapula_right': 'scapula',
+    'clavicula_left': 'clavicula',
+    'clavicula_right': 'clavicula',
+    
+    # Lower Extremity Bones
+    'femur_left': 'femur',
+    'femur_right': 'femur',
+    'hip_left': 'hip',
+    'hip_right': 'hip',
+    
+    # Muscles
+    'gluteus_maximus_left': 'gluteus',
+    'gluteus_maximus_right': 'gluteus',
+    'gluteus_medius_left': 'gluteus',
+    'gluteus_medius_right': 'gluteus',
+    'gluteus_minimus_left': 'gluteus',
+    'gluteus_minimus_right': 'gluteus',
+    'autochthon_left': 'autochthon',
+    'autochthon_right': 'autochthon',
+    'iliopsoas_left': 'iliopsoas',
+    'iliopsoas_right': 'iliopsoas',
+    
+    # Central Nervous System
+    'brain': 'brain',
+    'spinal_cord': 'spinal_cord',
+    
+    # Skull and Thoracic Cage
+    'skull': 'skull',
+    **{f'rib_left_{i}': 'ribs' for i in range(1, 13)},
+    **{f'rib_right_{i}': 'ribs' for i in range(1, 13)},
+    'costal_cartilages': 'ribs',
+    'sternum': 'sternum',
+}
