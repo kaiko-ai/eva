@@ -159,7 +159,7 @@ def _overlay_mask(image: torch.Tensor, mask: torch.Tensor) -> torch.Tensor:
         from the predefined colormap.
     """
     binary_masks = functional.one_hot(mask).permute(2, 0, 1).to(dtype=torch.bool)
-    colors = colormap.get_colors(binary_masks.shape[0]+1)
+    colors = colormap.get_colors(binary_masks.shape[0] + 1)
     return torchvision.utils.draw_segmentation_masks(
         image, binary_masks[1:], alpha=0.65, colors=colors[1:]  # type: ignore
     )

@@ -81,7 +81,7 @@ COLORMAP = dict(enumerate(COLORS)) | {255: (255, 255, 255)}
 
 def get_colors(num_colors: int) -> List[Tuple[int, int, int]]:
     """Get a list of RGB colors.
-    
+
     If the number of colors is greater than the predefined colors, it will
     repeat the colors until it reaches the requested number
 
