@@ -6,6 +6,10 @@ trainer:
     default_root_dir: &OUTPUT_ROOT ${oc.env:OUTPUT_ROOT, logs/${oc.env:MODEL_NAME, vit_small_patch16_224_dino}/monusac}
     max_steps: &MAX_STEPS ${oc.env:MAX_STEPS, 2000}
     log_every_n_steps: 6
+    plugins:
+      class_path: eva.core.plugins.SubmoduleTorchCheckpointIO
+      init_args:
+        submodule: decoder
     callbacks:
       - class_path: eva.callbacks.ConfigurationLogger
       - class_path: lightning.pytorch.callbacks.TQDMProgressBar
