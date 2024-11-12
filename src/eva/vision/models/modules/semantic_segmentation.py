@@ -103,7 +103,7 @@ class SemanticSegmentationModule(module.ModelModule):
                 "decoder should map the embeddings (`inputs`) to."
             )
         features = self.encoder(inputs) if self.encoder else inputs
-        decoder_inputs = DecoderInputs(features, inputs.shape[-2:], inputs)  # type: ignore
+        decoder_inputs = DecoderInputs(features, to_size or inputs.shape[-2:], inputs)  # type: ignore
         return self.decoder(decoder_inputs)
 
     @override

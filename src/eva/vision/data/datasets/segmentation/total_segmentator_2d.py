@@ -3,6 +3,7 @@
 import functools
 import os
 from glob import glob
+from pathlib import Path
 from typing import Any, Callable, Dict, List, Literal, Tuple
 
 import numpy as np
@@ -12,7 +13,8 @@ from torchvision import tv_tensors
 from torchvision.datasets import utils
 from typing_extensions import override
 
-from eva.core.utils.progress_bar import tqdm
+from eva.core.utils import io as core_io
+from eva.core.utils import multiprocessing
 from eva.vision.data.datasets import _validators, structs
 from eva.vision.data.datasets.segmentation import base
 from eva.vision.utils import io
@@ -65,6 +67,8 @@ class TotalSegmentator2D(base.ImageSegmentation):
         download: bool = False,
         classes: List[str] | None = None,
         optimize_mask_loading: bool = True,
+        decompress: bool = True,
+        num_workers: int = 10,
         transforms: Callable | None = None,
     ) -> None:
         """Initialize dataset.
@@ -85,8 +89,15 @@ class TotalSegmentator2D(base.ImageSegmentation):
                 in order to optimize the loading time. In the `setup` method, it
                 will reformat the binary one-hot masks to a semantic mask and store
                 it on disk.
+            decompress: Whether to decompress the ct.nii.gz files when preparing the data.
+                The label masks won't be decompressed, but when enabling optimize_mask_loading
+                it will export the semantic label masks to a single file in uncompressed .nii
+                format.
+            num_workers: The number of workers to use for optimizing the masks &
+                decompressing the .gz files.
             transforms: A function/transforms that takes in an image and a target
                 mask and returns the transformed versions of both.
+
         """
         super().__init__(transforms=transforms)
 
@@ -96,6 +107,8 @@ class TotalSegmentator2D(base.ImageSegmentation):
         self._download = download
         self._classes = classes
         self._optimize_mask_loading = optimize_mask_loading
+        self._decompress = decompress
+        self._num_workers = num_workers
 
         if self._optimize_mask_loading and self._classes is not None:
             raise ValueError(
@@ -128,23 +141,29 @@ class TotalSegmentator2D(base.ImageSegmentation):
     def class_to_idx(self) -> Dict[str, int]:
         return {label: index for index, label in enumerate(self.classes)}
 
+    @property
+    def _file_suffix(self) -> str:
+        return "nii" if self._decompress else "nii.gz"
+
     @override
-    def filename(self, index: int, segmented: bool = True) -> str:
+    def filename(self, index: int) -> str:
         sample_idx, _ = self._indices[index]
         sample_dir = self._samples_dirs[sample_idx]
-        return os.path.join(sample_dir, "ct.nii.gz")
+        return os.path.join(sample_dir, f"ct.{self._file_suffix}")
 
     @override
     def prepare_data(self) -> None:
         if self._download:
             self._download_dataset()
+        if self._decompress:
+            self._decompress_files()
+        self._samples_dirs = self._fetch_samples_dirs()
+        if self._optimize_mask_loading:
+            self._export_semantic_label_masks()
 
     @override
     def configure(self) -> None:
-        self._samples_dirs = self._fetch_samples_dirs()
         self._indices = self._create_indices()
-        if self._optimize_mask_loading:
-            self._export_semantic_label_masks()
 
     @override
     def validate(self) -> None:
@@ -186,16 +205,15 @@ class TotalSegmentator2D(base.ImageSegmentation):
         return {"slice_index": slice_index}
 
     def _load_mask(self, index: int) -> tv_tensors.Mask:
-        """Loads and builds the segmentation mask from NifTi files."""
         sample_index, slice_index = self._indices[index]
         semantic_labels = self._load_masks_as_semantic_label(sample_index, slice_index)
-        return tv_tensors.Mask(semantic_labels, dtype=torch.int64)  # type: ignore[reportCallIssue]
+        return tv_tensors.Mask(semantic_labels.squeeze(), dtype=torch.int64)  # type: ignore[reportCallIssue]
 
     def _load_semantic_label_mask(self, index: int) -> tv_tensors.Mask:
         """Loads the segmentation mask from a semantic label NifTi file."""
         sample_index, slice_index = self._indices[index]
         masks_dir = self._get_masks_dir(sample_index)
-        filename = os.path.join(masks_dir, "semantic_labels", "masks.nii.gz")
+        filename = os.path.join(masks_dir, "semantic_labels", "masks.nii")
         semantic_labels = io.read_nifti(filename, slice_index)
         return tv_tensors.Mask(semantic_labels.squeeze(), dtype=torch.int64)  # type: ignore[reportCallIssue]
 
@@ -209,7 +227,7 @@ class TotalSegmentator2D(base.ImageSegmentation):
             slice_index: Whether to return only a specific slice.
         """
         masks_dir = self._get_masks_dir(sample_index)
-        mask_paths = [os.path.join(masks_dir, label + ".nii.gz") for label in self.classes]
+        mask_paths = [os.path.join(masks_dir, f"{label}.nii.gz") for label in self.classes]
         binary_masks = [io.read_nifti(path, slice_index) for path in mask_paths]
         background_mask = np.zeros_like(binary_masks[0])
         return np.argmax([background_mask] + binary_masks, axis=0)
@@ -219,24 +237,28 @@ class TotalSegmentator2D(base.ImageSegmentation):
         total_samples = len(self._samples_dirs)
         masks_dirs = map(self._get_masks_dir, range(total_samples))
         semantic_labels = [
-            (index, os.path.join(directory, "semantic_labels", "masks.nii.gz"))
+            (index, os.path.join(directory, "semantic_labels", "masks.nii"))
             for index, directory in enumerate(masks_dirs)
         ]
         to_export = filter(lambda x: not os.path.isfile(x[1]), semantic_labels)
 
-        for sample_index, filename in tqdm(
-            list(to_export),
-            desc=">> Exporting optimized semantic masks",
-            leave=False,
-        ):
+        def _process_mask(sample_index: Any, filename: str) -> None:
             semantic_labels = self._load_masks_as_semantic_label(sample_index)
             os.makedirs(os.path.dirname(filename), exist_ok=True)
             io.save_array_as_nifti(semantic_labels, filename)
 
+        multiprocessing.run_with_threads(
+            _process_mask,
+            list(to_export),
+            num_workers=self._num_workers,
+            progress_desc=">> Exporting optimized semantic mask",
+            return_results=False,
+        )
+
     def _get_image_path(self, sample_index: int) -> str:
         """Returns the corresponding image path."""
         sample_dir = self._samples_dirs[sample_index]
-        return os.path.join(self._root, sample_dir, "ct.nii.gz")
+        return os.path.join(self._root, sample_dir, f"ct.{self._file_suffix}")
 
     def _get_masks_dir(self, sample_index: int) -> str:
         """Returns the directory of the corresponding masks."""
@@ -246,7 +268,7 @@ class TotalSegmentator2D(base.ImageSegmentation):
     def _get_semantic_labels_filename(self, sample_index: int) -> str:
         """Returns the semantic label filename."""
         masks_dir = self._get_masks_dir(sample_index)
-        return os.path.join(masks_dir, "semantic_labels", "masks.nii.gz")
+        return os.path.join(masks_dir, "semantic_labels", "masks.nii")
 
     def _get_number_of_slices_per_sample(self, sample_index: int) -> int:
         """Returns the total amount of slices of a sample."""
@@ -319,6 +341,16 @@ class TotalSegmentator2D(base.ImageSegmentation):
                 filename=resource.filename,
                 remove_finished=True,
             )
+
+    def _decompress_files(self) -> None:
+        compressed_paths = Path(self._root).rglob("*/ct.nii.gz")
+        multiprocessing.run_with_threads(
+            core_io.gunzip_file,
+            [(str(path),) for path in compressed_paths],
+            num_workers=self._num_workers,
+            progress_desc=">> Decompressing .gz files",
+            return_results=False,
+        )
 
     def _print_license(self) -> None:
         """Prints the dataset license."""
