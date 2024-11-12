@@ -128,7 +128,7 @@ def _draw_semantic_mask(tensor: torch.Tensor) -> torch.Tensor:
     integer values which represent the pixel class id.
 
     Args:
-        tensor: An image tensor of range [0., 1.].
+        tensor: An image tensor of range [0., N_CLASSES].
 
     Returns:
         The image as a tensor of range [0., 255.].
@@ -136,9 +136,11 @@ def _draw_semantic_mask(tensor: torch.Tensor) -> torch.Tensor:
     tensor = torch.squeeze(tensor)
     height, width = tensor.shape[-2], tensor.shape[-1]
     red, green, blue = torch.zeros((3, height, width), dtype=torch.uint8)
-    for class_id, color in colormap.COLORMAP.items():
+    class_ids = torch.unique(tensor)
+    colors = colormap.get_colors(max(class_ids))
+    for class_id in class_ids:
         indices = tensor == class_id
-        red[indices], green[indices], blue[indices] = color
+        red[indices], green[indices], blue[indices] = colors[int(class_id)]
     return torch.stack([red, green, blue])
 
 
@@ -157,8 +159,9 @@ def _overlay_mask(image: torch.Tensor, mask: torch.Tensor) -> torch.Tensor:
         from the predefined colormap.
     """
     binary_masks = functional.one_hot(mask).permute(2, 0, 1).to(dtype=torch.bool)
+    colors = colormap.get_colors(binary_masks.shape[0]+1)
     return torchvision.utils.draw_segmentation_masks(
-        image, binary_masks[1:], alpha=0.65, colors=colormap.COLORS[1:]  # type: ignore
+        image, binary_masks[1:], alpha=0.65, colors=colors[1:]  # type: ignore
     )
 
 

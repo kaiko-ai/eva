@@ -1,5 +1,7 @@
 """Color mapping constants."""
 
+from typing import List, Tuple
+
 COLORS = [
     (0, 0, 0),
     (255, 0, 0),  # Red
@@ -75,3 +77,21 @@ COLORS = [
 
 COLORMAP = dict(enumerate(COLORS)) | {255: (255, 255, 255)}
 """Class id to RGB color mapping."""
+
+
+def get_colors(num_colors: int) -> List[Tuple[int, int, int]]:
+    """Get a list of RGB colors.
+    
+    If the number of colors is greater than the predefined colors, it will
+    repeat the colors until it reaches the requested number
+
+    Args:
+        num_colors: The number of colors to return.
+
+    Returns:
+        A list of RGB colors.
+    """
+    colors = COLORS
+    while len(colors) < num_colors:
+        colors = colors + COLORS[1:]
+    return colors
