@@ -3,10 +3,8 @@
 import functools
 import os
 from glob import glob
-from typing import Any, Callable, Dict, List, Literal, Tuple
-from concurrent.futures import ThreadPoolExecutor, as_completed
-import gzip
 from pathlib import Path
+from typing import Any, Callable, Dict, List, Literal, Tuple
 
 import numpy as np
 import numpy.typing as npt
@@ -15,7 +13,8 @@ from torchvision import tv_tensors
 from torchvision.datasets import utils
 from typing_extensions import override
 
-from eva.core.utils.progress_bar import tqdm
+from eva.core.utils import io as core_io
+from eva.core.utils import multiprocessing
 from eva.vision.data.datasets import _validators, structs
 from eva.vision.data.datasets.segmentation import base
 from eva.vision.utils import io
@@ -90,12 +89,15 @@ class TotalSegmentator2D(base.ImageSegmentation):
                 in order to optimize the loading time. In the `setup` method, it
                 will reformat the binary one-hot masks to a semantic mask and store
                 it on disk.
-            decompress: Whether to decompress the .gz files when preparing the data.
+            decompress: Whether to decompress the ct.nii.gz files when preparing the data.
+                The label masks won't be decompressed, but when enabling optimize_mask_loading
+                it will export the semantic label masks to a single file in uncompressed .nii
+                format.
             num_workers: The number of workers to use for optimizing the masks &
                 decompressing the .gz files.
             transforms: A function/transforms that takes in an image and a target
                 mask and returns the transformed versions of both.
-            
+
         """
         super().__init__(transforms=transforms)
 
@@ -140,37 +142,24 @@ class TotalSegmentator2D(base.ImageSegmentation):
         return {label: index for index, label in enumerate(self.classes)}
 
     @property
-    def file_suffix(self) -> str:
-        return ".nii" if self._decompress else ".nii.gz"
+    def _file_suffix(self) -> str:
+        return "nii" if self._decompress else "nii.gz"
 
     @override
-    def filename(self, index: int, segmented: bool = True) -> str:
+    def filename(self, index: int) -> str:
         sample_idx, _ = self._indices[index]
         sample_dir = self._samples_dirs[sample_idx]
-        return os.path.join(sample_dir, "ct.nii.gz")
+        return os.path.join(sample_dir, f"ct.{self._file_suffix}")
 
     @override
     def prepare_data(self) -> None:
         if self._download:
             self._download_dataset()
+        if self._decompress:
+            self._decompress_files()
         self._samples_dirs = self._fetch_samples_dirs()
         if self._optimize_mask_loading:
             self._export_semantic_label_masks()
-        if self._decompress:
-            compressed_paths = Path(self._root).rglob("*/ct.nii.gz")
-            with ThreadPoolExecutor(max_workers=self._num_workers) as executor:
-                futures = {
-                    executor.submit(gunzip_file, str(path)): path
-                    for path in compressed_paths
-                }
-                with tqdm(total=len(futures), desc=">> Decompressing .gz files", leave=False) as pbar:
-                    for future in as_completed(futures):
-                        filename = futures[future]
-                        try:
-                            future.result()
-                            pbar.update(1)
-                        except Exception as e:
-                            print(f"Error processing {filename}: {str(e)}")
 
     @override
     def configure(self) -> None:
@@ -200,18 +189,12 @@ class TotalSegmentator2D(base.ImageSegmentation):
     def load_image(self, index: int) -> tv_tensors.Image:
         sample_index, slice_index = self._indices[index]
         image_path = self._get_image_path(sample_index)
-
-        if self._decompress:
-            # TODO: maybe use file_suffix property instead as before
-            image_path = self._uncompressed_path(image_path)
-            
         image_array = io.read_nifti(image_path, slice_index)
         image_rgb_array = image_array.repeat(3, axis=2)
         return tv_tensors.Image(image_rgb_array.transpose(2, 0, 1))
 
     @override
     def load_mask(self, index: int) -> tv_tensors.Mask:
-        return torch.tensor(1)
         if self._optimize_mask_loading:
             return self._load_semantic_label_mask(index)
         return self._load_mask(index)
@@ -230,7 +213,7 @@ class TotalSegmentator2D(base.ImageSegmentation):
         """Loads the segmentation mask from a semantic label NifTi file."""
         sample_index, slice_index = self._indices[index]
         masks_dir = self._get_masks_dir(sample_index)
-        filename = os.path.join(masks_dir, "semantic_labels", "masks.nii.gz")
+        filename = os.path.join(masks_dir, "semantic_labels", "masks.nii")
         semantic_labels = io.read_nifti(filename, slice_index)
         return tv_tensors.Mask(semantic_labels.squeeze(), dtype=torch.int64)  # type: ignore[reportCallIssue]
 
@@ -244,7 +227,7 @@ class TotalSegmentator2D(base.ImageSegmentation):
             slice_index: Whether to return only a specific slice.
         """
         masks_dir = self._get_masks_dir(sample_index)
-        mask_paths = [os.path.join(masks_dir, label + ".nii.gz") for label in self.classes]
+        mask_paths = [os.path.join(masks_dir, f"{label}.nii.gz") for label in self.classes]
         binary_masks = [io.read_nifti(path, slice_index) for path in mask_paths]
         background_mask = np.zeros_like(binary_masks[0])
         return np.argmax([background_mask] + binary_masks, axis=0)
@@ -254,50 +237,38 @@ class TotalSegmentator2D(base.ImageSegmentation):
         total_samples = len(self._samples_dirs)
         masks_dirs = map(self._get_masks_dir, range(total_samples))
         semantic_labels = [
-            (index, os.path.join(directory, "semantic_labels", "masks.nii.gz"))
+            (index, os.path.join(directory, "semantic_labels", "masks.nii"))
             for index, directory in enumerate(masks_dirs)
         ]
         to_export = filter(lambda x: not os.path.isfile(x[1]), semantic_labels)
 
         def _process_mask(sample_index: Any, filename: str) -> None:
-            """Process a single sample with error handling"""
             semantic_labels = self._load_masks_as_semantic_label(sample_index)
             os.makedirs(os.path.dirname(filename), exist_ok=True)
             io.save_array_as_nifti(semantic_labels, filename)
 
-        with ThreadPoolExecutor(max_workers=10) as executor:
-            futures = {
-                executor.submit(_process_mask, sample_index, filename): filename 
-                for sample_index, filename in to_export
-            }
-            
-            with tqdm(total=len(futures), desc=">> Exporting optimized semantic masks", leave=False) as pbar:
-                for future in as_completed(futures):
-                    filename = futures[future]
-                    try:
-                        future.result()
-                        pbar.update(1)
-                    except Exception as e:
-                        print(f"Error processing {filename}: {str(e)}")
+        multiprocessing.run_with_threads(
+            _process_mask,
+            list(to_export),
+            num_workers=self._num_workers,
+            progress_desc=">> Exporting optimized semantic mask",
+            return_results=False,
+        )
 
     def _get_image_path(self, sample_index: int) -> str:
         """Returns the corresponding image path."""
         sample_dir = self._samples_dirs[sample_index]
-        return os.path.join(self._root, sample_dir, "ct.nii.gz")
+        return os.path.join(self._root, sample_dir, f"ct.{self._file_suffix}")
 
     def _get_masks_dir(self, sample_index: int) -> str:
         """Returns the directory of the corresponding masks."""
         sample_dir = self._samples_dirs[sample_index]
         return os.path.join(self._root, sample_dir, "segmentations")
-        
-    def _uncompressed_path(self, path: str) -> str:
-        """Returns the uncompressed path of a file."""
-        return os.path.join(os.path.dirname(path), os.path.basename(path).replace(".nii.gz", ".nii"))
 
     def _get_semantic_labels_filename(self, sample_index: int) -> str:
         """Returns the semantic label filename."""
         masks_dir = self._get_masks_dir(sample_index)
-        return os.path.join(masks_dir, "semantic_labels", "masks.nii.gz")
+        return os.path.join(masks_dir, "semantic_labels", "masks.nii")
 
     def _get_number_of_slices_per_sample(self, sample_index: int) -> int:
         """Returns the total amount of slices of a sample."""
@@ -371,124 +342,16 @@ class TotalSegmentator2D(base.ImageSegmentation):
                 remove_finished=True,
             )
 
+    def _decompress_files(self) -> None:
+        compressed_paths = Path(self._root).rglob("*/ct.nii.gz")
+        multiprocessing.run_with_threads(
+            core_io.gunzip_file,
+            [(str(path),) for path in compressed_paths],
+            num_workers=self._num_workers,
+            progress_desc=">> Decompressing .gz files",
+            return_results=False,
+        )
+
     def _print_license(self) -> None:
         """Prints the dataset license."""
         print(f"Dataset license: {self._license}")
-
-
-def gunzip_file(path: str, unpack_dir: str | None = None) -> str:
-    """Unpacks a .gz file to the provided directory.
-
-    Args:
-        path: Path to the .gz file to extract.
-        unpack_dir: Directory to extract the file to. If `None`, it will use the
-            same directory as the compressed file.
-
-    Returns:
-        The path to the extracted file.
-    """
-    unpack_dir = unpack_dir or os.path.dirname(path)
-    save_path = os.path.join(unpack_dir, os.path.basename(path).replace(".gz", ""))
-    if not os.path.isfile(save_path):
-        with gzip.open(path, "rb") as f_in:
-            with open(save_path, "wb") as f_out:
-                f_out.write(f_in.read())
-    return save_path
-
-_grouped_class_mappings = {
-    # Abdominal Organs
-    'spleen': 'spleen',
-    'kidney_right': 'kidney',
-    'kidney_left': 'kidney',
-    'gallbladder': 'gallbladder',
-    'liver': 'liver',
-    'stomach': 'stomach',
-    'pancreas': 'pancreas',
-    'small_bowel': 'small_bowel',
-    'duodenum': 'duodenum',
-    'colon': 'colon',
-    
-    # Endocrine System
-    'adrenal_gland_right': 'adrenal_gland',
-    'adrenal_gland_left': 'adrenal_gland',
-    'thyroid_gland': 'thyroid_gland',
-    
-    # Respiratory System
-    'lung_upper_lobe_left': 'lungs',
-    'lung_lower_lobe_left': 'lungs',
-    'lung_upper_lobe_right': 'lungs',
-    'lung_middle_lobe_right': 'lungs',
-    'lung_lower_lobe_right': 'lungs',
-    'trachea': 'trachea',
-    'esophagus': 'esophagus',
-    
-    # Urogenital System
-    'urinary_bladder': 'urogenital_system',
-    'prostate': 'urogenital_system',
-    'kidney_cyst_left': 'kidney_cyst',
-    'kidney_cyst_right': 'kidney_cyst',
-    
-    # Vertebral Column
-    **{f'vertebrae_{v}': 'vertebrae' for v in ['C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7']},
-    **{f'vertebrae_{v}': 'vertebrae' for v in [f'T{i}' for i in range(1, 13)]},
-    **{f'vertebrae_{v}': 'vertebrae' for v in [f'L{i}' for i in range(1, 6)]},
-    'vertebrae_S1': 'vertebrae',
-    'sacrum': 'sacral_spine',
-    
-    # Cardiovascular System
-    'heart': 'heart',
-    'aorta': 'arteries',
-    'pulmonary_vein': 'veins',
-    'brachiocephalic_trunk': 'arteries',
-    'subclavian_artery_right': 'arteries',
-    'subclavian_artery_left': 'arteries',
-    'common_carotid_artery_right': 'arteries',
-    'common_carotid_artery_left': 'arteries',
-    'brachiocephalic_vein_left': 'veins',
-    'brachiocephalic_vein_right': 'veins',
-    'atrial_appendage_left': 'atrial_appendage_left',
-    'superior_vena_cava': 'veins',
-    'inferior_vena_cava': 'veins',
-    'portal_vein_and_splenic_vein': 'veins',
-    'iliac_artery_left': 'arteries',
-    'iliac_artery_right': 'arteries',
-    'iliac_vena_left': 'veins',
-    'iliac_vena_right': 'veins',
-    
-    # Upper Extremity Bones
-    'humerus_left': 'humerus',
-    'humerus_right': 'humerus',
-    'scapula_left': 'scapula',
-    'scapula_right': 'scapula',
-    'clavicula_left': 'clavicula',
-    'clavicula_right': 'clavicula',
-    
-    # Lower Extremity Bones
-    'femur_left': 'femur',
-    'femur_right': 'femur',
-    'hip_left': 'hip',
-    'hip_right': 'hip',
-    
-    # Muscles
-    'gluteus_maximus_left': 'gluteus',
-    'gluteus_maximus_right': 'gluteus',
-    'gluteus_medius_left': 'gluteus',
-    'gluteus_medius_right': 'gluteus',
-    'gluteus_minimus_left': 'gluteus',
-    'gluteus_minimus_right': 'gluteus',
-    'autochthon_left': 'autochthon',
-    'autochthon_right': 'autochthon',
-    'iliopsoas_left': 'iliopsoas',
-    'iliopsoas_right': 'iliopsoas',
-    
-    # Central Nervous System
-    'brain': 'brain',
-    'spinal_cord': 'spinal_cord',
-    
-    # Skull and Thoracic Cage
-    'skull': 'skull',
-    **{f'rib_left_{i}': 'ribs' for i in range(1, 13)},
-    **{f'rib_right_{i}': 'ribs' for i in range(1, 13)},
-    'costal_cartilages': 'ribs',
-    'sternum': 'sternum',
-}
