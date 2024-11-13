@@ -1,6 +1,7 @@
 """TotalSegmentator 2D segmentation dataset class."""
 
 import functools
+import hashlib
 import os
 from glob import glob
 from pathlib import Path
@@ -16,7 +17,7 @@ from typing_extensions import override
 from eva.core.utils import io as core_io
 from eva.core.utils import multiprocessing
 from eva.vision.data.datasets import _validators, structs
-from eva.vision.data.datasets.segmentation import base
+from eva.vision.data.datasets.segmentation import _total_segmentator, base
 from eva.vision.utils import io
 
 
@@ -66,6 +67,7 @@ class TotalSegmentator2D(base.ImageSegmentation):
         version: Literal["small", "full"] | None = "full",
         download: bool = False,
         classes: List[str] | None = None,
+        class_mappings: Dict[str, str] | None = _total_segmentator.reduced_class_mappings,
         optimize_mask_loading: bool = True,
         decompress: bool = True,
         num_workers: int = 10,
@@ -85,6 +87,8 @@ class TotalSegmentator2D(base.ImageSegmentation):
                 exist yet on disk.
             classes: Whether to configure the dataset with a subset of classes.
                 If `None`, it will use all of them.
+            class_mappings: A dictionary that maps the original class names to a
+                reduced set of classes. If `None`, it will use the original classes.
             optimize_mask_loading: Whether to pre-process the segmentation masks
                 in order to optimize the loading time. In the `setup` method, it
                 will reformat the binary one-hot masks to a semantic mask and store
@@ -109,11 +113,10 @@ class TotalSegmentator2D(base.ImageSegmentation):
         self._optimize_mask_loading = optimize_mask_loading
         self._decompress = decompress
         self._num_workers = num_workers
+        self._class_mappings = class_mappings
 
-        if self._optimize_mask_loading and self._classes is not None:
-            raise ValueError(
-                "To use customize classes please set the optimize_mask_loading to `False`."
-            )
+        if self._classes and self._class_mappings:
+            raise ValueError("Both 'classes' and 'class_mappings' cannot be set at the same time.")
 
         self._samples_dirs: List[str] = []
         self._indices: List[Tuple[int, int]] = []
@@ -125,16 +128,19 @@ class TotalSegmentator2D(base.ImageSegmentation):
             """Returns the filename from the full path."""
             return os.path.basename(path).split(".")[0]
 
-        first_sample_labels = os.path.join(
-            self._root, self._samples_dirs[0], "segmentations", "*.nii.gz"
-        )
+        first_sample_labels = os.path.join(self._root, "s0000", "segmentations", "*.nii.gz")
         all_classes = sorted(map(get_filename, glob(first_sample_labels)))
         if self._classes:
             is_subset = all(name in all_classes for name in self._classes)
             if not is_subset:
-                raise ValueError("Provided class names are not subset of the dataset onces.")
-
-        return all_classes if self._classes is None else self._classes
+                raise ValueError("Provided class names are not subset of the original ones.")
+            return sorted(self._classes)
+        elif self._class_mappings:
+            is_subset = all(name in all_classes for name in self._class_mappings.keys())
+            if not is_subset:
+                raise ValueError("Provided class names are not subset of the original ones.")
+            return sorted(set(self._class_mappings.values()))
+        return all_classes
 
     @property
     @override
@@ -144,6 +150,10 @@ class TotalSegmentator2D(base.ImageSegmentation):
     @property
     def _file_suffix(self) -> str:
         return "nii" if self._decompress else "nii.gz"
+
+    @functools.cached_property
+    def _classes_hash(self) -> str:
+        return hashlib.md5(str(self.classes).encode(), usedforsecurity=False).hexdigest()
 
     @override
     def filename(self, index: int) -> str:
@@ -170,15 +180,22 @@ class TotalSegmentator2D(base.ImageSegmentation):
         if self._version is None or self._sample_every_n_slices is not None:
             return
 
+        if self._classes:
+            first_and_last_labels = (self._classes[0], self._classes[-1])
+            n_classes = len(self._classes)
+        elif self._class_mappings:
+            classes = sorted(set(self._class_mappings.values()))
+            first_and_last_labels = (classes[0], classes[-1])
+            n_classes = len(classes)
+        else:
+            first_and_last_labels = ("adrenal_gland_left", "vertebrae_T9")
+            n_classes = 117
+
         _validators.check_dataset_integrity(
             self,
             length=self._expected_dataset_lengths.get(f"{self._split}_{self._version}", 0),
-            n_classes=len(self._classes) if self._classes else 117,
-            first_and_last_labels=(
-                (self._classes[0], self._classes[-1])
-                if self._classes
-                else ("adrenal_gland_left", "vertebrae_T9")
-            ),
+            n_classes=n_classes,
+            first_and_last_labels=first_and_last_labels,
         )
 
     @override
@@ -212,9 +229,7 @@ class TotalSegmentator2D(base.ImageSegmentation):
     def _load_semantic_label_mask(self, index: int) -> tv_tensors.Mask:
         """Loads the segmentation mask from a semantic label NifTi file."""
         sample_index, slice_index = self._indices[index]
-        masks_dir = self._get_masks_dir(sample_index)
-        filename = os.path.join(masks_dir, "semantic_labels", "masks.nii")
-        semantic_labels = io.read_nifti(filename, slice_index)
+        semantic_labels = io.read_nifti(self._get_optimized_masks_file(sample_index), slice_index)
         return tv_tensors.Mask(semantic_labels.squeeze(), dtype=torch.int64)  # type: ignore[reportCallIssue]
 
     def _load_masks_as_semantic_label(
@@ -227,18 +242,39 @@ class TotalSegmentator2D(base.ImageSegmentation):
             slice_index: Whether to return only a specific slice.
         """
         masks_dir = self._get_masks_dir(sample_index)
-        mask_paths = [os.path.join(masks_dir, f"{label}.nii.gz") for label in self.classes]
+        classes = self._class_mappings.keys() if self._class_mappings else self.classes
+        mask_paths = [os.path.join(masks_dir, f"{label}.nii.gz") for label in classes]
         binary_masks = [io.read_nifti(path, slice_index) for path in mask_paths]
+
+        if self._class_mappings:
+            mapped_binary_masks = [np.zeros_like(binary_masks[0], dtype=np.bool_)] * len(
+                self.classes
+            )
+            for original_class, mapped_class in self._class_mappings.items():
+                mapped_index = self.class_to_idx[mapped_class]
+                original_index = list(self._class_mappings.keys()).index(original_class)
+                mapped_binary_masks[mapped_index] = np.logical_or(
+                    mapped_binary_masks[mapped_index], binary_masks[original_index]
+                )
+            binary_masks = mapped_binary_masks
+
         background_mask = np.zeros_like(binary_masks[0])
         return np.argmax([background_mask] + binary_masks, axis=0)
 
     def _export_semantic_label_masks(self) -> None:
         """Exports the segmentation binary masks (one-hot) to semantic labels."""
+        mask_classes_file = os.path.join(f"{self._get_optimized_masks_root}/classes.txt")
+        if os.path.isfile(mask_classes_file):
+            with open(mask_classes_file, "r") as file:
+                if file.read() != str(self.classes):
+                    raise ValueError(
+                        "Optimized masks hash doesn't match the current classes or mappings."
+                    )
+            return
+
         total_samples = len(self._samples_dirs)
-        masks_dirs = map(self._get_masks_dir, range(total_samples))
         semantic_labels = [
-            (index, os.path.join(directory, "semantic_labels", "masks.nii"))
-            for index, directory in enumerate(masks_dirs)
+            (index, self._get_optimized_masks_file(index)) for index in range(total_samples)
         ]
         to_export = filter(lambda x: not os.path.isfile(x[1]), semantic_labels)
 
@@ -255,6 +291,10 @@ class TotalSegmentator2D(base.ImageSegmentation):
             return_results=False,
         )
 
+        os.makedirs(os.path.dirname(mask_classes_file), exist_ok=True)
+        with open(mask_classes_file, "w") as file:
+            file.write(str(self.classes))
+
     def _get_image_path(self, sample_index: int) -> str:
         """Returns the corresponding image path."""
         sample_dir = self._samples_dirs[sample_index]
@@ -265,10 +305,15 @@ class TotalSegmentator2D(base.ImageSegmentation):
         sample_dir = self._samples_dirs[sample_index]
         return os.path.join(self._root, sample_dir, "segmentations")
 
-    def _get_semantic_labels_filename(self, sample_index: int) -> str:
+    def _get_optimized_masks_root(self) -> str:
+        """Returns the directory of the optimized masks."""
+        return os.path.join(self._root, f"processed/masks/{self._classes_hash}")
+
+    def _get_optimized_masks_file(self, sample_index: int) -> str:
         """Returns the semantic label filename."""
-        masks_dir = self._get_masks_dir(sample_index)
-        return os.path.join(masks_dir, "semantic_labels", "masks.nii")
+        return os.path.join(
+            f"{self._get_optimized_masks_root()}/{self._samples_dirs[sample_index]}/masks.nii"
+        )
 
     def _get_number_of_slices_per_sample(self, sample_index: int) -> int:
         """Returns the total amount of slices of a sample."""
@@ -281,7 +326,7 @@ class TotalSegmentator2D(base.ImageSegmentation):
         sample_filenames = [
             filename
             for filename in os.listdir(self._root)
-            if os.path.isdir(os.path.join(self._root, filename))
+            if os.path.isdir(os.path.join(self._root, filename)) and filename != "processed"
         ]
         return sorted(sample_filenames)
 
