@@ -128,7 +128,7 @@ class TotalSegmentator2D(base.ImageSegmentation):
             """Returns the filename from the full path."""
             return os.path.basename(path).split(".")[0]
 
-        first_sample_labels = os.path.join(self._root, "s0000", "segmentations", "*.nii.gz")
+        first_sample_labels = os.path.join(self._root, "s0011", "segmentations", "*.nii.gz")
         all_classes = sorted(map(get_filename, glob(first_sample_labels)))
         if self._classes:
             is_subset = all(name in all_classes for name in self._classes)
@@ -263,7 +263,7 @@ class TotalSegmentator2D(base.ImageSegmentation):
 
     def _export_semantic_label_masks(self) -> None:
         """Exports the segmentation binary masks (one-hot) to semantic labels."""
-        mask_classes_file = os.path.join(f"{self._get_optimized_masks_root}/classes.txt")
+        mask_classes_file = os.path.join(f"{self._get_optimized_masks_root()}/classes.txt")
         if os.path.isfile(mask_classes_file):
             with open(mask_classes_file, "r") as file:
                 if file.read() != str(self.classes):
