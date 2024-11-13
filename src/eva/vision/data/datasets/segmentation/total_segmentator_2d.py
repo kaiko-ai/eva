@@ -3,6 +3,7 @@
 import functools
 import hashlib
 import os
+import re
 from glob import glob
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Literal, Tuple
@@ -326,7 +327,7 @@ class TotalSegmentator2D(base.ImageSegmentation):
         sample_filenames = [
             filename
             for filename in os.listdir(self._root)
-            if os.path.isdir(os.path.join(self._root, filename)) and filename != "processed"
+            if os.path.isdir(os.path.join(self._root, filename)) and re.match(r"^s\d{4}$", filename)
         ]
         return sorted(sample_filenames)
 
