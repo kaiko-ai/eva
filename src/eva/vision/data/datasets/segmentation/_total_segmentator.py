@@ -39,7 +39,7 @@ reduced_class_mappings: Dict[str, str] = {
     "sacrum": "sacral_spine",
     # Cardiovascular System
     "heart": "heart",
-    "aorta": "arteries",
+    "aorta": "aorta",
     "pulmonary_vein": "veins",
     "brachiocephalic_trunk": "arteries",
     "subclavian_artery_right": "arteries",
@@ -48,7 +48,7 @@ reduced_class_mappings: Dict[str, str] = {
     "common_carotid_artery_left": "arteries",
     "brachiocephalic_vein_left": "veins",
     "brachiocephalic_vein_right": "veins",
-    "atrial_appendage_left": "atrial_appendage_left",
+    "atrial_appendage_left": "atrial_appendage",
     "superior_vena_cava": "veins",
     "inferior_vena_cava": "veins",
     "portal_vein_and_splenic_vein": "veins",
