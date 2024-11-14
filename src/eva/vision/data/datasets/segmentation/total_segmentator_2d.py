@@ -135,13 +135,15 @@ class TotalSegmentator2D(base.ImageSegmentation):
             is_subset = all(name in all_classes for name in self._classes)
             if not is_subset:
                 raise ValueError("Provided class names are not subset of the original ones.")
-            return sorted(self._classes)
+            classes = sorted(self._classes)
         elif self._class_mappings:
             is_subset = all(name in all_classes for name in self._class_mappings.keys())
             if not is_subset:
                 raise ValueError("Provided class names are not subset of the original ones.")
-            return sorted(set(self._class_mappings.values()))
-        return all_classes
+            classes = sorted(set(self._class_mappings.values()))
+        else:
+            classes = all_classes
+        return ["background"] + classes
 
     @property
     @override
@@ -195,7 +197,7 @@ class TotalSegmentator2D(base.ImageSegmentation):
         _validators.check_dataset_integrity(
             self,
             length=self._expected_dataset_lengths.get(f"{self._split}_{self._version}", 0),
-            n_classes=n_classes,
+            n_classes=n_classes+1,
             first_and_last_labels=first_and_last_labels,
         )
 
