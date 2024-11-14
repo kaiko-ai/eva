@@ -245,12 +245,14 @@ class TotalSegmentator2D(base.ImageSegmentation):
             slice_index: Whether to return only a specific slice.
         """
         masks_dir = self._get_masks_dir(sample_index)
-        classes = self._class_mappings.keys() if self._class_mappings else self.classes
+        classes = self._class_mappings.keys() if self._class_mappings else self.classes[1:]
         mask_paths = [os.path.join(masks_dir, f"{label}.nii.gz") for label in classes]
         binary_masks = [io.read_nifti(path, slice_index) for path in mask_paths]
 
         if self._class_mappings:
-            mapped_binary_masks = [np.zeros_like(binary_masks[0], dtype=np.bool_)] * len(self.classes[1:])
+            mapped_binary_masks = [np.zeros_like(binary_masks[0], dtype=np.bool_)] * len(
+                self.classes[1:]
+            )
             for original_class, mapped_class in self._class_mappings.items():
                 mapped_index = self.class_to_idx[mapped_class] - 1
                 original_index = list(self._class_mappings.keys()).index(original_class)

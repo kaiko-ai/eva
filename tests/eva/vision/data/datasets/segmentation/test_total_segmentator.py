@@ -59,7 +59,7 @@ def test_sample(total_segmentator_dataset: datasets.TotalSegmentator2D, index: i
     assert "slice_index" in metadata
 
     # check the number of classes with v.s. without class mappings
-    n_classes_expected = 2 if total_segmentator_dataset._class_mappings is not None else 3
+    n_classes_expected = 3 if total_segmentator_dataset._class_mappings is not None else 4
     assert len(total_segmentator_dataset.classes) == n_classes_expected
 
 
