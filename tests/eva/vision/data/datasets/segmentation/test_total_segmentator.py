@@ -52,7 +52,7 @@ def test_sample(total_segmentator_dataset: datasets.TotalSegmentator2D, index: i
     # assert the format of the `image` and `mask`
     image, mask, metadata = sample
     assert isinstance(image, tv_tensors.Image)
-    assert image.shape == (3, 16, 16)
+    assert image.shape == (1, 16, 16)
     assert isinstance(mask, tv_tensors.Mask)
     assert mask.shape == (16, 16)
     assert isinstance(metadata, dict)
@@ -90,6 +90,7 @@ def test_optimize_mask_loading(total_segmentator_dataset: datasets.TotalSegmenta
     with (
         patch.object(total_segmentator_dataset, "_load_semantic_label_mask") as mock_load_optimized,
         patch.object(total_segmentator_dataset, "_load_mask") as mock_load,
+        patch.object(total_segmentator_dataset, "_fix_orientation") as _,
     ):
         _ = total_segmentator_dataset.load_mask(0)
         if optimize:
