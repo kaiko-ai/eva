@@ -32,6 +32,7 @@ class DataModule(pl.LightningDataModule):
         Args:
             datasets: The desired datasets.
             dataloaders: The desired dataloaders.
+            samplers: The desired samplers for the dataloaders.
         """
         super().__init__()
 
@@ -74,8 +75,10 @@ class DataModule(pl.LightningDataModule):
             )
         if isinstance(self.datasets.train, list) and len(self.datasets.train) > 1:
             raise ValueError("Train dataloader can not be initialized with multiple datasets.")
-        
-        return self._initialize_dataloaders(self.dataloaders.train, self.datasets.train, self.samplers.train)[0]
+
+        return self._initialize_dataloaders(
+            self.dataloaders.train, self.datasets.train, self.samplers.train
+        )[0]
 
     @override
     def val_dataloader(self) -> EVAL_DATALOADERS:
@@ -83,7 +86,9 @@ class DataModule(pl.LightningDataModule):
             raise ValueError(
                 "Validation dataloader can not be initialized as `self.datasets.val` is `None`."
             )
-        return self._initialize_dataloaders(self.dataloaders.val, self.datasets.val, self.samplers.val)
+        return self._initialize_dataloaders(
+            self.dataloaders.val, self.datasets.val, self.samplers.val
+        )
 
     @override
     def test_dataloader(self) -> EVAL_DATALOADERS:
@@ -91,7 +96,9 @@ class DataModule(pl.LightningDataModule):
             raise ValueError(
                 "Test dataloader can not be initialized as `self.datasets.test` is `None`."
             )
-        return self._initialize_dataloaders(self.dataloaders.test, self.datasets.test, self.samplers.test)
+        return self._initialize_dataloaders(
+            self.dataloaders.test, self.datasets.test, self.samplers.test
+        )
 
     @override
     def predict_dataloader(self) -> EVAL_DATALOADERS:
@@ -99,19 +106,22 @@ class DataModule(pl.LightningDataModule):
             raise ValueError(
                 "Predict dataloader can not be initialized as `self.datasets.predict` is `None`."
             )
-        return self._initialize_dataloaders(self.dataloaders.predict, self.datasets.predict, self.samplers.predict)
+        return self._initialize_dataloaders(
+            self.dataloaders.predict, self.datasets.predict, self.samplers.predict
+        )
 
     def _initialize_dataloaders(
         self,
         dataloader: dataloaders_lib.DataLoader,
         datasets: datasets_lib.TorchDataset | List[datasets_lib.TorchDataset],
-        sampler: samplers_lib.Sampler | None = None
+        sampler: samplers_lib.Sampler | None = None,
     ) -> EVAL_DATALOADERS:
         """Initializes dataloaders from a given set of dataset.
 
         Args:
             dataloader: The dataloader to apply to the provided datasets.
             datasets: The desired dataset(s) to allocate dataloader(s).
+            sampler: The sampler to use for the dataloader.
 
         Returns:
             A list with the dataloaders of the provided dataset(s).
@@ -121,6 +131,6 @@ class DataModule(pl.LightningDataModule):
         dataloaders = []
         for dataset in datasets:
             if sampler and isinstance(sampler, samplers_lib.SamplerWithDataSource):
-                sampler.set_dataset(dataset)
+                sampler.set_dataset(dataset)  # type: ignore
             dataloaders.append(dataloader(dataset, sampler=sampler))
         return dataloaders

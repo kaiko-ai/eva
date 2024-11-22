@@ -61,6 +61,7 @@ class DataloadersSchema:
     predict: dataloaders.DataLoader = dataclasses.field(default_factory=dataloaders.DataLoader)
     """Predict dataloader."""
 
+
 @dataclasses.dataclass(frozen=True)
 class SamplersSchema:
     """Samplers schema used in DataModule."""

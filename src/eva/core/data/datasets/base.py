@@ -1,7 +1,8 @@
 """Base dataset class."""
 
-from eva.core.data.datasets import dataset
 import abc
+
+from eva.core.data.datasets import dataset
 
 
 class Dataset(dataset.TorchDataset):
@@ -53,6 +54,7 @@ class Dataset(dataset.TorchDataset):
         called from every process (i.e. GPU) across all the nodes in DDP.
         """
 
+
 class MapDataset(Dataset):
     """Abstract base class for all map-style datasets."""
 
@@ -76,5 +78,3 @@ class MapDataset(Dataset):
             int: Length of the dataset
         """
         raise NotImplementedError
-
-
