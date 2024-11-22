@@ -59,7 +59,7 @@ class DataLoader:
     prefetch_factor: int | None = 2
     """Number of batches loaded in advance by each worker."""
 
-    def __call__(self, dataset: datasets.TorchDataset) -> dataloader.DataLoader:
+    def __call__(self, dataset: datasets.TorchDataset, sampler: samplers.Sampler | None = None) -> dataloader.DataLoader:
         """Returns the dataloader on the provided dataset.
 
         Args:
@@ -69,7 +69,7 @@ class DataLoader:
             dataset=dataset,
             batch_size=self.batch_size,
             shuffle=self.shuffle,
-            sampler=self.sampler,
+            sampler=sampler or self.sampler,
             batch_sampler=self.batch_sampler,
             num_workers=self.num_workers or multiprocessing.cpu_count(),
             collate_fn=self.collate_fn,
