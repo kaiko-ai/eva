@@ -9,7 +9,7 @@ DataSample = TypeVar("DataSample")
 """The data sample type."""
 
 
-class VisionDataset(base.Dataset, abc.ABC, Generic[DataSample]):
+class VisionDataset(base.MapDataset, abc.ABC, Generic[DataSample]):
     """Base dataset class for vision tasks."""
 
     @abc.abstractmethod
@@ -24,20 +24,3 @@ class VisionDataset(base.Dataset, abc.ABC, Generic[DataSample]):
         Returns:
             The filename of the `index`'th data sample.
         """
-
-    @abc.abstractmethod
-    def __getitem__(self, index: int) -> DataSample:
-        """Returns the `index`'th data sample.
-
-        Args:
-            index: The index of the data-sample to select.
-
-        Returns:
-            A data sample and its target.
-        """
-        raise NotImplementedError
-
-    @abc.abstractmethod
-    def __len__(self) -> int:
-        """Returns the total length of the data."""
-        raise NotImplementedError

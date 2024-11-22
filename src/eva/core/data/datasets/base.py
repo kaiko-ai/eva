@@ -1,6 +1,7 @@
 """Base dataset class."""
 
 from eva.core.data.datasets import dataset
+import abc
 
 
 class Dataset(dataset.TorchDataset):
@@ -51,3 +52,29 @@ class Dataset(dataset.TorchDataset):
         of fit (train + validate), validate, test, or predict and it will be
         called from every process (i.e. GPU) across all the nodes in DDP.
         """
+
+class MapDataset(Dataset):
+    """Abstract base class for all map-style datasets."""
+
+    @abc.abstractmethod
+    def __getitem__(self, index: int):
+        """Retrieves the item at the given index.
+
+        Args:
+            index (int): Index
+
+        Returns:
+            Any: The data at the given index
+        """
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def __len__(self) -> int:
+        """Returns the length of the dataset.
+
+        Returns:
+            int: Length of the dataset
+        """
+        raise NotImplementedError
+
+
