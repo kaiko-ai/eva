@@ -13,7 +13,6 @@ class RandomSampler(data.RandomSampler, SamplerWithDataSource[int]):
     """Samples elements randomly."""
 
     data_source: datasets.MapDataset  # type: ignore
-    replacement: bool
 
     def __init__(
         self, replacement: bool = False, num_samples: Optional[int] = None, generator=None

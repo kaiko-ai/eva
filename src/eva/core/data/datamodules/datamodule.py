@@ -130,7 +130,7 @@ class DataModule(pl.LightningDataModule):
 
         dataloaders = []
         for dataset in datasets:
-            if sampler and isinstance(sampler, samplers_lib.SamplerWithDataSource):
+            if sampler is not None and isinstance(sampler, samplers_lib.SamplerWithDataSource):
                 sampler.set_dataset(dataset)  # type: ignore
             dataloaders.append(dataloader(dataset, sampler=sampler))
         return dataloaders
