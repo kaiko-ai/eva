@@ -13,7 +13,11 @@ T_co = TypeVar("T_co", covariant=True)
 
 
 class SamplerWithDataSource(Sampler, Generic[T_co]):
-    """A sampler base class that enables to specify the data source after initialization."""
+    """A sampler base class that enables to specify the data source after initialization.
+
+    The `set_dataset` can also be overwritten to expand the functionality of the derived
+    sampler classes.
+    """
 
     data_source: datasets.MapDataset
 

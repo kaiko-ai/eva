@@ -1,4 +1,4 @@
-"""Random sampler for data loading."""
+"""Random class sampler for data loading."""
 
 from collections import defaultdict
 from typing import Dict, Iterator, List
@@ -20,14 +20,13 @@ class BalancedSampler(SamplerWithDataSource[int]):
     3. Samples of different classes appear in random order
     """
 
-    def __init__(self, num_samples: int, replacement: bool = False, seed: int | None = None):
+    def __init__(self, num_samples: int, replacement: bool = False, seed: int | None = 42):
         """Initializes the balanced sampler.
 
         Args:
             num_samples: The number of samples to draw per class.
             replacement: samples are drawn on-demand with replacement if ``True``, default=``False``
-            seed: Random seed for reproducibility. If None, sampling will be random
-                but not reproducible between runs.
+            seed: Random seed for reproducibility.
         """
         self._num_samples = num_samples
         self._replacement = replacement
