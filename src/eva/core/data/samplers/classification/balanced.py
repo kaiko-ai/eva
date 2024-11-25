@@ -9,6 +9,7 @@ from typing_extensions import override
 from eva.core.data import datasets
 from eva.core.data.datasets.typings import DataSample
 from eva.core.data.samplers.sampler import SamplerWithDataSource
+from eva.core.utils.progress_bar import tqdm
 
 
 class BalancedSampler(SamplerWithDataSource[int]):
@@ -74,7 +75,9 @@ class BalancedSampler(SamplerWithDataSource[int]):
         """Builds indices for each class in the dataset."""
         self._class_indices.clear()
 
-        for idx in range(len(self.data_source)):
+        for idx in tqdm(
+            range(len(self.data_source)), desc="Fetching class indices for balanced sampler"
+        ):
             _, target, _ = DataSample(*self.data_source[idx])
             if target is None:
                 raise ValueError("The dataset must return non-empty targets.")
