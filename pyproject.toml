@@ -6,7 +6,7 @@ build-backend = "pdm.backend"
 
 [project]
 name = "kaiko-eva"
-version = "0.1.4"
+version = "0.1.5"
 description = "Evaluation Framework for oncology foundation models."
 keywords = [
     "machine-learning",
@@ -59,7 +59,7 @@ file = "LICENSE"
 [project.optional-dependencies]
 vision = [
     "h5py>=3.10.0",
-    "nibabel>=5.2.0",
+    "nibabel>=4.0.1",
     "opencv-python-headless>=4.9.0.80",
     "timm>=1.0.9",
     "torchvision>=0.17.0",
@@ -72,7 +72,7 @@ vision = [
 ]
 all = [
     "h5py>=3.10.0",
-    "nibabel>=5.2.0",
+    "nibabel>=4.0.1",
     "opencv-python-headless>=4.9.0.80",
     "timm>=1.0.9",
     "torchvision>=0.17.0",
