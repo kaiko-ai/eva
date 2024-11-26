@@ -5,7 +5,7 @@
 groups = ["default", "all", "dev", "docs", "lint", "test", "typecheck", "vision"]
 strategy = ["inherit_metadata"]
 lock_version = "4.5.0"
-content_hash = "sha256:cc23a9652ade7a78ab86d2663e963e4d41f1c30cdb485f6459f4fefc9fcea7e0"
+content_hash = "sha256:db71a0a80cc410cadc0d9a14b08647ccefcbc7ea1415f49b50ec9d967dbdd56f"
 
 [[metadata.targets]]
 requires_python = ">=3.10"
@@ -1994,7 +1994,7 @@ name = "pyreadline3"
 version = "3.4.1"
 summary = "A python implementation of GNU readline."
 groups = ["default"]
-marker = "sys_platform == \"win32\""
+marker = "sys_platform == \"win32\" and python_version >= \"3.8\""
 files = [
     {file = "pyreadline3-3.4.1-py3-none-any.whl", hash = "sha256:b0efb6516fd4fb07b45949053826a62fa4cb353db5be2bbb4a7aa1fdd1e345fb"},
     {file = "pyreadline3-3.4.1.tar.gz", hash = "sha256:6f3d1f7b8a31ba32b73917cefc1f28cc660562f39aea8646d30bd6eff21f7bae"},
