@@ -24,7 +24,7 @@ import os
 
 import nox
 
-PYTHON_VERSIONS = ["3.10"]
+PYTHON_VERSIONS = ["3.11"]
 """The python versions to test on."""
 
 LOCATIONS = "src", "tests", "noxfile.py"

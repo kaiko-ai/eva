@@ -14,12 +14,12 @@ jobs:
       - name: Setting up PDM
         uses: pdm-project/setup-pdm@568ddd69406b30de1774ec0044b73ae06e716aa4 # v4
         with:
-          python-version: "3.10"
+          python-version: "3.11"
           architecture: x64
       - name: Setting up nox
         uses: wntrblm/nox@5656fcedc31a1ea37d016e4d94d00185330cc528 # 2024.04.15
         with:
-          python-versions: "3.10"
+          python-versions: "3.11"
       - name: Performing lint checks
         run: nox -s lint
       - name: Performing static type checks
@@ -30,7 +30,7 @@ jobs:
         os:
         - ubuntu-latest
         python-version:
-        - "3.10"
+        - "3.11"
     runs-on: ${{ matrix.os }}
     steps:
       - name: Install OS dependencies
@@ -62,12 +62,12 @@ jobs:
       - name: Setting up PDM
         uses: pdm-project/setup-pdm@568ddd69406b30de1774ec0044b73ae06e716aa4 # v4
         with:
-          python-version: "3.10"
+          python-version: "3.11"
           architecture: x64
       - name: Setting up nox
         uses: wntrblm/nox@5656fcedc31a1ea37d016e4d94d00185330cc528 # 2024.04.15
         with:
-          python-versions: "3.10"
+          python-versions: "3.11"
       - name: Configure Git Credentials
         run: |
           git config user.email "action@github.com"
