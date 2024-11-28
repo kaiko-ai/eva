@@ -53,5 +53,4 @@ class MulticlassSegmentationMetrics(structs.MetricCollection):
             },
             prefix=prefix,
             postfix=postfix,
-            compute_groups=False,
         )
