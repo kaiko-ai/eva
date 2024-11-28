@@ -9,7 +9,7 @@ from typing_extensions import override
 from eva.vision.metrics.segmentation import _utils
 
 
-class GeneralizedDiceScore(segmentation.GeneralizedDiceScore):
+class DiceScore(segmentation.DiceScore):
     """Defines the Generalized Dice Score.
 
     It expands the `torchmetrics` class by including an `ignore_index`
@@ -20,9 +20,8 @@ class GeneralizedDiceScore(segmentation.GeneralizedDiceScore):
         self,
         num_classes: int,
         include_background: bool = True,
-        weight_type: Literal["square", "simple", "linear"] = "linear",
+        average: Literal["micro", "macro", "weighted", "none"] | None = "micro",
         ignore_index: int | None = None,
-        per_class: bool = False,
         **kwargs: Any,
     ) -> None:
         """Initializes the metric.
@@ -34,8 +33,6 @@ class GeneralizedDiceScore(segmentation.GeneralizedDiceScore):
                 `"simple"`, or `"linear"`.
             ignore_index: Integer specifying a target class to ignore. If given, this class
                 index does not contribute to the returned score, regardless of reduction method.
-            per_class: Whether to compute the IoU for each class separately. If set to ``False``,
-                the metric will compute the mean IoU over all classes.
             kwargs: Additional keyword arguments, see :ref:`Metric kwargs` for more info.
         """
         super().__init__(
@@ -43,8 +40,8 @@ class GeneralizedDiceScore(segmentation.GeneralizedDiceScore):
             - (ignore_index is not None)
             + (ignore_index == 0 and not include_background),
             include_background=include_background,
-            weight_type=weight_type,
-            per_class=per_class,
+            average=average,
+            input_format="one-hot",
             **kwargs,
         )
         self.orig_num_classes = num_classes

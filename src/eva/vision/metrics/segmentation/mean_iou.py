@@ -13,7 +13,7 @@ class MeanIoU(segmentation.MeanIoU):
     """MeanIoU (mIOU) metric for semantic segmentation.
 
     It expands the `torchmetrics` class by including an `ignore_index`
-    functionality.
+    functionality and converting tensors to one-hot format.
     """
 
     def __init__(
