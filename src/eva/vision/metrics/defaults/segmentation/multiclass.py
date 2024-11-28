@@ -1,7 +1,7 @@
 """Default metric collection for multiclass semantic segmentation tasks."""
 
 from eva.core.metrics import structs
-from eva.vision.metrics.segmentation import generalized_dice, mean_iou
+from eva.vision.metrics.segmentation import dice, mean_iou
 
 
 class MulticlassSegmentationMetrics(structs.MetricCollection):
@@ -26,19 +26,31 @@ class MulticlassSegmentationMetrics(structs.MetricCollection):
             postfix: A string to add after the keys in the output dictionary.
         """
         super().__init__(
-            metrics=[
-                generalized_dice.GeneralizedDiceScore(
+            metrics={
+                "DiceScore (micro)": dice.DiceScore(
                     num_classes=num_classes,
                     include_background=include_background,
-                    weight_type="linear",
+                    average="micro",
                     ignore_index=ignore_index,
                 ),
-                mean_iou.MeanIoU(
+                "DiceScore (macro)": dice.DiceScore(
+                    num_classes=num_classes,
+                    include_background=include_background,
+                    average="macro",
+                    ignore_index=ignore_index,
+                ),
+                # "DiceScore (weighted)": dice.DiceScore(
+                #     num_classes=num_classes,
+                #     include_background=include_background,
+                #     average="weighted",
+                #     ignore_index=ignore_index,
+                # ), # TODO: for some reason this doesn't work when calculating also micro & macro
+                "MeanIoU": mean_iou.MeanIoU(
                     num_classes=num_classes,
                     include_background=include_background,
                     ignore_index=ignore_index,
                 ),
-            ],
+            },
             prefix=prefix,
             postfix=postfix,
         )
