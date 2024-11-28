@@ -105,8 +105,8 @@ class LiTS(base.ImageSegmentation):
         _validators.check_dataset_integrity(
             self,
             length=self._expected_dataset_lengths.get(self._split, 0),
-            n_classes=2,
-            first_and_last_labels=("liver", "tumor"),
+            n_classes=3,
+            first_and_last_labels=("background", "tumor"),
         )
 
     @override
