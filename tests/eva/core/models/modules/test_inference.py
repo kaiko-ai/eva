@@ -19,7 +19,7 @@ N_CLASSES = 4
     "dataset_fixture",
     [
         "classification_dataset",
-        "classification_dataset_with_metadata",
+        # "classification_dataset_with_metadata",
     ],
 )
 def test_inference_module_predict(

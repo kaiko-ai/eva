@@ -106,16 +106,17 @@ class DataModule(pl.LightningDataModule):
             raise ValueError(
                 "Predict dataloader can not be initialized as `self.datasets.predict` is `None`."
             )
-        train_dataloader = self._initialize_dataloaders(
-            self.dataloaders.predict, self.datasets.predict[0], self.samplers.predict
-        )
-        return train_dataloader + self._initialize_dataloaders(
-            self.dataloaders.predict,
-            (
-                self.datasets.predict[1:]
-                if isinstance(self.datasets.predict, list) and len(self.datasets.predict) > 1
-                else []
-            ),  # Don't apply samplers to datasets other than train
+        if isinstance(self.datasets.predict, list) and len(self.datasets.predict) > 1:
+            # Only apply sampler to the first predict dataset (should correspond to train split)
+            train_dataloader = self._initialize_dataloaders(
+                self.dataloaders.predict, self.datasets.predict[0], self.samplers.predict
+            )
+            return train_dataloader + self._initialize_dataloaders(
+                self.dataloaders.predict, self.datasets.predict[1:]
+            )
+
+        return self._initialize_dataloaders(
+            self.dataloaders.predict, self.datasets.predict, self.samplers.predict
         )
 
     def _initialize_dataloaders(
