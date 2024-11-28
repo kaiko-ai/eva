@@ -1,7 +1,7 @@
 """Default metric collection for multiclass semantic segmentation tasks."""
 
 from eva.core.metrics import structs
-from eva.vision.metrics.segmentation import dice, mean_iou
+from eva.vision.metrics import segmentation
 
 
 class MulticlassSegmentationMetrics(structs.MetricCollection):
@@ -27,25 +27,25 @@ class MulticlassSegmentationMetrics(structs.MetricCollection):
         """
         super().__init__(
             metrics={
-                "DiceScore (micro)": dice.DiceScore(
+                "DiceScore (micro)": segmentation.DiceScore(
                     num_classes=num_classes,
                     include_background=include_background,
                     average="micro",
                     ignore_index=ignore_index,
                 ),
-                "DiceScore (macro)": dice.DiceScore(
+                "DiceScore (macro)": segmentation.DiceScore(
                     num_classes=num_classes,
                     include_background=include_background,
                     average="macro",
                     ignore_index=ignore_index,
                 ),
-                # "DiceScore (weighted)": dice.DiceScore(
-                #     num_classes=num_classes,
-                #     include_background=include_background,
-                #     average="weighted",
-                #     ignore_index=ignore_index,
-                # ), # TODO: for some reason this doesn't work when calculating also micro & macro
-                "MeanIoU": mean_iou.MeanIoU(
+                "DiceScore (weighted)": segmentation.DiceScore(
+                    num_classes=num_classes,
+                    include_background=include_background,
+                    average="weighted",
+                    ignore_index=ignore_index,
+                ),
+                "MeanIoU": segmentation.MeanIoU(
                     num_classes=num_classes,
                     include_background=include_background,
                     ignore_index=ignore_index,
@@ -53,4 +53,5 @@ class MulticlassSegmentationMetrics(structs.MetricCollection):
             },
             prefix=prefix,
             postfix=postfix,
+            compute_groups=False,
         )
