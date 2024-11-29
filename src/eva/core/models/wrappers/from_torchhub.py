@@ -57,7 +57,7 @@ class TorchHubModel(wrappers.BaseModel):
 
     @override
     def load_model(self) -> None:
-        """Builds and loads the timm model as feature extractor."""
+        """Builds and loads the torch.hub model."""
         self._model: nn.Module = torch.hub.load(
             repo_or_dir=self._repo_or_dir,
             model=self._model_name,

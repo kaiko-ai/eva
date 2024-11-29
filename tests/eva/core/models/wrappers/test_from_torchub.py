@@ -1,4 +1,4 @@
-"""TimmModel tests."""
+"""TorchHubModel tests."""
 
 from typing import Any, Dict, Tuple
 
@@ -66,7 +66,7 @@ def torchhub_model(
     out_indices: int | Tuple[int, ...] | None,
     model_kwargs: Dict[str, Any] | None,
 ) -> wrappers.TorchHubModel:
-    """TimmModel fixture."""
+    """TorchHubModel fixture."""
     return wrappers.TorchHubModel(
         model_name=model_name,
         repo_or_dir=repo_or_dir,
