@@ -27,6 +27,18 @@ class MulticlassSegmentationMetrics(structs.MetricCollection):
         """
         super().__init__(
             metrics={
+                "MonaiDiceScore": segmentation.MonaiDiceScore(
+                    num_classes=num_classes,
+                    include_background=include_background,
+                    ignore_index=ignore_index,
+                    ignore_empty=True,
+                ),
+                "MonaiDiceScore (ignore_empty=False)": segmentation.MonaiDiceScore(
+                    num_classes=num_classes,
+                    include_background=include_background,
+                    ignore_index=ignore_index,
+                    ignore_empty=False,
+                ),
                 "DiceScore (micro)": segmentation.DiceScore(
                     num_classes=num_classes,
                     include_background=include_background,
