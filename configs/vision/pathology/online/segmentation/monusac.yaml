@@ -81,10 +81,11 @@ model:
         - class_path: torchmetrics.ClasswiseWrapper
           init_args:
             metric:
-              class_path: eva.vision.metrics.DiceScore
+              class_path: eva.vision.metrics.MonaiDiceScore
               init_args:
+                include_background: true
                 num_classes: 6
-                average: none
+                reduction: none
                 ignore_index: *IGNORE_INDEX
             labels:
               - background

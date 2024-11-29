@@ -77,10 +77,11 @@ model:
         - class_path: torchmetrics.ClasswiseWrapper
           init_args:
             metric:
-              class_path: eva.vision.metrics.DiceScore
+              class_path: eva.vision.metrics.MonaiDiceScore
               init_args:
+                include_background: true
                 num_classes: *NUM_CLASSES
-                average: none
+                reduction: none
             labels:
               - background
               - liver
