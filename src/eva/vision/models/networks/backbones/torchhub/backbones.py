@@ -28,7 +28,7 @@ def torch_hub_model(
         model_name: The name of the model to load.
         repo_or_dir: The torch.hub repository or local directory to load the model from.
         checkpoint_path: The path to the checkpoint file.
-        pretrained: If set to `True`, load pretrained ImageNet-1k weights.
+        pretrained: If set to `True`, load pretrained model weights if available.
         out_indices: Whether and which multi-level patch embeddings to return.
         **kwargs: Additional arguments to pass to the model
 
