@@ -43,7 +43,7 @@ class TimmModel(wrappers.BaseModel):
         self._pretrained = pretrained
         self._checkpoint_path = checkpoint_path
         self._out_indices = out_indices
-        self._model_kwargs = model_kwargs or {}
+        self._model_kwargs = model_kwargs or {"dynamic_img_size": True}
 
         self.load_model()
 
