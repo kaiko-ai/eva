@@ -13,10 +13,15 @@ NUM_CLASSES_ONE = 3
 PREDS_ONE = torch.randint(0, NUM_CLASSES_ONE, (NUM_BATCHES, BATCH_SIZE, 32, 32))
 TARGET_ONE = torch.randint(0, NUM_CLASSES_ONE, (NUM_BATCHES, BATCH_SIZE, 32, 32))
 EXPECTED_ONE = {
-    "GeneralizedDiceScore": torch.tensor(0.3482658863067627),
+    "MonaiDiceScore": torch.tensor(0.34805023670196533),
+    "MonaiDiceScore (ignore_empty=False)": torch.tensor(0.34805023670196533),
+    "DiceScore (micro)": torch.tensor(0.3482658863067627),
+    "DiceScore (macro)": torch.tensor(0.34805023670196533),
+    "DiceScore (weighted)": torch.tensor(0.3484232723712921),
     "MeanIoU": torch.tensor(0.2109210342168808),
 }
 """Test features."""
+assert EXPECTED_ONE["MonaiDiceScore (ignore_empty=False)"] == EXPECTED_ONE["DiceScore (macro)"]
 
 
 @pytest.mark.parametrize(

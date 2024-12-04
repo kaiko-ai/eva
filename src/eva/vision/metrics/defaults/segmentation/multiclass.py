@@ -1,7 +1,7 @@
 """Default metric collection for multiclass semantic segmentation tasks."""
 
 from eva.core.metrics import structs
-from eva.vision.metrics.segmentation import generalized_dice, mean_iou
+from eva.vision.metrics import segmentation
 
 
 class MulticlassSegmentationMetrics(structs.MetricCollection):
@@ -26,19 +26,43 @@ class MulticlassSegmentationMetrics(structs.MetricCollection):
             postfix: A string to add after the keys in the output dictionary.
         """
         super().__init__(
-            metrics=[
-                generalized_dice.GeneralizedDiceScore(
-                    num_classes=num_classes,
-                    include_background=include_background,
-                    weight_type="linear",
-                    ignore_index=ignore_index,
-                ),
-                mean_iou.MeanIoU(
+            metrics={
+                "MonaiDiceScore": segmentation.MonaiDiceScore(
                     num_classes=num_classes,
                     include_background=include_background,
                     ignore_index=ignore_index,
+                    ignore_empty=True,
                 ),
-            ],
+                "MonaiDiceScore (ignore_empty=False)": segmentation.MonaiDiceScore(
+                    num_classes=num_classes,
+                    include_background=include_background,
+                    ignore_index=ignore_index,
+                    ignore_empty=False,
+                ),
+                "DiceScore (micro)": segmentation.DiceScore(
+                    num_classes=num_classes,
+                    include_background=include_background,
+                    average="micro",
+                    ignore_index=ignore_index,
+                ),
+                "DiceScore (macro)": segmentation.DiceScore(
+                    num_classes=num_classes,
+                    include_background=include_background,
+                    average="macro",
+                    ignore_index=ignore_index,
+                ),
+                "DiceScore (weighted)": segmentation.DiceScore(
+                    num_classes=num_classes,
+                    include_background=include_background,
+                    average="weighted",
+                    ignore_index=ignore_index,
+                ),
+                "MeanIoU": segmentation.MeanIoU(
+                    num_classes=num_classes,
+                    include_background=include_background,
+                    ignore_index=ignore_index,
+                ),
+            },
             prefix=prefix,
             postfix=postfix,
         )

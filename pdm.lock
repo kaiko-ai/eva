@@ -5,7 +5,7 @@
 groups = ["default", "all", "dev", "docs", "lint", "test", "typecheck", "vision"]
 strategy = ["inherit_metadata"]
 lock_version = "4.5.0"
-content_hash = "sha256:b8df35bf60e5573e36c31c4ad4f324d7693f16b31cadcd27e48b352ae6c0235b"
+content_hash = "sha256:5b9e7f8ba62696f3e07200365e1c11658c9c9bd24dbffa67f790b30f4ab0ff01"
 
 [[metadata.targets]]
 requires_python = ">=3.10"
@@ -2743,20 +2743,20 @@ files = [
 
 [[package]]
 name = "torchmetrics"
-version = "1.4.2"
-requires_python = ">=3.8"
+version = "1.6.0"
+requires_python = ">=3.9"
 summary = "PyTorch native Metrics"
 groups = ["default"]
 dependencies = [
     "lightning-utilities>=0.8.0",
     "numpy>1.20.0",
     "packaging>17.1",
-    "torch>=1.10.0",
+    "torch>=2.0.0",
     "typing-extensions; python_version < \"3.9\"",
 ]
 files = [
-    {file = "torchmetrics-1.4.2-py3-none-any.whl", hash = "sha256:87b9eca51ff6f93985a0f9db509f646cb45425b016f4d2f383d8c28d40dde5b6"},
-    {file = "torchmetrics-1.4.2.tar.gz", hash = "sha256:7a40cbec85e5645090812b87601696b4adf158294ec8c407ae58a71710938b87"},
+    {file = "torchmetrics-1.6.0-py3-none-any.whl", hash = "sha256:a508cdd87766cedaaf55a419812bf9f493aff8fffc02cc19df5a8e2e7ccb942a"},
+    {file = "torchmetrics-1.6.0.tar.gz", hash = "sha256:aebba248708fb90def20cccba6f55bddd134a58de43fb22b0c5ca0f3a89fa984"},
 ]
 
 [[package]]

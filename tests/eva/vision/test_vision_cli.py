@@ -24,7 +24,7 @@ from tests.eva import _cli
         "configs/vision/pathology/online/segmentation/bcss.yaml",
         "configs/vision/pathology/online/segmentation/consep.yaml",
         "configs/vision/pathology/online/segmentation/monusac.yaml",
-        "configs/vision/pathology/online/segmentation/total_segmentator_2d.yaml",
+        "configs/vision/radiology/online/segmentation/total_segmentator_2d.yaml",
         "configs/vision/radiology/online/segmentation/lits.yaml",
         # | offline
         # classification
@@ -38,7 +38,7 @@ from tests.eva import _cli
         "configs/vision/pathology/offline/segmentation/bcss.yaml",
         "configs/vision/pathology/offline/segmentation/consep.yaml",
         "configs/vision/pathology/offline/segmentation/monusac.yaml",
-        "configs/vision/pathology/offline/segmentation/total_segmentator_2d.yaml",
+        "configs/vision/radiology/offline/segmentation/total_segmentator_2d.yaml",
         "configs/vision/radiology/offline/segmentation/lits.yaml",
     ],
 )
