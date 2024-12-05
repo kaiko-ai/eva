@@ -63,7 +63,7 @@ model:
       init_args:
         softmax: true
         batch: true
-        ignore_index: &IGNORE_INDEX 255
+        ignore_index: &IGNORE_INDEX 5
     optimizer:
       class_path: torch.optim.AdamW
       init_args:
@@ -84,17 +84,17 @@ model:
       evaluation:
         - class_path: eva.vision.metrics.defaults.MulticlassSegmentationMetrics
           init_args:
-            num_classes: *NUM_CLASSES
+            num_classes: 6
             ignore_index: *IGNORE_INDEX
         - class_path: torchmetrics.ClasswiseWrapper
           init_args:
             metric:
               class_path: eva.vision.metrics.GeneralizedDiceScore
               init_args:
-                num_classes: *NUM_CLASSES
+                num_classes: 6
                 weight_type: linear
-                per_class: true
                 ignore_index: *IGNORE_INDEX
+                per_class: true
 data:
   class_path: eva.DataModule
   init_args:
@@ -133,8 +133,11 @@ data:
     dataloaders:
       train:
         batch_size: &BATCH_SIZE ${oc.env:BATCH_SIZE, 64}
+        num_workers: &N_DATA_WORKERS ${oc.env:N_DATA_WORKERS, 4}
         shuffle: true
       val:
         batch_size: *BATCH_SIZE
+        num_workers: *N_DATA_WORKERS
       predict:
         batch_size: &PREDICT_BATCH_SIZE ${oc.env:PREDICT_BATCH_SIZE, 64}
+        num_workers: *N_DATA_WORKERS

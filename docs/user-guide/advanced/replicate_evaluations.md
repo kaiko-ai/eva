@@ -15,10 +15,13 @@ Keep in mind:
 
 ### DINO ViT-S16 (random weights)
 
-Evaluating the backbone with randomly initialized weights serves as a baseline to compare the pretrained FMs to an FM that produces embeddings without any prior learning on image tasks. To evaluate, run:
+Evaluating the backbone with randomly initialized weights serves as a baseline to compare the pretrained FMs to a FM that produces embeddings without any prior learning on image tasks. To evaluate, run:
 
 ```
 MODEL_NAME="universal/vit_small_patch16_224_random" \
+NORMALIZE_MEAN="[0.485,0.456,0.406]" \
+NORMALIZE_STD="[0.229,0.224,0.225]" \
+IN_FEATURES=384 \
 eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
 ```
 
@@ -28,6 +31,9 @@ The next baseline model, uses a pretrained ViT-S16 backbone with ImageNet weight
 
 ```
 MODEL_NAME="universal/vit_small_patch16_224_dino" \
+NORMALIZE_MEAN="[0.485,0.456,0.406]" \
+NORMALIZE_STD="[0.229,0.224,0.225]" \
+IN_FEATURES=384 \
 eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
 ```
 
@@ -38,8 +44,9 @@ on [GitHub](https://github.com/lunit-io/benchmark-ssl-pathology/releases/). To e
 
 ```
 MODEL_NAME=pathology/lunit_vits16
-NORMALIZE_MEAN=[0.70322989,0.53606487,0.66096631] \
-NORMALIZE_STD=[0.21716536,0.26081574,0.20723464] \
+NORMALIZE_MEAN="[0.70322989,0.53606487,0.66096631]" \
+NORMALIZE_STD="[0.21716536,0.26081574,0.20723464]" \
+IN_FEATURES=384 \
 eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
 ```
 
@@ -47,18 +54,36 @@ eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
 
 ```
 MODEL_NAME=pathology/lunit_vits8 \
-NORMALIZE_MEAN=[0.70322989,0.53606487,0.66096631] \
-NORMALIZE_STD=[0.21716536,0.26081574,0.20723464] \
+NORMALIZE_MEAN="[0.70322989,0.53606487,0.66096631]" \
+NORMALIZE_STD="[0.21716536,0.26081574,0.20723464]" \
+IN_FEATURES=384 \
 eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
 ```
 
 ### Phikon (Owkin) - iBOT ViT-B16 (TCGA) [[2]](#references)
 
-[Owkin](https://www.owkin.com/) released the weights for "Phikon", an FM trained with iBOT on TCGA data, via
+[Owkin](https://www.owkin.com/) released the weights for "Phikon", a FM trained with iBOT on TCGA data, via
 [HuggingFace](https://huggingface.co/owkin/phikon). To evaluate, run:
 
 ```
 MODEL_NAME=pathology/owkin_phikon \
+NORMALIZE_MEAN="[0.485,0.456,0.406]" \
+NORMALIZE_STD="[0.229,0.224,0.225]" \
+IN_FEATURES=768 \
+eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
+```
+
+### Phikon-v2 (Owkin) - DINOv2 ViT-L16 (PANCAN-XL) [[9]](#references)
+
+[Owkin](https://www.owkin.com/) released the weights for "Phikon-v2", a FM trained with DINOv2
+on the PANCAN-XL dataset (450M 20x magnification histology images sampled from 60K WSIs), via
+[HuggingFace](https://huggingface.co/owkin/phikon-v2). To evaluate, run:
+
+```
+MODEL_NAME=pathology/owkin_phikon_v2 \
+NORMALIZE_MEAN="[0.485,0.456,0.406]" \
+NORMALIZE_STD="[0.229,0.224,0.225]" \
+IN_FEATURES=1024 \
 eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
 ```
 
@@ -69,8 +94,10 @@ be requested.
 
 ```
 MODEL_NAME=pathology/mahmood_uni \
-HF_TOKEN=<your-huggingace-token-for-downloading-the-model> \
+NORMALIZE_MEAN="[0.485,0.456,0.406]" \
+NORMALIZE_STD="[0.229,0.224,0.225]" \
 IN_FEATURES=1024 \
+HF_TOKEN=<your-huggingace-token-for-downloading-the-model> \
 eva predict_fit --config configs/vision/phikon/offline/<task>.yaml
 ```
 
@@ -81,8 +108,9 @@ and available on [GitHub](https://github.com/kaiko-ai/towards_large_pathology_fm
 
 ```
 MODEL_NAME=pathology/kaiko_vits16 \
-NORMALIZE_MEAN=[0.5,0.5,0.5] \
-NORMALIZE_STD=[0.5,0.5,0.5] \
+NORMALIZE_MEAN="[0.5,0.5,0.5]" \
+NORMALIZE_STD="[0.5,0.5,0.5]" \
+IN_FEATURES=384 \
 eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
 ```
 
@@ -93,8 +121,9 @@ and available on [GitHub](https://github.com/kaiko-ai/towards_large_pathology_fm
 
 ```
 MODEL_NAME=pathology/kaiko_vits8 \
-NORMALIZE_MEAN=[0.5,0.5,0.5] \
-NORMALIZE_STD=[0.5,0.5,0.5] \
+NORMALIZE_MEAN="[0.5,0.5,0.5]" \
+NORMALIZE_STD="[0.5,0.5,0.5]" \
+IN_FEATURES=384 \
 eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
 ```
 
@@ -105,8 +134,8 @@ and available on [GitHub](https://github.com/kaiko-ai/towards_large_pathology_fm
 
 ```
 MODEL_NAME=pathology/kaiko_vitb16 \
-NORMALIZE_MEAN=[0.5,0.5,0.5] \
-NORMALIZE_STD=[0.5,0.5,0.5] \
+NORMALIZE_MEAN="[0.5,0.5,0.5]" \
+NORMALIZE_STD="[0.5,0.5,0.5]" \
 IN_FEATURES=768 \
 eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
 ```
@@ -117,9 +146,9 @@ To evaluate [kaiko.ai's](https://www.kaiko.ai/) FM with DINO ViT-B8 backbone, pr
 and available on [GitHub](https://github.com/kaiko-ai/towards_large_pathology_fms), run:
 
 ```
-MODEL_NAME=pathology/kaiko_vitb16 \
-NORMALIZE_MEAN=[0.5,0.5,0.5] \
-NORMALIZE_STD=[0.5,0.5,0.5] \
+MODEL_NAME=pathology/kaiko_vitb8 \
+NORMALIZE_MEAN="[0.5,0.5,0.5]" \
+NORMALIZE_STD="[0.5,0.5,0.5]" \
 IN_FEATURES=768 \
 eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
 ```
@@ -131,8 +160,8 @@ and available on [GitHub](https://github.com/kaiko-ai/towards_large_pathology_fm
 
 ```
 MODEL_NAME=pathology/kaiko_vitl14 \
-NORMALIZE_MEAN=[0.5,0.5,0.5] \
-NORMALIZE_STD=[0.5,0.5,0.5] \
+NORMALIZE_MEAN="[0.5,0.5,0.5]" \
+NORMALIZE_STD="[0.5,0.5,0.5]" \
 IN_FEATURES=1024 \
 eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
 ```
@@ -144,9 +173,9 @@ were released on [HuggingFace](https://huggingface.co/bioptimus/H-optimus-0).
 
 ```
 MODEL_NAME=pathology/bioptimus_h_optimus_0 \
-NORMALIZE_MEAN=[0.707223, 0.578729, 0.703617] \
-NORMALIZE_STD=[0.211883, 0.230117, 0.177517] \
-IN_FEATURES=1024 \
+NORMALIZE_MEAN="[0.707223,0.578729,0.703617]" \
+NORMALIZE_STD="[0.211883,0.230117,0.177517]" \
+IN_FEATURES=1536 \
 eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
 ```
 
@@ -156,6 +185,8 @@ To evaluate the [Prov-Gigapath](https://github.com/prov-gigapath/prov-gigapath) 
 
 ```
 MODEL_NAME=pathology/prov_gigapath \
+NORMALIZE_MEAN="[0.485,0.456,0.406]" \
+NORMALIZE_STD="[0.229,0.224,0.225]" \
 IN_FEATURES=1536 \
 eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
 ```
@@ -168,8 +199,8 @@ a proprietary dataset of one million slides, available for download on
 
 ```
 MODEL_NAME=pathology/histai_hibou_b \
-NORMALIZE_MEAN=[0.7068,0.5755,0.722] \
-NORMALIZE_STD=[0.195,0.2316,0.1816] \
+NORMALIZE_MEAN="[0.7068,0.5755,0.722]" \
+NORMALIZE_STD="[0.195,0.2316,0.1816]" \
 IN_FEATURES=768 \
 eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
 ```
@@ -181,9 +212,22 @@ a proprietary dataset of one million slides, available for download on
 
 ```
 MODEL_NAME=pathology/histai_hibou_l \
-NORMALIZE_MEAN=[0.7068,0.5755,0.722] \
-NORMALIZE_STD=[0.195,0.2316,0.1816] \
+NORMALIZE_MEAN="[0.7068,0.5755,0.722]" \
+NORMALIZE_STD="[0.195,0.2316,0.1816]" \
 IN_FEATURES=1024 \
+eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
+```
+
+### Virchow2 (paige.ai) - DINOv2 ViT-H14 (3.1M Slides) [[8]](#references)
+To evaluate [paige.ai's](https://www.paige.ai/) FM with DINOv2 ViT-H14 backbone, pretrained on
+a proprietary dataset of 3.1M million slides, available for download on
+[HuggingFace](https://huggingface.co/paige-ai/Virchow2), run:
+
+```
+MODEL_NAME=paige/virchow2 \
+NORMALIZE_MEAN="[0.485,0.456,0.406]" \
+NORMALIZE_STD="[0.229,0.224,0.225]" \
+IN_FEATURES=1280 \
 eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
 ```
 
@@ -203,3 +247,7 @@ eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
  [6]: Xu, Hanwen, et al. "A whole-slide foundation model for digital pathology from real-world data." Nature (2024): 1-8.
 
  [7]: Nechaev, Dmitry, Alexey Pchelnikov, and Ekaterina Ivanova. "Hibou: A Family of Foundational Vision Transformers for Pathology." arXiv preprint arXiv:2406.05074 (2024).
+
+ [8]: Zimmermann, Eric, et al. "Virchow 2: Scaling Self-Supervised Mixed Magnification Models in Pathology." arXiv preprint arXiv:2408.00738 (2024).
+
+ [9]: Filiot, Alexandre, et al. "Phikon-v2, A large and public feature extractor for biomarker prediction." arXiv preprint arXiv:2409.09173 (2024).

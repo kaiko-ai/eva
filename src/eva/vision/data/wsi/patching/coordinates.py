@@ -2,7 +2,7 @@
 
 import dataclasses
 import functools
-from typing import List, Tuple
+from typing import Any, Dict, List, Tuple
 
 from eva.vision.data.wsi import backends
 from eva.vision.data.wsi.patching import samplers
@@ -74,6 +74,14 @@ class PatchCoordinates:
         scaled_width, scaled_height = int(mpp_ratio * width), int(mpp_ratio * height)
 
         return cls(x_y, scaled_width, scaled_height, level_idx, sample_args.get("mask"))
+
+    def to_dict(self, include_keys: List[str] | None = None) -> Dict[str, Any]:
+        """Convert the coordinates to a dictionary."""
+        include_keys = include_keys or ["x_y", "width", "height", "level_idx"]
+        coord_dict = dataclasses.asdict(self)
+        if include_keys:
+            coord_dict = {key: coord_dict[key] for key in include_keys}
+        return coord_dict
 
 
 @functools.lru_cache(LRU_CACHE_SIZE)

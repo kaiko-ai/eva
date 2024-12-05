@@ -87,6 +87,7 @@ class Camelyon16(wsi.MultiWsiDataset, base.ImageClassification):
         target_mpp: float = 0.5,
         backend: str = "openslide",
         image_transforms: Callable | None = None,
+        coords_path: str | None = None,
         seed: int = 42,
     ) -> None:
         """Initializes the dataset.
@@ -100,6 +101,7 @@ class Camelyon16(wsi.MultiWsiDataset, base.ImageClassification):
             target_mpp: Target microns per pixel (mpp) for the patches.
             backend: The backend to use for reading the whole-slide images.
             image_transforms: Transforms to apply to the extracted image patches.
+            coords_path: File path to save the patch coordinates as .csv.
             seed: Random seed for reproducibility.
         """
         self._split = split
@@ -119,6 +121,7 @@ class Camelyon16(wsi.MultiWsiDataset, base.ImageClassification):
             target_mpp=target_mpp,
             backend=backend,
             image_transforms=image_transforms,
+            coords_path=coords_path,
         )
 
     @property
@@ -207,7 +210,7 @@ class Camelyon16(wsi.MultiWsiDataset, base.ImageClassification):
 
     @override
     def load_metadata(self, index: int) -> Dict[str, Any]:
-        return {"wsi_id": self.filename(index).split(".")[0]}
+        return wsi.MultiWsiDataset.load_metadata(self, index)
 
     def _load_file_paths(self, split: Literal["train", "val", "test"] | None = None) -> List[str]:
         """Loads the file paths of the corresponding dataset split."""

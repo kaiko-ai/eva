@@ -22,7 +22,8 @@
 | Dataset                            | #Slides  | Slide Size                | Magnification (μm/px)  | Task                       | Cancer Type      |
 |------------------------------------|----------|---------------------------|------------------------|----------------------------|------------------|
 | [Camelyon16](camelyon16.md)        | 400      | ~100-250k x ~100-250k x 3 |  40x (0.25)            | Classification (2 classes) | Breast           |
-| [PANDA](panda.md)                  | 10,616    | ~20k x 20k x 3            |  20x (0.5)             | Classification (6 classes) | Prostate         |
+| [PANDA](panda.md)                  | 9,555    | ~20k x 20k x 3            |  20x (0.5)             | Classification (6 classes) | Prostate         |
+| [PANDASmall](panda_small.md)       | 1,909     | ~20k x 20k x 3           |  20x (0.5)             | Classification (6 classes) | Prostate         |
 
 
 ### Radiology datasets

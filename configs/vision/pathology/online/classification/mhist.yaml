@@ -17,12 +17,12 @@ trainer:
           filename: best
           save_last: true
           save_top_k: 1
-          monitor: &MONITOR_METRIC ${oc.env:MONITOR_METRIC, val/BinaryAccuracy}
+          monitor: &MONITOR_METRIC ${oc.env:MONITOR_METRIC, val/BinaryBalancedAccuracy}
           mode: &MONITOR_METRIC_MODE ${oc.env:MONITOR_METRIC_MODE, max}
       - class_path: lightning.pytorch.callbacks.EarlyStopping
         init_args:
           min_delta: 0
-          patience: 51
+          patience: 70
           monitor: *MONITOR_METRIC
           mode: *MONITOR_METRIC_MODE
     logger:
@@ -45,11 +45,9 @@ model:
         out_features: 1
     criterion: torch.nn.BCEWithLogitsLoss
     optimizer:
-      class_path: torch.optim.SGD
+      class_path: torch.optim.AdamW
       init_args:
-        lr: &LR_VALUE ${oc.env:LR_VALUE, 0.000625}
-        momentum: 0.9
-        weight_decay: 0.0
+        lr: ${oc.env:LR_VALUE, 0.0003}
     lr_scheduler:
       class_path: torch.optim.lr_scheduler.CosineAnnealingLR
       init_args:
@@ -82,6 +80,8 @@ data:
     dataloaders:
       train:
         batch_size: &BATCH_SIZE ${oc.env:BATCH_SIZE, 256}
+        num_workers: &N_DATA_WORKERS ${oc.env:N_DATA_WORKERS, 4}
         shuffle: true
       val:
         batch_size: *BATCH_SIZE
+        num_workers: *N_DATA_WORKERS

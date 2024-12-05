@@ -1,6 +1,7 @@
 """TotalSegmentator2D dataset tests."""
 
 import os
+import shutil
 from typing import Literal
 
 import pytest
@@ -46,17 +47,19 @@ def test_sample(total_segmentator_dataset: datasets.TotalSegmentator2D, index: i
 
 @pytest.fixture(scope="function")
 def total_segmentator_dataset(
-    split: Literal["train", "val"] | None, assets_path: str
+    tmp_path: str, split: Literal["train", "val"] | None, assets_path: str
 ) -> datasets.TotalSegmentator2D:
     """TotalSegmentator2D dataset fixture."""
+    dataset_dir = os.path.join(
+        assets_path,
+        "vision",
+        "datasets",
+        "total_segmentator",
+        "Totalsegmentator_dataset_v201",
+    )
+    shutil.copytree(dataset_dir, tmp_path, dirs_exist_ok=True)
     dataset = datasets.TotalSegmentator2D(
-        root=os.path.join(
-            assets_path,
-            "vision",
-            "datasets",
-            "total_segmentator",
-            "Totalsegmentator_dataset_v201",
-        ),
+        root=tmp_path,
         split=split,
         version=None,
     )

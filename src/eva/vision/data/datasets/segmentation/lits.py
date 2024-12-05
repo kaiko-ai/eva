@@ -96,9 +96,10 @@ class LiTS(base.ImageSegmentation):
     @override
     def validate(self) -> None:
         for i in range(len(self._volume_files)):
-            if not os.path.exists(self._segmentation_file(i)):
+            seg_path = self._segmentation_file(i)
+            if not os.path.exists(seg_path):
                 raise FileNotFoundError(
-                    f"Segmentation file not found for volume {self._volume_files[i]}."
+                    f"Segmentation file {seg_path} not found for volume {self._volume_files[i]}."
                 )
 
         _validators.check_dataset_integrity(

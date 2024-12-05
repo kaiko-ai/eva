@@ -18,7 +18,7 @@ trainer:
           filename: best
           save_last: true
           save_top_k: 1
-          monitor: &MONITOR_METRIC ${oc.env:MONITOR_METRIC, val/BinaryAccuracy}
+          monitor: &MONITOR_METRIC ${oc.env:MONITOR_METRIC, val/BinaryBalancedAccuracy}
           mode: &MONITOR_METRIC_MODE ${oc.env:MONITOR_METRIC_MODE, max}
       - class_path: lightning.pytorch.callbacks.EarlyStopping
         init_args:
@@ -83,7 +83,7 @@ data:
           embeddings_transforms:
             class_path: eva.core.data.transforms.Pad2DTensor
             init_args:
-              pad_size: 10_000
+              pad_size: &N_PATCHES ${oc.env:N_PATCHES, 10000}
           target_transforms:
             class_path: eva.core.data.transforms.dtype.ArrayToFloatTensor
       val:
@@ -103,11 +103,12 @@ data:
             sampler:
               class_path: eva.vision.data.wsi.patching.samplers.ForegroundGridSampler
               init_args:
-                max_samples: 10_000
+                max_samples: *N_PATCHES
             width: 224
             height: 224
             target_mpp: 0.25
             split: train
+            coords_path: ${data.init_args.datasets.train.init_args.root}/coords_${.split}.csv
             image_transforms:
               class_path: eva.vision.data.transforms.common.ResizeAndCrop
               init_args:
@@ -125,10 +126,14 @@ data:
     dataloaders:
       train:
         batch_size: &BATCH_SIZE ${oc.env:BATCH_SIZE, 32}
+        num_workers: &N_DATA_WORKERS ${oc.env:N_DATA_WORKERS, 4}
         shuffle: true
       val:
         batch_size: *BATCH_SIZE
+        num_workers: *N_DATA_WORKERS
       test:
         batch_size: *BATCH_SIZE
+        num_workers: *N_DATA_WORKERS
       predict:
         batch_size: &PREDICT_BATCH_SIZE ${oc.env:PREDICT_BATCH_SIZE, 64}
+        num_workers: *N_DATA_WORKERS

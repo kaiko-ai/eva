@@ -47,11 +47,9 @@ model:
         out_features: 1
     criterion: torch.nn.BCEWithLogitsLoss
     optimizer:
-      class_path: torch.optim.SGD
+      class_path: torch.optim.AdamW
       init_args:
-        lr: ${oc.env:LR_VALUE, 0.1}
-        momentum: 0.9
-        weight_decay: 0.0
+        lr: ${oc.env:LR_VALUE, 0.0003}
     lr_scheduler:
       class_path: torch.optim.lr_scheduler.CosineAnnealingLR
       init_args:

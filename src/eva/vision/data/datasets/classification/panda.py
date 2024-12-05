@@ -49,6 +49,7 @@ class PANDA(wsi.MultiWsiDataset, base.ImageClassification):
         target_mpp: float = 0.5,
         backend: str = "openslide",
         image_transforms: Callable | None = None,
+        coords_path: str | None = None,
         seed: int = 42,
     ) -> None:
         """Initializes the dataset.
@@ -62,6 +63,7 @@ class PANDA(wsi.MultiWsiDataset, base.ImageClassification):
             target_mpp: Target microns per pixel (mpp) for the patches.
             backend: The backend to use for reading the whole-slide images.
             image_transforms: Transforms to apply to the extracted image patches.
+            coords_path: File path to save the patch coordinates as .csv.
             seed: Random seed for reproducibility.
         """
         self._split = split
@@ -80,6 +82,7 @@ class PANDA(wsi.MultiWsiDataset, base.ImageClassification):
             target_mpp=target_mpp,
             backend=backend,
             image_transforms=image_transforms,
+            coords_path=coords_path,
         )
 
     @property
@@ -132,7 +135,7 @@ class PANDA(wsi.MultiWsiDataset, base.ImageClassification):
 
     @override
     def load_metadata(self, index: int) -> Dict[str, Any]:
-        return {"wsi_id": self.filename(index).split(".")[0]}
+        return wsi.MultiWsiDataset.load_metadata(self, index)
 
     def _load_file_paths(self, split: Literal["train", "val", "test"] | None = None) -> List[str]:
         """Loads the file paths of the corresponding dataset split."""
@@ -182,3 +185,16 @@ class PANDA(wsi.MultiWsiDataset, base.ImageClassification):
 
     def _get_id_from_path(self, file_path: str) -> str:
         return os.path.basename(file_path).replace(".tiff", "")
+
+
+class PANDASmall(PANDA):
+    """Small version of the PANDA dataset for quicker benchmarking."""
+
+    _train_split_ratio: float = 0.1
+    """Train split ratio."""
+
+    _val_split_ratio: float = 0.05
+    """Validation split ratio."""
+
+    _test_split_ratio: float = 0.05
+    """Test split ratio."""
