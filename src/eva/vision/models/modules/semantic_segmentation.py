@@ -50,8 +50,8 @@ class SemanticSegmentationModule(module.ModelModule):
             postprocess: A list of helper functions to apply after the
                 loss and before the metrics calculation to the model
                 predictions and targets.
-            save_decoder_only: Whether to save the head only during checkpointing. If False,
-                will also save the backbone (not recommended when backbone is frozen).
+            save_decoder_only: Whether to save only the decoder during checkpointing. If False,
+                will also save the encoder (not recommended when frozen).
         """
         super().__init__(metrics=metrics, postprocess=postprocess)
 
