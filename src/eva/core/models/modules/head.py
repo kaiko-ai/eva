@@ -12,7 +12,7 @@ from typing_extensions import override
 from eva.core.metrics import structs as metrics_lib
 from eva.core.models.modules import module
 from eva.core.models.modules.typings import INPUT_BATCH, MODEL_TYPE
-from eva.core.models.modules.utils import batch_postprocess, grad
+from eva.core.models.modules.utils import batch_postprocess, grad, submodule_state_dict
 from eva.core.utils import parser
 
 
@@ -32,6 +32,7 @@ class HeadModule(module.ModelModule):
         lr_scheduler: LRSchedulerCallable = lr_scheduler.ConstantLR,
         metrics: metrics_lib.MetricsSchema | None = None,
         postprocess: batch_postprocess.BatchPostProcess | None = None,
+        save_head_only: bool = True,
     ) -> None:
         """Initializes the neural net head module.
 
@@ -48,6 +49,8 @@ class HeadModule(module.ModelModule):
             postprocess: A list of helper functions to apply after the
                 loss and before the metrics calculation to the model
                 predictions and targets.
+            save_head_only: Whether to save the head only during checkpointing. If False,
+                will also save the backbone (not recommended when backbone is frozen).
         """
         super().__init__(metrics=metrics, postprocess=postprocess)
 
@@ -56,6 +59,7 @@ class HeadModule(module.ModelModule):
         self.backbone = backbone
         self.optimizer = optimizer
         self.lr_scheduler = lr_scheduler
+        self.save_head_only = save_head_only
 
     @override
     def configure_model(self) -> Any:
@@ -71,6 +75,20 @@ class HeadModule(module.ModelModule):
         optimizer = self.optimizer(parameters)
         lr_scheduler = self.lr_scheduler(optimizer)
         return {"optimizer": optimizer, "lr_scheduler": lr_scheduler}
+
+    @override
+    def on_save_checkpoint(self, checkpoint: Dict[str, Any]) -> None:
+        if self.save_head_only:
+            checkpoint["state_dict"] = submodule_state_dict(checkpoint["state_dict"], "head")
+        super().on_save_checkpoint(checkpoint)
+
+    @override
+    def on_load_checkpoint(self, checkpoint: Dict[str, Any]) -> None:
+        if self.save_head_only and self.backbone is not None:
+            checkpoint["state_dict"].update(
+                {f"backbone.{k}": v for k, v in self.backbone.state_dict().items()}
+            )
+        super().on_load_checkpoint(checkpoint)
 
     @override
     def forward(self, tensor: torch.Tensor, *args: Any, **kwargs: Any) -> torch.Tensor:
