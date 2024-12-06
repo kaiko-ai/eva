@@ -1,0 +1,91 @@
+"""Utils for TotalSegmentator dataset classes."""
+
+from typing import Dict
+
+reduced_class_mappings: Dict[str, str] = {
+    # Abdominal Organs
+    "spleen": "spleen",
+    "kidney_right": "kidney",
+    "kidney_left": "kidney",
+    "gallbladder": "gallbladder",
+    "liver": "liver",
+    "stomach": "stomach",
+    "pancreas": "pancreas",
+    "small_bowel": "small_bowel",
+    "duodenum": "duodenum",
+    "colon": "colon",
+    # Endocrine System
+    "adrenal_gland_right": "adrenal_gland",
+    "adrenal_gland_left": "adrenal_gland",
+    "thyroid_gland": "thyroid_gland",
+    # Respiratory System
+    "lung_upper_lobe_left": "lungs",
+    "lung_lower_lobe_left": "lungs",
+    "lung_upper_lobe_right": "lungs",
+    "lung_middle_lobe_right": "lungs",
+    "lung_lower_lobe_right": "lungs",
+    "trachea": "trachea",
+    "esophagus": "esophagus",
+    # Urogenital System
+    "urinary_bladder": "urogenital_system",
+    "prostate": "urogenital_system",
+    "kidney_cyst_left": "kidney_cyst",
+    "kidney_cyst_right": "kidney_cyst",
+    # Vertebral Column
+    **{f"vertebrae_{v}": "vertebrae" for v in ["C1", "C2", "C3", "C4", "C5", "C6", "C7"]},
+    **{f"vertebrae_{v}": "vertebrae" for v in [f"T{i}" for i in range(1, 13)]},
+    **{f"vertebrae_{v}": "vertebrae" for v in [f"L{i}" for i in range(1, 6)]},
+    "vertebrae_S1": "vertebrae",
+    "sacrum": "sacral_spine",
+    # Cardiovascular System
+    "heart": "heart",
+    "aorta": "aorta",
+    "pulmonary_vein": "veins",
+    "brachiocephalic_trunk": "arteries",
+    "subclavian_artery_right": "arteries",
+    "subclavian_artery_left": "arteries",
+    "common_carotid_artery_right": "arteries",
+    "common_carotid_artery_left": "arteries",
+    "brachiocephalic_vein_left": "veins",
+    "brachiocephalic_vein_right": "veins",
+    "atrial_appendage_left": "atrial_appendage",
+    "superior_vena_cava": "veins",
+    "inferior_vena_cava": "veins",
+    "portal_vein_and_splenic_vein": "veins",
+    "iliac_artery_left": "arteries",
+    "iliac_artery_right": "arteries",
+    "iliac_vena_left": "veins",
+    "iliac_vena_right": "veins",
+    # Upper Extremity Bones
+    "humerus_left": "humerus",
+    "humerus_right": "humerus",
+    "scapula_left": "scapula",
+    "scapula_right": "scapula",
+    "clavicula_left": "clavicula",
+    "clavicula_right": "clavicula",
+    # Lower Extremity Bones
+    "femur_left": "femur",
+    "femur_right": "femur",
+    "hip_left": "hip",
+    "hip_right": "hip",
+    # Muscles
+    "gluteus_maximus_left": "gluteus",
+    "gluteus_maximus_right": "gluteus",
+    "gluteus_medius_left": "gluteus",
+    "gluteus_medius_right": "gluteus",
+    "gluteus_minimus_left": "gluteus",
+    "gluteus_minimus_right": "gluteus",
+    "autochthon_left": "autochthon",
+    "autochthon_right": "autochthon",
+    "iliopsoas_left": "iliopsoas",
+    "iliopsoas_right": "iliopsoas",
+    # Central Nervous System
+    "brain": "brain",
+    "spinal_cord": "spinal_cord",
+    # Skull and Thoracic Cage
+    "skull": "skull",
+    **{f"rib_left_{i}": "ribs" for i in range(1, 13)},
+    **{f"rib_right_{i}": "ribs" for i in range(1, 13)},
+    "costal_cartilages": "ribs",
+    "sternum": "sternum",
+}
