@@ -96,11 +96,13 @@ def fit_and_validate(
         A tuple of with the validation and the test metrics (if exists).
     """
     trainer.fit(model, datamodule=datamodule)
-    validation_scores = trainer.validate(datamodule=datamodule, verbose=verbose)
+    validation_scores = trainer.validate(
+        datamodule=datamodule, verbose=verbose, ckpt_path=trainer.checkpoint_type
+    )
     test_scores = (
         None
         if datamodule.datasets.test is None
-        else trainer.test(datamodule=datamodule, verbose=verbose)
+        else trainer.test(datamodule=datamodule, verbose=verbose, ckpt_path=trainer.checkpoint_type)
     )
     return validation_scores, test_scores
 

@@ -59,5 +59,7 @@ To customize runs, without the need of creating custom config-files, you can ove
 | `MONITOR_METRIC_MODE`   | `str`   | "min" or "max", depending on the `MONITOR_METRIC` used |
 | `REPO_OR_DIR`           | `str`   | GitHub repo with format containing model implementation, e.g. "facebookresearch/dino:main" |
 | `TQDM_REFRESH_RATE`     | `str`   | Determines at which rate (in number of batches) the progress bars get updated. Set it to 0 to disable the progress bar. |
-| `N_DATA_WORKERS`     | `str`   | How many subprocesses to use for the torch dataloaders. Set to `null` to use the number of cpu cores. |
+| `N_DATA_WORKERS`        | `str`   | How many subprocesses to use for the torch dataloaders. Set to `null` to use the number of cpu cores. |
 | `METRICS_DEVICE`        | `str`   | Specifies the device on which to compute the metrics. If not set, will use the same device as used for training. |
+| `CHECKPOINT_TYPE`       | `str`   | Set to "best" or "last", to select which checkpoint to load for evaluations on validation & test sets after training. |
+| `PATIENCE`       | `int`   | Number of checks with no improvement after which training will be stopped (early stopping). |

@@ -1,6 +1,6 @@
 """Model wrapper for torch.hub models."""
 
-from typing import Any, Callable, Dict, Tuple
+from typing import Any, Callable, Dict, List, Tuple
 
 import torch
 import torch.nn as nn
@@ -72,7 +72,7 @@ class TorchHubModel(wrappers.BaseModel):
         TorchHubModel.__name__ = self._model_name
 
     @override
-    def model_forward(self, tensor: torch.Tensor) -> torch.Tensor:
+    def model_forward(self, tensor: torch.Tensor) -> torch.Tensor | List[torch.Tensor]:
         if self._out_indices is not None:
             if not hasattr(self._model, "get_intermediate_layers"):
                 raise ValueError(
@@ -80,8 +80,14 @@ class TorchHubModel(wrappers.BaseModel):
                     "when using `out_indices`."
                 )
 
-            return self._model.get_intermediate_layers(
-                tensor, self._out_indices, reshape=True, return_class_token=False, norm=self._norm
+            return list(
+                self._model.get_intermediate_layers(
+                    tensor,
+                    self._out_indices,
+                    reshape=True,
+                    return_class_token=False,
+                    norm=self._norm,
+                )
             )
 
         return self._model(tensor)

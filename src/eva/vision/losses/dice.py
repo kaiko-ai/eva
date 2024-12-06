@@ -45,9 +45,6 @@ class DiceLoss(losses.DiceLoss):  # type: ignore
         inputs, targets = _apply_ignore_index(inputs, targets, self.ignore_index)
         targets = _to_one_hot(targets, num_classes=inputs.shape[1])
 
-        if targets.ndim == 3:
-            targets = one_hot(targets[:, None, ...], num_classes=inputs.shape[1])
-
         return super().forward(inputs, targets)
 
 
