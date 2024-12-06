@@ -54,7 +54,6 @@ def save_array_as_nifti(
         dtype: The data type to save the image.
     """
     nifti_image = nib.Nifti1Image(array, affine=np.eye(4), dtype=dtype)  # type: ignore
-    nifti_image.header.get_xyzt_units()
     nifti_image.to_filename(filename)
 
 

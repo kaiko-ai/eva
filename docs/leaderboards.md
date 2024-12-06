@@ -40,7 +40,7 @@ We selected this approach to prioritize reliable, robust and fair FM-evaluation 
 | **Output activation function** | none                      | none                      | none                      |
 | **Number of steps**            | 12,500                    | 12,500 (1)                | 2,000                     |
 | **Base batch size**            | 256                       | 32                        | 64                        |
-| **Base learning rate**         | 0.0003                    | 0.001                     | 0.0001                    |
+| **Base learning rate**         | 0.0003                    | 0.001                     | 0.002                    |
 | **Early stopping**             | 5% * [Max epochs]         | 10% * [Max epochs] (2)    | 10% * [Max epochs] (2)    |
 | **Optimizer**                  | SGD                       | AdamW                     | AdamW                     |
 | **Momentum**                   | 0.9                       | n/a                       | n/a                       |

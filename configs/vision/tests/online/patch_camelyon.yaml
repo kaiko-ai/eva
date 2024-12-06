@@ -6,6 +6,7 @@ trainer:
     max_epochs: &MAX_EPOCHS 1
     limit_train_batches: 2
     limit_val_batches: 2
+    checkpoint_type: ${oc.env:CHECKPOINT_TYPE, best}
 model:
   class_path: eva.HeadModule
   init_args:
