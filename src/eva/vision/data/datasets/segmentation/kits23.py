@@ -153,10 +153,10 @@ class KiTS23(base.ImageSegmentation):
         return volume_shape[-1]
 
     def _volume_filename(self, sample_index: int) -> str:
-        return os.path.join(f"case_{sample_index}", "imaging.nii.gz")
+        return os.path.join(f"case_{sample_index:05d}", f"master_{sample_index:05d}.nii.gz")
 
     def _segmentation_filename(self, sample_index: int) -> str:
-        return os.path.join(f"case_{sample_index}", "segmentation.nii.gz")
+        return os.path.join(f"case_{sample_index:05d}", "segmentation.nii.gz")
 
     def _volume_path(self, sample_index: int) -> str:
         return os.path.join(self._root, self._volume_filename(sample_index))
@@ -200,7 +200,7 @@ def _download_case_with_retry(
                 filename=image_path,
             )
             request.urlretrieve(
-                url=f"https://github.com/neheller/kits23/raw/refs/heads/main/dataset/case_{case_id:05d}/segmentation.nii.gz",  # nosec
+                url=f"https://raw.githubusercontent.com/neheller/kits23/e282208/dataset/case_{case_id:05d}/segmentation.nii.gz",  # nosec
                 filename=segmentation_path,
             )
             return
