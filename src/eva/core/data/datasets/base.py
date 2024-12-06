@@ -63,18 +63,14 @@ class MapDataset(Dataset):
         """Retrieves the item at the given index.
 
         Args:
-            index (int): Index
+            index: Index of the item to retrieve.
 
         Returns:
-            Any: The data at the given index
+            The data at the given index.
         """
         raise NotImplementedError
 
     @abc.abstractmethod
     def __len__(self) -> int:
-        """Returns the length of the dataset.
-
-        Returns:
-            int: Length of the dataset
-        """
+        """Returns the length of the dataset."""
         raise NotImplementedError
