@@ -36,15 +36,12 @@ class KiTS23(base.ImageSegmentation):
     """Ratios for dataset splits."""
 
     _expected_dataset_lengths: Dict[str | None, int] = {
-        "train": 175527,
-        "val": 37376,
-        "test": 38008,
-        None: 250911,
+        "train": 67582,
+        "val": 13751,
+        "test": 13888,
+        None: 95221,
     }
     """Dataset version and split to the expected size."""
-
-    _fix_orientation: bool = True
-    """Whether to fix the orientation of the images to match the default for radiologists."""
 
     _sample_every_n_slices: int | None = None
     """The amount of slices to sub-sample per 3D CT scan image."""
@@ -134,30 +131,20 @@ class KiTS23(base.ImageSegmentation):
     def load_image(self, index: int) -> tv_tensors.Image:
         sample_index, slice_index = self._indices[index]
         volume_path = self._volume_path(sample_index)
-        image_array = io.read_nifti(volume_path, slice_index)
-        if self._fix_orientation:
-            image_array = self._orientation(image_array, sample_index)
-        return tv_tensors.Image(image_array.transpose(2, 0, 1))
+        image_array = io.read_nifti(volume_path, slice_index, slice_dim=0)
+        return tv_tensors.Image(image_array)
 
     @override
     def load_mask(self, index: int) -> tv_tensors.Mask:
         sample_index, slice_index = self._indices[index]
         segmentation_path = self._segmentation_path(sample_index)
-        semantic_labels = io.read_nifti(segmentation_path, slice_index)
+        semantic_labels = io.read_nifti(segmentation_path, slice_index, slice_dim=0)
         return tv_tensors.Mask(semantic_labels.squeeze(), dtype=torch.int64)  # type: ignore[reportCallIssue]
 
     @override
     def load_metadata(self, index: int) -> Dict[str, Any]:
-        _, slice_index = self._indices[index]
-        return {"slice_index": slice_index}
-
-    def _orientation(self, array: npt.NDArray, sample_index: int) -> npt.NDArray:
-        # orientation = io.fetch_nifti_axis_direction_code(self._volume_path(sample_index))
-        # array = np.rot90(array, axes=(0, 1))
-        # if orientation == "LPS":
-        #     array = np.flip(array, axis=0)
-        # TODO: Implement orientation correction
-        return array.copy()
+        sample_index, slice_index = self._indices[index]
+        return {"case_id": f"{sample_index:05d}", "slice_index": slice_index}
 
     @override
     def __len__(self) -> int:
@@ -200,7 +187,7 @@ class KiTS23(base.ImageSegmentation):
     def _get_number_of_slices_per_volume(self, sample_index: int) -> int:
         """Returns the total amount of slices of a volume."""
         volume_shape = io.fetch_nifti_shape(self._volume_path(sample_index))
-        return volume_shape[-1]
+        return volume_shape[0]
 
     def _volume_filename(self, sample_index: int) -> str:
         return f"case_{sample_index:05d}/master_{sample_index:05d}.{self._file_suffix}"
