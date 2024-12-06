@@ -5,6 +5,7 @@ trainer:
     n_runs: &N_RUNS ${oc.env:N_RUNS, 5}
     default_root_dir: &OUTPUT_ROOT ${oc.env:OUTPUT_ROOT, logs/${oc.env:MODEL_NAME, dino_vits16}/offline/crc}
     max_steps: &MAX_STEPS ${oc.env:MAX_STEPS, 12500}
+    checkpoint_type: ${oc.env:CHECKPOINT_TYPE, best}
     callbacks:
       - class_path: eva.callbacks.ConfigurationLogger
       - class_path: lightning.pytorch.callbacks.TQDMProgressBar
@@ -23,7 +24,7 @@ trainer:
       - class_path: lightning.pytorch.callbacks.EarlyStopping
         init_args:
           min_delta: 0
-          patience: 24
+          patience: ${oc.env:PATIENCE, 24}
           monitor: *MONITOR_METRIC
           mode: *MONITOR_METRIC_MODE
       - class_path: eva.callbacks.ClassificationEmbeddingsWriter
