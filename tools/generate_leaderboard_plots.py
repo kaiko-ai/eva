@@ -28,8 +28,10 @@ _tasks_to_metric = {
     "monusac": "GeneralizedDiceScore",
 }
 _fm_name_map = {
-    "dino_vits16_lunit": "Lunit - ViT-S16 | TCGA",
-    "owkin_phikon": "Owkin (Phikon) - iBOT ViT-B16 | TCGA",
+    "paige_virchow2": "Virchow2 - DINOv2 ViT-H14 | 3.1M slides",
+    "dino_vits16_lunit": "Lunit - DINO ViT-S16 | TCGA",
+    "owkin_phikon": "Phikon - iBOT ViT-B16 | TCGA",
+    "owkin_phikon_v2": "Phikon-v2 - DINOv2 ViT-L16 | PANCAN-XL",
     "dino_vitl16_uni": "UNI - DINOv2 ViT-L16 | Mass-100k",
     "bioptimus_h_optimus_0": "H-optimus-0 - ViT-G14 | 500k slides",
     "prov_gigapath": "Prov-GigaPath - DINOv2 ViT-G14 | 181k slides",
