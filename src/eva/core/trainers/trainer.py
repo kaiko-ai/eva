@@ -1,7 +1,7 @@
 """Core trainer module."""
 
 import os
-from typing import Any
+from typing import Any, Literal
 
 import loguru
 from lightning.pytorch import loggers as pl_loggers
@@ -28,6 +28,7 @@ class Trainer(pl_trainer.Trainer):
         *args: Any,
         default_root_dir: str = "logs",
         n_runs: int = 1,
+        checkpoint_type: Literal["best", "last"] = "best",
         **kwargs: Any,
     ) -> None:
         """Initializes the trainer.
@@ -40,11 +41,14 @@ class Trainer(pl_trainer.Trainer):
                 Unlike in ::class::`lightning.pytorch.Trainer`, this path would be the
                 prioritized destination point.
             n_runs: The amount of runs (fit and evaluate) to perform in an evaluation session.
+            checkpoint_type: Wether to load the "best" or "last" checkpoint saved by the checkpoint
+                callback for evaluations on validation & test sets.
             kwargs: Kew-word arguments of ::class::`lightning.pytorch.Trainer`.
         """
         super().__init__(*args, default_root_dir=default_root_dir, **kwargs)
 
-        self._n_runs = n_runs
+        self.checkpoint_type = checkpoint_type
+        self.n_runs = n_runs
 
         self._session_id: str = _logging.generate_session_id()
         self._log_dir: str = self.default_log_dir
@@ -106,6 +110,6 @@ class Trainer(pl_trainer.Trainer):
             base_trainer=self,
             base_model=model,
             datamodule=datamodule,
-            n_runs=self._n_runs,
-            verbose=self._n_runs > 1,
+            n_runs=self.n_runs,
+            verbose=self.n_runs > 1,
         )
