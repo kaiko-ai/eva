@@ -4,15 +4,15 @@ import functools
 import os
 import time
 from pathlib import Path
-import numpy as np
-import numpy.typing as npt
 from typing import Any, Callable, Dict, List, Literal, Tuple
 from urllib import request
 
+import numpy.typing as npt
 import torch
 from torchvision import tv_tensors
 from typing_extensions import override
 
+from eva.core.data import splitting
 from eva.core.utils import io as core_io
 from eva.core.utils import multiprocessing
 from eva.core.utils.progress_bar import tqdm
@@ -27,11 +27,19 @@ class KiTS23(base.ImageSegmentation):
     Webpage: https://kits-challenge.org/kits23/
     """
 
-    _train_index_ranges: List[Tuple[int, int]] = [(0, 300), (400, 589)]
-    """Train range indices."""
+    _index_ranges: List[Tuple[int, int]] = [(0, 300), (400, 589)]
+    """Dataset index ranges."""
+
+    _train_ratio: float = 0.7
+    _val_ratio: float = 0.15
+    _test_ratio: float = 0.15
+    """Ratios for dataset splits."""
 
     _expected_dataset_lengths: Dict[str | None, int] = {
-        "train": 250911,
+        "train": 175527,
+        "val": 37376,
+        "test": 38008,
+        None: 250911,
     }
     """Dataset version and split to the expected size."""
 
@@ -47,18 +55,19 @@ class KiTS23(base.ImageSegmentation):
     def __init__(
         self,
         root: str,
-        split: Literal["train"],
+        split: Literal["train", "val", "test"] | None = None,
         download: bool = False,
         decompress: bool = True,
         num_workers: int = 10,
         transforms: Callable | None = None,
+        seed: int = 8,
     ) -> None:
         """Initialize dataset.
 
         Args:
             root: Path to the root directory of the dataset. The dataset will
                 be downloaded and extracted here, if it does not already exist.
-            split: Dataset split to use.
+            split: Dataset split to use. If `None`, the entire dataset will be used.
             download: Whether to download the data for the specified split.
                 Note that the download will be executed only by additionally
                 calling the :meth:`prepare_data` method and if the data does
@@ -69,6 +78,7 @@ class KiTS23(base.ImageSegmentation):
                 decompressing the .gz files.
             transforms: A function/transforms that takes in an image and a target
                 mask and returns the transformed versions of both.
+            seed: Seed used for generating the dataset splits.
         """
         super().__init__(transforms=transforms)
 
@@ -77,6 +87,7 @@ class KiTS23(base.ImageSegmentation):
         self._decompress = decompress
         self._num_workers = num_workers
         self._download = download
+        self._seed = seed
 
         self._indices: List[Tuple[int, int]] = []
 
@@ -170,14 +181,21 @@ class KiTS23(base.ImageSegmentation):
 
     def _get_split_indices(self) -> List[int]:
         """Builds the dataset indices for the specified split."""
-        split_index_ranges = {
-            "train": self._train_index_ranges,
-        }
-        index_ranges = split_index_ranges.get(self._split)
-        if index_ranges is None:
-            raise ValueError("Invalid data split. Use 'train'.")
+        indices = _utils.ranges_to_indices(self._index_ranges)
 
-        return _utils.ranges_to_indices(index_ranges)
+        train_indices, val_indices, test_indices = splitting.random_split(
+            indices, self._train_ratio, self._val_ratio, self._test_ratio, seed=self._seed
+        )
+        split_indices_dict = {
+            "train": [indices[i] for i in train_indices],
+            "val": [indices[i] for i in val_indices],
+            "test": [indices[i] for i in test_indices],  # type: ignore
+            None: indices,
+        }
+        if self._split not in split_indices_dict:
+            raise ValueError("Invalid data split. Use 'train', 'val', 'test' or `None`.")
+
+        return list(split_indices_dict[self._split])
 
     def _get_number_of_slices_per_volume(self, sample_index: int) -> int:
         """Returns the total amount of slices of a volume."""
@@ -213,14 +231,15 @@ class KiTS23(base.ImageSegmentation):
             _download_case_with_retry(case_id, image_path, segmentation_path)
 
     def _decompress_files(self) -> None:
-        compressed_paths = Path(self._root).rglob("*.nii.gz")
-        multiprocessing.run_with_threads(
-            functools.partial(core_io.gunzip_file, keep=False),
-            [(str(path),) for path in compressed_paths],
-            num_workers=self._num_workers,
-            progress_desc=">> Decompressing .gz files",
-            return_results=False,
-        )
+        compressed_paths = list(Path(self._root).rglob("*.nii.gz"))
+        if len(compressed_paths) > 0:
+            multiprocessing.run_with_threads(
+                functools.partial(core_io.gunzip_file, keep=False),
+                [(str(path),) for path in compressed_paths],
+                num_workers=self._num_workers,
+                progress_desc=">> Decompressing .gz files",
+                return_results=False,
+            )
 
     def _print_license(self) -> None:
         """Prints the dataset license."""

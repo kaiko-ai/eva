@@ -27,7 +27,7 @@ class LiTS(base.ImageSegmentation):
     _train_ratio: float = 0.7
     _val_ratio: float = 0.15
     _test_ratio: float = 0.15
-    """Index ranges per split."""
+    """Ratios for dataset splits."""
 
     _fix_orientation: bool = True
     """Whether to fix the orientation of the images to match the default for radiologists."""
