@@ -2770,6 +2770,16 @@
 <td><code>str</code></td>
 <td>Specifies the device on which to compute the metrics. If not set, will use the same device as used for training.</td>
 </tr>
+<tr>
+<td><code>CHECKPOINT_TYPE</code></td>
+<td><code>str</code></td>
+<td>Set to "best" or "last", to select which checkpoint to load for evaluations on validation &amp; test sets after training.</td>
+</tr>
+<tr>
+<td><code>PATIENCE</code></td>
+<td><code>int</code></td>
+<td>Number of checks with no improvement after which training will be stopped (early stopping).</td>
+</tr>
 </tbody>
 </table>
 
