@@ -66,7 +66,7 @@ model:
     optimizer:
       class_path: torch.optim.AdamW
       init_args:
-        lr: ${oc.env:LR_VALUE, 0.0001}
+        lr: ${oc.env:LR_VALUE, 0.002}
     lr_scheduler:
       class_path: torch.optim.lr_scheduler.PolynomialLR
       init_args:
