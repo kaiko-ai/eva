@@ -67,7 +67,7 @@ class KiTS23(base.ImageSegmentation):
     @property
     @override
     def classes(self) -> List[str]:
-        return ["kidney", "tumor", "cyst"]
+        return ["background", "kidney", "tumor", "cyst"]
 
     @functools.cached_property
     @override
@@ -93,8 +93,8 @@ class KiTS23(base.ImageSegmentation):
         _validators.check_dataset_integrity(
             self,
             length=self._expected_dataset_lengths.get(self._split, 0),
-            n_classes=3,
-            first_and_last_labels=("kidney", "cyst"),
+            n_classes=4,
+            first_and_last_labels=("background", "cyst"),
         )
 
     @override
