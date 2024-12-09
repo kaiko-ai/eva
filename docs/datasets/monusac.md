@@ -9,7 +9,7 @@ MoNuSAC (Multi-Organ Nuclei Segmentation And Classification Challenge) consists 
 |                       |                                                           |
 |-----------------------|-----------------------------------------------------------|
 | **Modality**          | Vision (WSI patches)                                      |
-| **Task**              | Segmentation - 4 classes                                  |
+| **Task**              | Segmentation - 5 classes *                               |
 | **Data size**         | total: ~600MB                                             |
 | **Image dimension**   | 113x81 - 1398x1956                                        |
 | **Magnification (μm/px)**  | 40x (0.25)                                           |
@@ -17,6 +17,7 @@ MoNuSAC (Multi-Organ Nuclei Segmentation And Classification Challenge) consists 
 | **Number of images**  | 294                                                       |
 | **Splits in use**     | Train and Test                                            |
 
+\* The fith class is "ambiguous" and doesn't contain a specific cell type.
 
 ### Organization
 
