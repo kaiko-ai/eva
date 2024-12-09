@@ -12,7 +12,7 @@ from typing_extensions import override
 from eva.core.metrics import structs as metrics_lib
 from eva.core.models.modules import module
 from eva.core.models.modules.typings import INPUT_BATCH, INPUT_TENSOR_BATCH
-from eva.core.models.modules.utils import batch_postprocess, grad
+from eva.core.models.modules.utils import batch_postprocess, grad, submodule_state_dict
 from eva.core.utils import parser
 from eva.vision.models.networks import decoders
 from eva.vision.models.networks.decoders.segmentation.typings import DecoderInputs
@@ -31,6 +31,7 @@ class SemanticSegmentationModule(module.ModelModule):
         lr_scheduler: LRSchedulerCallable = lr_scheduler.ConstantLR,
         metrics: metrics_lib.MetricsSchema | None = None,
         postprocess: batch_postprocess.BatchPostProcess | None = None,
+        save_decoder_only: bool = True,
     ) -> None:
         """Initializes the neural net head module.
 
@@ -49,6 +50,8 @@ class SemanticSegmentationModule(module.ModelModule):
             postprocess: A list of helper functions to apply after the
                 loss and before the metrics calculation to the model
                 predictions and targets.
+            save_decoder_only: Whether to save only the decoder during checkpointing. If False,
+                will also save the encoder (not recommended when frozen).
         """
         super().__init__(metrics=metrics, postprocess=postprocess)
 
@@ -58,6 +61,7 @@ class SemanticSegmentationModule(module.ModelModule):
         self.lr_multiplier_encoder = lr_multiplier_encoder
         self.optimizer = optimizer
         self.lr_scheduler = lr_scheduler
+        self.save_decoder_only = save_decoder_only
 
     @override
     def configure_model(self) -> None:
@@ -82,6 +86,20 @@ class SemanticSegmentationModule(module.ModelModule):
         )
         lr_scheduler = self.lr_scheduler(optimizer)
         return {"optimizer": optimizer, "lr_scheduler": lr_scheduler}
+
+    @override
+    def on_save_checkpoint(self, checkpoint: Dict[str, Any]) -> None:
+        if self.save_decoder_only:
+            checkpoint["state_dict"] = submodule_state_dict(checkpoint["state_dict"], "decoder")
+        super().on_save_checkpoint(checkpoint)
+
+    @override
+    def on_load_checkpoint(self, checkpoint: Dict[str, Any]) -> None:
+        if self.save_decoder_only and self.encoder is not None:
+            checkpoint["state_dict"].update(
+                {f"encoder.{k}": v for k, v in self.encoder.state_dict().items()}  # type: ignore
+            )
+        super().on_load_checkpoint(checkpoint)
 
     @override
     def forward(
