@@ -6,7 +6,7 @@ build-backend = "pdm.backend"
 
 [project]
 name = "kaiko-eva"
-version = "0.1.5"
+version = "0.1.6"
 description = "Evaluation Framework for oncology foundation models."
 keywords = [
     "machine-learning",
