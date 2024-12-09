@@ -116,7 +116,7 @@ class LiTS(base.ImageSegmentation):
         image_array = io.read_nifti(volume_path, slice_index)
         if self._fix_orientation:
             image_array = self._orientation(image_array, sample_index)
-        return tv_tensors.Image(image_array.transpose(2, 0, 1))
+        return tv_tensors.Image(image_array.transpose(2, 0, 1), dtype=torch.float32)  # type: ignore[reportCallIssue]
 
     @override
     def load_mask(self, index: int) -> tv_tensors.Mask:

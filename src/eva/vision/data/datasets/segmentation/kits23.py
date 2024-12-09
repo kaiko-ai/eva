@@ -7,18 +7,18 @@ from pathlib import Path
 from typing import Any, Callable, Dict, List, Literal, Tuple
 from urllib import request
 
-import numpy.typing as npt
+import nibabel as nib
 import torch
 from torchvision import tv_tensors
 from typing_extensions import override
 
 from eva.core.data import splitting
-from eva.core.utils import io as core_io
 from eva.core.utils import multiprocessing
 from eva.core.utils.progress_bar import tqdm
 from eva.vision.data.datasets import _utils, _validators
 from eva.vision.data.datasets.segmentation import base
 from eva.vision.utils import io
+from eva.vision.utils.io import nifti
 
 
 class KiTS23(base.ImageSegmentation):
@@ -46,6 +46,9 @@ class KiTS23(base.ImageSegmentation):
     _sample_every_n_slices: int | None = None
     """The amount of slices to sub-sample per 3D CT scan image."""
 
+    _processed_dir: str = "processed"
+    """Directory where the processed data (reoriented to LPS & uncompressed) is stored."""
+
     _license: str = "CC BY-NC-SA 4.0"
     """Dataset license."""
 
@@ -54,7 +57,6 @@ class KiTS23(base.ImageSegmentation):
         root: str,
         split: Literal["train", "val", "test"] | None = None,
         download: bool = False,
-        decompress: bool = True,
         num_workers: int = 10,
         transforms: Callable | None = None,
         seed: int = 8,
@@ -69,10 +71,7 @@ class KiTS23(base.ImageSegmentation):
                 Note that the download will be executed only by additionally
                 calling the :meth:`prepare_data` method and if the data does
                 not yet exist on disk.
-            decompress: Whether to decompress the .nii.gz files when preparing the data.
-                Without decompression, data loading will be very slow.
-            num_workers: The number of workers to use for optimizing the masks &
-                decompressing the .gz files.
+            num_workers: The number of workers to use for preprocessing the dataset.
             transforms: A function/transforms that takes in an image and a target
                 mask and returns the transformed versions of both.
             seed: Seed used for generating the dataset splits.
@@ -81,9 +80,8 @@ class KiTS23(base.ImageSegmentation):
 
         self._root = root
         self._split = split
-        self._decompress = decompress
-        self._num_workers = num_workers
         self._download = download
+        self._num_workers = num_workers
         self._seed = seed
 
         self._indices: List[Tuple[int, int]] = []
@@ -99,8 +97,8 @@ class KiTS23(base.ImageSegmentation):
         return {label: index for index, label in enumerate(self.classes)}
 
     @property
-    def _file_suffix(self) -> str:
-        return "nii" if self._decompress else "nii.gz"
+    def _processed_root(self) -> str:
+        return os.path.join(self._root, self._processed_dir)
 
     @override
     def filename(self, index: int) -> str:
@@ -111,8 +109,7 @@ class KiTS23(base.ImageSegmentation):
     def prepare_data(self) -> None:
         if self._download:
             self._download_dataset()
-        if self._decompress:
-            self._decompress_files()
+        self._preprocess()
 
     @override
     def configure(self) -> None:
@@ -131,14 +128,14 @@ class KiTS23(base.ImageSegmentation):
     def load_image(self, index: int) -> tv_tensors.Image:
         sample_index, slice_index = self._indices[index]
         volume_path = self._volume_path(sample_index)
-        image_array = io.read_nifti(volume_path, slice_index, target_orientation="LAS", use_storage_dtype=True)
-        return tv_tensors.Image(image_array, dtype=torch.float32)  # type: ignore[reportCallIssue]
+        image_array = io.read_nifti(volume_path, slice_index)
+        return tv_tensors.Image(image_array.transpose(2, 0, 1), dtype=torch.float32)  # type: ignore[reportCallIssue]
 
     @override
     def load_mask(self, index: int) -> tv_tensors.Mask:
         sample_index, slice_index = self._indices[index]
         segmentation_path = self._segmentation_path(sample_index)
-        semantic_labels = io.read_nifti(segmentation_path, slice_index, target_orientation="LAS", use_storage_dtype=True)
+        semantic_labels = io.read_nifti(segmentation_path, slice_index)
         return tv_tensors.Mask(semantic_labels.squeeze(), dtype=torch.int64)  # type: ignore[reportCallIssue]
 
     @override
@@ -187,19 +184,19 @@ class KiTS23(base.ImageSegmentation):
     def _get_number_of_slices_per_volume(self, sample_index: int) -> int:
         """Returns the total amount of slices of a volume."""
         volume_shape = io.fetch_nifti_shape(self._volume_path(sample_index))
-        return volume_shape[0]
+        return volume_shape[-1]
 
     def _volume_filename(self, sample_index: int) -> str:
-        return f"case_{sample_index:05d}/master_{sample_index:05d}.{self._file_suffix}"
+        return f"case_{sample_index:05d}/master_{sample_index:05d}.nii"
 
     def _segmentation_filename(self, sample_index: int) -> str:
-        return f"case_{sample_index:05d}/segmentation.{self._file_suffix}"
+        return f"case_{sample_index:05d}/segmentation.nii"
 
     def _volume_path(self, sample_index: int) -> str:
-        return os.path.join(self._root, self._volume_filename(sample_index))
+        return os.path.join(self._processed_root, self._volume_filename(sample_index))
 
     def _segmentation_path(self, sample_index: int) -> str:
-        return os.path.join(self._root, self._segmentation_filename(sample_index))
+        return os.path.join(self._processed_root, self._segmentation_filename(sample_index))
 
     def _download_dataset(self) -> None:
         """Downloads the dataset."""
@@ -217,16 +214,27 @@ class KiTS23(base.ImageSegmentation):
 
             _download_case_with_retry(case_id, image_path, segmentation_path)
 
-    def _decompress_files(self) -> None:
+    def _preprocess(self):
+        def _reorient_and_save(path: Path) -> None:
+            relative_path = str(path.relative_to(self._root))
+            save_path = os.path.join(self._processed_root, relative_path.rstrip(".gz"))
+            if os.path.isfile(save_path):
+                return
+            os.makedirs(os.path.dirname(save_path), exist_ok=True)
+            nifti.reorient(nib.load(path), "LPS").to_filename(str(save_path))
+
         compressed_paths = list(Path(self._root).rglob("*.nii.gz"))
-        if len(compressed_paths) > 0:
-            multiprocessing.run_with_threads(
-                functools.partial(core_io.gunzip_file, keep=False),
-                [(str(path),) for path in compressed_paths],
-                num_workers=self._num_workers,
-                progress_desc=">> Decompressing .gz files",
-                return_results=False,
-            )
+        multiprocessing.run_with_threads(
+            _reorient_and_save,
+            [(path,) for path in compressed_paths],
+            num_workers=self._num_workers,
+            progress_desc=">> Preprocessing dataset",
+            return_results=False,
+        )
+
+        processed_paths = list(Path(self._processed_root).rglob("*.nii"))
+        if len(compressed_paths) != len(processed_paths):
+            raise RuntimeError(f"Preprocessing failed, missing files in {self._processed_root}.")
 
     def _print_license(self) -> None:
         """Prints the dataset license."""

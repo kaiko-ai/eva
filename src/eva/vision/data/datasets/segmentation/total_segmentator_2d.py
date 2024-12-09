@@ -211,7 +211,7 @@ class TotalSegmentator2D(base.ImageSegmentation):
         image_path = self._get_image_path(sample_index)
         image_array = io.read_nifti(image_path, slice_index)
         image_array = self._fix_orientation(image_array)
-        return tv_tensors.Image(image_array.copy().transpose(2, 0, 1))
+        return tv_tensors.Image(image_array.transpose(2, 0, 1), dtype=torch.float32)  # type: ignore[reportCallIssue]
 
     @override
     def load_mask(self, index: int) -> tv_tensors.Mask:
