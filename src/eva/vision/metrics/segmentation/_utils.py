@@ -6,7 +6,7 @@ import torch
 
 
 def apply_ignore_index(
-    preds: torch.Tensor, target: torch.Tensor, ignore_index: int, num_classes: int
+    preds: torch.Tensor, target: torch.Tensor, ignore_index: int
 ) -> Tuple[torch.Tensor, torch.Tensor]:
     """Applies the ignore index to the predictions and target tensors.
 
@@ -17,7 +17,6 @@ def apply_ignore_index(
         preds: The predictions tensor. Expected to be of shape `(N,C,...)`.
         target: The target tensor. Expected to be of shape `(N,C,...)`.
         ignore_index: The index to ignore.
-        num_classes: The number of classes.
 
     Returns:
         The modified predictions and target tensors of shape `(N,C-1,...)`.

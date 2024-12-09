@@ -13,7 +13,7 @@ class MeanIoU(segmentation.MeanIoU):
     """MeanIoU (mIOU) metric for semantic segmentation.
 
     It expands the `torchmetrics` class by including an `ignore_index`
-    functionality.
+    functionality and converting tensors to one-hot format.
     """
 
     def __init__(
@@ -36,10 +36,8 @@ class MeanIoU(segmentation.MeanIoU):
             kwargs: Additional keyword arguments, see :ref:`Metric kwargs` for more info.
         """
         super().__init__(
-            num_classes=num_classes
-            - (ignore_index is not None)
-            + (ignore_index == 0 and not include_background),
-            include_background=include_background,
+            include_background=include_background or (ignore_index == 0),
+            num_classes=num_classes - (ignore_index is not None),
             per_class=per_class,
             **kwargs,
         )
@@ -51,7 +49,5 @@ class MeanIoU(segmentation.MeanIoU):
         preds = _utils.index_to_one_hot(preds, num_classes=self.orig_num_classes)
         target = _utils.index_to_one_hot(target, num_classes=self.orig_num_classes)
         if self.ignore_index is not None:
-            preds, target = _utils.apply_ignore_index(
-                preds, target, self.ignore_index, self.num_classes
-            )
+            preds, target = _utils.apply_ignore_index(preds, target, self.ignore_index)
         super().update(preds=preds.long(), target=target.long())

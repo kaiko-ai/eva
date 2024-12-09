@@ -2,7 +2,7 @@
 trainer:
   class_path: eva.Trainer
   init_args:
-    n_runs: &N_RUNS ${oc.env:N_RUNS, 1}
+    n_runs: &N_RUNS ${oc.env:N_RUNS, 5}
     default_root_dir: &OUTPUT_ROOT ${oc.env:OUTPUT_ROOT, logs/${oc.env:MODEL_NAME, vit_small_patch16_224_dino}/total_segmentator_2d}
     max_steps: &MAX_STEPS ${oc.env:MAX_STEPS, 40000}
     checkpoint_type: ${oc.env:CHECKPOINT_TYPE, best}
@@ -21,7 +21,7 @@ trainer:
           filename: best
           save_last: true
           save_top_k: 1
-          monitor: &MONITOR_METRIC ${oc.env:MONITOR_METRIC, val/GeneralizedDiceScore}
+          monitor: &MONITOR_METRIC ${oc.env:MONITOR_METRIC, 'val/MonaiDiceScore'}
           mode: &MONITOR_METRIC_MODE ${oc.env:MONITOR_METRIC_MODE, max}
       - class_path: lightning.pytorch.callbacks.EarlyStopping
         init_args:
@@ -29,20 +29,6 @@ trainer:
           patience: ${oc.env:PATIENCE, 5}
           monitor: *MONITOR_METRIC
           mode: *MONITOR_METRIC_MODE
-      - class_path: eva.callbacks.SegmentationEmbeddingsWriter
-        init_args:
-          output_dir: &DATASET_EMBEDDINGS_ROOT ${oc.env:EMBEDDINGS_ROOT, ./data/embeddings}/${oc.env:MODEL_NAME, vit_small_patch16_224_dino}/total_segmentator_2d
-          dataloader_idx_map:
-            0: train
-            1: test
-          overwrite: false
-          backbone:
-            class_path: eva.vision.models.ModelFromRegistry
-            init_args:
-              model_name: ${oc.env:MODEL_NAME, universal/vit_small_patch16_224_dino}
-              model_kwargs:
-                out_indices: ${oc.env:OUT_INDICES, 1}
-              model_extra_kwargs: ${oc.env:MODEL_EXTRA_KWARGS, null}
     logger:
       - class_path: lightning.pytorch.loggers.TensorBoardLogger
         init_args:
@@ -51,8 +37,15 @@ trainer:
 model:
   class_path: eva.vision.models.modules.SemanticSegmentationModule
   init_args:
+    encoder:
+      class_path: eva.vision.models.ModelFromRegistry
+      init_args:
+        model_name: ${oc.env:MODEL_NAME, universal/vit_small_patch16_224_dino}
+        model_kwargs:
+          out_indices: ${oc.env:OUT_INDICES, 1}
+        model_extra_kwargs: ${oc.env:MODEL_EXTRA_KWARGS, null}
     decoder:
-      class_path: eva.vision.models.networks.decoders.segmentation.ConvDecoderMS
+      class_path: eva.vision.models.networks.decoders.segmentation.ConvDecoderWithImage
       init_args:
         in_features: ${oc.env:IN_FEATURES, 384}
         num_classes:  &NUM_CLASSES 37
@@ -86,55 +79,40 @@ model:
         - class_path: torchmetrics.ClasswiseWrapper
           init_args:
             metric:
-              class_path: eva.vision.metrics.GeneralizedDiceScore
+              class_path: eva.vision.metrics.MonaiDiceScore
               init_args:
+                include_background: true
                 num_classes: *NUM_CLASSES
-                weight_type: linear
-                per_class: true
+                reduction: none
 data:
   class_path: eva.DataModule
   init_args:
     datasets:
       train:
-        class_path: eva.vision.datasets.EmbeddingsSegmentationDataset
+        class_path: eva.vision.datasets.TotalSegmentator2D
         init_args: &DATASET_ARGS
-          root: *DATASET_EMBEDDINGS_ROOT
-          manifest_file: manifest.csv
+          root: ${oc.env:DATA_ROOT, ./data/total_segmentator}
           split: train
+          download: ${oc.env:DOWNLOAD_DATA, false}
+          # Set `download: true` to download the dataset from https://zenodo.org/records/10047292
+          # The TotalSegmentator dataset is distributed under the following license: 
+          # "Creative Commons Attribution 4.0 International"
+          # (see: https://creativecommons.org/licenses/by/4.0/deed.en)
+          transforms:
+            class_path: eva.vision.data.transforms.common.ResizeAndClamp
+            init_args:
+              mean: *NORMALIZE_MEAN
+              std: *NORMALIZE_STD
       val:
-        class_path: eva.vision.datasets.EmbeddingsSegmentationDataset
+        class_path: eva.vision.datasets.TotalSegmentator2D
         init_args:
           <<: *DATASET_ARGS
           split: val
       test:
-        class_path: eva.vision.datasets.EmbeddingsSegmentationDataset
+        class_path: eva.vision.datasets.TotalSegmentator2D
         init_args:
           <<: *DATASET_ARGS
           split: test
-      predict:
-        - class_path: eva.vision.datasets.TotalSegmentator2D
-          init_args: &PREDICT_DATASET_ARGS
-            root: ${oc.env:DATA_ROOT, ./data/total_segmentator}
-            split: train
-            download: ${oc.env:DOWNLOAD_DATA, false}
-            # Set `download: true` to download the dataset from https://zenodo.org/records/10047292
-            # The TotalSegmentator dataset is distributed under the following license: 
-            # "Creative Commons Attribution 4.0 International"
-            # (see: https://creativecommons.org/licenses/by/4.0/deed.en)
-            transforms:
-              class_path: eva.vision.data.transforms.common.ResizeAndCrop
-              init_args:
-                size: ${oc.env:RESIZE_DIM, 224}  
-                mean: *NORMALIZE_MEAN
-                std: *NORMALIZE_STD
-        - class_path: eva.vision.datasets.TotalSegmentator2D
-          init_args:
-            <<: *PREDICT_DATASET_ARGS
-            split: val
-        - class_path: eva.vision.datasets.TotalSegmentator2D
-          init_args:
-            <<: *PREDICT_DATASET_ARGS
-            split: test
     dataloaders:
       train:
         batch_size: &BATCH_SIZE ${oc.env:BATCH_SIZE, 64}
@@ -146,7 +124,4 @@ data:
         shuffle: true
       test:
         batch_size: *BATCH_SIZE
-        num_workers: *N_DATA_WORKERS
-      predict:
-        batch_size: &PREDICT_BATCH_SIZE ${oc.env:PREDICT_BATCH_SIZE, 64}
         num_workers: *N_DATA_WORKERS

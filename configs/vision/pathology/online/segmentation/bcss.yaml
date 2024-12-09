@@ -22,7 +22,7 @@ trainer:
           filename: best
           save_last: true
           save_top_k: 1
-          monitor: &MONITOR_METRIC ${oc.env:MONITOR_METRIC, val/GeneralizedDiceScore}
+          monitor: &MONITOR_METRIC ${oc.env:MONITOR_METRIC, 'val/MonaiDiceScore'}
           mode: &MONITOR_METRIC_MODE ${oc.env:MONITOR_METRIC_MODE, max}
       - class_path: lightning.pytorch.callbacks.EarlyStopping
         init_args:
@@ -80,11 +80,18 @@ model:
         - class_path: torchmetrics.ClasswiseWrapper
           init_args:
             metric:
-              class_path: eva.vision.metrics.GeneralizedDiceScore
+              class_path: eva.vision.metrics.MonaiDiceScore
               init_args:
+                include_background: true
                 num_classes: *NUM_CLASSES
-                weight_type: linear
-                per_class: true
+                reduction: none
+            labels:
+              - outside_roi
+              - tumor
+              - stroma
+              - inflammatory
+              - necrosis
+              - other
 data:
   class_path: eva.DataModule
   init_args:
