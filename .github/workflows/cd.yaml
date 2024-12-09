@@ -42,9 +42,7 @@ jobs:
       - name: Deploy Documentation
         run: |
           git fetch origin gh-pages:gh-pages
-          tag="${{ github.ref_name }}"
-          DOC_VERSION=${tag%.*}
-          nox -s docs -- deploy --update-aliases "$DOC_VERSION" main
+          nox -s docs -- deploy --update-aliases main
           git push origin gh-pages
       - name: Publish package distributions to PyPI
         run: nox -s publish -- --no-build
