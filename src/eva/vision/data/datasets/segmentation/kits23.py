@@ -197,11 +197,13 @@ class KiTS23(base.ImageSegmentation):
     def _segmentation_filename(self, sample_index: int) -> str:
         return f"case_{sample_index:05d}/segmentation.nii"
 
-    def _volume_path(self, sample_index: int) -> str:
-        return os.path.join(self._processed_root, self._volume_filename(sample_index))
+    def _volume_path(self, sample_index: int, processed: bool = True) -> str:
+        root = self._processed_root if processed else self._root
+        return os.path.join(root, self._volume_filename(sample_index))
 
-    def _segmentation_path(self, sample_index: int) -> str:
-        return os.path.join(self._processed_root, self._segmentation_filename(sample_index))
+    def _segmentation_path(self, sample_index: int, processed: bool = True) -> str:
+        root = self._processed_root if processed else self._root
+        return os.path.join(root, self._segmentation_filename(sample_index))
 
     def _download_dataset(self) -> None:
         """Downloads the dataset."""
@@ -211,9 +213,8 @@ class KiTS23(base.ImageSegmentation):
             desc=">> Downloading dataset",
             leave=False,
         ):
-            image_path, segmentation_path = self._volume_path(case_id), self._segmentation_path(
-                case_id
-            )
+            image_path = self._volume_path(case_id, processed=False)
+            segmentation_path = self._segmentation_path(case_id, processed=False)
             if os.path.isfile(image_path) and os.path.isfile(segmentation_path):
                 continue
 
