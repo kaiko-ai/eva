@@ -20,9 +20,12 @@ from eva.vision.utils import io
 class CoNSeP(wsi.MultiWsiDataset, base.ImageSegmentation):
     """Dataset class for CoNSeP semantic segmentation task.
 
-    We combine classes 3 (healthy epithelial) & 4 (dysplastic/malignant epithelial)
+    As in [1], we combine classes 3 (healthy epithelial) & 4 (dysplastic/malignant epithelial)
     into the epithelial class and 5 (fibroblast), 6 (muscle) & 7 (endothelial) into
     the spindle-shaped class.
+
+    [1] Graham, Simon, et al. "Hover-net: Simultaneous segmentation and classification of
+        nuclei in multi-tissue histology images." https://arxiv.org/abs/1802.04712
     """
 
     _expected_dataset_lengths: Dict[str | None, int] = {

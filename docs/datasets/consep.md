@@ -2,6 +2,7 @@
 
 CoNSep (Colorectal Nuclear Segmentation and Phenotypes) consists of 41 1000x1000 tiles extracted from 16 WSIs of unique patients. Labels are segmentation masks which indicate if a pixel belongs to one of 7 categories of cell nuclei. In total 24,319 unique nuclei are present.
 
+
 ## Raw data
 
 ### Key stats
@@ -9,7 +10,7 @@ CoNSep (Colorectal Nuclear Segmentation and Phenotypes) consists of 41 1000x1000
 |                       |                                                           |
 |-----------------------|-----------------------------------------------------------|
 | **Modality**          | Vision (WSI patches)                                      |
-| **Task**              | Segmentation - 8 classes (non-"cell nucleus" + 7 categories)|
+| **Task**              | Segmentation - 4 classes *                           |
 | **Data size**         | total: ~800MB                                             |
 | **Image dimension**   | 1000 x 1000 x 3                                           |
 | **Magnification (μm/px)**  | 40x (0.25)                                           |
@@ -17,6 +18,18 @@ CoNSep (Colorectal Nuclear Segmentation and Phenotypes) consists of 41 1000x1000
 | **Number of images**  | 41                                                        |
 | **Splits in use**     | Train and Test                                            |
 
+
+\* The original dataset has 7 classes:
+
+1. Miscellaneous
+2. Inflammatory
+3. Normal epithelium
+4. Malignant/dysplastic	epithelium
+5. Fibroblast
+6. Muscle
+7. Endothelial
+
+As in the original paper [1], we combine classes 3 (normal epithelial) & 4 (malignant/dysplastic epithelial) into the epithelial class and 5 (fibroblast), 6 (muscle) & 7 (endothelial) into the spindle-shaped class.
 
 ### Organization
 
@@ -53,8 +66,7 @@ We work with the splits provided by the data source. Since no "validation" split
 
 | Splits   | Train           | Validation   | 
 |----------|-----------------|--------------|
-| #Samples | 27 (66%) | 14 (34%) | 
-
+| #Samples | 27 (66%)        | 14 (34%)     | 
 
 ## Relevant links
 
@@ -65,3 +77,6 @@ We work with the splits provided by the data source. Since no "validation" split
 ## License
 
 The CoNSeP dataset are held under the [Apache 2.0 License](https://www.apache.org/licenses/LICENSE-2.0)
+
+## References
+[1] : [HoVer-Net: Simultaneous Segmentation and Classification of Nuclei in Multi-Tissue Histology Images](https://arxiv.org/abs/1812.06499)
