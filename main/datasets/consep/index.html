@@ -1156,6 +1156,15 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#references" class="md-nav__link">
+    <span class="md-ellipsis">
+      References
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -2663,6 +2672,15 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#references" class="md-nav__link">
+    <span class="md-ellipsis">
+      References
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -2699,7 +2717,7 @@
 </tr>
 <tr>
 <td><strong>Task</strong></td>
-<td>Segmentation - 8 classes (non-"cell nucleus" + 7 categories)</td>
+<td>Segmentation - 4 classes *</td>
 </tr>
 <tr>
 <td><strong>Data size</strong></td>
@@ -2727,6 +2745,17 @@
 </tr>
 </tbody>
 </table>
+<p>* The original dataset has 7 classes:</p>
+<ol>
+<li>Miscellaneous</li>
+<li>Inflammatory</li>
+<li>Normal epithelium</li>
+<li>Malignant/dysplastic epithelium</li>
+<li>Fibroblast</li>
+<li>Muscle</li>
+<li>Endothelial</li>
+</ol>
+<p>As in the original paper [1], we combine classes 3 (normal epithelial) &amp; 4 (malignant/dysplastic epithelial) into the epithelial class and 5 (fibroblast), 6 (muscle) &amp; 7 (endothelial) into the spindle-shaped class.</p>
 <h3 id="organization">Organization</h3>
 <p>The data is organized as follows:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>consep
@@ -2776,6 +2805,8 @@
 </ul>
 <h2 id="license">License</h2>
 <p>The CoNSeP dataset are held under the <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 License</a></p>
+<h2 id="references">References</h2>
+<p>[1] : <a href="https://arxiv.org/abs/1812.06499">HoVer-Net: Simultaneous Segmentation and Classification of Nuclei in Multi-Tissue Histology Images</a></p>
 
 
 
