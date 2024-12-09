@@ -24,6 +24,11 @@ from eva.vision.utils.io import nifti
 class KiTS23(base.ImageSegmentation):
     """KiTS23 - The 2023 Kidney and Kidney Tumor Segmentation challenge.
 
+    To optimize data loading, the dataset is preprocessed by reorienting the images
+    from IPL to LAS and uncompressing them. The reorientation is necessary, because
+    loading slices from the first dimension is significantly slower than from the last,
+    due to data not being stored in a contiguous manner on disk accross all dimensions.
+
     Webpage: https://kits-challenge.org/kits23/
     """
 
@@ -215,6 +220,8 @@ class KiTS23(base.ImageSegmentation):
             _download_case_with_retry(case_id, image_path, segmentation_path)
 
     def _preprocess(self):
+        """Reorienting the images to LPS and uncompressing them."""
+
         def _reorient_and_save(path: Path) -> None:
             relative_path = str(path.relative_to(self._root))
             save_path = os.path.join(self._processed_root, relative_path.rstrip(".gz"))
@@ -227,7 +234,7 @@ class KiTS23(base.ImageSegmentation):
         multiprocessing.run_with_threads(
             _reorient_and_save,
             [(path,) for path in compressed_paths],
-            num_workers=self._num_workers,
+            num_workers=1,
             progress_desc=">> Preprocessing dataset",
             return_results=False,
         )

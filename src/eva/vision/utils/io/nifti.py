@@ -61,7 +61,7 @@ def reorient(
     """
     orig_ornt = nib.io_orientation(nii.affine)
     targ_ornt = orientations.axcodes2ornt(orientation)
-    if orig_ornt == targ_ornt:
+    if np.all(orig_ornt == targ_ornt):
         return nii
     transform = orientations.ornt_transform(orig_ornt, targ_ornt)
     reoriented_nii = nii.as_reoriented(transform)
