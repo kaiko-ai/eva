@@ -55,7 +55,5 @@ class GeneralizedDiceScore(segmentation.GeneralizedDiceScore):
         preds = _utils.index_to_one_hot(preds, num_classes=self.orig_num_classes)
         target = _utils.index_to_one_hot(target, num_classes=self.orig_num_classes)
         if self.ignore_index is not None:
-            preds, target = _utils.apply_ignore_index(
-                preds, target, self.ignore_index, self.num_classes
-            )
+            preds, target = _utils.apply_ignore_index(preds, target, self.ignore_index)
         super().update(preds=preds.long(), target=target.long())

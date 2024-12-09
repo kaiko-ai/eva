@@ -30,25 +30,23 @@ class MonaiDiceScore(wrappers.MonaiMetricWrapper):
         """
         super().__init__(
             DiceMetric(
-                include_background=include_background,
+                include_background=include_background or (ignore_index == 0),
                 reduction=reduction,
-                num_classes=num_classes,
+                num_classes=num_classes - (ignore_index is not None),
                 **kwargs,
             )
         )
 
         self.reduction = reduction
-        self.num_classes = num_classes
+        self.orig_num_classes = num_classes
         self.ignore_index = ignore_index
 
     @override
     def update(self, preds, target):
-        preds = _utils.index_to_one_hot(preds, num_classes=self.num_classes)
-        target = _utils.index_to_one_hot(target, num_classes=self.num_classes)
+        preds = _utils.index_to_one_hot(preds, num_classes=self.orig_num_classes)
+        target = _utils.index_to_one_hot(target, num_classes=self.orig_num_classes)
         if self.ignore_index is not None:
-            preds, target = _utils.apply_ignore_index(
-                preds, target, self.ignore_index, self.num_classes
-            )
+            preds, target = _utils.apply_ignore_index(preds, target, self.ignore_index)
         return super().update(preds, target)
 
     @override
