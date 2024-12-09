@@ -3,4 +3,4 @@
 from eva.vision.models.wrappers.from_registry import ModelFromRegistry
 from eva.vision.models.wrappers.from_timm import TimmModel
 
-__all__ = ["TimmModel", "ModelFromRegistry"]
+__all__ = ["ModelFromRegistry", "TimmModel"]
