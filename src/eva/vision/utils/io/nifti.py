@@ -11,18 +11,13 @@ from eva.vision.utils.io import _utils
 
 
 def read_nifti(
-    path: str,
-    slice_index: int | None = None,
-    *,
-    slice_dim: int = -1,
-    use_storage_dtype: bool = True,
+    path: str, slice_index: int | None = None, *, use_storage_dtype: bool = True, target_orientation: str | None = None
 ) -> npt.NDArray[Any]:
     """Reads and loads a NIfTI image from a file path.
 
     Args:
         path: The path to the NIfTI file.
         slice_index: Whether to read only a slice from the file.
-        slice_dim: The array dimension to slice the image. Default is -1.
         use_storage_dtype: Whether to cast the raw image
             array to the inferred type.
 
@@ -35,20 +30,30 @@ def read_nifti(
     """
     _utils.check_file(path)
     image_data: nib.Nifti1Image = nib.load(path)  # type: ignore
-
+    if target_orientation is not None:
+        image_data = reorient(image_data, target_orientation)
+    
     if slice_index is not None:
-        if slice_dim not in {-1, 0, 1, 2}:
-            raise ValueError(f"Expected slice_dim to be -1, 0, 1 or 2, but got {slice_dim}.")
-        array_indices = [slice(None)] * 3
-        array_indices[2 if slice_dim == -1 else slice_dim] = slice(slice_index, slice_index + 1)
-        image_data = image_data.slicer[tuple(array_indices)]
-
-    image_array = image_data.get_fdata()
+        image_array = image_data.dataobj[:, :, slice_index]
+    else:
+        image_array = image_data.get_fdata()
+    
     if use_storage_dtype:
         image_array = image_array.astype(image_data.get_data_dtype())
 
     return image_array
 
+def reorient(
+    nii: nib.Nifti1Image,
+    orientation: str | tuple[str, str, str] = "RAS",
+) -> nib.Nifti1Image:
+    """Reorients a nifti image to specified orientation. Orientation string or tuple
+    must consist of "R" or "L", "A" or "P", and "I" or "S" in any order."""
+    orig_ornt = nib.io_orientation(nii.affine)
+    targ_ornt = orientations.axcodes2ornt(orientation)
+    transform = orientations.ornt_transform(orig_ornt, targ_ornt)
+    reoriented_nii = nii.as_reoriented(transform)
+    return reoriented_nii
 
 def save_array_as_nifti(
     array: npt.ArrayLike,

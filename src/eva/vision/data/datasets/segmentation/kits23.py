@@ -131,14 +131,14 @@ class KiTS23(base.ImageSegmentation):
     def load_image(self, index: int) -> tv_tensors.Image:
         sample_index, slice_index = self._indices[index]
         volume_path = self._volume_path(sample_index)
-        image_array = io.read_nifti(volume_path, slice_index, slice_dim=0)
-        return tv_tensors.Image(image_array)
+        image_array = io.read_nifti(volume_path, slice_index, target_orientation="LAS", use_storage_dtype=True)
+        return tv_tensors.Image(image_array, dtype=torch.float32)  # type: ignore[reportCallIssue]
 
     @override
     def load_mask(self, index: int) -> tv_tensors.Mask:
         sample_index, slice_index = self._indices[index]
         segmentation_path = self._segmentation_path(sample_index)
-        semantic_labels = io.read_nifti(segmentation_path, slice_index, slice_dim=0)
+        semantic_labels = io.read_nifti(segmentation_path, slice_index, target_orientation="LAS", use_storage_dtype=True)
         return tv_tensors.Mask(semantic_labels.squeeze(), dtype=torch.int64)  # type: ignore[reportCallIssue]
 
     @override
