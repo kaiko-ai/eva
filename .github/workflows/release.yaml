@@ -47,7 +47,7 @@ jobs:
           git fetch origin gh-pages:gh-pages
           tag="${{ github.ref_name }}"
           DOC_VERSION=${tag%.*}
-          nox -s docs -- deploy --alias-type=copy --update-aliases "$DOC_VERSION" latest
+          nox -s docs -- deploy --alias-type=copy --update-aliases "$DOC_VERSION"
           git push origin gh-pages
       - name: Publish package distributions to PyPI
         run: nox -s publish -- --no-build
