@@ -4,6 +4,7 @@ from eva.vision.data.datasets.segmentation.base import ImageSegmentation
 from eva.vision.data.datasets.segmentation.bcss import BCSS
 from eva.vision.data.datasets.segmentation.consep import CoNSeP
 from eva.vision.data.datasets.segmentation.embeddings import EmbeddingsSegmentationDataset
+from eva.vision.data.datasets.segmentation.kits23 import KiTS23
 from eva.vision.data.datasets.segmentation.lits import LiTS
 from eva.vision.data.datasets.segmentation.lits_balanced import LiTSBalanced
 from eva.vision.data.datasets.segmentation.monusac import MoNuSAC
@@ -14,6 +15,7 @@ __all__ = [
     "BCSS",
     "CoNSeP",
     "EmbeddingsSegmentationDataset",
+    "KiTS23",
     "LiTS",
     "LiTSBalanced",
     "MoNuSAC",
