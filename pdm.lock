@@ -5,7 +5,7 @@
 groups = ["default", "all", "dev", "docs", "lint", "test", "typecheck", "vision"]
 strategy = ["inherit_metadata"]
 lock_version = "4.5.0"
-content_hash = "sha256:5b9e7f8ba62696f3e07200365e1c11658c9c9bd24dbffa67f790b30f4ab0ff01"
+content_hash = "sha256:4b4959c935c559d0a50b0a061b9c83610198ab2d074426a359d6006ce18fe376"
 
 [[metadata.targets]]
 requires_python = ">=3.10"
@@ -826,7 +826,7 @@ name = "importlib-resources"
 version = "6.4.0"
 requires_python = ">=3.8"
 summary = "Read resources from Python packages"
-groups = ["dev", "docs"]
+groups = ["default", "all", "dev", "docs", "vision"]
 dependencies = [
     "zipp>=3.1.0; python_version < \"3.10\"",
 ]
@@ -1405,18 +1405,19 @@ files = [
 
 [[package]]
 name = "nibabel"
-version = "4.0.2"
-requires_python = ">=3.7"
+version = "5.3.2"
+requires_python = ">=3.9"
 summary = "Access a multitude of neuroimaging data formats"
-groups = ["all", "vision"]
+groups = ["default", "all", "vision"]
 dependencies = [
-    "numpy>=1.17",
-    "packaging>=17.0",
-    "setuptools",
+    "importlib-resources>=5.12; python_version < \"3.12\"",
+    "numpy>=1.22",
+    "packaging>=20",
+    "typing-extensions>=4.6; python_version < \"3.13\"",
 ]
 files = [
-    {file = "nibabel-4.0.2-py3-none-any.whl", hash = "sha256:c4fe76348aa865f8300beaaf2a69d31624964c861853ef80c06e33d5f244413c"},
-    {file = "nibabel-4.0.2.tar.gz", hash = "sha256:45c49b5349351b45f6c045a91aa02b4f0d367686ff3284632ef95ac65b930786"},
+    {file = "nibabel-5.3.2-py3-none-any.whl", hash = "sha256:52970a5a8a53b1b55249cba4d9bcfaa8cc57e3e5af35a29d7352237e8680a6f8"},
+    {file = "nibabel-5.3.2.tar.gz", hash = "sha256:0bdca6503b1c784b446c745a4542367de7756cfba0d72143b91f9ffb78be569b"},
 ]
 
 [[package]]
@@ -2465,7 +2466,7 @@ name = "setuptools"
 version = "75.1.0"
 requires_python = ">=3.8"
 summary = "Easily download, build, install, upgrade, and uninstall Python packages"
-groups = ["default", "all", "dev", "docs", "vision"]
+groups = ["default", "dev", "docs"]
 files = [
     {file = "setuptools-75.1.0-py3-none-any.whl", hash = "sha256:35ab7fd3bcd95e6b7fd704e4a1539513edad446c097797f2985e0e4b960772f2"},
     {file = "setuptools-75.1.0.tar.gz", hash = "sha256:d59a21b17a275fb872a9c3dae73963160ae079f1049ed956880cd7c09b120538"},
