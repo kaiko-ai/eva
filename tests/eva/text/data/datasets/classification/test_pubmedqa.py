@@ -1,18 +1,15 @@
 """PubMedQA dataset tests."""
 
+from typing import Literal
+
 import pytest
-from typing import Literal, Dict, Any
+
 from eva.language.data import datasets
 
 
 @pytest.mark.parametrize(
     "split, expected_length",
-    [
-        ("train", 450),
-        ("test", 500),
-        ("validation", 50),
-        ("train+test+validation", 1000)
-    ],
+    [("train", 450), ("test", 500), ("validation", 50), ("train+test+validation", 1000)],
 )
 def test_length(pubmedqa_dataset: datasets.PubMedQA, expected_length: int) -> None:
     """Tests the length of the dataset."""
@@ -44,8 +41,14 @@ def test_sample(pubmedqa_dataset: datasets.PubMedQA, index: int) -> None:
     assert target in [0, 1, 2]
 
     assert isinstance(metadata, dict)
-    required_keys = {"year", "labels", "meshes", "long_answer",
-                    "reasoning_required", "reasoning_free"}
+    required_keys = {
+        "year",
+        "labels",
+        "meshes",
+        "long_answer",
+        "reasoning_required",
+        "reasoning_free",
+    }
     assert all(key in metadata for key in required_keys)
 
 
@@ -57,7 +60,9 @@ def test_classes(pubmedqa_dataset: datasets.PubMedQA) -> None:
 
 
 @pytest.fixture(scope="function")
-def pubmedqa_dataset(split: Literal["train", "test", "validation", "train+test+validation"]) -> datasets.PubMedQA:
+def pubmedqa_dataset(
+    split: Literal["train", "test", "validation", "train+test+validation"]
+) -> datasets.PubMedQA:
     """PubMedQA dataset fixture."""
     dataset = datasets.PubMedQA(split=split)
     return dataset

@@ -1,9 +1,9 @@
 """PubMedQA dataset class."""
 
-from typing import Dict, List, Any
+from typing import Any, Dict, List
 
-from typing_extensions import override
 from datasets import load_dataset
+from typing_extensions import override
 
 from eva.language.data.datasets.classification import base
 
@@ -26,9 +26,7 @@ class PubMedQA(base.TextClassification):
         super().__init__()
         self._split = split
         self.dataset = load_dataset(
-            "bigbio/pubmed_qa",
-            name="pubmed_qa_labeled_fold0_source",
-            split=split
+            "bigbio/pubmed_qa", name="pubmed_qa_labeled_fold0_source", split=split
         )
 
     @property

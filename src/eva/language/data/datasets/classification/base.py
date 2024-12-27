@@ -1,16 +1,17 @@
 """Base for text classification datasets."""
 
 import abc
-from typing import Any, Callable, Dict, List, Tuple
+from typing import Any, Dict, List, Tuple
 
 import torch
 from typing_extensions import override
 
 from eva.language.data.datasets.language import LanguageDataset
 
+
 class TextClassification(LanguageDataset[Tuple[str, torch.Tensor]], abc.ABC):
     """Text classification abstract dataset."""
-    
+
     def __init__(self) -> None:
         """Initializes the text classification dataset."""
         super().__init__()
@@ -47,7 +48,7 @@ class TextClassification(LanguageDataset[Tuple[str, torch.Tensor]], abc.ABC):
             The text content.
         """
         raise NotImplementedError
-    
+
     @abc.abstractmethod
     def load_target(self, index: int) -> torch.Tensor:
         """Returns the target label.
@@ -62,8 +63,4 @@ class TextClassification(LanguageDataset[Tuple[str, torch.Tensor]], abc.ABC):
 
     @override
     def __getitem__(self, index: int) -> Tuple[str, torch.Tensor, Dict[str, Any]]:
-        return (
-            self.load_text(index), 
-            self.load_target(index), 
-            self.load_metadata(index) or {}
-        )
+        return (self.load_text(index), self.load_target(index), self.load_metadata(index) or {})
