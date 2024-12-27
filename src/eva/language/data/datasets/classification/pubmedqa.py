@@ -8,7 +8,7 @@ from datasets import load_dataset
 from eva.language.data.datasets.classification import base
 
 
-class PubMedQA(base.LanguageClassification):
+class PubMedQA(base.TextClassification):
     """Dataset class for PubMedQA question answering task."""
 
     _license: str = "MIT License (https://github.com/pubmedqa/pubmedqa/blob/master/LICENSE)"
