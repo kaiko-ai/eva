@@ -8,7 +8,6 @@ from datasets import Dataset, load_dataset
 from typing_extensions import override
 
 from eva.language.data.datasets.classification import base
-from eva.vision.data.datasets import _validators
 
 
 class PubMedQA(base.TextClassification):
@@ -84,15 +83,6 @@ class PubMedQA(base.TextClassification):
 
         except Exception as e:
             raise RuntimeError(f"Failed to prepare dataset: {e}") from e
-
-    @override
-    def validate(self) -> None:
-        _validators.check_dataset_integrity(
-            self,
-            length=1000,
-            n_classes=3,
-            first_and_last_labels=("Benign", "Normal"),
-        )
 
     @property
     @override
