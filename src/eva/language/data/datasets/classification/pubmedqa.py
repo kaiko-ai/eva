@@ -1,5 +1,6 @@
 """PubMedQA dataset class."""
 
+import os
 from typing import Any, Dict, List
 
 import torch
@@ -7,6 +8,7 @@ from datasets import Dataset, load_dataset
 from typing_extensions import override
 
 from eva.language.data.datasets.classification import base
+from eva.vision.data.datasets import _validators
 
 
 class PubMedQA(base.TextClassification):
@@ -17,23 +19,80 @@ class PubMedQA(base.TextClassification):
 
     def __init__(
         self,
+        root: str | None = None,
         split: str | None = "train+test+validation",
+        download: bool = False,
     ) -> None:
         """Initialize the PubMedQA dataset.
 
         Args:
-            split: Dataset split to use. If default, entire dataset of 1000 samples is used.
+            root: Directory to cache the dataset. If None, no local caching is used.
+            split: Dataset split to use. Default is "train+test+validation".
+            download: Whether to download the dataset if not found locally. Default is False.
         """
         super().__init__()
+        self._root = root
         self._split = split
-        raw_dataset = load_dataset(
-            "bigbio/pubmed_qa", name="pubmed_qa_labeled_fold0_source", split=split, streaming=False
+        self._download = download
+
+    @override
+    def prepare_data(self) -> None:
+        """Downloads and prepares the PubMedQA dataset.
+
+        If `self._root` is None, the dataset is used directly from HuggingFace.
+        Otherwise, it checks if the dataset is already cached in `self._root`.
+        If not cached, it downloads the dataset into `self._root`.
+        """
+        dataset_cache_path = None
+
+        if self._root:
+            dataset_cache_path = os.path.join(self._root, "pubmed_qa")
+            os.makedirs(self._root, exist_ok=True)
+
+        try:
+            if dataset_cache_path and os.path.exists(dataset_cache_path):
+                raw_dataset = load_dataset(
+                    dataset_cache_path,
+                    name="pubmed_qa_labeled_fold0_source",
+                    split=self._split,
+                    streaming=False,
+                )
+                print(f"Loaded dataset from local cache: {dataset_cache_path}")
+            else:
+                if not self._download and self._root:
+                    raise ValueError(
+                        "Dataset not found locally and downloading is disabled. "
+                        "Set `download=True` or provide a valid local cache."
+                    )
+
+                raw_dataset = load_dataset(
+                    "bigbio/pubmed_qa",
+                    name="pubmed_qa_labeled_fold0_source",
+                    split=self._split,
+                    cache_dir=self._root if self._root else None,
+                    streaming=False,
+                )
+                if self._root:
+                    print(f"Dataset downloaded and cached in: {self._root}")
+                else:
+                    print("Using dataset directly from Hugging Face without caching.")
+
+            if not isinstance(raw_dataset, Dataset):
+                raise TypeError(f"Expected a `Dataset`, but got {type(raw_dataset)}")
+
+            self.dataset: Dataset = raw_dataset
+
+        except Exception as e:
+            raise RuntimeError(f"Failed to prepare dataset: {e}")
+
+    @override
+    def validate(self) -> None:
+        _validators.check_dataset_integrity(
+            self,
+            length=1000,
+            n_classes=3,
+            first_and_last_labels=("Benign", "Normal"),
         )
-
-        if not isinstance(raw_dataset, Dataset):
-            raise TypeError(f"Expected a `Dataset`, but got {type(raw_dataset)}")
-
-        self.dataset: Dataset = raw_dataset
 
     @property
     @override

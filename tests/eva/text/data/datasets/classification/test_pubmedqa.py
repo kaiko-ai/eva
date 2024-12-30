@@ -1,10 +1,35 @@
 """PubMedQA dataset tests."""
 
+import os
+import shutil
 from typing import Literal
 
 import pytest
+import torch
+from datasets import Dataset
 
 from eva.language.data import datasets
+
+
+@pytest.fixture(scope="function")
+def pubmedqa_dataset(
+    split: Literal["train", "test", "validation", "train+test+validation"]
+) -> datasets.PubMedQA:
+    """PubMedQA dataset fixture."""
+    dataset = datasets.PubMedQA(split=split)
+    dataset.prepare_data()
+    return dataset
+
+
+@pytest.fixture(scope="function")
+def pubmedqa_dataset_with_cache(
+    tmp_path, split: Literal["train", "test", "validation", "train+test+validation"]
+) -> datasets.PubMedQA:
+    """PubMedQA dataset fixture with caching enabled."""
+    root = tmp_path / "pubmed_qa_cache"
+    dataset = datasets.PubMedQA(root=str(root), split=split, download=True)
+    dataset.prepare_data()
+    return dataset
 
 
 @pytest.mark.parametrize(
@@ -37,7 +62,7 @@ def test_sample(pubmedqa_dataset: datasets.PubMedQA, index: int) -> None:
     assert text.startswith("Question: ")
     assert "Context: " in text
 
-    assert isinstance(target, int)
+    assert isinstance(target, torch.Tensor)
     assert target in [0, 1, 2]
 
     assert isinstance(metadata, dict)
@@ -59,10 +84,44 @@ def test_classes(pubmedqa_dataset: datasets.PubMedQA) -> None:
     assert pubmedqa_dataset.class_to_idx == {"no": 0, "yes": 1, "maybe": 2}
 
 
-@pytest.fixture(scope="function")
-def pubmedqa_dataset(
-    split: Literal["train", "test", "validation", "train+test+validation"]
-) -> datasets.PubMedQA:
-    """PubMedQA dataset fixture."""
-    dataset = datasets.PubMedQA(split=split)
-    return dataset
+@pytest.mark.parametrize("split", ["train+test+validation"])
+def test_prepare_data_no_root(pubmedqa_dataset: datasets.PubMedQA) -> None:
+    """Tests dataset preparation without specifying a root directory."""
+    assert isinstance(pubmedqa_dataset.dataset, Dataset)
+    assert len(pubmedqa_dataset) > 0
+
+
+@pytest.mark.parametrize("split", ["train+test+validation"])
+def test_prepare_data_with_cache(pubmedqa_dataset_with_cache: datasets.PubMedQA) -> None:
+    """Tests dataset preparation with caching."""
+    pubmedqa_dataset_with_cache.prepare_data()
+    assert isinstance(pubmedqa_dataset_with_cache.dataset, Dataset)
+    assert len(pubmedqa_dataset_with_cache) > 0
+
+    cache_dir = pubmedqa_dataset_with_cache._root
+    assert os.path.exists(cache_dir)
+    assert any(os.scandir(cache_dir))
+
+
+@pytest.mark.parametrize("split", ["train+test+validation"])
+def test_prepare_data_without_download(
+    tmp_path, split: Literal["train", "test", "validation", "train+test+validation"]
+) -> None:
+    """Tests dataset preparation when download is disabled and cache is missing."""
+    root = tmp_path / "pubmed_qa_cache"
+    dataset = datasets.PubMedQA(root=str(root), split=split, download=False)
+
+    with pytest.raises(RuntimeError, match="Dataset not found locally and downloading is disabled"):
+        dataset.prepare_data()
+
+
+def test_cleanup_cache(tmp_path) -> None:
+    """Tests that the cache can be cleaned up."""
+    root = tmp_path / "pubmed_qa_cache"
+    dataset = datasets.PubMedQA(root=str(root), split="train+test+validation", download=True)
+    dataset.prepare_data()
+
+    assert os.path.exists(root)
+
+    shutil.rmtree(root)
+    assert not os.path.exists(root)
