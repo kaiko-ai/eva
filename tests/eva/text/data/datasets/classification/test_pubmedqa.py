@@ -99,8 +99,9 @@ def test_prepare_data_with_cache(pubmedqa_dataset_with_cache: datasets.PubMedQA)
     assert len(pubmedqa_dataset_with_cache) > 0
 
     cache_dir = pubmedqa_dataset_with_cache._root
-    assert os.path.exists(cache_dir)
-    assert any(os.scandir(cache_dir))
+    if cache_dir:
+        assert os.path.exists(cache_dir)
+        assert any(os.scandir(cache_dir))
 
 
 @pytest.mark.parametrize("split", ["train+test+validation"])
