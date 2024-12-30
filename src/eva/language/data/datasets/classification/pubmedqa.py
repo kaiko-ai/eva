@@ -1,8 +1,9 @@
 """PubMedQA dataset class."""
 
 from typing import Any, Dict, List
+
 import torch
-from datasets import load_dataset, Dataset
+from datasets import Dataset, load_dataset
 from typing_extensions import override
 
 from eva.language.data.datasets.classification import base
@@ -26,10 +27,7 @@ class PubMedQA(base.TextClassification):
         super().__init__()
         self._split = split
         raw_dataset = load_dataset(
-            "bigbio/pubmed_qa",
-            name="pubmed_qa_labeled_fold0_source",
-            split=split,
-            streaming=False
+            "bigbio/pubmed_qa", name="pubmed_qa_labeled_fold0_source", split=split, streaming=False
         )
 
         if not isinstance(raw_dataset, Dataset):
@@ -55,8 +53,7 @@ class PubMedQA(base.TextClassification):
     @override
     def load_target(self, index: int) -> torch.Tensor:
         return torch.tensor(
-            self.class_to_idx[self.dataset[index]["final_decision"]],
-            dtype=torch.long
+            self.class_to_idx[self.dataset[index]["final_decision"]], dtype=torch.long
         )
 
     @override
