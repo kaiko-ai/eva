@@ -83,7 +83,7 @@ class PubMedQA(base.TextClassification):
             self.dataset: Dataset = raw_dataset
 
         except Exception as e:
-            raise RuntimeError(f"Failed to prepare dataset: {e}")
+            raise RuntimeError(f"Failed to prepare dataset: {e}") from e
 
     @override
     def validate(self) -> None:
