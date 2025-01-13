@@ -1,7 +1,7 @@
 """PubMedQA dataset class."""
 
 import os
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Literal
 
 import torch
 from datasets import Dataset, load_dataset
@@ -19,19 +19,23 @@ class PubMedQA(base.TextClassification):
     def __init__(
         self,
         root: str | None = None,
-        split: str | None = "train+test+validation",
+        split: Literal["train", "val", "test"] | None = None,
         download: bool = False,
     ) -> None:
         """Initialize the PubMedQA dataset.
 
         Args:
             root: Directory to cache the dataset. If None, no local caching is used.
-            split: Dataset split to use. Default is "train+test+validation".
+            split: Valid splits among ["train", "validation", "test"].
+                If None, it will use "train+test+validation".
             download: Whether to download the dataset if not found locally. Default is False.
         """
         super().__init__()
         self._root = root
-        self._split = split
+        if split is None:
+            self._split = "train+test+validation"
+        else:
+            self._split = "+".join(split)
         self._download = download
 
     @override

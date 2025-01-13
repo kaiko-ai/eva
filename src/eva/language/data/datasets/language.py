@@ -1,4 +1,4 @@
-"""Language Dataset base class."""
+"""Vision Dataset base class."""
 
 import abc
 from typing import Generic, TypeVar
@@ -11,5 +11,3 @@ DataSample = TypeVar("DataSample")
 
 class LanguageDataset(base.MapDataset, abc.ABC, Generic[DataSample]):
     """Base dataset class for text tasks."""
-
-    pass
