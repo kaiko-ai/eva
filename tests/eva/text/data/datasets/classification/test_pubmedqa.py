@@ -2,7 +2,6 @@
 
 import os
 import shutil
-from typing import Literal
 
 import pytest
 import torch
@@ -12,9 +11,7 @@ from eva.language.data import datasets
 
 
 @pytest.fixture(scope="function")
-def pubmedqa_dataset(
-    split: None
-) -> datasets.PubMedQA:
+def pubmedqa_dataset(split: None) -> datasets.PubMedQA:
     """PubMedQA dataset fixture."""
     dataset = datasets.PubMedQA(split=split)
     dataset.prepare_data()
@@ -22,8 +19,7 @@ def pubmedqa_dataset(
 
 
 @pytest.fixture(scope="function")
-def pubmedqa_dataset_with_cache(
-    tmp_path, split: None) -> datasets.PubMedQA:
+def pubmedqa_dataset_with_cache(tmp_path, split: None) -> datasets.PubMedQA:
     """PubMedQA dataset fixture with caching enabled."""
     root = tmp_path / "pubmed_qa_cache"
     dataset = datasets.PubMedQA(root=str(root), split=split, download=True)
@@ -82,11 +78,13 @@ def test_classes(pubmedqa_dataset: datasets.PubMedQA) -> None:
     assert pubmedqa_dataset.classes == ["no", "yes", "maybe"]
     assert pubmedqa_dataset.class_to_idx == {"no": 0, "yes": 1, "maybe": 2}
 
+
 @pytest.mark.parametrize("split", [None])
 def test_prepare_data_no_root(pubmedqa_dataset: datasets.PubMedQA) -> None:
     """Tests dataset preparation without specifying a root directory."""
     assert isinstance(pubmedqa_dataset.dataset, Dataset)
     assert len(pubmedqa_dataset) > 0
+
 
 @pytest.mark.parametrize("split", [None])
 def test_prepare_data_with_cache(pubmedqa_dataset_with_cache: datasets.PubMedQA) -> None:
@@ -100,10 +98,9 @@ def test_prepare_data_with_cache(pubmedqa_dataset_with_cache: datasets.PubMedQA)
         assert os.path.exists(cache_dir)
         assert any(os.scandir(cache_dir))
 
+
 @pytest.mark.parametrize("split", [None])
-def test_prepare_data_without_download(
-    tmp_path, split
-) -> None:
+def test_prepare_data_without_download(tmp_path, split) -> None:
     """Tests dataset preparation when download is disabled and cache is missing."""
     root = tmp_path / "pubmed_qa_cache"
     dataset = datasets.PubMedQA(root=str(root), split=split, download=False)
