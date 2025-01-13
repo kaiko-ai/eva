@@ -13,7 +13,7 @@ from eva.language.data import datasets
 
 @pytest.fixture(scope="function")
 def pubmedqa_dataset(
-    split: Literal["train", "test", "validation", "train+test+validation"]
+    split: None
 ) -> datasets.PubMedQA:
     """PubMedQA dataset fixture."""
     dataset = datasets.PubMedQA(split=split)
@@ -23,8 +23,7 @@ def pubmedqa_dataset(
 
 @pytest.fixture(scope="function")
 def pubmedqa_dataset_with_cache(
-    tmp_path, split: Literal["train", "test", "validation", "train+test+validation"]
-) -> datasets.PubMedQA:
+    tmp_path, split: None) -> datasets.PubMedQA:
     """PubMedQA dataset fixture with caching enabled."""
     root = tmp_path / "pubmed_qa_cache"
     dataset = datasets.PubMedQA(root=str(root), split=split, download=True)
@@ -34,7 +33,7 @@ def pubmedqa_dataset_with_cache(
 
 @pytest.mark.parametrize(
     "split, expected_length",
-    [("train", 450), ("test", 500), ("validation", 50), ("train+test+validation", 1000)],
+    [(["train"], 450), (["test"], 500), (["validation"], 50), (None, 1000)],
 )
 def test_length(pubmedqa_dataset: datasets.PubMedQA, expected_length: int) -> None:
     """Tests the length of the dataset."""
@@ -44,11 +43,11 @@ def test_length(pubmedqa_dataset: datasets.PubMedQA, expected_length: int) -> No
 @pytest.mark.parametrize(
     "split, index",
     [
-        ("train", 0),
-        ("train", 10),
-        ("test", 0),
-        ("validation", 0),
-        ("train+test+validation", 0),
+        (["train"], 0),
+        (["train"], 10),
+        (["test"], 0),
+        (["validation"], 0),
+        (None, 0),
     ],
 )
 def test_sample(pubmedqa_dataset: datasets.PubMedQA, index: int) -> None:
@@ -77,21 +76,19 @@ def test_sample(pubmedqa_dataset: datasets.PubMedQA, index: int) -> None:
     assert all(key in metadata for key in required_keys)
 
 
-@pytest.mark.parametrize("split", ["train", "test", "validation", "train+test+validation"])
+@pytest.mark.parametrize("split", [None])
 def test_classes(pubmedqa_dataset: datasets.PubMedQA) -> None:
     """Tests the dataset classes."""
     assert pubmedqa_dataset.classes == ["no", "yes", "maybe"]
     assert pubmedqa_dataset.class_to_idx == {"no": 0, "yes": 1, "maybe": 2}
 
-
-@pytest.mark.parametrize("split", ["train+test+validation"])
+@pytest.mark.parametrize("split", [None])
 def test_prepare_data_no_root(pubmedqa_dataset: datasets.PubMedQA) -> None:
     """Tests dataset preparation without specifying a root directory."""
     assert isinstance(pubmedqa_dataset.dataset, Dataset)
     assert len(pubmedqa_dataset) > 0
 
-
-@pytest.mark.parametrize("split", ["train+test+validation"])
+@pytest.mark.parametrize("split", [None])
 def test_prepare_data_with_cache(pubmedqa_dataset_with_cache: datasets.PubMedQA) -> None:
     """Tests dataset preparation with caching."""
     pubmedqa_dataset_with_cache.prepare_data()
@@ -103,10 +100,9 @@ def test_prepare_data_with_cache(pubmedqa_dataset_with_cache: datasets.PubMedQA)
         assert os.path.exists(cache_dir)
         assert any(os.scandir(cache_dir))
 
-
-@pytest.mark.parametrize("split", ["train+test+validation"])
+@pytest.mark.parametrize("split", [None])
 def test_prepare_data_without_download(
-    tmp_path, split: Literal["train", "test", "validation", "train+test+validation"]
+    tmp_path, split
 ) -> None:
     """Tests dataset preparation when download is disabled and cache is missing."""
     root = tmp_path / "pubmed_qa_cache"
@@ -119,7 +115,7 @@ def test_prepare_data_without_download(
 def test_cleanup_cache(tmp_path) -> None:
     """Tests that the cache can be cleaned up."""
     root = tmp_path / "pubmed_qa_cache"
-    dataset = datasets.PubMedQA(root=str(root), split="train+test+validation", download=True)
+    dataset = datasets.PubMedQA(root=str(root), download=True)
     dataset.prepare_data()
 
     assert os.path.exists(root)
