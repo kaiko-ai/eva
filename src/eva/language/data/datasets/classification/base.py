@@ -19,12 +19,10 @@ class TextClassification(LanguageDataset[Tuple[str, torch.Tensor]], abc.ABC):
     @property
     def classes(self) -> List[str] | None:
         """Returns list of class names."""
-        return None
 
     @property
     def class_to_idx(self) -> Dict[str, int] | None:
         """Returns class name to index mapping."""
-        return None
 
     def load_metadata(self, index: int) -> Dict[str, Any] | None:
         """Returns the dataset metadata.
@@ -35,7 +33,6 @@ class TextClassification(LanguageDataset[Tuple[str, torch.Tensor]], abc.ABC):
         Returns:
             The sample metadata.
         """
-        return None
 
     @abc.abstractmethod
     def load_text(self, index: int) -> str:
