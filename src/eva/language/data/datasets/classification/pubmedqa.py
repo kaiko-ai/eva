@@ -19,7 +19,7 @@ class PubMedQA(base.TextClassification):
 
     def __init__(
         self,
-        root: str | None = None,
+        root: Optional[str] = None,
         split: Literal["train", "validation", "test"] | None = None,
         download: bool = False,
     ) -> None:
