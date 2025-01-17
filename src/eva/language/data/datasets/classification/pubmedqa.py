@@ -38,28 +38,31 @@ class PubMedQA(base.TextClassification):
         self._download = download
 
     def _load_dataset(self, dataset_cache_path: Optional[str]) -> Dataset:
-        """Loads the PubMedQA dataset from the local cache or downloads it if needed.
+        """
+        Loads the PubMedQA dataset from the local cache or downloads it if needed.
 
         Args:
-            dataset_cache_path: The path to the local cache.
+            dataset_cache_path: The path to the local cache (may be None).
 
         Returns:
             The loaded Dataset object.
         """
-        is_local = bool(dataset_cache_path and os.path.exists(dataset_cache_path))
-        dataset_path = dataset_cache_path if is_local else "bigbio/pubmed_qa"
 
-        if not is_local and not self._download and self._root:
-            raise ValueError(
-                "Dataset not found locally and downloading is disabled. "
-                "Set `download=True` or provide a valid local cache."
-            )
-
-        if is_local:
+        if dataset_cache_path is not None and os.path.exists(dataset_cache_path):
+            dataset_path = dataset_cache_path
             logger.info(f"Loaded dataset from local cache: {dataset_cache_path}")
+            is_local = True
         else:
+            if not self._download and self._root:
+                raise ValueError(
+                    "Dataset not found locally and downloading is disabled. "
+                    "Set `download=True` or provide a valid local cache."
+                )
+            dataset_path = "bigbio/pubmed_qa"
+            is_local = False
+
             if self._root:
-                logger.info(f"Dataset downloaded and cached in: {self._root}")
+                logger.info(f"Dataset will be downloaded and cached in: {self._root}")
             else:
                 logger.info("Using dataset directly from HuggingFace without caching.")
 
