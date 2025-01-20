@@ -38,8 +38,7 @@ class PubMedQA(base.TextClassification):
         self._download = download
 
     def _load_dataset(self, dataset_cache_path: Optional[str]) -> Dataset:
-        """
-        Loads the PubMedQA dataset from the local cache or downloads it if needed.
+        """Loads the PubMedQA dataset from the local cache or downloads it if needed.
 
         Args:
             dataset_cache_path: The path to the local cache (may be None).
@@ -47,7 +46,6 @@ class PubMedQA(base.TextClassification):
         Returns:
             The loaded Dataset object.
         """
-
         if dataset_cache_path is not None and os.path.exists(dataset_cache_path):
             dataset_path = dataset_cache_path
             logger.info(f"Loaded dataset from local cache: {dataset_cache_path}")
