@@ -10,23 +10,6 @@ from datasets import Dataset
 from eva.language.data import datasets
 
 
-@pytest.fixture(scope="function")
-def pubmedqa_dataset(split: None) -> datasets.PubMedQA:
-    """PubMedQA dataset fixture."""
-    dataset = datasets.PubMedQA(split=split)
-    dataset.prepare_data()
-    return dataset
-
-
-@pytest.fixture(scope="function")
-def pubmedqa_dataset_with_cache(tmp_path, split: None) -> datasets.PubMedQA:
-    """PubMedQA dataset fixture with caching enabled."""
-    root = tmp_path / "pubmed_qa_cache"
-    dataset = datasets.PubMedQA(root=str(root), split=split, download=True)
-    dataset.prepare_data()
-    return dataset
-
-
 @pytest.mark.parametrize(
     "split, expected_length",
     [(["train"], 450), (["test"], 500), (["validation"], 50), (None, 1000)],
@@ -119,3 +102,20 @@ def test_cleanup_cache(tmp_path) -> None:
 
     shutil.rmtree(root)
     assert not os.path.exists(root)
+
+
+@pytest.fixture(scope="function")
+def pubmedqa_dataset(split: None) -> datasets.PubMedQA:
+    """PubMedQA dataset fixture."""
+    dataset = datasets.PubMedQA(split=split)
+    dataset.prepare_data()
+    return dataset
+
+
+@pytest.fixture(scope="function")
+def pubmedqa_dataset_with_cache(tmp_path, split: None) -> datasets.PubMedQA:
+    """PubMedQA dataset fixture with caching enabled."""
+    root = tmp_path / "pubmed_qa_cache"
+    dataset = datasets.PubMedQA(root=str(root), split=split, download=True)
+    dataset.prepare_data()
+    return dataset

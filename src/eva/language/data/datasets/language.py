@@ -1,4 +1,4 @@
-"""Vision Dataset base class."""
+"""Language Dataset base class."""
 
 import abc
 from typing import Generic, TypeVar
