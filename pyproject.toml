@@ -83,6 +83,7 @@ all = [
     "imagesize>=1.4.1",
     "scipy>=1.14.0",
     "monai>=1.3.2",
+    "datasets>=3.2.0",
 ]
 
 [project.scripts]
