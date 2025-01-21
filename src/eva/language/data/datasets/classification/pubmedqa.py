@@ -20,14 +20,14 @@ class PubMedQA(base.TextClassification):
     def __init__(
         self,
         root: str | None = None,
-        split: Literal["train", "validation", "test"] | None = None,
+        split: Literal["train", "val", "test"] | None = None,
         download: bool = False,
     ) -> None:
         """Initialize the PubMedQA dataset.
 
         Args:
             root: Directory to cache the dataset. If None, no local caching is used.
-            split: Valid splits among ["train", "validation", "test"].
+            split: Valid splits among ["train", "val", "test"].
                 If None, it will use "train+test+validation".
             download: Whether to download the dataset if not found locally. Default is False.
         """
@@ -64,14 +64,14 @@ class PubMedQA(base.TextClassification):
             else:
                 logger.info("Using dataset directly from HuggingFace without caching.")
 
+        split = (self._split or "train+test+validation") if self._split != "val" else "validation"
         raw_dataset = load_dataset(
             dataset_path,
             name="pubmed_qa_labeled_fold0_source",
-            split=self._split or "train+test+validation",
+            split=split,
             streaming=False,
             cache_dir=self._root if (not is_local and self._root) else None,
         )
-
         if not isinstance(raw_dataset, Dataset):
             raise TypeError(f"Expected a `Dataset`, but got {type(raw_dataset)}")
 

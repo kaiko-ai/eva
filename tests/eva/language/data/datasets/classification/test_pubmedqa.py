@@ -12,7 +12,7 @@ from eva.language.data import datasets
 
 @pytest.mark.parametrize(
     "split, expected_length",
-    [(["train"], 450), (["test"], 500), (["validation"], 50), (None, 1000)],
+    [("train", 450), ("test", 500), ("val", 50), (None, 1000)],
 )
 def test_length(pubmedqa_dataset: datasets.PubMedQA, expected_length: int) -> None:
     """Tests the length of the dataset."""
@@ -22,10 +22,10 @@ def test_length(pubmedqa_dataset: datasets.PubMedQA, expected_length: int) -> No
 @pytest.mark.parametrize(
     "split, index",
     [
-        (["train"], 0),
-        (["train"], 10),
-        (["test"], 0),
-        (["validation"], 0),
+        ("train", 0),
+        ("train", 10),
+        ("test", 0),
+        ("val", 0),
         (None, 0),
     ],
 )
