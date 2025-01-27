@@ -16,7 +16,7 @@ from eva.core.models import transforms, wrappers
         ("hf-internal-testing/tiny-random-ViTModel", transforms.ExtractCLSFeatures(), (16, 32)),
         (
             "hf-internal-testing/tiny-random-ViTModel",
-            transforms.ExtractCLSFeatures(include_patch_tokens=True),
+            transforms.ExtractCLSFeatures(concat_mean_patch_tokens=True),
             (16, 64),
         ),
     ],

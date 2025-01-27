@@ -8,19 +8,22 @@ class ExtractCLSFeatures:
     """Extracts the CLS token from a ViT model output."""
 
     def __init__(
-        self, cls_index: int = 0, num_register_tokens: int = 0, include_patch_tokens: bool = False
+        self,
+        cls_index: int = 0,
+        num_register_tokens: int = 0,
+        concat_mean_patch_tokens: bool = False,
     ) -> None:
         """Initializes the transformation.
 
         Args:
             cls_index: The index of the CLS token in the output tensor.
             num_register_tokens: The number of register tokens in the model output.
-            include_patch_tokens: Whether to concat the mean aggregated patch tokens with
+            concat_mean_patch_tokens: Whether to concat the mean aggregated patch tokens with
                 the cls token.
         """
         self._cls_index = cls_index
         self._num_register_tokens = num_register_tokens
-        self._include_patch_tokens = include_patch_tokens
+        self._concat_mean_patch_tokens = concat_mean_patch_tokens
 
     def __call__(
         self, tensor: torch.Tensor | modeling_outputs.BaseModelOutputWithPooling
@@ -34,7 +37,7 @@ class ExtractCLSFeatures:
             tensor = tensor.last_hidden_state
 
         cls_token = tensor[:, self._cls_index, :]
-        if self._include_patch_tokens:
+        if self._concat_mean_patch_tokens:
             patch_tokens = tensor[:, 1 + self._num_register_tokens :, :]
             return torch.cat([cls_token, patch_tokens.mean(1)], dim=-1)
 

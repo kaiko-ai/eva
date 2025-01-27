@@ -4,6 +4,7 @@ from typing import Any, Callable, Dict, Tuple
 from urllib import parse
 
 import timm
+import torch
 from typing_extensions import override
 
 from eva.core.models import wrappers
@@ -24,6 +25,7 @@ class TimmModel(wrappers.BaseModel):
         out_indices: int | Tuple[int, ...] | None = None,
         model_kwargs: Dict[str, Any] | None = None,
         tensor_transforms: Callable | None = None,
+        concat_mean_patch_tokens: bool = False,
     ) -> None:
         """Initializes the encoder.
 
@@ -36,6 +38,7 @@ class TimmModel(wrappers.BaseModel):
             model_kwargs: Extra model arguments.
             tensor_transforms: The transforms to apply to the output tensor
                 produced by the model.
+            concat_mean_patch_tokens: Whether to combine the mean aggregated patch tokens with cls token.
         """
         super().__init__(tensor_transforms=tensor_transforms)
 
@@ -44,6 +47,7 @@ class TimmModel(wrappers.BaseModel):
         self._checkpoint_path = checkpoint_path
         self._out_indices = out_indices
         self._model_kwargs = model_kwargs or {}
+        self._concat_mean_patch_tokens = concat_mean_patch_tokens
 
         self.load_model()
 
@@ -66,3 +70,26 @@ class TimmModel(wrappers.BaseModel):
             return {}
         key = "file" if parse.urlparse(self._checkpoint_path).scheme in ("file", "") else "url"
         return {key: self._checkpoint_path, "num_classes": 0}
+
+    @override
+    def model_forward(self, tensor: torch.Tensor) -> torch.Tensor:
+        """Implements the forward pass of the model.
+
+        Args:
+            tensor: The input tensor to the model.
+        """
+        if self._concat_mean_patch_tokens:
+            if not isinstance(self._model, timm.models.vision_transformer.VisionTransformer):
+                raise ValueError(
+                    f"Expected `VisionTransformer` model for `concat_mean_patch_tokens=True`, got {type(self._model)}"
+                )
+            output = self._model.forward_features(tensor)
+
+            cls_token = output[:, 0]
+            patch_tokens = output[
+                :, self._model.num_prefix_tokens :
+            ]  # Skip CLS and register tokens
+
+            return torch.cat([cls_token, patch_tokens.mean(1)], dim=-1)
+        else:
+            return self._model(tensor)
