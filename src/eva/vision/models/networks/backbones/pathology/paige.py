@@ -28,7 +28,7 @@ def paige_virchow2(
             the grid size (interpolate abs and/or ROPE pos) in the forward pass.
         out_indices: Whether and which multi-level patch embeddings to return.
         hf_token: HuggingFace token to download the model.
-        concat_mean_patch_tokens: Whether to combine the mean aggregated patch tokens with cls token.
+        concat_mean_patch_tokens: Concat the CLS token with mean aggregated patch tokens.
 
     Returns:
         The model instance.
@@ -44,7 +44,9 @@ def paige_virchow2(
             "act_layer": nn.SiLU,
         },
         tensor_transforms=(
-            transforms.ExtractCLSFeatures(concat_mean_patch_tokens=concat_mean_patch_tokens)
+            transforms.ExtractCLSFeatures(
+                concat_mean_patch_tokens=concat_mean_patch_tokens, num_register_tokens=4
+            )
             if out_indices is None
             else None
         ),

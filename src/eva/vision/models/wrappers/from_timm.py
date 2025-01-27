@@ -38,7 +38,7 @@ class TimmModel(wrappers.BaseModel):
             model_kwargs: Extra model arguments.
             tensor_transforms: The transforms to apply to the output tensor
                 produced by the model.
-            concat_mean_patch_tokens: Whether to combine the mean aggregated patch tokens with cls token.
+            concat_mean_patch_tokens: Concat the CLS token with mean aggregated patch tokens.
         """
         super().__init__(tensor_transforms=tensor_transforms)
 
@@ -81,7 +81,8 @@ class TimmModel(wrappers.BaseModel):
         if self._concat_mean_patch_tokens:
             if not isinstance(self._model, timm.models.vision_transformer.VisionTransformer):
                 raise ValueError(
-                    f"Expected `VisionTransformer` model for `concat_mean_patch_tokens=True`, got {type(self._model)}"
+                    f"Expected `VisionTransformer` model for `concat_mean_patch_tokens=True`"
+                    f"got {type(self._model)}"
                 )
             output = self._model.forward_features(tensor)
 

@@ -2,9 +2,9 @@
 
 from typing import Tuple
 
-import timm
 from torch import nn
 
+from eva.vision.models import wrappers
 from eva.vision.models.networks.backbones.registry import register_model
 
 
@@ -12,6 +12,7 @@ from eva.vision.models.networks.backbones.registry import register_model
 def prov_gigapath(
     dynamic_img_size: bool = True,
     out_indices: int | Tuple[int, ...] | None = None,
+    concat_mean_patch_tokens: bool = False,
 ) -> nn.Module:
     """Initializes the Prov-GigaPath pathology FM.
 
@@ -20,14 +21,17 @@ def prov_gigapath(
             to be interpolated at `forward()` time when image grid changes
             from original.
         out_indices: Weather and which multi-level patch embeddings to return.
+        concat_mean_patch_tokens: Concat the CLS token with mean aggregated patch tokens.
 
     Returns:
         The model instance.
     """
-    return timm.create_model(
+    return wrappers.TimmModel(
         model_name="hf_hub:prov-gigapath/prov-gigapath",
         pretrained=True,
-        dynamic_img_size=dynamic_img_size,
         out_indices=out_indices,
-        features_only=out_indices is not None,
+        model_kwargs={
+            "dynamic_img_size": dynamic_img_size,
+        },
+        concat_mean_patch_tokens=concat_mean_patch_tokens,
     )

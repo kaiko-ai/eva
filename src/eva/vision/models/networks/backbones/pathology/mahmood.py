@@ -17,6 +17,7 @@ from eva.vision.models.networks.backbones.registry import register_model
 def mahmood_uni(
     dynamic_img_size: bool = True,
     out_indices: int | Tuple[int, ...] | None = None,
+    concat_mean_patch_tokens: bool = False,
     hf_token: str | None = None,
     download_dir: str = os.path.join(str(Path.home()), ".cache/eva"),
 ) -> nn.Module:
@@ -26,6 +27,7 @@ def mahmood_uni(
         dynamic_img_size: Support different input image sizes by allowing to change
             the grid size (interpolate abs and/or ROPE pos) in the forward pass.
         out_indices: Whether and which multi-level patch embeddings to return.
+        concat_mean_patch_tokens: Concat the CLS token with mean aggregated patch tokens.
         hf_token: HuggingFace token to download the model.
         download_dir: Directory to download the model checkpoint.
 
@@ -52,4 +54,5 @@ def mahmood_uni(
             "dynamic_img_size": dynamic_img_size,
         },
         checkpoint_path=checkpoint_path,
+        concat_mean_patch_tokens=concat_mean_patch_tokens,
     )
