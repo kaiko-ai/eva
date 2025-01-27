@@ -25,14 +25,15 @@ def histai_hibou_b(
     Returns:
         The model instance.
     """
+    transform_args = {"num_register_tokens": 4}
     return _utils.load_hugingface_model(
         model_name="histai/hibou-B",
         out_indices=out_indices,
         model_kwargs={"trust_remote_code": True},
         transform_args=(
-            {"num_register_tokens": 4, "concat_mean_patch_tokens": concat_mean_patch_tokens}
-            if out_indices is not None
-            else None
+            transform_args | {"concat_mean_patch_tokens": concat_mean_patch_tokens}
+            if concat_mean_patch_tokens
+            else transform_args
         ),
     )
 
@@ -54,13 +55,14 @@ def histai_hibou_l(
     Returns:
         The model instance.
     """
+    transform_args = {"num_register_tokens": 4}
     return _utils.load_hugingface_model(
         model_name="histai/hibou-L",
         out_indices=out_indices,
         model_kwargs={"trust_remote_code": True},
         transform_args=(
-            {"num_register_tokens": 4, "concat_mean_patch_tokens": concat_mean_patch_tokens}
-            if out_indices is not None
-            else None
+            transform_args | {"concat_mean_patch_tokens": concat_mean_patch_tokens}
+            if concat_mean_patch_tokens
+            else transform_args
         ),
     )
