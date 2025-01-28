@@ -79,6 +79,8 @@ class TorchHubModel(wrappers.BaseModel):
                     "Only models with `get_intermediate_layers` are supported "
                     "when using `out_indices`."
                 )
+            if self._forward_features:
+                raise ValueError("`forward_features` is not supported when `out_indices` is enabled.")
 
             return list(
                 self._model.get_intermediate_layers(
