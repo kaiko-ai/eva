@@ -5,6 +5,7 @@ from eva.vision.data.datasets.classification import (
     CRC,
     MHIST,
     PANDA,
+    BreaKHis,
     Camelyon16,
     PANDASmall,
     PatchCamelyon,
@@ -26,6 +27,7 @@ from eva.vision.data.datasets.wsi import MultiWsiDataset, WsiDataset
 __all__ = [
     "BACH",
     "BCSS",
+    "BreaKHis",
     "CRC",
     "MHIST",
     "PANDA",
