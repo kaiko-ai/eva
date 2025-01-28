@@ -56,8 +56,8 @@ class BreaKHis(base.ImageClassification):
     """Patient IDs to use for dataset splits."""
 
     _expected_dataset_lengths: Dict[str | None, int] = {
-        "train": 1471,
-        "val": 524,
+        "train": 1393,
+        "val": 602,
         None: 1995,
     }
     """Expected dataset lengths for the splits and complete dataset."""
