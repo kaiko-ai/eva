@@ -2,6 +2,7 @@
 
 from eva.vision.data.datasets.classification import (
     BACH,
+    BRACS,
     CRC,
     MHIST,
     PANDA,
@@ -26,6 +27,7 @@ from eva.vision.data.datasets.wsi import MultiWsiDataset, WsiDataset
 __all__ = [
     "BACH",
     "BCSS",
+    "BRACS",
     "CRC",
     "MHIST",
     "PANDA",
