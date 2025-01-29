@@ -20,6 +20,7 @@ from tests.eva import _cli
         "configs/vision/pathology/online/classification/crc.yaml",
         "configs/vision/pathology/online/classification/mhist.yaml",
         "configs/vision/pathology/online/classification/patch_camelyon.yaml",
+        "configs/vision/pathology/online/classification/unitopatho.yaml",
         # segmentation
         "configs/vision/pathology/online/segmentation/bcss.yaml",
         "configs/vision/pathology/online/segmentation/consep.yaml",
@@ -34,6 +35,7 @@ from tests.eva import _cli
         "configs/vision/pathology/offline/classification/mhist.yaml",
         "configs/vision/pathology/offline/classification/panda.yaml",
         "configs/vision/pathology/offline/classification/patch_camelyon.yaml",
+        "configs/vision/pathology/offline/classification/unitopatho.yaml",
         # segmentation
         "configs/vision/pathology/offline/segmentation/bcss.yaml",
         "configs/vision/pathology/offline/segmentation/consep.yaml",

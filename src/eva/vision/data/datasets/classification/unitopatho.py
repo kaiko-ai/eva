@@ -105,8 +105,8 @@ class UNITOPatho(base.ImageClassification):
         _validators.check_dataset_integrity(
             self,
             length=self._expected_dataset_lengths[self._split],
-            n_classes=3,
-            first_and_last_labels=("type", "top_label"),
+            n_classes=6,
+            first_and_last_labels=("HP", "TVA.LG"),
         )
 
     @override
