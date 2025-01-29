@@ -50,8 +50,7 @@ class BRACS(base.ImageClassification):
     @property
     @override
     def classes(self) -> List[str]:
-        # return ["0_N", "1_PB", "2_UDH", "3_FEA", "4_ADH", "5_DCIS", "6_IC"]
-        return ["0_N", "1_PB"]
+        return ["0_N", "1_PB", "2_UDH", "3_FEA", "4_ADH", "5_DCIS", "6_IC"]
 
     @property
     @override

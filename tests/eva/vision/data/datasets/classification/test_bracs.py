@@ -2,6 +2,7 @@
 
 import os
 from typing import Literal
+from unittest import mock
 
 import pytest
 import torch
@@ -38,10 +39,14 @@ def test_sample(bracs_dataset: datasets.BRACS, index: int) -> None:
 @pytest.fixture(scope="function")
 def bracs_dataset(split: Literal["train", "val"], assets_path: str) -> datasets.BRACS:
     """BRACS dataset fixture."""
-    dataset = datasets.BRACS(
-        root=os.path.join(assets_path, "vision", "datasets", "bracs"),
-        split=split,
-    )
-    dataset.prepare_data()
-    dataset.configure()
-    return dataset
+    with mock.patch.object(
+        datasets.BRACS, "classes", new_callable=mock.PropertyMock
+    ) as mock_classes:
+        mock_classes.return_value = ["0_N", "1_PB"]
+        dataset = datasets.BRACS(
+            root=os.path.join(assets_path, "vision", "datasets", "bracs"),
+            split=split,
+        )
+        dataset.prepare_data()
+        dataset.configure()
+        return dataset
