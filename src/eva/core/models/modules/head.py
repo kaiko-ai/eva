@@ -1,4 +1,4 @@
-""""Neural Network Head Module."""
+"""Neural Network Head Module."""
 
 from typing import Any, Callable, Dict
 
