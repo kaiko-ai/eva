@@ -42,7 +42,7 @@ We selected this approach to prioritize reliable, robust and fair FM-evaluation 
 | **Base batch size**            | 256                       | 32                        | 64                        |
 | **Base learning rate**         | 0.0003                    | 0.001                     | 0.002                    |
 | **Early stopping**             | 5% * [Max epochs]         | 10% * [Max epochs] (2)    | 10% * [Max epochs] (2)    |
-| **Optimizer**                  | SGD                       | AdamW                     | AdamW                     |
+| **Optimizer**                  | AdamW                     | AdamW                     | AdamW                     |
 | **Momentum**                   | 0.9                       | n/a                       | n/a                       |
 | **Weight Decay**               | 0.0                       | n/a                       | n/a                       |
 | **betas**                      | n/a                       | [0.9, 0.999]              | [0.9, 0.999]              |

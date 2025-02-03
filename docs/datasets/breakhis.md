@@ -1,6 +1,6 @@
 # BreakHis
 
-The Breast Cancer Histopathological Image Classification (BreakHis) is  composed of 9,109 microscopic images of breast tumor tissue collected from 82 patients using different magnifying factors (40X, 100X, 200X, and 400X). To date, it contains 2,480 benign and 5,429 malignant samples (700X460 pixels, 3-channel RGB, 8-bit depth in each channel, PNG format). This database has been built in collaboration with the P&D Laboratory, Pathological Anatomy and Cytopathology, Parana, Brazil.
+The Breast Cancer Histopathological Image Classification (BreakHis) is  composed of 9,109 microscopic images of breast tumor tissue collected from 82 patients using different magnifying factors (40X, 100X, 200X, and 400X). For this benchmark we only use the 40X samples which results in a subset of 1,995 images. This database has been built in collaboration with the P&D Laboratory, Pathological Anatomy and Cytopathology, Parana, Brazil.
 
 The dataset is divided into two main groups: benign tumors and malignant tumors. The dataset currently contains four histological distinct types of benign breast tumors: adenosis (A), fibroadenoma (F), phyllodes tumor (PT), and tubular adenona (TA); and four malignant tumors (breast cancer): carcinoma (DC), lobular carcinoma (LC), mucinous carcinoma (MC) and papillary carcinoma (PC).
 
@@ -11,10 +11,10 @@ The dataset is divided into two main groups: benign tumors and malignant tumors.
 |                                |                             |
 |--------------------------------|-----------------------------|
 | **Modality**                   | Vision (WSI patches)        |
-| **Task**                       | Multiclass classification (6 classes) |
+| **Task**                       | Multiclass classification (8 classes) |
 | **Cancer type**                | Breast                      |
 | **Data size**                  | 4 GB                        |
-| **Image dimension**            | 1812 x 1812                 |
+| **Image dimension**            | 700 x 460                   |
 | **Magnification (μm/px)**      | 40x (0.25)                  |
 | **Files format**               | `png`                       |
 | **Number of images**           | 1995                        |
@@ -46,7 +46,7 @@ BreaKHis_v1
 
 
 ## Download and preprocessing
-The `UniToPatho` dataset class doesn't download the data during runtime and must be downloaded manually from [the official source](https://ieee-dataport.org/open-access/unitopatho).
+The `BreakHis` dataset class supports downloading the data during runtime through setting the environment variable `DOWNLOAD_DATA=true`.
 
 ## Relevant links
 
@@ -54,4 +54,4 @@ The `UniToPatho` dataset class doesn't download the data during runtime and must
 
 ## License
 
-[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)"
+[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)
