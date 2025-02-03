@@ -85,6 +85,7 @@ nav:
       - Patch-level:
         - BACH: datasets/bach.md
         - CRC: datasets/crc.md
+        - CRC: datasets/gleason_arvaniti.md
         - MHIST: datasets/mhist.md
         - PatchCamelyon: datasets/patch_camelyon.md
         - MoNuSAC: datasets/monusac.md

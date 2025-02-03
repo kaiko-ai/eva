@@ -11,6 +11,7 @@
 |------------------------------------|----------|------------|------------------------|----------------------------|------------------|
 | [BACH](bach.md)                    | 400      | 2048x1536  | 20x (0.5)              | Classification (4 classes) | Breast           |
 | [CRC](crc.md)                      | 107,180  | 224x224    | 20x (0.5)              | Classification (9 classes) | Colorectal       |
+| [GleasonArvaniti](crc.md)          | 22,752   | 750x750    | 40x (0.23)             | Classification (4 classes) | Prostate         |
 | [PatchCamelyon](patch_camelyon.md) | 327,680  | 96x96      | 10x (1.0) \*           | Classification (2 classes) | Breast           |
 | [MHIST](mhist.md)                  | 3,152    | 224x224    |  5x (2.0) \*           | Classification (2 classes) | Colorectal Polyp |
 | [MoNuSAC](monusac.md)              | 294      | 113x81 - 1398x1956  | 40x (0.25)    | Segmentation (4 classes)   | Multi-Organ Cell Type (Breast, Kidney, Lung and Prostate) |

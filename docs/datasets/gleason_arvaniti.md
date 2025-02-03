@@ -2,7 +2,7 @@
 
 Benchmark dataset for automated Gleason grading of prostate cancer tissue microarrays via deep learning as proposed by [Arvaniti et al.](https://www.nature.com/articles/s41598-018-30535-1).
 
-Classify image patches as benign, Gleason pattern 3, 4 or 5. For the test dataset, we use the labels from pathologist Nr. 1.
+Images are classified as benign, Gleason pattern 3, 4 or 5. The dataset contains annotations on a discovery / train cohort of 641 patients and an independent test cohort of 245 patients annotated by two pathologists. For the test cohort, we only use the labels from pathologist Nr. 1 for this benchmark
 
 ## Raw data
 
@@ -26,7 +26,7 @@ We use the same splits as proposed in the paper:.
 
 | Splits | Train         | Validation   | Test         |
 |---|---------------|--------------|--------------|
-| #Samples | 15,303 (67.26%) | 2482 (10.91%) | 4967 (21.83%) |
+| #Samples | 15,303 (67.26%) | 2,482 (10.91%) | 4,967 (21.83%) |
 
 Note that the authors chose TMA 76 as validation cohort because it contains the most balanced distribution of Gleason scores.
 
@@ -34,7 +34,7 @@ Note that the authors chose TMA 76 as validation cohort because it contains the 
 ## Download and preprocessing
 The `GleasonArvaniti` dataset class doesn't download the data during runtime and must be downloaded and preprocessed manually:
 
-1. Download dataset archives from https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/OCYCMP
+1. Download dataset archives from the [official source](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/OCYCMP)
 2. Unpack all .tar.gz archives into the same folder
 3. Adjust the folder structure and then run the `create_patches.py` from https://github.com/eiriniar/gleason_CNN/tree/master
 
