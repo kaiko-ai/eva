@@ -24,7 +24,7 @@ UniToPatho is an annotated dataset of 9536 hematoxylin and eosin stained patches
 | **Image dimension**            | 1812 x 1812                 |
 | **Magnification (μm/px)**      | 20x (0.4415)                |
 | **Files format**               | `png`                       |
-| **Number of images**           | TODO                        |
+| **Number of images**           | 8669                        |
 
 
 ### Splits
