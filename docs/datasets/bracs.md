@@ -11,7 +11,8 @@ according to the seven classes mentioned above (N, PB, UDH, FEA, ADH, DCIS, IC),
 pathologists of the Complex Structure Pathological Anatomy and Cytopathology of National Cancer
 Institute – IRCCS Fondazione Pascale, Naples, Italy.
 
-BRACS contains 547 WSIs collected by 189 patients.
+While the BRACS contains 547 WSIs collected by 189 patients, the `BRACS_ROI` subset which
+we use in this benchmarks contains 4539 extracted ROIs / patches.
 
 ## Raw data
 
@@ -24,7 +25,7 @@ BRACS contains 547 WSIs collected by 189 patients.
 | **Cancer type**                | Breast                      |
 | **Data size**                  | 52 GB                       |
 | **Image dimension**            | variable                    |
-| **Magnification (μm/px)**      | 10x (1.0) \*                |
+| **Magnification (μm/px)**      | 40x (0.25)                  |
 | **Files format**               | `png`                       |
 | **Number of images**           | 4539                        |
 
@@ -33,9 +34,9 @@ BRACS contains 547 WSIs collected by 189 patients.
 
 The data source provides train/validation/test splits
 
-| Splits | Train         | Validation   | Test         |
-|----------|---------------|-------------|-------------|
-| #Samples | 3657 (80.57%) | 312 (6.87%) | 12.56 (10%) |
+| Splits | Train         | Validation    | Test         |
+|----------|---------------|-------------|--------------|
+| #Samples | 3657 (80.57%) | 312 (6.87%) | 570 (12.56%) |
 
 
 ### Organization
@@ -67,4 +68,4 @@ The `BRACS` dataset class doesn't download the data during runtime and must be d
 
 ## License
 
-[CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/)"
+[CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/)
