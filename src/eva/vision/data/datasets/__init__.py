@@ -9,6 +9,7 @@ from eva.vision.data.datasets.classification import (
     PANDASmall,
     PatchCamelyon,
     WsiClassificationDataset,
+    GleasonArvaniti
 )
 from eva.vision.data.datasets.segmentation import (
     BCSS,
@@ -27,6 +28,7 @@ __all__ = [
     "BACH",
     "BCSS",
     "CRC",
+    "GleasonArvaniti",
     "MHIST",
     "PANDA",
     "PANDASmall",

@@ -1,6 +1,8 @@
 # Gleason (Arvaniti)
 
-Benchmark dataset for automated Gleason grading of prostate cancer tissue microarrays via deep learning as proposed by [Arvaniti et al.](https://www.nature.com/articles/s41598-018-30535-1)
+Benchmark dataset for automated Gleason grading of prostate cancer tissue microarrays via deep learning as proposed by [Arvaniti et al.](https://www.nature.com/articles/s41598-018-30535-1).
+
+Classify image patches as benign, Gleason pattern 3, 4 or 5. For the test dataset, we use the labels from pathologist Nr. 1.
 
 ## Raw data
 
@@ -20,12 +22,13 @@ Benchmark dataset for automated Gleason grading of prostate cancer tissue microa
 
 ### Splits
 
-The data source provides train/validation/test splits
+We use the same splits as proposed in the paper:.
 
-| Splits | Train           | Validation   |
-|----------|---------------|--------------|
-| #Samples | TODO (70%)    | TODO (30%)    |
+| Splits | Train         | Validation   | Test         |
+|---|---------------|--------------|--------------|
+| #Samples | 262,144 (80%) | 32,768 (10%) | 32,768 (10%) |
 
+Note that the authors chose TMA 76 as validation cohort because it contains the most balanced distribution of Gleason scores.
 
 
 ## Download and preprocessing
@@ -48,7 +51,7 @@ arvaniti_gleason_patches
 │   │   ├── ZT80_38_A_1_2
 │   │   │   └── ...
 │   │   └── ...
-│   ├── patho_2
+│   ├── patho_2  # we don't use this
 │   │   └── ...
 ├── train_validation_patches_750
 │   ├── ZT76_39_A_1_1
