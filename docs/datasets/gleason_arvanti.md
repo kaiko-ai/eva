@@ -17,7 +17,7 @@ Classify image patches as benign, Gleason pattern 3, 4 or 5. For the test datase
 | **Image dimension**            | 750 x 750                   |
 | **Magnification (μm/px)**      | 40x (0.23)                  |
 | **Files format**               | `jpg`                       |
-| **Number of images**           | TODO                        |
+| **Number of images**           | 22752                       |
 
 
 ### Splits
@@ -26,7 +26,7 @@ We use the same splits as proposed in the paper:.
 
 | Splits | Train         | Validation   | Test         |
 |---|---------------|--------------|--------------|
-| #Samples | 262,144 (80%) | 32,768 (10%) | 32,768 (10%) |
+| #Samples | 15,303 (67.26%) | 2482 (10.91%) | 4967 (21.83%) |
 
 Note that the authors chose TMA 76 as validation cohort because it contains the most balanced distribution of Gleason scores.
 
