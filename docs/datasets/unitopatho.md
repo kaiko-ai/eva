@@ -10,6 +10,7 @@ UniToPatho is an annotated dataset of 9536 hematoxylin and eosin stained patches
 - TVA.HG - Tubulo-Villous Adenoma, High-Grade dysplasia;
 - TVA.LG - Tubulo-Villous Adenoma, Low-Grade dysplasia.
 
+For this benchmark we used only the `800` subset which contains 8669 images of resolution 1812x1812 (the `7000` subset contains much bigger images and would therefore be difficult to handle as patch classification task).
 
 ## Raw data
 
@@ -19,10 +20,11 @@ UniToPatho is an annotated dataset of 9536 hematoxylin and eosin stained patches
 |--------------------------------|-----------------------------|
 | **Modality**                   | Vision (WSI patches)        |
 | **Task**                       | Multiclass classification (6 classes) |
-| **Cancer type**                | Breast                      |
-| **Data size**                  | TODO GB                     |
+| **Cancer type**                | Colorectal                  |
+| **Data size**                  | 48.37 GB                    |
 | **Image dimension**            | 1812 x 1812                 |
 | **Magnification (μm/px)**      | 20x (0.4415)                |
+| **Magnification after resize (μm/px)**      | 162x (3.57)    |
 | **Files format**               | `png`                       |
 | **Number of images**           | 8669                        |
 
@@ -31,9 +33,9 @@ UniToPatho is an annotated dataset of 9536 hematoxylin and eosin stained patches
 
 The data source provides train/validation/test splits
 
-| Splits | Train         | Validation   | Test         |
-|----------|---------------|-------------|-------------|
-| #Samples | 3657 (80.57%) | 312 (6.87%) | 12.56 (10%) |
+| Splits | Train          | Validation    |
+|----------|--------------|---------------|
+| #Samples | 6270 (72.33) | 2399 (27.67%) |
 
 
 ### Organization
@@ -61,4 +63,4 @@ The `UniToPatho` dataset class doesn't download the data during runtime and must
 
 ## License
 
-[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)"
+[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)
