@@ -40,8 +40,7 @@ class UNITOPatho(base.ImageClassification):
         the patient IDs to avoid any data leakage.
 
         Args:
-            root: Path to the root directory of the dataset. The dataset will
-                be downloaded and extracted here, if it does not already exist.
+            root: Path to the root directory of the dataset.
             split: Dataset split to use. If `None`, the entire dataset is used.
             transforms: A function/transform which returns a transformed
                 version of the raw data samples.
