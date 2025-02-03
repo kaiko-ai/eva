@@ -3,6 +3,7 @@
 import functools
 import glob
 import os
+from pathlib import Path
 from typing import Callable, Dict, List, Literal
 
 import pandas as pd
@@ -13,7 +14,6 @@ from typing_extensions import override
 from eva.vision.data.datasets import _validators
 from eva.vision.data.datasets.classification import base
 from eva.vision.utils import io
-from pathlib import Path
 
 
 class GleasonArvaniti(base.ImageClassification):
@@ -94,7 +94,9 @@ class GleasonArvaniti(base.ImageClassification):
     def prepare_data(self) -> None:
         _validators.check_dataset_exists(self._root, download_available=False)
         if not os.path.isdir(os.path.join(self._root, "train_validation_patches_750")):
-            raise FileNotFoundError(f"`train_validation_patches_750` directory not found in {self._root}")
+            raise FileNotFoundError(
+                f"`train_validation_patches_750` directory not found in {self._root}"
+            )
         if not os.path.isdir(os.path.join(self._root, "test_patches_750")):
             raise FileNotFoundError(f"`test_patches_750` directory not found in {self._root}")
 
@@ -132,7 +134,7 @@ class GleasonArvaniti(base.ImageClassification):
     def _extract_micro_array_id(self, file: str) -> str:
         """Extracts the ID of the tissue micro array from the file name."""
         return Path(file).stem.split("_")[0]
-    
+
     def _extract_class(self, file: str) -> int:
         """Extracts the class label from the file name."""
         return int(Path(file).stem.split("_")[-1])

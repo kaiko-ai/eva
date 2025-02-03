@@ -6,10 +6,10 @@ from eva.vision.data.datasets.classification import (
     MHIST,
     PANDA,
     Camelyon16,
+    GleasonArvaniti,
     PANDASmall,
     PatchCamelyon,
     WsiClassificationDataset,
-    GleasonArvaniti
 )
 from eva.vision.data.datasets.segmentation import (
     BCSS,
