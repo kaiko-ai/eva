@@ -84,6 +84,7 @@ nav:
     - WSI:
       - Patch-level:
         - BACH: datasets/bach.md
+        - BreakHis: datasets/breakhis.md
         - CRC: datasets/crc.md
         - MHIST: datasets/mhist.md
         - PatchCamelyon: datasets/patch_camelyon.md
