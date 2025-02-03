@@ -17,11 +17,11 @@ class TorchHubModel(wrappers.BaseModel):
         self,
         model_name: str,
         repo_or_dir: str,
-        pretrained: bool = True,
         checkpoint_path: str = "",
         out_indices: int | Tuple[int, ...] | None = None,
         norm: bool = False,
         trust_repo: bool = True,
+        forward_features: bool = False,
         model_kwargs: Dict[str, Any] | None = None,
         tensor_transforms: Callable | None = None,
     ) -> None:
@@ -30,7 +30,6 @@ class TorchHubModel(wrappers.BaseModel):
         Args:
             model_name: Name of model to instantiate.
             repo_or_dir: The torch.hub repository or local directory to load the model from.
-            pretrained: If set to `True`, load pretrained ImageNet-1k weights.
             checkpoint_path: Path of checkpoint to load.
             out_indices: Returns last n blocks if `int`, all if `None`, select
                 matching indices if sequence.
@@ -38,6 +37,8 @@ class TorchHubModel(wrappers.BaseModel):
                 used when `out_indices` is not `None`.
             trust_repo: If set to `False`, a prompt will ask the user whether the
                 repo should be trusted.
+            forward_features: Use `forward_features` method instead of `forward` in
+                forward pass.
             model_kwargs: Extra model arguments.
             tensor_transforms: The transforms to apply to the output tensor
                 produced by the model.
@@ -46,11 +47,11 @@ class TorchHubModel(wrappers.BaseModel):
 
         self._model_name = model_name
         self._repo_or_dir = repo_or_dir
-        self._pretrained = pretrained
         self._checkpoint_path = checkpoint_path
         self._out_indices = out_indices
         self._norm = norm
         self._trust_repo = trust_repo
+        self._forward_features = forward_features
         self._model_kwargs = model_kwargs or {}
 
         self.load_model()
@@ -62,7 +63,6 @@ class TorchHubModel(wrappers.BaseModel):
             repo_or_dir=self._repo_or_dir,
             model=self._model_name,
             trust_repo=self._trust_repo,
-            pretrained=self._pretrained,
             **self._model_kwargs,
         )  # type: ignore
 
@@ -79,6 +79,8 @@ class TorchHubModel(wrappers.BaseModel):
                     "Only models with `get_intermediate_layers` are supported "
                     "when using `out_indices`."
                 )
+            if self._forward_features:
+                raise ValueError("`forward_features` is not supported when `out_indices` is enabled.")
 
             return list(
                 self._model.get_intermediate_layers(
@@ -89,5 +91,11 @@ class TorchHubModel(wrappers.BaseModel):
                     norm=self._norm,
                 )
             )
+        elif self._forward_features:
+            if not hasattr(self._model, "forward_features"):
+                raise ValueError(
+                    f"`forward_features` method not available for model {type(self._model)}"
+                )
+            return self._model.forward_features(tensor)
 
         return self._model(tensor)

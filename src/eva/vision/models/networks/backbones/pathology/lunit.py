@@ -22,7 +22,9 @@ VITS_URL_PREFIX = (
 
 @register_model("pathology/lunit_vits16")
 def lunit_vits16(
-    dynamic_img_size: bool = True, out_indices: int | Tuple[int, ...] | None = None
+    dynamic_img_size: bool = True,
+    out_indices: int | Tuple[int, ...] | None = None,
+    concat_mean_patch_tokens: bool = False,
 ) -> nn.Module:
     """Initializes the ViTS-16 pathology FM by lunit.
 
@@ -30,6 +32,7 @@ def lunit_vits16(
         dynamic_img_size: Support different input image sizes by allowing to change
             the grid size (interpolate abs and/or ROPE pos) in the forward pass.
         out_indices: Whether and which multi-level patch embeddings to return.
+        concat_mean_patch_tokens: Concat the CLS token with mean aggregated patch tokens.
 
     Returns:
         The model instance.
@@ -41,12 +44,15 @@ def lunit_vits16(
             "dynamic_img_size": dynamic_img_size,
         },
         checkpoint_path=f"{VITS_URL_PREFIX}/dino_vit_small_patch16_ep200.torch",
+        concat_mean_patch_tokens=concat_mean_patch_tokens,
     )
 
 
 @register_model("pathology/lunit_vits8")
 def lunit_vits8(
-    dynamic_img_size: bool = True, out_indices: int | Tuple[int, ...] | None = None
+    dynamic_img_size: bool = True,
+    out_indices: int | Tuple[int, ...] | None = None,
+    concat_mean_patch_tokens: bool = False,
 ) -> nn.Module:
     """Initializes the ViTS-8 pathology FM by lunit.
 
@@ -54,6 +60,7 @@ def lunit_vits8(
         dynamic_img_size: Support different input image sizes by allowing to change
             the grid size (interpolate abs and/or ROPE pos) in the forward pass.
         out_indices: Whether and which multi-level patch embeddings to return.
+        concat_mean_patch_tokens: Concat the CLS token with mean aggregated patch tokens.
 
     Returns:
         The model instance.
@@ -65,4 +72,5 @@ def lunit_vits8(
             "dynamic_img_size": dynamic_img_size,
         },
         checkpoint_path=f"{VITS_URL_PREFIX}/dino_vit_small_patch8_ep200.torch",
+        concat_mean_patch_tokens=concat_mean_patch_tokens,
     )

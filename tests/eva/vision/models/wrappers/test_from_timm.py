@@ -52,6 +52,46 @@ def test_timm_model(
     assert outputs[0].shape == expected_shape
 
 
+@pytest.mark.parametrize(
+    "concat_mean_patch_tokens, expected_values, expected_shape",
+    [
+        (
+            False,
+            torch.Tensor(
+                [0.8181, -0.1896, 3.3068, 0.9524, -0.5112, 1.8521, -0.8656, 0.5558, 0.0436, 2.4057]
+            ),
+            (1, 384),
+        ),
+        (
+            True,
+            torch.Tensor(
+                [0.8181, -0.1896, 3.3068, 0.9524, -0.5112, 1.8521, -0.8656, 0.5558, 0.0436, 2.4057]
+            ),
+            (1, 768),
+        ),
+    ],
+)
+def test_expected_output_values(
+    concat_mean_patch_tokens: bool, expected_values: torch.Tensor, expected_shape: int
+):
+    """Test if forward pass returns expected values."""
+    model = wrappers.TimmModel(
+        model_name="vit_small_patch16_224",
+        out_indices=None,
+        pretrained=True,
+        model_kwargs={"num_classes": 0},
+        concat_mean_patch_tokens=concat_mean_patch_tokens,
+    )
+    generator = torch.Generator()
+    generator.manual_seed(42)
+    input_tensor = torch.randn(1, 3, 224, 224, generator=generator)
+
+    output = model(input_tensor)
+
+    assert torch.allclose(output[0, :10], expected_values, atol=1e-4)
+    assert output.shape == expected_shape
+
+
 @pytest.fixture(scope="function")
 def timm_model(
     model_name: str,
