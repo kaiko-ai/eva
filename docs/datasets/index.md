@@ -7,14 +7,15 @@
 ### Whole Slide (WSI) and microscopy image datasets
 
 #### Patch-level
-| Dataset                            | #Patches | Patch Size | Magnification (μm/px)  | Task                       |   Tissue Type   |
-|------------------------------------|----------|------------|------------------------|----------------------------|------------------|
-| [BACH](bach.md)                    | 400      | 2048x1536  | 20x (0.5)              | Classification (4 classes) | Breast           |
-| [CRC](crc.md)                      | 107,180  | 224x224    | 20x (0.5)              | Classification (9 classes) | Colorectal       |
-| [PatchCamelyon](patch_camelyon.md) | 327,680  | 96x96      | 10x (1.0) \*           | Classification (2 classes) | Breast           |
-| [MHIST](mhist.md)                  | 3,152    | 224x224    |  5x (2.0) \*           | Classification (2 classes) | Colorectal Polyp |
+| Dataset                            | #Patches | Patch Size  | Magnification (μm/px)  | Task                       |   Tissue Type   |
+|------------------------------------|----------|-------------|------------------------|----------------------------|------------------|
+| [BACH](bach.md)                    | 400      | 2048x1536   | 20x (0.5)              | Classification (4 classes) | Breast           |
+| [CRC](crc.md)                      | 107,180  | 224x224     | 20x (0.5)              | Classification (9 classes) | Colorectal       |
+| [PatchCamelyon](patch_camelyon.md) | 327,680  | 96x96       | 10x (1.0) \*           | Classification (2 classes) | Breast           |
+| [MHIST](mhist.md)                  | 3,152    | 224x224     |  5x (2.0) \*           | Classification (2 classes) | Colorectal Polyp |
+| [UniToPatho](unipatho.md)          | 8669     | 1812 x 1812 |  20x (0.4415)          | Classification (6 classes) | Colorectal Polyp |
 | [MoNuSAC](monusac.md)              | 294      | 113x81 - 1398x1956  | 40x (0.25)    | Segmentation (4 classes)   | Multi-Organ Cell Type (Breast, Kidney, Lung and Prostate) |
-| [CoNSeP](consep.md)                | 41       | 1000x1000  |  40x (0.25) \*         | Segmentation (8 classes)   | Colorectal Nuclear |
+| [CoNSeP](consep.md)                | 41       | 1000x1000   |  40x (0.25) \*         | Segmentation (8 classes)   | Colorectal Nuclear |
 
 \* Downsampled from 40x (0.25 μm/px) to increase the field of view.
 
