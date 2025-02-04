@@ -31,11 +31,13 @@ For this benchmark we used only the `800` subset which contains 8669 images of r
 
 ### Splits
 
-The data source provides train/validation/test splits
+The data source provides train/validation splits
 
 | Splits | Train          | Validation    |
 |----------|--------------|---------------|
 | #Samples | 6270 (72.33) | 2399 (27.67%) |
+
+The dataset authors only provide two splits, which is why we don't report performance on a third test split.
 
 
 ### Organization
