@@ -1,4 +1,4 @@
-"""UNITOPatho dataset class."""
+"""UniToPatho dataset class."""
 
 import functools
 import glob
@@ -15,8 +15,8 @@ from eva.vision.data.datasets.classification import base
 from eva.vision.utils import io
 
 
-class UNITOPatho(base.ImageClassification):
-    """Dataset class for UNITOPatho images and corresponding targets."""
+class UniToPatho(base.ImageClassification):
+    """Dataset class for UniToPatho images and corresponding targets."""
 
     _expected_dataset_lengths: Dict[str | None, int] = {
         "train": 6270,

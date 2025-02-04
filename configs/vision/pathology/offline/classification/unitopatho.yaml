@@ -84,7 +84,7 @@ data:
           <<: *DATASET_ARGS
           split: val
       predict:
-        - class_path: eva.vision.datasets.UNITOPatho
+        - class_path: eva.vision.datasets.UniToPatho
           init_args: &PREDICT_DATASET_ARGS
             root: ${oc.env:DATA_ROOT, ./data/unitopatho}
             split: train
@@ -93,7 +93,7 @@ data:
               init_args:
                 mean: ${oc.env:NORMALIZE_MEAN, [0.485, 0.456, 0.406]}
                 std: ${oc.env:NORMALIZE_STD, [0.229, 0.224, 0.225]}
-        - class_path: eva.vision.datasets.UNITOPatho
+        - class_path: eva.vision.datasets.UniToPatho
           init_args:
             <<: *PREDICT_DATASET_ARGS
             split: val

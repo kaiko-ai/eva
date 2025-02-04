@@ -1,4 +1,4 @@
-"""UNITOPatho dataset tests."""
+"""UniToPatho dataset tests."""
 
 import os
 from typing import Literal
@@ -19,7 +19,7 @@ from eva.vision.data import datasets
         ("val", 1),
     ],
 )
-def test_sample(unitopatho_dataset: datasets.UNITOPatho, index: int) -> None:
+def test_sample(unitopatho_dataset: datasets.UniToPatho, index: int) -> None:
     """Tests the format of a dataset sample."""
     sample = unitopatho_dataset[index]
     # assert data sample is a tuple
@@ -34,9 +34,9 @@ def test_sample(unitopatho_dataset: datasets.UNITOPatho, index: int) -> None:
 
 
 @pytest.fixture(scope="function")
-def unitopatho_dataset(split: Literal["train", "val"], assets_path: str) -> datasets.UNITOPatho:
-    """UNITOPatho dataset fixture."""
-    dataset = datasets.UNITOPatho(
+def unitopatho_dataset(split: Literal["train", "val"], assets_path: str) -> datasets.UniToPatho:
+    """UniToPatho dataset fixture."""
+    dataset = datasets.UniToPatho(
         root=os.path.join(assets_path, "vision", "datasets", "unitopatho"),
         split=split,
     )
