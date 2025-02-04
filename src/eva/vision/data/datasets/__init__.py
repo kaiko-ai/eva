@@ -2,11 +2,13 @@
 
 from eva.vision.data.datasets.classification import (
     BACH,
+    BRACS,
     CRC,
     MHIST,
     PANDA,
     BreaKHis,
     Camelyon16,
+    GleasonArvaniti,
     PANDASmall,
     PatchCamelyon,
     WsiClassificationDataset,
@@ -28,7 +30,9 @@ __all__ = [
     "BACH",
     "BCSS",
     "BreaKHis",
+    "BRACS",
     "CRC",
+    "GleasonArvaniti",
     "MHIST",
     "PANDA",
     "PANDASmall",
