@@ -11,6 +11,7 @@ from eva.vision.data.datasets.classification import (
     GleasonArvaniti,
     PANDASmall,
     PatchCamelyon,
+    UniToPatho,
     WsiClassificationDataset,
 )
 from eva.vision.data.datasets.segmentation import (
@@ -38,6 +39,7 @@ __all__ = [
     "PANDASmall",
     "Camelyon16",
     "PatchCamelyon",
+    "UniToPatho",
     "WsiClassificationDataset",
     "CoNSeP",
     "EmbeddingsSegmentationDataset",
