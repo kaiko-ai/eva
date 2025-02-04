@@ -17,12 +17,12 @@ Images are classified as benign, Gleason pattern 3, 4 or 5. The dataset contains
 | **Image dimension**            | 750 x 750                   |
 | **Magnification (μm/px)**      | 40x (0.23)                  |
 | **Files format**               | `jpg`                       |
-| **Number of images**           | 22752                       |
+| **Number of images**           | 22,752                       |
 
 
 ### Splits
 
-We use the same splits as proposed in the paper:.
+We use the same splits as proposed in the paper:
 
 | Splits | Train         | Validation   | Test         |
 |---|---------------|--------------|--------------|
