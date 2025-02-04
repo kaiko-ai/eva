@@ -84,6 +84,11 @@ data:
         init_args:
           <<: *DATASET_ARGS
           split: val
+      test:
+        class_path: eva.datasets.EmbeddingsClassificationDataset
+        init_args:
+          <<: *DATASET_ARGS
+          split: test
       predict:
         - class_path: eva.vision.datasets.GleasonArvaniti
           init_args: &PREDICT_DATASET_ARGS
