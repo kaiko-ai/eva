@@ -1,7 +1,5 @@
 """Pathology FMs from MahmoodLab."""
 
-import os
-from pathlib import Path
 from typing import Tuple
 
 import timm
