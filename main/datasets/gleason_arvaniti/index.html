@@ -9,10 +9,10 @@
       
       
       
-        <link rel="prev" href="../patch_camelyon/">
+        <link rel="prev" href="../crc/">
       
       
-        <link rel="next" href="../consep/">
+        <link rel="next" href="../mhist/">
       
       
       <link rel="icon" href="../../images/eva-stripes.png">
@@ -20,7 +20,7 @@
     
     
       
-        <title>MoNuSAC - eva</title>
+        <title>GleasonArvaniti - eva</title>
       
     
     
@@ -74,7 +74,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#monusac" class="md-skip">
+        <a href="#gleason-arvaniti" class="md-skip">
           Skip to content
         </a>
       
@@ -111,7 +111,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              MoNuSAC
+              GleasonArvaniti
             
           </span>
         </div>
@@ -1011,69 +1011,6 @@
                 
   
   
-  
-  
-    <li class="md-nav__item">
-      <a href="../gleason_arvaniti/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    GleasonArvaniti
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../mhist/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    MHIST
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../patch_camelyon/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    PatchCamelyon
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
     
   
   
@@ -1090,7 +1027,7 @@
           
   
   <span class="md-ellipsis">
-    MoNuSAC
+    GleasonArvaniti
   </span>
   
 
@@ -1101,7 +1038,7 @@
         
   
   <span class="md-ellipsis">
-    MoNuSAC
+    GleasonArvaniti
   </span>
   
 
@@ -1162,6 +1099,69 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mhist/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    MHIST
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../patch_camelyon/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    PatchCamelyon
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../monusac/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    MoNuSAC
+  </span>
+  
+
+      </a>
     </li>
   
 
@@ -2704,8 +2704,9 @@
   
 
 
-<h1 id="monusac">MoNuSAC</h1>
-<p>MoNuSAC (Multi-Organ Nuclei Segmentation And Classification Challenge) consists of H&amp;E stained tissue images of four organs with annotations of multiple cell-types including epithelial cells, lymphocytes, macrophages, and neutrophils with over 46,000 nuclei from 37 hospitals and 71 patients.</p>
+<h1 id="gleason-arvaniti">Gleason (Arvaniti)</h1>
+<p>Benchmark dataset for automated Gleason grading of prostate cancer tissue microarrays via deep learning as proposed by <a href="https://www.nature.com/articles/s41598-018-30535-1">Arvaniti et al.</a>.</p>
+<p>Images are classified as benign, Gleason pattern 3, 4 or 5. The dataset contains annotations on a discovery / train cohort of 641 patients and an independent test cohort of 245 patients annotated by two pathologists. For the test cohort, we only use the labels from pathologist Nr. 1 for this benchmark</p>
 <h2 id="raw-data">Raw data</h2>
 <h3 id="key-stats">Key stats</h3>
 <table>
@@ -2722,81 +2723,91 @@
 </tr>
 <tr>
 <td><strong>Task</strong></td>
-<td>Segmentation - 5 classes *</td>
+<td>Multiclass classification (4 classes)</td>
+</tr>
+<tr>
+<td><strong>Cancer type</strong></td>
+<td>Prostate</td>
 </tr>
 <tr>
 <td><strong>Data size</strong></td>
-<td>total: ~600MB</td>
+<td>4 GB</td>
 </tr>
 <tr>
 <td><strong>Image dimension</strong></td>
-<td>113x81 - 1398x1956</td>
+<td>750 x 750</td>
 </tr>
 <tr>
 <td><strong>Magnification (μm/px)</strong></td>
-<td>40x (0.25)</td>
+<td>40x (0.23)</td>
 </tr>
 <tr>
 <td><strong>Files format</strong></td>
-<td><code>.svs</code> or <code>.tif</code> images / <code>.xml</code> segmentation masks</td>
+<td><code>jpg</code></td>
 </tr>
 <tr>
 <td><strong>Number of images</strong></td>
-<td>294</td>
-</tr>
-<tr>
-<td><strong>Splits in use</strong></td>
-<td>Train and Test</td>
+<td>22,752</td>
 </tr>
 </tbody>
 </table>
-<p>* The fith class is "ambiguous" and doesn't contain a specific cell type.</p>
-<h3 id="organization">Organization</h3>
-<p>The data is organized as follows:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>monusac
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>├── MoNuSAC_images_and_annotations
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>│   ├── TCGA-5P-A9K0-01Z-00-DX1             # patient id
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>│   │   ├── TCGA-5P-A9K0-01Z-00-DX1_1.svs   # tissue image
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>│   │   ├── TCGA-5P-A9K0-01Z-00-DX1_1.tif   # tissue image
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>│   │   ├── TCGA-5P-A9K0-01Z-00-DX1_1.xml   # annotations
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>│   │   └── ...
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>├── MoNuSAC Testing Data and Annotations
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>│   ├── TCGA-5P-A9K0-01Z-00-DX1             # patient id
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>│   │   ├── TCGA-5P-A9K0-01Z-00-DX1_1.svs   # tissue image
-</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>│   │   ├── TCGA-5P-A9K0-01Z-00-DX1_1.tif   # tissue image
-</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>│   │   ├── TCGA-5P-A9K0-01Z-00-DX1_1.xml   # annotations
-</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>│   │   └── ...
-</span></code></pre></div>
-<h2 id="download-and-preprocessing">Download and preprocessing</h2>
-<p>The dataset class <code>MoNuSAC</code> supports downloading the data during runtime by setting the init argument <code>download=True</code>.</p>
-<blockquote>
-<p>[!NOTE]
-In the provided <code>MoNuSAC</code>-config files the download argument is set to <code>false</code>. To enable automatic download you will need to open the config and set <code>download: true</code>.</p>
-</blockquote>
 <h3 id="splits">Splits</h3>
-<p>We work with the splits provided by the data source. Since no "validation" split is provided, we use the "test" split as validation split.</p>
+<p>We use the same splits as proposed in the paper:</p>
 <table>
 <thead>
 <tr>
 <th>Splits</th>
 <th>Train</th>
 <th>Validation</th>
+<th>Test</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>#Samples</td>
-<td>209 (71%)</td>
-<td>85 (29%)</td>
+<td>15,303 (67.26%)</td>
+<td>2,482 (10.91%)</td>
+<td>4,967 (21.83%)</td>
 </tr>
 </tbody>
 </table>
+<p>Note that the authors chose TMA 76 as validation cohort because it contains the most balanced distribution of Gleason scores.</p>
+<h2 id="download-and-preprocessing">Download and preprocessing</h2>
+<p>The <code>GleasonArvaniti</code> dataset class doesn't download the data during runtime and must be downloaded and preprocessed manually:</p>
+<ol>
+<li>Download dataset archives from the <a href="https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/OCYCMP">official source</a></li>
+<li>Unpack all .tar.gz archives into the same folder</li>
+<li>Adjust the folder structure and then run the <code>create_patches.py</code> from https://github.com/eiriniar/gleason_CNN/tree/master</li>
+</ol>
+<p>This should result in the folloing folder structure:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>arvaniti_gleason_patches
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>├── test_patches_750
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>│   ├── patho_1
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>│   │   ├── ZT80_38_A_1_1
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    │   │   ├── ZT76_39_A_1_1_patch_12_class_0.jpg
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    │   │   ├── ZT76_39_A_1_1_patch_23_class_0.jpg
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>│   │   │   └── ...
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>│   │   ├── ZT80_38_A_1_2
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>│   │   │   └── ...
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>│   │   └── ...
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>│   ├── patho_2  # we don&#39;t use this
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>│   │   └── ...
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>├── train_validation_patches_750
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>│   ├── ZT76_39_A_1_1
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>│   │   ├── ZT76_39_A_1_1_patch_12_class_0.jpg
+</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>│   │   ├── ZT76_39_A_1_1_patch_23_class_0.jpg
+</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>│   │   └── ...
+</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>│   ├── ZT76_39_A_1_2
+</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>│   └── ...
+</span></code></pre></div>
 <h2 id="relevant-links">Relevant links</h2>
 <ul>
-<li><a href="https://monusac-2020.grand-challenge.org/Home/">MoNuSAC Dataset</a></li>
+<li><a href="https://www.nature.com/articles/s41598-018-30535-1">Paper</a></li>
+<li><a href="https://github.com/eiriniar/gleason_CNN">GitHub</a></li>
+<li><a href="https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/OCYCMP">Dataset</a></li>
 </ul>
 <h2 id="license">License</h2>
-<p>The challenge data is released under the creative commons license (<a href="https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode">CC BY-NC-SA 4.0</a>).</p>
+<p><a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0 1.0 Universal</a></p>
 
 
 
