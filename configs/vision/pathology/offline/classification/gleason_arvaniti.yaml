@@ -33,6 +33,7 @@ trainer:
           dataloader_idx_map:
             0: train
             1: val
+            2: test
           backbone:
             class_path: eva.vision.models.ModelFromRegistry
             init_args:
