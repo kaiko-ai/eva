@@ -9,10 +9,10 @@
       
       
       
-        <link rel="prev" href="../gleason_arvaniti/">
+        <link rel="prev" href="../bach/">
       
       
-        <link rel="next" href="../patch_camelyon/">
+        <link rel="next" href="../crc/">
       
       
       <link rel="icon" href="../../images/eva-stripes.png">
@@ -20,7 +20,7 @@
     
     
       
-        <title>MHIST - eva</title>
+        <title>BRACS - eva</title>
       
     
     
@@ -74,7 +74,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#mhist" class="md-skip">
+        <a href="#bracs" class="md-skip">
           Skip to content
         </a>
       
@@ -111,7 +111,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              MHIST
+              BRACS
             
           </span>
         </div>
@@ -992,10 +992,30 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../bracs/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    BRACS
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   <span class="md-ellipsis">
@@ -1004,6 +1024,62 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#raw-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      Raw data
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#download-and-preprocessing" class="md-nav__link">
+    <span class="md-ellipsis">
+      Download and preprocessing
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#relevant-links" class="md-nav__link">
+    <span class="md-ellipsis">
+      Relevant links
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#license" class="md-nav__link">
+    <span class="md-ellipsis">
+      License
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1055,30 +1131,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  <span class="md-ellipsis">
-    MHIST
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../mhist/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1087,53 +1143,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#raw-data" class="md-nav__link">
-    <span class="md-ellipsis">
-      Raw data
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#download-and-preprocessing" class="md-nav__link">
-    <span class="md-ellipsis">
-      Download and preprocessing
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#relevant-links" class="md-nav__link">
-    <span class="md-ellipsis">
-      Relevant links
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -2691,6 +2700,15 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#license" class="md-nav__link">
+    <span class="md-ellipsis">
+      License
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -2709,16 +2727,17 @@
   
 
 
-<h1 id="mhist">MHIST</h1>
-<p>MHIST is a binary classification task which comprises of 3,152 hematoxylin and eosin (H&amp;E)-stained
-Formalin Fixed Paraffin-Embedded (FFPE) fixed-size images (224 by 224 pixels) of colorectal polyps
-from the Department of Pathology and Laboratory Medicine at Dartmouth-Hitchcock Medical Center (DHMC).</p>
-<p>The tissue classes are: Hyperplastic Polyp (HP), Sessile Serrated Adenoma (SSA). This classification task
-focuses on the clinically-important binary distinction between HPs and SSAs, a challenging problem with
-considerable inter-pathologist variability. HPs are typically benign, while sessile serrated adenomas are
-precancerous lesions that can turn into cancer if left untreated and require sooner follow-up examinations.
-Histologically, HPs have a superficial serrated architecture and elongated crypts, whereas SSAs are characterized
-by broad-based crypts, often with complex structure and heavy serration.</p>
+<h1 id="bracs">BRACS</h1>
+<p>The BReAst Carcinoma Subtyping (BRACS) is a new dataset of hematoxylin and eosin (H&amp;E)
+histopathological images of breast carcinoma.</p>
+<p>Images (WSI) of hematoxylin and eosin (H&amp;E) stained breast tissues were generated by using an
+Aperio AT2 scanner at 0.25 µm/pixel for 40× resolution. Some Regions of Interest (RoIs) are
+associated with a subset of WSIs. See example figure below. Both WSIs and RoIs were annotated
+according to the seven classes mentioned above (N, PB, UDH, FEA, ADH, DCIS, IC), by three expert
+pathologists of the Complex Structure Pathological Anatomy and Cytopathology of National Cancer
+Institute – IRCCS Fondazione Pascale, Naples, Italy.</p>
+<p>While the BRACS contains 547 WSIs collected by 189 patients, the <code>BRACS_ROI</code> subset which
+we use in this benchmarks contains 4539 extracted ROIs / patches.</p>
 <h2 id="raw-data">Raw data</h2>
 <h3 id="key-stats">Key stats</h3>
 <table>
@@ -2735,82 +2754,77 @@ by broad-based crypts, often with complex structure and heavy serration.</p>
 </tr>
 <tr>
 <td><strong>Task</strong></td>
-<td>Binary classification (2 classes)</td>
+<td>Multiclass classification (7 classes)</td>
 </tr>
 <tr>
 <td><strong>Cancer type</strong></td>
-<td>Colorectal Polyp</td>
+<td>Breast</td>
 </tr>
 <tr>
 <td><strong>Data size</strong></td>
-<td>354 MB</td>
+<td>52 GB</td>
 </tr>
 <tr>
 <td><strong>Image dimension</strong></td>
-<td>224 x 224 x 3</td>
+<td>variable</td>
 </tr>
 <tr>
 <td><strong>Magnification (μm/px)</strong></td>
-<td>5x (2.0) *</td>
+<td>40x (0.25)</td>
 </tr>
 <tr>
 <td><strong>Files format</strong></td>
-<td><code>.png</code> images</td>
+<td><code>png</code></td>
 </tr>
 <tr>
 <td><strong>Number of images</strong></td>
-<td>3,152 (2,175 train, 977 test)</td>
-</tr>
-<tr>
-<td><strong>Splits in use</strong></td>
-<td>annotations.csv (train / test)</td>
+<td>4539</td>
 </tr>
 </tbody>
 </table>
-<p>* Downsampled from 40x to increase the field of view.</p>
-<h3 id="organization">Organization</h3>
-<p>The contents from <code>images.zip</code> and the file <code>annotations.csv</code> from <a href="https://bmirds.github.io/MHIST/#accessing-dataset">bmirds</a> are organized as follows:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>mhist                           # Root folder
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>├── images                      # All the dataset images
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>│   ├── MHIST_aaa.png
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>│   ├── MHIST_aab.png
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>│   ├── ...
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>└── annotations.csv             # The dataset annotations file
-</span></code></pre></div>
-<h2 id="download-and-preprocessing">Download and preprocessing</h2>
-<p>To download the dataset, please visit the <a href="https://bmirds.github.io/MHIST/#accessing-dataset">access portal on BMIRDS</a>
-and follow the instructions. You will then receive an email with all the relative links that you can use to download
-the data (<code>images.zip</code>, <code>annotations.csv</code>, <code>Dataset Research Use Agreement.pdf</code> and <code>MD5SUMs.txt</code>). </p>
-<p>Please create a root folder, e.g. <code>mhist</code>, and download all the files there, which unzipping the contents of
-<code>images.zip</code> to a directory named <code>images</code> inside your root folder (i.e. <code>mhist/images</code>). Afterwards, you can
-(optionally) delete the <code>images.zip</code> file.</p>
 <h3 id="splits">Splits</h3>
-<p>We work with the splits provided by the data source. Since no "validation" split is provided, we use the "test" split as validation split.</p>
-<ul>
-<li>Train split: <code>annotations.csv</code> :: "Partition" == "train"</li>
-<li>Validation split: <code>annotations.csv</code> :: "Partition" == "test"</li>
-</ul>
+<p>The data source provides train/validation/test splits</p>
 <table>
 <thead>
 <tr>
 <th>Splits</th>
 <th>Train</th>
 <th>Validation</th>
+<th>Test</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>#Samples</td>
-<td>2,175 (69%)</td>
-<td>977 (31%)</td>
+<td>3657 (80.57%)</td>
+<td>312 (6.87%)</td>
+<td>570 (12.56%)</td>
 </tr>
 </tbody>
 </table>
+<h3 id="organization">Organization</h3>
+<p>The BRACS data is organized as follows:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>BRACS_RoI
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>├── train
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>│   ├── 0_N                    # 1 folder per class 
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>│   ├── 1_PB
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>│   ├── ...
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>├── val
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>│   ├── 0_N
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>│   ├── ...
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>├── test
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>│   ├── 0_N
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>│   ├── ...
+</span></code></pre></div>
+<h2 id="download-and-preprocessing">Download and preprocessing</h2>
+<p>The <code>BRACS</code> dataset class doesn't download the data during runtime and must be downloaded manually from <a href="https://www.bracs.icar.cnr.it/download/">the official source</a>.</p>
 <h2 id="relevant-links">Relevant links</h2>
 <ul>
-<li><a href="https://bmirds.github.io/MHIST/#accessing-dataset">Accessing MHIST Dataset (BMIRDS)</a></li>
-<li><a href="https://arxiv.org/pdf/2101.12355.pdf">Paper: A Petri Dish for Histopathology Image Analysis</a></li>
+<li><a href="https://www.bracs.icar.cnr.it/">Official Website</a></li>
+<li><a href="https://academic.oup.com/database/article/doi/10.1093/database/baac093/6762252">Paper</a></li>
 </ul>
+<h2 id="license">License</h2>
+<p><a href="https://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC 4.0</a></p>
 
 
 
