@@ -17,6 +17,7 @@ from tests.eva import _cli
         # | online
         # classification
         "configs/vision/pathology/online/classification/bach.yaml",
+        "configs/vision/pathology/online/classification/breakhis.yaml",
         "configs/vision/pathology/online/classification/crc.yaml",
         "configs/vision/pathology/online/classification/gleason_arvaniti.yaml",
         "configs/vision/pathology/online/classification/mhist.yaml",
@@ -30,6 +31,7 @@ from tests.eva import _cli
         # | offline
         # classification
         "configs/vision/pathology/offline/classification/bach.yaml",
+        "configs/vision/pathology/offline/classification/breakhis.yaml",
         "configs/vision/pathology/offline/classification/camelyon16.yaml",
         "configs/vision/pathology/offline/classification/crc.yaml",
         "configs/vision/pathology/offline/classification/gleason_arvaniti.yaml",
