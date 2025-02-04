@@ -22,11 +22,13 @@ The dataset is divided into two main groups: benign tumors and malignant tumors.
 
 ### Splits
 
-The data source provides train/validation/test splits
+The data source provides train/validation splits
 
 | Splits | Train           | Validation   |
 |----------|---------------|--------------|
 | #Samples | 1393 (70%)    | 602 (30%)    |
+
+A test split is not provided, as by further dividing the dataset the number of samples per class becomes too low for robust evaluations. __eva__ therefore reports evaluation results for BreakHis on the validation split.
 
 
 ### Organization
