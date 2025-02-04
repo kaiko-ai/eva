@@ -86,6 +86,7 @@ nav:
         - BACH: datasets/bach.md
         - BRACS: datasets/bracs.md
         - CRC: datasets/crc.md
+        - GleasonArvaniti: datasets/gleason_arvaniti.md
         - MHIST: datasets/mhist.md
         - PatchCamelyon: datasets/patch_camelyon.md
         - MoNuSAC: datasets/monusac.md
