@@ -131,3 +131,31 @@ def infer_model(
         datamodule=datamodule,
         return_predictions=return_predictions,
     )
+
+def run_validation_only(
+    base_trainer: eva_trainer.Trainer,
+    base_model: modules.ModelModule,
+    datamodule: datamodules.DataModule,
+    verbose: bool = True,
+) -> _EVALUATE_OUTPUT:
+    """Validates a model out-of-place without fitting first.
+
+    Note:
+        This function clones the base model and trainer, so that the inputs
+        are not modified.
+
+    Args:
+        base_trainer: The base trainer to clone.
+        base_model: The model module to clone.
+        datamodule: The data module to validate on.
+        verbose: Whether to print the validation metrics after validation.
+
+    Returns:
+        The validation metrics produced by `trainer.validate`.
+    """
+    trainer, model = _utils.clone(base_trainer, base_model)
+    return trainer.validate(
+        model=model,
+        datamodule=datamodule,
+        verbose=verbose,
+    )

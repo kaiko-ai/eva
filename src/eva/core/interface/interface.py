@@ -51,7 +51,7 @@ class Interface:
             model: The model module to use but not modify.
             data: The data module.
         """
-        eva_trainer.infer_model(
+        trainer.infer_model(
             base_trainer=trainer,
             base_model=model,
             datamodule=data,
@@ -77,3 +77,27 @@ class Interface:
         """
         self.predict(trainer=trainer, model=model, data=data)
         self.fit(trainer=trainer, model=model, data=data)
+
+    def validate(
+        self,
+        trainer: eva_trainer.Trainer,
+        model: modules.ModelModule,
+        data: datamodules.DataModule,
+    ) -> None:
+        """Perform model validation out-of-place without running fit.
+
+        This method is useful when the model is already trained or does not
+        require further training (e.g., large language models) and you only
+        want to measure performance.
+
+        Args:
+            trainer: The base trainer to use but not modify.
+            model: The model module to use but not modify.
+            data: The data module containing validation data.
+        """
+        trainer.run_validation_only(
+            base_trainer=trainer,
+            base_model=model,
+            datamodule=data,
+            verbose=True,
+        )
