@@ -95,9 +95,8 @@ class Interface:
             model: The model module to use but not modify.
             data: The data module containing validation data.
         """
-        trainer.run_validation_only(
-            base_trainer=trainer,
-            base_model=model,
+        trainer.validate_only(
+            model=model,
             datamodule=data,
             verbose=True,
         )

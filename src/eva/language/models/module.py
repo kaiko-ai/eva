@@ -55,21 +55,26 @@ class TextModule(module.ModelModule):
         """Validation step that runs batch inference and evaluates metrics."""
         return self._batch_step(batch)
 
-    def _batch_step(self, batch: INPUT_BATCH) -> STEP_OUTPUT:
+    @override
+    def _batch_step(self, batch: Dict[str, Any]) -> STEP_OUTPUT:
         """Runs inference on a batch and evaluates model predictions.
 
         Args:
-            batch: A batch of input prompts and ground truth labels.
+            batch: A batch containing 'QUESTION', 'CONTEXTS', 'final_decision', etc.
 
         Returns:
             Dictionary with predictions, ground truth, and evaluation metrics.
         """
         data, targets, metadata = INPUT_BATCH(*batch)
-        message = self.prompt + data + '\nAnswer: '
+        print('!data:', data)
+        print('!targets:', targets)
+        print('!metadata:', metadata)
+        message = self.prompt + str(data) + '\nAnswer: '
         predictions = self.forward(message)
 
         return {
             "predictions": predictions,
             "targets": targets,
-            "metadata": metadata,
+            "metadata": batch  # Pass the entire batch as metadata
         }
+
