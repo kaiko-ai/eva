@@ -3,7 +3,7 @@
 import functools
 import glob
 import os
-from typing import Callable, Dict, List, Literal, Set
+from typing import Any, Callable, Dict, List, Literal, Set
 
 import torch
 from torchvision import tv_tensors
@@ -28,37 +28,26 @@ class BreaKHis(base.ImageClassification):
 
     _val_patient_ids: Set[str] = {
         "18842D",
-        "16184",
-        "8168",
-        "4372",
-        "16716",
-        "9146",
-        "21978AB",
-        "6241",
-        "17901",
-        "12465",
-        "3411F",
-        "18842",
-        "2980",
-        "15570C",
-        "2985",
-        "13413",
-        "3909",
-        "14134E",
-        "2523",
-        "19854C",
         "19979",
-        "29960CD",
-        "21998AB",
-        "29960AB",
-        "14946",
+        "15275",
+        "15792",
+        "16875",
+        "3909",
+        "5287",
+        "16716",
+        "2773",
+        "5695",
+        "16184CD",
+        "23060CD",
+        "21998CD",
+        "21998EF",
     }
     """Patient IDs to use for dataset splits."""
 
     _expected_dataset_lengths: Dict[str | None, int] = {
-        "train": 1393,
-        "val": 602,
-        None: 1995,
+        "train": 1132,
+        "val": 339,
+        None: 1471,
     }
     """Expected dataset lengths for the splits and complete dataset."""
 
@@ -106,7 +95,7 @@ class BreaKHis(base.ImageClassification):
     @property
     @override
     def classes(self) -> List[str]:
-        return ["A", "F", "PT", "TA", "DC", "LC", "MC", "PC"]
+        return ["TA", "MC", "F", "DC"]
 
     @property
     @override
@@ -151,8 +140,8 @@ class BreaKHis(base.ImageClassification):
         _validators.check_dataset_integrity(
             self,
             length=self._expected_dataset_lengths[self._split],
-            n_classes=8,
-            first_and_last_labels=("A", "PC"),
+            n_classes=4,
+            first_and_last_labels=("TA", "DC"),
         )
 
     @override
@@ -164,6 +153,10 @@ class BreaKHis(base.ImageClassification):
     def load_target(self, index: int) -> torch.Tensor:
         class_name = self._extract_class(self._image_files[self._indices[index]])
         return torch.tensor(self.class_to_idx[class_name], dtype=torch.long)
+
+    @override
+    def load_metadata(self, index: int) -> Dict[str, Any]:
+        return {"patient_id": self._extract_patient_id(self._image_files[self._indices[index]])}
 
     @override
     def __len__(self) -> int:
@@ -200,6 +193,8 @@ class BreaKHis(base.ImageClassification):
         val_indices = []
 
         for index, image_file in enumerate(self._image_files):
+            if self._extract_class(image_file) not in self.classes:
+                continue
             patient_id = self._extract_patient_id(image_file)
             if patient_id in self._val_patient_ids:
                 val_indices.append(index)
