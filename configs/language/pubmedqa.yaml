@@ -14,11 +14,11 @@ trainer:
           save_dir: *OUTPUT_ROOT
           name: ""
 model:
-  class_path: eva.language.models.module.TextModule
+  class_path: eva.language.models.TextModule
   init_args:
     prompt: "Respond to the question with a single digit only: 0 for no, 1 for yes, or 2 for maybe. Do not include any words, explanations, or additional characters—only the digit."
     model:
-      class_path: eva.language.models.wrappers.huggingface.HuggingFaceTextModel
+      class_path: eva.language.models.HuggingFaceTextModel
       init_args:
         model_name_or_path: "meta-llama/Llama-3.2-1B"
         model_kwargs:
