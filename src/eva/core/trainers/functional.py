@@ -132,6 +132,7 @@ def infer_model(
         return_predictions=return_predictions,
     )
 
+
 def run_validation_only(
     base_trainer: eva_trainer.Trainer,
     base_model: modules.ModelModule,

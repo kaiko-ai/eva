@@ -1,22 +1,22 @@
 """LLM Text Module for Inference."""
 
-from typing import Any, Dict, Callable
-import torch
+from typing import Any
+
+from lightning.pytorch.utilities.types import STEP_OUTPUT
 from torch import nn
 from typing_extensions import override
+
 from eva.core.metrics import structs as metrics_lib
 from eva.core.models.modules import module
 from eva.core.models.modules.typings import INPUT_BATCH
-from lightning.pytorch.utilities.types import STEP_OUTPUT
 from eva.core.models.modules.utils import batch_postprocess
-from eva.core.models.wrappers.huggingface import HuggingFaceModel
 
 
 class TextModule(module.ModelModule):
     """Text-based LLM module for inference.
 
-    Uses a Hugging Face wrapper for text generation.
-    Supports evaluation using configurable metrics and post-processing.
+    Uses LLM wrappers for text generation.
+    Supports evaluation using configurable metrics and post-processing. # TODO: Add support
     """
 
     def __init__(
@@ -29,7 +29,8 @@ class TextModule(module.ModelModule):
         """Initializes the text inference module.
 
         Args:
-            model: A HuggingFace wrapper or another PyTorch-compatible model for text generation.
+            model: An LLM wrapper (PyTorch-compatible) for text generation.
+            prompt: The prompt to use for generating text.
             metrics: Metrics schema for evaluation.
             postprocess: A helper function to post-process model outputs before evaluation.
         """
@@ -44,6 +45,8 @@ class TextModule(module.ModelModule):
 
         Args:
             prompts: List of input texts to generate responses.
+            args: Additional arguments.
+            kwargs: Additional keyword arguments.
 
         Returns:
             List of generated responses.
@@ -52,11 +55,19 @@ class TextModule(module.ModelModule):
 
     @override
     def validation_step(self, batch: INPUT_BATCH, *args: Any, **kwargs: Any) -> STEP_OUTPUT:
-        """Validation step that runs batch inference and evaluates metrics."""
+        """Validation step that runs batch inference and evaluates metrics.
+
+        Args:
+            batch: An input batch.
+            args: Additional arguments.
+            kwargs: Additional keyword arguments.
+
+        Returns:
+            Dictionary with predictions, ground truth, and evaluation metrics.
+        """
         return self._batch_step(batch)
 
-    @override
-    def _batch_step(self, batch: Dict[str, Any]) -> STEP_OUTPUT:
+    def _batch_step(self, batch: INPUT_BATCH) -> STEP_OUTPUT:
         """Runs inference on a batch and evaluates model predictions.
 
         Args:
@@ -66,15 +77,7 @@ class TextModule(module.ModelModule):
             Dictionary with predictions, ground truth, and evaluation metrics.
         """
         data, targets, metadata = INPUT_BATCH(*batch)
-        print('!data:', data)
-        print('!targets:', targets)
-        print('!metadata:', metadata)
-        message = self.prompt + str(data) + '\nAnswer: '
+        message = self.prompt + str(data) + "\nAnswer: "
         predictions = self.forward(message)
-
-        return {
-            "predictions": predictions,
-            "targets": targets,
-            "metadata": batch  # Pass the entire batch as metadata
-        }
-
+        # TODO: Add support for evaluation metrics
+        return {"predictions": predictions, "targets": targets, "metadata": batch}

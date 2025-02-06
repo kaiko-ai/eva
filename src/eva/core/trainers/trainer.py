@@ -120,8 +120,7 @@ class Trainer(pl_trainer.Trainer):
         datamodule: datamodules.DataModule,
         verbose: bool = True,
     ) -> None:
-        """
-        Runs validation on the model out-of-place without fitting or test.
+        """Runs validation on the model out-of-place without fitting or test.
 
         Args:
             model: The model to validate (cloned, not modified in-place).

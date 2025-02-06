@@ -1,8 +1,10 @@
 """LLM wrapper for HuggingFace `transformers` models."""
 
-from typing import Any, Callable, Dict, Optional
+from typing import Any, Dict, Optional
+
 import transformers
 from typing_extensions import override
+
 from eva.core.models.wrappers import base
 
 
@@ -37,9 +39,7 @@ class HuggingFaceTextModel(base.BaseModel):
     def load_model(self) -> None:
         """Loads the model as a Hugging Face pipeline."""
         self._pipeline = transformers.pipeline(
-            task=self._task,
-            model=self._model_name_or_path,
-            **self._model_kwargs
+            task=self._task, model=self._model_name_or_path, **self._model_kwargs
         )
 
     def generate(self, prompt: str, **generate_kwargs) -> str:
@@ -53,6 +53,4 @@ class HuggingFaceTextModel(base.BaseModel):
             The generated text as a string.
         """
         output = self._pipeline(prompt, return_full_text=False, **generate_kwargs)
-        print('!output:', output)
-        print('!prompt:', prompt)
         return output[0]["generated_text"] if isinstance(output, list) else output

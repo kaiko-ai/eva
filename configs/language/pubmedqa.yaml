@@ -1,4 +1,3 @@
-# Configuration for validating a model on PubMedQA
 ---
 trainer:
   class_path: eva.Trainer
@@ -21,16 +20,16 @@ model:
     model:
       class_path: eva.language.models.wrappers.huggingface.HuggingFaceTextModel
       init_args:
-        model_name_or_path: 'meta-llama/Llama-3.2-1B'
+        model_name_or_path: "meta-llama/Llama-3.2-1B"
         model_kwargs:
           max_new_tokens: 1
+    # TODO: implement metrics for language models
     # metrics:
     #   common:
     #     - class_path: eva.metrics.MulticlassClassificationMetrics
     #       init_args:
     #         num_classes: 3
-    postprocess: null  # Add if you need postprocessing
-
+    postprocess: null
 data:
   class_path: eva.DataModule
   init_args:
@@ -45,4 +44,4 @@ data:
       val:
         batch_size: &BATCH_SIZE ${oc.env:BATCH_SIZE, 1}
         num_workers: &N_DATA_WORKERS ${oc.env:N_DATA_WORKERS, 1}
-        shuffle: false  # Ensure validation data is not shuffled
+        shuffle: false

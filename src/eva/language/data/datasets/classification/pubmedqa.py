@@ -1,7 +1,7 @@
 """PubMedQA dataset class."""
 
 import os
-from typing import Any, Dict, List, Literal
+from typing import Dict, List, Literal
 
 import torch
 from datasets import Dataset, load_dataset
