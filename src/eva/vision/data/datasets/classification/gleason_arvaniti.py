@@ -8,6 +8,7 @@ from typing import Callable, Dict, List, Literal
 
 import pandas as pd
 import torch
+from loguru import logger
 from torchvision import tv_tensors
 from typing_extensions import override
 
@@ -99,6 +100,12 @@ class GleasonArvaniti(base.ImageClassification):
             )
         if not os.path.isdir(os.path.join(self._root, "test_patches_750")):
             raise FileNotFoundError(f"`test_patches_750` directory not found in {self._root}")
+
+        if self._split == "test":
+            logger.warning(
+                "The test split currently leads to unstable evaluation results. "
+                "We recommend using the validation split instead."
+            )
 
     @override
     def configure(self) -> None:
