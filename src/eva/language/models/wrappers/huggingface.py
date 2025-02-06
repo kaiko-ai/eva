@@ -42,7 +42,7 @@ class HuggingFaceTextModel(base.BaseModel):
             task=self._task, model=self._model_name_or_path, **self._model_kwargs
         )
 
-    def generate(self, prompt: str, **generate_kwargs) -> str:
+    def generate(self, prompt: str, **generate_kwargs) -> Any:
         """Generates text using the pipeline.
 
         Args:

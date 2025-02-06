@@ -51,7 +51,7 @@ class Interface:
             model: The model module to use but not modify.
             data: The data module.
         """
-        trainer.infer_model(
+        eva_trainer.infer_model(
             base_trainer=trainer,
             base_model=model,
             datamodule=data,
