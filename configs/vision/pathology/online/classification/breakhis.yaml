@@ -44,7 +44,7 @@ model:
       class_path: torch.nn.Linear
       init_args:
         in_features: ${oc.env:IN_FEATURES, 384}
-        out_features: &NUM_CLASSES 8
+        out_features: &NUM_CLASSES 4
     criterion: torch.nn.CrossEntropyLoss
     optimizer:
       class_path: torch.optim.AdamW
