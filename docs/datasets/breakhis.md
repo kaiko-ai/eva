@@ -13,13 +13,13 @@ Given that patient counts for some classes are very low (e.g. 3 for PT), we only
 |                                |                             |
 |--------------------------------|-----------------------------|
 | **Modality**                   | Vision (WSI patches)        |
-| **Task**                       | Multiclass classification (8 classes) |
+| **Task**                       | Multiclass classification (4 classes) |
 | **Cancer type**                | Breast                      |
 | **Data size**                  | 4 GB                        |
 | **Image dimension**            | 700 x 460                   |
 | **Magnification (μm/px)**      | 40x (0.25)                  |
 | **Files format**               | `png`                       |
-| **Number of images**           | 1995                        |
+| **Number of images**           | 1471                        |
 
 
 ### Splits
