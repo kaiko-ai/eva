@@ -1,6 +1,6 @@
 """LLM wrapper for HuggingFace `transformers` models."""
 
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Literal
 
 import transformers
 from typing_extensions import override
@@ -14,8 +14,8 @@ class HuggingFaceTextModel(base.BaseModel):
     def __init__(
         self,
         model_name_or_path: str,
-        task: str = "text-generation",
-        model_kwargs: Optional[Dict[str, Any]] = None,
+        task: Literal["text-generation", "text-classification"] = "text-generation",
+        model_kwargs: Dict[str, Any] | None = None,
     ) -> None:
         """Initializes the model.
 
@@ -23,8 +23,7 @@ class HuggingFaceTextModel(base.BaseModel):
             model_name_or_path: The model name or path to load the model from.
                 This can be a local path or a model name from the `HuggingFace`
                 model hub.
-            task: The pipeline task (e.g., "text-generation", "text-classification").
-                Defaults to "text-generation".
+            task: The pipeline task. Defaults to "text-generation".
             model_kwargs: Additional arguments for configuring the pipeline.
         """
         super().__init__()

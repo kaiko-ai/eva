@@ -133,7 +133,7 @@ def infer_model(
     )
 
 
-def run_validation_only(
+def run_validation(
     base_trainer: eva_trainer.Trainer,
     base_model: modules.ModelModule,
     datamodule: datamodules.DataModule,

@@ -1,6 +1,6 @@
 """LLM Text Module for Inference."""
 
-from typing import Any
+from typing import Any, List
 
 from lightning.pytorch.utilities.types import STEP_OUTPUT
 from torch import nn
@@ -40,7 +40,7 @@ class TextModule(module.ModelModule):
         self.prompt = prompt
 
     @override
-    def forward(self, prompts: str, *args: Any, **kwargs: Any) -> list[str]:
+    def forward(self, prompts: str, *args: Any, **kwargs: Any) -> List[str]:
         """Generates text responses for a batch of prompts.
 
         Args:
@@ -78,6 +78,6 @@ class TextModule(module.ModelModule):
         """
         data, targets, metadata = INPUT_BATCH(*batch)
         message = self.prompt + str(data) + "\nAnswer: "
-        predictions = self.forward(message)
+        predictions = self(message)
         # TODO: Add support for evaluation metrics
         return {"predictions": predictions, "targets": targets, "metadata": batch}

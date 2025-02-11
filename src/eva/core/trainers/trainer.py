@@ -130,7 +130,7 @@ class Trainer(pl_trainer.Trainer):
         Returns:
             Validation metrics as returned by trainer.validate.
         """
-        functional.run_validation_only(
+        functional.run_validation(
             base_trainer=self,
             base_model=model,
             datamodule=datamodule,

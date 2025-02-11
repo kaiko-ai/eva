@@ -121,15 +121,12 @@ class PubMedQA(base.TextClassification):
     def load_metadata(self, index: int) -> Dict[str, str]:
         sample = self.dataset[index]
         return {
-            key: str(value) if value is not None else ""
-            for key, value in {
-                "year": sample.get("YEAR"),
-                "labels": sample.get("LABELS"),
-                "meshes": sample.get("MESHES"),
-                "long_answer": sample.get("LONG_ANSWER"),
-                "reasoning_required": sample.get("reasoning_required_pred"),
-                "reasoning_free": sample.get("reasoning_free_pred"),
-            }.items()
+            "year": sample.get("YEAR", ""),
+            "labels": sample.get("LABELS", ""),
+            "meshes": sample.get("MESHES", ""),
+            "long_answer": sample.get("LONG_ANSWER", ""),
+            "reasoning_required": sample.get("reasoning_required_pred", ""),
+            "reasoning_free": sample.get("reasoning_free_pred", ""),
         }
 
     @override
