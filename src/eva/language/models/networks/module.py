@@ -80,4 +80,4 @@ class TextModule(module.ModelModule):
         message = self.prompt + str(data) + "\nAnswer: "
         predictions = self(message)
         # TODO: Add support for evaluation metrics
-        return {"predictions": predictions, "targets": targets, "metadata": batch}
+        return {"predictions": predictions, "targets": targets, "metadata": metadata}
