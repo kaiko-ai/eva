@@ -17,6 +17,7 @@ class MLP(nn.Module):
         hidden_activation_fn: Type[torch.nn.Module] | None = nn.ReLU,
         output_activation_fn: Type[torch.nn.Module] | None = None,
         dropout: float = 0.0,
+        use_batch_norm: bool = False,
     ) -> None:
         """Initializes the MLP.
 
@@ -36,6 +37,7 @@ class MLP(nn.Module):
         self.hidden_activation_fn = hidden_activation_fn
         self.output_activation_fn = output_activation_fn
         self.dropout = dropout
+        self.use_batch_norm = use_batch_norm
 
         self._network = self._build_network()
 
@@ -45,6 +47,8 @@ class MLP(nn.Module):
         prev_size = self.input_size
         for size in self.hidden_layer_sizes:
             layers.append(nn.Linear(prev_size, size))
+            if self.use_batch_norm:
+                layers.append(nn.BatchNorm1d(size))
             if self.hidden_activation_fn is not None:
                 layers.append(self.hidden_activation_fn())
             if self.dropout > 0:
