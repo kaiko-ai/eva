@@ -2775,7 +2775,8 @@
 
 <h1 id="breakhis">BreakHis</h1>
 <p>The Breast Cancer Histopathological Image Classification (BreakHis) is  composed of 9,109 microscopic images of breast tumor tissue collected from 82 patients using different magnifying factors (40X, 100X, 200X, and 400X). For this benchmark we only use the 40X samples which results in a subset of 1,995 images. This database has been built in collaboration with the P&amp;D Laboratory, Pathological Anatomy and Cytopathology, Parana, Brazil.</p>
-<p>The dataset is divided into two main groups: benign tumors and malignant tumors. The dataset currently contains four histological distinct types of benign breast tumors: adenosis (A), fibroadenoma (F), phyllodes tumor (PT), and tubular adenona (TA); and four malignant tumors (breast cancer): carcinoma (DC), lobular carcinoma (LC), mucinous carcinoma (MC) and papillary carcinoma (PC).</p>
+<p>The dataset is divided into two main groups: benign tumors and malignant tumors. The original dataset contains four histological distinct types of benign breast tumors: adenosis (A), fibroadenoma (F), phyllodes tumor (PT), and tubular adenona (TA); and four malignant tumors (breast cancer): carcinoma (DC), lobular carcinoma (LC), mucinous carcinoma (MC) and papillary carcinoma (PC).</p>
+<p>Given that patient counts for some classes are very low (e.g. 3 for PT), we only use classes with at least 7 patients for this benchmark: TA, MC, F &amp; DC.</p>
 <h2 id="raw-data">Raw data</h2>
 <h3 id="key-stats">Key stats</h3>
 <table>
@@ -2792,7 +2793,7 @@
 </tr>
 <tr>
 <td><strong>Task</strong></td>
-<td>Multiclass classification (8 classes)</td>
+<td>Multiclass classification (4 classes)</td>
 </tr>
 <tr>
 <td><strong>Cancer type</strong></td>
@@ -2816,12 +2817,12 @@
 </tr>
 <tr>
 <td><strong>Number of images</strong></td>
-<td>1995</td>
+<td>1471</td>
 </tr>
 </tbody>
 </table>
 <h3 id="splits">Splits</h3>
-<p>The data source provides train/validation splits</p>
+<p>The data source provides train/validation splits. There is no overlap of patients between the splits, and a stratified distribution of the classes is approximated (extact stratification is not possible due to the patient separation constraint).</p>
 <table>
 <thead>
 <tr>
@@ -2833,12 +2834,11 @@
 <tbody>
 <tr>
 <td>#Samples</td>
-<td>1393 (70%)</td>
-<td>602 (30%)</td>
+<td>1132 (76.95%)</td>
+<td>339 (23.04%)</td>
 </tr>
 </tbody>
 </table>
-<p>A test split is not provided, as by further dividing the dataset the number of samples per class becomes too low for robust evaluations. <strong>eva</strong> therefore reports evaluation results for BreakHis on the validation split.</p>
 <h3 id="organization">Organization</h3>
 <p>The BreakHis data is organized as follows:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>BreaKHis_v1

@@ -2821,7 +2821,7 @@
 </tbody>
 </table>
 <h3 id="splits">Splits</h3>
-<p>We use the same splits as proposed in the paper:</p>
+<p>The following splits are proposed in the paper:</p>
 <table>
 <thead>
 <tr>
@@ -2840,7 +2840,8 @@
 </tr>
 </tbody>
 </table>
-<p>Note that the authors chose TMA 76 as validation cohort because it contains the most balanced distribution of Gleason scores.</p>
+<p>Note that the authors chose TMA 76 as validation cohort because it contains the most balanced distribution of Gleason scores.
+We couldn't achieve stable results when evaluating on the test set, so we only use the train and validation sets for this benchmark.</p>
 <h2 id="download-and-preprocessing">Download and preprocessing</h2>
 <p>The <code>GleasonArvaniti</code> dataset class doesn't download the data during runtime and must be downloaded and preprocessed manually:</p>
 <ol>
