@@ -238,7 +238,7 @@ a proprietary dataset of 3.1M million slides, available for download on
 [HuggingFace](https://huggingface.co/paige-ai/Virchow2), run:
 
 ```
-MODEL_NAME=paige/virchow2 \
+MODEL_NAME=pathology/paige_virchow2 \
 NORMALIZE_MEAN="[0.485,0.456,0.406]" \
 NORMALIZE_STD="[0.229,0.224,0.225]" \
 IN_FEATURES=1280 \

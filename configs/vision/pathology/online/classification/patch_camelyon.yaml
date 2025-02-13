@@ -17,7 +17,7 @@ trainer:
       - class_path: lightning.pytorch.callbacks.ModelCheckpoint
         init_args:
           filename: best
-          save_last: true
+          save_last: ${oc.env:SAVE_LAST, false}
           save_top_k: 1
           monitor: &MONITOR_METRIC ${oc.env:MONITOR_METRIC, val/BinaryBalancedAccuracy}
           mode: &MONITOR_METRIC_MODE ${oc.env:MONITOR_METRIC_MODE, max}
