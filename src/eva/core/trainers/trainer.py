@@ -54,6 +54,8 @@ class Trainer(pl_trainer.Trainer):
         self._session_id: str = _logging.generate_session_id()
         self._log_dir: str = self.default_log_dir
 
+        self.init_logger_run(0)
+
     @property
     def default_log_dir(self) -> str:
         """Returns the default log directory."""
@@ -87,7 +89,8 @@ class Trainer(pl_trainer.Trainer):
                     logger._version = subdirectory
             elif isinstance(logger, pl_loggers.WandbLogger):
                 task_name = self.default_root_dir.split("/")[-1]
-                wandb_utils.init_run(f"{task_name}_{self._session_id}_{run_id}", logger._wandb_init)
+                run_name = os.getenv("WANDB_RUN_NAME", f"{task_name}_{self._session_id}")
+                wandb_utils.init_run(f"{run_name}_{run_id}", logger._wandb_init)
             enabled_loggers.append(logger)
 
         self._loggers = enabled_loggers or [eva_loggers.DummyLogger(self._log_dir)]
