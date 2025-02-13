@@ -22,14 +22,14 @@ Images are classified as benign, Gleason pattern 3, 4 or 5. The dataset contains
 
 ### Splits
 
-We use the same splits as proposed in the paper:
+The following splits are proposed in the paper:
 
-| Splits | Train         | Validation   | Test         |
-|---|---------------|--------------|--------------|
+| Splits   | Train           | Validation     | Test           |
+|----------|-----------------|----------------|----------------|
 | #Samples | 15,303 (67.26%) | 2,482 (10.91%) | 4,967 (21.83%) |
 
 Note that the authors chose TMA 76 as validation cohort because it contains the most balanced distribution of Gleason scores.
-
+We couldn't achieve stable results when evaluating on the test set, so we only use the train and validation sets for this benchmark.
 
 ## Download and preprocessing
 The `GleasonArvaniti` dataset class doesn't download the data during runtime and must be downloaded and preprocessed manually:

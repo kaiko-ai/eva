@@ -33,7 +33,6 @@ trainer:
           dataloader_idx_map:
             0: train
             1: val
-            2: test
           backbone:
             class_path: eva.vision.models.ModelFromRegistry
             init_args:
@@ -84,11 +83,6 @@ data:
         init_args:
           <<: *DATASET_ARGS
           split: val
-      test:
-        class_path: eva.datasets.EmbeddingsClassificationDataset
-        init_args:
-          <<: *DATASET_ARGS
-          split: test
       predict:
         - class_path: eva.vision.datasets.GleasonArvaniti
           init_args: &PREDICT_DATASET_ARGS
@@ -103,19 +97,12 @@ data:
           init_args:
             <<: *PREDICT_DATASET_ARGS
             split: val
-        - class_path: eva.vision.datasets.GleasonArvaniti
-          init_args:
-            <<: *PREDICT_DATASET_ARGS
-            split: test
     dataloaders:
       train:
         batch_size: &BATCH_SIZE ${oc.env:BATCH_SIZE, 256}
         num_workers: &N_DATA_WORKERS ${oc.env:N_DATA_WORKERS, 4}
         shuffle: true
       val:
-        batch_size: *BATCH_SIZE
-        num_workers: *N_DATA_WORKERS
-      test:
         batch_size: *BATCH_SIZE
         num_workers: *N_DATA_WORKERS
       predict:
