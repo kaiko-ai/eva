@@ -44,7 +44,6 @@ class ConfigurationLogger(pl.Callback):
             return
 
         configuration = _load_submitted_config()
-        configuration["MODEL_NAME"] = os.getenv("MODEL_NAME", "")
 
         if self._verbose:
             config_as_text = yaml.dump(configuration, sort_keys=False)
