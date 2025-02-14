@@ -10,16 +10,16 @@ from eva.core.models.networks import MLP
 
 
 @pytest.mark.parametrize(
-    "input_size, output_size, hidden_layer_sizes, dropout",
+    "in_features, out_features, hidden_layer_sizes, dropout",
     list(itertools.product([8], [2, 4], [(), (5,), (5, 5)], [0.0, 0.5])),
 )
 def test_mlp_initialization(
-    input_size: int, output_size: int, hidden_layer_sizes: Tuple[int, ...], dropout: float
+    in_features: int, out_features: int, hidden_layer_sizes: Tuple[int, ...], dropout: float
 ):
     """Tests intitializing mlp with different parameters."""
     mlp = MLP(
-        input_size=input_size,
-        output_size=output_size,
+        in_features=in_features,
+        out_features=out_features,
         hidden_layer_sizes=hidden_layer_sizes,
         dropout=dropout,
         hidden_activation_fn=torch.nn.ReLU,
@@ -31,28 +31,28 @@ def test_mlp_initialization(
 
 
 @pytest.mark.parametrize(
-    "batch_size, input_size, output_size, hidden_layer_sizes, dropout",
+    "batch_size, in_features, out_features, hidden_layer_sizes, dropout",
     list(itertools.product([1, 4], [8], [1, 4], [(), (5, 5)], [0.5])),
 )
 def test_mlp_forward_pass(
     batch_size: int,
-    input_size: int,
-    output_size: int,
+    in_features: int,
+    out_features: int,
     hidden_layer_sizes: Tuple[int, ...],
     dropout: float,
 ):
     """Tests forward pass with different hyper parameters, input & output sizes & batch sizes."""
     mlp = MLP(
-        input_size=input_size,
-        output_size=output_size,
+        in_features=in_features,
+        out_features=out_features,
         hidden_layer_sizes=hidden_layer_sizes,
         dropout=dropout,
         hidden_activation_fn=torch.nn.ReLU,
     )
 
     # Create a dummy input tensor
-    x = torch.randn(batch_size, input_size)
+    x = torch.randn(batch_size, in_features)
     output = mlp(x)
 
     # Check the output size
-    assert output.shape == (batch_size, output_size)
+    assert output.shape == (batch_size, out_features)

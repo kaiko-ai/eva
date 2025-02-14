@@ -1,7 +1,7 @@
 """Models API."""
 
 from eva.core.models.modules import HeadModule, InferenceModule
-from eva.core.models.networks import MLP
+from eva.core.models.networks import MLP, LinearClassifier
 from eva.core.models.wrappers import (
     BaseModel,
     HuggingFaceModel,
@@ -14,6 +14,7 @@ __all__ = [
     "HeadModule",
     "InferenceModule",
     "MLP",
+    "LinearClassifier",
     "BaseModel",
     "HuggingFaceModel",
     "ModelFromFunction",

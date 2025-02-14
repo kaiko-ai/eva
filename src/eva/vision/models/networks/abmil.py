@@ -82,8 +82,8 @@ class ABMIL(torch.nn.Module):
         )
 
         self.classifier = MLP(
-            input_size=input_size,
-            output_size=output_size,
+            in_features=input_size,
+            out_features=output_size,
             hidden_layer_sizes=hidden_sizes_mlp,
             dropout=dropout_mlp,
             hidden_activation_fn=nn.ReLU,
