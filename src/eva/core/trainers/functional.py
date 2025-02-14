@@ -39,7 +39,7 @@ def run_evaluation_session(
             base_trainer,
             base_model,
             datamodule,
-            run_id=f"run_{run_index}",
+            run_id=run_index,
             verbose=not verbose,
         )
         recorder.update(validation_scores, test_scores)
@@ -51,7 +51,7 @@ def run_evaluation(
     base_model: modules.ModelModule,
     datamodule: datamodules.DataModule,
     *,
-    run_id: str | None = None,
+    run_id: int | None = None,
     verbose: bool = True,
 ) -> Tuple[_EVALUATE_OUTPUT, _EVALUATE_OUTPUT | None]:
     """Fits and evaluates a model out-of-place.
@@ -61,7 +61,6 @@ def run_evaluation(
         base_model: The model module to use but not modify.
         datamodule: The data module.
         run_id: The run id to be appended to the output log directory.
-            If `None`, it will use the log directory of the trainer as is.
         verbose: Whether to print the validation and test metrics
             in the end of the training.
 
@@ -70,8 +69,12 @@ def run_evaluation(
     """
     trainer, model = _utils.clone(base_trainer, base_model)
     model.configure_model()
-    trainer.setup_log_dirs(run_id or "")
-    return fit_and_validate(trainer, model, datamodule, verbose=verbose)
+
+    trainer.init_logger_run(run_id)
+    results = fit_and_validate(trainer, model, datamodule, verbose=verbose)
+    trainer.finish_logger_run(run_id)
+
+    return results
 
 
 def fit_and_validate(
