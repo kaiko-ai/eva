@@ -28,6 +28,7 @@ class MLP(nn.Module):
             dropout: Dropout probability for hidden layers.
             hidden_activation_fn: Activation function to use for hidden layers. Default is ReLU.
             output_activation_fn: Activation function to use for the output layer. Default is None.
+            use_batch_norm: Wether to apply batch norm after the hidden layers.
         """
         super().__init__()
 
