@@ -6,6 +6,8 @@ trainer:
     default_root_dir: &OUTPUT_ROOT ${oc.env:OUTPUT_ROOT, logs/${oc.env:MODEL_NAME, dino_vits16}/offline/crc}
     max_steps: &MAX_STEPS ${oc.env:MAX_STEPS, 12500}
     checkpoint_type: ${oc.env:CHECKPOINT_TYPE, best}
+    val_check_interval: &VAL_CHECK_INTERVAL ${oc.env:VAL_CHECK_INTERVAL, 50}
+    check_val_every_n_epoch: null
     callbacks:
       - class_path: eva.callbacks.ConfigurationLogger
       - class_path: lightning.pytorch.callbacks.TQDMProgressBar
@@ -19,14 +21,9 @@ trainer:
           filename: best
           save_last: ${oc.env:SAVE_LAST, false}
           save_top_k: 1
+          every_n_train_steps: *VAL_CHECK_INTERVAL
           monitor: &MONITOR_METRIC ${oc.env:MONITOR_METRIC, val/MulticlassAccuracy}
           mode: &MONITOR_METRIC_MODE ${oc.env:MONITOR_METRIC_MODE, max}
-      - class_path: lightning.pytorch.callbacks.EarlyStopping
-        init_args:
-          min_delta: 0
-          patience: ${oc.env:PATIENCE, 24}
-          monitor: *MONITOR_METRIC
-          mode: *MONITOR_METRIC_MODE
       - class_path: eva.callbacks.ClassificationEmbeddingsWriter
         init_args:
           output_dir: &DATASET_EMBEDDINGS_ROOT ${oc.env:EMBEDDINGS_ROOT, ./data/embeddings}/${oc.env:MODEL_NAME, dino_vits16}/crc
@@ -57,11 +54,6 @@ model:
       class_path: torch.optim.AdamW
       init_args:
         lr: ${oc.env:LR_VALUE, 0.0003}
-    lr_scheduler:
-      class_path: torch.optim.lr_scheduler.CosineAnnealingLR
-      init_args:
-        T_max: *MAX_STEPS
-        eta_min: 0.0
     metrics:
       common:
         - class_path: eva.metrics.AverageLoss
