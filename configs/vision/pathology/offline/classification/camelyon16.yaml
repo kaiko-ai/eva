@@ -2,7 +2,7 @@
 trainer:
   class_path: eva.Trainer
   init_args:
-    n_runs: &N_RUNS ${oc.env:N_RUNS, 5}
+    n_runs: &N_RUNS ${oc.env:N_RUNS, 20}
     default_root_dir: &OUTPUT_ROOT ${oc.env:OUTPUT_ROOT, logs/${oc.env:MODEL_NAME, dino_vits16}/offline/camelyon16}
     max_epochs: &MAX_EPOCHS ${oc.env:MAX_EPOCHS, 100}
     checkpoint_type: ${oc.env:CHECKPOINT_TYPE, best}
@@ -24,7 +24,7 @@ trainer:
       - class_path: lightning.pytorch.callbacks.EarlyStopping
         init_args:
           min_delta: 0
-          patience: ${oc.env:PATIENCE, 10}
+          patience: ${oc.env:PATIENCE, 20}
           monitor: *MONITOR_METRIC
           mode: *MONITOR_METRIC_MODE
       - class_path: eva.callbacks.ClassificationEmbeddingsWriter
@@ -39,7 +39,7 @@ trainer:
           backbone:
             class_path: eva.vision.models.ModelFromRegistry
             init_args:
-              model_name: ${oc.env:MODEL_NAME, universal/vit_small_patch16_224_dino}
+              model_name: ${oc.env:MODEL_NAME, universal/}
               model_extra_kwargs: ${oc.env:MODEL_EXTRA_KWARGS, null}
           overwrite: false
     logger:

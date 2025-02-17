@@ -2,7 +2,7 @@
 trainer:
   class_path: eva.Trainer
   init_args:
-    n_runs: &N_RUNS ${oc.env:N_RUNS, 5}
+    n_runs: &N_RUNS ${oc.env:N_RUNS, 20}
     default_root_dir: &OUTPUT_ROOT ${oc.env:OUTPUT_ROOT, logs/${oc.env:MODEL_NAME, dino_vits16}/offline/panda}
     max_epochs: &MAX_EPOCHS ${oc.env:MAX_EPOCHS, 49}
     checkpoint_type: ${oc.env:CHECKPOINT_TYPE, best}
@@ -24,7 +24,7 @@ trainer:
       - class_path: lightning.pytorch.callbacks.EarlyStopping
         init_args:
           min_delta: 0
-          patience: ${oc.env:PATIENCE, 8}
+          patience: ${oc.env:PATIENCE, 10}
           monitor: *MONITOR_METRIC
           mode: *MONITOR_METRIC_MODE
       - class_path: eva.callbacks.ClassificationEmbeddingsWriter
