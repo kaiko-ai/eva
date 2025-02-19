@@ -2,6 +2,6 @@
 
 from eva.language.models import networks, wrappers
 from eva.language.models.networks import TextModule
-from eva.language.models.wrappers import HuggingFaceTextModel
+from eva.language.models.wrappers import HuggingFaceTextModel, LiteLLMTextModel
 
-__all__ = ["networks", "wrappers", "TextModule", "HuggingFaceTextModel"]
+__all__ = ["networks", "wrappers", "TextModule", "HuggingFaceTextModel", "LiteLLMTextModel"]
