@@ -8,8 +8,7 @@ DUMMY_RESPONSE = {"choices": [{"message": {"content": "Test response"}}]}
 
 
 def test_generate(model_instance):
-    """Test that the generate method returns the expected dummy response.
-    """
+    """Test that the generate method returns the expected dummy response."""
     prompt = "Hello, world!"
     result = model_instance.generate(prompt)
     assert result == "Test response"
@@ -17,9 +16,7 @@ def test_generate(model_instance):
 
 @pytest.fixture
 def fake_completion(monkeypatch):
-    """Fixture to override the imported `completion` function in your wrapper module
-    and set a dummy OPENAI_API_KEY.
-    """
+    """Fixture to override `completion` function and set a dummy OPENAI_API_KEY."""
 
     def _fake_completion(model, messages, **kwargs):
         assert isinstance(messages, list)
@@ -35,6 +32,7 @@ def fake_completion(monkeypatch):
 @pytest.fixture
 def model_instance(fake_completion):
     """Fixture to instantiate the LiteLLMTextModel with a valid model name.
+
     Using a valid model name (like 'openai/gpt-3.5-turbo') helps pass the provider lookup.
     """
     return LiteLLMTextModel("openai/gpt-3.5-turbo", model_kwargs={"temperature": 0.7})
