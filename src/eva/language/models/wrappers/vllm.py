@@ -1,10 +1,8 @@
 """LLM wrapper for vLLM models."""
 
 from typing import Any, Dict
-import time
 
 from typing_extensions import override
-
 from vllm import LLM, SamplingParams
 from vllm.inputs import TokensPrompt
 
@@ -12,8 +10,7 @@ from eva.core.models.wrappers import base
 
 
 class VLLMTextModel(base.BaseModel):
-    """
-    Wrapper class for using vLLM for text generation.
+    """Wrapper class for using vLLM for text generation.
 
     This wrapper loads a vLLM model, sets up the tokenizer and sampling parameters,
     and uses a chat template to convert a plain string prompt into the proper input
@@ -25,8 +22,7 @@ class VLLMTextModel(base.BaseModel):
         model_name_or_path: str,
         model_kwargs: Dict[str, Any] | None = None,
     ) -> None:
-        """
-        Initializes the vLLM model wrapper.
+        """Initializes the vLLM model wrapper.
 
         Args:
             model_name_or_path: The model identifier (e.g., a Hugging Face repo ID or local path).
@@ -40,15 +36,12 @@ class VLLMTextModel(base.BaseModel):
 
     @override
     def load_model(self) -> None:
-        """
-        Loads the vLLM model and sets up the tokenizer and sampling parameters.
-        """
+        """Loads the vLLM model and sets up the tokenizer and sampling parameters."""
         self._model = LLM(model=self._model_name_or_path, **self._model_kwargs)
         self._tokenizer = self._model.get_tokenizer()
 
     def _apply_chat_template(self, prompt: str) -> TokensPrompt:
-        """
-        Converts a prompt string into a TokensPrompt using the tokenizer's chat template.
+        """Converts a prompt string into a TokensPrompt using the tokenizer's chat template.
 
         Args:
             prompt: The input prompt as a string.
@@ -75,8 +68,7 @@ class VLLMTextModel(base.BaseModel):
         return [TokensPrompt(prompt_token_ids=encoded_messages[0])]
 
     def generate(self, prompt: str, **generate_kwargs) -> str:
-        """
-        Generates text for the given prompt using the vLLM model.
+        """Generates text for the given prompt using the vLLM model.
 
         Args:
             prompt: A string prompt for generation.
