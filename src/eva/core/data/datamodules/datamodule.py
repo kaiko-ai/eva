@@ -147,7 +147,7 @@ class DataModule(pl.LightningDataModule):
                 collate_fn = getattr(module, function_name)
                 dataloader_kwargs["collate_fn"] = collate_fn
             except (ImportError, AttributeError) as e:
-                raise ImportError(f"Failed to import collate_fn {collate_fn}: {str(e)}")
+                raise ImportError(f"Failed to import collate_fn {collate_fn}: {str(e)}") from e
 
         dataloaders = []
         for dataset in datasets:
