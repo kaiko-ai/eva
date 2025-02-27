@@ -95,6 +95,7 @@ data:
             transforms:
               class_path: eva.vision.data.transforms.common.ResizeAndCrop
               init_args:
+                size: ${oc.env:RESIZE_DIM, 224}  
                 mean: ${oc.env:NORMALIZE_MEAN, [0.485, 0.456, 0.406]}
                 std: ${oc.env:NORMALIZE_STD, [0.229, 0.224, 0.225]}
         - class_path: eva.vision.datasets.CRC

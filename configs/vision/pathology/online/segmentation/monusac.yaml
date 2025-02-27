@@ -115,7 +115,7 @@ data:
               transforms:
                 - class_path: torchvision.transforms.v2.RandomResizedCrop
                   init_args:
-                    size: ${oc.env:IMAGE_SIZE, 224}                    
+                    size: ${oc.env:RESIZE_DIM, 224}                    
                 - class_path: torchvision.transforms.v2.ToDtype
                   init_args:
                     dtype: torch.float32
