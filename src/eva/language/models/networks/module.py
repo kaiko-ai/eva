@@ -3,6 +3,7 @@
 from typing import Any, List
 
 from lightning.pytorch.utilities.types import STEP_OUTPUT
+from loguru import logger
 from torch import nn
 from typing_extensions import override
 
@@ -77,7 +78,9 @@ class TextModule(module.ModelModule):
             Dictionary with predictions, ground truth, and evaluation metrics.
         """
         data, targets, metadata = INPUT_BATCH(*batch)
-        message = self.prompt + str(data) + "\nAnswer: "
-        predictions = self(message)
+        messages = [self.prompt + "\n" + d + "\nAnswer: " for d in data]
+        predictions = self(messages)
+        logger.info(f"Predictions: {predictions}")
+        logger.info(f"Targets: {targets}")
         # TODO: Add support for evaluation metrics
         return {"predictions": predictions, "targets": targets, "metadata": metadata}

@@ -18,11 +18,11 @@ model:
   init_args:
     prompt: "Respond to the question with a single digit only: 0 for no, 1 for yes, or 2 for maybe. Do not include any words, explanations, or additional characters—only the digit."
     model:
-      class_path: eva.language.models.LiteLLMTextModel #HuggingFaceTextModel
+      class_path: eva.language.models.HuggingFaceTextModel #LiteLLMTextModel #
       init_args:
-        model_name_or_path: "claude-3-5-sonnet-20240620" #"meta-llama/Llama-3.2-1B"
+        model_name_or_path: "meta-llama/Llama-3.2-1B" #"claude-3-sonnet-20240229" #
         model_kwargs:
-          temperature: 0.0
+          temperature: 0.01 # should be strictly positive for HF models
     # TODO: implement metrics for language models
     # metrics:
     #   common:
@@ -42,6 +42,7 @@ data:
           download: true
     dataloaders:
       val:
-        batch_size: &BATCH_SIZE ${oc.env:BATCH_SIZE, 1}
+        batch_size: &BATCH_SIZE ${oc.env:BATCH_SIZE, 8}
         num_workers: &N_DATA_WORKERS ${oc.env:N_DATA_WORKERS, 1}
         shuffle: false
+        collate_fn: eva.core.data.dataloaders.text_collate_fn

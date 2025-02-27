@@ -41,15 +41,18 @@ class HuggingFaceTextModel(base.BaseModel):
             task=self._task, model=self._model_name_or_path, **self._model_kwargs
         )
 
-    def generate(self, prompt: str, **generate_kwargs) -> Any:
+    def generate(self, prompts: list[str], **generate_kwargs) -> Any:
         """Generates text using the pipeline.
 
         Args:
-            prompt: The input prompt for the model.
-            generate_kwargs: Additional generation parameters (e.g., max_length).
+            prompts: The input prompts for the model.
+            generate_kwargs: Additional generation parameters (temperature).
 
         Returns:
             The generated text as a string.
         """
-        output = self._pipeline(prompt, return_full_text=False, **generate_kwargs)
-        return output[0]["generated_text"] if isinstance(output, list) else output
+        outputs = self._pipeline(prompts, return_full_text=False, **generate_kwargs)
+        return [
+            output[0]["generated_text"] if isinstance(output, list) else output
+            for output in outputs
+        ]

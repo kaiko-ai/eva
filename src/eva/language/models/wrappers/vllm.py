@@ -12,9 +12,10 @@ from eva.core.models.wrappers import base
 class VLLMTextModel(base.BaseModel):
     """Wrapper class for using vLLM for text generation.
 
-    This wrapper loads a vLLM model, sets up the tokenizer and sampling parameters,
-    and uses a chat template to convert a plain string prompt into the proper input
-    format for vLLM generation. It then returns the generated text response.
+    This wrapper loads a vLLM model, sets up the tokenizer and sampling
+    parameters, and uses a chat template to convert a plain string prompt
+    into the proper input format for vLLM generation. It then returns the
+    generated text response.
     """
 
     def __init__(
@@ -25,9 +26,10 @@ class VLLMTextModel(base.BaseModel):
         """Initializes the vLLM model wrapper.
 
         Args:
-            model_name_or_path: The model identifier (e.g., a Hugging Face repo ID or local path).
-            model_kwargs: Additional keyword arguments for initializing the vLLM model.
-            generation_kwargs: Additional keyword arguments for the sampling parameters.
+            model_name_or_path: The model identifier (e.g., a Hugging Face
+             repo ID or local path).
+            model_kwargs: Additional keyword arguments for initializing the
+             vLLM model.
         """
         super().__init__()
         self._model_name_or_path = model_name_or_path
@@ -36,12 +38,12 @@ class VLLMTextModel(base.BaseModel):
 
     @override
     def load_model(self) -> None:
-        """Loads the vLLM model and sets up the tokenizer and sampling parameters."""
+        """Loads the vLLM model and sets up the tokenizer."""
         self._model = LLM(model=self._model_name_or_path, **self._model_kwargs)
         self._tokenizer = self._model.get_tokenizer()
 
-    def _apply_chat_template(self, prompt: str) -> TokensPrompt:
-        """Converts a prompt string into a TokensPrompt using the tokenizer's chat template.
+    def _apply_chat_template(self, prompt: str):
+        """Converts a prompt string into a TokensPrompt using chat template.
 
         Args:
             prompt: The input prompt as a string.
@@ -67,16 +69,15 @@ class VLLMTextModel(base.BaseModel):
             encoded_messages[0] = encoded_messages[0][1:]
         return [TokensPrompt(prompt_token_ids=encoded_messages[0])]
 
-    def generate(self, prompt: str, **generate_kwargs) -> str:
+    def generate(self, prompt: str) -> str:
         """Generates text for the given prompt using the vLLM model.
 
         Args:
             prompt: A string prompt for generation.
-            generate_kwargs: Additional parameters for generation (e.g., max_tokens).
 
         Returns:
             The generated text response.
         """
         tokens_prompt = self._apply_chat_template(prompt)
-        outputs = self._model.generate(tokens_prompt, SamplingParams(**generate_kwargs))
+        outputs = self._model.generate(tokens_prompt, SamplingParams(**self._model_kwargs))
         return outputs[0].outputs[0].text
