@@ -27,7 +27,7 @@ trainer:
       - class_path: lightning.pytorch.callbacks.EarlyStopping
         init_args:
           min_delta: 0
-          patience: ${oc.env:PATIENCE, 34}
+          patience: ${oc.env:PATIENCE, 57}  # 2000 / 7 * 0.2 = 57 (7 steps per epoch)
           monitor: *MONITOR_METRIC
           mode: *MONITOR_METRIC_MODE
     logger:
