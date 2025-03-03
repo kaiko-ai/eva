@@ -71,6 +71,7 @@ class PubMedQA(base.TextClassification):
             split=split,
             streaming=False,
             cache_dir=self._root if (not is_local and self._root) else None,
+            trust_remote_code=True,
         )
         if not isinstance(raw_dataset, Dataset):
             raise TypeError(f"Expected a `Dataset`, but got {type(raw_dataset)}")
