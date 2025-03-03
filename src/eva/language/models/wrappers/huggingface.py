@@ -38,7 +38,9 @@ class HuggingFaceTextModel(base.BaseModel):
     def load_model(self) -> None:
         """Loads the model as a Hugging Face pipeline."""
         self._pipeline = transformers.pipeline(
-            task=self._task, model=self._model_name_or_path, **self._model_kwargs
+            task=self._task,
+            model=self._model_name_or_path,
+            trust_remote_code=True, **self._model_kwargs
         )
 
     def generate(self, prompts: list[str], **generate_kwargs) -> Any:
