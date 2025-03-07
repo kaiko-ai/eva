@@ -10,6 +10,7 @@ from eva.core.data import datasets
 from eva.core.data.datasets.typings import DataSample
 from eva.core.data.samplers.sampler import SamplerWithDataSource
 from eva.core.utils.progress_bar import tqdm
+from loguru import logger
 
 
 class BalancedSampler(SamplerWithDataSource[int]):
@@ -44,18 +45,7 @@ class BalancedSampler(SamplerWithDataSource[int]):
         Returns:
             Iterator yielding dataset indices.
         """
-        indices = []
-
-        for class_idx in self._class_indices:
-            class_indices = self._class_indices[class_idx]
-            sampled_indices = self._random_generator.choice(
-                class_indices, size=self._num_samples, replace=self._replacement
-            ).tolist()
-            indices.extend(sampled_indices)
-
-        self._random_generator.shuffle(indices)
-
-        return iter(indices)
+        return iter(self._indices)
 
     @override
     def set_dataset(self, data_source: datasets.MapDataset):
@@ -78,7 +68,10 @@ class BalancedSampler(SamplerWithDataSource[int]):
         for idx in tqdm(
             range(len(self.data_source)), desc="Fetching class indices for balanced sampler"
         ):
-            _, target, _ = DataSample(*self.data_source[idx])
+            try:
+                target = self.data_source._load_target(idx)
+            except:
+                _, target, _ = DataSample(*self.data_source[idx])
             if target is None:
                 raise ValueError("The dataset must return non-empty targets.")
             if target.numel() != 1:
@@ -94,3 +87,14 @@ class BalancedSampler(SamplerWithDataSource[int]):
                         f"Class {class_idx} has only {len(indices)} samples, "
                         f"which is less than the required {self._num_samples} samples."
                     )
+
+        # sample a new sequence
+        self._indices = []
+        for class_idx in self._class_indices:
+            class_indices = self._class_indices[class_idx]
+            sampled_indices = self._random_generator.choice(
+                class_indices, size=self._num_samples, replace=self._replacement
+            ).tolist()
+            self._indices.extend(sampled_indices)
+        self._random_generator.shuffle(self._indices)
+        logger.info(f"Sampled indices: {self._indices}")
