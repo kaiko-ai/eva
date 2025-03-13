@@ -40,8 +40,8 @@ class VLLMTextModel(base.BaseModel):
         """
         super().__init__()
         self._model_name_or_path = model_name_or_path
-        self._model_kwargs = model_kwargs
-        self._sampling_params = SamplingParams(**generation_kwargs)
+        self._model_kwargs = model_kwargs or {}
+        self._generation_kwargs = generation_kwargs or {}
         self.load_model()
 
     @override
@@ -92,5 +92,5 @@ class VLLMTextModel(base.BaseModel):
             The generated text response.
         """
         prompt_tokens = self._apply_chat_template(prompts)
-        outputs = self._model.generate(prompt_tokens, self._sampling_params)
+        outputs = self._model.generate(prompt_tokens, SamplingParams(**self._generation_kwargs))
         return [output[0].outputs[0].text for output in outputs]
