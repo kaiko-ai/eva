@@ -4,6 +4,8 @@ from typing import Any, Dict, List
 
 from loguru import logger
 from typing_extensions import override
+from vllm import LLM, SamplingParams
+from vllm.inputs import TokensPrompt
 
 from eva.core.models.wrappers import base
 
@@ -36,8 +38,6 @@ class VLLMTextModel(base.BaseModel):
                 [vllm.SamplingParams](https://github.com/vllm-project/vllm/blob/main/vllm/sampling_params.py).
 
         """
-        from vllm import LLM  # pants: no-infer-dep; # type: ignore
-
         super().__init__()
         self._model_name_or_path = model_name_or_path
         self._model_kwargs = model_kwargs or {}
@@ -66,8 +66,6 @@ class VLLMTextModel(base.BaseModel):
         Raises:
             ValueError: If the tokenizer does not have a chat template.
         """
-        from vllm.inputs import TokensPrompt  # pants: no-infer-dep; # type: ignore
-
         if self.tokenizer.chat_template is None:
             raise ValueError("Tokenizer does not have a chat template.")
         encoded_messages = self.tokenizer.apply_chat_template(
