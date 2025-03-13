@@ -42,13 +42,14 @@ class VLLMTextModel(base.BaseModel):
         self._model_name_or_path = model_name_or_path
         self._model_kwargs = model_kwargs or {}
         self._generation_kwargs = generation_kwargs or {}
-        self.load_model()
+        self._model = LLM(model=self._model_name_or_path, **self._model_kwargs)
+        self._tokenizer = self._model.get_tokenizer()
 
     @override
     def load_model(self) -> None:
-        """Loads the vLLM model and sets up the tokenizer."""
-        self._model = LLM(model=self._model_name_or_path, **self._model_kwargs)
-        self._tokenizer = self._model.get_tokenizer()
+        """Note: The vLLM model needs to be initialized in __init__
+        to avoid pickling issues in Ray. """
+        pass
 
     def _apply_chat_template(
         self, messages: list[list[dict[str, str]]]
