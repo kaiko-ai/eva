@@ -40,7 +40,8 @@ class HuggingFaceTextModel(base.BaseModel):
         self._pipeline = transformers.pipeline(
             task=self._task,
             model=self._model_name_or_path,
-            trust_remote_code=True, **self._model_kwargs
+            trust_remote_code=True,
+            **self._model_kwargs,
         )
 
     def generate(self, prompts: list[str], **generate_kwargs) -> Any:

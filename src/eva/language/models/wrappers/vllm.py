@@ -2,6 +2,7 @@
 
 from typing import Any, Dict, List
 
+from loguru import logger
 from typing_extensions import override
 from vllm import LLM, SamplingParams
 from vllm.inputs import TokensPrompt
@@ -80,7 +81,6 @@ class VLLMTextModel(base.BaseModel):
         return [
             TokensPrompt(prompt_token_ids=encoded_message) for encoded_message in encoded_messages
         ]
-
 
     def generate(self, prompts: List[str]) -> List[str]:
         """Generates text for the given prompt using the vLLM model.
