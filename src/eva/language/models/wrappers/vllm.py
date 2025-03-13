@@ -1,6 +1,6 @@
 """LLM wrapper for vLLM models."""
 
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 from typing_extensions import override
 from vllm import LLM, SamplingParams
@@ -22,18 +22,25 @@ class VLLMTextModel(base.BaseModel):
         self,
         model_name_or_path: str,
         model_kwargs: Dict[str, Any] | None = None,
+        generation_kwargs: Dict[str, Any] | None = None,
     ) -> None:
         """Initializes the vLLM model wrapper.
 
         Args:
             model_name_or_path: The model identifier (e.g., a Hugging Face
              repo ID or local path).
-            model_kwargs: Additional keyword arguments for initializing the
-             vLLM model.
+            model_kwargs: Arguments required to initialize the vLLM model,
+                see https://github.com/vllm-project/vllm/blob/main/vllm/entrypoints/llm.py
+                for more information.
+            generation_kwargs: Arguments required to generate the output,
+                need to align with the arguments of
+                [vllm.SamplingParams](https://github.com/vllm-project/vllm/blob/main/vllm/sampling_params.py).
+
         """
         super().__init__()
         self._model_name_or_path = model_name_or_path
-        self._model_kwargs = model_kwargs or {}
+        self._model_kwargs = model_kwargs
+        self._sampling_params = SamplingParams(**generation_kwargs)
         self.load_model()
 
     @override
@@ -42,34 +49,40 @@ class VLLMTextModel(base.BaseModel):
         self._model = LLM(model=self._model_name_or_path, **self._model_kwargs)
         self._tokenizer = self._model.get_tokenizer()
 
-    def _apply_chat_template(self, prompt: str):
-        """Converts a prompt string into a TokensPrompt using chat template.
+    def _apply_chat_template(
+        self, messages: list[list[dict[str, str]]]
+    ) -> Any:  # Should be vllm.inputs.TokensPrompt
+        """Apply chat template to the messages.
 
         Args:
-            prompt: The input prompt as a string.
+            messages: List of messages.
 
         Returns:
-            A TokensPrompt object ready for generation.
+            List of encoded messages.
 
         Raises:
-            ValueError: If the tokenizer does not support a chat template.
+            ValueError: If the tokenizer does not have a chat template.
         """
-        messages = [{"role": "user", "content": prompt}]
-        if self._tokenizer.chat_template is None:
+        if self.tokenizer.chat_template is None:
             raise ValueError("Tokenizer does not have a chat template.")
-        encoded_messages = self._tokenizer.apply_chat_template(
-            [messages],
+        encoded_messages = self.tokenizer.apply_chat_template(
+            messages,
             tokenize=True,
             add_generation_prompt=True,
         )
-        if len(encoded_messages[0]) >= 2 and (
-            encoded_messages[0][0] == self._tokenizer.bos_token_id
-            and encoded_messages[0][1] == self._tokenizer.bos_token_id
-        ):
-            encoded_messages[0] = encoded_messages[0][1:]
-        return [TokensPrompt(prompt_token_ids=encoded_messages[0])]
 
-    def generate(self, prompt: str) -> str:
+        # Check for double start token
+        wrong_sequence = [self.tokenizer.bos_token_id] * 2
+        if encoded_messages[: len(wrong_sequence)] == wrong_sequence:
+            logger.warning("Found a double start token in the input_ids. Removing it.")
+            encoded_messages.pop(0)
+
+        return [
+            TokensPrompt(prompt_token_ids=encoded_message) for encoded_message in encoded_messages
+        ]
+
+
+    def generate(self, prompts: List[str]) -> List[str]:
         """Generates text for the given prompt using the vLLM model.
 
         Args:
@@ -78,6 +91,6 @@ class VLLMTextModel(base.BaseModel):
         Returns:
             The generated text response.
         """
-        tokens_prompt = self._apply_chat_template(prompt)
-        outputs = self._model.generate(tokens_prompt, SamplingParams(**self._model_kwargs))
-        return outputs[0].outputs[0].text
+        prompt_tokens = self._apply_chat_template(prompts)
+        outputs = self._model.generate(prompt_tokens, self._sampling_params)
+        return [output[0].outputs[0].text for output in outputs]
