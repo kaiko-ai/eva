@@ -48,7 +48,8 @@ class VLLMTextModel(base.BaseModel):
     @override
     def load_model(self) -> None:
         """Note: The vLLM model needs to be initialized in __init__
-        to avoid pickling issues in Ray. """
+        to avoid pickling issues in Ray.
+        """
         pass
 
     def _apply_chat_template(
