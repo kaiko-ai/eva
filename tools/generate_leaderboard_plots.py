@@ -29,26 +29,34 @@ _tasks_to_metric = {
 }
 _fm_name_map = {
     "paige_virchow2": "Virchow2 - DINOv2 ViT-H14 | 3.1M slides",
-    "dino_vits16_lunit": "Lunit - DINO ViT-S16 | TCGA",
+    "lunit_vits16": "Lunit - DINO ViT-S16 | TCGA",
     "owkin_phikon": "Phikon - iBOT ViT-B16 | TCGA",
     "owkin_phikon_v2": "Phikon-v2 - DINOv2 ViT-L16 | PANCAN-XL",
-    "dino_vitl16_uni": "UNI - DINOv2 ViT-L16 | Mass-100k",
+    "mahmood_uni": "UNI - DINOv2 ViT-L16 | Mass-100k",
+    "mahmood_uni2_h": "UNI2-h - DINOv2 ViT-H14 | 250k slides",
     "bioptimus_h_optimus_0": "H-optimus-0 - ViT-G14 | 500k slides",
     "prov_gigapath": "Prov-GigaPath - DINOv2 ViT-G14 | 181k slides",
     "histai_hibou_l": "hibou-L - DINOv2 ViT-B14 | 1M slides",
-    "dino_vits16_kaiko": "kaiko.ai - DINO ViT-S16 | TCGA",
-    "dino_vits8_kaiko": "kaiko.ai - DINO ViT-S8 | TCGA",
-    "dino_vitb16_kaiko": "kaiko.ai - DINO ViT-B16 | TCGA",
-    "dino_vitb8_kaiko": "kaiko.ai - DINO ViT-B8 | TCGA",
-    "dino_vitl14_kaiko": "kaiko.ai - DINOv2 ViT-L14 | TCGA",
+    "kaiko_vits16": "kaiko.ai - DINO ViT-S16 | TCGA",
+    "kaiko_vits8": "kaiko.ai - DINO ViT-S8 | TCGA",
+    "kaiko_vitb16": "kaiko.ai - DINO ViT-B16 | TCGA",
+    "kaiko_vitb8": "kaiko.ai - DINO ViT-B8 | TCGA",
+    "kaiko_vitl14": "kaiko.ai - DINOv2 ViT-L14 | TCGA",
 }
 _tasks_names_map = {
     "bach": "BACH",
+    "bracs": "BRACS",
+    "bracs/test": "BRACS/test",
+    "breakhis": "BreakHis",
+    "gleason_arvaniti": "Gleason",
     "crc": "CRC",
     "mhist": "MHIST",
     "patch_camelyon": "PCam",
+    "patch_camelyon/test": "PCam/test",
     "camelyon16_small": "Cam16Small",
+    "camelyon16_small/test": "Cam16Small/test",
     "panda_small": "PANDASmall",
+    "panda_small/test": "PANDASmall/test",
     "consep": "CoNSeP",
     "monusac": "MoNuSAC",
 }
@@ -142,7 +150,7 @@ def plot_leaderboard(df: pd.DataFrame, output_file: str = "docs/images/leaderboa
     scaled_df = (df - df.min(axis=0)) / (df.max(axis=0) - df.min(axis=0))
 
     # create plot:
-    fig, ax = plt.subplots(figsize=(8, 5))
+    fig, ax = plt.subplots(figsize=(12, 6))
     sns.heatmap(scaled_df, annot=df, cmap=cmap, ax=ax, cbar=False, fmt=".3f")
     plt.tick_params(
         axis="x",
@@ -221,9 +229,8 @@ def plot_startplot(df: pd.DataFrame, output_file: str = "docs/images/starplot.pn
 
 
 def main():
-    # get log_dir from arg parser
     parser = argparse.ArgumentParser()
-    parser.add_argument("--logs_dir", type=str, default="logs")
+    parser.add_argument("--logs_dir", type=str, default=None)
     parser.add_argument("--output_leaderboard", type=str, default="docs/images/leaderboard.svg")
     parser.add_argument("--output_starplot", type=str, default="docs/images/starplot.png")
     args = parser.parse_args()
