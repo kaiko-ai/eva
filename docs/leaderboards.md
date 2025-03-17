@@ -5,7 +5,7 @@ hide:
 
 # Leaderboards
 
-We evaluated the following FMs on the 6 supported WSI-classification tasks. We report *Balanced Accuracy* for binary & multiclass tasks and generalized Dice score (no background) for segmentation tasks. The score shows the average performance over 5 runs. Note the leaderboard orders from best to worst according to the average performance across all tasks, excluding BACH (not comparable due to much larger patch size).
+We evaluated the following FMs on the 6 supported WSI-classification tasks. We report *Balanced Accuracy* for binary & multiclass tasks and generalized Dice score (no background) for segmentation tasks. The score shows the average performance over 5 runs for patch-level classification & segmentation tasks, and 20 runs for slide-level (due to higher standard deviation among runs). Note the leaderboard orders from best to worst according to the average performance across all tasks, excluding BACH (not comparable due to much larger patch size).
 
 <br/>
 
@@ -40,19 +40,16 @@ We selected this approach to prioritize reliable, robust and fair FM-evaluation 
 | **Output activation function** | none                      | none                      | none                      |
 | **Number of steps**            | 12,500                    | 12,500 (1)                | 2,000                     |
 | **Base batch size**            | 256                       | 32                        | 64                        |
-| **Base learning rate**         | 0.0003                    | 0.001                     | 0.002                    |
-| **Early stopping**             | 5% * [Max epochs]         | 10% * [Max epochs] (2)    | 10% * [Max epochs] (2)    |
+| **Base learning rate**         | 0.0003                    | 0.001                     | 0.002                     |
+| **Early stopping**             | 20% * [Max epochs]        | 20% * [Max epochs]        | 20% * [Max epochs]        |
 | **Optimizer**                  | AdamW                     | AdamW                     | AdamW                     |
 | **Momentum**                   | 0.9                       | n/a                       | n/a                       |
 | **Weight Decay**               | 0.0                       | n/a                       | n/a                       |
 | **betas**                      | n/a                       | [0.9, 0.999]              | [0.9, 0.999]              |
-| **LR Schedule**                | Cosine without warmup     | Cosine without warmup     | PolynomialLR              |
 | **Loss**                       | Cross entropy             | Cross entropy             | Dice                      |
-| **number of patches per slide**| 1                         | dataset specific (3)      | dataset specific (3)      |
+| **number of patches per slide**| 1                         | dataset specific (2)      | dataset specific (2)      |
 
 
 (1) Upper cap at a maximum of 100 epochs.
 
-(2) Lower cap at a minimum of 8 epochs.
-
-(3) Number of patches per slide depends on task and slide size. E.g. for `PANDASmall` and `Camelyon16Small` we use a max of 200 and 1000 random patches per slide respectively.
+(2) Number of patches per slide depends on task and slide size. E.g. for `PANDASmall` and `Camelyon16Small` we use a max of 200 and 1000 random patches per slide respectively.
