@@ -13,10 +13,6 @@ We evaluated the following FMs on the 6 supported WSI-classification tasks. We r
 
 <br/>
 
-![Screenshot](images/starplot.png)
-
-<br/>
-
 </center>
 
 The runs use the default setup described in the section below.
