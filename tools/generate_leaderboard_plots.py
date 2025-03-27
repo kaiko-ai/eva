@@ -21,7 +21,6 @@ from typing import Optional
 
 _tasks_to_metric = {
     "bach": "MulticlassAccuracy",
-    "bracs": "MulticlassAccuracy",
     "breakhis": "MulticlassAccuracy",
     "crc": "MulticlassAccuracy",
     "gleason_arvaniti": "MulticlassAccuracy",
@@ -50,7 +49,6 @@ _fm_name_map = {
 }
 _tasks_names_map = {
     "bach": "BACH",
-    "bracs": "BRACS",
     "breakhis": "BreakHis",
     "crc": "CRC",
     "gleason_arvaniti": "Gleason",
