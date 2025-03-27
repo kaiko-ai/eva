@@ -98,12 +98,12 @@ class EmbeddingsDataset(base.Dataset, Generic[TargetType]):
         Returns:
             A data sample and its target.
         """
-        embeddings = self._load_embeddings(index)
-        target = self._load_target(index)
+        embeddings = self.load_embeddings(index)
+        target = self.load_target(index)
         return self._apply_transforms(embeddings, target)
 
     @abc.abstractmethod
-    def _load_embeddings(self, index: int) -> torch.Tensor:
+    def load_embeddings(self, index: int) -> torch.Tensor:
         """Returns the `index`'th embedding sample.
 
         Args:
@@ -114,7 +114,7 @@ class EmbeddingsDataset(base.Dataset, Generic[TargetType]):
         """
 
     @abc.abstractmethod
-    def _load_target(self, index: int) -> TargetType:
+    def load_target(self, index: int) -> TargetType:
         """Returns the `index`'th target sample.
 
         Args:
