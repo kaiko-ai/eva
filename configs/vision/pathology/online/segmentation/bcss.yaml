@@ -20,14 +20,14 @@ trainer:
       - class_path: lightning.pytorch.callbacks.ModelCheckpoint
         init_args:
           filename: best
-          save_last: true
+          save_last: ${oc.env:SAVE_LAST, false}
           save_top_k: 1
           monitor: &MONITOR_METRIC ${oc.env:MONITOR_METRIC, 'val/MonaiDiceScore'}
           mode: &MONITOR_METRIC_MODE ${oc.env:MONITOR_METRIC_MODE, max}
       - class_path: lightning.pytorch.callbacks.EarlyStopping
         init_args:
           min_delta: 0
-          patience: ${oc.env:PATIENCE, 100}
+          patience: ${oc.env:PATIENCE, 200}
           monitor: *MONITOR_METRIC
           mode: *MONITOR_METRIC_MODE
     logger:
