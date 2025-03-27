@@ -25,8 +25,8 @@ trainer:
           mode: &MONITOR_METRIC_MODE ${oc.env:MONITOR_METRIC_MODE, max}
       - class_path: lightning.pytorch.callbacks.EarlyStopping
         init_args:
-          min_delta: 0
-          patience: ${oc.env:PATIENCE, 100}
+          min_delta: 0.0001
+          patience: ${oc.env:PATIENCE, 125}
           monitor: *MONITOR_METRIC
           mode: *MONITOR_METRIC_MODE
       - class_path: eva.callbacks.ClassificationEmbeddingsWriter
