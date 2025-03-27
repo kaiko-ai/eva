@@ -4,13 +4,13 @@ from collections import defaultdict
 from typing import Dict, Iterator, List
 
 import numpy as np
+from loguru import logger
 from typing_extensions import override
 
 from eva.core.data import datasets
 from eva.core.data.datasets.typings import DataSample
 from eva.core.data.samplers.sampler import SamplerWithDataSource
 from eva.core.utils.progress_bar import tqdm
-from loguru import logger
 
 
 class BalancedSampler(SamplerWithDataSource[int]):
@@ -34,6 +34,7 @@ class BalancedSampler(SamplerWithDataSource[int]):
         self._replacement = replacement
         self._class_indices: Dict[int, List[int]] = defaultdict(list)
         self._random_generator = np.random.default_rng(seed)
+        self._indices: List[int] = []
 
     def __len__(self) -> int:
         """Returns the total number of samples."""
@@ -62,15 +63,12 @@ class BalancedSampler(SamplerWithDataSource[int]):
         self._make_indices()
 
     def _make_indices(self):
-        """Builds indices for each class in the dataset."""
+        """Samples the indices for each class in the dataset."""
         self._class_indices.clear()
-
-        for idx in tqdm(
-            range(len(self.data_source)), desc="Fetching class indices for balanced sampler"
-        ):
-            try:
-                target = self.data_source._load_target(idx)
-            except:
+        for idx in tqdm(range(len(self.data_source)), desc="Fetching class indices for sampler"):
+            if hasattr(self.data_source, "load_target"):
+                target = self.data_source.load_target(idx)  # type: ignore
+            else:
                 _, target, _ = DataSample(*self.data_source[idx])
             if target is None:
                 raise ValueError("The dataset must return non-empty targets.")
@@ -88,7 +86,6 @@ class BalancedSampler(SamplerWithDataSource[int]):
                         f"which is less than the required {self._num_samples} samples."
                     )
 
-        # sample a new sequence
         self._indices = []
         for class_idx in self._class_indices:
             class_indices = self._class_indices[class_idx]
@@ -97,4 +94,4 @@ class BalancedSampler(SamplerWithDataSource[int]):
             ).tolist()
             self._indices.extend(sampled_indices)
         self._random_generator.shuffle(self._indices)
-        logger.info(f"Sampled indices: {self._indices}")
+        logger.debug(f"Sampled indices: {self._indices}")

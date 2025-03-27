@@ -66,7 +66,7 @@ class MultiEmbeddingsClassificationDataset(embeddings_base.EmbeddingsDataset[tor
         self._multi_ids = list(self._data[self._column_mapping["multi_id"]].unique())
 
     @override
-    def _load_embeddings(self, index: int) -> torch.Tensor:
+    def load_embeddings(self, index: int) -> torch.Tensor:
         """Loads and stacks all embedding corresponding to the `index`'th multi_id."""
         # Get all embeddings for the given index (multi_id)
         multi_id = self._multi_ids[index]
@@ -89,7 +89,7 @@ class MultiEmbeddingsClassificationDataset(embeddings_base.EmbeddingsDataset[tor
         return embeddings
 
     @override
-    def _load_target(self, index: int) -> np.ndarray:
+    def load_target(self, index: int) -> np.ndarray:
         """Returns the target corresponding to the `index`'th multi_id.
 
         This method assumes that all the embeddings corresponding to the same `multi_id`
