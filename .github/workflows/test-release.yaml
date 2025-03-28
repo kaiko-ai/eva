@@ -74,8 +74,8 @@ jobs:
             * Documentation: ✅ Simulated (not actually deployed)
             
             *Automated test PR created by the Test Release workflow*
-          branch: test-bump-version
-          base: test-release-workflow
+          branch: test-bump-version-automated-pr
+          base: main
           labels: |
             test
             automated-pr
