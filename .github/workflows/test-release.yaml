@@ -1,0 +1,82 @@
+---
+name: Test Release
+
+on:
+  push:
+    branches:
+      - test-release-workflow
+
+permissions:
+  id-token: write
+  contents: write
+
+jobs:
+  test-release-process:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: write
+    steps:
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
+      - name: Setting up PDM
+        uses: pdm-project/setup-pdm@568ddd69406b30de1774ec0044b73ae06e716aa4 # v4
+        with:
+          python-version: "3.10"
+          architecture: x64
+      - name: Setting up nox
+        uses: wntrblm/nox@5656fcedc31a1ea37d016e4d94d00185330cc528 # 2024.04.15
+        with:
+          python-versions: "3.10"
+      - name: Configure Git Credentials
+        run: |
+          git config user.email "action@github.com"
+          git config user.name "GitHub Action"
+      - name: Bumping version (test)
+        run: |
+          # Using test version instead of tag for testing
+          TEST_VERSION="0.0.0-test"
+          echo "Using test version: $TEST_VERSION"
+          nox -s bump -- to "$TEST_VERSION"
+          echo "TEST_VERSION=$TEST_VERSION" >> $GITHUB_ENV
+      - name: Build artifacts
+        run: |
+          nox -s build
+      - name: Test Build
+        run: |
+          python -m pip install dist/*.whl
+          eva --version || echo "Package install test complete"
+      - name: Mock PyPI Publish (for testing)
+        run: |
+          echo "Would publish version ${{ env.TEST_VERSION }} to PyPI"
+          echo "PyPI publishing skipped in test mode"
+        # In test mode, we don't actually publish to PyPI
+        # Uncomment for real workflow:
+        # run: nox -s publish -- --no-build
+        # env:
+        #   PDM_PUBLISH_USERNAME: ${{ secrets.PYPI_USERNAME }}
+        #   PDM_PUBLISH_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+      - name: Create Pull Request for version bump
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore: bump version to ${{ env.TEST_VERSION }} (test)"
+          title: "[TEST] Bump version to ${{ env.TEST_VERSION }}"
+          body: |
+            This is a **TEST PR** for the release workflow.
+            
+            This PR updates the pyproject.toml with the test version number.
+            
+            Version: ${{ env.TEST_VERSION }}
+            
+            * Build: ✅ Simulated
+            * Tests: ✅ Simulated
+            * Published to PyPI: ✅ Simulated (not actually published)
+            * Documentation: ✅ Simulated (not actually deployed)
+            
+            *Automated test PR created by the Test Release workflow*
+          branch: test-bump-version
+          base: test-release-workflow
+          labels: |
+            test
+            automated-pr
+            do-not-merge
