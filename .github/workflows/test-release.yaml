@@ -4,7 +4,7 @@ name: Test Release
 on:
   push:
     branches:
-      - test-release-workflow
+      - test-release
 
 permissions:
   id-token: write
