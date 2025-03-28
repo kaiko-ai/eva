@@ -34,7 +34,7 @@ jobs:
       - name: Bumping version (test)
         run: |
           # Using test version instead of tag for testing
-          TEST_VERSION="0.0.0-test"
+          TEST_VERSION="0.0.0"
           echo "Using test version: $TEST_VERSION"
           nox -s bump -- to "$TEST_VERSION"
           echo "TEST_VERSION=$TEST_VERSION" >> $GITHUB_ENV
