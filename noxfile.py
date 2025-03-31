@@ -161,3 +161,63 @@ def build(session: nox.Session) -> None:
 def publish(session: nox.Session) -> None:
     """Builds and publishes the source and wheel distributions."""
     session.run("pdm", "publish")
+
+
+@nox.session
+def release(session: nox.Session) -> None:
+    """Prepares a release by bumping version, building, and creating a commit.
+    
+    Usage:
+      Make a patch release (0.2.0 -> 0.2.1):
+      >>> nox -s release -- patch
+      
+      Make a minor release (0.2.1 -> 0.3.0):
+      >>> nox -s release -- minor
+      
+      Make a major release (0.3.0 -> 1.0.0):
+      >>> nox -s release -- major
+      
+      Prepare a specific version:
+      >>> nox -s release -- to 1.2.3
+    """
+    if not session.posargs:
+        session.error("You must specify a release type: patch, minor, major, or 'to X.Y.Z'")
+    
+    bump_cmd = session.posargs
+    
+    # Run version command to see current version
+    session.run_always("pdm", "self", "add", "pdm-version", external=True)
+    session.run("pdm", "version", external=True)
+    
+    # Bump version according to args
+    session.run_always("pdm", "self", "add", "pdm-bump", external=True)
+    session.run("pdm", "bump", *bump_cmd, external=True)
+    
+    # Run lint and tests
+    session.run("nox", "-s", "lint", external=True)
+    session.run("nox", "-s", "check", external=True)
+    session.run("nox", "-s", "test", external=True)
+    
+    # Build artifacts
+    session.run("nox", "-s", "build", external=True)
+    
+    # Get the new version for commit message
+    import configparser
+    config = configparser.ConfigParser()
+    config.read("pyproject.toml", encoding="utf-8")
+    version = config["project"]["version"].strip('"')
+    
+    # Create git commit with version
+    session.run("git", "add", "pyproject.toml", external=True)
+    session.run("git", "commit", "-m", f"chore: bump version to {version}", external=True)
+    
+    # Create a tag
+    session.run("git", "tag", "-a", f"v{version}", "-m", f"Release v{version}", external=True)
+    
+    # Instructions for next steps
+    print(f"\n\nRelease v{version} prepared!\n")
+    print("Next steps:")
+    print("1. Review the changes: git show")
+    print("2. Push the commit: git push origin HEAD")
+    print("3. Push the tag to trigger the release: git push origin v{version}")
+    print("   Or run the Release workflow in GitHub Actions\n")

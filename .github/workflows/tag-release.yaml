@@ -1,0 +1,125 @@
+---
+name: Tag Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  id-token: write
+  contents: write
+  pull-requests: write
+
+jobs:
+  process-tag-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setting up PDM
+        uses: pdm-project/setup-pdm@v4
+        with:
+          python-version: "3.10"
+          architecture: x64
+
+      - name: Setting up nox
+        uses: wntrblm/nox@2024.04.15
+        with:
+          python-versions: "3.10"
+
+      - name: Configure Git
+        run: |
+          git config user.name "GitHub Action"
+          git config user.email "action@github.com"
+
+      - name: Extract version from tag
+        id: get_version
+        run: |
+          TAG_NAME="${GITHUB_REF#refs/tags/}"
+          VERSION="${TAG_NAME#v}"
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "Tag: $TAG_NAME, Version: $VERSION"
+
+      - name: Update version in pyproject.toml
+        run: |
+          VERSION="${{ steps.get_version.outputs.version }}"
+          # Replace version in pyproject.toml
+          sed -i "s/version = \"[0-9]*\.[0-9]*\.[0-9]*\"/version = \"$VERSION\"/" pyproject.toml
+          echo "Updated pyproject.toml with version $VERSION"
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          # Get previous tag
+          PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "none")
+          
+          if [ "$PREV_TAG" = "none" ]; then
+            # First release - get all commits
+            COMMITS=$(git log --pretty=format:"- %s (%h)" --no-merges)
+          else
+            # Get commits between tags
+            COMMITS=$(git log --pretty=format:"- %s (%h)" --no-merges $PREV_TAG..HEAD)
+          fi
+          
+          # Create changelog content
+          echo "# Changelog for version ${{ steps.get_version.outputs.version }}" > changelog.md
+          echo "" >> changelog.md
+          echo "## Changes" >> changelog.md
+          echo "$COMMITS" >> changelog.md
+          
+          # Save changelog for release body
+          CHANGELOG=$(cat changelog.md)
+          echo "changelog<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGELOG" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Build package
+        run: nox -s build
+
+      - name: Test built package
+        run: |
+          python -m pip install dist/*.whl
+          eva --version
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          body: ${{ steps.changelog.outputs.changelog }}
+          files: |
+            dist/*.tar.gz
+            dist/*.whl
+            LICENSE
+            README.md
+
+      - name: Build Release Docs
+        run: |
+          git fetch origin gh-pages:gh-pages
+          VERSION="${{ steps.get_version.outputs.version }}"
+          DOC_VERSION=${VERSION%.*}
+          nox -s docs -- deploy --alias-type=copy --update-aliases "$DOC_VERSION"
+          git push origin gh-pages
+
+      - name: Publish package to PyPI
+        run: nox -s publish -- --no-build
+        env:
+          PDM_PUBLISH_USERNAME: ${{ secrets.PYPI_USERNAME }}
+          PDM_PUBLISH_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+
+      - name: Create Pull Request for version bump
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore: bump version to ${{ steps.get_version.outputs.version }}"
+          title: "chore: bump version to ${{ steps.get_version.outputs.version }} [skip ci]"
+          body: |
+            This PR updates the pyproject.toml with the new version number.
+            
+            Version: v${{ steps.get_version.outputs.version }}
+            
+            *Automated PR created by the Tag-Release workflow*
+          branch: bump-version-${{ steps.get_version.outputs.version }}
+          base: main

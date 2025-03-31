@@ -97,6 +97,12 @@ includes = [
 
 [tool.pdm.scripts]
 bump = "nox -s bump"
+release = "nox -s release"
+lint = "nox -s lint"
+check = "nox -s check"
+test = "nox -s test"
+build = "nox -s build"
+docs = "nox -s docs -- serve"
 
 [tool.pdm.dev-dependencies]
 lint = [
