@@ -11,7 +11,11 @@ from eva.vision.utils.io import _utils
 
 
 def read_nifti(
-    path: str, slice_index: int | None = None, *, use_storage_dtype: bool = True
+    path: str,
+    slice_index: int | None = None,
+    *,
+    use_storage_dtype: bool = True,
+    target_orientation: str | None = None,
 ) -> npt.NDArray[Any]:
     """Reads and loads a NIfTI image from a file path.
 
@@ -20,6 +24,7 @@ def read_nifti(
         slice_index: Whether to read only a slice from the file.
         use_storage_dtype: Whether to cast the raw image
             array to the inferred type.
+        target_orientation: The target orientation to reorient the image. E.g. "LPS".
 
     Returns:
         The image as a numpy array (height, width, channels).
@@ -30,14 +35,37 @@ def read_nifti(
     """
     _utils.check_file(path)
     image_data: nib.Nifti1Image = nib.load(path)  # type: ignore
-    if slice_index is not None:
-        image_data = image_data.slicer[:, :, slice_index : slice_index + 1]
+    if target_orientation is not None:
+        image_data = reorient(image_data, target_orientation)
 
-    image_array = image_data.get_fdata()
+    if slice_index is not None:
+        image_array = np.expand_dims(image_data.dataobj[:, :, slice_index], -1)
+    else:
+        image_array = image_data.get_fdata()
+
     if use_storage_dtype:
         image_array = image_array.astype(image_data.get_data_dtype())
 
     return image_array
+
+
+def reorient(
+    nii: nib.Nifti1Image,
+    orientation: str | Tuple[str, str, str] = "LPS",
+) -> nib.Nifti1Image:
+    """Reorients a nifti image to specified orientation.
+
+    Args:
+        nii: The input nifti image.
+        orientation: The target orientation to reorient the image. E.g. "LPS" or ("L", "P", "S").
+    """
+    orig_ornt = nib.io_orientation(nii.affine)
+    targ_ornt = orientations.axcodes2ornt(orientation)
+    if np.all(orig_ornt == targ_ornt):
+        return nii
+    transform = orientations.ornt_transform(orig_ornt, targ_ornt)
+    reoriented_nii = nii.as_reoriented(transform)
+    return reoriented_nii
 
 
 def save_array_as_nifti(
