@@ -113,7 +113,8 @@ class LiTS(base.ImageSegmentation):
     def load_image(self, index: int) -> tv_tensors.Image:
         sample_index, slice_index = self._indices[index]
         volume_path = self._volume_files[sample_index]
-        image_array = io.read_nifti(volume_path, slice_index)
+        image_nii = io.read_nifti(volume_path, slice_index)
+        image_array = io.nifti_to_array(image_nii)
         if self._fix_orientation:
             image_array = self._orientation(image_array, sample_index)
         return tv_tensors.Image(image_array.transpose(2, 0, 1))
@@ -122,9 +123,10 @@ class LiTS(base.ImageSegmentation):
     def load_target(self, index: int) -> tv_tensors.Mask:
         sample_index, slice_index = self._indices[index]
         segmentation_path = self._segmentation_file(sample_index)
-        semantic_labels = io.read_nifti(segmentation_path, slice_index)
+        mask_nii = io.read_nifti(segmentation_path, slice_index)
+        mask_array = io.nifti_to_array(mask_nii)
         if self._fix_orientation:
-            semantic_labels = self._orientation(semantic_labels, sample_index)
+            semantic_labels = self._orientation(mask_array, sample_index)
         return tv_tensors.Mask(semantic_labels.squeeze(), dtype=torch.int64)  # type: ignore[reportCallIssue]
 
     def _orientation(self, array: npt.NDArray, sample_index: int) -> npt.NDArray:

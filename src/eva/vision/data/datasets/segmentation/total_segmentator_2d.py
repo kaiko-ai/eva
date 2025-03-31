@@ -209,7 +209,8 @@ class TotalSegmentator2D(base.ImageSegmentation):
     def load_image(self, index: int) -> tv_tensors.Image:
         sample_index, slice_index = self._indices[index]
         image_path = self._get_image_path(sample_index)
-        image_array = io.read_nifti(image_path, slice_index)
+        image_nii = io.read_nifti(image_path, slice_index)
+        image_array = io.nifti_to_array(image_nii)
         image_array = self._fix_orientation(image_array)
         return tv_tensors.Image(image_array.copy().transpose(2, 0, 1))
 
@@ -234,7 +235,8 @@ class TotalSegmentator2D(base.ImageSegmentation):
     def _load_semantic_label_mask(self, index: int) -> npt.NDArray[Any]:
         """Loads the segmentation mask from a semantic label NifTi file."""
         sample_index, slice_index = self._indices[index]
-        return io.read_nifti(self._get_optimized_masks_file(sample_index), slice_index)
+        nii = io.read_nifti(self._get_optimized_masks_file(sample_index), slice_index)
+        return io.nifti_to_array(nii)
 
     def _load_masks_as_semantic_label(
         self, sample_index: int, slice_index: int | None = None
@@ -248,7 +250,7 @@ class TotalSegmentator2D(base.ImageSegmentation):
         masks_dir = self._get_masks_dir(sample_index)
         classes = self._class_mappings.keys() if self._class_mappings else self.classes[1:]
         mask_paths = [os.path.join(masks_dir, f"{label}.nii.gz") for label in classes]
-        binary_masks = [io.read_nifti(path, slice_index) for path in mask_paths]
+        binary_masks = [io.nifti_to_array(io.read_nifti(path, slice_index)) for path in mask_paths]
 
         if self._class_mappings:
             mapped_binary_masks = [np.zeros_like(binary_masks[0], dtype=np.bool_)] * len(
