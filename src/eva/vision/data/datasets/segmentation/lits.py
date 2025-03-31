@@ -119,7 +119,7 @@ class LiTS(base.ImageSegmentation):
         return tv_tensors.Image(image_array.transpose(2, 0, 1))
 
     @override
-    def load_mask(self, index: int) -> tv_tensors.Mask:
+    def load_target(self, index: int) -> tv_tensors.Mask:
         sample_index, slice_index = self._indices[index]
         segmentation_path = self._segmentation_file(sample_index)
         semantic_labels = io.read_nifti(segmentation_path, slice_index)

@@ -137,7 +137,7 @@ class BCSS(wsi.MultiWsiDataset, base.ImageSegmentation):
         return functional.to_image(image_array)
 
     @override
-    def load_mask(self, index: int) -> tv_tensors.Mask:
+    def load_target(self, index: int) -> tv_tensors.Mask:
         path = self._get_mask_path(index)
         mask = io.read_image_as_array(path)
         mask_patch = _utils.extract_mask_patch(mask, self, index)

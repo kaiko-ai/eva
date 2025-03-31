@@ -214,11 +214,11 @@ class TotalSegmentator2D(base.ImageSegmentation):
         return tv_tensors.Image(image_array.copy().transpose(2, 0, 1))
 
     @override
-    def load_mask(self, index: int) -> tv_tensors.Mask:
+    def load_target(self, index: int) -> tv_tensors.Mask:
         if self._optimize_mask_loading:
             mask = self._load_semantic_label_mask(index)
         else:
-            mask = self._load_mask(index)
+            mask = self._load_target(index)
         mask = self._fix_orientation(mask)
         return tv_tensors.Mask(mask.copy().squeeze(), dtype=torch.int64)  # type: ignore
 
@@ -227,7 +227,7 @@ class TotalSegmentator2D(base.ImageSegmentation):
         _, slice_index = self._indices[index]
         return {"slice_index": slice_index}
 
-    def _load_mask(self, index: int) -> npt.NDArray[Any]:
+    def _load_target(self, index: int) -> npt.NDArray[Any]:
         sample_index, slice_index = self._indices[index]
         return self._load_masks_as_semantic_label(sample_index, slice_index)
 

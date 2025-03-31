@@ -92,7 +92,7 @@ def test_optimize_mask_loading(total_segmentator_dataset: datasets.TotalSegmenta
         patch.object(total_segmentator_dataset, "_load_mask") as mock_load,
         patch.object(total_segmentator_dataset, "_fix_orientation") as _,
     ):
-        _ = total_segmentator_dataset.load_mask(0)
+        _ = total_segmentator_dataset.load_target(0)
         if optimize:
             mock_load_optimized.assert_called_once_with(0)
             mock_load.assert_not_called()

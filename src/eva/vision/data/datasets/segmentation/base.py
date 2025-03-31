@@ -1,15 +1,22 @@
 """Base for image segmentation datasets."""
 
 import abc
-from typing import Any, Callable, Dict, List, Tuple
+from typing import Any, Callable, Dict, Generic, List, Tuple, TypeVar
 
 from torchvision import tv_tensors
 from typing_extensions import override
 
 from eva.vision.data.datasets import vision
 
+DataType = TypeVar("DataType")
+"""The data sample type."""
 
-class ImageSegmentation(vision.VisionDataset[Tuple[tv_tensors.Image, tv_tensors.Mask]], abc.ABC):
+
+class ImageSegmentation(
+    vision.VisionDataset[Tuple[DataType, tv_tensors.Mask, Dict[str, Any]]],
+    abc.ABC,
+    Generic[DataType],
+):
     """Image segmentation abstract dataset."""
 
     def __init__(self, transforms: Callable | None = None) -> None:
@@ -43,7 +50,7 @@ class ImageSegmentation(vision.VisionDataset[Tuple[tv_tensors.Image, tv_tensors.
         """
 
     @abc.abstractmethod
-    def load_mask(self, index: int) -> tv_tensors.Mask:
+    def load_target(self, index: int) -> tv_tensors.Mask:
         """Returns the `index`'th target masks sample.
 
         Args:
@@ -73,7 +80,7 @@ class ImageSegmentation(vision.VisionDataset[Tuple[tv_tensors.Image, tv_tensors.
     @override
     def __getitem__(self, index: int) -> Tuple[tv_tensors.Image, tv_tensors.Mask, Dict[str, Any]]:
         image = self.load_image(index)
-        mask = self.load_mask(index)
+        mask = self.load_target(index)
         metadata = self.load_metadata(index) or {}
         image_tensor, mask_tensor = self._apply_transforms(image, mask)
         return image_tensor, mask_tensor, metadata

@@ -118,7 +118,7 @@ class MoNuSAC(base.ImageSegmentation):
         return tv_tensors.Image(image_rgb_array.transpose(2, 0, 1))
 
     @override
-    def load_mask(self, index: int) -> tv_tensors.Mask:
+    def load_target(self, index: int) -> tv_tensors.Mask:
         semantic_labels = (
             self._load_semantic_mask_file(index)
             if self._export_masks

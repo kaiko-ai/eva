@@ -9,7 +9,7 @@ DataSample = TypeVar("DataSample")
 """The data sample type."""
 
 
-class VisionDataset(base.MapDataset, abc.ABC, Generic[DataSample]):
+class VisionDataset(base.MapDataset[DataSample], abc.ABC, Generic[DataSample]):
     """Base dataset class for vision tasks."""
 
     @abc.abstractmethod
