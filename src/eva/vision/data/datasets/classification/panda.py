@@ -13,12 +13,11 @@ from torchvision.transforms.v2 import functional
 from typing_extensions import override
 
 from eva.core.data import splitting
-from eva.vision.data.datasets import _validators, structs, wsi
-from eva.vision.data.datasets.classification import base
+from eva.vision.data.datasets import _validators, structs, vision, wsi
 from eva.vision.data.wsi.patching import samplers
 
 
-class PANDA(wsi.MultiWsiDataset, base.ImageClassification):
+class PANDA(wsi.MultiWsiDataset, vision.VisionDataset[tv_tensors.Image, torch.Tensor]):
     """Dataset class for PANDA images and corresponding targets."""
 
     _train_split_ratio: float = 0.7
@@ -121,7 +120,7 @@ class PANDA(wsi.MultiWsiDataset, base.ImageClassification):
 
     @override
     def __getitem__(self, index: int) -> Tuple[tv_tensors.Image, torch.Tensor, Dict[str, Any]]:
-        return base.ImageClassification.__getitem__(self, index)
+        return vision.VisionDataset.__getitem__(self, index)
 
     @override
     def load_image(self, index: int) -> tv_tensors.Image:

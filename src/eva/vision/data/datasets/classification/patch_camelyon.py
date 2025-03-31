@@ -10,14 +10,13 @@ from torchvision.datasets import utils
 from torchvision.transforms.v2 import functional
 from typing_extensions import override
 
-from eva.vision.data.datasets import _validators, structs
-from eva.vision.data.datasets.classification import base
+from eva.vision.data.datasets import _validators, structs, vision
 
 _URL_TEMPLATE = "https://zenodo.org/records/2546921/files/{filename}.gz?download=1"
 """PatchCamelyon URL files templates."""
 
 
-class PatchCamelyon(base.ImageClassification):
+class PatchCamelyon(vision.VisionDataset[tv_tensors.Image, torch.Tensor]):
     """Dataset class for PatchCamelyon images and corresponding targets."""
 
     _train_resources: List[structs.DownloadResource] = [

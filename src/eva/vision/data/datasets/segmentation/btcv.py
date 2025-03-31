@@ -12,11 +12,11 @@ from typing_extensions import override
 
 from eva.vision.data import tv_tensors as eva_tv_tensors
 from eva.vision.data.datasets import _utils as _data_utils
-from eva.vision.data.datasets import segmentation
 from eva.vision.data.datasets.segmentation import _utils
+from eva.vision.data.datasets.vision import VisionDataset
 
 
-class BTCV(segmentation.ImageSegmentation[eva_tv_tensors.Volume]):
+class BTCV(VisionDataset[eva_tv_tensors.Volume, tv_tensors.Mask]):
     """Beyond the Cranial Vault (BTCV) Abdomen dataset.
 
     The BTCV dataset comprises abdominal CT acquired at the Vanderbilt
@@ -48,12 +48,11 @@ class BTCV(segmentation.ImageSegmentation[eva_tv_tensors.Volume]):
             transforms: A callable object for applying data transformations.
                 If None, no transformations are applied.
         """
-        super().__init__()
+        super().__init__(transforms=transforms)
 
         self._root = root
         self._split = split
         self._download = download
-        self._transforms = transforms
 
         self._samples: List[Tuple[str, str]]
         self._indices: List[int]

@@ -13,12 +13,11 @@ from typing_extensions import override
 
 from eva.core import utils
 from eva.core.data import splitting
-from eva.vision.data.datasets import _validators
-from eva.vision.data.datasets.segmentation import base
+from eva.vision.data.datasets import _validators, vision
 from eva.vision.utils import io
 
 
-class LiTS(base.ImageSegmentation):
+class LiTS(vision.VisionDataset[tv_tensors.Image, tv_tensors.Mask]):
     """LiTS - Liver Tumor Segmentation Challenge.
 
     Webpage: https://competitions.codalab.org/competitions/17094

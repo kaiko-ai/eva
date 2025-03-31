@@ -10,12 +10,11 @@ from torchvision import tv_tensors
 from torchvision.datasets import utils
 from typing_extensions import override
 
-from eva.vision.data.datasets import _validators, structs
-from eva.vision.data.datasets.classification import base
+from eva.vision.data.datasets import _validators, structs, vision
 from eva.vision.utils import io
 
 
-class BreaKHis(base.ImageClassification):
+class BreaKHis(vision.VisionDataset[tv_tensors.Image, torch.Tensor]):
     """Dataset class for BreaKHis images and corresponding targets."""
 
     _resources: List[structs.DownloadResource] = [

@@ -17,12 +17,12 @@ from typing_extensions import override
 
 from eva.core.utils import io as core_io
 from eva.core.utils import multiprocessing
-from eva.vision.data.datasets import _validators, structs
-from eva.vision.data.datasets.segmentation import _total_segmentator, base
+from eva.vision.data.datasets import _validators, structs, vision
+from eva.vision.data.datasets.segmentation import _total_segmentator
 from eva.vision.utils import io
 
 
-class TotalSegmentator2D(base.ImageSegmentation):
+class TotalSegmentator2D(vision.VisionDataset[tv_tensors.Image, tv_tensors.Mask]):
     """TotalSegmentator 2D segmentation dataset."""
 
     _expected_dataset_lengths: Dict[str, int] = {

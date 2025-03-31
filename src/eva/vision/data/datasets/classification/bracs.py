@@ -8,12 +8,11 @@ from torchvision import tv_tensors
 from torchvision.datasets import folder
 from typing_extensions import override
 
-from eva.vision.data.datasets import _validators
-from eva.vision.data.datasets.classification import base
+from eva.vision.data.datasets import _validators, vision
 from eva.vision.utils import io
 
 
-class BRACS(base.ImageClassification):
+class BRACS(vision.VisionDataset[tv_tensors.Image, torch.Tensor]):
     """Dataset class for BRACS images and corresponding targets."""
 
     _expected_dataset_lengths: Dict[str, int] = {

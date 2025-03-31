@@ -16,12 +16,11 @@ from torchvision.datasets import utils
 from typing_extensions import override
 
 from eva.core.utils.progress_bar import tqdm
-from eva.vision.data.datasets import _validators, structs
-from eva.vision.data.datasets.segmentation import base
+from eva.vision.data.datasets import _validators, structs, vision
 from eva.vision.utils import io
 
 
-class MoNuSAC(base.ImageSegmentation):
+class MoNuSAC(vision.VisionDataset[tv_tensors.Image, tv_tensors.Mask]):
     """MoNuSAC2020: A Multi-organ Nuclei Segmentation and Classification Challenge.
 
     Webpage: https://monusac-2020.grand-challenge.org/
