@@ -60,7 +60,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: "chore: bump version to ${{ github.ref_name }}"
-          title: "chore: bump version to ${{ github.ref_name }}"
+          title: "bump version to ${{ github.ref_name }} [skip ci]"
           body: |
             This PR updates the pyproject.toml with the new version number.
             
