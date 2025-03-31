@@ -232,6 +232,4 @@ class BTCV(segmentation.ImageSegmentation[eva_tv_tensors.Volume]):
                 f"BTCV.zip not found in {self._root}, something with the download went wrong."
             )
 
-        data_utils.extract_archive(
-            zip_path, self._root, remove_finished=True
-        )  # TODO: set remove to True
+        data_utils.extract_archive(zip_path, self._root, remove_finished=True)
