@@ -71,7 +71,6 @@ class BCSS(wsi.MultiWsiDataset, vision.VisionDataset[tv_tensors.Image, tv_tensor
             width: Width of the patches to be extracted, in pixels.
             height: Height of the patches to be extracted, in pixels.
             target_mpp: Target microns per pixel (mpp) for the patches.
-            backend: The backend to use for reading the whole-slide images.
             transforms: Transforms to apply to the extracted image & mask patches.
         """
         self._split = split
