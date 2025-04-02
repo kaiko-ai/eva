@@ -10,7 +10,7 @@ from torchvision import tv_tensors
 from torchvision.transforms import v2
 from typing_extensions import override
 
-from kaiko.radiology_fm.data import tv_tensors as kaiko_tv_tensors
+from eva.vision.data import tv_tensors as eva_tv_tensors
 
 
 class RandCropByPosNegLabel(v2.Transform):
@@ -102,7 +102,7 @@ class RandCropByPosNegLabel(v2.Transform):
         return inpt
 
     @_transform.register(tv_tensors.Image)
-    @_transform.register(kaiko_tv_tensors.Volume)
+    @_transform.register(eva_tv_tensors.Volume)
     @_transform.register(tv_tensors.Mask)
     def _(self, inpt: Any, params: Dict[str, Any]) -> Any:
         inpt_foreground_crops = self._rand_crop(img=inpt, randomize=False)

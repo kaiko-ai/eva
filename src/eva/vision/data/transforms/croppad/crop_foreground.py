@@ -11,7 +11,7 @@ from torchvision import tv_tensors
 from torchvision.transforms import v2
 from typing_extensions import override
 
-from kaiko.radiology_fm.data import tv_tensors as kaiko_tv_tensors
+from eva.vision.data import tv_tensors as eva_tv_tensors
 
 
 class CropForeground(v2.Transform):
@@ -75,7 +75,7 @@ class CropForeground(v2.Transform):
         )
 
     def _get_params(self, flat_inputs: List[Any]) -> Dict[str, Any]:
-        volume = next(inpt for inpt in flat_inputs if isinstance(inpt, kaiko_tv_tensors.Volume))
+        volume = next(inpt for inpt in flat_inputs if isinstance(inpt, eva_tv_tensors.Volume))
         box_start, box_end = self._foreground_crop.compute_bounding_box(volume)
         return {"box_start": box_start, "box_end": box_end}
 
@@ -85,7 +85,7 @@ class CropForeground(v2.Transform):
         return inpt
 
     @_transform.register(tv_tensors.Image)
-    @_transform.register(kaiko_tv_tensors.Volume)
+    @_transform.register(eva_tv_tensors.Volume)
     @_transform.register(tv_tensors.Mask)
     def _(self, inpt: Any, params: Dict[str, Any]) -> Any:
         inpt_foreground_cropped = self._foreground_crop.crop_pad(

@@ -11,7 +11,7 @@ from torchvision import tv_tensors
 from torchvision.transforms import v2
 from typing_extensions import override
 
-from kaiko.radiology_fm.data import tv_tensors as kaiko_tv_tensors
+from eva.vision.data import tv_tensors as eva_tv_tensors
 
 
 class Spacing(v2.Transform):
@@ -45,7 +45,7 @@ class Spacing(v2.Transform):
 
     def _get_params(self, flat_inputs: List[Any]) -> Dict[str, Any]:
         self._affine = next(
-            inpt.affine for inpt in flat_inputs if isinstance(inpt, kaiko_tv_tensors.Volume)
+            inpt.affine for inpt in flat_inputs if isinstance(inpt, eva_tv_tensors.Volume)
         )
         return {}
 
@@ -54,12 +54,12 @@ class Spacing(v2.Transform):
     def _transform(self, inpt: Any, params: Dict[str, Any]) -> Any:
         return inpt
 
-    @_transform.register(kaiko_tv_tensors.Volume)
-    def _(self, inpt: kaiko_tv_tensors.Volume, params: Dict[str, Any]) -> Any:
+    @_transform.register(eva_tv_tensors.Volume)
+    def _(self, inpt: eva_tv_tensors.Volume, params: Dict[str, Any]) -> Any:
         inpt_spacing = self._spacing(inpt.to_meta_tensor(), mode="bilinear")
         if not isinstance(inpt_spacing, meta_tensor.MetaTensor):
             raise ValueError(f"Expected MetaTensor, got {type(inpt_spacing)}")
-        return kaiko_tv_tensors.Volume.from_meta_tensor(inpt_spacing)
+        return eva_tv_tensors.Volume.from_meta_tensor(inpt_spacing)
 
     @_transform.register(tv_tensors.Mask)
     def _(self, inpt: Any, params: Dict[str, Any]) -> Any:

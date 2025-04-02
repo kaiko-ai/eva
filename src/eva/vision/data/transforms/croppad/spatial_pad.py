@@ -9,11 +9,14 @@ from torchvision import tv_tensors
 from torchvision.transforms import v2
 from typing_extensions import override
 
-from kaiko.radiology_fm.data import tv_tensors as kaiko_tv_tensors
+from eva.vision.data import tv_tensors as eva_tv_tensors
 
 
 class SpatialPad(v2.Transform):
-    """Performs padding to the data, symmetric for all sides or all on one side for each dimension."""
+    """Performs padding to the data.
+
+    Padding is applied symmetric for all sides or all on one side for each dimension.
+    """
 
     def __init__(
         self,
@@ -38,8 +41,8 @@ class SpatialPad(v2.Transform):
                 ``"linear_ramp"``, ``"maximum"``, ``"mean"``, ``"median"``, ``"minimum"``,
                 ``"reflect"``, ``"symmetric"``, ``"wrap"``, ``"empty"``}
                 available modes for PyTorch Tensor: {``"constant"``, ``"reflect"``, ``"replicate"``,
-                ``"circular"``}.
-                One of the listed string values or a user supplied function. Defaults to ``"constant"``.
+                ``"circular"``}. One of the listed string values or a user supplied function.
+                Defaults to ``"constant"``.
                 See also: https://numpy.org/doc/1.18/reference/generated/numpy.pad.html
                 https://pytorch.org/docs/stable/generated/torch.nn.functional.pad.html
         """
@@ -57,7 +60,7 @@ class SpatialPad(v2.Transform):
         return inpt
 
     @_transform.register(tv_tensors.Image)
-    @_transform.register(kaiko_tv_tensors.Volume)
+    @_transform.register(eva_tv_tensors.Volume)
     @_transform.register(tv_tensors.Mask)
     def _(self, inpt: Any, params: Dict[str, Any]) -> Any:
         inpt_padded = self._spatial_pad(inpt)

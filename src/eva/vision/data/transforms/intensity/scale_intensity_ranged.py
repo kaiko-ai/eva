@@ -8,7 +8,7 @@ from torchvision import tv_tensors
 from torchvision.transforms import v2
 from typing_extensions import override
 
-from kaiko.radiology_fm.data import tv_tensors as kaiko_tv_tensors
+from eva.vision.data import tv_tensors as eva_tv_tensors
 
 
 class ScaleIntensityRange(v2.Transform):
@@ -16,8 +16,9 @@ class ScaleIntensityRange(v2.Transform):
 
     Scaling from [a_min, a_max] to [b_min, b_max] with clip option.
 
-    When `b_min` or `b_max` are `None`, `scaled_array * (b_max - b_min) + b_min` will be skipped.
-    If `clip=True`, when `b_min`/`b_max` is None, the clipping is not performed on the corresponding edge.
+    When `b_min` or `b_max` are `None`, `scaled_array * (b_max - b_min) + b_min`
+    will be skipped. If `clip=True`, when `b_min`/`b_max` is None, the clipping
+    is not performed on the corresponding edge.
     """
 
     def __init__(
@@ -49,7 +50,7 @@ class ScaleIntensityRange(v2.Transform):
         return inpt
 
     @_transform.register(tv_tensors.Image)
-    @_transform.register(kaiko_tv_tensors.Volume)
+    @_transform.register(eva_tv_tensors.Volume)
     def _(self, inpt: tv_tensors.Image, params: Dict[str, Any]) -> Any:
         inpt_scaled = self._scale_intensity_range(inpt)
         return tv_tensors.wrap(inpt_scaled, like=inpt)
