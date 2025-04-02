@@ -2,10 +2,11 @@
 
 import pytest
 import torch
+from monai.inferers.inferer import SimpleInferer
 from torch import nn
 
 from eva.core import metrics, trainers
-from eva.core.data import datamodules
+from eva.core.data import datamodules, datasets
 from eva.vision.models import modules, wrappers
 from eva.vision.models.networks.decoders import segmentation
 
@@ -32,6 +33,25 @@ def test_semantic_segmentation_module_fit(
     assert not torch.all(torch.eq(initial_decoder_weights, model.decoder._layers.weight))
 
 
+def test_semantic_segmentation_module_with_inferer(
+    model_with_inferer: modules.SemanticSegmentationModule,
+    segmentation_dataset: datasets.TorchDataset,
+) -> None:
+    """Tests the SemanticSegmentationModule with inferer for inference."""
+    # Get a sample from dataset
+    sample_data, _ = segmentation_dataset[0]
+    sample_data = sample_data.unsqueeze(0)  # Add batch dimension
+
+    # Run inference with the inferer
+    model_with_inferer.eval()
+    output = model_with_inferer(sample_data)
+
+    # Check output shape
+    assert output.shape[0] == 1  # Batch size of 1
+    assert output.shape[1] == 4  # Number of classes
+    assert output.shape[2:] == (16, 16)  # H, W of input
+
+
 @pytest.fixture(scope="function")
 def model(n_classes: int = 4) -> modules.SemanticSegmentationModule:
     """Returns a SemanticSegmentationModule model fixture."""
@@ -56,3 +76,12 @@ def model(n_classes: int = 4) -> modules.SemanticSegmentationModule:
             common=metrics.AverageLoss(),
         ),
     )
+
+
+@pytest.fixture(scope="function")
+def model_with_inferer(
+    model: modules.SemanticSegmentationModule,
+) -> modules.SemanticSegmentationModule:
+    """Returns a SemanticSegmentationModule model fixture with an inferer."""
+    model.inferer = SimpleInferer()
+    return model
