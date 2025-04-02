@@ -44,7 +44,7 @@ model:
         model_kwargs:
           out_indices: ${oc.env:OUT_INDICES, 1}
     decoder:
-      class_path: eva.vision.models.networks.decoders.segmentation.ConvDecoderMS
+      class_path: eva.vision.models.networks.decoders.segmentation.ConvDecoderWithImage
       init_args:
         in_features: ${oc.env:IN_FEATURES, 384}
         num_classes:  &NUM_CLASSES 3
