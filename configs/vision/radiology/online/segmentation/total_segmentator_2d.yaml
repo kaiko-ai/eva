@@ -99,10 +99,20 @@ data:
           # "Creative Commons Attribution 4.0 International"
           # (see: https://creativecommons.org/licenses/by/4.0/deed.en)
           transforms:
-            class_path: eva.vision.data.transforms.common.ResizeAndClamp
+            class_path: torchvision.transforms.v2.Compose
             init_args:
-              mean: *NORMALIZE_MEAN
-              std: *NORMALIZE_STD
+              transforms:
+                - class_path: eva.vision.data.transforms.ScaleIntensityRange
+                  init_args:
+                    input_range:
+                      - ${oc.env:SCALE_INTENSITY_MIN, -175.0}
+                      - ${oc.env:SCALE_INTENSITY_MAX, 250.0}
+                    output_range: [0, 255]
+                - class_path: eva.vision.data.transforms.common.ResizeAndCrop
+                  init_args:
+                    size: ${oc.env:RESIZE_DIM, 224}  
+                    mean: *NORMALIZE_MEAN
+                    std: *NORMALIZE_STD
       val:
         class_path: eva.vision.datasets.TotalSegmentator2D
         init_args:
