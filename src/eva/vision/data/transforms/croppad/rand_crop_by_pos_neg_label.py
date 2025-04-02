@@ -47,29 +47,29 @@ class RandCropByPosNegLabel(v2.Transform):
 
         Args:
             spatial_size: the spatial size of the crop region e.g. [224, 224, 128].
-                if a dimension of ROI size is larger than image size, will not crop that dimension of the image.
-                if its components have non-positive values, the corresponding size of `label` will be used.
-                for example: if the spatial size of input data is [40, 40, 40] and `spatial_size=[32, 64, -1]`,
-                the spatial size of output data will be [32, 40, 40].
-            label: the label image that is used for finding foreground/background, if None, must set at
-                `self.__call__`.  Non-zero indicates foreground, zero indicates background.
-            pos: used with `neg` together to calculate the ratio ``pos / (pos + neg)`` for the probability
-                to pick a foreground voxel as a center rather than a background voxel.
-            neg: used with `pos` together to calculate the ratio ``pos / (pos + neg)`` for the probability
-                to pick a foreground voxel as a center rather than a background voxel.
+                if a dimension of ROI size is larger than image size, will not crop that dimension.
+                if components have non-positive values, corresponding size of `label` will be used.
+                for example: if the spatial size of input data is [40, 40, 40] and
+                `spatial_size=[32, 64, -1]`, the spatial size of output data will be [32, 40, 40].
+            label: the label image that is used for finding foreground/background, if None, must
+                set at `self.__call__`. Non-zero indicates foreground, zero indicates background.
+            pos: used with `neg` together to calculate the ratio ``pos / (pos + neg)`` for
+                the probability to pick a foreground voxel as center rather than background voxel.
+            neg: used with `pos` together to calculate the ratio ``pos / (pos + neg)`` for
+                the probability to pick a foreground voxel as center rather than background voxel.
             num_samples: number of samples (crop regions) to take in each list.
-            image: optional image data to help select valid area, can be same as `img` or another image array.
+            image: optional image data to help select valid area, can be same as `img` or another.
                 if not None, use ``label == 0 & image > image_threshold`` to select the negative
-                sample (background) center. So the crop center will only come from the valid image areas.
+                sample (background) center. Crop center will only come from valid image areas.
             image_threshold: if enabled `image`, use ``image > image_threshold`` to determine
                 the valid image content areas.
-            fg_indices: if provided pre-computed foreground indices of `label`, will ignore above `image` and
-                `image_threshold`, and randomly select crop centers based on them, need to provide `fg_indices`
-                and `bg_indices` together, expect to be 1 dim array of spatial indices after flattening.
+            fg_indices: if provided pre-computed foreground indices of `label`, will ignore `image`
+                and `image_threshold`, randomly select crop centers based on them, need to provide
+                `fg_indices` and `bg_indices` together, expect to be 1 dim array of spatial indices.
                 a typical usage is to call `FgBgToIndices` transform first and cache the results.
-            bg_indices: if provided pre-computed background indices of `label`, will ignore above `image` and
-                `image_threshold`, and randomly select crop centers based on them, need to provide `fg_indices`
-                and `bg_indices` together, expect to be 1 dim array of spatial indices after flattening.
+            bg_indices: if provided pre-computed background indices of `label`, will ignore `image`
+                and `image_threshold`, randomly select crop centers based on them, need to provide
+                `fg_indices` and `bg_indices` together, expect to be 1 dim array of spatial indices.
                 a typical usage is to call `FgBgToIndices` transform first and cache the results.
             allow_smaller: if `False`, an exception will be raised if the image is smaller than
                 the requested ROI in any dimension. If `True`, any smaller dimensions will be set to
