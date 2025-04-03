@@ -109,7 +109,7 @@ class LiTS(vision.VisionDataset[tv_tensors.Image, tv_tensors.Mask]):
         )
 
     @override
-    def load_image(self, index: int) -> tv_tensors.Image:
+    def load_data(self, index: int) -> tv_tensors.Image:
         sample_index, slice_index = self._indices[index]
         volume_path = self._volume_files[sample_index]
         image_nii = io.read_nifti(volume_path, slice_index)

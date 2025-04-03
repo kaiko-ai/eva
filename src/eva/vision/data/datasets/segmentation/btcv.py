@@ -118,7 +118,7 @@ class BTCV(VisionDataset[eva_tv_tensors.Volume, tv_tensors.Mask]):
     def __getitem__(
         self, index: int
     ) -> tuple[eva_tv_tensors.Volume, tv_tensors.Mask, dict[str, Any]]:
-        volume = self.load_image(index)
+        volume = self.load_data(index)
         mask = self.load_target(index)
         metadata = self.load_metadata(index) or {}
         volume_tensor, mask_tensor = self._apply_transforms(volume, mask)
@@ -129,7 +129,7 @@ class BTCV(VisionDataset[eva_tv_tensors.Volume, tv_tensors.Mask]):
         return len(self._indices)
 
     @override
-    def load_image(self, index: int) -> eva_tv_tensors.Volume:
+    def load_data(self, index: int) -> eva_tv_tensors.Volume:
         """Loads the CT volume for a given sample.
 
         Args:

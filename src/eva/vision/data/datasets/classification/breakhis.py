@@ -144,7 +144,7 @@ class BreaKHis(vision.VisionDataset[tv_tensors.Image, torch.Tensor]):
         )
 
     @override
-    def load_image(self, index: int) -> tv_tensors.Image:
+    def load_data(self, index: int) -> tv_tensors.Image:
         image_path = self._image_files[self._indices[index]]
         return io.read_image_as_tensor(image_path)
 

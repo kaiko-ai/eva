@@ -68,7 +68,7 @@ class MHIST(vision.VisionDataset[tv_tensors.Image, torch.Tensor]):
         )
 
     @override
-    def load_image(self, index: int) -> tv_tensors.Image:
+    def load_data(self, index: int) -> tv_tensors.Image:
         image_filename, _ = self._samples[index]
         image_path = os.path.join(self._dataset_path, image_filename)
         return io.read_image_as_tensor(image_path)

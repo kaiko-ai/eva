@@ -131,7 +131,7 @@ class BCSS(wsi.MultiWsiDataset, vision.VisionDataset[tv_tensors.Image, tv_tensor
         return vision.VisionDataset.__getitem__(self, index)
 
     @override
-    def load_image(self, index: int) -> tv_tensors.Image:
+    def load_data(self, index: int) -> tv_tensors.Image:
         image_array = wsi.MultiWsiDataset.__getitem__(self, index)
         return functional.to_image(image_array)
 

@@ -126,7 +126,7 @@ class PatchCamelyon(vision.VisionDataset[tv_tensors.Image, torch.Tensor]):
         )
 
     @override
-    def load_image(self, index: int) -> tv_tensors.Image:
+    def load_data(self, index: int) -> tv_tensors.Image:
         return self._load_from_h5("x", index)
 
     @override

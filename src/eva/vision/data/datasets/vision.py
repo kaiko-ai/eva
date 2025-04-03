@@ -5,17 +5,17 @@ from typing import Any, Callable, Dict, Generic, List, Tuple, TypeVar
 
 from eva.core.data.datasets import base
 
-ImageType = TypeVar("ImageType")
-"""The image data type."""
+InputType = TypeVar("InputType")
+"""The input data type."""
 
 TargetType = TypeVar("TargetType")
 """The target data type."""
 
 
 class VisionDataset(
-    base.MapDataset[Tuple[ImageType, TargetType, Dict[str, Any]]],
+    base.MapDataset[Tuple[InputType, TargetType, Dict[str, Any]]],
     abc.ABC,
-    Generic[ImageType, TargetType],
+    Generic[InputType, TargetType],
 ):
     """Base dataset class for vision tasks."""
 
@@ -41,7 +41,7 @@ class VisionDataset(
     def class_to_idx(self) -> Dict[str, int] | None:
         """Returns a mapping of the class name to its target index."""
 
-    def __getitem__(self, index: int) -> Tuple[ImageType, TargetType, Dict[str, Any]]:
+    def __getitem__(self, index: int) -> Tuple[InputType, TargetType, Dict[str, Any]]:
         """Returns the `index`'th data sample.
 
         Args:
@@ -50,7 +50,7 @@ class VisionDataset(
         Returns:
             A tuple with the image, the target and the metadata.
         """
-        image = self.load_image(index)
+        image = self.load_data(index)
         target = self.load_target(index)
         image, target = self._apply_transforms(image, target)
         return image, target, self.load_metadata(index) or {}
@@ -66,14 +66,14 @@ class VisionDataset(
         """
 
     @abc.abstractmethod
-    def load_image(self, index: int) -> ImageType:
-        """Returns the `index`'th image sample.
+    def load_data(self, index: int) -> InputType:
+        """Returns the `index`'th data sample.
 
         Args:
             index: The index of the data sample to load.
 
         Returns:
-            The image as a numpy array.
+            The sample data.
         """
 
     @abc.abstractmethod
@@ -84,7 +84,7 @@ class VisionDataset(
             index: The index of the data sample to load.
 
         Returns:
-            The sample target as an array.
+            The sample target.
         """
 
     @abc.abstractmethod
@@ -101,8 +101,8 @@ class VisionDataset(
         """
 
     def _apply_transforms(
-        self, image: ImageType, target: TargetType
-    ) -> Tuple[ImageType, TargetType]:
+        self, image: InputType, target: TargetType
+    ) -> Tuple[InputType, TargetType]:
         """Applies the transforms to the provided data and returns them.
 
         Args:

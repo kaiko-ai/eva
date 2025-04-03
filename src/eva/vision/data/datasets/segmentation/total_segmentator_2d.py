@@ -206,7 +206,7 @@ class TotalSegmentator2D(vision.VisionDataset[tv_tensors.Image, tv_tensors.Mask]
         return len(self._indices)
 
     @override
-    def load_image(self, index: int) -> tv_tensors.Image:
+    def load_data(self, index: int) -> tv_tensors.Image:
         sample_index, slice_index = self._indices[index]
         image_path = self._get_image_path(sample_index)
         image_nii = io.read_nifti(image_path, slice_index)

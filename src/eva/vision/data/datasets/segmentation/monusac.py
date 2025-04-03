@@ -111,7 +111,7 @@ class MoNuSAC(vision.VisionDataset[tv_tensors.Image, tv_tensors.Mask]):
         )
 
     @override
-    def load_image(self, index: int) -> tv_tensors.Image:
+    def load_data(self, index: int) -> tv_tensors.Image:
         image_path = self._image_files[index]
         image_rgb_array = io.read_image(image_path)
         return tv_tensors.Image(image_rgb_array.transpose(2, 0, 1))
