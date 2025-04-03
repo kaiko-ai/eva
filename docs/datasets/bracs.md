@@ -29,6 +29,8 @@ we use in this benchmarks contains 4539 extracted ROIs / patches.
 | **Files format**               | `png`                       |
 | **Number of images**           | 4539                        |
 
+Given that some images in the `BRACS_ROI` can be very large, we split the image into a grid of 224x224 patches and then treat it as a multi instance learning (MIL) classification problem.
+
 
 ### Splits
 
