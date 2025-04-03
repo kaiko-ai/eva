@@ -81,7 +81,7 @@ data:
           embeddings_transforms:
             class_path: eva.core.data.transforms.Pad2DTensor
             init_args:
-              pad_size: &N_PATCHES ${oc.env:N_PATCHES, 500}
+              pad_size: &N_PATCHES ${oc.env:N_PATCHES, 250}
       val:
         class_path: eva.datasets.MultiEmbeddingsClassificationDataset
         init_args:
@@ -101,8 +101,7 @@ data:
               class_path: eva.vision.data.wsi.patching.samplers.GridSampler
               init_args:
                 max_samples: *N_PATCHES
-                validate_dimensions: false  # Some images are smaller than 224x224
-                include_last: true
+                include_partial_patches: true
             transforms:
               class_path: eva.vision.data.transforms.common.ResizeAndCrop
               init_args:

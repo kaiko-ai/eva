@@ -65,28 +65,51 @@ def test_different_seed(max_samples: int, seed_1: int, seed_2: int) -> None:
     assert x_y_1 != x_y_2
 
 
-def test_invalid_width_height() -> None:
-    """Tests if the sampler raises an error when width / height is bigger than layer_shape."""
-    sampler = samplers.GridSampler(max_samples=10, seed=42)
-
-    with pytest.raises(ValueError):
-        list(sampler.sample(width=200, height=200, layer_shape=(100, 100)))
-
-
 @pytest.mark.parametrize(
-    "width, height, layer_shape",
+    "width, height, layer_shape, include_partial_patches, expected_n_samples",
     [
-        (5, 5, (25, 25)),
-        (5, 5, (100, 100)),
-        (224, 224, (1000, 1000)),
+        (5, 5, (25, 25), False, 25),
+        (5, 5, (25, 25), True, 25),
+        (224, 224, (1000, 1000), False, 16),
+        (224, 224, (1000, 1000), True, 25),
+        (10, 10, (5, 5), True, 1),
     ],
 )
-def test_expected_n_patches(width: int, height: int, layer_shape: Tuple[int, int]) -> None:
+def test_expected_n_patches(
+    width: int,
+    height: int,
+    layer_shape: Tuple[int, int],
+    include_partial_patches: bool,
+    expected_n_samples: int,
+) -> None:
     """Tests if the sampler respects the max_samples limit."""
-    sampler = samplers.GridSampler(max_samples=None)
-
-    expected_max_samples = (layer_shape[0] // width) * (layer_shape[1] // height)
+    sampler = samplers.GridSampler(
+        max_samples=None, include_partial_patches=include_partial_patches
+    )
 
     x_y = list(sampler.sample(width=width, height=height, layer_shape=layer_shape))
 
-    assert len(x_y) == expected_max_samples
+    assert len(x_y) == expected_n_samples
+
+
+@pytest.mark.parametrize("include_partial_patches", [False, True])
+def test_patch_bigger_than_image(include_partial_patches: bool) -> None:
+    """Test edge case where the patch size is bigger than the image."""
+    sampler = samplers.GridSampler(
+        max_samples=10, seed=42, include_partial_patches=include_partial_patches
+    )
+    patch_dim, image_dim = 200, 100
+
+    if not include_partial_patches:
+        with pytest.raises(ValueError, match="The patch size cannot be bigger than the image."):
+            list(
+                sampler.sample(
+                    width=patch_dim, height=patch_dim, layer_shape=(image_dim, image_dim)
+                )
+            )
+    else:
+        x_y = list(
+            sampler.sample(width=patch_dim, height=patch_dim, layer_shape=(image_dim, image_dim))
+        )
+        assert len(x_y) == 1
+        assert x_y[0] == (0, 0)

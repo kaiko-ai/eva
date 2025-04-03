@@ -13,8 +13,7 @@ class GridSampler(base.Sampler):
         max_samples: int | None = None,
         overlap: Tuple[int, int] = (0, 0),
         seed: int = 42,
-        validate_dimensions: bool = True,
-        include_last: bool = False,
+        include_partial_patches: bool = False,
     ):
         """Initializes the sampler.
 
@@ -22,17 +21,14 @@ class GridSampler(base.Sampler):
             max_samples: The maximum number of samples to return.
             overlap: The overlap between patches in the grid.
             seed: The random seed.
-            validate_dimensions: Whether to validate the dimensions the image. It
-                expects the patch size to be smaller than the image size.
-            include_last: Whether to include coordinates of the last patch when it
+            include_partial_patches: Whether to include coordinates of the last patch when it
                 it partially exceeds the image and therefore is smaller than the
                 specified patch size.
         """
         self.max_samples = max_samples
         self.overlap = overlap
         self.seed = seed
-        self.validate_dimensions = validate_dimensions
-        self.include_last = include_last
+        self.include_partial_patches = include_partial_patches
 
     def sample(
         self,
@@ -47,11 +43,14 @@ class GridSampler(base.Sampler):
             height: The height of the patches.
             layer_shape: The shape of the layer.
         """
-        if self.validate_dimensions:
-            _utils.validate_dimensions(width, height, layer_shape)
         x_y = _utils.get_grid_coords(
-            layer_shape, width, height, self.overlap, seed=self.seed, include_last=self.include_last
+            layer_shape,
+            width,
+            height,
+            self.overlap,
+            seed=self.seed,
+            include_partial_patches=self.include_partial_patches,
         )
-        max_samples = len(x_y) if self.max_samples is None else self.max_samples
+        max_samples = len(x_y) if self.max_samples is None else min(self.max_samples, len(x_y))
         for i in range(max_samples):
             yield x_y[i]
