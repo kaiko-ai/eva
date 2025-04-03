@@ -9,6 +9,7 @@ import torch
 from torchvision import tv_tensors
 
 from eva.vision.data import datasets
+from eva.vision.data.wsi.patching import samplers
 
 
 @pytest.mark.parametrize(
@@ -31,13 +32,13 @@ def test_sample(bracs_dataset: datasets.BRACS, index: int) -> None:
     # assert the format of the `image` and `target`
     image, target, _ = sample
     assert isinstance(image, tv_tensors.Image)
-    assert image.shape == (3, 40, 40)
+    assert image.shape == (3, 10, 10)
     assert isinstance(target, torch.Tensor)
     assert target in [0, 1, 2, 3, 4, 5, 6, 7, 8]
 
 
 @pytest.fixture(scope="function")
-def bracs_dataset(split: Literal["train", "val"], assets_path: str) -> datasets.BRACS:
+def bracs_dataset(split: Literal["train", "val", "test"], assets_path: str) -> datasets.BRACS:
     """BRACS dataset fixture."""
     with mock.patch.object(
         datasets.BRACS, "classes", new_callable=mock.PropertyMock
@@ -46,6 +47,10 @@ def bracs_dataset(split: Literal["train", "val"], assets_path: str) -> datasets.
         dataset = datasets.BRACS(
             root=os.path.join(assets_path, "vision", "datasets", "bracs"),
             split=split,
+            width=10,
+            height=10,
+            target_mpp=0.25,
+            sampler=samplers.GridSampler(),
         )
         dataset.prepare_data()
         dataset.configure()

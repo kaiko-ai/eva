@@ -1,27 +1,28 @@
 """BRACS dataset class."""
 
 import os
-from typing import Callable, Dict, List, Literal, Tuple
+from typing import Any, Callable, Dict, List, Literal, Tuple
 
 import torch
 from torchvision import tv_tensors
 from torchvision.datasets import folder
+from torchvision.transforms.v2 import functional
 from typing_extensions import override
 
-from eva.vision.data.datasets import _validators
+from eva.vision.data.datasets import _validators, wsi
 from eva.vision.data.datasets.classification import base
-from eva.vision.utils import io
+from eva.vision.data.wsi.patching import samplers
 
 
-class BRACS(base.ImageClassification):
+class BRACS(wsi.MultiWsiDataset, base.ImageClassification):
     """Dataset class for BRACS images and corresponding targets."""
 
-    _expected_dataset_lengths: Dict[str, int] = {
+    _expected_files: Dict[str, int] = {
         "train": 3657,
         "val": 312,
         "test": 570,
     }
-    """Expected dataset lengths for the splits and complete dataset."""
+    """Expected number of files for each split."""
 
     _license: str = "CC BY-NC 4.0 (https://creativecommons.org/licenses/by-nc/4.0/)"
     """Dataset license."""
@@ -30,6 +31,10 @@ class BRACS(base.ImageClassification):
         self,
         root: str,
         split: Literal["train", "val", "test"],
+        sampler: samplers.Sampler | None = None,
+        width: int = 224,
+        height: int = 224,
+        target_mpp: float = 0.25,
         transforms: Callable | None = None,
     ) -> None:
         """Initializes the dataset.
@@ -37,15 +42,31 @@ class BRACS(base.ImageClassification):
         Args:
             root: Path to the root directory of the dataset.
             split: Dataset split to use.
+            sampler: The sampler to use for sampling patch coordinates.
+                If `None`, it will use the ::class::`ForegroundGridSampler` sampler.
+            width: Width of the patches to be extracted, in pixels.
+            height: Height of the patches to be extracted, in pixels.
+            target_mpp: Target microns per pixel (mpp) for the patches.
             transforms: A function/transform which returns a transformed
                 version of the raw data samples.
         """
-        super().__init__(transforms=transforms)
-
         self._root = root
         self._split = split
+        self._path_to_target = self._make_dataset()
+        self._file_to_path = {os.path.basename(p): p for p in self._path_to_target.keys()}
 
-        self._samples: List[Tuple[str, int]] = []
+        wsi.MultiWsiDataset.__init__(
+            self,
+            root=root,
+            file_paths=sorted(self._path_to_target.keys()),
+            width=width,
+            height=height,
+            sampler=sampler or samplers.ForegroundGridSampler(max_samples=25),
+            target_mpp=target_mpp,
+            overwrite_mpp=0.25,
+            backend="pil",
+            image_transforms=transforms,
+        )
 
     @property
     @override
@@ -58,54 +79,51 @@ class BRACS(base.ImageClassification):
         return {name: index for index, name in enumerate(self.classes)}
 
     @override
-    def filename(self, index: int) -> str:
-        image_path, *_ = self._samples[index]
-        return os.path.relpath(image_path, self._dataset_path)
-
-    @override
     def prepare_data(self) -> None:
         _validators.check_dataset_exists(self._root, True)
 
     @override
-    def configure(self) -> None:
-        self._samples = self._make_dataset()
-
-    @override
     def validate(self) -> None:
+        if len(self._path_to_target) != self._expected_files[self._split]:
+            raise ValueError(
+                f"Expected {self._split} split to have {self._expected_files[self._split]} files, "
+                f"but found {len(self._path_to_target)} files."
+            )
+
         _validators.check_dataset_integrity(
             self,
-            length=self._expected_dataset_lengths[self._split],
+            length=None,
             n_classes=7,
             first_and_last_labels=("0_N", "6_IC"),
         )
 
     @override
+    def __getitem__(self, index: int) -> Tuple[tv_tensors.Image, torch.Tensor, Dict[str, Any]]:
+        return base.ImageClassification.__getitem__(self, index)
+
+    @override
     def load_image(self, index: int) -> tv_tensors.Image:
-        image_path, _ = self._samples[index]
-        return io.read_image_as_tensor(image_path)
+        image_array = wsi.MultiWsiDataset.__getitem__(self, index)
+        return functional.to_image(image_array)
 
     @override
     def load_target(self, index: int) -> torch.Tensor:
-        _, target = self._samples[index]
-        return torch.tensor(target, dtype=torch.long)
-
-    @override
-    def __len__(self) -> int:
-        return len(self._samples)
+        path = self._file_to_path[self.filename(index)]
+        return torch.tensor(self._path_to_target[path], dtype=torch.long)
 
     @property
     def _dataset_path(self) -> str:
         """Returns the full path of dataset directory."""
         return os.path.join(self._root, "BRACS_RoI/latest_version")
 
-    def _make_dataset(self) -> List[Tuple[str, int]]:
+    def _make_dataset(self) -> Dict[str, int]:
         """Builds the dataset for the specified split."""
         dataset = folder.make_dataset(
             directory=os.path.join(self._dataset_path, self._split),
             class_to_idx=self.class_to_idx,
             extensions=(".png"),
         )
-        return dataset
+        return dict(dataset)
 
     def _print_license(self) -> None:
         """Prints the dataset license."""

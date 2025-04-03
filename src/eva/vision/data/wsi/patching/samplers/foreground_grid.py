@@ -45,13 +45,10 @@ class ForegroundGridSampler(base.ForegroundSampler):
             layer_shape: The shape of the layer.
             mask: The mask of the image.
         """
-        _utils.validate_dimensions(width, height, layer_shape)
-        x_y, indices = _utils.get_grid_coords_and_indices(
-            layer_shape, width, height, self.overlap, seed=self.seed
-        )
+        x_y = _utils.get_grid_coords(layer_shape, width, height, self.overlap, seed=self.seed)
 
         count = 0
-        for i in indices:
+        for i in range(len(x_y)):
             if count >= self.max_samples:
                 break
 
