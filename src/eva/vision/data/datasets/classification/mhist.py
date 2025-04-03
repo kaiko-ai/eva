@@ -7,12 +7,11 @@ import torch
 from torchvision import tv_tensors
 from typing_extensions import override
 
-from eva.vision.data.datasets import _validators
-from eva.vision.data.datasets.classification import base
+from eva.vision.data.datasets import _validators, vision
 from eva.vision.utils import io
 
 
-class MHIST(base.ImageClassification):
+class MHIST(vision.VisionDataset[tv_tensors.Image, torch.Tensor]):
     """MHIST dataset."""
 
     def __init__(
@@ -69,7 +68,7 @@ class MHIST(base.ImageClassification):
         )
 
     @override
-    def load_image(self, index: int) -> tv_tensors.Image:
+    def load_data(self, index: int) -> tv_tensors.Image:
         image_filename, _ = self._samples[index]
         image_path = os.path.join(self._dataset_path, image_filename)
         return io.read_image_as_tensor(image_path)

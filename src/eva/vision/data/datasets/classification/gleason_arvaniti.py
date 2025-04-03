@@ -12,12 +12,11 @@ from loguru import logger
 from torchvision import tv_tensors
 from typing_extensions import override
 
-from eva.vision.data.datasets import _validators
-from eva.vision.data.datasets.classification import base
+from eva.vision.data.datasets import _validators, vision
 from eva.vision.utils import io
 
 
-class GleasonArvaniti(base.ImageClassification):
+class GleasonArvaniti(vision.VisionDataset[tv_tensors.Image, torch.Tensor]):
     """Dataset class for GleasonArvaniti images and corresponding targets."""
 
     _expected_dataset_lengths: Dict[str | None, int] = {
@@ -121,7 +120,7 @@ class GleasonArvaniti(base.ImageClassification):
         )
 
     @override
-    def load_image(self, index: int) -> tv_tensors.Image:
+    def load_data(self, index: int) -> tv_tensors.Image:
         image_path = self._image_files[self._indices[index]]
         return io.read_image_as_tensor(image_path)
 

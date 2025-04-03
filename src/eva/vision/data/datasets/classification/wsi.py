@@ -9,12 +9,13 @@ import torch
 from torchvision import tv_tensors
 from typing_extensions import override
 
-from eva.vision.data.datasets import wsi
-from eva.vision.data.datasets.classification import base
+from eva.vision.data.datasets import vision, wsi
 from eva.vision.data.wsi.patching import samplers
 
 
-class WsiClassificationDataset(wsi.MultiWsiDataset, base.ImageClassification):
+class WsiClassificationDataset(
+    wsi.MultiWsiDataset, vision.VisionDataset[tv_tensors.Image, torch.Tensor]
+):
     """A general dataset class for whole-slide image classification using manifest files."""
 
     default_column_mapping: Dict[str, str] = {
@@ -78,10 +79,10 @@ class WsiClassificationDataset(wsi.MultiWsiDataset, base.ImageClassification):
 
     @override
     def __getitem__(self, index: int) -> Tuple[tv_tensors.Image, torch.Tensor, Dict[str, Any]]:
-        return base.ImageClassification.__getitem__(self, index)
+        return vision.VisionDataset.__getitem__(self, index)
 
     @override
-    def load_image(self, index: int) -> tv_tensors.Image:
+    def load_data(self, index: int) -> tv_tensors.Image:
         return wsi.MultiWsiDataset.__getitem__(self, index)
 
     @override

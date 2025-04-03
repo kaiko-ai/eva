@@ -13,12 +13,11 @@ from typing_extensions import override
 
 from eva.core import utils
 from eva.core.data import splitting
-from eva.vision.data.datasets import _validators
-from eva.vision.data.datasets.segmentation import base
+from eva.vision.data.datasets import _validators, vision
 from eva.vision.utils import io
 
 
-class LiTS(base.ImageSegmentation):
+class LiTS(vision.VisionDataset[tv_tensors.Image, tv_tensors.Mask]):
     """LiTS - Liver Tumor Segmentation Challenge.
 
     Webpage: https://competitions.codalab.org/competitions/17094
@@ -110,21 +109,23 @@ class LiTS(base.ImageSegmentation):
         )
 
     @override
-    def load_image(self, index: int) -> tv_tensors.Image:
+    def load_data(self, index: int) -> tv_tensors.Image:
         sample_index, slice_index = self._indices[index]
         volume_path = self._volume_files[sample_index]
-        image_array = io.read_nifti(volume_path, slice_index)
+        image_nii = io.read_nifti(volume_path, slice_index)
+        image_array = io.nifti_to_array(image_nii)
         if self._fix_orientation:
             image_array = self._orientation(image_array, sample_index)
         return tv_tensors.Image(image_array.transpose(2, 0, 1))
 
     @override
-    def load_mask(self, index: int) -> tv_tensors.Mask:
+    def load_target(self, index: int) -> tv_tensors.Mask:
         sample_index, slice_index = self._indices[index]
         segmentation_path = self._segmentation_file(sample_index)
-        semantic_labels = io.read_nifti(segmentation_path, slice_index)
+        mask_nii = io.read_nifti(segmentation_path, slice_index)
+        mask_array = io.nifti_to_array(mask_nii)
         if self._fix_orientation:
-            semantic_labels = self._orientation(semantic_labels, sample_index)
+            semantic_labels = self._orientation(mask_array, sample_index)
         return tv_tensors.Mask(semantic_labels.squeeze(), dtype=torch.int64)  # type: ignore[reportCallIssue]
 
     def _orientation(self, array: npt.NDArray, sample_index: int) -> npt.NDArray:

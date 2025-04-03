@@ -8,12 +8,11 @@ from torchvision import tv_tensors
 from torchvision.datasets import folder, utils
 from typing_extensions import override
 
-from eva.vision.data.datasets import _utils, _validators, structs
-from eva.vision.data.datasets.classification import base
+from eva.vision.data.datasets import _utils, _validators, structs, vision
 from eva.vision.utils import io
 
 
-class BACH(base.ImageClassification):
+class BACH(vision.VisionDataset[tv_tensors.Image, torch.Tensor]):
     """Dataset class for BACH images and corresponding targets."""
 
     _train_index_ranges: List[Tuple[int, int]] = [
@@ -125,7 +124,7 @@ class BACH(base.ImageClassification):
         )
 
     @override
-    def load_image(self, index: int) -> tv_tensors.Image:
+    def load_data(self, index: int) -> tv_tensors.Image:
         image_path, _ = self._samples[self._indices[index]]
         return io.read_image_as_tensor(image_path)
 

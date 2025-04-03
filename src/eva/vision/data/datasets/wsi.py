@@ -11,12 +11,12 @@ from torchvision import tv_tensors
 from torchvision.transforms.v2 import functional
 from typing_extensions import override
 
+from eva.core.data.datasets import base
 from eva.vision.data import wsi
-from eva.vision.data.datasets import vision
 from eva.vision.data.wsi.patching import samplers
 
 
-class WsiDataset(vision.VisionDataset):
+class WsiDataset(base.MapDataset):
     """Dataset class for reading patches from whole-slide images."""
 
     def __init__(
@@ -57,8 +57,8 @@ class WsiDataset(vision.VisionDataset):
     def __len__(self):
         return len(self._coords.x_y)
 
-    @override
     def filename(self, index: int) -> str:
+        """Returns the filename of the patch at the specified index."""
         return f"{self._file_path}_{index}"
 
     @property
@@ -103,7 +103,7 @@ class WsiDataset(vision.VisionDataset):
         return image
 
 
-class MultiWsiDataset(vision.VisionDataset):
+class MultiWsiDataset(base.MapDataset):
     """Dataset class for reading patches from multiple whole-slide images."""
 
     def __init__(
@@ -171,8 +171,8 @@ class MultiWsiDataset(vision.VisionDataset):
     def __getitem__(self, index: int) -> tv_tensors.Image:
         return self._concat_dataset[index]
 
-    @override
     def filename(self, index: int) -> str:
+        """Returns the filename of the patch at the specified index."""
         return os.path.basename(self._file_paths[self._get_dataset_idx(index)])
 
     def load_metadata(self, index: int) -> Dict[str, Any]:

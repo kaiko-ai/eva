@@ -64,7 +64,8 @@ class LiTSBalanced(lits.LiTS):
             if sample_idx not in split_indices:
                 continue
 
-            segmentation = io.read_nifti(self._segmentation_file(sample_idx))
+            segmentation_nii = io.read_nifti(self._segmentation_file(sample_idx))
+            segmentation = io.nifti_to_array(segmentation_nii)
             tumor_filter = segmentation == 2
             tumor_slice_filter = tumor_filter.sum(axis=(0, 1)) > 0
 

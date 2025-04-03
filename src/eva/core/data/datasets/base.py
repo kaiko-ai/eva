@@ -1,6 +1,7 @@
 """Base dataset class."""
 
 import abc
+from typing import Generic, TypeVar
 
 from eva.core.data.datasets import dataset
 
@@ -55,11 +56,15 @@ class Dataset(dataset.TorchDataset):
         """
 
 
-class MapDataset(Dataset):
+DataSample = TypeVar("DataSample")
+"""The data sample type."""
+
+
+class MapDataset(Dataset, abc.ABC, Generic[DataSample]):
     """Abstract base class for all map-style datasets."""
 
     @abc.abstractmethod
-    def __getitem__(self, index: int):
+    def __getitem__(self, index: int) -> DataSample:
         """Retrieves the item at the given index.
 
         Args:

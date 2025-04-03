@@ -11,13 +11,13 @@ from torchvision import tv_tensors
 from torchvision.transforms.v2 import functional
 from typing_extensions import override
 
-from eva.vision.data.datasets import _validators, wsi
-from eva.vision.data.datasets.segmentation import _utils, base
+from eva.vision.data.datasets import _validators, vision, wsi
+from eva.vision.data.datasets.segmentation import _utils
 from eva.vision.data.wsi.patching import samplers
 from eva.vision.utils import io
 
 
-class CoNSeP(wsi.MultiWsiDataset, base.ImageSegmentation):
+class CoNSeP(wsi.MultiWsiDataset, vision.VisionDataset[tv_tensors.Image, tv_tensors.Mask]):
     """Dataset class for CoNSeP semantic segmentation task.
 
     As in [1], we combine classes 3 (healthy epithelial) & 4 (dysplastic/malignant epithelial)
@@ -55,7 +55,6 @@ class CoNSeP(wsi.MultiWsiDataset, base.ImageSegmentation):
             width: Width of the patches to be extracted, in pixels.
             height: Height of the patches to be extracted, in pixels.
             target_mpp: Target microns per pixel (mpp) for the patches.
-            backend: The backend to use for reading the whole-slide images.
             transforms: Transforms to apply to the extracted image & mask patches.
         """
         self._split = split
@@ -112,15 +111,15 @@ class CoNSeP(wsi.MultiWsiDataset, base.ImageSegmentation):
 
     @override
     def __getitem__(self, index: int) -> Tuple[tv_tensors.Image, tv_tensors.Mask, Dict[str, Any]]:
-        return base.ImageSegmentation.__getitem__(self, index)
+        return vision.VisionDataset.__getitem__(self, index)
 
     @override
-    def load_image(self, index: int) -> tv_tensors.Image:
+    def load_data(self, index: int) -> tv_tensors.Image:
         image_array = wsi.MultiWsiDataset.__getitem__(self, index)
         return functional.to_image(image_array)
 
     @override
-    def load_mask(self, index: int) -> tv_tensors.Mask:
+    def load_target(self, index: int) -> tv_tensors.Mask:
         path = self._get_mask_path(index)
         mask = np.array(io.read_mat(path)["type_map"])
         mask_patch = _utils.extract_mask_patch(mask, self, index)
