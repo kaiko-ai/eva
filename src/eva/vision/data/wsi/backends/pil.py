@@ -50,3 +50,16 @@ class PILImage(base.Wsi):
             )
         )
         return np.array(patch)
+
+    @override
+    def _verify_location(self, location: Tuple[int, int], size: Tuple[int, int]) -> None:
+        """Verifies that the requested coordinates are within the slide dimensions.
+
+        Args:
+            location: Top-left corner (x, y) coordinates to read.
+            size: Size of the requested region (width, height)
+        """
+        x_max, y_max = self.level_dimensions[0]
+
+        if int(location[0]) >= x_max or int(location[1]) >= y_max:
+            raise ValueError(f"Out of bounds region: {location}, {size}")
