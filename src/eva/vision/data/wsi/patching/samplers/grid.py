@@ -25,7 +25,8 @@ class GridSampler(base.Sampler):
             validate_dimensions: Whether to validate the dimensions the image. It
                 expects the patch size to be smaller than the image size.
             include_last: Whether to include coordinates of the last patch when it
-                it partially exceeds the image.
+                it partially exceeds the image and therefore is smaller than the
+                specified patch size.
         """
         self.max_samples = max_samples
         self.overlap = overlap
@@ -48,9 +49,9 @@ class GridSampler(base.Sampler):
         """
         if self.validate_dimensions:
             _utils.validate_dimensions(width, height, layer_shape)
-        x_y, indices = _utils.get_grid_coords_and_indices(
+        x_y = _utils.get_grid_coords(
             layer_shape, width, height, self.overlap, seed=self.seed, include_last=self.include_last
         )
-        max_samples = len(indices) if self.max_samples is None else self.max_samples
-        for i in indices[:max_samples]:
+        max_samples = len(x_y) if self.max_samples is None else self.max_samples
+        for i in range(max_samples):
             yield x_y[i]
