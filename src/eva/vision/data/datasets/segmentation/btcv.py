@@ -31,6 +31,13 @@ class BTCV(VisionDataset[eva_tv_tensors.Volume, tv_tensors.Mask]):
         https://github.com/Luffy03/Large-Scale-Medical/blob/main/Downstream/monai/BTCV/dataset/dataset_0.json
     """
 
+    _split_index_ranges = {
+        "train": [(0, 24)],
+        "val": [(24, 30)],
+        None: [(0, 30)],
+    }
+    """Sample indices for the dataset splits."""
+
     def __init__(
         self,
         root: str,
@@ -200,12 +207,7 @@ class BTCV(VisionDataset[eva_tv_tensors.Volume, tv_tensors.Mask]):
 
     def _make_indices(self) -> list[int]:
         """Builds the dataset indices for the specified split."""
-        split_index_ranges = {
-            "train": [(0, 24)],
-            "val": [(24, 30)],
-            None: [(0, 30)],
-        }
-        index_ranges = split_index_ranges.get(self._split)
+        index_ranges = self._split_index_ranges.get(self._split)
         if index_ranges is None:
             raise ValueError("Invalid data split. Use 'train', 'val' or `None`.")
 
