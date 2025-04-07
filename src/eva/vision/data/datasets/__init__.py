@@ -16,9 +16,9 @@ from eva.vision.data.datasets.classification import (
 )
 from eva.vision.data.datasets.segmentation import (
     BCSS,
+    BTCV,
     CoNSeP,
     EmbeddingsSegmentationDataset,
-    ImageSegmentation,
     LiTS,
     LiTSBalanced,
     MoNuSAC,
@@ -29,6 +29,7 @@ from eva.vision.data.datasets.wsi import MultiWsiDataset, WsiDataset
 
 __all__ = [
     "BACH",
+    "BTCV",
     "BCSS",
     "BreaKHis",
     "BRACS",
@@ -43,7 +44,6 @@ __all__ = [
     "WsiClassificationDataset",
     "CoNSeP",
     "EmbeddingsSegmentationDataset",
-    "ImageSegmentation",
     "LiTS",
     "LiTSBalanced",
     "MoNuSAC",
