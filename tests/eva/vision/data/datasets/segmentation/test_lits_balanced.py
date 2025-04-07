@@ -33,9 +33,9 @@ def test_sample(lits_balanced_dataset: datasets.LiTSBalanced, index: int) -> Non
     # assert the format of the `image` and `mask`
     image, mask, metadata = sample
     assert isinstance(image, tv_tensors.Image)
-    assert image.shape == (1, 512, 512)
+    assert image.shape == (1, 8, 8)
     assert isinstance(mask, tv_tensors.Mask)
-    assert mask.shape == (512, 512)
+    assert mask.shape == (8, 8)
     assert isinstance(metadata, dict)
     assert "slice_index" in metadata
 
