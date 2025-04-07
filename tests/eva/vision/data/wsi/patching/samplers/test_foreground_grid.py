@@ -55,6 +55,7 @@ def test_same_seed(max_samples: int, seed: int, x_y_expected: list) -> None:
     x_y_2 = list(sampler.sample(**TEST_ARGS))
 
     assert x_y_1 == x_y_2
+    assert x_y_1 == x_y_expected
 
 
 @pytest.mark.parametrize("max_samples, seed_1, seed_2", [(3, 1, 2), (5, 3, 4)])
