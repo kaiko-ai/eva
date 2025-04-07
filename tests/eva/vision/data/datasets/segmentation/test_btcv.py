@@ -34,9 +34,9 @@ def test_sample(btcv_dataset: datasets.BTCV, index: int) -> None:
     # assert the format of the `image` and `mask`
     image, mask, metadata = sample
     assert isinstance(image, eva_tv_tensors.Volume)
-    assert image.shape == (4, 1, 512, 512)
+    assert image.shape == (4, 1, 8, 8)
     assert isinstance(mask, tv_tensors.Mask)
-    assert mask.shape == (4, 1, 512, 512)
+    assert mask.shape == (4, 1, 8, 8)
     assert isinstance(metadata, dict)
 
 
