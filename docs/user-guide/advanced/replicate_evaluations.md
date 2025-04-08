@@ -184,7 +184,7 @@ eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
 ### kaiko.ai - DINOv2 Midnight-12k (TCGA) [[4]](#references)
 
 To evaluate [kaiko.ai's](https://www.kaiko.ai/) FM with Midnight-12k (ViT-G14) backbone, pretrained on TCGA data 
-and available on [GitHub](https://github.com/kaiko-ai/towards_large_pathology_fms), run:
+and available on [GitHub](https://github.com/kaiko-ai/Midnight), run:
 
 ```
 MODEL_NAME=pathology/kaiko_midnight_12k \
