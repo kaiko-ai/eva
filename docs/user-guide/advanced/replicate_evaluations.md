@@ -181,6 +181,19 @@ IN_FEATURES=1024 \
 eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
 ```
 
+### kaiko.ai - DINOv2 Midnight-12k (TCGA) [[4]](#references)
+
+To evaluate [kaiko.ai's](https://www.kaiko.ai/) FM with Midnight-12k (ViT-G14) backbone, pretrained on TCGA data 
+and available on [GitHub](https://github.com/kaiko-ai/towards_large_pathology_fms), run:
+
+```
+MODEL_NAME=pathology/kaiko_midnight_12k \
+NORMALIZE_MEAN="[0.5,0.5,0.5]" \
+NORMALIZE_STD="[0.5,0.5,0.5]" \
+IN_FEATURES=1536 \
+eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
+```
+
 
 ### H-optimus-0 (Bioptimus) - ViT-G14 [[5]](#references)
 [Bioptimus](https://www.bioptimus.com) released their H-optimus-0 which was trained on a collection of 500,000 H&E slides. The model weights
@@ -268,3 +281,5 @@ eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
  [9]: Filiot, Alexandre, et al. "Phikon-v2, A large and public feature extractor for biomarker prediction." arXiv preprint arXiv:2409.09173 (2024).
 
  [10]: Chen, Richard J., et al. "Towards a general-purpose foundation model for computational pathology." Nature Medicine 30.3 (2024): 850-862.
+
+ [11]: Karasikov, Mikhail, et al. "Training state-of-the-art pathology foundation models with orders of magnitude less data" arXiv preprint arXiv:2504.05186850-862.
