@@ -23,7 +23,6 @@ def kaiko_midnight_12k(out_indices: int | Tuple[int, ...] | None = None) -> nn.M
         model_name="kaiko-ai/midnight",
         out_indices=out_indices,
         model_kwargs={"trust_remote_code": True},
-        transform_args={"num_register_tokens": 0} if out_indices is not None else None,
     )
 
 
