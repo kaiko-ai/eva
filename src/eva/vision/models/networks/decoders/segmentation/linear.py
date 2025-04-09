@@ -7,6 +7,7 @@ from torch import nn
 from torch.nn import functional
 
 from eva.vision.models.networks.decoders.segmentation import base
+from eva.vision.models.networks.decoders.segmentation.typings import DecoderInputs
 
 
 class LinearDecoder(base.Decoder):
@@ -104,11 +105,7 @@ class LinearDecoder(base.Decoder):
         """
         return functional.interpolate(logits, image_size, mode="bilinear")
 
-    def forward(
-        self,
-        features: List[torch.Tensor],
-        image_size: Tuple[int, int],
-    ) -> torch.Tensor:
+    def forward(self, decoder_inputs: DecoderInputs) -> torch.Tensor:
         """Maps the patch embeddings to a segmentation mask of the image size.
 
         Args:
@@ -120,6 +117,6 @@ class LinearDecoder(base.Decoder):
             Tensor containing scores for all of the classes with shape
             (batch_size, n_classes, image_height, image_width).
         """
-        patch_embeddings = self._forward_features(features)
+        patch_embeddings = self._forward_features(decoder_inputs.features)
         logits = self._forward_head(patch_embeddings)
-        return self._cls_seg(logits, image_size)
+        return self._cls_seg(logits, decoder_inputs.image_size)
