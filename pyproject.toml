@@ -70,6 +70,7 @@ vision = [
     "imagesize>=1.4.1",
     "scipy>=1.14.0",
     "monai>=1.3.2",
+    "einops>=0.8.1",
 ]
 all = [
     "h5py>=3.10.0",
@@ -83,6 +84,7 @@ all = [
     "imagesize>=1.4.1",
     "scipy>=1.14.0",
     "monai>=1.3.2",
+    "einops>=0.8.1",
 ]
 
 [project.scripts]
