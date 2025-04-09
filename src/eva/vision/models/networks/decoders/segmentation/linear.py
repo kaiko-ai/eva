@@ -109,9 +109,7 @@ class LinearDecoder(base.Decoder):
         """Maps the patch embeddings to a segmentation mask of the image size.
 
         Args:
-            features: List of multi-level image features of shape (batch_size,
-                hidden_size, n_patches_height, n_patches_width).
-            image_size: The target image size (height, width).
+            decoder_inputs: Inputs required by the decoder.
 
         Returns:
             Tensor containing scores for all of the classes with shape

@@ -1,3 +1,5 @@
+"""Unit tests for the Swin UNETR encoder."""
+
 import pytest
 import torch
 
