@@ -5,7 +5,25 @@ from typing import Tuple
 import torch
 from torch import nn
 
+from eva.vision.models.networks.backbones import _utils
 from eva.vision.models.networks.backbones.registry import register_model
+
+
+@register_model("pathology/kaiko_midnight_12k")
+def kaiko_midnight_12k(out_indices: int | Tuple[int, ...] | None = None) -> nn.Module:
+    """Initializes the Midnight-12k pathology FM by kaiko.ai.
+
+    Args:
+        out_indices: Whether and which multi-level patch embeddings to return.
+
+    Returns:
+        The model instance.
+    """
+    return _utils.load_hugingface_model(
+        model_name="kaiko-ai/midnight",
+        out_indices=out_indices,
+        model_kwargs={"trust_remote_code": True},
+    )
 
 
 @register_model("pathology/kaiko_vits16")

@@ -16,12 +16,11 @@ from torchvision.datasets import utils
 from typing_extensions import override
 
 from eva.core.utils.progress_bar import tqdm
-from eva.vision.data.datasets import _validators, structs
-from eva.vision.data.datasets.segmentation import base
+from eva.vision.data.datasets import _validators, structs, vision
 from eva.vision.utils import io
 
 
-class MoNuSAC(base.ImageSegmentation):
+class MoNuSAC(vision.VisionDataset[tv_tensors.Image, tv_tensors.Mask]):
     """MoNuSAC2020: A Multi-organ Nuclei Segmentation and Classification Challenge.
 
     Webpage: https://monusac-2020.grand-challenge.org/
@@ -112,13 +111,13 @@ class MoNuSAC(base.ImageSegmentation):
         )
 
     @override
-    def load_image(self, index: int) -> tv_tensors.Image:
+    def load_data(self, index: int) -> tv_tensors.Image:
         image_path = self._image_files[index]
         image_rgb_array = io.read_image(image_path)
         return tv_tensors.Image(image_rgb_array.transpose(2, 0, 1))
 
     @override
-    def load_mask(self, index: int) -> tv_tensors.Mask:
+    def load_target(self, index: int) -> tv_tensors.Mask:
         semantic_labels = (
             self._load_semantic_mask_file(index)
             if self._export_masks
