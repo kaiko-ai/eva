@@ -8,14 +8,16 @@ from eva.vision.models.networks.decoders.segmentation.semantic import (
     ConvDecoderMS,
     ConvDecoderWithImage,
     SingleLinearDecoder,
+    SwinUNETRDecoder,
 )
 
 __all__ = [
     "Decoder",
+    "Decoder2D",
     "ConvDecoder1x1",
     "ConvDecoderMS",
-    "SingleLinearDecoder",
     "ConvDecoderWithImage",
-    "Decoder2D",
     "LinearDecoder",
+    "SingleLinearDecoder",
+    "SwinUNETRDecoder",
 ]
