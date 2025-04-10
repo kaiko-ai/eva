@@ -1,5 +1,6 @@
 """Utilities and helper functions for models."""
 
+import hashlib
 import os
 import sys
 from typing import Any, Dict
@@ -9,7 +10,6 @@ from fsspec.core import url_to_fs
 from lightning_fabric.utilities import cloud_io
 from loguru import logger
 from torch import hub, nn
-from torchvision.datasets import utils
 
 from eva.core.utils.progress_bar import tqdm
 
@@ -63,11 +63,11 @@ def load_state_dict_from_url(
     os.makedirs(model_dir, exist_ok=True)
 
     cached_file = os.path.join(model_dir, filename or os.path.basename(url))
-    if force or not utils.check_integrity(cached_file, md5):
+    if force or not _check_integrity(cached_file, md5):
         sys.stderr.write(f"Downloading: '{url}' to {cached_file}\n")
         _download_url_to_file(url, cached_file, progress=progress)
-        if md5 is None or not utils.check_integrity(cached_file, md5):
-            sys.stderr.write(f"File MD5: {utils.calculate_md5(cached_file)}\n")
+        if md5 is None or not _check_integrity(cached_file, md5):
+            sys.stderr.write(f"File MD5: {_calculate_md5(cached_file)}\n")
 
     return torch.load(cached_file, map_location="cpu")
 
@@ -132,3 +132,14 @@ def _download_with_fsspec(
 
                 local_file.write(data)
                 pbar.update(chunk_size)
+
+
+def _calculate_md5(path: str) -> str:
+    """Calculate the md5 hash of a file."""
+    with open(path, "rb") as file:
+        return hashlib.md5(file.read(), usedforsecurity=False).hexdigest()
+
+
+def _check_integrity(path: str, md5: str | None) -> bool:
+    """Check if the file matches the specified md5 hash."""
+    return (md5 is None) or (md5 == _calculate_md5(path))
