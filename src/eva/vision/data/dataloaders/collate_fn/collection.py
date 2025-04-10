@@ -16,7 +16,7 @@ def collection_collate(batch: List[List[INPUT_BATCH]]) -> Any:
     Returns:
         The collated batch.
     """
-    tensors, targets, metadata = zip(*batch)
+    tensors, targets, metadata = zip(*batch, strict=False)
     batch_tensors = torch.cat(list(map(torch.stack, tensors)))
     batch_targets = torch.cat(list(map(torch.stack, targets)))
     return batch_tensors, batch_targets, metadata

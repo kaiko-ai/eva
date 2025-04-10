@@ -1,6 +1,6 @@
 """Type annotations for model modules."""
 
-from typing import Any, Dict, NamedTuple, List
+from typing import Any, Dict, List, NamedTuple
 
 import lightning.pytorch as pl
 import torch
