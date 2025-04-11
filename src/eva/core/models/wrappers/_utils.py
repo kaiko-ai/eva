@@ -63,7 +63,7 @@ def load_state_dict_from_url(
     os.makedirs(model_dir, exist_ok=True)
 
     cached_file = os.path.join(model_dir, filename or os.path.basename(url))
-    if force or not _check_integrity(cached_file, md5):
+    if force or not os.path.exists(cached_file) or not _check_integrity(cached_file, md5):
         sys.stderr.write(f"Downloading: '{url}' to {cached_file}\n")
         _download_url_to_file(url, cached_file, progress=progress)
         if md5 is None or not _check_integrity(cached_file, md5):

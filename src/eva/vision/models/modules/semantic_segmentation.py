@@ -25,7 +25,7 @@ class SemanticSegmentationModule(module.ModelModule):
 
     def __init__(
         self,
-        decoder: decoders.Decoder,
+        decoder: decoders.Decoder | nn.Module,
         criterion: Callable[..., torch.Tensor],
         encoder: Dict[str, Any] | Callable[[torch.Tensor], List[torch.Tensor]] | None = None,
         lr_multiplier_encoder: float = 0.0,

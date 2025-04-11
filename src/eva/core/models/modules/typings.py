@@ -1,6 +1,6 @@
 """Type annotations for model modules."""
 
-from typing import Any, Dict, NamedTuple
+from typing import Any, Dict, List, NamedTuple
 
 import lightning.pytorch as pl
 import torch
@@ -13,7 +13,7 @@ MODEL_TYPE = nn.Module | pl.LightningModule
 class INPUT_BATCH(NamedTuple):
     """The default input batch data scheme."""
 
-    data: torch.Tensor
+    data: torch.Tensor | List[torch.Tensor]
     """The data batch."""
 
     targets: torch.Tensor | None = None
