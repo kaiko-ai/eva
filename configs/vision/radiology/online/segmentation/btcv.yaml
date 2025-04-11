@@ -4,32 +4,25 @@ trainer:
   init_args:
     n_runs: &N_RUNS ${oc.env:N_RUNS, 5}
     default_root_dir: &OUTPUT_ROOT ${oc.env:OUTPUT_ROOT, logs/${oc.env:MODEL_NAME, radiology/voco_b}/btcv}
-    max_steps: &MAX_STEPS ${oc.env:MAX_STEPS, 500000}
+    max_epochs: &MAX_EPOCHS ${oc.env:MAX_EPOCHS, 500}
     checkpoint_type: ${oc.env:CHECKPOINT_TYPE, best}
+    check_val_every_n_epoch: ${oc.env:CHECK_VAL_EVERY_N_EPOCHS, 50}
     num_sanity_val_steps: 0
+    log_every_n_steps: ${oc.env:LOG_EVERY_N_STEPS, 100}
     callbacks:
       - class_path: eva.callbacks.ConfigurationLogger
       - class_path: lightning.pytorch.callbacks.TQDMProgressBar
         init_args:
           refresh_rate: ${oc.env:TQDM_REFRESH_RATE, 1}
-      - class_path: lightning.pytorch.callbacks.ModelCheckpoint
-        init_args:
-          filename: best
-          save_last: ${oc.env:SAVE_LAST, false}
-          save_top_k: 1
-          monitor: &MONITOR_METRIC ${oc.env:MONITOR_METRIC, 'val/MonaiDiceScore'}
-          mode: &MONITOR_METRIC_MODE ${oc.env:MONITOR_METRIC_MODE, max}
-      - class_path: lightning.pytorch.callbacks.EarlyStopping
-        init_args:
-          min_delta: 0
-          patience: ${oc.env:PATIENCE, 100}
-          monitor: *MONITOR_METRIC
-          mode: *MONITOR_METRIC_MODE
     logger:
       - class_path: lightning.pytorch.loggers.TensorBoardLogger
         init_args:
           save_dir: *OUTPUT_ROOT
           name: ""
+      # - class_path: lightning.pytorch.loggers.WandbLogger
+      #   init_args:
+      #     project: ${oc.env:WANDB_PROJECT, radiology}
+      #     name: ${oc.env:WANDB_RUN_NAME, btcv-${oc.env:MODEL_NAME, radiology/voco_b}}
 model:
   class_path: eva.vision.models.modules.SemanticSegmentationModule
   init_args:
@@ -48,8 +41,7 @@ model:
       class_path: monai.inferers.SlidingWindowInferer
       init_args:
         roi_size: &ROI_SIZE ${oc.env:ROI_SIZE, [96, 96, 96]}
-        sw_batch_size: ${oc.env:SW_BATCH_SIZE, 2}
-        # sw_batch_size: ${oc.env:SW_BATCH_SIZE, 8}
+        sw_batch_size: ${oc.env:SW_BATCH_SIZE, 8}
         overlap: ${oc.env:SW_OVERLAP, 0.75}
     criterion:
       class_path: monai.losses.DiceCELoss
@@ -61,17 +53,24 @@ model:
     optimizer:
       class_path: torch.optim.AdamW
       init_args:
-        lr: ${oc.env:LR_VALUE, 0.002}
+        lr: ${oc.env:LR_VALUE, 0.001}
+        betas: [0.9, 0.999]
+        weight_decay: ${oc.env:WEIGHT_DECAY, 0.01}
     lr_scheduler:
-      class_path: torch.optim.lr_scheduler.PolynomialLR
+      class_path: torch.optim.lr_scheduler.CosineAnnealingLR
       init_args:
-        total_iters: *MAX_STEPS
-        power: 0.9
+        T_max: *MAX_EPOCHS
+        eta_min: ${oc.env:LR_VALUE_END, 0.0001}
     postprocess:
       predictions_transforms:
-        - class_path: torch.argmax
+        - class_path: eva.core.models.transforms.AsDiscrete
           init_args:
-            dim: 1
+            argmax: true
+            to_onehot: *NUM_CLASSES
+      targets_transforms:
+        - class_path: eva.core.models.transforms.AsDiscrete
+          init_args:
+            to_onehot: *NUM_CLASSES
     metrics:
       common:
         - class_path: eva.metrics.AverageLoss
