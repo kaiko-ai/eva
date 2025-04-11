@@ -46,6 +46,7 @@ _fm_name_map = {
     "kaiko_vitb16": "kaiko.ai - DINO ViT-B16 | TCGA",
     "kaiko_vitb8": "kaiko.ai - DINO ViT-B8 | TCGA",
     "kaiko_vitl14": "kaiko.ai - DINOv2 ViT-L14 | TCGA",
+    "kaiko_midnight_12k": "kaiko.ai - DINOv2 Midnight-12k | TCGA",
 }
 _tasks_names_map = {
     "bach": "BACH",
@@ -130,9 +131,8 @@ def plot_leaderboard(df: pd.DataFrame, output_file: str = "docs/images/leaderboa
             tasks_for_average.append(f"{task}/test")
         else:
             tasks_for_average.append(task)
-    df["overall_performance"] = df[tasks_for_average].mean(axis=1)
-    df = df.sort_values(by="overall_performance", ascending=False)
-    df = df.drop(columns=["overall_performance"])
+    df["Average"] = df[tasks_for_average].mean(axis=1)
+    df = df.sort_values(by="Average", ascending=False)
 
     # create plot:
     df.columns = [_task_name(c) or c for c in df.columns]
