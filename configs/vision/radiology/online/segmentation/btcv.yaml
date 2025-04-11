@@ -88,6 +88,7 @@ model:
               init_args:
                 include_background: true
                 num_classes: *NUM_CLASSES
+                input_format: one-hot
                 reduction: none
             prefix: DiceScore_
             labels:
