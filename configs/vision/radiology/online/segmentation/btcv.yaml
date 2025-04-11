@@ -139,7 +139,7 @@ data:
                   init_args:
                     spatial_size: *ROI_SIZE
                     num_samples: ${oc.env:SAMPLE_BATCH_SIZE, 4}
-                    pos: ${oc.env:RAND_CROP_POS_WEIGHT, 1}
+                    pos: ${oc.env:RAND_CROP_POS_WEIGHT, 9}
                     neg: ${oc.env:RAND_CROP_NEG_WEIGHT, 1}
                 - class_path: eva.vision.data.transforms.RandFlip
                   init_args:
