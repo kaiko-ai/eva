@@ -133,7 +133,9 @@ class SemanticSegmentationModule(module.ModelModule):
         return self._batch_step(batch)
 
     @override
-    def predict_step(self, batch: INPUT_BATCH, *args: Any, **kwargs: Any) -> torch.Tensor:
+    def predict_step(
+        self, batch: INPUT_BATCH, *args: Any, **kwargs: Any
+    ) -> torch.Tensor | List[torch.Tensor]:
         tensor = INPUT_BATCH(*batch).data
         return self.encoder(tensor) if isinstance(self.encoder, nn.Module) else tensor
 
