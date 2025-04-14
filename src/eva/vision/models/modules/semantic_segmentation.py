@@ -25,7 +25,7 @@ class SemanticSegmentationModule(module.ModelModule):
 
     def __init__(
         self,
-        decoder: decoders.Decoder,
+        decoder: decoders.Decoder | nn.Module,
         criterion: Callable[..., torch.Tensor],
         encoder: Dict[str, Any] | Callable[[torch.Tensor], List[torch.Tensor]] | None = None,
         lr_multiplier_encoder: float = 0.0,
@@ -133,7 +133,9 @@ class SemanticSegmentationModule(module.ModelModule):
         return self._batch_step(batch)
 
     @override
-    def predict_step(self, batch: INPUT_BATCH, *args: Any, **kwargs: Any) -> torch.Tensor:
+    def predict_step(
+        self, batch: INPUT_BATCH, *args: Any, **kwargs: Any
+    ) -> torch.Tensor | List[torch.Tensor]:
         tensor = INPUT_BATCH(*batch).data
         return self.encoder(tensor) if isinstance(self.encoder, nn.Module) else tensor
 
