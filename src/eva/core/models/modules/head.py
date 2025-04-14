@@ -1,6 +1,6 @@
 """Neural Network Head Module."""
 
-from typing import Any, Callable, Dict
+from typing import Any, Callable, Dict, List
 
 import torch
 from lightning.pytorch.cli import LRSchedulerCallable, OptimizerCallable
@@ -108,7 +108,9 @@ class HeadModule(module.ModelModule):
         return self._batch_step(batch)
 
     @override
-    def predict_step(self, batch: INPUT_BATCH, *args: Any, **kwargs: Any) -> torch.Tensor:
+    def predict_step(
+        self, batch: INPUT_BATCH, *args: Any, **kwargs: Any
+    ) -> torch.Tensor | List[torch.Tensor]:
         tensor = INPUT_BATCH(*batch).data
         return tensor if self.backbone is None else self.backbone(tensor)
 

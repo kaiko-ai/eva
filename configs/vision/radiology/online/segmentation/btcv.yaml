@@ -115,6 +115,10 @@ data:
         init_args: &DATASET_ARGS
           root: ${oc.env:DATA_ROOT, ./data/btcv}
           split: train
+          download: ${oc.env:DOWNLOAD_DATA, false}
+          # Set `download: true` to download the dataset automatically
+          # The BTCV dataset is distributed under the CC BY 4.0 license
+          # (https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode)
           transforms:
             class_path: torchvision.transforms.v2.Compose
             init_args:
