@@ -7,6 +7,7 @@ from typing_extensions import override
 
 from eva.core.data import datasets
 from eva.core.data.samplers.sampler import SamplerWithDataSource
+import torch
 
 
 class RandomSampler(data.RandomSampler, SamplerWithDataSource[int]):
@@ -15,7 +16,7 @@ class RandomSampler(data.RandomSampler, SamplerWithDataSource[int]):
     data_source: datasets.MapDataset  # type: ignore
 
     def __init__(
-        self, replacement: bool = False, num_samples: Optional[int] = None, generator=None
+        self, replacement: bool = False, num_samples: Optional[int] = None, seed: int = 42
     ) -> None:
         """Initializes the random sampler.
 
@@ -23,17 +24,23 @@ class RandomSampler(data.RandomSampler, SamplerWithDataSource[int]):
             data_source: dataset to sample from
             replacement: samples are drawn on-demand with replacement if ``True``, default=``False``
             num_samples: number of samples to draw, default=`len(dataset)`.
-            generator: Generator used in sampling.
+        seed: Random seed for reproducibility.
         """
-        self.replacement = replacement
+        self._replacement = replacement
         self._num_samples = num_samples
-        self.generator = generator
+        self._generator = self._get_generator(seed)
 
     @override
     def set_dataset(self, data_source: datasets.MapDataset) -> None:
         super().__init__(
             data_source,
-            replacement=self.replacement,
-            num_samples=self.num_samples,
-            generator=self.generator,
+            replacement=self._replacement,
+            num_samples=self._num_samples,
+            generator=self._generator,
         )
+
+    def _get_generator(self, seed: int) -> torch.Generator:
+        """Returns the randbom generator used for sampling."""
+        generator = torch.Generator()
+        generator.manual_seed(seed)
+        return generator
