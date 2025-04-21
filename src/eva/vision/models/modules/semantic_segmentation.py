@@ -1,10 +1,11 @@
 """"Neural Network Semantic Segmentation Module."""
 
-from typing import Any, Callable, Dict, Iterable, List, Tuple
+from typing import Any, Callable, Dict, Iterable, List
 
 import torch
 from lightning.pytorch.cli import LRSchedulerCallable, OptimizerCallable
 from lightning.pytorch.utilities.types import STEP_OUTPUT
+from monai.inferers.inferer import Inferer
 from torch import nn, optim
 from torch.optim import lr_scheduler
 from typing_extensions import override
@@ -15,6 +16,7 @@ from eva.core.models.modules.typings import INPUT_BATCH, INPUT_TENSOR_BATCH
 from eva.core.models.modules.utils import batch_postprocess, grad, submodule_state_dict
 from eva.core.utils import parser
 from eva.vision.models.networks import decoders
+from eva.vision.models.networks.decoders import segmentation
 from eva.vision.models.networks.decoders.segmentation.typings import DecoderInputs
 
 
@@ -23,10 +25,11 @@ class SemanticSegmentationModule(module.ModelModule):
 
     def __init__(
         self,
-        decoder: decoders.Decoder,
+        decoder: decoders.Decoder | nn.Module,
         criterion: Callable[..., torch.Tensor],
         encoder: Dict[str, Any] | Callable[[torch.Tensor], List[torch.Tensor]] | None = None,
         lr_multiplier_encoder: float = 0.0,
+        inferer: Inferer | None = None,
         optimizer: OptimizerCallable = optim.AdamW,
         lr_scheduler: LRSchedulerCallable = lr_scheduler.ConstantLR,
         metrics: metrics_lib.MetricsSchema | None = None,
@@ -44,6 +47,8 @@ class SemanticSegmentationModule(module.ModelModule):
                 during the `configure_model` step.
             lr_multiplier_encoder: The learning rate multiplier for the
                 encoder parameters. If `0`, it will freeze the encoder.
+            inferer: An optional MONAI `Inferer` for inference
+                postprocess during evaluation.
             optimizer: The optimizer to use.
             lr_scheduler: The learning rate scheduler to use.
             metrics: The metric groups to track.
@@ -62,6 +67,7 @@ class SemanticSegmentationModule(module.ModelModule):
         self.optimizer = optimizer
         self.lr_scheduler = lr_scheduler
         self.save_decoder_only = save_decoder_only
+        self.inferer = inferer
 
     @override
     def configure_model(self) -> None:
@@ -104,25 +110,15 @@ class SemanticSegmentationModule(module.ModelModule):
     @override
     def forward(
         self,
-        inputs: torch.Tensor,
-        to_size: Tuple[int, int] | None = None,
+        tensor: torch.Tensor,
         *args: Any,
         **kwargs: Any,
     ) -> torch.Tensor:
-        """Maps the input tensor (image tensor or embeddings) to masks.
-
-        If `inputs` is image tensor, then the `self.encoder`
-        should be implemented, otherwise it will be interpreted
-        as embeddings, where the `to_size` should be given.
-        """
-        if self.encoder is None and to_size is None:
-            raise ValueError(
-                "Please provide the expected `to_size` that the "
-                "decoder should map the embeddings (`inputs`) to."
-            )
-        features = self.encoder(inputs) if self.encoder else inputs
-        decoder_inputs = DecoderInputs(features, to_size or inputs.shape[-2:], inputs)  # type: ignore
-        return self.decoder(decoder_inputs)
+        return (
+            self.inferer(tensor, network=self._forward_networks)
+            if self.inferer is not None and not self.training
+            else self._forward_networks(tensor)
+        )
 
     @override
     def training_step(self, batch: INPUT_TENSOR_BATCH, *args: Any, **kwargs: Any) -> STEP_OUTPUT:
@@ -137,7 +133,9 @@ class SemanticSegmentationModule(module.ModelModule):
         return self._batch_step(batch)
 
     @override
-    def predict_step(self, batch: INPUT_BATCH, *args: Any, **kwargs: Any) -> torch.Tensor:
+    def predict_step(
+        self, batch: INPUT_BATCH, *args: Any, **kwargs: Any
+    ) -> torch.Tensor | List[torch.Tensor]:
         tensor = INPUT_BATCH(*batch).data
         return self.encoder(tensor) if isinstance(self.encoder, nn.Module) else tensor
 
@@ -170,7 +168,7 @@ class SemanticSegmentationModule(module.ModelModule):
             The batch step output.
         """
         data, targets, metadata = INPUT_TENSOR_BATCH(*batch)
-        predictions = self(data, to_size=targets.shape[-2:])
+        predictions = self(data)
         loss = self.criterion(predictions, targets)
         return {
             "loss": loss,
@@ -178,3 +176,13 @@ class SemanticSegmentationModule(module.ModelModule):
             "predictions": predictions,
             "metadata": metadata,
         }
+
+    def _forward_networks(self, tensor: torch.Tensor) -> torch.Tensor:
+        """Passes the input tensor through the encoder and decoder."""
+        features = self.encoder(tensor) if self.encoder else tensor
+        if isinstance(self.decoder, segmentation.Decoder):
+            if not isinstance(features, list):
+                raise ValueError(f"Expected a list of feature map tensors, got {type(features)}.")
+            image_size = (tensor.shape[-2], tensor.shape[-1])
+            return self.decoder(DecoderInputs(features, image_size, tensor))
+        return self.decoder(features)

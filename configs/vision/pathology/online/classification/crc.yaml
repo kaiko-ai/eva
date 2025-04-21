@@ -24,7 +24,7 @@ trainer:
       - class_path: lightning.pytorch.callbacks.EarlyStopping
         init_args:
           min_delta: 0
-          patience: ${oc.env:PATIENCE, 24}
+          patience: ${oc.env:PATIENCE, 7}
           monitor: *MONITOR_METRIC
           mode: *MONITOR_METRIC_MODE
     logger:
@@ -50,11 +50,6 @@ model:
       class_path: torch.optim.AdamW
       init_args:
         lr: ${oc.env:LR_VALUE, 0.0003}
-    lr_scheduler:
-      class_path: torch.optim.lr_scheduler.CosineAnnealingLR
-      init_args:
-        T_max: *MAX_STEPS
-        eta_min: 0.0
     metrics:
       common:
         - class_path: eva.metrics.AverageLoss

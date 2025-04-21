@@ -99,6 +99,7 @@ nav:
         - PANDA: datasets/panda.md
         - PANDASmall: datasets/panda_small.md
     - Radiology:
+      - BTCV: datasets/btcv.md
       - TotalSegmentator: datasets/total_segmentator.md
       - LiTS: datasets/lits.md
   - Reference API:

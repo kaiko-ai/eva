@@ -8,12 +8,11 @@ from torchvision import tv_tensors
 from torchvision.datasets import folder, utils
 from typing_extensions import override
 
-from eva.vision.data.datasets import _validators, structs
-from eva.vision.data.datasets.classification import base
+from eva.vision.data.datasets import _validators, structs, vision
 from eva.vision.utils import io
 
 
-class CRC(base.ImageClassification):
+class CRC(vision.VisionDataset[tv_tensors.Image, torch.Tensor]):
     """Dataset class for CRC images and corresponding targets."""
 
     _train_resource: structs.DownloadResource = structs.DownloadResource(
@@ -117,7 +116,7 @@ class CRC(base.ImageClassification):
         )
 
     @override
-    def load_image(self, index: int) -> tv_tensors.Image:
+    def load_data(self, index: int) -> tv_tensors.Image:
         image_path, _ = self._samples[index]
         return io.read_image_as_tensor(image_path)
 
