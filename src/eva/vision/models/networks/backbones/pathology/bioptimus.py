@@ -16,7 +16,9 @@ def bioptimus_h_optimus_0(
     dynamic_img_size: bool = True,
     out_indices: int | Tuple[int, ...] | None = None,
 ) -> nn.Module:
-    """Initializes the h_optimus_0 pathology FM by Bioptimus.
+    """Initializes the H-Optimus-0 pathology FM by Bioptimus.
+
+    See https://huggingface.co/bioptimus/H-optimus-0 for details.
 
     Args:
         dynamic_img_size: Whether to allow the interpolation embedding
@@ -44,7 +46,9 @@ def bioptimus_h0_mini(
     hf_token: str | None = None,
     include_patch_tokens: bool = False,
 ) -> nn.Module:
-    """Initializes Owkin & Bioptimus ViT-B distilled from H-Optimus-0 on 40M TCGA tiles.
+    """Initializes H0-mini (ViT-B) pathology FM by Bioptimus.
+
+    This model was distilled from H-Optimus-0 on 40M TCGA tiles.
 
     See https://huggingface.co/bioptimus/H0-mini for details.
 

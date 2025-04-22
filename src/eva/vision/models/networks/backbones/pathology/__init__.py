@@ -1,8 +1,8 @@
 """Vision Pathology Model Backbones API."""
 
 from eva.vision.models.networks.backbones.pathology.bioptimus import (
-    bioptimus_h_optimus_0,
     bioptimus_h0_mini,
+    bioptimus_h_optimus_0,
 )
 from eva.vision.models.networks.backbones.pathology.gigapath import prov_gigapath
 from eva.vision.models.networks.backbones.pathology.histai import histai_hibou_b, histai_hibou_l
