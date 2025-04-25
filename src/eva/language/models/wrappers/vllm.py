@@ -74,18 +74,18 @@ class VLLMTextModel(base.BaseModel):
             ValueError: If the tokenizer does not have a chat template.
         """
         self.load_model()
-        if self.tokenizer.chat_template is None:
+        if self._tokenizer.chat_template is None:
             raise ValueError("Tokenizer does not have a chat template.")
 
         chat_messages = [[{"role": "user", "content": p}] for p in prompts]
-        encoded_messages = self.tokenizer.apply_chat_template(
+        encoded_messages = self._tokenizer.apply_chat_template(
             chat_messages,
             tokenize=True,
             add_generation_prompt=True,
         )
 
         # Check for double start token (BOS)
-        wrong_sequence = [self.tokenizer.bos_token_id] * 2
+        wrong_sequence = [self._tokenizer.bos_token_id] * 2
         if encoded_messages[: len(wrong_sequence)] == wrong_sequence:
             logger.warning("Found a double start token in the input_ids. Removing it.")
             encoded_messages.pop(0)
