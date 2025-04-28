@@ -21,7 +21,7 @@ jobs:
     steps:
       - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
       - name: Setting up PDM
-        uses: pdm-project/setup-pdm@568ddd69406b30de1774ec0044b73ae06e716aa4 # v4
+        uses: pdm-project/setup-pdm@94a823180e06fcde4ad29308721954a521c96ed0 # v4
         with:
           python-version: "3.10"
           architecture: x64
@@ -56,7 +56,7 @@ jobs:
           PDM_PUBLISH_USERNAME: ${{ secrets.PYPI_USERNAME }}
           PDM_PUBLISH_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
       - name: Create Pull Request for version bump
-        uses: peter-evans/create-pull-request@v6
+        uses: peter-evans/create-pull-request@c5a7806660adbe173f04e3e038b0ccdcd758773c # v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: "chore: bump version to ${{ github.ref_name }}"
