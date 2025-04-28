@@ -6,6 +6,7 @@ from loguru import logger
 from typing_extensions import override
 from vllm import LLM, SamplingParams
 from vllm.inputs import TokensPrompt
+from vllm.transformers_utils.tokenizer import AnyTokenizer
 
 from eva.core.models.wrappers import base
 
@@ -45,7 +46,7 @@ class VLLMTextModel(base.BaseModel):
 
         # Postpone heavy LLM initialisation to avoid pickling issues
         self._model: LLM | None = None
-        self._tokenizer = None
+        self._tokenizer: AnyTokenizer | None = None
 
     @override
     def load_model(self) -> None:
@@ -58,9 +59,7 @@ class VLLMTextModel(base.BaseModel):
         self._model = LLM(model=self._model_name_or_path, **self._model_kwargs)
         self._tokenizer = self._model.get_tokenizer()
 
-    def _apply_chat_template(
-        self, prompts: Sequence[str]  # CHANGED: accept raw strings
-    ) -> Any:  # Should be vllm.inputs.TokensPrompt
+    def _apply_chat_template(self, prompts: Sequence[str]) -> list[TokensPrompt]:
         """Apply chat template to the messages.
 
         Args:
@@ -73,6 +72,10 @@ class VLLMTextModel(base.BaseModel):
             ValueError: If the tokenizer does not have a chat template.
         """
         self.load_model()
+
+        assert self._model is not None, "Please check your model"
+        assert self._tokenizer is not None, "Please check yuor tokenizer"
+
         if self._tokenizer.chat_template is None:
             raise ValueError("Tokenizer does not have a chat template.")
 
@@ -103,7 +106,7 @@ class VLLMTextModel(base.BaseModel):
             The generated text response.
         """
         self.load_model()
-
+        assert self._model is not None, "The model is not loaded successfully"
         prompt_tokens = self._apply_chat_template(prompts)
         outputs = self._model.generate(prompt_tokens, SamplingParams(**self._generation_kwargs))
-        return [output.outputs[0].text for output in outputs]  # CHANGED: simplified indexing
+        return [output.outputs[0].text for output in outputs]
