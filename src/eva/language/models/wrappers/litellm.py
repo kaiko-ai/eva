@@ -46,20 +46,32 @@ class LiteLLMTextModel(base.BaseModel):
         """
         pass
 
-    def generate(self, prompts: list) -> str:
+    def generate(self, prompts: list) -> list[str]:
         """Generates text using litellm.
 
         Args:
             prompts: A list of prompts to be converted into a "user" message.
 
         Returns:
-            The generated text response.
+            A list of generated text responses. Failed generations will contain
+            error messages instead of generated text.
         """
         messages = [[{"role": "user", "content": prompt}] for prompt in prompts]
-        try:
-            responses = batch_completion(
-                model=self._model_name_or_path, messages=messages, **self._model_kwargs
-            )
-        except Exception as e:
-            logger.error(f"Error generating text: {e}")
-        return [response["choices"][0]["message"]["content"] for response in responses]
+
+        responses = batch_completion(
+            model=self._model_name_or_path,
+            messages=messages,
+            return_exceptions=True,
+            **self._model_kwargs,
+        )
+
+        results = []
+        for i, response in enumerate(responses):
+            if isinstance(response, Exception):
+                error_msg = f"Error generating text for prompt {i}: {response}"
+                logger.error(error_msg)
+                results.append(f"[GENERATION ERROR]: {error_msg}")
+            else:
+                results.append(response["choices"][0]["message"]["content"])
+
+        return results

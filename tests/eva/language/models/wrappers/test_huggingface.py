@@ -36,8 +36,9 @@ def test_real_small_hf_model_generation(
     """
     model = HuggingFaceTextModel(model_name_or_path=model_name_or_path, task="text-generation")
 
-    output1 = model.generate(prompt, **generate_kwargs)
-    output2 = model.generate(prompt, **generate_kwargs)
+    # Wrap the prompt in a list to match the updated API
+    output1 = model.generate([prompt], **generate_kwargs)[0]
+    output2 = model.generate([prompt], **generate_kwargs)[0]
 
     assert isinstance(output1, str) and output1, "First output should be a non-empty string."
     assert isinstance(output2, str) and output2, "Second output should be a non-empty string."

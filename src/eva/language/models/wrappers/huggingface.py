@@ -55,6 +55,8 @@ class HuggingFaceTextModel(base.BaseModel):
             The generated text as a string.
         """
         outputs = self._pipeline(prompts, return_full_text=False, **generate_kwargs)
+        if outputs is None:
+            raise ValueError("Outputs from the model are None.")
         return [
             output[0]["generated_text"] if isinstance(output, list) else output
             for output in outputs
