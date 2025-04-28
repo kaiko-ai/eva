@@ -75,10 +75,7 @@ class VLLMTextModel(base.BaseModel):
         if self._llm_tokenizer is None:
             raise RuntimeError("Tokenizer not initialized")
 
-        if (
-            not hasattr(self._llm_tokenizer, "chat_template")
-            or self._llm_tokenizer.chat_template is None
-        ):
+        if not hasattr(self._llm_tokenizer, "chat_template"):
             raise ValueError("Tokenizer does not have a chat template.")
 
         chat_messages = [[{"role": "user", "content": p}] for p in prompts]
@@ -101,9 +98,26 @@ class VLLMTextModel(base.BaseModel):
             logger.warning("Found a double start token in the input_ids. Removing it.")
             encoded_messages = encoded_messages[1:]
 
-        return [
-            TokensPrompt(prompt_token_ids=encoded_message) for encoded_message in encoded_messages
-        ]
+        result = []
+        for encoded_message in encoded_messages:
+            if isinstance(encoded_message, (list, tuple)):
+                # Ensure all elements are integers
+                token_ids = [
+                    int(token) if isinstance(token, (int, str)) and str(token).isdigit() else 0
+                    for token in encoded_message
+                ]
+            else:
+                # Handle single token case
+                token_id = (
+                    int(encoded_message)
+                    if isinstance(encoded_message, (int, str)) and str(encoded_message).isdigit()
+                    else 0
+                )
+                token_ids = [token_id]
+
+            result.append(TokensPrompt(prompt_token_ids=token_ids))
+
+        return result
 
     def generate(self, prompts: List[str]) -> List[str]:
         """Generates text for the given prompt using the vLLM model.
