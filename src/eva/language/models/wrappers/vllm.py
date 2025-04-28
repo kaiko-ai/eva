@@ -45,8 +45,8 @@ class VLLMTextModel(base.BaseModel):
         self._generation_kwargs = generation_kwargs or {}
 
         # Postpone heavy LLM initialisation to avoid pickling issues
-        self._model: LLM | None = None
-        self._tokenizer: AnyTokenizer | None = None
+        self._llm_model: LLM | None = None
+        self._llm_tokenizer: AnyTokenizer | None = None
 
     @override
     def load_model(self) -> None:
@@ -54,14 +54,10 @@ class VLLMTextModel(base.BaseModel):
 
         This lazy initialisation keeps the wrapper picklable by Ray / Lightning.
         """
-        if self._model is not None:
+        if self._llm_model is not None:
             return
-        self._model: LLM = LLM(model=self._model_name_or_path, **self._model_kwargs)
-        self._tokenizer: AnyTokenizer = self._model.get_tokenizer()
-        if self._model is None:
-            logger.error("Please check your model")
-        if self._tokenizer is None:
-            logger.error("Please check yuor tokenizer")
+        self._llm_model = LLM(model=self._model_name_or_path, **self._model_kwargs)
+        self._llm_tokenizer = self._llm_model.get_tokenizer()
 
     def _apply_chat_template(self, prompts: Sequence[str]) -> list[TokensPrompt]:
         """Apply chat template to the messages.
@@ -76,22 +72,34 @@ class VLLMTextModel(base.BaseModel):
             ValueError: If the tokenizer does not have a chat template.
         """
         self.load_model()
+        if self._llm_tokenizer is None:
+            raise RuntimeError("Tokenizer not initialized")
 
-        if self._tokenizer.chat_template is None:
+        if (
+            not hasattr(self._llm_tokenizer, "chat_template")
+            or self._llm_tokenizer.chat_template is None
+        ):
             raise ValueError("Tokenizer does not have a chat template.")
 
         chat_messages = [[{"role": "user", "content": p}] for p in prompts]
-        encoded_messages = self._tokenizer.apply_chat_template(
-            chat_messages,
+        encoded_messages = self._llm_tokenizer.apply_chat_template(
+            chat_messages,  # type: ignore
             tokenize=True,
             add_generation_prompt=True,
         )
 
         # Check for double start token (BOS)
-        wrong_sequence = [self._tokenizer.bos_token_id] * 2
-        if encoded_messages[: len(wrong_sequence)] == wrong_sequence:
+        if (
+            hasattr(self._llm_tokenizer, "bos_token_id")
+            and self._llm_tokenizer.bos_token_id is not None
+            and isinstance(encoded_messages, list)
+            and len(encoded_messages) >= 2
+            and encoded_messages[0] == self._llm_tokenizer.bos_token_id
+            and encoded_messages[1] == self._llm_tokenizer.bos_token_id
+        ):
+
             logger.warning("Found a double start token in the input_ids. Removing it.")
-            encoded_messages.pop(0)
+            encoded_messages = encoded_messages[1:]
 
         return [
             TokensPrompt(prompt_token_ids=encoded_message) for encoded_message in encoded_messages
@@ -107,6 +115,9 @@ class VLLMTextModel(base.BaseModel):
             The generated text response.
         """
         self.load_model()
+        if self._llm_model is None:
+            raise RuntimeError("Model not initialized")
+
         prompt_tokens = self._apply_chat_template(prompts)
-        outputs = self._model.generate(prompt_tokens, SamplingParams(**self._generation_kwargs))
+        outputs = self._llm_model.generate(prompt_tokens, SamplingParams(**self._generation_kwargs))
         return [output.outputs[0].text for output in outputs]
