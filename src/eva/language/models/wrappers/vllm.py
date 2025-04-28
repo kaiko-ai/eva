@@ -1,7 +1,6 @@
 """LLM wrapper for vLLM models."""
 
-from typing import Any, Dict, List
-from typing import Sequence
+from typing import Any, Dict, List, Sequence
 
 from loguru import logger
 from typing_extensions import override
