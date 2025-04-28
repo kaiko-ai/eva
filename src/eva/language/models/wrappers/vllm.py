@@ -56,8 +56,12 @@ class VLLMTextModel(base.BaseModel):
         """
         if self._model is not None:
             return
-        self._model = LLM(model=self._model_name_or_path, **self._model_kwargs)
-        self._tokenizer = self._model.get_tokenizer()
+        self._model: LLM = LLM(model=self._model_name_or_path, **self._model_kwargs)
+        self._tokenizer: AnyTokenizer = self._model.get_tokenizer()
+        if self._model is None:
+            logger.error("Please check your model")
+        if self._tokenizer is None:
+            logger.error("Please check yuor tokenizer")
 
     def _apply_chat_template(self, prompts: Sequence[str]) -> list[TokensPrompt]:
         """Apply chat template to the messages.
@@ -72,9 +76,6 @@ class VLLMTextModel(base.BaseModel):
             ValueError: If the tokenizer does not have a chat template.
         """
         self.load_model()
-
-        assert self._model is not None, "Please check your model"
-        assert self._tokenizer is not None, "Please check yuor tokenizer"
 
         if self._tokenizer.chat_template is None:
             raise ValueError("Tokenizer does not have a chat template.")
@@ -106,7 +107,6 @@ class VLLMTextModel(base.BaseModel):
             The generated text response.
         """
         self.load_model()
-        assert self._model is not None, "The model is not loaded successfully"
         prompt_tokens = self._apply_chat_template(prompts)
         outputs = self._model.generate(prompt_tokens, SamplingParams(**self._generation_kwargs))
         return [output.outputs[0].text for output in outputs]
