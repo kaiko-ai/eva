@@ -137,22 +137,9 @@ class DataModule(pl.LightningDataModule):
         """
         datasets = datasets if isinstance(datasets, list) else [datasets]
 
-        dataloader_kwargs = getattr(dataloader, "kwargs", {})
-        collate_fn = dataloader_kwargs.get("collate_fn")
-
-        if isinstance(collate_fn, str):
-            try:
-                module_path, function_name = collate_fn.rsplit(".", 1)
-                module = __import__(module_path, fromlist=[function_name])
-                collate_fn = getattr(module, function_name)
-                dataloader_kwargs["collate_fn"] = collate_fn
-            except (ImportError, AttributeError) as e:
-                raise ImportError(f"Failed to import collate_fn {collate_fn}: {str(e)}") from e
-
         dataloaders = []
         for dataset in datasets:
             if sampler is not None and isinstance(sampler, samplers_lib.SamplerWithDataSource):
                 sampler.set_dataset(dataset)  # type: ignore
-            dataloaders.append(dataloader(dataset, sampler=sampler, **dataloader_kwargs))
-
+            dataloaders.append(dataloader(dataset, sampler=sampler))
         return dataloaders
