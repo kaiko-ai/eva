@@ -14,7 +14,7 @@ class HuggingFaceTextModel(base.BaseModel):
     def __init__(
         self,
         model_name_or_path: str,
-        task: Literal["text-generation", "text-classification"] = "text-generation",
+        task: Literal["text-generation"] = "text-generation",
         model_kwargs: Dict[str, Any] | None = None,
     ) -> None:
         """Initializes the model.
