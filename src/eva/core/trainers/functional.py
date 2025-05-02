@@ -77,7 +77,7 @@ def run_evaluation(
         If a stage is not executed, its value will be None.
     """
     if not stages:
-        stages =  ["fit", "validate"]
+        stages = ["fit", "validate"]
     trainer, model = _utils.clone(base_trainer, base_model)
     model.configure_model()
     trainer.setup_log_dirs(run_id or "")
