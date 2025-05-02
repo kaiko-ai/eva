@@ -59,7 +59,7 @@ def run_evaluation(
     run_id: str | None = None,
     stages: List[Literal["fit", "validate", "test"]] | None = None,
     verbose: bool = True,
-) -> Tuple[_EVALUATE_OUTPUT, _EVALUATE_OUTPUT | None]:
+) -> Tuple[_EVALUATE_OUTPUT | None, _EVALUATE_OUTPUT | None]:
     """Runs the specified evaluation stages out-of-place.
 
     Args:
