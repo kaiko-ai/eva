@@ -38,7 +38,7 @@ class Interface:
             base_trainer=trainer,
             base_model=model,
             datamodule=data,
-            stages=["fit", "validate"],
+            stages=["fit", "validate", "test"],
             n_runs=1,
             verbose=True,
         )

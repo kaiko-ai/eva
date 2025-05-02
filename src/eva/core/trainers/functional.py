@@ -36,7 +36,7 @@ def run_evaluation_session(
             those of each individual run and vice-versa.
     """
     if not stages:
-        stages = ["fit", "validate"]
+        stages = ["fit", "validate", "test"]
     recorder = _recorder.SessionRecorder(output_dir=base_trainer.default_log_dir, verbose=verbose)
     for run_index in range(n_runs):
         validation_scores, test_scores = run_evaluation(
@@ -47,7 +47,8 @@ def run_evaluation_session(
             stages=stages,
             verbose=not verbose,
         )
-        recorder.update(validation_scores, test_scores)
+        if validation_scores:
+            recorder.update(validation_scores, test_scores)
     recorder.save()
 
 
@@ -77,7 +78,7 @@ def run_evaluation(
         If a stage is not executed, its value will be None.
     """
     if not stages:
-        stages = ["fit", "validate"]
+        stages = ["fit", "validate", "test"]
     trainer, model = _utils.clone(base_trainer, base_model)
     model.configure_model()
     trainer.setup_log_dirs(run_id or "")

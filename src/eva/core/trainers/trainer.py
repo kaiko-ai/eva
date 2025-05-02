@@ -109,7 +109,7 @@ class Trainer(pl_trainer.Trainer):
             stages: List of stages to execute. Options: "fit", "validate", "test".
         """
         if not stages:
-            stages = ["fit", "validate"]
+            stages = ["fit", "validate", "test"]
         functional.run_evaluation_session(
             base_trainer=self,
             base_model=model,
