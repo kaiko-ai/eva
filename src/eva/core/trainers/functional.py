@@ -16,7 +16,7 @@ def run_evaluation_session(
     datamodule: datamodules.DataModule,
     *,
     n_runs: int = 1,
-    stages: List[Literal["fit", "validate", "test"]] = ["fit", "validate"],
+    stages: List[Literal["fit", "validate", "test"]] | None = None,
     verbose: bool = True,
 ) -> None:
     """Runs a downstream evaluation session out-of-place.
@@ -35,6 +35,8 @@ def run_evaluation_session(
         verbose: Whether to verbose the session metrics instead of
             those of each individual run and vice-versa.
     """
+    if not stages:
+        stages = ["fit", "validate"]
     recorder = _recorder.SessionRecorder(output_dir=base_trainer.default_log_dir, verbose=verbose)
     for run_index in range(n_runs):
         validation_scores, test_scores = run_evaluation(
@@ -55,7 +57,7 @@ def run_evaluation(
     datamodule: datamodules.DataModule,
     *,
     run_id: str | None = None,
-    stages: List[Literal["fit", "validate", "test"]] = ["fit", "validate"],
+    stages: List[Literal["fit", "validate", "test"]] | None = None,
     verbose: bool = True,
 ) -> Tuple[_EVALUATE_OUTPUT, _EVALUATE_OUTPUT | None]:
     """Runs the specified evaluation stages out-of-place.
@@ -74,6 +76,8 @@ def run_evaluation(
         A tuple with the validation and the test metrics (if executed).
         If a stage is not executed, its value will be None.
     """
+    if not stages:
+        stages =  ["fit", "validate"]
     trainer, model = _utils.clone(base_trainer, base_model)
     model.configure_model()
     trainer.setup_log_dirs(run_id or "")

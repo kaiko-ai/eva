@@ -94,7 +94,7 @@ class Trainer(pl_trainer.Trainer):
         self,
         model: modules.ModelModule,
         datamodule: datamodules.DataModule,
-        stages: list[str] = ["fit", "validate"],
+        stages: List[Literal["fit", "validate", "test"]] | None = None,
     ) -> None:
         """Runs an evaluation session out-of-place.
 
@@ -106,7 +106,10 @@ class Trainer(pl_trainer.Trainer):
         Args:
             model: The base model module to evaluate.
             datamodule: The data module.
+            stages: List of stages to execute. Options: "fit", "validate", "test".
         """
+        if not stages:
+            stages = ["fit", "validate"]
         functional.run_evaluation_session(
             base_trainer=self,
             base_model=model,
