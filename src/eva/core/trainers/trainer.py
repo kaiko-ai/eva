@@ -94,6 +94,7 @@ class Trainer(pl_trainer.Trainer):
         self,
         model: modules.ModelModule,
         datamodule: datamodules.DataModule,
+        stages: list[str] = ["fit", "validate"],
     ) -> None:
         """Runs an evaluation session out-of-place.
 
@@ -110,29 +111,7 @@ class Trainer(pl_trainer.Trainer):
             base_trainer=self,
             base_model=model,
             datamodule=datamodule,
+            stages=stages,
             n_runs=self.n_runs,
             verbose=self.n_runs > 1,
-        )
-
-    def validate_only(
-        self,
-        model: modules.ModelModule,
-        datamodule: datamodules.DataModule,
-        verbose: bool = True,
-    ) -> None:
-        """Runs validation on the model out-of-place without fitting or test.
-
-        Args:
-            model: The model to validate (cloned, not modified in-place).
-            datamodule: The datamodule for validation.
-            verbose: Whether to print validation metrics to stdout.
-
-        Returns:
-            Validation metrics as returned by trainer.validate.
-        """
-        functional.run_validation(
-            base_trainer=self,
-            base_model=model,
-            datamodule=datamodule,
-            verbose=verbose,
         )

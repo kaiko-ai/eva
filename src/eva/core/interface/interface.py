@@ -34,7 +34,14 @@ class Interface:
             model: The model module to use but not modify.
             data: The data module.
         """
-        trainer.run_evaluation_session(model=model, datamodule=data)
+        eva_trainer.run_evaluation_session(
+            base_trainer=trainer,
+            base_model=model,
+            datamodule=data,
+            stages=["fit", "validate"],
+            n_runs=1,
+            verbose=True,
+        )
 
     def predict(
         self,
@@ -95,8 +102,11 @@ class Interface:
             model: The model module to use but not modify.
             data: The data module containing validation data.
         """
-        trainer.validate_only(
-            model=model,
+        eva_trainer.run_evaluation_session(
+            base_trainer=trainer,
+            base_model=model,
             datamodule=data,
+            stages=["validate"],
+            n_runs=1,
             verbose=True,
         )
