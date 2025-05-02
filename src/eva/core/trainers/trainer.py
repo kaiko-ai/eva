@@ -1,7 +1,7 @@
 """Core trainer module."""
 
 import os
-from typing import Any, Literal, List
+from typing import Any, List, Literal
 
 import loguru
 from lightning.pytorch import loggers as pl_loggers
