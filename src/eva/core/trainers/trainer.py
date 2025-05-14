@@ -1,7 +1,7 @@
 """Core trainer module."""
 
 import os
-from typing import Any, List, Literal
+from typing import Any, Literal
 
 import loguru
 from lightning.pytorch import loggers as pl_loggers
@@ -11,9 +11,7 @@ from lightning_fabric.utilities import cloud_io
 from typing_extensions import override
 
 from eva.core import loggers as eva_loggers
-from eva.core.data import datamodules
-from eva.core.models import modules
-from eva.core.trainers import _logging, functional
+from eva.core.trainers import _logging
 
 
 class Trainer(pl_trainer.Trainer):
@@ -89,4 +87,3 @@ class Trainer(pl_trainer.Trainer):
                 enabled_loggers.append(logger)
 
         self._loggers = enabled_loggers or [eva_loggers.DummyLogger(self._log_dir)]
-
