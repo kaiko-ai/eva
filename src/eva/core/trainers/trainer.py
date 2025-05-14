@@ -90,31 +90,3 @@ class Trainer(pl_trainer.Trainer):
 
         self._loggers = enabled_loggers or [eva_loggers.DummyLogger(self._log_dir)]
 
-    def run_evaluation_session(
-        self,
-        model: modules.ModelModule,
-        datamodule: datamodules.DataModule,
-        stages: List[Literal["fit", "validate", "test"]] | None = None,
-    ) -> None:
-        """Runs an evaluation session out-of-place.
-
-        It performs an evaluation run (fit and evaluate) the model
-        `self._n_run` times. Note that the input `base_model` would
-        not be modified, so the weights of the input model will remain
-        as they are.
-
-        Args:
-            model: The base model module to evaluate.
-            datamodule: The data module.
-            stages: List of stages to execute. Options: "fit", "validate", "test".
-        """
-        if not stages:
-            stages = ["fit", "validate", "test"]
-        functional.run_evaluation_session(
-            base_trainer=self,
-            base_model=model,
-            datamodule=datamodule,
-            stages=stages,
-            n_runs=self.n_runs,
-            verbose=self.n_runs > 1,
-        )

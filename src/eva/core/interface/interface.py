@@ -39,8 +39,8 @@ class Interface:
             base_model=model,
             datamodule=data,
             stages=["fit", "validate", "test"],
-            n_runs=1,
-            verbose=True,
+            n_runs=trainer.n_runs,
+            verbose=trainer.n_runs > 1,
         )
 
     def predict(
@@ -107,6 +107,6 @@ class Interface:
             base_model=model,
             datamodule=data,
             stages=["validate"],
-            n_runs=1,
-            verbose=True,
+            n_runs=trainer.n_runs,
+            verbose=trainer.n_runs > 1,
         )
