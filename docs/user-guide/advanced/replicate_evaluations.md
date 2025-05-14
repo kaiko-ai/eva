@@ -207,6 +207,20 @@ IN_FEATURES=1536 \
 eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
 ```
 
+### H0-mini (Bioptimus) - DINOv2 Distilled ViT-G14 [[12]](#references)
+[Bioptimus](https://www.bioptimus.com) released their H0-mini which was trained on a collection of 500,000 H&E slides. The model weights
+were released on [HuggingFace](https://huggingface.co/bioptimus/H-optimus-0).
+
+This model by [Bioptimus](https://www.bioptimus.com) is a Vision Transformer Base/14 distilled from H-optimus-0 [5] (ViT-g/14) with DINOv2 self-supervised distillation method on PanCancer40M, a set of 43 million histology tiles extracted from 6,093 histology slides of TCGA.
+
+```
+MODEL_NAME=pathology/bioptimus_h0_mini \
+NORMALIZE_MEAN="[0.707223,0.578729,0.703617]" \
+NORMALIZE_STD="[0.211883,0.230117,0.177517]" \
+IN_FEATURES=768 \
+eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
+```
+
 
 ### Prov-GigaPath - DINOv2 ViT-G14 [[6]](#references)
 To evaluate the [Prov-Gigapath](https://github.com/prov-gigapath/prov-gigapath) model, available on [HuggingFace](https://huggingface.co/prov-gigapath/prov-gigapath), run:
@@ -283,3 +297,5 @@ eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
  [10]: Chen, Richard J., et al. "Towards a general-purpose foundation model for computational pathology." Nature Medicine 30.3 (2024): 850-862.
 
  [11]: Karasikov, Mikhail, et al. "Training state-of-the-art pathology foundation models with orders of magnitude less data" arXiv preprint arXiv:2504.05186850-862.
+
+ [12]: Filiot, Alexandre, et al. "Distilling foundation models for robust and efficient models in digital pathology." arXiv preprint arXiv:2501.16239 (2025).
