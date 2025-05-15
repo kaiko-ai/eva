@@ -1,7 +1,7 @@
 """PubMedQA dataset class."""
 
 import os
-from typing import Any, Dict, List, Literal
+from typing import Dict, List, Literal
 
 import torch
 from datasets import Dataset, load_dataset
@@ -71,6 +71,7 @@ class PubMedQA(base.TextClassification):
             split=split,
             streaming=False,
             cache_dir=self._root if (not is_local and self._root) else None,
+            trust_remote_code=True,
         )
         if not isinstance(raw_dataset, Dataset):
             raise TypeError(f"Expected a `Dataset`, but got {type(raw_dataset)}")
@@ -109,7 +110,7 @@ class PubMedQA(base.TextClassification):
     @override
     def load_text(self, index: int) -> str:
         sample = dict(self.dataset[index])
-        return f"Question: {sample['QUESTION']}\nContext: {sample['CONTEXTS']}"
+        return f"Question: {sample['QUESTION']} \nContext: {sample['CONTEXTS']}"
 
     @override
     def load_target(self, index: int) -> torch.Tensor:
@@ -118,15 +119,15 @@ class PubMedQA(base.TextClassification):
         )
 
     @override
-    def load_metadata(self, index: int) -> Dict[str, Any]:
+    def load_metadata(self, index: int) -> Dict[str, str]:
         sample = self.dataset[index]
         return {
-            "year": sample["YEAR"],
-            "labels": sample["LABELS"],
-            "meshes": sample["MESHES"],
-            "long_answer": sample["LONG_ANSWER"],
-            "reasoning_required": sample["reasoning_required_pred"],
-            "reasoning_free": sample["reasoning_free_pred"],
+            "year": sample.get("YEAR") or "",
+            "labels": sample.get("LABELS") or "",
+            "meshes": sample.get("MESHES") or "",
+            "long_answer": sample.get("LONG_ANSWER") or "",
+            "reasoning_required": sample.get("reasoning_required_pred") or "",
+            "reasoning_free": sample.get("reasoning_free_pred") or "",
         }
 
     @override

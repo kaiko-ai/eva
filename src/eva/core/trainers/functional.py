@@ -1,6 +1,6 @@
 """Fit session related functions."""
 
-from typing import Tuple
+from typing import List, Literal, Tuple
 
 from lightning.pytorch.utilities.types import _EVALUATE_OUTPUT
 
@@ -16,11 +16,12 @@ def run_evaluation_session(
     datamodule: datamodules.DataModule,
     *,
     n_runs: int = 1,
+    stages: List[Literal["fit", "validate", "test"]] | None = None,
     verbose: bool = True,
 ) -> None:
     """Runs a downstream evaluation session out-of-place.
 
-    It performs an evaluation run (fit and evaluate) on the model
+    It performs an evaluation run (with configurable stages) on the model
     multiple times. Note that as the input `base_trainer` and
     `base_model` would be cloned, the input object would not
     be modified.
@@ -29,10 +30,13 @@ def run_evaluation_session(
         base_trainer: The base trainer module to use.
         base_model: The base model module to use.
         datamodule: The data module.
-        n_runs: The amount of runs (fit and evaluate) to perform.
+        n_runs: The number of runs to perform.
+        stages: List of stages to execute. Options: "fit", "validate", "test".
         verbose: Whether to verbose the session metrics instead of
-            these of each individual runs and vice-versa.
+            those of each individual run and vice-versa.
     """
+    if not stages:
+        stages = ["fit", "validate", "test"]
     recorder = _recorder.SessionRecorder(output_dir=base_trainer.default_log_dir, verbose=verbose)
     for run_index in range(n_runs):
         validation_scores, test_scores = run_evaluation(
@@ -40,9 +44,11 @@ def run_evaluation_session(
             base_model,
             datamodule,
             run_id=f"run_{run_index}",
+            stages=stages,
             verbose=not verbose,
         )
-        recorder.update(validation_scores, test_scores)
+        if validation_scores:
+            recorder.update(validation_scores, test_scores)
     recorder.save()
 
 
@@ -52,9 +58,10 @@ def run_evaluation(
     datamodule: datamodules.DataModule,
     *,
     run_id: str | None = None,
+    stages: List[Literal["fit", "validate", "test"]] | None = None,
     verbose: bool = True,
-) -> Tuple[_EVALUATE_OUTPUT, _EVALUATE_OUTPUT | None]:
-    """Fits and evaluates a model out-of-place.
+) -> Tuple[_EVALUATE_OUTPUT | None, _EVALUATE_OUTPUT | None]:
+    """Runs the specified evaluation stages out-of-place.
 
     Args:
         base_trainer: The base trainer to use but not modify.
@@ -62,48 +69,39 @@ def run_evaluation(
         datamodule: The data module.
         run_id: The run id to be appended to the output log directory.
             If `None`, it will use the log directory of the trainer as is.
+        stages: List of stages to execute. Options: "fit", "validate", "test".
         verbose: Whether to print the validation and test metrics
             in the end of the training.
 
     Returns:
-        A tuple of with the validation and the test metrics (if exists).
+        A tuple with the validation and the test metrics (if executed).
+        If a stage is not executed, its value will be None.
     """
+    if not stages:
+        stages = ["fit", "validate", "test"]
     trainer, model = _utils.clone(base_trainer, base_model)
     model.configure_model()
     trainer.setup_log_dirs(run_id or "")
-    return fit_and_validate(trainer, model, datamodule, verbose=verbose)
 
+    validation_scores = None
+    test_scores = None
 
-def fit_and_validate(
-    trainer: eva_trainer.Trainer,
-    model: modules.ModelModule,
-    datamodule: datamodules.DataModule,
-    verbose: bool = True,
-) -> Tuple[_EVALUATE_OUTPUT, _EVALUATE_OUTPUT | None]:
-    """Fits and evaluates a model in-place.
-
-    If the test set is set in the datamodule, it will evaluate the model
-    on the test set as well.
-
-    Args:
-        trainer: The trainer module to use and update in-place.
-        model: The model module to use and update in-place.
-        datamodule: The data module.
-        verbose: Whether to print the validation and test metrics
-            in the end of the training.
-
-    Returns:
-        A tuple of with the validation and the test metrics (if exists).
-    """
-    trainer.fit(model, datamodule=datamodule)
-    validation_scores = trainer.validate(
-        datamodule=datamodule, verbose=verbose, ckpt_path=trainer.checkpoint_type
-    )
-    test_scores = (
-        None
-        if datamodule.datasets.test is None
-        else trainer.test(datamodule=datamodule, verbose=verbose, ckpt_path=trainer.checkpoint_type)
-    )
+    if "fit" in stages:
+        trainer.fit(model, datamodule=datamodule)
+    if "validate" in stages:
+        validation_scores = trainer.validate(
+            model=model,
+            datamodule=datamodule,
+            verbose=verbose,
+            ckpt_path=trainer.checkpoint_type,
+        )
+    if "test" in stages and getattr(datamodule.datasets, "test", None) is not None:
+        test_scores = trainer.test(
+            model=model,
+            datamodule=datamodule,
+            verbose=verbose,
+            ckpt_path=trainer.checkpoint_type,
+        )
     return validation_scores, test_scores
 
 

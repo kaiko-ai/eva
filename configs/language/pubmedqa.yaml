@@ -1,0 +1,48 @@
+---
+trainer:
+  class_path: eva.Trainer
+  init_args:
+    n_runs: &N_RUNS ${oc.env:N_RUNS, 5}
+    default_root_dir: &OUTPUT_ROOT ${oc.env:OUTPUT_ROOT, logs/${oc.env:MODEL_NAME, meta-llama/Llama-3.2-1B}/online/pubmedqa}
+    max_steps: &MAX_STEPS ${oc.env:MAX_STEPS, 12500}
+    checkpoint_type: ${oc.env:CHECKPOINT_TYPE, best}
+    callbacks:
+      - class_path: eva.callbacks.ConfigurationLogger
+    logger:
+      - class_path: lightning.pytorch.loggers.TensorBoardLogger
+        init_args:
+          save_dir: *OUTPUT_ROOT
+          name: ""
+model:
+  class_path: eva.language.models.TextModule
+  init_args:
+    prompt: "Respond to the question with a single digit only: 0 for no, 1 for yes, or 2 for maybe. Do not include any words, explanations, or additional characters—only the digit."
+    model:
+      class_path: eva.language.models.HuggingFaceTextModel #LiteLLMTextModel #VLLMTextModel
+      init_args:
+        model_name_or_path: "meta-llama/Llama-3.2-1B" #"claude-3-sonnet-20240229" #"meta-llama/Llama-3.2-1B-Instruct"
+        model_kwargs:
+          temperature: 0.01 # should be strictly positive for HF models
+    # TODO: implement metrics for language models
+    # metrics:
+    #   common:
+    #     - class_path: eva.metrics.MulticlassClassificationMetrics
+    #       init_args:
+    #         num_classes: 3
+    postprocess: null
+data:
+  class_path: eva.DataModule
+  init_args:
+    datasets:
+      val:
+        class_path: eva.language.datasets.PubMedQA
+        init_args: &DATASET_ARGS
+          root: ${oc.env:DATA_ROOT, ./data/pubmedqa}
+          split: null
+          download: true
+    dataloaders:
+      val:
+        batch_size: &BATCH_SIZE ${oc.env:BATCH_SIZE, 8}
+        num_workers: &N_DATA_WORKERS ${oc.env:N_DATA_WORKERS, 1}
+        shuffle: false
+        collate_fn: eva.core.data.dataloaders.text_collate_fn
