@@ -93,7 +93,7 @@ def run_evaluation(
             model=model,
             datamodule=datamodule,
             verbose=verbose,
-            ckpt_path=trainer.checkpoint_type,
+            # ckpt_path=trainer.checkpoint_type,
         )
     if "test" in stages and getattr(datamodule.datasets, "test", None) is not None:
         test_scores = trainer.test(

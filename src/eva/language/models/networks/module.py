@@ -80,7 +80,6 @@ class TextModule(module.ModelModule):
         data, targets, metadata = INPUT_BATCH(*batch)
         messages = [self.prompt + "\n" + d + "\nAnswer: " for d in data]
         predictions = self(messages)
-        logger.debug(f"Predictions: {predictions}")
-        logger.debug(f"Targets: {targets}")
-        # TODO: Add support for evaluation metrics
+        logger.info(f"Predictions: {predictions}")
+        logger.info(f"Targets: {targets}")
         return {"predictions": predictions, "targets": targets, "metadata": metadata}
