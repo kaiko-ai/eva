@@ -1,6 +1,7 @@
 """"Neural Network Semantic Segmentation Module."""
 
-from typing import Any, Callable, Dict, Iterable, List
+import functools
+from typing import Any, Callable, Dict, Iterable, List, Tuple
 
 import torch
 from lightning.pytorch.cli import LRSchedulerCallable, OptimizerCallable
@@ -35,6 +36,7 @@ class SemanticSegmentationModule(module.ModelModule):
         metrics: metrics_lib.MetricsSchema | None = None,
         postprocess: batch_postprocess.BatchPostProcess | None = None,
         save_decoder_only: bool = True,
+        spatial_dims: int = 2,
     ) -> None:
         """Initializes the neural net head module.
 
@@ -57,6 +59,8 @@ class SemanticSegmentationModule(module.ModelModule):
                 predictions and targets.
             save_decoder_only: Whether to save only the decoder during checkpointing. If False,
                 will also save the encoder (not recommended when frozen).
+            spatial_dims: The number of spatial dimensions, 2 for 2D
+                and 3 for 3D segmentation.
         """
         super().__init__(metrics=metrics, postprocess=postprocess)
 
@@ -68,6 +72,7 @@ class SemanticSegmentationModule(module.ModelModule):
         self.lr_scheduler = lr_scheduler
         self.save_decoder_only = save_decoder_only
         self.inferer = inferer
+        self.spatial_dims = spatial_dims
 
     @override
     def configure_model(self) -> None:
@@ -111,13 +116,14 @@ class SemanticSegmentationModule(module.ModelModule):
     def forward(
         self,
         tensor: torch.Tensor,
+        to_size: Tuple[int, int],
         *args: Any,
         **kwargs: Any,
     ) -> torch.Tensor:
         return (
-            self.inferer(tensor, network=self._forward_networks)
+            self.inferer(tensor, network=functools.partial(self._forward_networks, to_size=to_size))
             if self.inferer is not None and not self.training
-            else self._forward_networks(tensor)
+            else self._forward_networks(tensor, to_size=to_size)
         )
 
     @override
@@ -168,7 +174,7 @@ class SemanticSegmentationModule(module.ModelModule):
             The batch step output.
         """
         data, targets, metadata = INPUT_TENSOR_BATCH(*batch)
-        predictions = self(data)
+        predictions = self(data, to_size=targets.shape[-self.spatial_dims :])
         loss = self.criterion(predictions, targets)
         return {
             "loss": loss,
@@ -177,12 +183,11 @@ class SemanticSegmentationModule(module.ModelModule):
             "metadata": metadata,
         }
 
-    def _forward_networks(self, tensor: torch.Tensor) -> torch.Tensor:
+    def _forward_networks(self, tensor: torch.Tensor, to_size: Tuple[int, int]) -> torch.Tensor:
         """Passes the input tensor through the encoder and decoder."""
         features = self.encoder(tensor) if self.encoder else tensor
         if isinstance(self.decoder, segmentation.Decoder):
             if not isinstance(features, list):
                 raise ValueError(f"Expected a list of feature map tensors, got {type(features)}.")
-            image_size = (tensor.shape[-2], tensor.shape[-1])
-            return self.decoder(DecoderInputs(features, image_size, tensor))
+            return self.decoder(DecoderInputs(features, to_size, tensor))
         return self.decoder(features)

@@ -37,6 +37,7 @@ model:
       init_args:
         feature_size: ${oc.env:IN_FEATURES, 48}
         out_channels:  &NUM_CLASSES 14
+    spatial_dims: 3
     inferer:
       class_path: monai.inferers.SlidingWindowInferer
       init_args:
