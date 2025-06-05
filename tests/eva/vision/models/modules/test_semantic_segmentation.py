@@ -43,17 +43,18 @@ def test_semantic_segmentation_module_forward_with_inferer(
     # Get a sample from dataset
     sample_data, _ = segmentation_dataset[0]
     sample_data = sample_data.unsqueeze(0)
+    to_size = sample_data.shape[2:]
 
     # Execute the forward pass in train & eval mode
     assert model_with_inferer.inferer is not None, "Inferer should not be None"
     with mock.patch.object(
         type(model_with_inferer.inferer), "__call__", wraps=model_with_inferer.inferer.__call__
     ) as mock_inferer_call:
-        output = model_with_inferer(sample_data)
+        output = model_with_inferer(sample_data, to_size=to_size)
         mock_inferer_call.assert_not_called()
 
         model_with_inferer.eval()
-        output = model_with_inferer(sample_data)
+        output = model_with_inferer(sample_data, to_size=to_size)
         mock_inferer_call.assert_called_once()
 
     assert output.shape[0] == 1
