@@ -15,10 +15,10 @@ class CastStrToIntTensor:
     Supports single values, lists of strings, or lists of integers.
 
     Example:
-        >>> transformer = CastStrToIntTensor()
-        >>> transformer(['0', '1', '2'])
+        >>> transform = CastStrToIntTensor()
+        >>> transform(['0', '1', '2'])
         tensor([0, 1, 2])
-        >>> transformer('3')
+        >>> transform('3')
         tensor([3])
     """
 
@@ -34,9 +34,10 @@ class CastStrToIntTensor:
         Raises:
             ValueError: If any value in the input cannot be cast to an integer.
         """
-        if isinstance(values, list):
-            return torch.tensor([self._cast_single(v) for v in values], dtype=torch.int)
-        return torch.tensor([self._cast_single(values)], dtype=torch.int)
+        return torch.tensor(
+            [self._cast_single(v) for v in (values if isinstance(values, list) else [values])],
+            dtype=torch.int,
+        )
 
     def _cast_single(self, value: Any) -> int:
         """Casts a single value to an integer.
@@ -52,5 +53,5 @@ class CastStrToIntTensor:
         """
         try:
             return int(value)
-        except (ValueError, TypeError) as err:
-            raise ValueError(f"Cannot convert value to int: {value!r}") from err
+        except (ValueError, TypeError) as e:
+            raise ValueError(f"Cannot convert value to int: {value!r}") from e

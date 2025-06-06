@@ -110,7 +110,7 @@ class PubMedQA(base.TextClassification):
     @override
     def load_text(self, index: int) -> str:
         sample = dict(self.dataset[index])
-        return f"Question: {sample['QUESTION']}\n\nContext:\n{chr(10).join(sample['CONTEXTS'])}"
+        return f"\n\nQuestion:\n {sample['QUESTION']}\n\nContext:\n" + "\n".join(sample['CONTEXTS'])
 
     @override
     def load_target(self, index: int) -> torch.Tensor:

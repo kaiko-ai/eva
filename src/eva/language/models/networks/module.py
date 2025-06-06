@@ -78,8 +78,8 @@ class TextModule(module.ModelModule):
             Dictionary with predictions, ground truth, and evaluation metrics.
         """
         data, targets, metadata = INPUT_BATCH(*batch)
-        messages = [self.prompt + "\n" + d + "\nAnswer: " for d in data]
+        messages = [self.prompt + "\n" + d + "\n\nAnswer:\n" for d in data]
         predictions = self(messages)
-        logger.debug(f"Predictions: {predictions}")
-        logger.debug(f"Targets: {targets}")
+        logger.info(f"Predictions: {predictions}")
+        logger.info(f"Targets: {targets}")
         return {"predictions": predictions, "targets": targets, "metadata": metadata}

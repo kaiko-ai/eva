@@ -1,28 +1,28 @@
 ---
 trainer:
   class_path: eva.Trainer
+  init_args:
+    checkpoint_type: null
 model:
   class_path: eva.language.models.TextModule
   init_args:
-    prompt: "Instruction: Respond to the question with a single digit only: 0 for no, 1 for yes, or 2 for maybe. Do not include any words, explanations, or additional characters—only the digit."
+    prompt: "Instruction:\n Respond to the question with a single digit only: 0 for no, 1 for yes, or 2 for maybe. Do not include any words, explanations, or additional characters—only the digit."
     model:
-      class_path: eva.language.models.LiteLLMTextModel #HuggingFaceTextModel  #VLLMTextModel
+      class_path: eva.language.models.LiteLLMTextModel
       init_args:
-        model_name_or_path: "anthropic/claude-3-7-sonnet-latest" #"meta-llama/Llama-3.2-1B-Instruct"
+        model_name_or_path: ${oc.env:MODEL_NAME, anthropic/claude-3-7-sonnet-latest}
         model_kwargs:
           temperature: 0.01 # should be strictly positive for HF models
           # max_new_tokens: 1 # used for HF
-    # TODO: implement metrics for language models
     metrics:
       common:
         - class_path: eva.metrics.MulticlassClassificationMetrics
           init_args:
-            average: macro
             num_classes: 3
-            use_auroc: false
+            input_type: "discrete"
     postprocess:
       predictions_transforms:
-        - class_path: eva.language.utils.transforms.CastStrToIntTensor
+        - class_path: eva.language.utils.str_to_int_tensor.CastStrToIntTensor
 data:
   class_path: eva.DataModule
   init_args:
