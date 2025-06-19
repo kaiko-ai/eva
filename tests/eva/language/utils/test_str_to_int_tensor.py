@@ -9,6 +9,12 @@ from eva.language.utils.str_to_int_tensor import CastStrToIntTensor
 @pytest.mark.parametrize(
     "input_values, expected",
     [
+        # Test with text responses (default mapping)
+        ("yes", torch.tensor([1], dtype=torch.int)),
+        ("no", torch.tensor([0], dtype=torch.int)),
+        ("maybe", torch.tensor([2], dtype=torch.int)),
+        (["no", "yes", "maybe"], torch.tensor([0, 1, 2], dtype=torch.int)),
+        # Test numeric fallback
         ("0", torch.tensor([0], dtype=torch.int)),
         (["0", "1", "2"], torch.tensor([0, 1, 2], dtype=torch.int)),
         ([0, 1, 2], torch.tensor([0, 1, 2], dtype=torch.int)),

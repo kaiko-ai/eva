@@ -16,8 +16,8 @@ from eva.core.models.modules.utils import batch_postprocess
 class TextModule(module.ModelModule):
     """Text-based LLM module for inference.
 
-    Uses LLM wrappers for text generation.
-    Supports evaluation using configurable metrics and post-processing. # TODO: Add support
+    Uses LLM wrappers for text generation and supports evaluation using
+    configurable metrics and post-processing transforms.
     """
 
     def __init__(
@@ -78,7 +78,7 @@ class TextModule(module.ModelModule):
             Dictionary with predictions, ground truth, and evaluation metrics.
         """
         data, targets, metadata = INPUT_BATCH(*batch)
-        messages = [self.prompt + "\n" + d + "\n\nAnswer:\n" for d in data]
+        messages = [self.prompt + "\n" + d + "\nAnswer: " for d in data]
         predictions = self(messages)
         logger.info(f"Predictions: {predictions}")
         logger.info(f"Targets: {targets}")

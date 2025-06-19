@@ -109,11 +109,15 @@ class PubMedQA(base.TextClassification):
 
     @override
     def load_text(self, index: int) -> str:
+        if index < 0 or index >= len(self.dataset):
+            raise IndexError(f"Index {index} out of range for dataset of size {len(self.dataset)}")
         sample = dict(self.dataset[index])
-        return f"\n\nQuestion:\n {sample['QUESTION']}\n\nContext:\n" + "\n".join(sample['CONTEXTS'])
+        return f"Question: {sample['QUESTION']}\nContext: " + " ".join(sample["CONTEXTS"])
 
     @override
     def load_target(self, index: int) -> torch.Tensor:
+        if index < 0 or index >= len(self.dataset):
+            raise IndexError(f"Index {index} out of range for dataset of size {len(self.dataset)}")
         return torch.tensor(
             self.class_to_idx[self.dataset[index]["final_decision"]], dtype=torch.long
         )

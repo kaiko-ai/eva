@@ -131,7 +131,7 @@ The PubMedQA config demonstrates several important concepts:
 
 #### Text prompting:
 ```yaml
-prompt: "Instruction:\n Respond to the question with a single digit only: 0 for no, 1 for yes, or 2 for maybe. Do not include any words, explanations, or additional characters—only the digit."
+prompt: "Instruction:\n Answer the question with yes, no, or maybe. Provide only one of these three words as your response."
 ```
 
 #### Model configuration (LiteLLM):
@@ -151,7 +151,21 @@ postprocess:
     - class_path: eva.language.utils.str_to_int_tensor.CastStrToIntTensor
 ```
 
-This converts the model's text output to integer tensors for evaluation.
+This converts the model's text output (yes/no/maybe) to integer tensors for evaluation using regex mapping:
+- "no" → 0
+- "yes" → 1  
+- "maybe" → 2
+
+Custom mappings are also supported by providing a mapping dictionary during initialization:
+```yaml
+postprocess:
+  predictions_transforms:
+    - class_path: eva.language.utils.str_to_int_tensor.CastStrToIntTensor
+      init_args:
+        mapping:
+          "positive|good": 1
+          "negative|bad": 0
+```
 
 ## Advanced usage
 
