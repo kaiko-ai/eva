@@ -37,20 +37,11 @@ export ANTHROPIC_API_KEY=your_anthropic_api_key
 export TOGETHER_API_KEY=your_together_api_key
 ```
 
-Then run with provider-prefixed model names:
+Then run with provider-prefixed model names. For example:
 
 ```bash
 # Anthropic Claude models
-MODEL_NAME=anthropic/claude-3-sonnet-20240229 eva fit --config configs/language/pubmedqa.yaml
-MODEL_NAME=anthropic/claude-3-haiku-20240307 eva fit --config configs/language/pubmedqa.yaml
-
-# OpenAI models
-MODEL_NAME=openai/gpt-4o-mini eva fit --config configs/language/pubmedqa.yaml
-MODEL_NAME=openai/gpt-4o eva fit --config configs/language/pubmedqa.yaml
-
-# Together.ai models
-MODEL_NAME=together_ai/meta-llama/Llama-2-7b-chat-hf eva fit --config configs/language/pubmedqa.yaml
-```
+MODEL_NAME=anthropic/claude-opus-4-0 eva fit --config configs/language/pubmedqa.yaml
 
 ### 2. Using HuggingFace models (local execution)
 
@@ -65,13 +56,13 @@ model:
     model:
       class_path: eva.language.models.HuggingFaceTextModel
       init_args:
-        model_name_or_path: microsoft/DialoGPT-medium
+        model_name_or_path: meta-llama/Llama-3.2-1B-Instruct
 ```
 
 Then run:
 
 ```bash
-MODEL_NAME=microsoft/DialoGPT-medium eva fit --config configs/language/pubmedqa.yaml
+MODEL_NAME=meta-llama/Llama-3.2-1B-Instruct eva fit --config configs/language/pubmedqa.yaml
 ```
 
 ### 3. Using vLLM (cloud/distributed execution)
@@ -89,7 +80,6 @@ model:
       class_path: eva.language.models.VLLMTextModel
       init_args:
         model_name_or_path: meta-llama/Llama-2-70b-chat-hf
-        server_url: http://your-vllm-server:8000
 ```
 
 ### 4. Basic evaluation with default configuration
@@ -105,7 +95,7 @@ This command will:
 - Download the PubMedQA dataset to `./data/pubmedqa` (if not already downloaded)
 - Load the manually curated test set of 1000 question-abstract pairs
 - Use the default Claude model to classify each question-abstract pair
-- Store evaluation results including accuracy, precision, recall, and F1 scores
+- Show evaluation results including accuracy, precision, recall, and F1 scores
 
 ### 5. Customizing batch size and workers
 
@@ -123,7 +113,6 @@ Once the evaluation is complete:
 - The results will include metrics computed on the 1000 manually annotated test examples:
   - **Accuracy**: Overall classification accuracy across all three classes
   - **Precision/Recall/F1**: Per-class and macro-averaged metrics
-  - **Confusion Matrix**: Detailed breakdown of predictions vs. ground truth
 
 ## Key configuration components
 
@@ -131,7 +120,7 @@ The PubMedQA config demonstrates several important concepts:
 
 #### Text prompting:
 ```yaml
-prompt: "Instruction:\n Answer the question with yes, no, or maybe. Provide only one of these three words as your response."
+prompt: "Instruction: You are an expert in biomedical research. Please carefully read the question and the relevant context and answer with yes, no, or maybe. Only answer with one of these three words."
 ```
 
 #### Model configuration (LiteLLM):
@@ -140,8 +129,6 @@ model:
   class_path: eva.language.models.LiteLLMTextModel
   init_args:
     model_name_or_path: ${oc.env:MODEL_NAME, anthropic/claude-3-7-sonnet-latest}
-    model_kwargs:
-      temperature: 0.01
 ```
 
 #### Postprocessing:

@@ -57,6 +57,7 @@ class LiteLLMTextModel(base.BaseModel):
             error messages instead of generated text.
         """
         messages = [[{"role": "user", "content": prompt}] for prompt in prompts]
+
         responses = batch_completion(
             model=self._model_name_or_path,
             messages=messages,
