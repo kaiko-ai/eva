@@ -179,12 +179,3 @@ MODEL_NAME=anthropic/claude-3-sonnet-20240229 eva fit --config configs/language/
 ```
 
 The results from each run will be stored separately, allowing you to compare performance across different models and configurations.
-
-## Notes
-
-- **Test Set**: The evaluation uses the manually gathered 1000 test questions, ensuring high-quality annotations for reliable benchmarking
-- **API Keys**: Make sure you have the appropriate API keys set up for the models you want to use and set them as environment variables
-- **Model Names**: For LiteLLM, use provider-prefixed names (e.g., `anthropic/claude-3-sonnet-20240229`, `openai/gpt-4o`)
-- **Rate Limits**: Be mindful of API rate limits when using commercial language models
-- **Cost**: Commercial API usage incurs costs - consider using smaller batch sizes or local models for experimentation
-- **Hardware Requirements**: Local HuggingFace models require sufficient GPU memory; vLLM setup requires cloud infrastructure management

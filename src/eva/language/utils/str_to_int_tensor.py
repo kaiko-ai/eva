@@ -88,7 +88,8 @@ class CastStrToIntTensor:
 
         try:
             return int(value)
-        except (ValueError, TypeError):
+        except (ValueError, TypeError) as e:
             raise ValueError(
-                f"Cannot map value to int: {value!r}. Available patterns: {list(self.mapping.keys())}"
-            )
+                f"Cannot map value to int: {value!r}. "
+                f"Available patterns: {list(self.mapping.keys())}"
+            ) from e
