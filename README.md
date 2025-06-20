@@ -34,7 +34,7 @@ Check out the [documentation](https://kaiko-ai.github.io/eva/) for more informat
 
 ### Highlights:
 - Easy and reliable benchmark of Oncology FMs
-- Supports path-level classification, slide-level classification and semantic segmentation downstream tasks
+- Supports patch-level classification, slide-level classification and semantic segmentation downstream tasks
 - Automatic embedding inference and evaluation of a downstream task
 - Native support of popular medical [datasets](https://kaiko-ai.github.io/eva/dev/datasets/) and models
 - Produce statistics over multiple evaluation fits and multiple metrics
