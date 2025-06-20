@@ -5,6 +5,7 @@ import json
 import os
 import statistics
 import sys
+import requests
 from typing import Dict, List, Mapping, TypedDict
 
 from lightning.pytorch.utilities.types import _EVALUATE_OUTPUT
@@ -14,6 +15,8 @@ from omegaconf import OmegaConf
 from rich import console as rich_console
 from rich import table as rich_table
 from toolz import dicttoolz
+from urllib.parse import urlparse
+from requests.exceptions import RequestException
 
 SESSION_METRICS = Mapping[str, List[float]]
 """Session metrics type-hint."""
@@ -129,7 +132,21 @@ class SessionRecorder:
     def _save_config(self) -> None:
         """Saves the config yaml with resolved env placeholders to the output directory."""
         if self.config_path:
-            config = OmegaConf.load(self.config_path)
+
+            parsed_url = urlparse(self.config_path)
+            is_remote = parsed_url.scheme in ("http", "https")
+
+            if is_remote:
+                try:
+                    response = requests.get(self.config_path, timeout=10)
+                    response.raise_for_status()
+                except RequestException as e:
+                    raise RuntimeError(f"Failed to download remote config: {self.config_path}\n{str(e)}")
+                
+                config = OmegaConf.create(response.text)
+            else:
+                config = OmegaConf.load(self.config_path)
+
             fs = cloud_io.get_filesystem(self._output_dir, anon=False)
             with fs.open(os.path.join(self._output_dir, self._config_file), "w") as file:
                 config_yaml = OmegaConf.to_yaml(config, resolve=True)

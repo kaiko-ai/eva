@@ -8,10 +8,13 @@ from typing import Any, Dict, List
 
 import lightning.pytorch as pl
 import yaml
+import requests
 from lightning_fabric.utilities import cloud_io
 from loguru import logger as cli_logger
 from omegaconf import OmegaConf
 from typing_extensions import TypeGuard, override
+from requests import RequestException
+from urllib.parse import urlparse
 
 from eva.core import loggers
 
@@ -105,12 +108,26 @@ def _load_yaml_files(paths: List[str]) -> Dict[str, Any]:
     """
     merged_config = {}
     for config_path in paths:
-        fs = cloud_io.get_filesystem(config_path)
-        with fs.open(config_path, "r") as file:
-            omegaconf_file = OmegaConf.load(file)  # type: ignore
-            config_dict = OmegaConf.to_object(omegaconf_file)  # type: ignore
-            parsed_config = _type_resolver(config_dict)  # type: ignore
-            merged_config.update(parsed_config)
+        parsed_url = urlparse(config_path)
+        is_remote = parsed_url.scheme in ("http", "https")
+
+        if is_remote:
+            try:
+                response = requests.get(config_path)
+                response.raise_for_status()
+            except RequestException as e:
+                raise RuntimeError(f"Failed to download remote config: {config_path}\n{str(e)}")
+            
+            omegaconf_file = OmegaConf.create(response.text)
+        else:
+            fs = cloud_io.get_filesystem(config_path)
+            with fs.open(config_path, "r") as file:
+                omegaconf_file = OmegaConf.load(file)  # type: ignore
+
+        config_dict = OmegaConf.to_object(omegaconf_file)  # type: ignore
+        parsed_config = _type_resolver(config_dict)  # type: ignore
+        merged_config.update(parsed_config)
+
     return merged_config
 
 
