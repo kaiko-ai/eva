@@ -2,18 +2,19 @@
 trainer:
   class_path: eva.Trainer
   init_args:
+    n_runs: &N_RUNS ${oc.env:N_RUNS, 1}
     default_root_dir: ${oc.env:OUTPUT_ROOT, logs/${oc.env:MODEL_NAME, anthropic-claude-3-7-sonnet-latest}/pubmedqa}
     checkpoint_type: null
 model:
   class_path: eva.language.models.TextModule
   init_args:
-    prompt: "Instruction: You are an expert in biomedical research. Carefully read the question and the provided context. Based on the information, answer with one word: yes, no, or maybe. Use only one of these three words."
+    prompt: "Instruction: Carefully read the question and the provided context. Answer with one word: 'yes', 'no', or 'maybe'. Answer: "
     model:
       class_path: eva.language.models.LiteLLMTextModel
       init_args:
         model_name_or_path: ${oc.env:MODEL_NAME, anthropic/claude-3-7-sonnet-latest}
-        # model_kwargs:
-          # temperature: 0.0 # should be strictly positive for HF models
+        model_kwargs:
+          temperature: 0.0 # should be strictly positive for HF models
           # max_new_tokens: 1 # used for HF
     metrics:
       common:
@@ -33,10 +34,11 @@ data:
         init_args: &DATASET_ARGS
           root: ${oc.env:DATA_ROOT, ./data/pubmedqa}
           split: null
-          download: true
+          download: false
+          max_samples: 500
     dataloaders:
       val:
-        batch_size: &BATCH_SIZE ${oc.env:BATCH_SIZE, 32}
+        batch_size: &BATCH_SIZE ${oc.env:BATCH_SIZE, 16}
         num_workers: &N_DATA_WORKERS ${oc.env:N_DATA_WORKERS, 1}
         shuffle: false
         collate_fn: eva.core.data.dataloaders.text_collate_fn

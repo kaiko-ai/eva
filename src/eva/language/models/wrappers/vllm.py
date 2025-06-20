@@ -4,9 +4,17 @@ from typing import Any, Dict, List, Sequence
 
 from loguru import logger
 from typing_extensions import override
-from vllm import LLM, SamplingParams
-from vllm.inputs import TokensPrompt
-from vllm.transformers_utils.tokenizer import AnyTokenizer
+
+try:
+    from vllm import LLM, SamplingParams
+    from vllm.inputs import TokensPrompt
+    from vllm.transformers_utils.tokenizer import AnyTokenizer
+except ImportError as e:
+    raise ImportError(
+        "vLLM is required for VLLMTextModel but not installed. "
+        "Install with: pip install 'kaiko-eva[language]' "
+        "Note: vLLM requires Linux for optimal performance."
+    ) from e
 
 from eva.core.models.wrappers import base
 

@@ -8,9 +8,11 @@ If you haven't downloaded the config files yet, please download them from [GitHu
 
 For this tutorial we use the [PubMedQA](https://pubmedqa.github.io/) dataset, which contains biomedical questions paired with abstracts from PubMed. The task is to classify whether the abstract supports a "yes", "no", or "maybe" answer to the question.
 
-**Important**: This evaluation uses the manually gathered test set of 1000 questions from PubMedQA, which provides high-quality expert annotations for reliable model evaluation.
+**Important**: This evaluation uses the manually gathered test set of 1000 questions from PubMedQA, which provides high-quality expert annotations for reliable model evaluation. Note that the official PubMedQA leaderboard uses a hidden subset of 500 questions for evaluation. Our config uses a random subset of 500 samples by default (`max_samples: 500`) to speed up evaluation, but these are not the same samples as the official leaderboard (which are not publicly available).
 
-To let *eva* automatically handle the dataset download, the config file is already set with `download: true` in `configs/language/pubmedqa.yaml`. Additionally, you can set `DATA_ROOT` to configure the location where the dataset will be downloaded to / loaded from during evaluation (the default is `./data/pubmedqa`).
+**Dataset License**: PubMedQA is released under the MIT License (https://github.com/pubmedqa/pubmedqa/blob/master/LICENSE).
+
+To enable automatic dataset download, set the environment variable `DOWNLOAD_DATA="true"` when running eva. By default, all eva config files have `download: false` to make sure users don't violate the license terms unintentionally. Additionally, you can set `DATA_ROOT` to configure the location where the dataset will be downloaded to / loaded from during evaluation (the default is `./data/pubmedqa`).
 
 ## Model Options
 
@@ -41,7 +43,7 @@ Then run with provider-prefixed model names. For example:
 
 ```bash
 # Anthropic Claude models
-MODEL_NAME=anthropic/claude-opus-4-0 eva fit --config configs/language/pubmedqa.yaml
+MODEL_NAME=anthropic/claude-opus-4-0 eva validate --config configs/language/pubmedqa.yaml
 
 ### 2. Using HuggingFace models (local execution)
 
@@ -62,7 +64,7 @@ model:
 Then run:
 
 ```bash
-MODEL_NAME=meta-llama/Llama-3.2-1B-Instruct eva fit --config configs/language/pubmedqa.yaml
+MODEL_NAME=meta-llama/Llama-3.2-1B-Instruct eva validate --config configs/language/pubmedqa.yaml
 ```
 
 ### 3. Using vLLM (cloud/distributed execution)
@@ -87,13 +89,18 @@ model:
 The default PubMedQA config uses LiteLLM with Anthropic's Claude model. Run:
 
 ```bash
-eva fit --config configs/language/pubmedqa.yaml
+eva validate --config configs/language/pubmedqa.yaml
+```
+
+To enable automatic dataset download:
+
+```bash
+DOWNLOAD_DATA="true" eva validate --config configs/language/pubmedqa.yaml
 ```
 
 This command will:
 
-- Download the PubMedQA dataset to `./data/pubmedqa` (if not already downloaded)
-- Load the manually curated test set of 1000 question-abstract pairs
+- Load the manually curated test set of 1000 question-abstract pairs (automatically download if `DOWNLOAD_DATA="true"` is set)
 - Use the default Claude model to classify each question-abstract pair
 - Show evaluation results including accuracy, precision, recall, and F1 scores
 
@@ -102,7 +109,7 @@ This command will:
 For better performance or to work within API rate limits, you can adjust the batch size and number of workers:
 
 ```bash
-BATCH_SIZE=4 N_DATA_WORKERS=2 eva fit --config configs/language/pubmedqa.yaml
+BATCH_SIZE=4 N_DATA_WORKERS=2 eva validate --config configs/language/pubmedqa.yaml
 ```
 
 ## Understanding the results
@@ -170,12 +177,23 @@ Run evaluations with multiple models to compare their performance on the 1000-qu
 
 ```bash
 # Compare different API providers
-MODEL_NAME=anthropic/claude-3-sonnet-20240229 eva fit --config configs/language/pubmedqa.yaml
-MODEL_NAME=openai/gpt-4o eva fit --config configs/language/pubmedqa.yaml
+MODEL_NAME=anthropic/claude-3-sonnet-20240229 eva validate --config configs/language/pubmedqa.yaml
+MODEL_NAME=openai/gpt-4o eva validate --config configs/language/pubmedqa.yaml
 
 # Compare model sizes within a provider
-MODEL_NAME=anthropic/claude-3-haiku-20240307 eva fit --config configs/language/pubmedqa.yaml
-MODEL_NAME=anthropic/claude-3-sonnet-20240229 eva fit --config configs/language/pubmedqa.yaml
+MODEL_NAME=anthropic/claude-3-haiku-20240307 eva validate --config configs/language/pubmedqa.yaml
+MODEL_NAME=anthropic/claude-3-sonnet-20240229 eva validate --config configs/language/pubmedqa.yaml
 ```
+
+### Statistical evaluation with multiple runs
+
+For more robust evaluation with statistical significance, you can run multiple evaluations and calculate mean and standard deviation across runs:
+
+```bash
+# Run 5 evaluations with different random seeds
+N_RUNS=5 eva validate --config configs/language/pubmedqa.yaml
+```
+
+This will automatically run the evaluation 5 times and compute statistics (mean and standard deviation) across all runs for more reliable performance estimates.
 
 The results from each run will be stored separately, allowing you to compare performance across different models and configurations.
