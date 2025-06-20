@@ -5,7 +5,6 @@ import json
 import os
 import statistics
 import sys
-import requests
 from typing import Dict, List, Mapping, TypedDict
 
 from lightning.pytorch.utilities.types import _EVALUATE_OUTPUT
@@ -15,8 +14,6 @@ from omegaconf import OmegaConf
 from rich import console as rich_console
 from rich import table as rich_table
 from toolz import dicttoolz
-from urllib.parse import urlparse
-from requests.exceptions import RequestException
 
 SESSION_METRICS = Mapping[str, List[float]]
 """Session metrics type-hint."""
