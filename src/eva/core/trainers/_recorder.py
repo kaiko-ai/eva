@@ -129,7 +129,10 @@ class SessionRecorder:
     def _save_config(self) -> None:
         """Saves the config yaml with resolved env placeholders to the output directory."""
         if self.config_path:
-            config = OmegaConf.load(self.config_path)
+            config_fs = cloud_io.get_filesystem(self.config_path)
+            with config_fs.open(self.config_path, "r") as config_file:
+                config = OmegaConf.load(config_file)  # type: ignore
+
             fs = cloud_io.get_filesystem(self._output_dir, anon=False)
             with fs.open(os.path.join(self._output_dir, self._config_file), "w") as file:
                 config_yaml = OmegaConf.to_yaml(config, resolve=True)
