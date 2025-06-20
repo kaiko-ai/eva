@@ -12,8 +12,10 @@ try:
 except ImportError as e:
     raise ImportError(
         "vLLM is required for VLLMTextModel but not installed. "
-        "Install with: pip install 'kaiko-eva[language]' "
-        "Note: vLLM requires Linux for optimal performance."
+        "vLLM must be installed manually as it requires CUDA and is not included in eva dependencies. "
+        "Install with: pip install vllm "
+        "Note: vLLM requires Linux with CUDA support for optimal performance. "
+        "For alternatives, consider using HuggingFaceTextModel or LiteLLMTextModel."
     ) from e
 
 from eva.core.models.wrappers import base
