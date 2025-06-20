@@ -34,7 +34,7 @@ Check out the [documentation](https://kaiko-ai.github.io/eva/) for more informat
 
 ### Highlights:
 - Easy and reliable benchmark of Oncology FMs
-- Supports path-level classification, slide-level classification and semantic segmentation downstream tasks
+- Supports patch-level classification, slide-level classification and semantic segmentation downstream tasks
 - Automatic embedding inference and evaluation of a downstream task
 - Native support of popular medical [datasets](https://kaiko-ai.github.io/eva/dev/datasets/) and models
 - Produce statistics over multiple evaluation fits and multiple metrics
@@ -189,26 +189,28 @@ input, resulting in a faster evaluation.
 Here are some examples to get you started:
 
 - Perform a downstream offline **classification** evaluation of `DINO ViT-S/16`
-on the `BACH` dataset with linear probing by first inferring the embeddings
-and then performing 5 sequential fits:
+on the `BACH` dataset with linear probing by first pre-calculating the embeddings:
   ```sh
-  export DOWNLOAD_DATA=true
-  eva predict_fit --config https://raw.githubusercontent.com/kaiko-ai/eva/main/configs/vision/dino_vit/offline/bach.yaml
+  DOWNLOAD_DATA=true \
+  MODEL_NAME=universal/vit_small_patch16_224_dino \
+  eva predict_fit --config https://raw.githubusercontent.com/kaiko-ai/eva/main/configs/vision/pathology/offline/classification/bach.yaml
   ```
 
-- Perform a downstream online **segmentation** evaluation of `DINO ViT-S/16` on the
-`MoNuSAC` dataset with the `ConvDecoderMS` decoder:
+- Perform a downstream online **segmentation** evaluation of `DINO ViT-S/16` on the `MoNuSAC` dataset with the `ConvDecoderWithImage` decoder:
   ```sh
-  export DOWNLOAD_DATA=true
-  eva fit --config https://raw.githubusercontent.com/kaiko-ai/eva/main/configs/vision/dino_vit/online/monusac.yaml
+  DOWNLOAD_DATA=true \
+  MODEL_NAME=universal/vit_small_patch16_224_dino \
+  eva fit --config https://raw.githubusercontent.com/kaiko-ai/eva/main/configs/vision/pathology/online/segmentation/monusac.yaml
   ```
+
+By default `eva` will perform 5 evaluation runs using different seeds, however, you can control the number of runs through the `N_RUNS` environment variable or in the configuration file. The results will be saved to `./logs` by default, or to `OUTPUT_ROOT` if specified.
 
 For more examples, take a look at the [configs](https://github.com/kaiko-ai/eva/tree/main/configs)
-and [tutorials](https://kaiko-ai.github.io/eva/dev/user-guide/advanced/replicate_evaluations/).
+and [tutorials](https://kaiko-ai.github.io/eva/main/user-guide/advanced/replicate_evaluations/).
 
 > [!NOTE]
 > All the datasets that support automatic download in the repo have by default the option to automatically download set to false.
-> For automatic download you have to manually set the environmental variable `DOWNLOAD_DATA=true` or in the configuration file `download=true`.
+> For automatic download you have to manually set the environment variable `DOWNLOAD_DATA=true` or in the configuration file `download=true`.
 
 ## Leaderboards
 
