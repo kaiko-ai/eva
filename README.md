@@ -193,14 +193,14 @@ on the `BACH` dataset with linear probing by first inferring the embeddings
 and then performing 5 sequential fits:
   ```sh
   export DOWNLOAD_DATA=true
-  eva predict_fit --config https://raw.githubusercontent.com/kaiko-ai/eva/main/configs/vision/dino_vit/offline/bach.yaml
+  eva predict_fit --config https://raw.githubusercontent.com/kaiko-ai/eva/main/configs/vision/pathology/offline/classification/bach.yaml
   ```
 
 - Perform a downstream online **segmentation** evaluation of `DINO ViT-S/16` on the
 `MoNuSAC` dataset with the `ConvDecoderMS` decoder:
   ```sh
   export DOWNLOAD_DATA=true
-  eva fit --config https://raw.githubusercontent.com/kaiko-ai/eva/main/configs/vision/dino_vit/online/monusac.yaml
+  eva fit --config https://raw.githubusercontent.com/kaiko-ai/eva/main/configs/vision/pathology/online/segmentation/monusac.yaml
   ```
 
 For more examples, take a look at the [configs](https://github.com/kaiko-ai/eva/tree/main/configs)
