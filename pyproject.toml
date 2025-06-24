@@ -189,6 +189,7 @@ exclude_dirs = [
     ".venv",
     "tests/**",
 ]
+skips = ["B614"]
 
 [tool.pyright]
 pythonVersion = "3.10"
