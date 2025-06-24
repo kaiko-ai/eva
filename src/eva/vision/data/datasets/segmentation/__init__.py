@@ -7,6 +7,7 @@ from eva.vision.data.datasets.segmentation.embeddings import EmbeddingsSegmentat
 from eva.vision.data.datasets.segmentation.lits import LiTS
 from eva.vision.data.datasets.segmentation.lits_balanced import LiTSBalanced
 from eva.vision.data.datasets.segmentation.monusac import MoNuSAC
+from eva.vision.data.datasets.segmentation.msd_task7_pancreas import MSDTask7Pancreas
 from eva.vision.data.datasets.segmentation.total_segmentator_2d import TotalSegmentator2D
 
 __all__ = [
@@ -16,6 +17,7 @@ __all__ = [
     "EmbeddingsSegmentationDataset",
     "LiTS",
     "LiTSBalanced",
+    "MSDTask7Pancreas",
     "MoNuSAC",
     "TotalSegmentator2D",
 ]

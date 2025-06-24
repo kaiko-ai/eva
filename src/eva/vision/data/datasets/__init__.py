@@ -22,6 +22,7 @@ from eva.vision.data.datasets.segmentation import (
     LiTS,
     LiTSBalanced,
     MoNuSAC,
+    MSDTask7Pancreas,
     TotalSegmentator2D,
 )
 from eva.vision.data.datasets.vision import VisionDataset
@@ -46,6 +47,7 @@ __all__ = [
     "EmbeddingsSegmentationDataset",
     "LiTS",
     "LiTSBalanced",
+    "MSDTask7Pancreas",
     "MoNuSAC",
     "TotalSegmentator2D",
     "VisionDataset",
