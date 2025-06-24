@@ -81,7 +81,6 @@ class LiTS17(VisionDataset[eva_tv_tensors.Volume, tv_tensors.Mask]):
         self,
         root: str,
         split: Literal["train", "val"] | None = None,
-        download: bool = False,
         transforms: Callable | None = None,
     ) -> None:
         """Initializes the dataset.
@@ -90,7 +89,6 @@ class LiTS17(VisionDataset[eva_tv_tensors.Volume, tv_tensors.Mask]):
             root: Path to the dataset root directory.
             split: Dataset split to use ('train' or 'val').
                 If None, it uses the full dataset.
-            download: Whether to download the dataset.
             transforms: A callable object for applying data transformations.
                 If None, no transformations are applied.
         """
@@ -98,7 +96,6 @@ class LiTS17(VisionDataset[eva_tv_tensors.Volume, tv_tensors.Mask]):
 
         self._root = root
         self._split = split
-        self._download = download
         self._transforms = transforms
 
         self._samples: Dict[int, Tuple[str, str]]
