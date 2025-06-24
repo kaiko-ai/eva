@@ -1,4 +1,4 @@
-"""LiTS 2017 dataset."""
+"""LiTS17 dataset."""
 
 import glob
 import os
