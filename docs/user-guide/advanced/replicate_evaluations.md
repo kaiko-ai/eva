@@ -9,6 +9,7 @@ Keep in mind:
 
 - Some datasets provide automatic download by setting the argument `download: true` (either modify the `.yaml` config file or set the environment variable `DOWNLOAD=true`), while other datasets need to be downloaded manually beforehand. Please review the instructions in the corresponding dataset [documentation](../../datasets/index.md).
 - The following `eva predict_fit` commands will store the generated embeddings to the `./data/embeddings` directory. To change this location you can alternatively set the `EMBEDDINGS_ROOT` environment variable.
+- Segmentation tasks need to be run in `online` mode because the decoder currently doesn't support evaluation with precomputed embeddings. In other words, use `fit --config .../online/<task>.yaml` instead of `predict_fit  --config .../offline/<task>.yam` here.
 
 
 ## Pathology FMs
@@ -101,6 +102,20 @@ HF_TOKEN=<your-huggingace-token-for-downloading-the-model> \
 eva predict_fit --config configs/vision/phikon/offline/<task>.yaml
 ```
 
+### UNI2-h (MahmoodLab) - DINOv2 ViT-G14 [[3]](#references)
+
+The UNI2-h FM by MahmoodLab is available on [HuggingFace](https://huggingface.co/MahmoodLab/UNI). Note that access needs to 
+be requested.
+
+```
+MODEL_NAME=pathology/mahmood_uni2_h \
+NORMALIZE_MEAN="[0.485,0.456,0.406]" \
+NORMALIZE_STD="[0.229,0.224,0.225]" \
+IN_FEATURES=1536 \
+HF_TOKEN=<your-huggingace-token-for-downloading-the-model> \
+eva predict_fit --config configs/vision/phikon/offline/<task>.yaml
+```
+
 ### kaiko.ai - DINO ViT-S16 (TCGA) [[4]](#references)
 
 To evaluate [kaiko.ai's](https://www.kaiko.ai/) FM with DINO ViT-S16 backbone, pretrained on TCGA data 
@@ -166,6 +181,19 @@ IN_FEATURES=1024 \
 eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
 ```
 
+### kaiko.ai - DINOv2 Midnight-12k (TCGA) [[4]](#references)
+
+To evaluate [kaiko.ai's](https://www.kaiko.ai/) FM with Midnight-12k (ViT-G14) backbone, pretrained on TCGA data 
+and available on [GitHub](https://github.com/kaiko-ai/Midnight), run:
+
+```
+MODEL_NAME=pathology/kaiko_midnight_12k \
+NORMALIZE_MEAN="[0.5,0.5,0.5]" \
+NORMALIZE_STD="[0.5,0.5,0.5]" \
+IN_FEATURES=1536 \
+eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
+```
+
 
 ### H-optimus-0 (Bioptimus) - ViT-G14 [[5]](#references)
 [Bioptimus](https://www.bioptimus.com) released their H-optimus-0 which was trained on a collection of 500,000 H&E slides. The model weights
@@ -224,7 +252,7 @@ a proprietary dataset of 3.1M million slides, available for download on
 [HuggingFace](https://huggingface.co/paige-ai/Virchow2), run:
 
 ```
-MODEL_NAME=paige/virchow2 \
+MODEL_NAME=pathology/paige_virchow2 \
 NORMALIZE_MEAN="[0.485,0.456,0.406]" \
 NORMALIZE_STD="[0.229,0.224,0.225]" \
 IN_FEATURES=1280 \
@@ -251,3 +279,7 @@ eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
  [8]: Zimmermann, Eric, et al. "Virchow 2: Scaling Self-Supervised Mixed Magnification Models in Pathology." arXiv preprint arXiv:2408.00738 (2024).
 
  [9]: Filiot, Alexandre, et al. "Phikon-v2, A large and public feature extractor for biomarker prediction." arXiv preprint arXiv:2409.09173 (2024).
+
+ [10]: Chen, Richard J., et al. "Towards a general-purpose foundation model for computational pathology." Nature Medicine 30.3 (2024): 850-862.
+
+ [11]: Karasikov, Mikhail, et al. "Training state-of-the-art pathology foundation models with orders of magnitude less data" arXiv preprint arXiv:2504.05186850-862.

@@ -9,6 +9,7 @@ on:
 permissions:
   id-token: write
   contents: write
+  pull-requests: write
 
 jobs:
   release-pypi:
@@ -16,15 +17,16 @@ jobs:
     permissions:
       id-token: write
       contents: write
+      pull-requests: write
     steps:
       - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
       - name: Setting up PDM
-        uses: pdm-project/setup-pdm@568ddd69406b30de1774ec0044b73ae06e716aa4 # v4
+        uses: pdm-project/setup-pdm@94a823180e06fcde4ad29308721954a521c96ed0 # v4
         with:
           python-version: "3.10"
           architecture: x64
       - name: Setting up nox
-        uses: wntrblm/nox@5656fcedc31a1ea37d016e4d94d00185330cc528 # 2024.04.15
+        uses: wntrblm/nox@a74da2c766d4e656d6105639926c31f3aa4a6ca1 # 2025.02.09
         with:
           python-versions: "3.10"
       - name: Configure Git Credentials
@@ -34,7 +36,6 @@ jobs:
       - name: Bumping version
         run: |
           nox -s bump -- to "${{ github.ref_name }}"
-          git push origin main
       - name: Build artifacts
         run: |
           nox -s build
@@ -54,3 +55,17 @@ jobs:
         env:
           PDM_PUBLISH_USERNAME: ${{ secrets.PYPI_USERNAME }}
           PDM_PUBLISH_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+      - name: Create Pull Request for version bump
+        uses: peter-evans/create-pull-request@271a8d0340265f705b14b6d32b9829c1cb33d45e # v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore: bump version to ${{ github.ref_name }}"
+          title: "bump version to ${{ github.ref_name }} [skip ci]"
+          body: |
+            This PR updates the pyproject.toml with the new version number.
+            
+            Version: ${{ github.ref_name }}
+            
+            *Automated PR created by the Release workflow*
+          branch: bump-version-${{ github.ref_name }}
+          base: main

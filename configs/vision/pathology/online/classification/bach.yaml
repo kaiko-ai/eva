@@ -17,14 +17,14 @@ trainer:
       - class_path: lightning.pytorch.callbacks.ModelCheckpoint
         init_args:
           filename: best
-          save_last: true
+          save_last: ${oc.env:SAVE_LAST, false}
           save_top_k: 1
           monitor: &MONITOR_METRIC ${oc.env:MONITOR_METRIC, val/MulticlassAccuracy}
           mode: &MONITOR_METRIC_MODE ${oc.env:MONITOR_METRIC_MODE, max}
       - class_path: lightning.pytorch.callbacks.EarlyStopping
         init_args:
           min_delta: 0
-          patience: ${oc.env:PATIENCE, 400}
+          patience: ${oc.env:PATIENCE, 1250}
           monitor: *MONITOR_METRIC
           mode: *MONITOR_METRIC_MODE
     logger:
@@ -50,11 +50,6 @@ model:
       class_path: torch.optim.AdamW
       init_args:
         lr: ${oc.env:LR_VALUE, 0.0003}
-    lr_scheduler:
-      class_path: torch.optim.lr_scheduler.CosineAnnealingLR
-      init_args:
-        T_max: *MAX_STEPS
-        eta_min: 0.0
     metrics:
       common:
         - class_path: eva.metrics.AverageLoss

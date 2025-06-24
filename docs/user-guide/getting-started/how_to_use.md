@@ -51,6 +51,7 @@ To customize runs, without the need of creating custom config-files, you can ove
 | `EMBEDDINGS_ROOT`       | `str`   | The directory to store the computed embeddings during `eva predict`. |
 | `IN_FEATURES`           | `int`   | The input feature dimension (embedding) |
 | `N_RUNS`                | `int`   | Number of `fit` runs to perform in a session, defaults to 5 |
+| `RESIZE_DIM`            | `int \| tuple[int]` | Dimension to which to resize the images before the forward pass. |
 | `MAX_STEPS`             | `int`   | Maximum number of training steps (if early stopping is not triggered) |
 | `BATCH_SIZE`            | `int`   | Batch size for a training step |
 | `PREDICT_BATCH_SIZE`    | `int`   | Batch size for a predict step |

@@ -48,6 +48,7 @@ def test_same_seed(n_samples: int, seed: int, x_y_expected: int) -> None:
     x_y_2 = list(sampler_2.sample(**TEST_ARGS))
 
     assert x_y_1 == x_y_2
+    assert x_y_1 == x_y_expected
 
 
 @pytest.mark.parametrize("n_samples, seed_1, seed_2", [(10, 1, 2), (22, 3, 4)])

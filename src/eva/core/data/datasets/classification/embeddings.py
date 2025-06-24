@@ -12,7 +12,7 @@ class EmbeddingsClassificationDataset(embeddings_base.EmbeddingsDataset[torch.Te
     """Embeddings dataset class for classification tasks."""
 
     @override
-    def _load_embeddings(self, index: int) -> torch.Tensor:
+    def load_embeddings(self, index: int) -> torch.Tensor:
         filename = self.filename(index)
         embeddings_path = os.path.join(self._root, filename)
         tensor = torch.load(embeddings_path, map_location="cpu")
@@ -25,7 +25,7 @@ class EmbeddingsClassificationDataset(embeddings_base.EmbeddingsDataset[torch.Te
         return tensor.squeeze(0)
 
     @override
-    def _load_target(self, index: int) -> torch.Tensor:
+    def load_target(self, index: int) -> torch.Tensor:
         target = self._data.at[index, self._column_mapping["target"]]
         return torch.tensor(target, dtype=torch.int64)
 

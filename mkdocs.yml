@@ -85,9 +85,13 @@ nav:
     - WSI:
       - Patch-level:
         - BACH: datasets/bach.md
+        - BRACS: datasets/bracs.md
+        - BreakHis: datasets/breakhis.md
         - CRC: datasets/crc.md
+        - GleasonArvaniti: datasets/gleason_arvaniti.md
         - MHIST: datasets/mhist.md
         - PatchCamelyon: datasets/patch_camelyon.md
+        - UniToPatho: datasets/unitopatho.md
         - MoNuSAC: datasets/monusac.md
         - CoNSeP: datasets/consep.md
         - BCSS: datasets/bcss.md
@@ -96,6 +100,7 @@ nav:
         - PANDA: datasets/panda.md
         - PANDASmall: datasets/panda_small.md
     - Radiology:
+      - BTCV: datasets/btcv.md
       - TotalSegmentator: datasets/total_segmentator.md
       - LiTS: datasets/lits.md
   - Reference API:
