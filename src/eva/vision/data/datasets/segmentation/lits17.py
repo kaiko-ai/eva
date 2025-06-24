@@ -8,6 +8,7 @@ from typing import Any, Callable, Dict, List, Literal, Tuple
 from torchvision import tv_tensors
 from typing_extensions import override
 
+from eva.core.utils import requirements
 from eva.vision.data import tv_tensors as eva_tv_tensors
 from eva.vision.data.datasets import _utils as _data_utils
 from eva.vision.data.datasets.segmentation import _utils
@@ -100,6 +101,8 @@ class LiTS17(VisionDataset[eva_tv_tensors.Volume, tv_tensors.Mask]):
 
         self._samples: Dict[int, Tuple[str, str]]
         self._indices: List[int]
+
+        requirements.check_dependencies(requirements={"torch": "2.5.1", "torchvision": "0.20.1"})
 
     @property
     @override
