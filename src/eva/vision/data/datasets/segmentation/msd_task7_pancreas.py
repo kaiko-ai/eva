@@ -186,11 +186,14 @@ class MSDTask7Pancreas(VisionDataset[eva_tv_tensors.Volume, tv_tensors.Mask]):
                 raise ValueError(f"Filename '{filename}' is not valid.")
             return int(matches.group(1))
 
-        volume_files_pattern = os.path.join(self._root, "**/imagesTr", "*.nii.gz")
+        optional_subdir = os.path.join(self._root, "Dataset007_Pancreas")
+        search_dir = optional_subdir if os.path.isdir(optional_subdir) else self._root
+
+        volume_files_pattern = os.path.join(search_dir, "imagesTr", "*.nii.gz")
         volume_filenames = glob.glob(volume_files_pattern)
         volume_ids = {filename_id_volume(filename): filename for filename in volume_filenames}
 
-        segmentation_files_pattern = os.path.join(self._root, "**/labelsTr", "*.nii.gz")
+        segmentation_files_pattern = os.path.join(search_dir, "labelsTr", "*.nii.gz")
         segmentation_filenames = glob.glob(segmentation_files_pattern)
         segmentation_ids = {
             filename_id_segmentation(filename): filename for filename in segmentation_filenames
