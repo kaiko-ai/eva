@@ -29,21 +29,24 @@ model:
     encoder:
       class_path: eva.vision.models.ModelFromRegistry
       init_args:
-        model_name: ${oc.env:MODEL_NAME, radiology/voco_b}
+        model_name: ${oc.env:MODEL_NAME, universal/vit_small_patch16_224_dino_1chan}
         model_kwargs:
-          out_indices: ${oc.env:OUT_INDICES, 6}
+          out_indices: ${oc.env:OUT_INDICES, 1}
     decoder:
-      class_path: eva.vision.models.networks.decoders.segmentation.SwinUNETRDecoder
+      class_path: eva.vision.models.networks.decoders.segmentation.ConvDecoderWithImage
       init_args:
-        feature_size: ${oc.env:IN_FEATURES, 48}
-        out_channels:  &NUM_CLASSES 14
-    spatial_dims: 3
+        in_features: ${oc.env:IN_FEATURES, 384}
+        num_classes: &NUM_CLASSES 14
+        greyscale: true
+    spatial_dims: 2
     inferer:
-      class_path: monai.inferers.SlidingWindowInferer
+      class_path: monai.inferers.SliceInferer
       init_args:
-        roi_size: &ROI_SIZE ${oc.env:ROI_SIZE, [96, 96, 96]}
-        sw_batch_size: ${oc.env:SW_BATCH_SIZE, 8}
-        overlap: ${oc.env:SW_OVERLAP, 0.75}
+        roi_size: [224, 224]
+        spatial_dim: 0
+        sw_batch_size: ${oc.env:SW_BATCH_SIZE, 32}
+        overlap: ${oc.env:SW_OVERLAP, 0.25}
+        progress: true
     criterion:
       class_path: monai.losses.DiceCELoss
       init_args:
@@ -121,22 +124,24 @@ data:
                       - ${oc.env:SCALE_INTENSITY_MIN, -175.0}
                       - ${oc.env:SCALE_INTENSITY_MAX, 250.0}
                     output_range: [0.0, 1.0]
-                - class_path: eva.vision.data.transforms.CropForeground
                 - class_path: eva.vision.data.transforms.SpatialPad
                   init_args:
-                    spatial_size: *ROI_SIZE
+                    spatial_size: &ROI_SIZE [1, 224, 224]
                 - class_path: eva.vision.data.transforms.RandCropByPosNegLabel
                   init_args:
                     spatial_size: *ROI_SIZE
-                    num_samples: ${oc.env:SAMPLE_BATCH_SIZE, 4}
+                    num_samples: ${oc.env:SAMPLE_BATCH_SIZE, 8}
                     pos: ${oc.env:RAND_CROP_POS_WEIGHT, 9}
                     neg: ${oc.env:RAND_CROP_NEG_WEIGHT, 1}
+                - class_path: eva.vision.data.transforms.Squeeze
+                  init_args:
+                    dim: 1
                 - class_path: eva.vision.data.transforms.RandFlip
                   init_args:
-                    spatial_axes: [0, 1, 2]
+                    spatial_axes: [0, 1]
                 - class_path: eva.vision.data.transforms.RandRotate90
                   init_args:
-                    spatial_axes: [1, 2]
+                    spatial_axes: [0, 1]
                 - class_path: eva.vision.data.transforms.RandScaleIntensity
                   init_args:
                     factors: 0.1
@@ -166,7 +171,6 @@ data:
                       - ${oc.env:SCALE_INTENSITY_MIN, -175.0}
                       - ${oc.env:SCALE_INTENSITY_MAX, 250.0}
                     output_range: [0.0, 1.0]
-                - class_path: eva.vision.data.transforms.CropForeground
     dataloaders:
       train:
         batch_size: ${oc.env:BATCH_SIZE, 2}

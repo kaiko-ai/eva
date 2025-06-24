@@ -6,7 +6,7 @@ trainer:
     default_root_dir: &OUTPUT_ROOT ${oc.env:OUTPUT_ROOT, logs/${oc.env:MODEL_NAME, radiology/voco_b}/btcv}
     max_epochs: &MAX_EPOCHS ${oc.env:MAX_EPOCHS, 500}
     checkpoint_type: ${oc.env:CHECKPOINT_TYPE, best}
-    check_val_every_n_epoch: ${oc.env:CHECK_VAL_EVERY_N_EPOCHS, 50}
+    check_val_every_n_epoch: ${oc.env:CHECK_VAL_EVERY_N_EPOCHS, 25}
     num_sanity_val_steps: 0
     log_every_n_steps: ${oc.env:LOG_EVERY_N_STEPS, 100}
     callbacks:
