@@ -36,7 +36,7 @@ model:
       class_path: eva.vision.models.networks.decoders.segmentation.ConvDecoderWithImage
       init_args:
         in_features: ${oc.env:IN_FEATURES, 384}
-        num_classes: &NUM_CLASSES 14
+        num_classes: &NUM_CLASSES 3
         greyscale: true
     spatial_dims: 2
     inferer:
