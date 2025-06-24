@@ -1,6 +1,7 @@
 """PubMedQA dataset class."""
 
 import os
+import random
 from typing import Dict, List, Literal
 
 import torch
@@ -22,6 +23,7 @@ class PubMedQA(base.TextClassification):
         root: str | None = None,
         split: Literal["train", "val", "test"] | None = None,
         download: bool = False,
+        max_samples: int | None = None,
     ) -> None:
         """Initialize the PubMedQA dataset.
 
@@ -30,12 +32,14 @@ class PubMedQA(base.TextClassification):
             split: Valid splits among ["train", "val", "test"].
                 If None, it will use "train+test+validation".
             download: Whether to download the dataset if not found locally. Default is False.
+            max_samples: Maximum number of samples to use. If None, use all samples.
         """
         super().__init__()
 
         self._root = root
         self._split = split
         self._download = download
+        self._max_samples = max_samples
 
     def _load_dataset(self, dataset_cache_path: str | None) -> Dataset:
         """Loads the PubMedQA dataset from the local cache or downloads it if needed.
@@ -94,6 +98,13 @@ class PubMedQA(base.TextClassification):
 
         try:
             self.dataset = self._load_dataset(dataset_cache_path)
+            if self._max_samples is not None and len(self.dataset) > self._max_samples:
+                logger.info(
+                    f"Subsampling dataset from {len(self.dataset)} to {self._max_samples} samples"
+                )
+                random.seed(42)
+                indices = random.sample(range(len(self.dataset)), self._max_samples)
+                self.dataset = self.dataset.select(indices)
         except Exception as e:
             raise RuntimeError(f"Failed to prepare dataset: {e}") from e
 
@@ -109,11 +120,15 @@ class PubMedQA(base.TextClassification):
 
     @override
     def load_text(self, index: int) -> str:
+        if index < 0 or index >= len(self.dataset):
+            raise IndexError(f"Index {index} out of range for dataset of size {len(self.dataset)}")
         sample = dict(self.dataset[index])
-        return f"Question: {sample['QUESTION']} \nContext: {sample['CONTEXTS']}"
+        return f"Question: {sample['QUESTION']}\nContext: " + " ".join(sample["CONTEXTS"])
 
     @override
     def load_target(self, index: int) -> torch.Tensor:
+        if index < 0 or index >= len(self.dataset):
+            raise IndexError(f"Index {index} out of range for dataset of size {len(self.dataset)}")
         return torch.tensor(
             self.class_to_idx[self.dataset[index]["final_decision"]], dtype=torch.long
         )

@@ -61,7 +61,6 @@ class LiteLLMTextModel(base.BaseModel):
         responses = batch_completion(
             model=self._model_name_or_path,
             messages=messages,
-            return_exceptions=True,
             **self._model_kwargs,
         )
 

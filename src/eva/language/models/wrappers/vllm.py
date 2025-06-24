@@ -4,9 +4,19 @@ from typing import Any, Dict, List, Sequence
 
 from loguru import logger
 from typing_extensions import override
-from vllm import LLM, SamplingParams
-from vllm.inputs import TokensPrompt
-from vllm.transformers_utils.tokenizer import AnyTokenizer
+
+try:
+    from vllm import LLM, SamplingParams
+    from vllm.inputs import TokensPrompt
+    from vllm.transformers_utils.tokenizer import AnyTokenizer
+except ImportError as e:
+    raise ImportError(
+        "vLLM is required for VLLMTextModel but not installed. "
+        "vLLM must be installed manually as it requires CUDA and is not included in dependencies. "
+        "Install with: pip install vllm "
+        "Note: vLLM requires Linux with CUDA support for optimal performance. "
+        "For alternatives, consider using HuggingFaceTextModel or LiteLLMTextModel."
+    ) from e
 
 from eva.core.models.wrappers import base
 
