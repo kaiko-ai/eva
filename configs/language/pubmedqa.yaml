@@ -34,7 +34,10 @@ data:
         init_args: &DATASET_ARGS
           root: ${oc.env:DATA_ROOT, ./data/pubmedqa}
           split: null
-          download: false
+          download: ${oc.env:DOWNLOAD_DATA, false}
+          # Set `download: true` to download the dataset from https://huggingface.co/datasets/bigbio/pubmed_qa
+          # The PubMedQA dataset is distributed under the following license: MIT License
+          # See (https://github.com/pubmedqa/pubmedqa/blob/master/LICENSE)
           max_samples: 500
     dataloaders:
       val:
