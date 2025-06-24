@@ -60,5 +60,5 @@ def lits17_dataset(split: Literal["train", "val"] | None, assets_path: str) -> d
     }
 
     dataset.prepare_data()
-    dataset.setup()
+    dataset.configure()
     return dataset

@@ -116,7 +116,7 @@ class SemanticSegmentationModule(module.ModelModule):
     def forward(
         self,
         tensor: torch.Tensor,
-        to_size: Tuple[int, int],
+        to_size: Tuple[int, ...],
         *args: Any,
         **kwargs: Any,
     ) -> torch.Tensor:
@@ -185,11 +185,11 @@ class SemanticSegmentationModule(module.ModelModule):
         }
 
     def _forward_networks(
-        self, tensor: torch.Tensor, to_size: Tuple[int, int] | None = None
+        self, tensor: torch.Tensor, to_size: Tuple[int, ...] | None = None
     ) -> torch.Tensor:
         """Passes the input tensor through the encoder and decoder."""
         if self.encoder:
-            to_size = to_size or tensor.shape[-self.spatial_dims :]
+            to_size = to_size or tuple(tensor.shape[-self.spatial_dims :])
             features = self.encoder(tensor)
         else:
             if to_size is None:
