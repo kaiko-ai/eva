@@ -43,7 +43,7 @@ def run_evaluation_session(
             base_trainer,
             base_model,
             datamodule,
-            run_id=f"run_{run_index}",
+            run_id=run_index,
             stages=stages,
             verbose=not verbose,
         )
@@ -57,7 +57,7 @@ def run_evaluation(
     base_model: modules.ModelModule,
     datamodule: datamodules.DataModule,
     *,
-    run_id: str | None = None,
+    run_id: int | None = None,
     stages: List[Literal["fit", "validate", "test"]] | None = None,
     verbose: bool = True,
 ) -> Tuple[_EVALUATE_OUTPUT | None, _EVALUATE_OUTPUT | None]:
