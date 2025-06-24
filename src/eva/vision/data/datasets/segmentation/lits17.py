@@ -45,7 +45,7 @@ class LiTS17(VisionDataset[eva_tv_tensors.Volume, tv_tensors.Mask]):
         (104, 116),
         (117, 123),
         (124, 126),
-        (127, 131),
+        (127, 132),
     ]
     """Train range indices."""
 
