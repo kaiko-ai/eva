@@ -21,6 +21,7 @@ from eva.vision.data.datasets.segmentation import (
     EmbeddingsSegmentationDataset,
     LiTS17,
     MoNuSAC,
+    TotalSegmentator2D,
 )
 from eva.vision.data.datasets.vision import VisionDataset
 from eva.vision.data.datasets.wsi import MultiWsiDataset, WsiDataset
@@ -38,6 +39,7 @@ __all__ = [
     "PANDASmall",
     "Camelyon16",
     "PatchCamelyon",
+    "TotalSegmentator2D",
     "UniToPatho",
     "WsiClassificationDataset",
     "CoNSeP",
