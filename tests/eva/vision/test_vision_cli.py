@@ -66,6 +66,7 @@ def test_configuration_initialization(configuration_file: str, lib_path: str) ->
     "configuration_file",
     [
         "configs/vision/tests/online/patch_camelyon.yaml",
+        "configs/vision/tests/online/consep.yaml",
     ],
 )
 def test_fit_from_configuration(configuration_file: str, lib_path: str) -> None:
@@ -85,6 +86,7 @@ def test_fit_from_configuration(configuration_file: str, lib_path: str) -> None:
     [
         "configs/vision/tests/offline/patch_camelyon.yaml",
         "configs/vision/tests/offline/panda.yaml",
+        "configs/vision/tests/offline/consep.yaml",
     ],
 )
 def test_predict_fit_from_configuration(configuration_file: str, lib_path: str) -> None:
@@ -104,6 +106,7 @@ def test_predict_fit_from_configuration(configuration_file: str, lib_path: str) 
 def _skip_dataset_validation() -> None:
     """Mocks the validation step of the datasets."""
     datasets.PatchCamelyon.validate = mock.MagicMock(return_value=None)
+    datasets.CoNSeP.validate = mock.MagicMock(return_value=None)
 
 
 @pytest.fixture(autouse=True)
