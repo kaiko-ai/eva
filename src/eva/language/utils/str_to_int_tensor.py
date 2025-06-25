@@ -29,7 +29,7 @@ class CastStrToIntTensor:
         tensor([1, 0])
     """
 
-    def __init__(self, mapping: Dict[str, int] = None):
+    def __init__(self, mapping: Dict[str, int] | None = None):
         """Initialize the transform with a regex-to-integer mapping.
 
         Args:
