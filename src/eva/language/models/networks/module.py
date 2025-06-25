@@ -41,7 +41,7 @@ class TextModule(module.ModelModule):
         self.prompt = prompt
 
     @override
-    def forward(self, prompts: str, *args: Any, **kwargs: Any) -> List[str]:
+    def forward(self, prompts: List[str], *args: Any, **kwargs: Any) -> List[str]:
         """Generates text responses for a batch of prompts.
 
         Args:
@@ -77,8 +77,8 @@ class TextModule(module.ModelModule):
         Returns:
             Dictionary with predictions, ground truth, and evaluation metrics.
         """
-        data, targets, metadata = INPUT_BATCH(*batch)
-        messages = [d + "\n" + self.prompt for d in data]
+        data, targets, metadata = batch
+        messages = [str(d) + "\n" + self.prompt for d in data]
         predictions = self(messages)
         logger.debug(f"Predictions: {predictions}")
         logger.debug(f"Targets: {targets}")

@@ -2,7 +2,7 @@
 
 from typing import Any, Dict
 
-from litellm import batch_completion
+from litellm import batch_completion  # type: ignore
 from loguru import logger
 from typing_extensions import override
 

@@ -2,7 +2,7 @@
 
 from typing import Any, Dict, Literal
 
-import transformers
+from transformers import pipeline
 from typing_extensions import override
 
 from eva.core.models.wrappers import base
@@ -37,7 +37,7 @@ class HuggingFaceTextModel(base.BaseModel):
     @override
     def load_model(self) -> None:
         """Loads the model as a Hugging Face pipeline."""
-        self._pipeline = transformers.pipeline(
+        self._pipeline = pipeline(
             task=self._task,
             model=self._model_name_or_path,
             trust_remote_code=True,

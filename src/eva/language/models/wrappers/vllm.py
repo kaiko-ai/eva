@@ -6,9 +6,9 @@ from loguru import logger
 from typing_extensions import override
 
 try:
-    from vllm import LLM, SamplingParams
-    from vllm.inputs import TokensPrompt
-    from vllm.transformers_utils.tokenizer import AnyTokenizer
+    from vllm import LLM, SamplingParams  # type: ignore
+    from vllm.inputs import TokensPrompt  # type: ignore
+    from vllm.transformers_utils.tokenizer import AnyTokenizer  # type: ignore
 except ImportError as e:
     raise ImportError(
         "vLLM is required for VLLMTextModel but not installed. "
