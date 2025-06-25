@@ -2,7 +2,7 @@
 
 from typing import Any, Dict, Literal
 
-from transformers import pipeline
+from transformers.pipelines import pipeline
 from typing_extensions import override
 
 from eva.core.models.wrappers import base

@@ -67,6 +67,8 @@ class VLLMTextModel(base.BaseModel):
         if self._llm_model is not None:
             return
         self._llm_model = LLM(model=self._model_name_or_path, **self._model_kwargs)
+        if self._llm_model is None:
+            raise RuntimeError("Model not initialized")
         self._llm_tokenizer = self._llm_model.get_tokenizer()
 
     def _apply_chat_template(self, prompts: Sequence[str]) -> list[TokensPrompt]:
