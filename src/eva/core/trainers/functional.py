@@ -103,6 +103,7 @@ def run_evaluation(
             verbose=verbose,
             ckpt_path=trainer.checkpoint_type,
         )
+    trainer.finish_logger_run(run_id)
     return validation_scores, test_scores
 
 
