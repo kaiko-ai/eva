@@ -108,7 +108,6 @@ data:
               std: *NORMALIZE_STD
           width: 16
           height: 16
-          validate: false
       val:
         class_path: eva.vision.datasets.CoNSeP
         init_args:
