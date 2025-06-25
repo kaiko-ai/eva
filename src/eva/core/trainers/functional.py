@@ -81,7 +81,8 @@ def run_evaluation(
         stages = ["fit", "validate", "test"]
     trainer, model = _utils.clone(base_trainer, base_model)
     model.configure_model()
-    trainer.setup_log_dirs(run_id or "")
+
+    trainer.init_logger_run(run_id)
 
     validation_scores = None
     test_scores = None
