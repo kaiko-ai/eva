@@ -42,7 +42,9 @@ model:
     inferer:
       class_path: monai.inferers.SliceInferer
       init_args:
-        roi_size: [224, 224]
+        roi_size:
+          - ${oc.env:IMG_DIM, 224}
+          - ${oc.env:IMG_DIM, 224}
         spatial_dim: 0
         sw_batch_size: ${oc.env:SW_BATCH_SIZE, 32}
         overlap: ${oc.env:SW_OVERLAP, 0.25}
@@ -126,7 +128,10 @@ data:
                     output_range: [0.0, 1.0]
                 - class_path: eva.vision.data.transforms.SpatialPad
                   init_args:
-                    spatial_size: &ROI_SIZE [1, 224, 224]
+                    spatial_size: &ROI_SIZE
+                      - 1
+                      - ${oc.env:IMG_DIM, 224}
+                      - ${oc.env:IMG_DIM, 224}
                 - class_path: eva.vision.data.transforms.RandCropByPosNegLabel
                   init_args:
                     spatial_size: *ROI_SIZE
