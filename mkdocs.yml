@@ -101,6 +101,7 @@ nav:
     - Radiology:
       - BTCV: datasets/btcv.md
       - LiTS17: datasets/lits17.md
+      - MSDTask7Pancreas: datasets/msd_task7_pancreas.md
   - Reference API:
     - reference/index.md
     - Core:
