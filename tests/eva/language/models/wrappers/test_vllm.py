@@ -1,6 +1,5 @@
 """VLLM wrapper tests."""
 
-
 import pytest
 
 try:
@@ -133,7 +132,6 @@ def test_double_bos_removal(mock_vllm_imports, monkeypatch):
     model.load_model()
     monkeypatch.setattr(model._llm_model, "get_tokenizer", mock_get_tokenizer)
     model._llm_tokenizer = mock_get_tokenizer()
-
 
     with monkeypatch.context() as m:
         # Mock logger to capture warning
