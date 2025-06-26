@@ -1,4 +1,4 @@
-"""BTCV dataset tests."""
+"""MSDTask7Pancreas dataset tests."""
 
 import os
 from typing import Literal
@@ -14,9 +14,11 @@ from eva.vision.data import tv_tensors as eva_tv_tensors
     "split, expected_length",
     [(None, 2), ("train", 1), ("val", 1)],
 )
-def test_length(btcv_dataset: datasets.BTCV, expected_length: int) -> None:
+def test_length(
+    msd_task7_pancreas_dataset: datasets.MSDTask7Pancreas, expected_length: int
+) -> None:
     """Tests the length of the dataset."""
-    assert len(btcv_dataset) == expected_length
+    assert len(msd_task7_pancreas_dataset) == expected_length
 
 
 @pytest.mark.parametrize(
@@ -25,10 +27,10 @@ def test_length(btcv_dataset: datasets.BTCV, expected_length: int) -> None:
         (None, 0),
     ],
 )
-def test_sample(btcv_dataset: datasets.BTCV, index: int) -> None:
+def test_sample(msd_task7_pancreas_dataset: datasets.MSDTask7Pancreas, index: int) -> None:
     """Tests the format of a dataset sample."""
     # assert data sample is a tuple
-    sample = btcv_dataset[index]
+    sample = msd_task7_pancreas_dataset[index]
     assert isinstance(sample, tuple)
     assert len(sample) == 3
     # assert the format of the `image` and `mask`
@@ -41,22 +43,23 @@ def test_sample(btcv_dataset: datasets.BTCV, index: int) -> None:
 
 
 @pytest.fixture(scope="function")
-def btcv_dataset(split: Literal["train", "val"] | None, assets_path: str) -> datasets.BTCV:
-    """BTCV dataset fixture."""
-    dataset = datasets.BTCV(
+def msd_task7_pancreas_dataset(
+    split: Literal["train", "val"] | None, assets_path: str
+) -> datasets.MSDTask7Pancreas:
+    """MSDTask7Pancreas dataset fixture."""
+    dataset = datasets.MSDTask7Pancreas(
         root=os.path.join(
             assets_path,
             "vision",
             "datasets",
-            "btcv",
+            "msd_task7_pancreas",
         ),
         split=split,
     )
-    dataset._split_index_ranges = {
-        "train": [(0, 1)],
-        "val": [(1, 2)],
-        None: [(0, 2)],
-    }
+
+    dataset._train_ids = [1]
+    dataset._val_ids = [6]
+
     dataset.prepare_data()
     dataset.configure()
     return dataset

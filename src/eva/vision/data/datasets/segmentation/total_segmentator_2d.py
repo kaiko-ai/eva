@@ -18,7 +18,7 @@ from typing_extensions import override
 from eva.core.utils import io as core_io
 from eva.core.utils import multiprocessing
 from eva.vision.data.datasets import _validators, structs, vision
-from eva.vision.data.datasets.segmentation import _total_segmentator
+from eva.vision.data.datasets.segmentation.metadata import _total_segmentator
 from eva.vision.utils import io
 
 

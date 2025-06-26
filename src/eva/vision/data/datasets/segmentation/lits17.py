@@ -1,13 +1,11 @@
-"""BTCV dataset."""
+"""LiTS17 dataset."""
 
 import glob
 import os
 import re
 from typing import Any, Callable, Dict, List, Literal, Tuple
 
-import huggingface_hub
 from torchvision import tv_tensors
-from torchvision.datasets import utils as data_utils
 from typing_extensions import override
 
 from eva.core.utils import requirements
@@ -17,25 +15,66 @@ from eva.vision.data.datasets.segmentation import _utils
 from eva.vision.data.datasets.vision import VisionDataset
 
 
-class BTCV(VisionDataset[eva_tv_tensors.Volume, tv_tensors.Mask]):
-    """Beyond the Cranial Vault (BTCV) Abdomen dataset.
-
-    The BTCV dataset comprises abdominal CT acquired at the Vanderbilt
-    University Medical Center from metastatic liver cancer patients or
-    post-operative ventral hernia patients. The dataset contains one
-    background class and thirteen organ classes.
+class LiTS17(VisionDataset[eva_tv_tensors.Volume, tv_tensors.Mask]):
+    """LiTS17 - Liver Tumor Segmentation Challenge 2017.
 
     More info:
-      - Multi-organ Abdominal CT Reference Standard Segmentations
-        https://zenodo.org/records/1169361
+      - The Liver Tumor Segmentation Benchmark (LiTS)
+        https://arxiv.org/pdf/1901.04056
       - Dataset Split
-        https://github.com/Luffy03/Large-Scale-Medical/blob/main/Downstream/monai/BTCV/dataset/dataset_0.json
+        https://github.com/Luffy03/Large-Scale-Medical/blob/main/Downstream/monai/LiTs/dataset_lits.json
+      - Data needs to be manually downloaded from:
+        https://drive.google.com/drive/folders/0B0vscETPGI1-Q1h1WFdEM2FHSUE
     """
 
+    _train_index_ranges: List[Tuple[int, int]] = [
+        (0, 2),
+        (4, 14),
+        (15, 16),
+        (18, 48),
+        (50, 51),
+        (52, 57),
+        (58, 65),
+        (66, 67),
+        (71, 74),
+        (75, 81),
+        (82, 85),
+        (86, 92),
+        (93, 99),
+        (102, 103),
+        (104, 116),
+        (117, 123),
+        (124, 126),
+        (127, 131),
+    ]
+    """Train range indices."""
+
+    _val_index_ranges: List[Tuple[int, int]] = [
+        (2, 4),
+        (14, 15),
+        (16, 18),
+        (48, 50),
+        (51, 52),
+        (57, 58),
+        (65, 66),
+        (67, 68),
+        (70, 71),
+        (74, 75),
+        (81, 82),
+        (85, 86),
+        (92, 93),
+        (99, 102),
+        (103, 104),
+        (116, 117),
+        (123, 124),
+        (126, 127),
+    ]
+    """Validation range indices."""
+
     _split_index_ranges = {
-        "train": [(0, 24)],
-        "val": [(24, 30)],
-        None: [(0, 30)],
+        "train": _train_index_ranges,
+        "val": _val_index_ranges,
+        None: [(0, 128)],
     }
     """Sample indices for the dataset splits."""
 
@@ -43,7 +82,6 @@ class BTCV(VisionDataset[eva_tv_tensors.Volume, tv_tensors.Mask]):
         self,
         root: str,
         split: Literal["train", "val"] | None = None,
-        download: bool = False,
         transforms: Callable | None = None,
     ) -> None:
         """Initializes the dataset.
@@ -52,38 +90,22 @@ class BTCV(VisionDataset[eva_tv_tensors.Volume, tv_tensors.Mask]):
             root: Path to the dataset root directory.
             split: Dataset split to use ('train' or 'val').
                 If None, it uses the full dataset.
-            download: Whether to download the dataset.
             transforms: A callable object for applying data transformations.
                 If None, no transformations are applied.
         """
-        super().__init__(transforms=transforms)
+        super().__init__()
 
         self._root = root
         self._split = split
-        self._download = download
+        self._transforms = transforms
 
-        self._samples: List[Tuple[str, str]]
+        self._samples: Dict[int, Tuple[str, str]]
         self._indices: List[int]
 
     @property
     @override
     def classes(self) -> List[str]:
-        return [
-            "background",
-            "spleen",
-            "right_kidney",
-            "left_kidney",
-            "gallbladder",
-            "esophagus",
-            "liver",
-            "stomach",
-            "aorta",
-            "inferior_vena_cava",
-            "portal_and_splenic_vein",
-            "pancreas",
-            "right_adrenal_gland",
-            "left_adrenal_gland",
-        ]
+        return ["background", "liver", "tumor"]
 
     @property
     @override
@@ -92,12 +114,7 @@ class BTCV(VisionDataset[eva_tv_tensors.Volume, tv_tensors.Mask]):
 
     @override
     def filename(self, index: int) -> str:
-        return os.path.basename(self._samples[self._indices[index]][0])
-
-    @override
-    def prepare_data(self) -> None:
-        if self._download:
-            self._download_dataset()
+        return os.path.relpath(self._samples[self._indices[index]][0], self._root)
 
     @override
     def configure(self) -> None:
@@ -166,7 +183,7 @@ class BTCV(VisionDataset[eva_tv_tensors.Volume, tv_tensors.Mask]):
 
     def _apply_transforms(
         self, ct_scan: eva_tv_tensors.Volume, mask: tv_tensors.Mask
-    ) -> tuple[eva_tv_tensors.Volume, tv_tensors.Mask]:
+    ) -> Tuple[eva_tv_tensors.Volume, tv_tensors.Mask]:
         """Applies transformations to the provided data.
 
         Args:
@@ -178,11 +195,11 @@ class BTCV(VisionDataset[eva_tv_tensors.Volume, tv_tensors.Mask]):
         """
         return self._transforms(ct_scan, mask) if self._transforms else (ct_scan, mask)
 
-    def _find_samples(self) -> list[tuple[str, str]]:
+    def _find_samples(self) -> Dict[int, Tuple[str, str]]:
         """Retrieves the file paths for the CT volumes and segmentation.
 
         Returns:
-            The a list of file path to the CT volumes and segmentation.
+            The a dictionary mapping file IDs to tuples of volume and segmentation file paths.
         """
 
         def filename_id(filename: str) -> int:
@@ -192,48 +209,23 @@ class BTCV(VisionDataset[eva_tv_tensors.Volume, tv_tensors.Mask]):
 
             return int(matches.group(1))
 
-        subdir = os.path.join(self._root, "BTCV")
-        root = subdir if os.path.isdir(subdir) else self._root
-
-        volume_files_pattern = os.path.join(root, "imagesTr", "*.nii.gz")
-        volume_filenames = glob.glob(volume_files_pattern)
+        volume_files_pattern = os.path.join(self._root, "**", "volume-*.nii")
+        volume_filenames = glob.glob(volume_files_pattern, recursive=True)
         volume_ids = {filename_id(filename): filename for filename in volume_filenames}
 
-        segmentation_files_pattern = os.path.join(root, "labelsTr", "*.nii.gz")
-        segmentation_filenames = glob.glob(segmentation_files_pattern)
+        segmentation_files_pattern = os.path.join(self._root, "**", "segmentation-*.nii")
+        segmentation_filenames = glob.glob(segmentation_files_pattern, recursive=True)
         segmentation_ids = {filename_id(filename): filename for filename in segmentation_filenames}
 
-        return [
-            (volume_ids[file_id], segmentation_ids[file_id])
+        return {
+            file_id: (volume_ids[file_id], segmentation_ids[file_id])
             for file_id in sorted(volume_ids.keys() & segmentation_ids.keys())
-        ]
+        }
 
-    def _make_indices(self) -> list[int]:
+    def _make_indices(self) -> List[int]:
         """Builds the dataset indices for the specified split."""
         index_ranges = self._split_index_ranges.get(self._split)
         if index_ranges is None:
             raise ValueError("Invalid data split. Use 'train', 'val' or `None`.")
 
         return _data_utils.ranges_to_indices(index_ranges)
-
-    def _download_dataset(self) -> None:
-        hf_token = os.getenv("HF_TOKEN")
-        if not hf_token:
-            raise ValueError("Huggingface token required, please set the HF_TOKEN env variable.")
-
-        huggingface_hub.snapshot_download(
-            "Luffy503/VoCo_Downstream",
-            repo_type="dataset",
-            token=hf_token,
-            local_dir=self._root,
-            ignore_patterns=[".git*"],
-            allow_patterns=["BTCV.zip"],
-        )
-
-        zip_path = os.path.join(self._root, "BTCV.zip")
-        if not os.path.exists(zip_path):
-            raise FileNotFoundError(
-                f"BTCV.zip not found in {self._root}, something with the download went wrong."
-            )
-
-        data_utils.extract_archive(zip_path, self._root, remove_finished=True)

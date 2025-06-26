@@ -115,4 +115,4 @@ class Decoder2D(base.Decoder):
         if self._combine_features:
             features = self._forward_features(features)
         logits = self._forward_head(features)
-        return self._upscale(logits, image_size)
+        return self._upscale(logits, image_size)  # type: ignore
