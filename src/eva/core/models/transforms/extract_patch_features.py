@@ -43,7 +43,7 @@ class ExtractPatchFeatures:
         """
         num_skip = int(self._has_cls_token) + self._num_register_tokens
         if isinstance(tensor, modeling_outputs.BaseModelOutputWithPooling):
-            features = tensor.last_hidden_state[:, num_skip:, :].permute(0, 2, 1)
+            features = tensor.last_hidden_state[:, num_skip:, :].permute(0, 2, 1)  # type: ignore
         else:
             features = tensor[:, num_skip:, :].permute(0, 2, 1)
 

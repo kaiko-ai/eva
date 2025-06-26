@@ -31,7 +31,7 @@ class ExtractCLSFeatures:
             tensor: The tensor representing the model output.
         """
         if isinstance(tensor, modeling_outputs.BaseModelOutputWithPooling):
-            tensor = tensor.last_hidden_state
+            tensor = tensor.last_hidden_state  # type: ignore
 
         cls_token = tensor[:, self._cls_index, :]
         if self._include_patch_tokens:
