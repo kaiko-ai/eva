@@ -34,7 +34,8 @@
 
 | Dataset | #Images | Image Size | Task  | Download provided
 |---|---|---|---|---|
-| [BTCV](btcv.md) | 30 | 512 x 512 x ~140 \* |  Semantic Segmentation (14 classes) | Yes |
-| [LiTS17](lits17.md) | 131 (58638) | ~300 x ~300 x ~350 \* |  Semantic Segmentation (3 classes) | No |
+| [BTCV](btcv.md) | 30 | ~100 x 512 x 512 \* |  Semantic Segmentation (14 classes) | Yes |
+| [LiTS17](lits17.md) | 130 | ~500 x 512 x 512 \* |  Semantic Segmentation (3 classes) | No |
+| [MSDTask7Pancreas](msd_task7_pancreas.md) | 281 | ~100 x ~512 x ~512 \* |  Semantic Segmentation (3 classes) | Yes |
 
 \* 3D images of varying sizes

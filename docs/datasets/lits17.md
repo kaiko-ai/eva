@@ -13,7 +13,7 @@ The segmentation classes are: Background, Liver and Tumor.
 | **Modality**          | Vision (radiology, CT scans)                              |
 | **Task**              | Segmentation (3 classes)                                  |
 | **Data size**         | train: 15GB (53.66 GB uncompressed)                       |
-| **Image dimension**   | ~300 x ~300 x ~350 (number of slices) x 1 (grey scale) *  |
+| **Image dimension**   | ~500 x 512 x 512                                          |
 | **Files format**      | `.nii` ("NIFTI") images                                   |
 | **Number of scans**   | 130 (58638 slices)                                        |
 | **Splits in use**     | train (82.17%) / val (17.83%)                             |

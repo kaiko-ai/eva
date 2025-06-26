@@ -63,6 +63,7 @@ Supported datasets & tasks include:
 
 -	**[BTCV](datasets/btcv.md)**: Segmentation of abdominal organs (CT scans).
 -	**[LiTS17](datasets/lits17.md)**: Segmentation of liver and tumor (CT scans).
+-	**[MSDTask7Pancreas](datasets/msd_task7_pancreas.md)**: Segmentation of pancreas and tumor (CT scans).
 
 To evaluate FMs, *eva* provides support for different model-formats, including models trained with PyTorch, models available on HuggingFace and ONNX-models. For other formats custom wrappers can be implemented.
 
