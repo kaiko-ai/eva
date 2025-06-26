@@ -1,0 +1,172 @@
+---
+trainer:
+  class_path: eva.Trainer
+  init_args:
+    accelerator: cpu
+    n_runs: &N_RUNS ${oc.env:N_RUNS, 1}
+    default_root_dir: &LIGHTNING_ROOT ${oc.env:LIGHTNING_ROOT, logs/test/online/lits17}
+    max_steps: &MAX_STEPS ${oc.env:MAX_STEPS, 2}
+    limit_train_batches: 1
+    limit_val_batches: 1
+    log_every_n_steps: 1
+    val_check_interval: 2
+    num_sanity_val_steps: 0
+    check_val_every_n_epoch: null
+    checkpoint_type: ${oc.env:CHECKPOINT_TYPE, best}
+    callbacks:
+      - class_path: eva.callbacks.ConfigurationLogger
+    logger:
+      - class_path: lightning.pytorch.loggers.TensorBoardLogger
+        init_args:
+          save_dir: *LIGHTNING_ROOT
+          name: ""
+          version: ""
+model:
+  class_path: eva.vision.models.modules.SemanticSegmentationModule
+  init_args:
+    encoder:
+      class_path: eva.vision.models.ModelFromRegistry
+      init_args:
+        model_name: ${oc.env:MODEL_NAME, radiology/voco_b}
+        model_kwargs:
+          out_indices: ${oc.env:OUT_INDICES, 6}
+    decoder:
+      class_path: eva.vision.models.networks.decoders.segmentation.SwinUNETRDecoder
+      init_args:
+        feature_size: ${oc.env:IN_FEATURES, 48}
+        out_channels:  &NUM_CLASSES 3
+    spatial_dims: 3
+    inferer:
+      class_path: monai.inferers.SlidingWindowInferer
+      init_args:
+        roi_size: &ROI_SIZE ${oc.env:ROI_SIZE, [96, 96, 96]}
+        sw_batch_size: ${oc.env:SW_BATCH_SIZE, 8}
+        overlap: ${oc.env:SW_OVERLAP, 0.25}
+    criterion:
+      class_path: monai.losses.DiceCELoss
+      init_args:
+        include_background: false
+        to_onehot_y: true
+        softmax: true
+    lr_multiplier_encoder: 0.0
+    optimizer:
+      class_path: torch.optim.AdamW
+      init_args:
+        lr: ${oc.env:LR_VALUE, 0.001}
+        betas: [0.9, 0.999]
+        weight_decay: ${oc.env:WEIGHT_DECAY, 0.01}
+    lr_scheduler:
+      class_path: torch.optim.lr_scheduler.CosineAnnealingLR
+      init_args:
+        T_max: 2
+        eta_min: ${oc.env:LR_VALUE_END, 0.0001}
+    postprocess:
+      predictions_transforms:
+        - class_path: eva.core.models.transforms.AsDiscrete
+          init_args:
+            argmax: true
+            to_onehot: *NUM_CLASSES
+      targets_transforms:
+        - class_path: eva.core.models.transforms.AsDiscrete
+          init_args:
+            to_onehot: *NUM_CLASSES
+    metrics:
+      common:
+        - class_path: eva.metrics.AverageLoss
+      evaluation:
+        - class_path: torchmetrics.segmentation.DiceScore
+          init_args:
+            num_classes: *NUM_CLASSES
+            include_background: false
+            average: macro
+            input_format: one-hot
+data:
+  class_path: eva.DataModule
+  init_args:
+    datasets:
+      train:
+        class_path: eva.vision.datasets.LiTS17
+        init_args: &DATASET_ARGS
+          root: ${oc.env:TESTS_ROOT, tests/eva}/assets/vision/datasets/lits17
+          split: train
+          transforms:
+            class_path: torchvision.transforms.v2.Compose
+            init_args:
+              transforms:
+                - class_path: eva.vision.data.transforms.EnsureChannelFirst
+                  init_args:
+                    channel_dim: 1
+                - class_path: eva.vision.data.transforms.Spacing
+                  init_args:
+                    pixdim: [1.5, 1.5, 1.5]
+                - class_path: eva.vision.data.transforms.ScaleIntensityRange
+                  init_args:
+                    input_range:
+                      - ${oc.env:SCALE_INTENSITY_MIN, -175.0}
+                      - ${oc.env:SCALE_INTENSITY_MAX, 250.0}
+                    output_range: [0.0, 1.0]
+                - class_path: eva.vision.data.transforms.CropForeground
+                - class_path: eva.vision.data.transforms.SpatialPad
+                  init_args:
+                    spatial_size: *ROI_SIZE
+                - class_path: eva.vision.data.transforms.RandCropByPosNegLabel
+                  init_args:
+                    spatial_size: *ROI_SIZE
+                    num_samples: ${oc.env:SAMPLE_BATCH_SIZE, 2}
+                    pos: ${oc.env:RAND_CROP_POS_WEIGHT, 9}
+                    neg: ${oc.env:RAND_CROP_NEG_WEIGHT, 1}
+                - class_path: eva.vision.data.transforms.RandFlip
+                  init_args:
+                    spatial_axes: [0, 1, 2]
+                - class_path: eva.vision.data.transforms.RandRotate90
+                  init_args:
+                    spatial_axes: [1, 2]
+                - class_path: eva.vision.data.transforms.RandScaleIntensity
+                  init_args:
+                    factors: 0.1
+                    prob: 0.1
+                - class_path: eva.vision.data.transforms.RandShiftIntensity
+                  init_args:
+                    offsets: 0.1
+                    prob: 0.1
+      val:
+        class_path: eva.vision.datasets.LiTS17
+        init_args:
+          <<: *DATASET_ARGS
+          split: val
+          transforms:
+            class_path: torchvision.transforms.v2.Compose
+            init_args:
+              transforms:
+                - class_path: eva.vision.data.transforms.EnsureChannelFirst
+                  init_args:
+                    channel_dim: 1
+                - class_path: eva.vision.data.transforms.Spacing
+                  init_args:
+                    pixdim: [1.5, 1.5, 1.5]
+                - class_path: eva.vision.data.transforms.ScaleIntensityRange
+                  init_args:
+                    input_range:
+                      - ${oc.env:SCALE_INTENSITY_MIN, -175.0}
+                      - ${oc.env:SCALE_INTENSITY_MAX, 250.0}
+                    output_range: [0.0, 1.0]
+                - class_path: eva.vision.data.transforms.CropForeground
+                # NOTE: perform cropping to make the validation faster
+                - class_path: eva.vision.data.transforms.RandSpatialCrop
+                  init_args:
+                    roi_size: *ROI_SIZE
+    dataloaders:
+      train:
+        batch_size: &BATCH_SIZE 2
+        shuffle: true
+        num_workers: 0
+        pin_memory: false
+        persistent_workers: false
+        prefetch_factor: null
+        collate_fn: eva.vision.data.dataloaders.collate_fn.collection_collate
+      val:
+        batch_size: *BATCH_SIZE
+        num_workers: 0
+        pin_memory: false
+        persistent_workers: false
+        prefetch_factor: null
