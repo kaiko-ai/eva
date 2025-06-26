@@ -12,11 +12,11 @@ The annotations cover segmentations of the spleen, right and left kidney, gallbl
 |                       |                                                           |
 |-----------------------|-----------------------------------------------------------|
 | **Modality**          | Vision (radiology, CT scans)                              |
-| **Task**              | Segmentation (14 classes)                                  |
-| **Image dimension**   | 512 x 512 x ~140 (number of slices)  |
+| **Task**              | Segmentation (14 classes)                                 |
+| **Image dimension**   | ~100 x 512 x 512                                          |
 | **Files format**      | `.nii` ("NIFTI") images                                   |
-| **Number of scans**   | 30                                        |
-| **Splits in use**     | train (80%) / val (20%)                  |
+| **Number of scans**   | 30                                                        |
+| **Splits in use**     | train (80%) / val (20%)                                   |
 
 
 ### Splits

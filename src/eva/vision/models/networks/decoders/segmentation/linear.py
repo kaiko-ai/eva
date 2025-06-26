@@ -117,4 +117,4 @@ class LinearDecoder(base.Decoder):
         """
         patch_embeddings = self._forward_features(decoder_inputs.features)
         logits = self._forward_head(patch_embeddings)
-        return self._cls_seg(logits, decoder_inputs.image_size)
+        return self._cls_seg(logits, decoder_inputs.image_size)  # type: ignore

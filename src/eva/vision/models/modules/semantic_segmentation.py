@@ -116,7 +116,7 @@ class SemanticSegmentationModule(module.ModelModule):
     def forward(
         self,
         tensor: torch.Tensor,
-        to_size: Tuple[int, int],
+        to_size: Tuple[int, ...],
         *args: Any,
         **kwargs: Any,
     ) -> torch.Tensor:
@@ -174,7 +174,8 @@ class SemanticSegmentationModule(module.ModelModule):
             The batch step output.
         """
         data, targets, metadata = INPUT_TENSOR_BATCH(*batch)
-        predictions = self(data, to_size=targets.shape[-self.spatial_dims :])
+        to_size = targets.shape[-self.spatial_dims :] if self.inferer is None else None
+        predictions = self(data, to_size=to_size)
         loss = self.criterion(predictions, targets)
         return {
             "loss": loss,
@@ -183,11 +184,21 @@ class SemanticSegmentationModule(module.ModelModule):
             "metadata": metadata,
         }
 
-    def _forward_networks(self, tensor: torch.Tensor, to_size: Tuple[int, int]) -> torch.Tensor:
+    def _forward_networks(
+        self, tensor: torch.Tensor, to_size: Tuple[int, ...] | None = None
+    ) -> torch.Tensor:
         """Passes the input tensor through the encoder and decoder."""
-        features = self.encoder(tensor) if self.encoder else tensor
+        if self.encoder:
+            to_size = to_size or tuple(tensor.shape[-self.spatial_dims :])
+            features = self.encoder(tensor)
+        else:
+            if to_size is None:
+                raise ValueError("`to_size` must be provided when no encoder is used.")
+            features = tensor
+
         if isinstance(self.decoder, segmentation.Decoder):
             if not isinstance(features, list):
                 raise ValueError(f"Expected a list of feature map tensors, got {type(features)}.")
             return self.decoder(DecoderInputs(features, to_size, tensor))
+
         return self.decoder(features)

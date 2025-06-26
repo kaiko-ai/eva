@@ -101,8 +101,8 @@ nav:
         - PANDASmall: datasets/panda_small.md
     - Radiology:
       - BTCV: datasets/btcv.md
-      - TotalSegmentator: datasets/total_segmentator.md
-      - LiTS: datasets/lits.md
+      - LiTS17: datasets/lits17.md
+      - MSDTask7Pancreas: datasets/msd_task7_pancreas.md
   - Reference API:
     - reference/index.md
     - Core:
