@@ -10,7 +10,7 @@ from torchvision import tv_tensors
 from torchvision.datasets import utils as data_utils
 from typing_extensions import override
 
-# from eva.core.utils import requirements
+from eva.core.utils import requirements
 from eva.vision.data import tv_tensors as eva_tv_tensors
 from eva.vision.data.datasets.segmentation import _utils
 from eva.vision.data.datasets.segmentation.metadata import _msd_task7_pancreas
@@ -95,7 +95,7 @@ class MSDTask7Pancreas(VisionDataset[eva_tv_tensors.Volume, tv_tensors.Mask]):
 
     @override
     def validate(self) -> None:
-        # requirements.check_dependencies(requirements={"torch": "2.5.1", "torchvision": "0.20.1"})
+        requirements.check_dependencies(requirements={"torch": "2.5.1", "torchvision": "0.20.1"})
 
         def _valid_sample(index: int) -> bool:
             """Indicates if the sample files exist and are reachable."""
