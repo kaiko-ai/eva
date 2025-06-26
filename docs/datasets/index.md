@@ -35,7 +35,6 @@
 | Dataset | #Images | Image Size | Task  | Download provided
 |---|---|---|---|---|
 | [BTCV](btcv.md) | 30 | 512 x 512 x ~140 \* |  Semantic Segmentation (14 classes) | Yes |
-| [TotalSegmentator](total_segmentator.md) | 1228 | ~300 x ~300 x ~350 \* |  Semantic Segmentation (117 classes) | Yes |
-| [LiTS](lits.md) | 131 (58638) | ~300 x ~300 x ~350 \* |  Semantic Segmentation (3 classes) | No |
+| [LiTS17](lits17.md) | 131 (58638) | ~300 x ~300 x ~350 \* |  Semantic Segmentation (3 classes) | No |
 
 \* 3D images of varying sizes
