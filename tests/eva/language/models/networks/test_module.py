@@ -16,13 +16,14 @@ def test_forward(text_module, text_model):
 
 def test_validation_step(text_module, text_model):
     """Test the validation_step method of the TextModule class."""
-    data = "What is the capital of France?"
-    targets = "Paris"
-    metadata = {"id": 1}
+    data = ["What is the capital of France?"]
+    targets = ["Paris"]
+    metadata = [{"id": 1}]
     batch = (data, targets, metadata)
 
-    expected_message = text_module.prompt + str(data) + "\nAnswer: "
-    expected_predictions = text_model.generate(expected_message)
+    # The module creates messages list: [str(d) + "\n" + prompt for d in data]
+    expected_messages = [str(data[0]) + "\n" + text_module.prompt]
+    expected_predictions = text_model.generate(expected_messages)
 
     output = text_module.validation_step(batch)
 
@@ -45,9 +46,14 @@ def test_init_attributes(text_model):
 class TextModel(nn.Module):
     """A simple text model for testing purposes."""
 
-    def generate(self, prompts: str):
+    def generate(self, prompts):
         """Generate some text based on the input prompt."""
-        return [f"Generated: {prompts}"]
+        if isinstance(prompts, str):
+            return [f"Generated: {prompts}"]
+        elif isinstance(prompts, list):
+            return [f"Generated: {prompt}" for prompt in prompts]
+        else:
+            return [f"Generated: {str(prompts)}"]
 
 
 @pytest.fixture

@@ -81,6 +81,7 @@ def test(session: nox.Session) -> None:
     """Runs the tests and code coverage analysis session of all the source code."""
     session.notify("test_core")
     session.notify("test_vision")
+    session.notify("test_language")
 
 
 @nox.session(python=PYTHON_VERSIONS, tags=["unit-tests", "tests"])
@@ -97,6 +98,14 @@ def test_vision(session: nox.Session) -> None:
     args = session.posargs or ["--cov"]
     session.run_always("pdm", "install", "--group", "test", "--group", "vision", external=True)
     session.run("pytest", os.path.join("tests", "eva", "vision"), *args)
+
+
+@nox.session(python=PYTHON_VERSIONS, tags=["unit-tests", "tests"])
+def test_language(session: nox.Session) -> None:
+    """Runs the tests and code coverage analysis session of the language source code."""
+    args = session.posargs or ["--cov"]
+    session.run_always("pdm", "install", "--group", "test", "--group", "language", external=True)
+    session.run("pytest", os.path.join("tests", "eva", "language"), *args)
 
 
 @nox.session(python=PYTHON_VERSIONS, tags=["unit-tests", "tests"])
