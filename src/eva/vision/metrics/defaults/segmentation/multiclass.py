@@ -1,5 +1,7 @@
 """Default metric collection for multiclass semantic segmentation tasks."""
 
+from typing import Literal
+
 from eva.core.metrics import structs
 from eva.vision.metrics import segmentation
 
@@ -66,3 +68,53 @@ class MulticlassSegmentationMetrics(structs.MetricCollection):
             prefix=prefix,
             postfix=postfix,
         )
+
+
+class MulticlassSegmentationMetricsV2(structs.MetricCollection):
+    """Metrics for multi-class semantic segmentation tasks.
+
+    In torchmetrics 1.7.2, the DiceScore implementation has been
+    improved, and should now provide enough signal. Therefore,
+    removing the monai implementation and iou for simplicity and
+    computational efficiency.
+    """
+
+    def __init__(
+        self,
+        num_classes: int,
+        include_background: bool = False,
+        prefix: str | None = None,
+        postfix: str | None = None,
+        input_format: Literal["one-hot", "index"] = "one-hot",
+    ) -> None:
+        """Initializes the multi-class semantic segmentation metrics.
+
+        Args:
+            num_classes: Integer specifying the number of classes.
+            include_background: Whether to include the background class in the metrics computation.
+            prefix: A string to add before the keys in the output dictionary.
+            postfix: A string to add after the keys in the output dictionary.
+            input_format: Input tensor format. Options are `"one-hot"` for one-hot encoded tensors,
+                `"index"` for index tensors.
+        """
+        super().__init__(
+            metrics={
+                "DiceScore (macro)": segmentation.DiceScore(
+                    num_classes=num_classes,
+                    include_background=include_background,
+                    average="macro",
+                    aggregation_level="samplewise",
+                    input_format=input_format,
+                ),
+                "DiceScore (macro/global)": segmentation.DiceScore(
+                    num_classes=num_classes,
+                    include_background=include_background,
+                    average="macro",
+                    aggregation_level="global",
+                    input_format=input_format,
+                ),
+            },
+            prefix=prefix,
+            postfix=postfix,
+        )
+        self.num_classes = num_classes
