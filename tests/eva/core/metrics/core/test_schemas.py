@@ -2,6 +2,7 @@
 
 import pytest
 import torchmetrics
+import torchmetrics.segmentation
 
 from eva.core.metrics import structs
 from eva.core.metrics.structs.typings import MetricModuleType
@@ -33,23 +34,23 @@ from eva.core.metrics.structs.typings import MetricModuleType
         ),
         (
             torchmetrics.Accuracy("binary"),
-            torchmetrics.Dice(),
+            torchmetrics.segmentation.DiceScore(num_classes=2),
             None,
-            "[BinaryAccuracy(), Dice()]",
+            "[BinaryAccuracy(), DiceScore()]",
             "BinaryAccuracy()",
         ),
         (
             torchmetrics.Accuracy("binary"),
             None,
-            torchmetrics.Dice(),
+            torchmetrics.segmentation.DiceScore(num_classes=2),
             "BinaryAccuracy()",
-            "[BinaryAccuracy(), Dice()]",
+            "[BinaryAccuracy(), DiceScore()]",
         ),
         (
             torchmetrics.Accuracy("binary"),
-            torchmetrics.Dice(),
+            torchmetrics.segmentation.DiceScore(num_classes=2),
             torchmetrics.AUROC("binary"),
-            "[BinaryAccuracy(), Dice()]",
+            "[BinaryAccuracy(), DiceScore()]",
             "[BinaryAccuracy(), BinaryAUROC()]",
         ),
     ],
