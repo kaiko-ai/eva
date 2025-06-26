@@ -36,6 +36,8 @@ class HuggingFaceModel(base.BaseModel):
 
     @override
     def load_model(self) -> None:
+        # Use safetensors to avoid torch.load security vulnerability
+        model_kwargs = {"use_safetensors": True, **self._model_kwargs}
         self._model = transformers.AutoModel.from_pretrained(
-            self._model_name_or_path, **self._model_kwargs
+            self._model_name_or_path, **model_kwargs
         )

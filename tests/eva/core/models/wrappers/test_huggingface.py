@@ -32,6 +32,6 @@ def test_huggingface_model(
     output_tensor = model(input_tenor)
 
     if isinstance(output_tensor, modeling_outputs.BaseModelOutputWithPooling):
-        assert output_tensor.last_hidden_state.shape == expected_output_shape
+        assert output_tensor.last_hidden_state.shape == expected_output_shape  # type: ignore
     else:
         assert output_tensor.shape == expected_output_shape
