@@ -2,13 +2,14 @@
 
 from typing import Any, Callable, Dict
 
+import torch
 from typing_extensions import override
 
-from eva.core.models import wrappers
+from eva.core.models.wrappers import base
 from eva.vision.models.networks.backbones import BackboneModelRegistry
 
 
-class ModelFromRegistry(wrappers.BaseModel):
+class ModelFromRegistry(base.BaseModel[torch.Tensor, torch.Tensor]):
     """Wrapper class for vision backbone models.
 
     This class can be used by load backbones available in eva's
@@ -21,7 +22,7 @@ class ModelFromRegistry(wrappers.BaseModel):
         model_name: str,
         model_kwargs: Dict[str, Any] | None = None,
         model_extra_kwargs: Dict[str, Any] | None = None,
-        tensor_transforms: Callable | None = None,
+        transforms: Callable | None = None,
     ) -> None:
         """Initializes the model.
 
@@ -29,10 +30,10 @@ class ModelFromRegistry(wrappers.BaseModel):
             model_name: The name of the model to load.
             model_kwargs: The arguments used for instantiating the model.
             model_extra_kwargs: Extra arguments used for instantiating the model.
-            tensor_transforms: The transforms to apply to the output tensor
+            transforms: The transforms to apply to the output tensor
                 produced by the model.
         """
-        super().__init__(tensor_transforms=tensor_transforms)
+        super().__init__(transforms=transforms)
 
         self._model_name = model_name
         self._model_kwargs = model_kwargs or {}

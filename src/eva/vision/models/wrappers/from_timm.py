@@ -4,12 +4,13 @@ from typing import Any, Callable, Dict, Tuple
 from urllib import parse
 
 import timm
+import torch
 from typing_extensions import override
 
-from eva.core.models import wrappers
+from eva.core.models.wrappers import base
 
 
-class TimmModel(wrappers.BaseModel):
+class TimmModel(base.BaseModel[torch.Tensor, torch.Tensor]):
     """Model wrapper for `timm` models.
 
     Note that only models with `forward_intermediates`
@@ -23,7 +24,7 @@ class TimmModel(wrappers.BaseModel):
         checkpoint_path: str = "",
         out_indices: int | Tuple[int, ...] | None = None,
         model_kwargs: Dict[str, Any] | None = None,
-        tensor_transforms: Callable | None = None,
+        transforms: Callable | None = None,
     ) -> None:
         """Initializes the encoder.
 
@@ -34,10 +35,10 @@ class TimmModel(wrappers.BaseModel):
             out_indices: Returns last n blocks if `int`, all if `None`, select
                 matching indices if sequence.
             model_kwargs: Extra model arguments.
-            tensor_transforms: The transforms to apply to the output tensor
+            transforms: The transforms to apply to the output tensor
                 produced by the model.
         """
-        super().__init__(tensor_transforms=tensor_transforms)
+        super().__init__(transforms=transforms)
 
         self._model_name = model_name
         self._pretrained = pretrained
