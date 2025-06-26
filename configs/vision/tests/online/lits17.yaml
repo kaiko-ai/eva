@@ -25,15 +25,14 @@ model:
   class_path: eva.vision.models.modules.SemanticSegmentationModule
   init_args:
     encoder:
-      class_path: eva.vision.models.ModelFromRegistry
+      class_path: eva.vision.models.networks.backbones.radiology.SwinUNETREncoder
       init_args:
-        model_name: ${oc.env:MODEL_NAME, radiology/voco_b}
-        model_kwargs:
-          out_indices: ${oc.env:OUT_INDICES, 6}
+        feature_size: 6
+        out_indices: 6
     decoder:
       class_path: eva.vision.models.networks.decoders.segmentation.SwinUNETRDecoder
       init_args:
-        feature_size: ${oc.env:IN_FEATURES, 48}
+        feature_size: 6
         out_channels:  &NUM_CLASSES 3
     spatial_dims: 3
     inferer:
