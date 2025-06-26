@@ -7,7 +7,7 @@ from eva.vision.metrics import segmentation
 
 
 class MulticlassSegmentationMetrics(structs.MetricCollection):
-    """Default metrics for multi-class semantic segmentation tasks."""
+    """Metrics for multi-class semantic segmentation tasks."""
 
     def __init__(
         self,
