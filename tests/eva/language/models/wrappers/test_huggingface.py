@@ -36,33 +36,26 @@ def test_real_small_hf_model_generation(
     expected output format for deterministic vs non-deterministic generation.
     """
     mock_pipeline = MagicMock()
-    
+
     if expect_deterministic:
         mock_pipeline.return_value = [[{"generated_text": f"{prompt} generated"}]]
     else:
         mock_pipeline.side_effect = [
             [[{"generated_text": f"{prompt} generated 1"}]],
-            [[{"generated_text": f"{prompt} generated 2"}]]
+            [[{"generated_text": f"{prompt} generated 2"}]],
         ]
-    
-    with patch("eva.language.models.wrappers.huggingface.pipeline",
-               return_value=mock_pipeline):
-        model = HuggingFaceTextModel(
-            model_name_or_path=model_name_or_path, task="text-generation"
-        )
-        
+
+    with patch("eva.language.models.wrappers.huggingface.pipeline", return_value=mock_pipeline):
+        model = HuggingFaceTextModel(model_name_or_path=model_name_or_path, task="text-generation")
+
         output1 = model.generate([prompt], **generate_kwargs)[0]
         output2 = model.generate([prompt], **generate_kwargs)[0]
 
-        assert isinstance(output1, str) and output1, \
-            "First output should be a non-empty string."
-        assert isinstance(output2, str) and output2, \
-            "Second output should be a non-empty string."
+        assert isinstance(output1, str) and output1, "First output should be a non-empty string."
+        assert isinstance(output2, str) and output2, "Second output should be a non-empty string."
 
         if expect_deterministic:
-            assert output1 == output2, \
-                "Outputs should be identical when do_sample is False."
+            assert output1 == output2, "Outputs should be identical when do_sample is False."
         else:
             # For non-deterministic, outputs should differ
-            assert output1 != output2, \
-                "Outputs should differ when do_sample is True."
+            assert output1 != output2, "Outputs should differ when do_sample is True."

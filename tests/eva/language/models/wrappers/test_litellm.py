@@ -23,7 +23,9 @@ def fake_completion(monkeypatch):
 
     monkeypatch.setenv("OPENAI_API_KEY", "dummy-key")
 
-    monkeypatch.setattr("eva.language.models.wrappers.litellm.batch_completion", _fake_batch_completion)
+    monkeypatch.setattr(
+        "eva.language.models.wrappers.litellm.batch_completion", _fake_batch_completion
+    )
     return _fake_batch_completion
 
 
@@ -34,6 +36,4 @@ def model_instance(fake_completion):  # noqa: ARG001
     Using a valid model name (like 'openai/gpt-3.5-turbo') helps pass provider lookup.
     fake_completion dependency ensures mocking is set up before model creation.
     """
-    return LiteLLMTextModel(
-        "openai/gpt-3.5-turbo", model_kwargs={"temperature": 0.7}
-    )
+    return LiteLLMTextModel("openai/gpt-3.5-turbo", model_kwargs={"temperature": 0.7})
