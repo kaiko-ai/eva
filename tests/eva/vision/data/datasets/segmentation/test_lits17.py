@@ -1,4 +1,4 @@
-"""LiTS dataset tests."""
+"""LiTS17 dataset tests."""
 
 import os
 from typing import Literal
@@ -7,15 +7,16 @@ import pytest
 from torchvision import tv_tensors
 
 from eva.vision.data import datasets
+from eva.vision.data import tv_tensors as eva_tv_tensors
 
 
 @pytest.mark.parametrize(
     "split, expected_length",
-    [(None, 8)],
+    [(None, 2), ("train", 1), ("val", 1)],
 )
-def test_length(lits_dataset: datasets.LiTS, expected_length: int) -> None:
+def test_length(lits17_dataset: datasets.LiTS17, expected_length: int) -> None:
     """Tests the length of the dataset."""
-    assert len(lits_dataset) == expected_length
+    assert len(lits17_dataset) == expected_length
 
 
 @pytest.mark.parametrize(
@@ -24,34 +25,40 @@ def test_length(lits_dataset: datasets.LiTS, expected_length: int) -> None:
         (None, 0),
     ],
 )
-def test_sample(lits_dataset: datasets.LiTS, index: int) -> None:
+def test_sample(lits17_dataset: datasets.LiTS17, index: int) -> None:
     """Tests the format of a dataset sample."""
     # assert data sample is a tuple
-    sample = lits_dataset[index]
+    sample = lits17_dataset[index]
     assert isinstance(sample, tuple)
     assert len(sample) == 3
     # assert the format of the `image` and `mask`
     image, mask, metadata = sample
-    assert isinstance(image, tv_tensors.Image)
-    assert image.shape == (1, 8, 8)
+    assert isinstance(image, eva_tv_tensors.Volume)
+    assert image.shape == (4, 1, 8, 8)
     assert isinstance(mask, tv_tensors.Mask)
-    assert mask.shape == (8, 8)
+    assert mask.shape == (4, 1, 8, 8)
     assert isinstance(metadata, dict)
-    assert "slice_index" in metadata
 
 
 @pytest.fixture(scope="function")
-def lits_dataset(split: Literal["train", "val", "test"] | None, assets_path: str) -> datasets.LiTS:
-    """LiTS dataset fixture."""
-    dataset = datasets.LiTS(
+def lits17_dataset(split: Literal["train", "val"] | None, assets_path: str) -> datasets.LiTS17:
+    """LiTS17 dataset fixture."""
+    dataset = datasets.LiTS17(
         root=os.path.join(
             assets_path,
             "vision",
             "datasets",
-            "lits",
+            "lits17",
         ),
         split=split,
     )
+
+    dataset._split_index_ranges = {
+        "train": [(31, 32)],
+        "val": [(45, 46)],
+        None: [(31, 32), (45, 46)],
+    }
+
     dataset.prepare_data()
     dataset.configure()
     return dataset

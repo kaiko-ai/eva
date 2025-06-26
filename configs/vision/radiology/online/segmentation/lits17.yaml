@@ -3,7 +3,7 @@ trainer:
   class_path: eva.Trainer
   init_args:
     n_runs: &N_RUNS ${oc.env:N_RUNS, 5}
-    default_root_dir: &OUTPUT_ROOT ${oc.env:OUTPUT_ROOT, logs/${oc.env:MODEL_NAME, radiology/voco_b}/btcv}
+    default_root_dir: &OUTPUT_ROOT ${oc.env:OUTPUT_ROOT, logs/${oc.env:MODEL_NAME, radiology/voco_b}/lits17}
     max_epochs: &MAX_EPOCHS ${oc.env:MAX_EPOCHS, 500}
     checkpoint_type: ${oc.env:CHECKPOINT_TYPE, best}
     check_val_every_n_epoch: ${oc.env:CHECK_VAL_EVERY_N_EPOCHS, 25}
@@ -22,7 +22,7 @@ trainer:
       # - class_path: lightning.pytorch.loggers.WandbLogger
       #   init_args:
       #     project: ${oc.env:WANDB_PROJECT, radiology}
-      #     name: ${oc.env:WANDB_RUN_NAME, btcv-${oc.env:MODEL_NAME, radiology/voco_b}}
+      #     name: ${oc.env:WANDB_RUN_NAME, lits17-${oc.env:MODEL_NAME, radiology/voco_b}}
 model:
   class_path: eva.vision.models.modules.SemanticSegmentationModule
   init_args:
@@ -36,7 +36,7 @@ model:
       class_path: eva.vision.models.networks.decoders.segmentation.SwinUNETRDecoder
       init_args:
         feature_size: ${oc.env:IN_FEATURES, 48}
-        out_channels:  &NUM_CLASSES 14
+        out_channels:  &NUM_CLASSES 3
     spatial_dims: 3
     inferer:
       class_path: monai.inferers.SlidingWindowInferer
@@ -94,32 +94,17 @@ model:
             prefix: DiceScore_
             labels:
               - "0_background"
-              - "1_spleen"
-              - "2_right_kidney"
-              - "3_left_kidney"
-              - "4_gallbladder"
-              - "5_esophagus"
-              - "6_liver"
-              - "7_stomach"
-              - "8_aorta"
-              - "9_inferior_vena_cava"
-              - "10_portal_and_splenic_vein"
-              - "11_pancreas"
-              - "12_right_adrenal_gland"
-              - "13_left_adrenal_gland"
+              - "1_liver"
+              - "2_tumor"
 data:
   class_path: eva.DataModule
   init_args:
     datasets:
       train:
-        class_path: eva.vision.datasets.BTCV
+        class_path: eva.vision.datasets.LiTS17
         init_args: &DATASET_ARGS
-          root: ${oc.env:DATA_ROOT, ./data/btcv}
+          root: ${oc.env:DATA_ROOT, ./data/lits17}
           split: train
-          download: ${oc.env:DOWNLOAD_DATA, false}
-          # Set `download: true` to download the dataset automatically
-          # The BTCV dataset is distributed under the CC BY 4.0 license
-          # (https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode)
           transforms:
             class_path: torchvision.transforms.v2.Compose
             init_args:
@@ -161,7 +146,7 @@ data:
                     offsets: 0.1
                     prob: 0.1
       val:
-        class_path: eva.vision.datasets.BTCV
+        class_path: eva.vision.datasets.LiTS17
         init_args:
           <<: *DATASET_ARGS
           split: val

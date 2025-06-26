@@ -21,8 +21,6 @@
 ::: eva.vision.data.datasets.BCSS
 ::: eva.vision.data.datasets.BTCV
 ::: eva.vision.data.datasets.CoNSeP
-::: eva.vision.data.datasets.LiTS
-::: eva.vision.data.datasets.LiTSBalanced
+::: eva.vision.data.datasets.LiTS17
 ::: eva.vision.data.datasets.MoNuSAC
-::: eva.vision.data.datasets.TotalSegmentator2D
 ::: eva.vision.data.datasets.EmbeddingsSegmentationDataset

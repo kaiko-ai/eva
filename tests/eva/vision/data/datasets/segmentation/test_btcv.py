@@ -58,5 +58,5 @@ def btcv_dataset(split: Literal["train", "val"] | None, assets_path: str) -> dat
         None: [(0, 2)],
     }
     dataset.prepare_data()
-    dataset.setup()
+    dataset.configure()
     return dataset

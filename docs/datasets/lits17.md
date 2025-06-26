@@ -1,6 +1,6 @@
 # LiTS17 (Liver Tumor Segmentation Challenge 2017)
 
-LiTS17 is a liver tumor segmentation benchmark. The data and segmentations are provided by various clinical sites around the world. The training data set contains 130 CT scans and the test data set 70 CT scans.
+LiTS17 is a liver tumor segmentation benchmark. The data and segmentations are provided by various clinical sites around the world. The training data set contains 130 CT scans.
 
 The segmentation classes are: Background, Liver and Tumor.
 
@@ -15,17 +15,17 @@ The segmentation classes are: Background, Liver and Tumor.
 | **Data size**         | train: 15GB (53.66 GB uncompressed)                       |
 | **Image dimension**   | ~300 x ~300 x ~350 (number of slices) x 1 (grey scale) *  |
 | **Files format**      | `.nii` ("NIFTI") images                                   |
-| **Number of scans**   | 131 (58638 slices)                                        |
-| **Splits in use**     | train (70%) / val (15%) / test (15%)                  |
+| **Number of scans**   | 130 (58638 slices)                                        |
+| **Splits in use**     | train (82.17%) / val (17.83%)                             |
 
 
 ### Splits
 
 We use the following random split:
 
-| Splits         | Train            | Validation        | Test             |
-|----------------|------------------|-------------------|------------------|
-| #Scans; Slices | 91; 38686 (77%) | 19; 11192 (11.5%) | 21; 8760 (11.5%) |
+| Splits         | Train            | Validation        |
+|----------------|------------------|-------------------|
+| #Scans         | 107 (82.31%)     | 23 (17.69%)       |
 
 
 ### Organization

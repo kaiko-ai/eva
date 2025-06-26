@@ -1,7 +1,7 @@
 """Common semantic segmentation decoders.
 
-This module contains implementations of different types of decoder models 
-used in semantic segmentation. These decoders convert the high-level features 
+This module contains implementations of different types of decoder models
+used in semantic segmentation. These decoders convert the high-level features
 output by an encoder into pixel-wise predictions for segmentation tasks.
 """
 
