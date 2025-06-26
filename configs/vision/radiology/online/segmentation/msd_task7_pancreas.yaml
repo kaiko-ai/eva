@@ -107,8 +107,8 @@ data:
           split: train
           download: ${oc.env:DOWNLOAD_DATA, false}
           # Set `download: true` to download the dataset automatically
-          # The MSDTask7Pancreas dataset is distributed under the CC BY 4.0 license
-          # (https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode)
+          # The MSDTask7Pancreas dataset is distributed under the CC-BY-SA 4.0 license
+          # (https://creativecommons.org/licenses/by-sa/4.0/)
           transforms:
             class_path: torchvision.transforms.v2.Compose
             init_args:
