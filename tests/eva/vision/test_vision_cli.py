@@ -29,6 +29,7 @@ from tests.eva import _cli
         "configs/vision/pathology/online/segmentation/consep.yaml",
         "configs/vision/pathology/online/segmentation/monusac.yaml",
         "configs/vision/radiology/online/segmentation/lits17.yaml",
+        "configs/vision/radiology/online/segmentation/msd_task7_pancreas.yaml",
         # | offline
         # classification
         "configs/vision/pathology/offline/classification/bach.yaml",
@@ -63,6 +64,8 @@ def test_configuration_initialization(configuration_file: str, lib_path: str) ->
     "configuration_file",
     [
         "configs/vision/tests/online/patch_camelyon.yaml",
+        "configs/vision/tests/online/consep.yaml",
+        "configs/vision/tests/online/lits17.yaml",
     ],
 )
 def test_fit_from_configuration(configuration_file: str, lib_path: str) -> None:
@@ -82,6 +85,7 @@ def test_fit_from_configuration(configuration_file: str, lib_path: str) -> None:
     [
         "configs/vision/tests/offline/patch_camelyon.yaml",
         "configs/vision/tests/offline/panda.yaml",
+        "configs/vision/tests/offline/consep.yaml",
     ],
 )
 def test_predict_fit_from_configuration(configuration_file: str, lib_path: str) -> None:
@@ -101,6 +105,12 @@ def test_predict_fit_from_configuration(configuration_file: str, lib_path: str) 
 def _skip_dataset_validation() -> None:
     """Mocks the validation step of the datasets."""
     datasets.PatchCamelyon.validate = mock.MagicMock(return_value=None)
+    datasets.CoNSeP.validate = mock.MagicMock(return_value=None)
+    datasets.LiTS17.validate = mock.MagicMock(return_value=None)
+    datasets.LiTS17._split_index_ranges = {  # type: ignore
+        "train": [(31, 32)],
+        "val": [(45, 46)],
+    }
 
 
 @pytest.fixture(autouse=True)
