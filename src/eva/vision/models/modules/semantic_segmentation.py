@@ -1,4 +1,4 @@
-""" "Neural Network Semantic Segmentation Module."""
+"""Neural Network Semantic Segmentation Module."""
 
 import functools
 from typing import Any, Callable, Dict, Iterable, List, Tuple
