@@ -12,14 +12,17 @@ class MockLLM:
     """Mock vLLM LLM class."""
 
     def __init__(self, model: str, **kwargs):
+        """Initialize mock LLM with model name and kwargs."""
         self.model = model
         self.kwargs = kwargs
         self._tokenizer = MockTokenizer()
 
     def get_tokenizer(self):
+        """Return the mock tokenizer."""
         return self._tokenizer
 
     def generate(self, prompts, sampling_params):
+        """Generate mock responses for given prompts."""
         return [MockOutput() for _ in prompts]
 
 
@@ -27,10 +30,12 @@ class MockTokenizer:
     """Mock vLLM tokenizer."""
 
     def __init__(self):
+        """Initialize mock tokenizer with default properties."""
         self.chat_template = "template"
         self.bos_token_id = 1
 
     def apply_chat_template(self, messages, tokenize=True, add_generation_prompt=True):
+        """Apply mock chat template returning dummy token lists."""
         # Return list of token lists for each message
         return [[1, 2, 3, 4] for _ in messages]
 
@@ -39,6 +44,7 @@ class MockTokensPrompt:
     """Mock vLLM TokensPrompt."""
 
     def __init__(self, prompt_token_ids):
+        """Initialize with token IDs."""
         self.prompt_token_ids = prompt_token_ids
 
 
@@ -46,6 +52,7 @@ class MockOutput:
     """Mock vLLM output."""
 
     def __init__(self):
+        """Initialize with mock text outputs."""
         self.outputs = [MockTextOutput()]
 
 
@@ -53,6 +60,7 @@ class MockTextOutput:
     """Mock vLLM text output."""
 
     def __init__(self):
+        """Initialize with default response text."""
         self.text = "Generated response"
 
 
@@ -60,6 +68,7 @@ class MockSamplingParams:
     """Mock vLLM SamplingParams."""
 
     def __init__(self, **kwargs):
+        """Initialize with sampling parameters."""
         self.kwargs = kwargs
 
 
@@ -153,6 +162,7 @@ def test_no_chat_template_error(mock_vllm_imports, monkeypatch):
 
     class MockTokenizerNoTemplate:
         def __init__(self):
+            """Initialize tokenizer without chat template."""
             pass
 
     model = VLLMTextModel("test/model")
