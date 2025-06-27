@@ -36,7 +36,7 @@ def load_hugingface_model(
 
     return models.HuggingFaceModel(
         model_name_or_path=model_name,
-        tensor_transforms=tensor_transforms,
+        transforms=tensor_transforms,
         model_kwargs=model_kwargs,
     )
 

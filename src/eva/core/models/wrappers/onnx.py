@@ -9,23 +9,23 @@ from typing_extensions import override
 from eva.core.models.wrappers import base
 
 
-class ONNXModel(base.BaseModel):
+class ONNXModel(base.BaseModel[torch.Tensor, torch.Tensor]):
     """Wrapper class for loading ONNX models."""
 
     def __init__(
         self,
         path: str,
         device: Literal["cpu", "cuda"] | None = "cpu",
-        tensor_transforms: Callable | None = None,
+        transforms: Callable | None = None,
     ):
         """Initializes the model.
 
         Args:
             path: The path to the .onnx model file.
             device: The device to run the model on. This can be either "cpu" or "cuda".
-            tensor_transforms: The transforms to apply to the output tensor produced by the model.
+            transforms: The transforms to apply to the output tensor produced by the model.
         """
-        super().__init__(tensor_transforms=tensor_transforms)
+        super().__init__(transforms=transforms)
 
         self._path = path
         self._device = device

@@ -6,11 +6,10 @@ import torch
 import torch.nn as nn
 from typing_extensions import override
 
-from eva.core.models import wrappers
-from eva.core.models.wrappers import _utils
+from eva.core.models.wrappers import _utils, base
 
 
-class TorchHubModel(wrappers.BaseModel):
+class TorchHubModel(base.BaseModel[torch.Tensor, torch.Tensor]):
     """Model wrapper for `torch.hub` models."""
 
     def __init__(
@@ -23,7 +22,7 @@ class TorchHubModel(wrappers.BaseModel):
         norm: bool = False,
         trust_repo: bool = True,
         model_kwargs: Dict[str, Any] | None = None,
-        tensor_transforms: Callable | None = None,
+        transforms: Callable | None = None,
     ) -> None:
         """Initializes the encoder.
 
@@ -39,10 +38,10 @@ class TorchHubModel(wrappers.BaseModel):
             trust_repo: If set to `False`, a prompt will ask the user whether the
                 repo should be trusted.
             model_kwargs: Extra model arguments.
-            tensor_transforms: The transforms to apply to the output tensor
+            transforms: The transforms to apply to the output tensor
                 produced by the model.
         """
-        super().__init__(tensor_transforms=tensor_transforms)
+        super().__init__(transforms=transforms)
 
         self._model_name = model_name
         self._repo_or_dir = repo_or_dir

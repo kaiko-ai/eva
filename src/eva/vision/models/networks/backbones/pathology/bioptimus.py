@@ -72,7 +72,7 @@ def bioptimus_h0_mini(
             "mlp_layer": timm.layers.SwiGLUPacked,
             "act_layer": nn.SiLU,
         },
-        tensor_transforms=(
+        transforms=(
             transforms.ExtractCLSFeatures(include_patch_tokens=include_patch_tokens)
             if out_indices is None
             else None
