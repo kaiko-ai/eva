@@ -8,7 +8,7 @@ from typing_extensions import override
 from eva.core.models.wrappers import base
 
 
-class HuggingFaceTextModel(base.BaseModel):
+class HuggingFaceTextModel(base.BaseModel[list[str], list[str]]):
     """Wrapper class for loading HuggingFace `transformers` models using pipelines."""
 
     def __init__(
@@ -16,6 +16,7 @@ class HuggingFaceTextModel(base.BaseModel):
         model_name_or_path: str,
         task: Literal["text-generation"] = "text-generation",
         model_kwargs: Dict[str, Any] | None = None,
+        generation_kwargs: Dict[str, Any] | None = None,
     ) -> None:
         """Initializes the model.
 
@@ -25,12 +26,14 @@ class HuggingFaceTextModel(base.BaseModel):
                 model hub.
             task: The pipeline task. Defaults to "text-generation".
             model_kwargs: Additional arguments for configuring the pipeline.
+            generation_kwargs: Additional generation parameters (temperature, max_length, etc.).
         """
         super().__init__()
 
         self._model_name_or_path = model_name_or_path
         self._task = task
         self._model_kwargs = model_kwargs or {}
+        self._generation_kwargs = generation_kwargs or {}
 
         self.load_model()
 
@@ -44,17 +47,17 @@ class HuggingFaceTextModel(base.BaseModel):
             **self._model_kwargs,
         )
 
-    def generate(self, prompts: list[str], **generate_kwargs) -> Any:
+    @override
+    def model_forward(self, prompts: list[str]) -> list[str]:
         """Generates text using the pipeline.
 
         Args:
             prompts: The input prompts for the model.
-            generate_kwargs: Additional generation parameters (temperature).
 
         Returns:
             The generated text as a string.
         """
-        outputs = self._pipeline(prompts, return_full_text=False, **generate_kwargs)
+        outputs = self._pipeline(prompts, return_full_text=False, **self._generation_kwargs)
         if outputs is None:
             raise ValueError("Outputs from the model are None.")
         return [

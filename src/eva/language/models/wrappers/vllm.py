@@ -1,6 +1,6 @@
 """LLM wrapper for vLLM models."""
 
-from typing import Any, Dict, List, Sequence
+from typing import Any, Dict, Sequence
 
 from loguru import logger
 from typing_extensions import override
@@ -21,7 +21,7 @@ except ImportError as e:
 from eva.core.models.wrappers import base
 
 
-class VLLMTextModel(base.BaseModel):
+class VLLMTextModel(base.BaseModel[list[str], list[str]]):
     """Wrapper class for using vLLM for text generation.
 
     This wrapper loads a vLLM model, sets up the tokenizer and sampling
@@ -131,7 +131,8 @@ class VLLMTextModel(base.BaseModel):
 
         return result
 
-    def generate(self, prompts: List[str]) -> List[str]:
+    @override
+    def model_forward(self, prompts: list[str]) -> list[str]:
         """Generates text for the given prompt using the vLLM model.
 
         Args:

@@ -9,7 +9,7 @@ from typing_extensions import override
 from eva.core.models.wrappers import base
 
 
-class LiteLLMTextModel(base.BaseModel):
+class LiteLLMTextModel(base.BaseModel[list[str], list[str]]):
     """Wrapper class for using litellm for chat-based text generation.
 
     This wrapper uses litellm's `completion` function which accepts a list of
@@ -46,7 +46,8 @@ class LiteLLMTextModel(base.BaseModel):
         """
         pass
 
-    def generate(self, prompts: list) -> list[str]:
+    @override
+    def model_forward(self, prompts: list[str]) -> list[str]:
         """Generates text using litellm.
 
         Args:
