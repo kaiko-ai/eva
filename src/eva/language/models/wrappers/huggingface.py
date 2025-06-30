@@ -1,6 +1,6 @@
 """LLM wrapper for HuggingFace `transformers` models."""
 
-from typing import Any, Dict, Literal
+from typing import Any, Dict, List, Literal
 
 from transformers.pipelines import pipeline
 from typing_extensions import override
@@ -8,7 +8,7 @@ from typing_extensions import override
 from eva.core.models.wrappers import base
 
 
-class HuggingFaceTextModel(base.BaseModel[list[str], list[str]]):
+class HuggingFaceTextModel(base.BaseModel[List[str], List[str]]):
     """Wrapper class for loading HuggingFace `transformers` models using pipelines."""
 
     def __init__(
@@ -48,7 +48,7 @@ class HuggingFaceTextModel(base.BaseModel[list[str], list[str]]):
         )
 
     @override
-    def model_forward(self, prompts: list[str]) -> list[str]:
+    def model_forward(self, prompts: List[str]) -> List[str]:
         """Generates text using the pipeline.
 
         Args:

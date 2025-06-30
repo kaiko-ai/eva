@@ -1,6 +1,6 @@
 """LLM wrapper for litellm models."""
 
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 from litellm import batch_completion  # type: ignore
 from loguru import logger
@@ -9,7 +9,7 @@ from typing_extensions import override
 from eva.core.models.wrappers import base
 
 
-class LiteLLMTextModel(base.BaseModel[list[str], list[str]]):
+class LiteLLMTextModel(base.BaseModel[List[str], List[str]]):
     """Wrapper class for using litellm for chat-based text generation.
 
     This wrapper uses litellm's `completion` function which accepts a list of
@@ -47,7 +47,7 @@ class LiteLLMTextModel(base.BaseModel[list[str], list[str]]):
         pass
 
     @override
-    def model_forward(self, prompts: list[str]) -> list[str]:
+    def model_forward(self, prompts: List[str]) -> List[str]:
         """Generates text using litellm.
 
         Args:
