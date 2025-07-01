@@ -3,8 +3,8 @@
 from typing import Literal
 
 from eva.core.metrics import structs
-from eva.vision.metrics import segmentation
 from eva.core.utils import requirements
+from eva.vision.metrics import segmentation
 
 
 class MulticlassSegmentationMetrics(structs.MetricCollection):
