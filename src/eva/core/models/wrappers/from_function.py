@@ -3,13 +3,14 @@
 from typing import Any, Callable, Dict
 
 import jsonargparse
+import torch
 from torch import nn
 from typing_extensions import override
 
 from eva.core.models.wrappers import _utils, base
 
 
-class ModelFromFunction(base.BaseModel):
+class ModelFromFunction(base.BaseModel[torch.Tensor, torch.Tensor]):
     """Wrapper class for models which are initialized from functions.
 
     This is helpful for initializing models in a `.yaml` configuration file.
@@ -20,7 +21,7 @@ class ModelFromFunction(base.BaseModel):
         path: Callable[..., nn.Module],
         arguments: Dict[str, Any] | None = None,
         checkpoint_path: str | None = None,
-        tensor_transforms: Callable | None = None,
+        transforms: Callable | None = None,
     ) -> None:
         """Initializes and constructs the model.
 
@@ -31,10 +32,10 @@ class ModelFromFunction(base.BaseModel):
                 weights from. This is currently only supported for torch
                 model checkpoints. For other formats, the checkpoint loading
                 should be handled within the provided callable object in <path>.
-            tensor_transforms: The transforms to apply to the output tensor
+            transforms: The transforms to apply to the output tensor
                 produced by the model.
         """
-        super().__init__(tensor_transforms=tensor_transforms)
+        super().__init__(transforms=transforms)
 
         self._path = path
         self._arguments = arguments
