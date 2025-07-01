@@ -4,6 +4,7 @@ from typing import Literal
 
 from eva.core.metrics import structs
 from eva.vision.metrics import segmentation
+from eva.core.utils import requirements
 
 
 class MulticlassSegmentationMetrics(structs.MetricCollection):
@@ -97,6 +98,7 @@ class MulticlassSegmentationMetricsV2(structs.MetricCollection):
             input_format: Input tensor format. Options are `"one-hot"` for one-hot encoded tensors,
                 `"index"` for index tensors.
         """
+        requirements.check_dependencies(requirements={"torchmetrics": "1.8.0"})
         super().__init__(
             metrics={
                 "DiceScore (macro)": segmentation.DiceScore(
