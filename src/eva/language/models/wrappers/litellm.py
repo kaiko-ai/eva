@@ -13,7 +13,7 @@ class LiteLLMTextModel(base.BaseModel[List[str], List[str]]):
     """Wrapper class for using litellm for chat-based text generation.
 
     This wrapper uses litellm's `completion` function which accepts a list of
-    message dicts. The `generate` method converts a string prompt into a chat
+    message dicts. The `forward` method converts a string prompt into a chat
     message with a default "user" role, optionally prepends a system message,
     and includes an API key if provided.
     """

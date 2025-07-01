@@ -9,7 +9,7 @@ from eva.language.models import TextModule
 def test_forward(text_module, text_model):
     """Test the forward method of the TextModule class."""
     input_text = "Hello world"
-    expected = text_model.generate(input_text)
+    expected = text_model(input_text)
     result = text_module.forward(input_text)
     assert result == expected
 
@@ -23,7 +23,7 @@ def test_validation_step(text_module, text_model):
 
     # The module creates messages list: [str(d) + "\n" + prompt for d in data]
     expected_messages = [str(data[0]) + "\n" + text_module.prompt]
-    expected_predictions = text_model.generate(expected_messages)
+    expected_predictions = text_model(expected_messages)
 
     output = text_module.validation_step(batch)
 
@@ -46,7 +46,7 @@ def test_init_attributes(text_model):
 class TextModel(nn.Module):
     """A simple text model for testing purposes."""
 
-    def generate(self, prompts):
+    def forward(self, prompts):
         """Generate some text based on the input prompt."""
         if isinstance(prompts, str):
             return [f"Generated: {prompts}"]

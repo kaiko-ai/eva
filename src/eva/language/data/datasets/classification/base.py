@@ -9,7 +9,7 @@ from typing_extensions import override
 from eva.language.data.datasets.language import LanguageDataset
 
 
-class TextClassification(LanguageDataset[Tuple[str, torch.Tensor]], abc.ABC):
+class TextClassification(LanguageDataset[Tuple[str, torch.Tensor, Dict[str, Any]]], abc.ABC):
     """Text classification abstract dataset."""
 
     def __init__(self) -> None:
