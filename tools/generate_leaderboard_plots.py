@@ -47,7 +47,8 @@ class LeaderboardConfig:
             "kaiko_midnight_12k": "kaiko.ai - DINOv2 Midnight-12k | TCGA",
         },
         "radiology": {
-            "voco_b": "VoCo-B"
+            "voco_b": "VoCo-B",
+            "voco_h": "VoCo-H"
         }
     }
     _task_name_map = {
@@ -120,7 +121,8 @@ def plot_leaderboard(df: pd.DataFrame, config: LeaderboardConfig, output_file: s
 
     # create plot:
     df.columns = [_task_name(c) or c for c in df.columns]
-    fig, ax = plt.subplots(figsize=(12, 6))
+    height = max(2, len(df) * 0.5) if len(df) < 4 else 6
+    fig, ax = plt.subplots(figsize=(12, height))
     scaled_df = (df - df.min(axis=0)) / (df.max(axis=0) - df.min(axis=0))
     sns.heatmap(scaled_df, annot=df, cmap=cmap, ax=ax, cbar=False, fmt=".3f")
     plt.tick_params(
@@ -132,6 +134,12 @@ def plot_leaderboard(df: pd.DataFrame, config: LeaderboardConfig, output_file: s
         top=False,
         labeltop=True,
         rotation=20,
+    )
+    plt.tick_params(
+        axis="y",
+        which="major",
+        labelsize=10,
+        rotation=0,
     )
     plt.savefig(output_file, format="svg", dpi=1200, bbox_inches="tight")
 

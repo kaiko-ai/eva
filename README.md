@@ -220,9 +220,8 @@ The following table shows the FMs we have evaluated with _`eva`_. For more detai
 ![Pathology Leaderboard](./docs/images/leaderboards/pathology.svg)
 
 ### Radiology
-TODO: Add .svg image
 
-![Radiology Leaderboard](./docs/images/leaderboards/radiology.svg)
+<img src="./docs/images/leaderboards/radiology.svg" alt="Radiology Leaderboard" width="600">
 
 
 ## Contributing
