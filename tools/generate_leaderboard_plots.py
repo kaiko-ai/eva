@@ -66,8 +66,8 @@ def get_leaderboard(logs_dir: Optional[str] = None) -> pd.DataFrame:
     """Get the leaderboard data frame."""
 
     # load existing leaderboard if available:
-    if os.path.isfile("tools/data/leaderboard.csv"):
-        df_existing = pd.read_csv("tools/data/leaderboard.csv")
+    if os.path.isfile("tools/data/leaderboards/pathology.csv"):
+        df_existing = pd.read_csv("tools/data/leaderboards/pathology.csv")
     else:
         df_existing = pd.DataFrame()
 
@@ -97,7 +97,7 @@ def get_leaderboard(logs_dir: Optional[str] = None) -> pd.DataFrame:
 
         # combine existing and new data frame
         df = pd.concat([df, df_existing]).drop_duplicates()
-        df.to_csv("tools/data/leaderboard.csv", index=False)
+        df.to_csv("tools/data/leaderboards/pathology.csv", index=False)
     else:
         df = df_existing
 
@@ -107,7 +107,7 @@ def get_leaderboard(logs_dir: Optional[str] = None) -> pd.DataFrame:
     return df
 
 
-def plot_leaderboard(df: pd.DataFrame, output_file: str = "docs/images/leaderboard.svg"):
+def plot_leaderboard(df: pd.DataFrame, output_file: str = "docs/images/leaderboards/pathology.svg"):
     """Plot the leaderboard heatmap."""
 
     def _task_name(name: str) -> str:
@@ -155,7 +155,7 @@ def plot_leaderboard(df: pd.DataFrame, output_file: str = "docs/images/leaderboa
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--logs_dir", type=str, default=None)
-    parser.add_argument("--output_leaderboard", type=str, default="docs/images/leaderboard.svg")
+    parser.add_argument("--output_leaderboard", type=str, default="docs/images/leaderboards/pathology.svg")
     args = parser.parse_args()
 
     leaderboard_df = get_leaderboard(args.logs_dir)

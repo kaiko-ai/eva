@@ -216,7 +216,13 @@ and [tutorials](https://kaiko-ai.github.io/eva/main/user-guide/advanced/replicat
 
 The following table shows the FMs we have evaluated with _`eva`_. For more detailed information about the evaluation process, please refer to our [documentation](https://kaiko-ai.github.io/eva/main/leaderboards/).
 
-![Pathology Leaderboard](./docs/images/leaderboard.svg)
+### Pathology
+![Pathology Leaderboard](./docs/images/leaderboards/pathology.svg)
+
+### Radiology
+TODO: Add .svg image
+
+![Radiology Leaderboard](./docs/images/leaderboards/radiology.svg)
 
 
 ## Contributing
