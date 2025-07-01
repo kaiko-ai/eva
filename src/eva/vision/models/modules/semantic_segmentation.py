@@ -19,6 +19,7 @@ from eva.core.utils import parser
 from eva.vision.models.networks import decoders
 from eva.vision.models.networks.decoders import segmentation
 from eva.vision.models.networks.decoders.segmentation.typings import DecoderInputs
+from eva.core.models.modules import SchedulerConfiguration
 
 
 class SemanticSegmentationModule(module.ModelModule):
@@ -32,7 +33,7 @@ class SemanticSegmentationModule(module.ModelModule):
         lr_multiplier_encoder: float = 0.0,
         inferer: Inferer | None = None,
         optimizer: OptimizerCallable = optim.AdamW,
-        lr_scheduler: LRSchedulerCallable = lr_scheduler.ConstantLR,
+        lr_scheduler: LRSchedulerCallable | SchedulerConfiguration = lr_scheduler.ConstantLR,
         metrics: metrics_lib.MetricsSchema | None = None,
         postprocess: batch_postprocess.BatchPostProcess | None = None,
         save_decoder_only: bool = True,
