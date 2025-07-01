@@ -73,7 +73,7 @@ class MulticlassSegmentationMetrics(structs.MetricCollection):
 class MulticlassSegmentationMetricsV2(structs.MetricCollection):
     """Metrics for multi-class semantic segmentation tasks.
 
-    In torchmetrics 1.7.2, the DiceScore implementation has been
+    In torchmetrics 1.8.0, the DiceScore implementation has been
     improved, and should now provide enough signal. Therefore,
     removing the monai implementation and iou for simplicity and
     computational efficiency.
