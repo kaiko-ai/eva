@@ -52,8 +52,8 @@ def test_real_small_hf_model_generation(
             generation_kwargs=generate_kwargs,
         )
 
-        output1 = model.forward([prompt])[0]
-        output2 = model.forward([prompt])[0]
+        output1 = model([prompt])[0]
+        output2 = model([prompt])[0]
 
         assert isinstance(output1, str) and output1, "First output should be a non-empty string."
         assert isinstance(output2, str) and output2, "Second output should be a non-empty string."

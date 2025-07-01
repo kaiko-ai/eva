@@ -108,7 +108,7 @@ def test_generate(mock_vllm_imports):
     model = VLLMTextModel("test/model")
     prompts = ["Hello", "How are you?"]
 
-    results = model.forward(prompts)
+    results = model(prompts)
 
     assert len(results) == 2
     assert all(result == "Generated response" for result in results)
