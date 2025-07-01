@@ -21,7 +21,7 @@ except ImportError as e:
 from eva.core.models.wrappers import base
 
 
-class VLLMTextModel(base.BaseModel):
+class VLLMTextModel(base.BaseModel[List[str], List[str]]):
     """Wrapper class for using vLLM for text generation.
 
     This wrapper loads a vLLM model, sets up the tokenizer and sampling
@@ -71,7 +71,7 @@ class VLLMTextModel(base.BaseModel):
             raise RuntimeError("Model not initialized")
         self._llm_tokenizer = self._llm_model.get_tokenizer()
 
-    def _apply_chat_template(self, prompts: Sequence[str]) -> list[TokensPrompt]:
+    def _apply_chat_template(self, prompts: Sequence[str]) -> List[TokensPrompt]:
         """Apply chat template to the messages.
 
         Args:
@@ -131,7 +131,8 @@ class VLLMTextModel(base.BaseModel):
 
         return result
 
-    def generate(self, prompts: List[str]) -> List[str]:
+    @override
+    def model_forward(self, prompts: List[str]) -> List[str]:
         """Generates text for the given prompt using the vLLM model.
 
         Args:

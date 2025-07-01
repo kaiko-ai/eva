@@ -52,7 +52,7 @@ class TextModule(module.ModelModule):
         Returns:
             List of generated responses.
         """
-        return self.model.generate(prompts)  # type: ignore
+        return self.model(prompts)
 
     @override
     def validation_step(self, batch: INPUT_BATCH, *args: Any, **kwargs: Any) -> STEP_OUTPUT:

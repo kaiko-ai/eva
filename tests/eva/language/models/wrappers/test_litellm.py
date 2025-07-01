@@ -10,7 +10,7 @@ DUMMY_RESPONSE = {"choices": [{"message": {"content": "Test response"}}]}
 def test_generate(model_instance):
     """Test that the generate method returns the expected dummy response."""
     prompts = ["Hello, world!"]
-    result = model_instance.generate(prompts)
+    result = model_instance(prompts)
     assert result == ["Test response"]
 
 

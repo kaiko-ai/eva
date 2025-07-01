@@ -67,6 +67,12 @@ Then run:
 MODEL_NAME=meta-llama/Llama-3.2-1B-Instruct eva validate --config configs/language/pubmedqa.yaml
 ```
 
+**Note**: If you encounter the error `TypeError: argument of type 'NoneType' is not iterable` when using HuggingFace models, this is due to a compatibility issue between transformers 4.45+ and PyTorch 2.3.0. To fix this, downgrade transformers:
+
+```bash
+pip install "transformers<4.45"
+```
+
 ### 3. Using vLLM (cloud/distributed execution)
 
 For larger models that require specialized infrastructure, you'll need to:
