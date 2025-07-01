@@ -5,7 +5,7 @@
 groups = ["default", "all", "dev", "docs", "lint", "test", "typecheck", "vision"]
 strategy = ["inherit_metadata"]
 lock_version = "4.5.0"
-content_hash = "sha256:8cdda60bd5fe81fb09201e2815228f74c2af9aae44d89fccac7e11e2edac1d80"
+content_hash = "sha256:b27c1b09fe545b987d2a823ed6825d3f5445efba9b9a23207b328d6255e051cb"
 
 [[metadata.targets]]
 requires_python = ">=3.10"
@@ -2755,11 +2755,8 @@ files = [
 
 [[package]]
 name = "torchmetrics"
-version = "1.8.0.dev0"
+version = "1.6.0"
 requires_python = ">=3.9"
-git = "https://github.com/kaiko-ai/torchmetrics.git"
-ref = "1.8.0dev"
-revision = "b1a458c11fb43ea6b0745be23c529ea11e534eed"
 summary = "PyTorch native Metrics"
 groups = ["default"]
 dependencies = [
@@ -2767,6 +2764,11 @@ dependencies = [
     "numpy>1.20.0",
     "packaging>17.1",
     "torch>=2.0.0",
+    "typing-extensions; python_version < \"3.9\"",
+]
+files = [
+    {file = "torchmetrics-1.6.0-py3-none-any.whl", hash = "sha256:a508cdd87766cedaaf55a419812bf9f493aff8fffc02cc19df5a8e2e7ccb942a"},
+    {file = "torchmetrics-1.6.0.tar.gz", hash = "sha256:aebba248708fb90def20cccba6f55bddd134a58de43fb22b0c5ca0f3a89fa984"},
 ]
 
 [[package]]
