@@ -1,7 +1,12 @@
 """Vision data transforms."""
 
 from eva.vision.data.transforms.common import ResizeAndCrop, Squeeze
-from eva.vision.data.transforms.croppad import CropForeground, RandCropByPosNegLabel, SpatialPad
+from eva.vision.data.transforms.croppad import (
+    CropForeground,
+    RandCropByLabelClasses,
+    RandCropByPosNegLabel,
+    SpatialPad,
+)
 from eva.vision.data.transforms.intensity import (
     RandScaleIntensity,
     RandShiftIntensity,
@@ -14,6 +19,7 @@ __all__ = [
     "ResizeAndCrop",
     "Squeeze",
     "CropForeground",
+    "RandCropByLabelClasses",
     "RandCropByPosNegLabel",
     "SpatialPad",
     "RandScaleIntensity",

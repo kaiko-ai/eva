@@ -50,6 +50,7 @@ model:
         include_background: false
         to_onehot_y: true
         softmax: true
+        batch: true
     lr_multiplier_encoder: 0.0
     optimizer:
       class_path: torch.optim.AdamW
@@ -129,12 +130,12 @@ data:
                 - class_path: eva.vision.data.transforms.SpatialPad
                   init_args:
                     spatial_size: *ROI_SIZE
-                - class_path: eva.vision.data.transforms.RandCropByPosNegLabel
+                - class_path: eva.vision.data.transforms.RandCropByLabelClasses
                   init_args:
                     spatial_size: *ROI_SIZE
                     num_samples: ${oc.env:SAMPLE_BATCH_SIZE, 4}
-                    pos: ${oc.env:RAND_CROP_POS_WEIGHT, 9}
-                    neg: ${oc.env:RAND_CROP_NEG_WEIGHT, 1}
+                    num_classes: *NUM_CLASSES
+                    ratios: ${oc.env:SAMPLE_CLASS_RATIOS, null}
                 - class_path: eva.vision.data.transforms.RandFlip
                   init_args:
                     spatial_axes: [0, 1, 2]
