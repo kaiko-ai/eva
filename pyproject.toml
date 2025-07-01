@@ -45,8 +45,8 @@ dependencies = [
     "onnx>=1.16.0",
     "toolz>=0.12.1",
     "rich>=13.7.1",
-    "torchmetrics>=1.7.2",
     "nibabel>=3.2.2",
+    "torchmetrics @ git+https://github.com/kaiko-ai/torchmetrics.git@1.8.0dev",
 ]
 
 [project.urls]
