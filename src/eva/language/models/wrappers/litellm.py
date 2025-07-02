@@ -70,7 +70,7 @@ class LiteLLMTextModel(base.BaseModel[List[str], List[str]]):
             if isinstance(response, Exception):
                 error_msg = f"Error generating text for prompt {i}: {response}"
                 logger.error(error_msg)
-                results.append(f"[GENERATION ERROR]: {error_msg}")
+                raise RuntimeError(error_msg)
             else:
                 results.append(response["choices"][0]["message"]["content"])
 

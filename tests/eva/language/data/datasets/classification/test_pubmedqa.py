@@ -85,10 +85,9 @@ def test_prepare_data_with_cache(pubmedqa_dataset_with_cache: datasets.PubMedQA)
 @pytest.mark.parametrize("split", [None])
 def test_prepare_data_without_download(tmp_path, split) -> None:
     """Tests dataset preparation when download is disabled and cache is missing."""
-    root = tmp_path / "pubmed_qa_cache"
-    dataset = datasets.PubMedQA(root=str(root), split=split, download=False)
+    dataset = datasets.PubMedQA(split=split, download=False)
 
-    with pytest.raises(RuntimeError, match="Dataset not found locally and downloading is disabled"):
+    with pytest.raises(RuntimeError, match="Failed to prepare dataset: Dataset path not found."):
         dataset.prepare_data()
 
 
@@ -107,7 +106,7 @@ def test_cleanup_cache(tmp_path) -> None:
 @pytest.fixture(scope="function")
 def pubmedqa_dataset(split: None) -> datasets.PubMedQA:
     """PubMedQA dataset fixture."""
-    dataset = datasets.PubMedQA(split=split)
+    dataset = datasets.PubMedQA(split=split, download=True)
     dataset.prepare_data()
     return dataset
 
