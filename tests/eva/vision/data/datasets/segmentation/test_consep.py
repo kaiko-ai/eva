@@ -68,5 +68,5 @@ def dataset(split: Literal["train", "val"] | None, root: str) -> datasets.CoNSeP
             sampler=samplers.GridSampler(),
         )
         dataset.prepare_data()
-        dataset.setup()
+        dataset.configure()
         return dataset
