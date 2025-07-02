@@ -3,19 +3,39 @@
 from typing import List
 
 import pytest
-import torchmetrics
+import torchmetrics.segmentation
 
 from eva.core.metrics import structs
+
+NUM_CLASSES = 3
 
 
 @pytest.mark.parametrize(
     "schema, expected",
     [
-        (structs.MetricsSchema(train=torchmetrics.Dice()), [1, 0, 0]),
-        (structs.MetricsSchema(evaluation=torchmetrics.Dice()), [0, 1, 1]),
-        (structs.MetricsSchema(common=torchmetrics.Dice()), [1, 1, 1]),
         (
-            structs.MetricsSchema(train=torchmetrics.Dice(), evaluation=torchmetrics.Dice()),
+            structs.MetricsSchema(
+                train=torchmetrics.segmentation.DiceScore(num_classes=NUM_CLASSES)
+            ),
+            [1, 0, 0],
+        ),
+        (
+            structs.MetricsSchema(
+                evaluation=torchmetrics.segmentation.DiceScore(num_classes=NUM_CLASSES)
+            ),
+            [0, 1, 1],
+        ),
+        (
+            structs.MetricsSchema(
+                common=torchmetrics.segmentation.DiceScore(num_classes=NUM_CLASSES)
+            ),
+            [1, 1, 1],
+        ),
+        (
+            structs.MetricsSchema(
+                train=torchmetrics.segmentation.DiceScore(num_classes=NUM_CLASSES),
+                evaluation=torchmetrics.segmentation.DiceScore(num_classes=NUM_CLASSES),
+            ),
             [1, 1, 1],
         ),
     ],

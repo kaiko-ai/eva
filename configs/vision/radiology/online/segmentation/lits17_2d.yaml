@@ -81,21 +81,19 @@ model:
       common:
         - class_path: eva.metrics.AverageLoss
       evaluation:
-        - class_path: torchmetrics.segmentation.DiceScore
+        - class_path: eva.vision.metrics.defaults.MulticlassSegmentationMetricsV2
           init_args:
             num_classes: *NUM_CLASSES
-            include_background: false
-            average: macro
             input_format: one-hot
         - class_path: torchmetrics.ClasswiseWrapper
           init_args:
             metric:
-              class_path: eva.vision.metrics.MonaiDiceScore
+              class_path: torchmetrics.segmentation.DiceScore
               init_args:
                 include_background: true
                 num_classes: *NUM_CLASSES
+                average: none
                 input_format: one-hot
-                reduction: none
             prefix: DiceScore_
             labels:
               - "0_background"
