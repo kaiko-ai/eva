@@ -72,7 +72,7 @@ class TextModule(module.ModelModule):
         """Runs inference on a batch and evaluates model predictions.
 
         Args:
-            batch: A batch containing 'QUESTION', 'CONTEXTS', 'final_decision', etc.
+            batch: Input batch containing data, targets, and metadata.
 
         Returns:
             Dictionary with predictions, ground truth, and evaluation metrics.

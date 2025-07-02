@@ -1,16 +1,10 @@
 # PubMedQA Text Classification
 
-This tutorial demonstrates how to evaluate large language models on the PubMedQA dataset using eva's language module. PubMedQA is a biomedical question-answering dataset where models must classify answers as "yes", "no", or "maybe" based on medical abstracts and questions.
+This tutorial demonstrates how to evaluate large language models using eva's language module. For detailed information about the dataset, see the [PubMedQA dataset documentation](../../datasets/pubmedqa.md).
 
 ### Before you start
 
 If you haven't downloaded the config files yet, please download them from [GitHub](https://github.com/kaiko-ai/eva/tree/main).
-
-For this tutorial we use the [PubMedQA](https://pubmedqa.github.io/) dataset, which contains biomedical questions paired with abstracts from PubMed. The task is to classify whether the abstract supports a "yes", "no", or "maybe" answer to the question.
-
-**Important**: This evaluation uses the manually gathered test set of 1000 questions from PubMedQA, which provides high-quality expert annotations for reliable model evaluation. Note that the official PubMedQA leaderboard uses a hidden subset of 500 questions for evaluation. Our config uses a random subset of 500 samples by default (`max_samples: 500`) to speed up evaluation, but these are not the same samples as the official leaderboard (which are not publicly available).
-
-**Dataset License**: PubMedQA is released under the MIT License (https://github.com/pubmedqa/pubmedqa/blob/master/LICENSE).
 
 To enable automatic dataset download, set the environment variable `DOWNLOAD_DATA="true"` when running eva. By default, all eva config files have `download: false` to make sure users don't violate the license terms unintentionally. Additionally, you can set `DATA_ROOT` to configure the location where the dataset will be downloaded to / loaded from during evaluation (the default is `./data/pubmedqa`).
 
@@ -43,7 +37,8 @@ Then run with provider-prefixed model names. For example:
 
 ```bash
 # Anthropic Claude models
-MODEL_NAME=anthropic/claude-opus-4-0 eva validate --config configs/language/pubmedqa.yaml
+MODEL_NAME=anthropic/claude-3-7-sonnet-latest eva validate --config configs/language/pubmedqa.yaml
+```
 
 ### 2. Using HuggingFace models (local execution)
 

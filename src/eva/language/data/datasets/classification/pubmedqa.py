@@ -5,7 +5,7 @@ import random
 from typing import Dict, List, Literal
 
 import torch
-from datasets import Dataset, load_dataset
+from datasets import Dataset, load_dataset, load_from_disk
 from loguru import logger
 from typing_extensions import override
 
@@ -41,44 +41,39 @@ class PubMedQA(base.TextClassification):
         self._download = download
         self._max_samples = max_samples
 
-    def _load_dataset(self, dataset_cache_path: str | None) -> Dataset:
-        """Loads the PubMedQA dataset from the local cache or downloads it if needed.
+    def _load_dataset(self, dataset_path: str | None) -> Dataset:
+        """Loads the PubMedQA dataset from the local cache or downloads it.
 
         Args:
-            dataset_cache_path: The path to the local cache (may be None).
+            dataset_path: The path to the local cache (may be None).
 
         Returns:
-            The loaded Dataset object.
+            The loaded dataset object.
         """
-        if dataset_cache_path is not None and os.path.exists(dataset_cache_path):
-            dataset_path = dataset_cache_path
-            logger.info(f"Loaded dataset from local cache: {dataset_cache_path}")
-            is_local = True
-        else:
-            if not self._download and self._root:
-                raise ValueError(
-                    "Dataset not found locally and downloading is disabled. "
-                    "Set `download=True` or provide a valid local cache."
-                )
-            dataset_path = "bigbio/pubmed_qa"
-            is_local = False
-
-            if self._root:
-                logger.info(f"Dataset will be downloaded and cached in: {self._root}")
-            else:
-                logger.info("Using dataset directly from HuggingFace without caching.")
-
+        dataset_name = "bigbio/pubmed_qa"
+        config_name = "pubmed_qa_labeled_fold0_source"
         split = (self._split or "train+test+validation") if self._split != "val" else "validation"
-        raw_dataset = load_dataset(
-            dataset_path,
-            name="pubmed_qa_labeled_fold0_source",
-            split=split,
-            streaming=False,
-            cache_dir=self._root if (not is_local and self._root) else None,
-            trust_remote_code=True,
-        )
-        if not isinstance(raw_dataset, Dataset):
-            raise TypeError(f"Expected a `Dataset`, but got {type(raw_dataset)}")
+
+        if self._download:
+            logger.info("Downloading dataset from HuggingFace Hub")
+            raw_dataset = load_dataset(
+                dataset_name,
+                name=config_name,
+                split=split,
+                trust_remote_code=True,
+                download_mode="reuse_dataset_if_exists"
+            )
+            if dataset_path:
+                raw_dataset.save_to_disk(dataset_path)
+                logger.info(f"Dataset saved to: {dataset_path}")
+        else:
+            if not dataset_path or not os.path.exists(dataset_path):
+                raise ValueError(
+                    "Dataset path not found. Set download=True or provide a valid root path."
+                )
+
+            logger.info(f"Loading dataset from: {dataset_path}")
+            raw_dataset = load_from_disk(dataset_path)
 
         return raw_dataset
 
@@ -90,14 +85,14 @@ class PubMedQA(base.TextClassification):
         Otherwise, it checks if the dataset is already cached in `self._root`.
         If not cached, it downloads the dataset into `self._root`.
         """
-        dataset_cache_path = None
+        dataset_path = None
 
         if self._root:
-            dataset_cache_path = os.path.join(self._root, "pubmed_qa")
+            dataset_path = self._root
             os.makedirs(self._root, exist_ok=True)
 
         try:
-            self.dataset = self._load_dataset(dataset_cache_path)
+            self.dataset = self._load_dataset(dataset_path)
             if self._max_samples is not None and len(self.dataset) > self._max_samples:
                 logger.info(
                     f"Subsampling dataset from {len(self.dataset)} to {self._max_samples} samples"

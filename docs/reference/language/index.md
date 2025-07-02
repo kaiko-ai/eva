@@ -1,8 +1,8 @@
 # Language
 
-Reference information for the `Language` API.
+Reference information for the `language` API.
 
-If you have not already installed the `Language`-package, install it with:
+If you have not already installed the `language`-package, install it with:
 ```
 pip install 'kaiko-eva[language]'
 ```
