@@ -64,7 +64,7 @@ class PubMedQA(base.TextClassification):
                 download_mode="reuse_dataset_if_exists",
             )
             if dataset_path:
-                raw_dataset.save_to_disk(dataset_path). # type: ignore
+                raw_dataset.save_to_disk(dataset_path)  # type: ignore
                 logger.info(f"Dataset saved to: {dataset_path}")
         else:
             if not dataset_path or not os.path.exists(dataset_path):
