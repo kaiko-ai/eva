@@ -64,7 +64,7 @@ class PubMedQA(base.TextClassification):
                 download_mode="reuse_dataset_if_exists",
             )
             if dataset_path:
-                raw_dataset.save_to_disk(dataset_path)
+                raw_dataset.save_to_disk(dataset_path). # type: ignore
                 logger.info(f"Dataset saved to: {dataset_path}")
         else:
             if not dataset_path or not os.path.exists(dataset_path):
@@ -75,7 +75,7 @@ class PubMedQA(base.TextClassification):
             logger.info(f"Loading dataset from: {dataset_path}")
             raw_dataset = load_from_disk(dataset_path)
 
-        return raw_dataset
+        return raw_dataset  # type: ignore
 
     @override
     def prepare_data(self) -> None:

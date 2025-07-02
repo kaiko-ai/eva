@@ -9,8 +9,8 @@ from typing_extensions import override
 
 from eva.core.metrics import structs as metrics_lib
 from eva.core.models.modules import module
-from eva.core.models.modules.typings import INPUT_BATCH
 from eva.core.models.modules.utils import batch_postprocess
+from eva.language.models.modules.typings import TEXT_BATCH
 
 
 class TextModule(module.ModelModule):
@@ -55,7 +55,7 @@ class TextModule(module.ModelModule):
         return self.model(prompts)
 
     @override
-    def validation_step(self, batch: INPUT_BATCH, *args: Any, **kwargs: Any) -> STEP_OUTPUT:
+    def validation_step(self, batch: TEXT_BATCH, *args: Any, **kwargs: Any) -> STEP_OUTPUT:
         """Validation step that runs batch inference and evaluates metrics.
 
         Args:
@@ -68,7 +68,7 @@ class TextModule(module.ModelModule):
         """
         return self._batch_step(batch)
 
-    def _batch_step(self, batch: INPUT_BATCH) -> STEP_OUTPUT:
+    def _batch_step(self, batch: TEXT_BATCH) -> STEP_OUTPUT:
         """Runs inference on a batch and evaluates model predictions.
 
         Args:
