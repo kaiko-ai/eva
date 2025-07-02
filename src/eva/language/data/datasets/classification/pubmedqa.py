@@ -61,7 +61,7 @@ class PubMedQA(base.TextClassification):
                 name=config_name,
                 split=split,
                 trust_remote_code=True,
-                download_mode="reuse_dataset_if_exists"
+                download_mode="reuse_dataset_if_exists",
             )
             if dataset_path:
                 raw_dataset.save_to_disk(dataset_path)
