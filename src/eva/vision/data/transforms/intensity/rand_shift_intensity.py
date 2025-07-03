@@ -5,13 +5,13 @@ from typing import Any, Dict
 
 from monai.transforms.intensity import array as monai_intensity_transforms
 from torchvision import tv_tensors
-from torchvision.transforms import v2
 from typing_extensions import override
 
 from eva.vision.data import tv_tensors as eva_tv_tensors
+from eva.vision.data.transforms import base
 
 
-class RandShiftIntensity(v2.Transform):
+class RandShiftIntensity(base.RandomMonaiTransform):
     """Randomly shift intensity with randomly picked offset."""
 
     def __init__(
@@ -36,12 +36,16 @@ class RandShiftIntensity(v2.Transform):
         """
         super().__init__()
 
-        self._rand_swift_intensity = monai_intensity_transforms.RandShiftIntensity(
+        self._rand_shift_intensity = monai_intensity_transforms.RandShiftIntensity(
             offsets=offsets,
             safe=safe,
             prob=prob,
             channel_wise=channel_wise,
         )
+
+    @override
+    def set_random_state(self, seed: int) -> None:
+        self._rand_shift_intensity.set_random_state(seed)
 
     @functools.singledispatchmethod
     @override
@@ -51,5 +55,5 @@ class RandShiftIntensity(v2.Transform):
     @_transform.register(tv_tensors.Image)
     @_transform.register(eva_tv_tensors.Volume)
     def _(self, inpt: tv_tensors.Image, params: Dict[str, Any]) -> Any:
-        inpt_scaled = self._rand_swift_intensity(inpt)
+        inpt_scaled = self._rand_shift_intensity(inpt)
         return tv_tensors.wrap(inpt_scaled, like=inpt)
