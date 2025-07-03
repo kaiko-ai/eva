@@ -173,6 +173,7 @@ data:
         num_workers: &N_DATA_WORKERS ${oc.env:N_DATA_WORKERS, 8}
         shuffle: true
         collate_fn: eva.vision.data.dataloaders.collate_fn.collection_collate
+        worker_init_fn: eva.vision.data.dataloaders.seed_worker
       val:
         batch_size: 1
         num_workers: *N_DATA_WORKERS
