@@ -7,13 +7,13 @@ import torch
 from monai.config.type_definitions import NdarrayOrTensor
 from monai.transforms.croppad import array as monai_croppad_transforms
 from torchvision import tv_tensors
-from torchvision.transforms import v2
 from typing_extensions import override
 
 from eva.vision.data import tv_tensors as eva_tv_tensors
+from eva.vision.data.transforms import base
 
 
-class RandCropByPosNegLabel(v2.Transform):
+class RandCropByPosNegLabel(base.RandomMonaiTransform):
     """Crop random fixed sized regions with the center being a foreground or background voxel.
 
     Its based on the Pos Neg Ratio and will return a list of arrays for all the cropped images.
@@ -90,6 +90,10 @@ class RandCropByPosNegLabel(v2.Transform):
             allow_smaller=allow_smaller,
             lazy=False,
         )
+
+    @override
+    def set_random_state(self, seed: int) -> None:
+        self._rand_crop.set_random_state(seed)
 
     def _get_params(self, flat_inputs: List[Any]) -> Dict[str, Any]:
         mask = next(inpt for inpt in flat_inputs if isinstance(inpt, tv_tensors.Mask))

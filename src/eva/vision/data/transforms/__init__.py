@@ -5,6 +5,7 @@ from eva.vision.data.transforms.croppad import (
     CropForeground,
     RandCropByLabelClasses,
     RandCropByPosNegLabel,
+    RandSpatialCrop,
     SpatialPad,
 )
 from eva.vision.data.transforms.intensity import (
@@ -27,6 +28,7 @@ __all__ = [
     "ScaleIntensityRange",
     "RandFlip",
     "RandRotate90",
+    "RandSpatialCrop",
     "Spacing",
     "EnsureChannelFirst",
 ]
