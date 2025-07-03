@@ -7,13 +7,13 @@ import torch
 from monai.config.type_definitions import NdarrayOrTensor
 from monai.transforms.croppad import array as monai_croppad_transforms
 from torchvision import tv_tensors
-from torchvision.transforms import v2
 from typing_extensions import override
 
 from eva.vision.data import tv_tensors as eva_tv_tensors
+from eva.vision.data.transforms import base
 
 
-class RandCropByLabelClasses(v2.Transform):
+class RandCropByLabelClasses(base.RandomMonaiTransform):
     """Crop random fixed sized regions with the center belonging to one of the classes.
 
     Please refer to `monai.transforms.croppad.RandCropByLabelClasses` docs for more details.
@@ -52,8 +52,8 @@ class RandCropByLabelClasses(v2.Transform):
             lazy=lazy,
         )
 
+    @override
     def set_random_state(self, seed: int) -> None:
-        """Set the random state for the transform."""
         self._rand_crop.set_random_state(seed)
 
     def _get_params(self, flat_inputs: List[Any]) -> Dict[str, Any]:

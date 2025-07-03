@@ -12,14 +12,13 @@ from torch.optim import lr_scheduler
 from typing_extensions import override
 
 from eva.core.metrics import structs as metrics_lib
-from eva.core.models.modules import module
+from eva.core.models.modules import SchedulerConfiguration, module
 from eva.core.models.modules.typings import INPUT_BATCH, INPUT_TENSOR_BATCH
 from eva.core.models.modules.utils import batch_postprocess, grad, submodule_state_dict
 from eva.core.utils import parser
 from eva.vision.models.networks import decoders
 from eva.vision.models.networks.decoders import segmentation
 from eva.vision.models.networks.decoders.segmentation.typings import DecoderInputs
-from eva.core.models.modules import SchedulerConfiguration
 
 
 class SemanticSegmentationModule(module.ModelModule):
