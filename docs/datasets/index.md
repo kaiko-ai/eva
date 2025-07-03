@@ -39,3 +39,9 @@
 | [MSDTask7Pancreas](msd_task7_pancreas.md) | 281 | ~100 x ~512 x ~512 \* |  Semantic Segmentation (3 classes) | Yes |
 
 \* 3D images of varying sizes
+
+## Language Datasets Overview
+
+| Dataset | #Samples | Task | Domain | Download provided |
+|---------|----------|------|---------|-------------------|
+| [PubMedQA](pubmedqa.md) | 1,000 | Classification (3 classes) | Biomedical Q&A | Yes |

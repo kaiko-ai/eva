@@ -34,7 +34,7 @@ Check out the [documentation](https://kaiko-ai.github.io/eva/) for more informat
 
 ### Highlights:
 - Easy and reliable benchmark of Oncology FMs
-- Supports patch-level classification, slide-level classification and semantic segmentation downstream tasks
+- Supports patch-level classification, slide-level classification, semantic segmentation, and text classification downstream tasks
 - Automatic embedding inference and evaluation of a downstream task
 - Native support of popular medical [datasets](https://kaiko-ai.github.io/eva/dev/datasets/) and models
 - Produce statistics over multiple evaluation fits and multiple metrics
@@ -48,6 +48,9 @@ pip install kaiko-eva
 
 # to install the expanded `vision` version
 pip install 'kaiko-eva[vision]'
+
+# to install the expanded `language` version
+pip install 'kaiko-eva[language]'
 
 # to install everything
 pip install 'kaiko-eva[all]'
