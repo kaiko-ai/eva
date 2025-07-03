@@ -21,7 +21,7 @@ except ImportError as e:
 from eva.core.models.wrappers import base
 
 
-class VLLMTextModel(base.BaseModel[List[str], List[str]]):
+class VLLMTextModel(base.BaseModel):
     """Wrapper class for using vLLM for text generation.
 
     This wrapper loads a vLLM model, sets up the tokenizer and sampling
@@ -42,7 +42,7 @@ class VLLMTextModel(base.BaseModel[List[str], List[str]]):
             model_name_or_path: The model identifier (e.g., a Hugging Face
              repo ID or local path).
             model_kwargs: Arguments required to initialize the vLLM model,
-                see https://github.com/vllm-project/vllm/blob/main/vllm/entrypoints/llm.py
+                see [link](https://github.com/vllm-project/vllm/blob/main/vllm/entrypoints/llm.py)
                 for more information.
             generation_kwargs: Arguments required to generate the output,
                 need to align with the arguments of
@@ -71,7 +71,7 @@ class VLLMTextModel(base.BaseModel[List[str], List[str]]):
             raise RuntimeError("Model not initialized")
         self._llm_tokenizer = self._llm_model.get_tokenizer()
 
-    def _apply_chat_template(self, prompts: Sequence[str]) -> List[TokensPrompt]:
+    def _apply_chat_template(self, prompts: Sequence[str]) -> list[TokensPrompt]:
         """Apply chat template to the messages.
 
         Args:
@@ -131,8 +131,7 @@ class VLLMTextModel(base.BaseModel[List[str], List[str]]):
 
         return result
 
-    @override
-    def model_forward(self, prompts: List[str]) -> List[str]:
+    def generate(self, prompts: List[str]) -> List[str]:
         """Generates text for the given prompt using the vLLM model.
 
         Args:

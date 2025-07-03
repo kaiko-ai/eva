@@ -33,10 +33,10 @@ DOWNLOAD_DATA="true" eva validate --config configs/language/pubmedqa.yaml
 ## Relevant links
 
 - **Paper**: [PubMedQA: A Dataset for Biomedical Research Question Answering](https://arxiv.org/abs/1909.06146)
-- **Official Repository**: https://github.com/pubmedqa/pubmedqa
-- **Leaderboard**: https://pubmedqa.github.io/
-- **HuggingFace**: https://huggingface.co/datasets/bigbio/pubmed_qa
+- [**Official Repository**](https://github.com/pubmedqa/pubmedqa)
+- [**Leaderboard**](https://pubmedqa.github.io/)
+- [**HuggingFace**](https://huggingface.co/datasets/bigbio/pubmed_qa)
 
 ## License information
 
-Released under the MIT License. See: https://github.com/pubmedqa/pubmedqa/blob/master/LICENSE
+Released under the [MIT License](https://github.com/pubmedqa/pubmedqa/blob/master/LICENSE)
