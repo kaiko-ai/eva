@@ -1,0 +1,201 @@
+---
+trainer:
+  class_path: eva.Trainer
+  init_args:
+    n_runs: &N_RUNS ${oc.env:N_RUNS, 5}
+    default_root_dir: &OUTPUT_ROOT ${oc.env:OUTPUT_ROOT, logs/${oc.env:MODEL_NAME, radiology/voco_b}/msd_task7_pancreas}
+    max_steps: &MAX_STEPS ${oc.env:MAX_STEPS, 30000}
+    val_check_interval: ${oc.env:VAL_CHECK_INTERVAL, 500}
+    max_epochs: null
+    check_val_every_n_epoch: null
+    checkpoint_type: ${oc.env:CHECKPOINT_TYPE, best}
+    num_sanity_val_steps: 0
+    log_every_n_steps: ${oc.env:LOG_EVERY_N_STEPS, 100}
+    callbacks:
+      - class_path: eva.callbacks.ConfigurationLogger
+      - class_path: lightning.pytorch.callbacks.TQDMProgressBar
+        init_args:
+          refresh_rate: ${oc.env:TQDM_REFRESH_RATE, 1}
+      - class_path: lightning.pytorch.callbacks.LearningRateMonitor
+        init_args:
+          logging_interval: step
+      - class_path: lightning.pytorch.callbacks.ModelCheckpoint
+        init_args:
+          filename: best
+          save_last: ${oc.env:SAVE_LAST, false}
+          save_top_k: 1
+          monitor: &MONITOR_METRIC ${oc.env:MONITOR_METRIC, val/DiceScore}
+          mode: &MONITOR_METRIC_MODE ${oc.env:MONITOR_METRIC_MODE, max}
+    logger:
+      - class_path: lightning.pytorch.loggers.TensorBoardLogger
+        init_args:
+          save_dir: *OUTPUT_ROOT
+          name: ""
+model:
+  class_path: eva.vision.models.modules.SemanticSegmentationModule
+  init_args:
+    encoder:
+      class_path: eva.vision.models.ModelFromRegistry
+      init_args:
+        model_name: ${oc.env:MODEL_NAME, universal/vit_base_patch16_224_dino_1chan}
+        model_kwargs:
+          out_indices: ${oc.env:OUT_INDICES, 1}
+    decoder:
+      class_path: eva.vision.models.networks.decoders.segmentation.ConvDecoderWithImage
+      init_args:
+        in_features: ${oc.env:IN_FEATURES, 768}
+        num_classes: &NUM_CLASSES 3
+        greyscale: true
+    spatial_dims: 2
+    inferer:
+      class_path: monai.inferers.SliceInferer
+      init_args:
+        roi_size:
+          - ${oc.env:IMG_DIM, 224}
+          - ${oc.env:IMG_DIM, 224}
+        spatial_dim: 0
+        sw_batch_size: ${oc.env:SW_BATCH_SIZE, 32}
+        overlap: ${oc.env:SW_OVERLAP, 0.25}
+        progress: true
+    criterion:
+      class_path: monai.losses.DiceCELoss
+      init_args:
+        include_background: false
+        to_onehot_y: true
+        softmax: true
+        batch: true
+    lr_multiplier_encoder: 0.0
+    optimizer:
+      class_path: torch.optim.AdamW
+      init_args:
+        lr: ${oc.env:LR_VALUE, 0.001}
+        betas: [0.9, 0.999]
+        weight_decay: ${oc.env:WEIGHT_DECAY, 0.01}
+    lr_scheduler:
+      interval: step
+      scheduler:
+        class_path: torch.optim.lr_scheduler.CosineAnnealingLR
+        init_args:
+          T_max: *MAX_STEPS
+          eta_min: ${oc.env:LR_VALUE_END, 0.0001}
+    postprocess:
+      predictions_transforms:
+        - class_path: eva.core.models.transforms.AsDiscrete
+          init_args:
+            argmax: true
+            to_onehot: *NUM_CLASSES
+      targets_transforms:
+        - class_path: eva.core.models.transforms.AsDiscrete
+          init_args:
+            to_onehot: *NUM_CLASSES
+    metrics:
+      common:
+        - class_path: eva.metrics.AverageLoss
+      evaluation:
+        - class_path: torchmetrics.segmentation.DiceScore
+          init_args:
+            num_classes: *NUM_CLASSES
+            include_background: false
+            average: macro
+            input_format: one-hot
+        - class_path: torchmetrics.ClasswiseWrapper
+          init_args:
+            metric:
+              class_path: eva.vision.metrics.MonaiDiceScore
+              init_args:
+                include_background: true
+                num_classes: *NUM_CLASSES
+                input_format: one-hot
+                reduction: none
+            prefix: DiceScore_
+            labels:
+              - "0_background"
+              - "1_liver"
+              - "2_tumor"
+data:
+  class_path: eva.DataModule
+  init_args:
+    datasets:
+      train:
+        class_path: eva.vision.datasets.MSDTask7Pancreas
+        init_args: &DATASET_ARGS
+          root: ${oc.env:DATA_ROOT, ./data/msd_task7_pancreas}
+          split: train
+          transforms:
+            class_path: torchvision.transforms.v2.Compose
+            init_args:
+              transforms:
+                - class_path: eva.vision.data.transforms.EnsureChannelFirst
+                  init_args:
+                    channel_dim: 1
+                - class_path: eva.vision.data.transforms.Spacing
+                  init_args:
+                    pixdim: [1.5, 1.5, 1.5]
+                - class_path: eva.vision.data.transforms.ScaleIntensityRange
+                  init_args:
+                    input_range:
+                      - ${oc.env:SCALE_INTENSITY_MIN, -175.0}
+                      - ${oc.env:SCALE_INTENSITY_MAX, 250.0}
+                    output_range: [0.0, 1.0]
+                - class_path: eva.vision.data.transforms.CropForeground
+                - class_path: eva.vision.data.transforms.SpatialPad
+                  init_args:
+                    spatial_size: &ROI_SIZE
+                      - 1
+                      - ${oc.env:IMG_DIM, 224}
+                      - ${oc.env:IMG_DIM, 224}
+                - class_path: eva.vision.data.transforms.RandCropByLabelClasses
+                  init_args:
+                    spatial_size: *ROI_SIZE
+                    num_samples: ${oc.env:SAMPLE_BATCH_SIZE, 4}
+                    num_classes: *NUM_CLASSES
+                    ratios: ${oc.env:SAMPLE_CLASS_RATIOS, null}
+                - class_path: eva.vision.data.transforms.Squeeze
+                  init_args:
+                    dim: 1
+                - class_path: eva.vision.data.transforms.RandFlip
+                  init_args:
+                    spatial_axes: [0, 1]
+                - class_path: eva.vision.data.transforms.RandRotate90
+                  init_args:
+                    spatial_axes: [0, 1]
+                - class_path: eva.vision.data.transforms.RandScaleIntensity
+                  init_args:
+                    factors: 0.1
+                    prob: 0.1
+                - class_path: eva.vision.data.transforms.RandShiftIntensity
+                  init_args:
+                    offsets: 0.1
+                    prob: 0.1
+      val:
+        class_path: eva.vision.datasets.MSDTask7Pancreas
+        init_args:
+          <<: *DATASET_ARGS
+          split: val
+          transforms:
+            class_path: torchvision.transforms.v2.Compose
+            init_args:
+              transforms:
+                - class_path: eva.vision.data.transforms.EnsureChannelFirst
+                  init_args:
+                    channel_dim: 1
+                - class_path: eva.vision.data.transforms.Spacing
+                  init_args:
+                    pixdim: [1.5, 1.5, 1.5]
+                - class_path: eva.vision.data.transforms.ScaleIntensityRange
+                  init_args:
+                    input_range:
+                      - ${oc.env:SCALE_INTENSITY_MIN, -175.0}
+                      - ${oc.env:SCALE_INTENSITY_MAX, 250.0}
+                    output_range: [0.0, 1.0]
+                - class_path: eva.vision.data.transforms.CropForeground
+    dataloaders:
+      train:
+        batch_size: ${oc.env:BATCH_SIZE, 2}
+        num_workers: &N_DATA_WORKERS ${oc.env:N_DATA_WORKERS, 8}
+        shuffle: true
+        collate_fn: eva.vision.data.dataloaders.collate_fn.collection_collate
+        worker_init_fn: eva.vision.data.dataloaders.seed_worker
+      val:
+        batch_size: 1
+        num_workers: *N_DATA_WORKERS
