@@ -74,6 +74,7 @@ nav:
       - Tutorials:
         - user-guide/tutorials/offline_vs_online.md
         - user-guide/tutorials/evaluate_resnet.md
+        - user-guide/tutorials/pubmedqa_classification.md
       - Advanced user guide:
         - user-guide/advanced/replicate_evaluations.md
         - user-guide/advanced/model_registry.md
@@ -102,6 +103,8 @@ nav:
       - BTCV: datasets/btcv.md
       - LiTS17: datasets/lits17.md
       - MSDTask7Pancreas: datasets/msd_task7_pancreas.md
+    - Language:
+      - PubMedQA: datasets/pubmedqa.md
   - Reference API:
     - reference/index.md
     - Core:
@@ -141,3 +144,11 @@ nav:
         - Wrappers: reference/vision/models/wrappers.md
       - Utils:
         - IO: reference/vision/utils/io.md
+    - Language:
+      - reference/language/index.md
+      - Data:
+        - reference/language/data/index.md
+        - reference/language/data/datasets.md
+      - Models:
+        - Networks: reference/language/models/networks.md
+        - Wrappers: reference/language/models/wrappers.md
