@@ -110,8 +110,8 @@ model:
             prefix: DiceScore_
             labels:
               - "0_background"
-              - "1_liver"
-              - "2_tumor"
+              - "1_pancreas"
+              - "2_cancer"
 data:
   class_path: eva.DataModule
   init_args:

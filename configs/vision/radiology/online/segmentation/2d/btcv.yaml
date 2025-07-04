@@ -44,7 +44,7 @@ model:
       class_path: eva.vision.models.networks.decoders.segmentation.ConvDecoderWithImage
       init_args:
         in_features: ${oc.env:IN_FEATURES, 768}
-        num_classes: &NUM_CLASSES 3
+        num_classes: &NUM_CLASSES 14
         greyscale: true
     spatial_dims: 2
     inferer:
@@ -110,8 +110,19 @@ model:
             prefix: DiceScore_
             labels:
               - "0_background"
-              - "1_liver"
-              - "2_tumor"
+              - "1_spleen"
+              - "2_right_kidney"
+              - "3_left_kidney"
+              - "4_gallbladder"
+              - "5_esophagus"
+              - "6_liver"
+              - "7_stomach"
+              - "8_aorta"
+              - "9_inferior_vena_cava"
+              - "10_portal_and_splenic_vein"
+              - "11_pancreas"
+              - "12_right_adrenal_gland"
+              - "13_left_adrenal_gland"
 data:
   class_path: eva.DataModule
   init_args:
