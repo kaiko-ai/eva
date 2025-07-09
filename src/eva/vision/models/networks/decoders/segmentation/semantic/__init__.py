@@ -5,7 +5,10 @@ from eva.vision.models.networks.decoders.segmentation.semantic.common import (
     ConvDecoderMS,
     SingleLinearDecoder,
 )
-from eva.vision.models.networks.decoders.segmentation.semantic.swin_unetr import SwinUNETRDecoder
+from eva.vision.models.networks.decoders.segmentation.semantic.swin_unetr import (
+    SwinUNETRDecoder,
+    SwinUNETRDecoderWithProjection,
+)
 from eva.vision.models.networks.decoders.segmentation.semantic.with_image import (
     ConvDecoderWithImage,
 )
@@ -16,4 +19,5 @@ __all__ = [
     "ConvDecoderWithImage",
     "SingleLinearDecoder",
     "SwinUNETRDecoder",
+    "SwinUNETRDecoderWithProjection",
 ]
