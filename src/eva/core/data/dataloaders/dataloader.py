@@ -56,6 +56,9 @@ class DataLoader:
     persistent_workers: bool = True
     """Will keep the worker processes after a dataset has been consumed once."""
 
+    worker_init_fn: Callable | None = None
+    """Function to call on each worker process before data loading."""
+
     prefetch_factor: int | None = 2
     """Number of batches loaded in advance by each worker."""
 
@@ -80,4 +83,5 @@ class DataLoader:
             drop_last=self.drop_last,
             persistent_workers=self.persistent_workers,
             prefetch_factor=self.prefetch_factor,
+            worker_init_fn=self.worker_init_fn,
         )

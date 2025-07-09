@@ -7,13 +7,13 @@ import numpy as np
 from monai.config.type_definitions import DtypeLike
 from monai.transforms.intensity import array as monai_intensity_transforms
 from torchvision import tv_tensors
-from torchvision.transforms import v2
 from typing_extensions import override
 
 from eva.vision.data import tv_tensors as eva_tv_tensors
+from eva.vision.data.transforms import base
 
 
-class RandScaleIntensity(v2.Transform):
+class RandScaleIntensity(base.RandomMonaiTransform):
     """Randomly scale the intensity of input image.
 
     The factor is by ``v = v * (1 + factor)``, where
@@ -46,6 +46,10 @@ class RandScaleIntensity(v2.Transform):
             channel_wise=channel_wise,
             dtype=dtype,
         )
+
+    @override
+    def set_random_state(self, seed: int) -> None:
+        self._rand_scale_intensity.set_random_state(seed)
 
     @functools.singledispatchmethod
     @override

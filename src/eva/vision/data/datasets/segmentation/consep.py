@@ -108,6 +108,11 @@ class CoNSeP(wsi.MultiWsiDataset, vision.VisionDataset[tv_tensors.Image, tv_tens
             n_classes=5,
             first_and_last_labels=((self.classes[0], self.classes[-1])),
         )
+        n_expected = self._expected_dataset_lengths[None]
+        if len(self._file_paths) != n_expected:
+            raise ValueError(
+                f"Expected {n_expected} images, found {len(self._file_paths)} in {self._root}."
+            )
 
     @override
     def __getitem__(self, index: int) -> Tuple[tv_tensors.Image, tv_tensors.Mask, Dict[str, Any]]:
@@ -135,10 +140,6 @@ class CoNSeP(wsi.MultiWsiDataset, vision.VisionDataset[tv_tensors.Image, tv_tens
     def _load_file_paths(self, split: Literal["train", "val"] | None = None) -> List[str]:
         """Loads the file paths of the corresponding dataset split."""
         paths = list(glob.glob(os.path.join(self._root, "**/Images/*.png"), recursive=True))
-        n_expected = self._expected_dataset_lengths[None]
-        if len(paths) != n_expected:
-            raise ValueError(f"Expected {n_expected} images, found {len(paths)} in {self._root}.")
-
         if split is not None:
             split_to_folder = {"train": "Train", "val": "Test"}
             paths = filter(lambda p: split_to_folder[split] == p.split("/")[-3], paths)

@@ -17,6 +17,7 @@ class MulticlassClassificationMetrics(structs.MetricCollection):
         ignore_index: int | None = None,
         prefix: str | None = None,
         postfix: str | None = None,
+        input_type: Literal["logits", "discrete"] = "logits",
     ) -> None:
         """Initializes the multi-class classification metrics.
 
@@ -27,46 +28,55 @@ class MulticlassClassificationMetrics(structs.MetricCollection):
                 contribute to the metric calculation.
             prefix: A string to append in front of the keys of the output dict.
             postfix: A string to append after the keys of the output dict.
+            input_type: Type of input predictions - "logits" for probabilities/logits
+                or "discrete" for discrete class predictions. Determines which metrics
+                are applicable.
         """
-        super().__init__(
-            metrics=[
+        metrics = [
+            classification.MulticlassAccuracy(
+                num_classes=num_classes,
+                average=average,
+                ignore_index=ignore_index,
+            ),
+            classification.MulticlassF1Score(
+                num_classes=num_classes,
+                average=average,
+                ignore_index=ignore_index,
+            ),
+            classification.MulticlassPrecision(
+                num_classes=num_classes,
+                average=average,
+                ignore_index=ignore_index,
+            ),
+            classification.MulticlassRecall(
+                num_classes=num_classes,
+                average=average,
+                ignore_index=ignore_index,
+            ),
+        ]
+
+        compute_groups = [
+            [
+                "MulticlassAccuracy",
+                "MulticlassF1Score",
+                "MulticlassPrecision",
+                "MulticlassRecall",
+            ]
+        ]
+
+        if input_type == "logits":
+            metrics.append(
                 classification.MulticlassAUROC(
                     num_classes=num_classes,
                     average=average,
                     ignore_index=ignore_index,
-                ),
-                classification.MulticlassAccuracy(
-                    num_classes=num_classes,
-                    average=average,
-                    ignore_index=ignore_index,
-                ),
-                classification.MulticlassF1Score(
-                    num_classes=num_classes,
-                    average=average,
-                    ignore_index=ignore_index,
-                ),
-                classification.MulticlassPrecision(
-                    num_classes=num_classes,
-                    average=average,
-                    ignore_index=ignore_index,
-                ),
-                classification.MulticlassRecall(
-                    num_classes=num_classes,
-                    average=average,
-                    ignore_index=ignore_index,
-                ),
-            ],
+                )
+            )
+            compute_groups.append(["MulticlassAUROC"])
+
+        super().__init__(
+            metrics=metrics,
             prefix=prefix,
             postfix=postfix,
-            compute_groups=[
-                [
-                    "MulticlassAccuracy",
-                    "MulticlassF1Score",
-                    "MulticlassPrecision",
-                    "MulticlassRecall",
-                ],
-                [
-                    "MulticlassAUROC",
-                ],
-            ],
+            compute_groups=compute_groups,
         )
