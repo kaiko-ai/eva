@@ -48,7 +48,8 @@ class LeaderboardConfig:
         },
         "radiology": {
             "voco_b": "VoCo-B",
-            "voco_h": "VoCo-H"
+            "voco_h": "VoCo-H",
+            "vit_base_patch16_224_dino_1chan": "ViT-B16 (DINO)"
         }
     }
     _task_name_map = {
