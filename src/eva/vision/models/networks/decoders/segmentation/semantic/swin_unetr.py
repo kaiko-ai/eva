@@ -208,14 +208,13 @@ class SwinUNETRDecoderWithProjection(nn.Module):
         )
 
         if self._project_dims:
-            self.proj_enc0 = nn.Conv3d(feature_size, self._project_dims[0], kernel_size=1)
-            self.proj_enc1 = nn.Conv3d(feature_size, self._project_dims[1], kernel_size=1)
-            self.proj_enc2 = nn.Conv3d(feature_size * 2, self._project_dims[2], kernel_size=1)
-            self.proj_enc3 = nn.Conv3d(feature_size * 4, self._project_dims[3], kernel_size=1)
-            self.proj_hid3 = nn.Conv3d(feature_size * 8, self._project_dims[4], kernel_size=1)
-            self.proj_dec4 = nn.Conv3d(feature_size * 16, self._project_dims[5], kernel_size=1)
-
-        self._load_checkpoint()
+            conv_layer = nn.Conv2d if spatial_dims == 2 else nn.Conv3d
+            self.proj_enc0 = conv_layer(feature_size, self._project_dims[0], kernel_size=1)
+            self.proj_enc1 = conv_layer(feature_size, self._project_dims[1], kernel_size=1)
+            self.proj_enc2 = conv_layer(feature_size * 2, self._project_dims[2], kernel_size=1)
+            self.proj_enc3 = conv_layer(feature_size * 4, self._project_dims[3], kernel_size=1)
+            self.proj_hid3 = conv_layer(feature_size * 8, self._project_dims[4], kernel_size=1)
+            self.proj_dec4 = conv_layer(feature_size * 16, self._project_dims[5], kernel_size=1)
 
     def _forward_features(self, features: List[torch.Tensor]) -> torch.Tensor:
         """Forward function for multi-level feature maps to a single one."""
