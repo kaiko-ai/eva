@@ -7,7 +7,7 @@ from eva.vision.models.networks.backbones.radiology import swin_unetr
 from eva.vision.models.networks.backbones.registry import backbone_registry
 
 
-class _VoCo(swin_unetr.SwinUNETREncoder):
+class _VoCo(swin_unetr.SwinUNETREncoder):  # type: ignore
     """Base class for the VoCo self-supervised encoders."""
 
     _checkpoint: str
