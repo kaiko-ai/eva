@@ -1,4 +1,4 @@
-"""Helper registration class."""
+"""Registry for classes and methods."""
 
 from typing import Any, Callable, Dict, List, Type, Union
 

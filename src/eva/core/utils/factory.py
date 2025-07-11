@@ -1,4 +1,4 @@
-"""Model builder wrapper."""
+"""Factory classes."""
 
 import inspect
 from typing import Any, Dict, Generic, Type, TypeVar
