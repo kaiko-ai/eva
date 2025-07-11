@@ -21,7 +21,7 @@ A model can then be loaded and instantiated like this:
 import torch
 from eva.vision.models.networks.backbones.registry import backbone_registry
 
-model = backbone_registry.get("universal/vit_small_patch16_224_random")(out_indices=2)
+model = backbone_registry.get("universal/vit_small_patch16_224_random")()
 output = model(torch.randn(1, 3, 224, 224))
 print(output.shape)
 # console output:
@@ -69,6 +69,6 @@ If you want to add a new FM backbone to *eva*'s registry, you'll need to follow 
 
 1. Implement a Python function that returns your model as a `torch.nn.Module`. If it's not a native PyTorch model, or if you have made the model already available in public hubs such as torch.hub or huggingface, our [model wrapper](./model_wrappers.md) classes might come in handy.
 
-2. Add your model function to `eva.vision.models.networks.backbones` together with a `@register_model("your_model_name")` decorator. Then add an import statement to the `__init__` file of the corresponding module.
+2. Add your model function to `eva.vision.models.networks.backbones` together with a `@backbone_registry.register("your_model_name")` decorator. Then add an import statement to the `__init__` file of the corresponding module.
 
 3. Open a PR 🚀
