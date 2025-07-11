@@ -9,10 +9,10 @@ from monai.networks.nets import swin_unetr
 from monai.utils import misc
 from torch import nn
 
-from eva.vision.models.networks.backbones.registry import register_model
+from eva.vision.models.networks.backbones.registry import backbone_registry
 
 
-@register_model("radiology/swin_unetr_encoder")
+@backbone_registry.register("radiology/swin_unetr_encoder")
 class SwinUNETREncoder(nn.Module):
     """Swin transformer encoder based on UNETR [0].
 

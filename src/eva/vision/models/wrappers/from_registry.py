@@ -6,7 +6,8 @@ import torch
 from typing_extensions import override
 
 from eva.core.models.wrappers import base
-from eva.vision.models.networks.backbones import BackboneModelRegistry
+from eva.core.utils import factory
+from eva.vision.models.networks.backbones import backbone_registry
 
 
 class ModelFromRegistry(base.BaseModel[torch.Tensor, torch.Tensor]):
@@ -14,7 +15,7 @@ class ModelFromRegistry(base.BaseModel[torch.Tensor, torch.Tensor]):
 
     This class can be used by load backbones available in eva's
     model registry by name. New backbones can be registered by using
-    the `@register_model(model_name)` decorator.
+    the `@backbone_registry.register(model_name)` decorator.
     """
 
     def __init__(
@@ -43,7 +44,10 @@ class ModelFromRegistry(base.BaseModel[torch.Tensor, torch.Tensor]):
 
     @override
     def load_model(self) -> None:
-        self._model = BackboneModelRegistry.load_model(
-            self._model_name, self._model_kwargs | self._model_extra_kwargs
+        self._model = factory.ModuleFactory(
+            registry=backbone_registry,
+            name=self._model_name,
+            init_args=self._model_kwargs | self._model_extra_kwargs,
         )
+
         ModelFromRegistry.__name__ = self._model_name

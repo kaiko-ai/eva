@@ -8,10 +8,10 @@ from torch import nn
 from eva.core.models import transforms
 from eva.vision.models import wrappers
 from eva.vision.models.networks.backbones import _utils
-from eva.vision.models.networks.backbones.registry import register_model
+from eva.vision.models.networks.backbones.registry import backbone_registry
 
 
-@register_model("pathology/bioptimus_h_optimus_0")
+@backbone_registry.register("pathology/bioptimus_h_optimus_0")
 def bioptimus_h_optimus_0(
     dynamic_img_size: bool = True,
     out_indices: int | Tuple[int, ...] | None = None,
@@ -39,7 +39,7 @@ def bioptimus_h_optimus_0(
     )
 
 
-@register_model("pathology/bioptimus_h0_mini")
+@backbone_registry.register("pathology/bioptimus_h0_mini")
 def bioptimus_h0_mini(
     dynamic_img_size: bool = True,
     out_indices: int | Tuple[int, ...] | None = None,

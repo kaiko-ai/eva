@@ -8,10 +8,10 @@ from torch import nn
 
 from eva.vision.models import wrappers
 from eva.vision.models.networks.backbones import _utils
-from eva.vision.models.networks.backbones.registry import register_model
+from eva.vision.models.networks.backbones.registry import backbone_registry
 
 
-@register_model("pathology/mahmood_uni")
+@backbone_registry.register("pathology/mahmood_uni")
 def mahmood_uni(
     dynamic_img_size: bool = True,
     out_indices: int | Tuple[int, ...] | None = None,
@@ -41,7 +41,7 @@ def mahmood_uni(
     )
 
 
-@register_model("pathology/mahmood_uni2_h")
+@backbone_registry.register("pathology/mahmood_uni2_h")
 def mahmood_uni2_h(
     dynamic_img_size: bool = True,
     out_indices: int | Tuple[int, ...] | None = None,

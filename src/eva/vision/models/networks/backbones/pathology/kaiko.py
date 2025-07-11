@@ -6,10 +6,10 @@ import torch
 from torch import nn
 
 from eva.vision.models.networks.backbones import _utils
-from eva.vision.models.networks.backbones.registry import register_model
+from eva.vision.models.networks.backbones.registry import backbone_registry
 
 
-@register_model("pathology/kaiko_midnight_12k")
+@backbone_registry.register("pathology/kaiko_midnight_12k")
 def kaiko_midnight_12k(out_indices: int | Tuple[int, ...] | None = None) -> nn.Module:
     """Initializes the Midnight-12k pathology FM by kaiko.ai.
 
@@ -26,7 +26,7 @@ def kaiko_midnight_12k(out_indices: int | Tuple[int, ...] | None = None) -> nn.M
     )
 
 
-@register_model("pathology/kaiko_vits16")
+@backbone_registry.register("pathology/kaiko_vits16")
 def kaiko_vits16(
     dynamic_img_size: bool = True, out_indices: int | Tuple[int, ...] | None = None
 ) -> nn.Module:
@@ -49,7 +49,7 @@ def kaiko_vits16(
     )
 
 
-@register_model("pathology/kaiko_vits8")
+@backbone_registry.register("pathology/kaiko_vits8")
 def kaiko_vits8(
     dynamic_img_size: bool = True, out_indices: int | Tuple[int, ...] | None = None
 ) -> nn.Module:
@@ -72,7 +72,7 @@ def kaiko_vits8(
     )
 
 
-@register_model("pathology/kaiko_vitb16")
+@backbone_registry.register("pathology/kaiko_vitb16")
 def kaiko_vitb16(
     dynamic_img_size: bool = True, out_indices: int | Tuple[int, ...] | None = None
 ) -> nn.Module:
@@ -95,7 +95,7 @@ def kaiko_vitb16(
     )
 
 
-@register_model("pathology/kaiko_vitb8")
+@backbone_registry.register("pathology/kaiko_vitb8")
 def kaiko_vitb8(
     dynamic_img_size: bool = True, out_indices: int | Tuple[int, ...] | None = None
 ) -> nn.Module:
@@ -118,7 +118,7 @@ def kaiko_vitb8(
     )
 
 
-@register_model("pathology/kaiko_vitl14")
+@backbone_registry.register("pathology/kaiko_vitl14")
 def kaiko_vitl14(
     dynamic_img_size: bool = True, out_indices: int | Tuple[int, ...] | None = None
 ) -> nn.Module:

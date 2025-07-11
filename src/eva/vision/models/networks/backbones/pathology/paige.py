@@ -11,10 +11,10 @@ import torch.nn as nn
 from eva.core.models import transforms
 from eva.vision.models import wrappers
 from eva.vision.models.networks.backbones import _utils
-from eva.vision.models.networks.backbones.registry import register_model
+from eva.vision.models.networks.backbones.registry import backbone_registry
 
 
-@register_model("pathology/paige_virchow2")
+@backbone_registry.register("pathology/paige_virchow2")
 def paige_virchow2(
     dynamic_img_size: bool = True,
     out_indices: int | Tuple[int, ...] | None = None,

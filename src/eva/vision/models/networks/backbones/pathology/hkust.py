@@ -7,10 +7,10 @@ import timm
 from torch import nn
 
 from eva.core.models.wrappers import _utils
-from eva.vision.models.networks.backbones.registry import register_model
+from eva.vision.models.networks.backbones.registry import backbone_registry
 
 
-@register_model("pathology/hkust_gpfm")
+@backbone_registry.register("pathology/hkust_gpfm")
 def hkust_gpfm(
     dynamic_img_size: bool = True,
     out_indices: int | Tuple[int, ...] | None = None,

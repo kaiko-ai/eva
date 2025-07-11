@@ -5,10 +5,10 @@ from typing import Tuple
 from torch import nn
 
 from eva.vision.models.networks.backbones import _utils
-from eva.vision.models.networks.backbones.registry import register_model
+from eva.vision.models.networks.backbones.registry import backbone_registry
 
 
-@register_model("pathology/histai_hibou_b")
+@backbone_registry.register("pathology/histai_hibou_b")
 def histai_hibou_b(out_indices: int | Tuple[int, ...] | None = None) -> nn.Module:
     """Initializes the hibou-B pathology FM by hist.ai (https://huggingface.co/histai/hibou-B).
 
@@ -30,7 +30,7 @@ def histai_hibou_b(out_indices: int | Tuple[int, ...] | None = None) -> nn.Modul
     )
 
 
-@register_model("pathology/histai_hibou_l")
+@backbone_registry.register("pathology/histai_hibou_l")
 def histai_hibou_l(out_indices: int | Tuple[int, ...] | None = None) -> nn.Module:
     """Initializes the hibou-L pathology FM by hist.ai (https://huggingface.co/histai/hibou-L).
 
