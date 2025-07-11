@@ -4,9 +4,9 @@
 ## Loading models through the Python API
 The available models can be listed as follows after installing the *eva* package:
 ```python
-from eva.vision.models.networks.backbones import BackboneModelRegistry
+from eva.vision.models.networks.backbones.registry import backbone_registry
 
-models = BackboneModelRegistry.list_models()
+models = backbone_registry.entries()
 print(models)
 ```
 
@@ -19,12 +19,9 @@ A model can then be loaded and instantiated like this:
 
 ```python
 import torch
-from eva.vision.models.networks.backbones import BackboneModelRegistry
+from eva.vision.models.networks.backbones.registry import backbone_registry
 
-model = BackboneModelRegistry.load_model(
-    model_name="universal/vit_small_patch16_224_random",
-     **{"out_indices": 2}
-)
+model = backbone_registry.get("universal/vit_small_patch16_224_random")(out_indices=2)
 output = model(torch.randn(1, 3, 224, 224))
 print(output.shape)
 # console output:
@@ -35,10 +32,7 @@ In the above example, we load a vit-s model initialized with random weights. The
 For segmentation tasks, we need to access not only the CLS embedding, but entire feature maps. This we can achieve by using the `out_indices` argument:
 
 ```python
-model = BackboneModelRegistry.load_model(
-    model_name="universal/vit_small_patch16_224_random",
-     **{"out_indices": 2}
-)
+model = backbone_registry.get("universal/vit_small_patch16_224_random")(out_indices=2)
 outputs = model(torch.randn(1, 3, 224, 224))
 for output in outputs:
     print(output.shape)
@@ -62,7 +56,7 @@ backbone:
       out_indices: ${oc.env:OUT_INDICES, 1}
 ```
 
-Note that `ModelFromRegistry` is a model wrapper class, which loads the models through `BackboneModelRegistry`.
+Note that `ModelFromRegistry` is a model wrapper class, which loads the models through `backbone_registry`.
 
 By using the `MODEL_NAME` environment variable, you can run an evaluation with a specific model from the registry, without modifying the default config files:
 ```bash

@@ -8,7 +8,7 @@ from loguru import logger
 from torch import nn
 
 from eva.vision.models import wrappers
-from eva.vision.models.networks.backbones.registry import BackboneModelRegistry
+from eva.vision.models.networks.backbones.registry import backbone_registry
 
 
 def timm_model(
@@ -46,7 +46,7 @@ def timm_model(
     )
 
 
-BackboneModelRegistry._registry.update(
+backbone_registry._registry.update(
     {
         f"timm/{model_name}": functools.partial(timm_model, model_name=model_name)
         for model_name in timm.list_models()

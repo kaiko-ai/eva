@@ -4,7 +4,7 @@ from typing_extensions import override
 
 from eva.core.models.wrappers import _utils
 from eva.vision.models.networks.backbones.radiology import swin_unetr
-from eva.vision.models.networks.backbones.registry import register_model
+from eva.vision.models.networks.backbones.registry import backbone_registry
 
 
 class _VoCo(swin_unetr.SwinUNETREncoder):
@@ -39,7 +39,7 @@ class _VoCo(swin_unetr.SwinUNETREncoder):
         self.load_state_dict(state_dict)
 
 
-@register_model("radiology/voco_b")
+@backbone_registry.register("radiology/voco_b")
 class VoCoB(_VoCo):
     """VoCo Self-supervised pre-trained B model."""
 
@@ -51,7 +51,7 @@ class VoCoB(_VoCo):
         super().__init__(feature_size=48, out_indices=out_indices)
 
 
-@register_model("radiology/voco_l")
+@backbone_registry.register("radiology/voco_l")
 class VoCoL(_VoCo):
     """VoCo Self-supervised pre-trained L model."""
 
@@ -63,7 +63,7 @@ class VoCoL(_VoCo):
         super().__init__(feature_size=96, out_indices=out_indices)
 
 
-@register_model("radiology/voco_h")
+@backbone_registry.register("radiology/voco_h")
 class VoCoH(_VoCo):
     """VoCo Self-supervised pre-trained H model."""
 
