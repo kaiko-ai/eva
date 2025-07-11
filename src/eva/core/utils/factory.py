@@ -29,9 +29,9 @@ class Factory(Generic[T]):
                 f"of the following: {registry.entries()}"
             )
 
-        cls = registry.get(name)
-        filtered_kwargs = _filter_kwargs(cls, init_args)
-        instance = cls(**filtered_kwargs)
+        registry_item = registry.get(name)
+        filtered_kwargs = _filter_kwargs(registry_item, init_args)
+        instance = registry_item(**filtered_kwargs)
 
         if not isinstance(instance, expected_type):
             raise TypeError(f"Expected an instance of {expected_type}, but got {type(instance)}.")
@@ -46,15 +46,21 @@ class ModuleFactory(Factory[nn.Module]):
         return super().__new__(cls, registry, name, init_args, nn.Module)
 
 
-def _filter_kwargs(cls: RegistryItem, kwargs: dict) -> Dict[str, Any]:
-    """Filters the given keyword arguments to match the `__init__` signature of a given class.
+def _filter_kwargs(registry_item: RegistryItem, kwargs: dict) -> Dict[str, Any]:
+    """Filters the given keyword arguments to match the signature of a given class or method.
 
     Args:
-        cls: The class whose `__init__` signature should be used for filtering.
+        registry_item: The class or method from the registry whose
+            signature should be used for filtering.
         kwargs: The keyword arguments to filter.
 
     Returns:
         A dictionary containing only the valid keyword arguments that match
-        the class constructor's parameters.
+        the callable's parameters.
     """
-    return {k: v for k, v in kwargs.items() if k in inspect.signature(cls.__init__).parameters}
+    if inspect.isclass(registry_item):
+        signature = inspect.signature(registry_item.__init__)
+    else:
+        signature = inspect.signature(registry_item)
+
+    return {k: v for k, v in kwargs.items() if k in signature.parameters}
