@@ -3133,9 +3133,9 @@
 <p><em>eva</em> contains a model registry that provides the most popular FM backbones that are publicly available and which we list in the Leaderboard.</p>
 <h2 id="loading-models-through-the-python-api">Loading models through the Python API</h2>
 <p>The available models can be listed as follows after installing the <em>eva</em> package:
-<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span> <span class="nn">eva.vision.models.networks.backbones</span> <span class="kn">import</span> <span class="n">BackboneModelRegistry</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span> <span class="nn">eva.vision.models.networks.backbones.registry</span> <span class="kn">import</span> <span class="n">backbone_registry</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">models</span> <span class="o">=</span> <span class="n">BackboneModelRegistry</span><span class="o">.</span><span class="n">list_models</span><span class="p">()</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">models</span> <span class="o">=</span> <span class="n">backbone_registry</span><span class="o">.</span><span class="n">entries</span><span class="p">()</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="nb">print</span><span class="p">(</span><span class="n">models</span><span class="p">)</span>
 </span></code></pre></div></p>
 <p>This should output a list of the model names such as:
@@ -3143,29 +3143,23 @@
 </span></code></pre></div></p>
 <p>A model can then be loaded and instantiated like this:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">import</span> <span class="nn">torch</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="kn">from</span> <span class="nn">eva.vision.models.networks.backbones</span> <span class="kn">import</span> <span class="n">BackboneModelRegistry</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="kn">from</span> <span class="nn">eva.vision.models.networks.backbones.registry</span> <span class="kn">import</span> <span class="n">backbone_registry</span>
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="n">model</span> <span class="o">=</span> <span class="n">BackboneModelRegistry</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    <span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;universal/vit_small_patch16_224_random&quot;</span><span class="p">,</span>
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>     <span class="o">**</span><span class="p">{</span><span class="s2">&quot;out_indices&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">}</span>
-</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="p">)</span>
-</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="n">output</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">224</span><span class="p">,</span> <span class="mi">224</span><span class="p">))</span>
-</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="nb">print</span><span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="c1"># console output:</span>
-</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="c1"># &gt; torch.Size([1, 384])</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="n">model</span> <span class="o">=</span> <span class="n">backbone_registry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;universal/vit_small_patch16_224_random&quot;</span><span class="p">)()</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="n">output</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">224</span><span class="p">,</span> <span class="mi">224</span><span class="p">))</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="nb">print</span><span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="c1"># console output:</span>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="c1"># &gt; torch.Size([1, 384])</span>
 </span></code></pre></div>
 <p>In the above example, we load a vit-s model initialized with random weights. The <code>output</code> tensor corresponds to the CLS embedding which for this backbone is a one dimensional tensor of dimension <code>384</code>.
 For segmentation tasks, we need to access not only the CLS embedding, but entire feature maps. This we can achieve by using the <code>out_indices</code> argument:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">model</span> <span class="o">=</span> <span class="n">BackboneModelRegistry</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;universal/vit_small_patch16_224_random&quot;</span><span class="p">,</span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>     <span class="o">**</span><span class="p">{</span><span class="s2">&quot;out_indices&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">}</span>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="p">)</span>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">224</span><span class="p">,</span> <span class="mi">224</span><span class="p">))</span>
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="k">for</span> <span class="n">output</span> <span class="ow">in</span> <span class="n">outputs</span><span class="p">:</span>
-</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>    <span class="nb">print</span><span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="c1"># console output:</span>
-</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="c1"># &gt; torch.Size([1, 384, 14, 14])</span>
-</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="c1"># &gt; torch.Size([1, 384, 14, 14])</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">model</span> <span class="o">=</span> <span class="n">backbone_registry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;universal/vit_small_patch16_224_random&quot;</span><span class="p">)(</span><span class="n">out_indices</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">224</span><span class="p">,</span> <span class="mi">224</span><span class="p">))</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="k">for</span> <span class="n">output</span> <span class="ow">in</span> <span class="n">outputs</span><span class="p">:</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="nb">print</span><span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="c1"># console output:</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="c1"># &gt; torch.Size([1, 384, 14, 14])</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="c1"># &gt; torch.Size([1, 384, 14, 14])</span>
 </span></code></pre></div>
 <p>The above example returns a <code>list</code> of 4D tensors, each representing the feature map from a different level in the backbone. <code>out_indices=2</code> means that it returns the last two feature maps. This also supports tuples, for instance <code>(-2, -4)</code> returns the penultimate and the forth before the last maps.</p>
 <h2 id="run-evaluations-using-backbones-from-the-registry">Run evaluations using backbones from the registry</h2>
@@ -3177,7 +3171,7 @@ For segmentation tasks, we need to access not only the CLS embedding, but entire
 </span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>    model_kwargs:
 </span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>      out_indices: ${oc.env:OUT_INDICES, 1}
 </span></code></pre></div>
-<p>Note that <code>ModelFromRegistry</code> is a model wrapper class, which loads the models through <code>BackboneModelRegistry</code>.</p>
+<p>Note that <code>ModelFromRegistry</code> is a model wrapper class, which loads the models through <code>backbone_registry</code>.</p>
 <p>By using the <code>MODEL_NAME</code> environment variable, you can run an evaluation with a specific model from the registry, without modifying the default config files:
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nv">MODEL_NAME</span><span class="o">=</span>pathology/kaiko_vits16<span class="w"> </span><span class="se">\</span>
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>eva<span class="w"> </span>predict_fit<span class="w"> </span>--config<span class="w"> </span>configs/vision/pathology/offline/segmentation/consep.yaml
@@ -3189,7 +3183,7 @@ For segmentation tasks, we need to access not only the CLS embedding, but entire
 <p>Implement a Python function that returns your model as a <code>torch.nn.Module</code>. If it's not a native PyTorch model, or if you have made the model already available in public hubs such as torch.hub or huggingface, our <a href="../model_wrappers/">model wrapper</a> classes might come in handy.</p>
 </li>
 <li>
-<p>Add your model function to <code>eva.vision.models.networks.backbones</code> together with a <code>@register_model("your_model_name")</code> decorator. Then add an import statement to the <code>__init__</code> file of the corresponding module.</p>
+<p>Add your model function to <code>eva.vision.models.networks.backbones</code> together with a <code>@backbone_registry.register("your_model_name")</code> decorator. Then add an import statement to the <code>__init__</code> file of the corresponding module.</p>
 </li>
 <li>
 <p>Open a PR 🚀</p>
