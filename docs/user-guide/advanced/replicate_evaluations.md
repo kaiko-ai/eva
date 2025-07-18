@@ -259,6 +259,52 @@ IN_FEATURES=1280 \
 eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
 ```
 
+## Radiology FMs
+
+The following commands can be used to reproduce the results from the radiiology leaderboard. Not that for radiology segmentation tasks, we currently only support online evaluation (`eva fit`). 
+
+### DINO ViT-B16 (ImageNet)
+
+This 2D baseline model, uses a pretrained ViT-B16 backbone with ImageNet weights. To evaluate, run:
+
+```
+MODEL_NAME="universal/vit_base_patch16_224_dino_1chan" \
+IN_FEATURES=768 \
+SCALE_INTENSITY_MIN=-175 \
+SCALE_INTENSITY_MAX=250 \
+eva fit --config configs/vision/radiology/online/<task>.yaml
+```
+
+### VoCo-B [[12]](#references)
+To evaluate VoCo-B (3D radiology FM) developed by the Hong Kong University of Science
+and Technology FM, pretrained on 160K CT volumes (42M slices) and available for download on
+[HuggingFace](https://huggingface.co/Luffy503/VoCo), run:
+
+```
+MODEL_NAME=radiology/voco_b \
+IN_FEATURES=48 \
+SCALE_INTENSITY_MIN=-175 \
+SCALE_INTENSITY_MAX=250 \
+eva fit --config configs/vision/radiology/online/<task>.yaml
+```
+
+
+### VoCo-H [[12]](#references)
+To evaluate VoCo-H (3D radiology FM) developed by the Hong Kong University of Science
+and Technology FM, pretrained on 160K CT volumes (42M slices) and available for download on
+[HuggingFace](https://huggingface.co/Luffy503/VoCo), run:
+
+```
+MODEL_NAME=radiology/voco_h \
+IN_FEATURES=192 \
+SCALE_INTENSITY_MIN=-175 \
+SCALE_INTENSITY_MAX=250 \
+CHANNEL_PROJECTION_DIMS="[48,48,96,192,384,768]" \
+eva fit --config configs/vision/radiology/online/<task>.yaml
+```
+
+Note that the `CHANNEL_PROJECTION_DIMS` argument is used to reduce the number of channels in the produced feature maps through 1x1 convolutions to reduce the number of parameters in the decoder and keep the size comparable to decoders for smaller encoders such as `VoCo-B`. While this reduces the number of parameters significantly, we found that it does not negatively impact the performance.
+
 
 ## References
 
@@ -283,3 +329,5 @@ eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
  [10]: Chen, Richard J., et al. "Towards a general-purpose foundation model for computational pathology." Nature Medicine 30.3 (2024): 850-862.
 
  [11]: Karasikov, Mikhail, et al. "Training state-of-the-art pathology foundation models with orders of magnitude less data" arXiv preprint arXiv:2504.05186850-862.
+
+ [12]: Wu, Linshan, Jiaxin Zhuang, and Hao Chen. "Large-scale 3d medical image pre-training with geometric context priors." arXiv preprint arXiv:2410.09890 (2024).
