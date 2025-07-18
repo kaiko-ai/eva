@@ -129,7 +129,10 @@ data:
                     channel_dim: 1
                 - class_path: eva.vision.data.transforms.Spacing
                   init_args:
-                    pixdim: [1.5, 1.5, 1.5]
+                    pixdim:
+                      - ${oc.env:SPACING_T, 1.5}
+                      - ${oc.env:SPACING_H, 1.5}
+                      - ${oc.env:SPACING_W, 1.5}
                 - class_path: eva.vision.data.transforms.ScaleIntensityRange
                   init_args:
                     input_range:
@@ -174,7 +177,10 @@ data:
                     channel_dim: 1
                 - class_path: eva.vision.data.transforms.Spacing
                   init_args:
-                    pixdim: [1.5, 1.5, 1.5]
+                    pixdim:
+                      - ${oc.env:SPACING_T, 1.5}
+                      - ${oc.env:SPACING_H, 1.5}
+                      - ${oc.env:SPACING_W, 1.5}
                 - class_path: eva.vision.data.transforms.ScaleIntensityRange
                   init_args:
                     input_range:

@@ -13,14 +13,14 @@ from typing import Tuple
 from torch import nn
 
 from eva.vision.models import wrappers
-from eva.vision.models.networks.backbones.registry import register_model
+from eva.vision.models.networks.backbones.registry import backbone_registry
 
 VITS_URL_PREFIX = (
     "https://github.com/lunit-io/benchmark-ssl-pathology/releases/download/pretrained-weights"
 )
 
 
-@register_model("pathology/lunit_vits16")
+@backbone_registry.register("pathology/lunit_vits16")
 def lunit_vits16(
     dynamic_img_size: bool = True, out_indices: int | Tuple[int, ...] | None = None
 ) -> nn.Module:
@@ -44,7 +44,7 @@ def lunit_vits16(
     )
 
 
-@register_model("pathology/lunit_vits8")
+@backbone_registry.register("pathology/lunit_vits8")
 def lunit_vits8(
     dynamic_img_size: bool = True, out_indices: int | Tuple[int, ...] | None = None
 ) -> nn.Module:
