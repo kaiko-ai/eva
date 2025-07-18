@@ -1,3 +1,4 @@
 model,btcv,lits17,msd_task7_pancreas
 voco_b,0.83,0.816,0.734
+voco_h,0.832,0.818,0.725
 vit_base_patch16_224_dino_1chan,0.69,0.677,0.445
