@@ -77,7 +77,7 @@ We use the following evaluation protocol for radiology tasks:
 |--------------------------------|------------------------------|
 | **Backbone**                   | frozen                       |
 | **Decoder**                    | `SwinUNETRDecoder` (1)       |
-| **Training Epochs**            | 500-1000 (task specific)     |
+| **Training Steps**             | 20k-50k (task specific)      |
 | **Batch size**                 | 8 crops from 2 CT scans (2)  |
 | **Base learning rate**         | 0.001                        |
 | **Optimizer**                  | AdamW                        |
@@ -87,6 +87,6 @@ We use the following evaluation protocol for radiology tasks:
 
 After training, the checkpoint with the best validation dice score is selected.
 
-(1) Hatamizadeh, Ali, et al. "Unetr: Transformers for 3d medical image segmentation." Proceedings of the IEEE/CVF winter conference on applications of computer vision. 2022. Note that for 2D baselines we use the same convolutional decoder as for the pathology tasks (see description above).
+(1) Hatamizadeh, Ali, et al. "Unetr: Transformers for 3d medical image segmentation." Proceedings of the IEEE/CVF winter conference on applications of computer vision. 2022. For big encoders such as `VoCo-H` be reduce the number of channels in the produced feature maps through 1x1 convolutions to reduce the number of parameters in the decoder and keep the size comparable to decoders for smaller encoders. For 2D baselines we use the same convolutional decoder as for the pathology tasks (see description above).
 
-(2) The crops are randomly sampled from the CT scans, with the center corresponding to one of the class labels. The size of the crops depends on the backbone.
+(2) We use 8 crops from 2 CT scans, where each crop is randomly sampled from the CT scan. The crops are randomly sampled from the CT scans, with the center corresponding to one of the class labels. The size of the crops depends on the backbone.
