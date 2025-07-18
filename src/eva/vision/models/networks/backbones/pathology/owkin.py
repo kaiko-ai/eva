@@ -5,10 +5,10 @@ from typing import Tuple
 from torch import nn
 
 from eva.vision.models.networks.backbones import _utils
-from eva.vision.models.networks.backbones.registry import register_model
+from eva.vision.models.networks.backbones.registry import backbone_registry
 
 
-@register_model("pathology/owkin_phikon")
+@backbone_registry.register("pathology/owkin_phikon")
 def owkin_phikon(out_indices: int | Tuple[int, ...] | None = None) -> nn.Module:
     """Initializes the phikon pathology FM by owkin (https://huggingface.co/owkin/phikon).
 
@@ -22,7 +22,7 @@ def owkin_phikon(out_indices: int | Tuple[int, ...] | None = None) -> nn.Module:
     return _utils.load_hugingface_model(model_name="owkin/phikon", out_indices=out_indices)
 
 
-@register_model("pathology/owkin_phikon_v2")
+@backbone_registry.register("pathology/owkin_phikon_v2")
 def owkin_phikon_v2(out_indices: int | Tuple[int, ...] | None = None) -> nn.Module:
     """Initializes the phikon-v2 pathology FM by owkin (https://huggingface.co/owkin/phikon-v2).
 

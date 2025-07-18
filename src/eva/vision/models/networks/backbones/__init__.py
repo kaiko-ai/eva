@@ -1,13 +1,12 @@
 """Vision Model Backbones API."""
 
 from eva.vision.models.networks.backbones import pathology, radiology, timm, universal
-from eva.vision.models.networks.backbones.registry import BackboneModelRegistry, register_model
+from eva.vision.models.networks.backbones.registry import backbone_registry
 
 __all__ = [
     "radiology",
     "pathology",
     "timm",
     "universal",
-    "BackboneModelRegistry",
-    "register_model",
+    "backbone_registry",
 ]

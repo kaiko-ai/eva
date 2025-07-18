@@ -5,10 +5,10 @@ from typing import Tuple
 import timm
 from torch import nn
 
-from eva.vision.models.networks.backbones.registry import register_model
+from eva.vision.models.networks.backbones.registry import backbone_registry
 
 
-@register_model("universal/vit_small_patch16_224_random")
+@backbone_registry.register("universal/vit_small_patch16_224_random")
 def vit_small_patch16_224_random(
     dynamic_img_size: bool = True, out_indices: int | Tuple[int, ...] | None = None
 ) -> nn.Module:
@@ -31,7 +31,7 @@ def vit_small_patch16_224_random(
     )
 
 
-@register_model("universal/vit_small_patch16_224_dino")
+@backbone_registry.register("universal/vit_small_patch16_224_dino")
 def vit_small_patch16_224_dino(
     dynamic_img_size: bool = True, out_indices: int | Tuple[int, ...] | None = None
 ) -> nn.Module:
@@ -54,7 +54,7 @@ def vit_small_patch16_224_dino(
     )
 
 
-@register_model("universal/vit_small_patch16_224_dino_1chan")
+@backbone_registry.register("universal/vit_small_patch16_224_dino_1chan")
 def vit_small_patch16_224_dino_1chan(
     dynamic_img_size: bool = True, out_indices: int | Tuple[int, ...] | None = None
 ) -> nn.Module:
@@ -79,7 +79,7 @@ def vit_small_patch16_224_dino_1chan(
     )
 
 
-@register_model("universal/vit_base_patch16_224_dino_1chan")
+@backbone_registry.register("universal/vit_base_patch16_224_dino_1chan")
 def vit_base_patch16_224_dino_1chan(
     dynamic_img_size: bool = True, out_indices: int | Tuple[int, ...] | None = None
 ) -> nn.Module:
