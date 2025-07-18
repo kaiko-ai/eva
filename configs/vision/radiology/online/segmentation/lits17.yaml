@@ -41,10 +41,11 @@ model:
         model_kwargs:
           out_indices: ${oc.env:OUT_INDICES, 6}
     decoder:
-      class_path: eva.vision.models.networks.decoders.segmentation.SwinUNETRDecoder
+      class_path: eva.vision.models.networks.decoders.segmentation.SwinUNETRDecoderWithProjection
       init_args:
         feature_size: ${oc.env:IN_FEATURES, 48}
         out_channels:  &NUM_CLASSES 3
+        project_dims: ${oc.env:CHANNEL_PROJECTION_DIMS, null}
     spatial_dims: 3
     inferer:
       class_path: monai.inferers.SlidingWindowInferer
@@ -125,7 +126,10 @@ data:
                     channel_dim: 1
                 - class_path: eva.vision.data.transforms.Spacing
                   init_args:
-                    pixdim: [1.5, 1.5, 1.5]
+                    pixdim:
+                      - ${oc.env:SPACING_T, 1.5}
+                      - ${oc.env:SPACING_H, 1.5}
+                      - ${oc.env:SPACING_W, 1.5}
                 - class_path: eva.vision.data.transforms.ScaleIntensityRange
                   init_args:
                     input_range:
@@ -170,7 +174,10 @@ data:
                     channel_dim: 1
                 - class_path: eva.vision.data.transforms.Spacing
                   init_args:
-                    pixdim: [1.5, 1.5, 1.5]
+                    pixdim:
+                      - ${oc.env:SPACING_T, 1.5}
+                      - ${oc.env:SPACING_H, 1.5}
+                      - ${oc.env:SPACING_W, 1.5}
                 - class_path: eva.vision.data.transforms.ScaleIntensityRange
                   init_args:
                     input_range:

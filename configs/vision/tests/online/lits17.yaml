@@ -30,10 +30,11 @@ model:
         feature_size: 6
         out_indices: 6
     decoder:
-      class_path: eva.vision.models.networks.decoders.segmentation.SwinUNETRDecoder
+      class_path: eva.vision.models.networks.decoders.segmentation.SwinUNETRDecoderWithProjection
       init_args:
         feature_size: 6
         out_channels:  &NUM_CLASSES 3
+        project_dims: ${oc.env:CHANNEL_PROJECTION_DIMS, null}
     spatial_dims: 3
     inferer:
       class_path: monai.inferers.SlidingWindowInferer
