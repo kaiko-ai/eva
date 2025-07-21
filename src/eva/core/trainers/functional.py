@@ -89,7 +89,7 @@ def run_evaluation(
 
     if "fit" in stages:
         trainer.fit(model, datamodule=datamodule)
-    if "validate" in stages:
+    if "validate" in stages and getattr(datamodule.datasets, "val", None) is not None:
         validation_scores = trainer.validate(
             model=model,
             datamodule=datamodule,
