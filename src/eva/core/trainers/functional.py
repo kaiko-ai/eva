@@ -79,7 +79,9 @@ def run_evaluation(
     """
     if not stages:
         stages = ["fit", "validate", "test"]
-    trainer, datamodule, model = _utils.clone(base_trainer, datamodule, base_model)
+    trainer, datamodule.datasets, model = _utils.clone(
+        base_trainer, datamodule.datasets, base_model
+    )
     model.configure_model()
 
     trainer.init_logger_run(run_id)
