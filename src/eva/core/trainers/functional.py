@@ -47,7 +47,7 @@ def run_evaluation_session(
             stages=stages,
             verbose=not verbose,
         )
-        if validation_scores:
+        if validation_scores or test_scores:
             recorder.update(validation_scores, test_scores)
     recorder.save()
 
