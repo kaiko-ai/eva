@@ -30,7 +30,7 @@ def log_table(
         dataframe: A pandas DataFrame to log.
         step: The global step of the log.
     """
-    utils.raise_not_supported(logger, "image")
+    utils.raise_not_supported(logger, "table")
 
 
 @log_table.register
