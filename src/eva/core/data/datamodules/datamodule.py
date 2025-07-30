@@ -39,6 +39,7 @@ class DataModule(pl.LightningDataModule):
         self.datasets = datasets or self.default_datasets
         self.dataloaders = dataloaders or self.default_dataloaders
         self.samplers = samplers or self.default_samplers
+        self.prepare_data_per_node = True
 
     @property
     def default_datasets(self) -> schemas.DatasetsSchema:
