@@ -51,6 +51,10 @@ class ConfigurationLogger(pl.Callback):
 
         save_as = os.path.join(log_dir, self._save_as)
         fs = cloud_io.get_filesystem(log_dir)
+
+        if not fs.exists(log_dir):
+            fs.makedirs(log_dir)
+
         with fs.open(save_as, "w") as output_file:
             yaml.dump(configuration, output_file, sort_keys=False)
 
