@@ -24,7 +24,7 @@ class RandomSampler(data.RandomSampler, SamplerWithDataSource[int]):
         """Initialize the random sampler.
 
         Args:
-            replacement: Samples are drawn on-demand with replacement if ``True``, default=``False``.
+            replacement: Samples are drawn on-demand with replacement if ``True``, default=``False``
             num_samples: Number of samples to draw, default=``len(dataset)``.
             seed: Optional seed for the random number generator.
         """
