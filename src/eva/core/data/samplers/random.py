@@ -19,7 +19,6 @@ class RandomSampler(data.RandomSampler, SamplerWithDataSource[int]):
         self,
         replacement: bool = False,
         num_samples: Optional[int] = None,
-        generator: Optional[torch.Generator] = None,
         seed: Optional[int] = None,
     ) -> None:
         """Initialize the random sampler.
@@ -27,22 +26,21 @@ class RandomSampler(data.RandomSampler, SamplerWithDataSource[int]):
         Args:
             replacement: Samples are drawn on-demand with replacement if ``True``, default=``False``.
             num_samples: Number of samples to draw, default=``len(dataset)``.
-            generator: Optional torch.Generator used for sampling.
             seed: Optional seed for the random number generator.
         """
         self.replacement = replacement
         self._num_samples = num_samples
-        self.generator = generator or torch.Generator()
-        self.seed = seed
+        self._generator = None
 
-        if self.seed is not None:
-            self.generator.manual_seed(self.seed)
+        if seed is not None:
+            self._generator = torch.Generator()
+            self._generator.manual_seed(seed)
 
     @override
     def set_dataset(self, data_source: datasets.MapDataset) -> None:
         super().__init__(
             data_source,
             replacement=self.replacement,
-            num_samples=self.num_samples,
-            generator=self.generator,
+            num_samples=self._num_samples,
+            generator=self._generator,
         )
