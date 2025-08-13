@@ -13,6 +13,7 @@ class Qwen25VL7BInstruct(wrappers.HuggingFaceModel):
     def __init__(
         self, cache_dir: str | None = None, attn_implementation: str = "flash_attention_2"
     ):
+        """Initialize the model."""
         super().__init__(
             model_name_or_path="Qwen/Qwen2.5-VL-7B-Instruct",
             model_class="Qwen2_5_VLForConditionalGeneration",

@@ -9,6 +9,7 @@ from eva.multimodal.models.typings import TextImageBatch
 
 
 def text_image_collate(batch: List[TextImageSample]) -> TextImageBatch:
+    """Collate function for text-image batches."""
     return TextImageBatch(
         text=[sample.text for sample in batch],
         image=[sample.image for sample in batch],

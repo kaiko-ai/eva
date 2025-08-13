@@ -1,3 +1,5 @@
+"""Image resizing utilities."""
+
 import io
 
 from torchvision import tv_tensors

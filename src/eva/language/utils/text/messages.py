@@ -1,3 +1,5 @@
+"""Message formatting utilities for language models."""
+
 from typing import Any, Dict, List
 
 from eva.language.data.messages import MessageSeries

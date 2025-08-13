@@ -18,11 +18,17 @@ class _Claude(wrappers.LiteLLMModel):
 
 @model_registry.register("anthropic/claude-3-5-sonnet-20240620")
 class Claude35Sonnet20240620(_Claude):
+    """Claude 3.5 Sonnet (June 2024) model."""
+
     def __init__(self):
+        """Initialize the model."""
         super().__init__(model_name="claude-3-5-sonnet-20240620")
 
 
 @model_registry.register("anthropic/claude-3-7-sonnet-20250219")
 class Claude37Sonnet20250219(_Claude):
+    """Claude 3.7 Sonnet (February 2025) model."""
+
     def __init__(self):
+        """Initialize the model."""
         super().__init__(model_name="claude-3-7-sonnet-20250219")

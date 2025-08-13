@@ -17,6 +17,7 @@ class PathoR13b(wrappers.HuggingFaceModel):
         cache_dir: str | None = None,
         attn_implementation: str = "flash_attention_2",
     ):
+        """Initialize the Patho-R1-3B model."""
         if not os.getenv("HF_TOKEN"):
             raise ValueError("HF_TOKEN env variable must be set.")
 

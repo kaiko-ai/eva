@@ -57,9 +57,7 @@ class TextImageDataset(
         """Applies the dataset transforms to the text, image and target.
 
         Args:
-            text: The text content.
-            image: The image tensor.
-            target: The target label.
+            sample: The sample containing text, image, target and metadata.
 
         Returns:
             The transformed sample.

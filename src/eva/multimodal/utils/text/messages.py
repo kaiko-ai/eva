@@ -1,3 +1,5 @@
+"""Message formatting utilities for multimodal models."""
+
 import functools
 from typing import Any, Dict, List
 
@@ -9,7 +11,7 @@ from eva.multimodal.utils import image as image_utils
 
 
 def format_huggingface_message(
-    message: MessageSeries, with_images: bool = False, image_token: str = ""
+    message: MessageSeries, with_images: bool = False, image_token: str | None = None
 ) -> List[Dict[str, Any]]:
     """Formats a message series into a format suitable for Huggingface models."""
     if not with_images:
@@ -26,7 +28,9 @@ def format_huggingface_message(
                     "content": [
                         {
                             "type": "text",
-                            "text": str(item.content).replace("<image>", image_token),
+                            "text": str(item.content).replace(
+                                "<image>", image_token or ""
+                            ),  # TODO: test this
                         },
                         {"type": "image"},
                     ],
@@ -38,6 +42,15 @@ def format_huggingface_message(
 def format_litellm_message(
     message: MessageSeries, image: tv_tensors.Image | None
 ) -> List[Dict[str, Any]]:
+    """Format a message series for LiteLLM API.
+
+    Args:
+        message: The message series to format.
+        image: Optional image to include in the message.
+
+    Returns:
+        A list of formatted message dictionaries.
+    """
     if image is None:
         return language_utils.format_message(message)
 
@@ -52,12 +65,17 @@ def format_litellm_message(
                     "content": [
                         {
                             "type": "text",
-                            "text": str(item.content).replace("<image>", ""),
+                            "text": str(item.content).replace(
+                                "<image>", ""
+                            ),  # TODO: is this necessary?
                         },
                         {
                             "type": "image_url",
                             "image_url": {
-                                "url": f"data:image/png;base64,{image_utils.encode_image(image, encoding='base64')}"
+                                "url": (
+                                    f"data:image/png;base64,"
+                                    f"{image_utils.encode_image(image, encoding='base64')}"
+                                )
                             },
                         },
                     ],
@@ -109,7 +127,7 @@ def batch_insert_system_message(
 
 
 def messages_to_string(messages: List[Dict[str, Any]]) -> str:
-    """Extract string content from a list of message dicts"""
+    """Extract string content from a list of message dicts."""
     return " ".join(
         f"{message['role'].upper()}: "
         + " ".join(

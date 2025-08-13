@@ -1,4 +1,6 @@
-from typing import Any, Dict, Generic, List, Literal, NamedTuple, TypeVar
+"""Type definitions for language models."""
+
+from typing import Any, Dict, Generic, List, NamedTuple, TypeVar
 
 from eva.language.data.messages import MessageSeries
 
@@ -17,7 +19,3 @@ class TextBatch(NamedTuple, Generic[TargetType]):
 
     metadata: Dict[str, Any] | None
     """Additional metadata."""
-
-
-ModelType = Literal["huggingface", "internal", "api"]
-"""The type of model being used."""

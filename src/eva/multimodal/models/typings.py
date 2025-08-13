@@ -1,6 +1,9 @@
-from typing import Any, Dict, Generic, List, NamedTuple, NotRequired, TypedDict, TypeVar
+"""Type definitions for multimodal models."""
+
+from typing import Any, Dict, Generic, List, NamedTuple, TypedDict, TypeVar
 
 from torchvision import tv_tensors
+from typing_extensions import NotRequired
 
 from eva.language.data.messages import MessageSeries
 

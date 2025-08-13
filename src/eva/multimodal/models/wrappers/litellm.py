@@ -1,3 +1,5 @@
+"""LiteLLM Vision-Language Model wrapper."""
+
 import logging
 import os
 from typing import Any, Dict, List
@@ -15,7 +17,7 @@ from litellm.exceptions import (
 from loguru import logger
 from typing_extensions import override
 
-from eva.multimodal.models.typings import ModelType, TextBatch, TextImageBatch, VisionLanguageOutput
+from eva.multimodal.models.typings import TextBatch, TextImageBatch, VisionLanguageOutput
 from eva.multimodal.models.utils.batch import unpack_batch
 from eva.multimodal.models.wrappers import base
 from eva.multimodal.utils.text import messages as message_utils
@@ -32,9 +34,6 @@ RETRYABLE_ERRORS = (
 
 class LiteLLMModel(base.VisionLanguageModel):
     """Lightweight wrapper for LiteLLM models."""
-
-    model_type: ModelType = "api"
-    """API model type."""
 
     def __init__(
         self,

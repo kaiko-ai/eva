@@ -1,3 +1,5 @@
+"""Image encoding utilities."""
+
 import base64
 import io
 from typing import Literal
