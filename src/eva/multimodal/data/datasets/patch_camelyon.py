@@ -65,5 +65,5 @@ class PatchCamelyonVQA(TextImageDataset[str], vision_datasets.PatchCamelyon):
         return self.idx_to_class[target]
 
     @override
-    def load_metadata(self, index: int) -> Dict[str, Any]:
+    def load_metadata(self, index: int) -> Dict[str, Any] | None:
         return vision_datasets.PatchCamelyon.load_metadata(self, index)

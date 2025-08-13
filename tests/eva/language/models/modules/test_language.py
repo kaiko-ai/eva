@@ -1,31 +1,31 @@
-"""Tests the TextModule module."""
+"""Tests the language model module."""
 
 import pytest
 from torch import nn
 
-from eva.language.models import TextModule
+from eva.language.models import LanguageModule
 
 
-def test_forward(text_module, text_model):
-    """Test the forward method of the TextModule class."""
+def test_forward(language_module, text_model):
+    """Test the forward method of the LanguageModule class."""
     input_text = "Hello world"
     expected = text_model(input_text)
-    result = text_module.forward(input_text)
+    result = language_module.forward(input_text)
     assert result == expected
 
 
-def test_validation_step(text_module, text_model):
-    """Test the validation_step method of the TextModule class."""
+def test_validation_step(language_module, text_model):
+    """Test the validation_step method of the LanguageModule class."""
     data = ["What is the capital of France?"]
     targets = ["Paris"]
     metadata = [{"id": 1}]
     batch = (data, targets, metadata)
 
     # The module creates messages list: [str(d) + "\n" + prompt for d in data]
-    expected_messages = [str(data[0]) + "\n" + text_module.prompt]
+    expected_messages = [str(data[0]) + "\n" + language_module.prompt]
     expected_predictions = text_model(expected_messages)
 
-    output = text_module.validation_step(batch)
+    output = language_module.validation_step(batch)
 
     assert "predictions" in output
     assert "targets" in output
@@ -36,9 +36,9 @@ def test_validation_step(text_module, text_model):
 
 
 def test_init_attributes(text_model):
-    """Test the attributes of the TextModule class."""
+    """Test the attributes of the LanguageModule class."""
     prompt = "Initialization Prompt: "
-    module_instance = TextModule(model=text_model, prompt=prompt)
+    module_instance = LanguageModule(model=text_model)
     assert module_instance.model is text_model
     assert module_instance.prompt == prompt
 
@@ -63,7 +63,6 @@ def text_model():
 
 
 @pytest.fixture
-def text_module(text_model):
-    """Return a TextModule instance."""
-    prompt = "Test Prompt: "
-    return TextModule(model=text_model, prompt=prompt)
+def language_module(text_model):
+    """Return a LanguageModule instance."""
+    return LanguageModule(model=text_model)

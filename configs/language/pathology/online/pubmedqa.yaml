@@ -6,16 +6,13 @@ trainer:
     default_root_dir: ${oc.env:OUTPUT_ROOT, logs/${oc.env:MODEL_NAME, anthropic-claude-3-7-sonnet-latest}/pubmedqa}
     checkpoint_type: null
 model:
-  class_path: eva.language.models.TextModule
+  class_path: eva.language.models.LanguageModule
   init_args:
-    prompt: "Instruction: Carefully read the question and the provided context. Answer with one word: 'yes', 'no', or 'maybe'. Answer: "
     model:
-      class_path: eva.language.models.LiteLLMTextModel
+      class_path: eva.language.models.wrappers.ModelFromRegistry
       init_args:
-        model_name_or_path: ${oc.env:MODEL_NAME, anthropic/claude-3-7-sonnet-latest}
-        model_kwargs:
-          temperature: 0.0 # should be strictly positive for HF models
-          # max_new_tokens: 1 # used for HF
+        model_name: ${oc.env:MODEL_NAME, anthropic/claude-3-7-sonnet-20250219}
+        model_extra_kwargs: ${oc.env:MODEL_EXTRA_KWARGS, null}
     metrics:
       common:
         - class_path: eva.metrics.MulticlassClassificationMetrics

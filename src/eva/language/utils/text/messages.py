@@ -8,18 +8,7 @@ from eva.language.data.messages import MessageSeries, SystemMessage
 
 def format_message(message: MessageSeries) -> List[Dict[str, Any]]:
     """Formats a message series into a format following OpenAI's API specification."""
-    return [
-        {
-            "role": item.role,
-            "content": [
-                {
-                    "type": "text",
-                    "text": item.content,
-                }
-            ],
-        }
-        for item in message
-    ]
+    return [{"role": item.role, "content": item.content} for item in message]
 
 
 def combine_system_messages(message: MessageSeries, join_char: str = "\n") -> MessageSeries:

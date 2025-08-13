@@ -8,6 +8,7 @@ import transformers
 from loguru import logger
 from typing_extensions import override
 
+from eva.language.utils.text import messages as language_message_utils
 from eva.multimodal.models.typings import TextImageBatch
 from eva.multimodal.models.wrappers import base
 from eva.multimodal.utils.text import messages as message_utils
@@ -101,10 +102,10 @@ class HuggingFaceModel(base.VisionLanguageModel):
         message_batch, image_batch, _, _ = TextImageBatch(*batch)
         with_images = image_batch is not None
 
-        message_batch = message_utils.batch_insert_system_message(
+        message_batch = language_message_utils.batch_insert_system_message(
             message_batch, self.system_message
         )
-        message_batch = list(map(message_utils.combine_system_messages, message_batch))
+        message_batch = list(map(language_message_utils.combine_system_messages, message_batch))
 
         templated_text = [
             self.processor.apply_chat_template(

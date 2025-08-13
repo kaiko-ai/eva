@@ -121,7 +121,10 @@ class PubMedQA(base.TextClassification):
         sample = dict(self.dataset[index])
         return [
             UserMessage(
-                content=f"Question: {sample['QUESTION']}\nContext: " + " ".join(sample["CONTEXTS"])
+                content=f"Question: {sample['QUESTION']}\nContext: "
+                + " ".join(sample["CONTEXTS"])
+                + "\nInstruction: Carefully read the question and the provided context. "
+                + "Answer with one word: 'yes', 'no', or 'maybe'. Answer: "
             )
         ]
 
