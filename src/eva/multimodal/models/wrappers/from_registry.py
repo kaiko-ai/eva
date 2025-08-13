@@ -1,16 +1,16 @@
 """Vision backbone helper class."""
 
-from typing import Any, Callable, Dict
+from typing import Any, Callable, Dict, List
 
 from typing_extensions import override
 
 from eva.core.models.wrappers import base
 from eva.core.utils import factory
 from eva.multimodal.models.networks.registry import model_registry
-from eva.multimodal.models.typings import TextImageBatch, VisionLanguageOutput
+from eva.multimodal.models.typings import TextImageBatch
 
 
-class ModelFromRegistry(base.BaseModel[TextImageBatch, VisionLanguageOutput]):
+class ModelFromRegistry(base.BaseModel[TextImageBatch, List[str]]):
     """Wrapper class for vision backbone models.
 
     This class can be used by load backbones available in eva's

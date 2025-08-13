@@ -1,6 +1,6 @@
 """Model module for vision-language models."""
 
-from typing import Any
+from typing import Any, List
 
 from lightning.pytorch.utilities.types import STEP_OUTPUT
 from torch import nn
@@ -9,7 +9,7 @@ from typing_extensions import override
 from eva.core.metrics import structs as metrics_lib
 from eva.core.models.modules import module
 from eva.core.models.modules.utils import batch_postprocess
-from eva.multimodal.models.typings import TextImageBatch, VisionLanguageOutput
+from eva.multimodal.models.typings import TextImageBatch
 
 
 class VisionLanguageModule(module.ModelModule):
@@ -33,7 +33,7 @@ class VisionLanguageModule(module.ModelModule):
         self.model = model
 
     @override
-    def forward(self, batch: TextImageBatch, *args: Any, **kwargs: Any) -> VisionLanguageOutput:
+    def forward(self, batch: TextImageBatch, *args: Any, **kwargs: Any) -> List[str]:
         return self.model(batch)
 
     @override
@@ -49,7 +49,7 @@ class VisionLanguageModule(module.ModelModule):
         predictions = self.forward(batch)
         return {
             "inputs": text,
-            "predictions": predictions["output"],
+            "predictions": predictions,
             "targets": targets,
             "metadata": metadata,
         }

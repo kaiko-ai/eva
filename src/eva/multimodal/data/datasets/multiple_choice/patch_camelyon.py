@@ -11,7 +11,7 @@ from eva.multimodal.data.datasets.text_image import TextImageDataset
 from eva.vision.data import datasets as vision_datasets
 
 
-class PatchCamelyonVQA(TextImageDataset[str], vision_datasets.PatchCamelyon):
+class PatchCamelyon(TextImageDataset[str], vision_datasets.PatchCamelyon):
     """PatchCamelyon image classification using a multiple choice text prompt."""
 
     _default_prompt = (

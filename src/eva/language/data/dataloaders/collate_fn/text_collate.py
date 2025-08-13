@@ -5,7 +5,7 @@ from typing import Dict, List, Tuple
 import torch
 
 
-def text_collate_fn(
+def text_collate(
     batch: List[Tuple[str, torch.Tensor, Dict]],
 ) -> Tuple[List[str], torch.Tensor, List[Dict]]:
     """Collate function for text data that keeps texts as separate strings.

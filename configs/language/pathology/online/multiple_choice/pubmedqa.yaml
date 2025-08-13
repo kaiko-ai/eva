@@ -41,4 +41,4 @@ data:
         batch_size: &BATCH_SIZE ${oc.env:BATCH_SIZE, 16}
         num_workers: &N_DATA_WORKERS ${oc.env:N_DATA_WORKERS, 1}
         shuffle: false
-        collate_fn: eva.core.data.dataloaders.text_collate_fn
+        collate_fn: eva.language.data.dataloaders.text_collate

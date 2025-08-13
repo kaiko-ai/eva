@@ -1,9 +1,9 @@
 """Type definitions for multimodal models."""
 
-from typing import Any, Dict, Generic, List, TypedDict, TypeVar
+from typing import Any, Dict, Generic, List, TypeVar
 
 from torchvision import tv_tensors
-from typing_extensions import NamedTuple, NotRequired
+from typing_extensions import NamedTuple
 
 from eva.language.data.messages import MessageSeries
 
@@ -24,20 +24,4 @@ class TextImageBatch(NamedTuple, Generic[TargetType]):
     """Target data."""
 
     metadata: Dict[str, Any] | None
-    """Additional metadata."""
-
-
-class VisionLanguageOutput(TypedDict):
-    """Output data schema for vision-language models."""
-
-    output: List[str]
-    """Generated text outputs."""
-
-    processed_input: List[Any]
-    """Inputs after preprocessing."""
-
-    raw_input: NotRequired[List[str]]
-    """Original inputs without processing."""
-
-    metadata: NotRequired[Dict[str, Any]]
     """Additional metadata."""
