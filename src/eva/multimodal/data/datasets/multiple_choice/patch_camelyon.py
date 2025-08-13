@@ -11,13 +11,16 @@ from eva.multimodal.data.datasets.text_image import TextImageDataset
 from eva.vision.data import datasets as vision_datasets
 
 
-class PatchCamelyon(TextImageDataset[str], vision_datasets.PatchCamelyon):
+class PatchCamelyon(TextImageDataset[int], vision_datasets.PatchCamelyon):
     """PatchCamelyon image classification using a multiple choice text prompt."""
 
     _default_prompt = (
-        "You are a pathology expert helping pathologists to analyze images of tissue samples. "
-        "Does this image show metastatic breast tissue? Answer with a single letter A: no, B: yes "
-        "Please always provide an answer, even if you are not sure. Answer: "
+        "You are a pathology expert helping pathologists to analyze images of tissue samples.\n"
+        "Question: Does this image show metastatic breast tissue?\n"
+        "Options: A: no, B: yes\n"
+        "Only answer with a single letter without further explanation. "
+        "Please always provide an answer, even if you are not sure.\n"
+        "Answer: "
     )
 
     def __init__(
@@ -27,6 +30,7 @@ class PatchCamelyon(TextImageDataset[str], vision_datasets.PatchCamelyon):
         download: bool = False,
         transforms: TransformsSchema | None = None,
         prompt: str | None = None,
+        max_samples: int | None = None,
     ) -> None:
         """Initializes the dataset.
 
@@ -40,16 +44,24 @@ class PatchCamelyon(TextImageDataset[str], vision_datasets.PatchCamelyon):
             transforms: A function/transform which returns a transformed
                 version of the raw data samples.
             prompt: The text prompt to use for classification (multple choice).
+            max_samples: Maximum number of samples to use. If None, use all samples.
         """
         super().__init__(root=root, split=split, download=download, transforms=transforms)
 
+        self.max_samples = max_samples
         self.prompt = prompt or self._default_prompt
-        self.idx_to_class = {i: c for c, i in self.class_to_idx.items()}
+
+        if self.max_samples is not None:
+            self._expected_length = {split: max_samples}
 
     @property
     @override
     def class_to_idx(self) -> Dict[str, int]:
         return {"A": 0, "B": 1}
+
+    @override
+    def __len__(self) -> int:
+        return self.max_samples or self._fetch_dataset_length()
 
     @override
     def load_text(self, index: int) -> MessageSeries:
@@ -60,9 +72,8 @@ class PatchCamelyon(TextImageDataset[str], vision_datasets.PatchCamelyon):
         return vision_datasets.PatchCamelyon.load_data(self, index)
 
     @override
-    def load_target(self, index: int) -> str:
-        target = int(vision_datasets.PatchCamelyon.load_target(self, index).item())
-        return self.idx_to_class[target]
+    def load_target(self, index: int) -> int:
+        return int(vision_datasets.PatchCamelyon.load_target(self, index).item())
 
     @override
     def load_metadata(self, index: int) -> Dict[str, Any] | None:

@@ -37,7 +37,7 @@ class LiteLLMModel(base.LanguageModel):
         model_name: str,
         model_kwargs: Dict[str, Any] | None = None,
         system_prompt: str | None = None,
-        log_level: int | None = logging.WARNING,
+        log_level: int | None = logging.INFO,
     ):
         """Initialize the LiteLLM Wrapper.
 

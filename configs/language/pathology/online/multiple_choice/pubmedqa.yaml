@@ -22,6 +22,9 @@ model:
     postprocess:
       predictions_transforms:
         - class_path: eva.language.utils.str_to_int_tensor.CastStrToIntTensor
+          init_args:
+            mapping: {"no": 0, "yes": 1, "maybe": 2}
+            case_sensitive: false
 data:
   class_path: eva.DataModule
   init_args:
