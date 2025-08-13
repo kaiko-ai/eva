@@ -15,7 +15,7 @@ except ImportError as e:
         "vLLM must be installed manually as it requires CUDA and is not included in dependencies. "
         "Install with: pip install vllm "
         "Note: vLLM requires Linux with CUDA support for optimal performance. "
-        "For alternatives, consider using HuggingFaceTextModel or LiteLLMTextModel."
+        "For alternatives, consider using HuggingFaceTextModel or LiteLLMModel."
     ) from e
 
 from eva.core.models.wrappers import base

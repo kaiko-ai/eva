@@ -2,7 +2,7 @@
 
 import pytest
 
-from eva.language.models import LiteLLMTextModel
+from eva.language.models import LiteLLMModel
 
 DUMMY_RESPONSE = {"choices": [{"message": {"content": "Test response"}}]}
 
@@ -31,9 +31,9 @@ def fake_completion(monkeypatch):
 
 @pytest.fixture
 def model_instance(fake_completion):  # noqa: ARG001
-    """Fixture to instantiate the LiteLLMTextModel with a valid model name.
+    """Fixture to instantiate the LiteLLMModel with a valid model name.
 
     Using a valid model name (like 'openai/gpt-3.5-turbo') helps pass provider lookup.
     fake_completion dependency ensures mocking is set up before model creation.
     """
-    return LiteLLMTextModel("openai/gpt-3.5-turbo", model_kwargs={"temperature": 0.7})
+    return LiteLLMModel("openai/gpt-3.5-turbo", model_kwargs={"temperature": 0.7})

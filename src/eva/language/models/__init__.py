@@ -1,8 +1,8 @@
 """Language Models API."""
 
-from eva.language.models import modules, wrappers
-from eva.language.models.modules import TextModule
-from eva.language.models.wrappers import HuggingFaceTextModel, LiteLLMTextModel
+from eva.language.models import modules, networks, wrappers
+from eva.language.models.modules import LanguageModule
+from eva.language.models.wrappers import HuggingFaceTextModel, LiteLLMModel
 
 try:
     from eva.language.models.wrappers import VLLMTextModel
@@ -10,16 +10,18 @@ try:
     __all__ = [
         "modules",
         "wrappers",
-        "TextModule",
+        "networks",
         "HuggingFaceTextModel",
-        "LiteLLMTextModel",
+        "LiteLLMModel",
         "VLLMTextModel",
+        "LanguageModule",
     ]
 except ImportError:
     __all__ = [
         "modules",
         "wrappers",
-        "TextModule",
+        "networks",
         "HuggingFaceTextModel",
-        "LiteLLMTextModel",
+        "LiteLLMModel",
+        "LanguageModule",
     ]

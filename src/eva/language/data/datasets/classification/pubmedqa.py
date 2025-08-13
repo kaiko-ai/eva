@@ -10,6 +10,7 @@ from loguru import logger
 from typing_extensions import override
 
 from eva.language.data.datasets.classification import base
+from eva.language.data.messages import MessageSeries, UserMessage
 
 
 class PubMedQA(base.TextClassification):
@@ -114,11 +115,18 @@ class PubMedQA(base.TextClassification):
         return {"no": 0, "yes": 1, "maybe": 2}
 
     @override
-    def load_text(self, index: int) -> str:
+    def load_text(self, index: int) -> MessageSeries:
         if index < 0 or index >= len(self.dataset):
             raise IndexError(f"Index {index} out of range for dataset of size {len(self.dataset)}")
         sample = dict(self.dataset[index])
-        return f"Question: {sample['QUESTION']}\nContext: " + " ".join(sample["CONTEXTS"])
+        return [
+            UserMessage(
+                content=f"Question: {sample['QUESTION']}\nContext: "
+                + " ".join(sample["CONTEXTS"])
+                + "\nInstruction: Carefully read the question and the provided context. "
+                + "Answer with one word: 'yes', 'no', or 'maybe'. Answer: "
+            )
+        ]
 
     @override
     def load_target(self, index: int) -> torch.Tensor:
