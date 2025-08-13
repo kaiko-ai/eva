@@ -6,6 +6,7 @@ from torchvision import tv_tensors
 
 from eva.language import utils as language_utils
 from eva.language.data.messages import MessageSeries
+from eva.multimodal.data.datasets import constants
 from eva.multimodal.utils import image as image_utils
 
 
@@ -28,8 +29,8 @@ def format_huggingface_message(
                         {
                             "type": "text",
                             "text": str(item.content).replace(
-                                "<image>", image_token or ""
-                            ),  # TODO: test this
+                                constants.IMAGE_TOKEN_PLACEHOLDER, image_token or ""
+                            ),
                         },
                         {"type": "image"},
                     ],
@@ -65,8 +66,8 @@ def format_litellm_message(
                         {
                             "type": "text",
                             "text": str(item.content).replace(
-                                "<image>", ""
-                            ),  # TODO: is this necessary?
+                                constants.IMAGE_TOKEN_PLACEHOLDER, ""
+                            ),
                         },
                         {
                             "type": "image_url",

@@ -6,6 +6,7 @@ from torchvision import tv_tensors
 from typing_extensions import override
 
 from eva.language.data.messages import MessageSeries, UserMessage
+from eva.multimodal.data.datasets.constants import IMAGE_TOKEN_PLACEHOLDER
 from eva.multimodal.data.datasets.schemas import TransformsSchema
 from eva.multimodal.data.datasets.text_image import TextImageDataset
 from eva.vision.data import datasets as vision_datasets
@@ -16,7 +17,7 @@ class PatchCamelyon(TextImageDataset[int], vision_datasets.PatchCamelyon):
 
     _default_prompt = (
         "You are a pathology expert helping pathologists to analyze images of tissue samples.\n"
-        "Question: Does this image show metastatic breast tissue?\n"
+        f"Question: Does this image show metastatic breast tissue? {IMAGE_TOKEN_PLACEHOLDER}\n"
         "Options: A: no, B: yes\n"
         "Only answer with a single letter without further explanation. "
         "Please always provide an answer, even if you are not sure.\n"
