@@ -4,17 +4,18 @@ import pytest
 from torch import nn
 
 from eva.language.models import LanguageModule
+from eva.language.models.typings import TextBatch
 
 
-def test_forward(language_module, text_model):
+def test_forward(language_module):
     """Test the forward method of the LanguageModule class."""
-    input_text = "Hello world"
-    expected = text_model(input_text)
+    input_text = ["Hello world"]
+    expected = ["Dummy response Nr. 0"]
     result = language_module.forward(input_text)
     assert result == expected
 
 
-def test_validation_step(language_module, text_model):
+def test_validation_step(language_module, model):
     """Test the validation_step method of the LanguageModule class."""
     data = ["What is the capital of France?"]
     targets = ["Paris"]
@@ -22,8 +23,8 @@ def test_validation_step(language_module, text_model):
     batch = (data, targets, metadata)
 
     # The module creates messages list: [str(d) + "\n" + prompt for d in data]
-    expected_messages = [str(data[0]) + "\n" + language_module.prompt]
-    expected_predictions = text_model(expected_messages)
+    expected_messages = [f"Dummy response Nr. {i}" for i in range(len(batch))]
+    expected_predictions = model(expected_messages)
 
     output = language_module.validation_step(batch)
 
@@ -35,34 +36,27 @@ def test_validation_step(language_module, text_model):
     assert output["metadata"] == metadata
 
 
-def test_init_attributes(text_model):
+def test_init_attributes(model):
     """Test the attributes of the LanguageModule class."""
-    prompt = "Initialization Prompt: "
-    module_instance = LanguageModule(model=text_model)
-    assert module_instance.model is text_model
-    assert module_instance.prompt == prompt
+    module_instance = LanguageModule(model=model)
+    assert module_instance.model is model
 
 
-class TextModel(nn.Module):
+class DummyModel(nn.Module):
     """A simple text model for testing purposes."""
 
-    def forward(self, prompts):
+    def forward(self, batch: TextBatch) -> list[str]:
         """Generate some text based on the input prompt."""
-        if isinstance(prompts, str):
-            return [f"Generated: {prompts}"]
-        elif isinstance(prompts, list):
-            return [f"Generated: {prompt}" for prompt in prompts]
-        else:
-            return [f"Generated: {str(prompts)}"]
+        return [f"Dummy response Nr. {i}" for i in range(len(batch))]
 
 
 @pytest.fixture
-def text_model():
-    """Return a TextModel instance."""
-    return TextModel()
+def model():
+    """Return a dummy model instance."""
+    return DummyModel()
 
 
 @pytest.fixture
-def language_module(text_model):
+def language_module(model):
     """Return a LanguageModule instance."""
-    return LanguageModule(model=text_model)
+    return LanguageModule(model=model)
