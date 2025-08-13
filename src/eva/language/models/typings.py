@@ -1,6 +1,8 @@
 """Type definitions for language models."""
 
-from typing import Any, Dict, Generic, List, NamedTuple, TypeVar
+from typing import Any, Dict, Generic, List, TypeVar
+
+from typing_extensions import NamedTuple
 
 from eva.language.data.messages import MessageSeries
 

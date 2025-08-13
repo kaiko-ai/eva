@@ -1,8 +1,9 @@
 """Typings for multimodal datasets."""
 
-from typing import Any, Generic, NamedTuple, TypeVar
+from typing import Any, Generic, TypeVar
 
 from torchvision import tv_tensors
+from typing_extensions import NamedTuple
 
 from eva.language.data.messages import MessageSeries
 

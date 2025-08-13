@@ -2,7 +2,7 @@
 
 from eva.language.models import modules, wrappers
 from eva.language.models.modules import TextModule
-from eva.language.models.wrappers import HuggingFaceTextModel, LiteLLMTextModel
+from eva.language.models.wrappers import HuggingFaceTextModel, LiteLLMModel
 
 try:
     from eva.language.models.wrappers import VLLMTextModel
@@ -12,7 +12,7 @@ try:
         "wrappers",
         "TextModule",
         "HuggingFaceTextModel",
-        "LiteLLMTextModel",
+        "LiteLLMModel",
         "VLLMTextModel",
     ]
 except ImportError:
@@ -21,5 +21,5 @@ except ImportError:
         "wrappers",
         "TextModule",
         "HuggingFaceTextModel",
-        "LiteLLMTextModel",
+        "LiteLLMModel",
     ]
