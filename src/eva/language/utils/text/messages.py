@@ -30,9 +30,23 @@ def combine_system_messages(message: MessageSeries, join_char: str = "\n") -> Me
     if len(system_messages) == 0:
         return message
 
-    combined_content = join_char.join(item.content for item in system_messages)
     non_system_messages = list(filter(lambda item: item.role != "system", message))
-    return [SystemMessage(content=combined_content)] + non_system_messages
+    return [
+        SystemMessage(content=merge_message_contents(system_messages, join_char=join_char))
+    ] + non_system_messages
+
+
+def merge_message_contents(message: MessageSeries, join_char: str = "\n") -> str:
+    """Merges the all contents within a message series into a string.
+
+    Args:
+        message: The message series to combine.
+        join_char: The character to use to join the message contents. Default is newline.
+
+    Returns:
+        A string containing the combined message contents.
+    """
+    return join_char.join(item.content for item in message)
 
 
 def insert_system_message(

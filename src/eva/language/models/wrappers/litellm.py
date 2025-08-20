@@ -60,7 +60,21 @@ class LiteLLMModel(base.LanguageModel):
 
     @override
     def format_inputs(self, batch: TextBatch) -> List[List[Dict[str, Any]]]:
-        """Format inputs for LiteLLM processor with byte-encoded images in the prompt."""
+        """Formats inputs for LiteLLM.
+
+        Args:
+            batch: A batch of text inputs.
+
+        Returns:
+            A list of messages in the following format:
+            [
+                {
+                    "role": ...
+                    "content": ...
+                },
+                ...
+            ]
+        """
         message_batch, _, _ = TextBatch(*batch)
 
         message_batch = message_utils.batch_insert_system_message(
@@ -70,6 +84,7 @@ class LiteLLMModel(base.LanguageModel):
 
         return list(map(message_utils.format_message, message_batch))
 
+    @override
     @backoff.on_exception(
         backoff.expo,
         RETRYABLE_ERRORS,
@@ -80,7 +95,7 @@ class LiteLLMModel(base.LanguageModel):
         ),
     )
     def model_forward(self, batch: List[List[Dict[str, Any]]]) -> List[str]:
-        """API model calls for text generation."""
+        """Generates output text through API calls via LiteLLM's batch completion functionality."""
         outputs = batch_completion(model=self.model_name, messages=batch, **self.model_kwargs)
         self._raise_exceptions(outputs)
 

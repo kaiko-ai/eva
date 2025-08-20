@@ -2,6 +2,7 @@
 
 from typing import Any, Callable, Dict, List
 
+from torch import nn
 from typing_extensions import override
 
 from eva.core.models.wrappers import base
@@ -40,14 +41,14 @@ class ModelFromRegistry(base.BaseModel[TextBatch, List[str]]):
         self._model_kwargs = model_kwargs or {}
         self._model_extra_kwargs = model_extra_kwargs or {}
 
-        self.load_model()
+        self.model = self.load_model()
 
     @override
-    def load_model(self) -> None:
-        self._model = factory.ModuleFactory(
+    def load_model(self) -> nn.Module:
+        ModelFromRegistry.__name__ = self._model_name
+
+        return factory.ModuleFactory(
             registry=model_registry,
             name=self._model_name,
             init_args=self._model_kwargs | self._model_extra_kwargs,
         )
-
-        ModelFromRegistry.__name__ = self._model_name

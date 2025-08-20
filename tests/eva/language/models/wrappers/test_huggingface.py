@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from eva.language.models import HuggingFaceTextModel
+from eva.language.models import HuggingFaceModel
 
 
 @pytest.mark.parametrize(
@@ -46,7 +46,7 @@ def test_real_small_hf_model_generation(
         ]
 
     with patch("eva.language.models.wrappers.huggingface.pipeline", return_value=mock_pipeline):
-        model = HuggingFaceTextModel(
+        model = HuggingFaceModel(
             model_name_or_path=model_name_or_path,
             task="text-generation",
             generation_kwargs=generate_kwargs,
