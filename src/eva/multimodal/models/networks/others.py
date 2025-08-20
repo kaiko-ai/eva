@@ -4,6 +4,7 @@ import os
 
 import torch
 
+from eva.core.utils import requirements
 from eva.multimodal.models import wrappers
 from eva.multimodal.models.networks.registry import model_registry
 
@@ -18,6 +19,8 @@ class PathoR13b(wrappers.HuggingFaceModel):
         attn_implementation: str = "flash_attention_2",
     ):
         """Initialize the Patho-R1-3B model."""
+        requirements.check_dependencies(requirements={"torch": "2.5.1", "torchvision": "0.20.1"})
+
         if not os.getenv("HF_TOKEN"):
             raise ValueError("HF_TOKEN env variable must be set.")
 
