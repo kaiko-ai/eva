@@ -43,9 +43,10 @@ data:
           # (see: https://choosealicense.com/licenses/cc0-1.0/)
           transforms:
             image:
-              class_path: torchvision.transforms.v2.Resize # TODO: use new Resize transform
+              class_path: eva.vision.data.transforms.Resize
               init_args:
-                size: ${oc.env:RESIZE_DIM, 96}
+                size: ${oc.env:RESIZE_DIM, null}
+                max_bytes: ${oc.env:IMAGE_MAX_BYTES, null}
           max_samples: 500
       test:
         class_path: eva.multimodal.data.datasets.PatchCamelyon

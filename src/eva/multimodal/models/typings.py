@@ -20,7 +20,7 @@ class TextImageBatch(NamedTuple, Generic[TargetType]):
     image: List[tv_tensors.Image]
     """Image tensor."""
 
-    target: List[TargetType | None]
+    target: TargetType | None
     """Target data."""
 
     metadata: Dict[str, Any] | None

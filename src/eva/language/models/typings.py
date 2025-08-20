@@ -16,7 +16,7 @@ class TextBatch(NamedTuple, Generic[TargetType]):
     text: List[MessageSeries]
     """Text content."""
 
-    target: List[TargetType | None]
+    target: TargetType | None
     """Target data."""
 
     metadata: Dict[str, Any] | None

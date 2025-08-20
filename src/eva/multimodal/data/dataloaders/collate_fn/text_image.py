@@ -1,6 +1,6 @@
-"""Data loader collator functions for the LLM multimodal data."""
+"""Collate functions for text-image data."""
 
-from typing import Any, List, cast
+from typing import List
 
 from torch.utils.data._utils.collate import default_collate
 
@@ -10,8 +10,7 @@ from eva.multimodal.models.typings import TextImageBatch
 
 def text_image_collate(batch: List[TextImageSample]) -> TextImageBatch:
     """Collate function for text-image batches."""
-    targets = [sample.target for sample in batch]
-    collated_targets = cast(List[Any], default_collate(targets))
+    texts, images, targets, metadata = zip(*batch, strict=False)
 
     first_sample = batch[0]
     metadata = None
@@ -22,8 +21,8 @@ def text_image_collate(batch: List[TextImageSample]) -> TextImageBatch:
         }
 
     return TextImageBatch(
-        text=[sample.text for sample in batch],
-        image=[sample.image for sample in batch],
-        target=collated_targets,
+        text=list(texts),
+        image=list(images),
+        target=default_collate(targets) if targets[0] is not None else None,
         metadata=metadata,
     )
