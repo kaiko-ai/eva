@@ -83,9 +83,9 @@ class HuggingFaceModel(base.VisionLanguageModel):
         )
         message_batch = list(map(language_message_utils.combine_system_messages, message_batch))
 
-        if self.processor.chat_template is not None:
+        if self.processor.chat_template is not None:  # type: ignore
             templated_text = [
-                self.processor.apply_chat_template(
+                self.processor.apply_chat_template(  # type: ignore
                     message,
                     add_generation_prompt=True,
                     tokenize=False,
@@ -111,7 +111,7 @@ class HuggingFaceModel(base.VisionLanguageModel):
         if with_images:
             processor_inputs["image"] = [[image] for image in image_batch]
 
-        return self.processor(**processor_inputs).to(self.model.device)
+        return self.processor(**processor_inputs).to(self.model.device)  # type: ignore
 
     @override
     def model_forward(self, batch: Dict[str, torch.Tensor]) -> List[str]:
@@ -125,7 +125,7 @@ class HuggingFaceModel(base.VisionLanguageModel):
         Returns:
             A dictionary containing the processed input and the model's output.
         """
-        output = self.model.generate(**batch, **self.generation_kwargs)
+        output = self.model.generate(**batch, **self.generation_kwargs)  # type: ignore
         return self._decode_output(output, batch["input_ids"].shape[-1])
 
     @override
@@ -142,7 +142,12 @@ class HuggingFaceModel(base.VisionLanguageModel):
         else:
             raise ValueError(f"Model class {self.base_model_class} not found in transformers")
 
-        return model_class.from_pretrained(self.model_name_or_path, **self.model_kwargs)
+        model = model_class.from_pretrained(self.model_name_or_path, **self.model_kwargs)
+
+        if not hasattr(model, "generate"):
+            raise ValueError(f"Model {self.model_name_or_path} does not support generation. ")
+
+        return model
 
     def load_processor(self) -> Callable:
         """Initialize the processor."""
@@ -166,4 +171,4 @@ class HuggingFaceModel(base.VisionLanguageModel):
         Returns:
             A list of decoded text responses.
         """
-        return self.processor.batch_decode(output[:, instruction_length:], skip_special_tokens=True)
+        return self.processor.batch_decode(output[:, instruction_length:], skip_special_tokens=True)  # type: ignore

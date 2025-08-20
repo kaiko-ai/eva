@@ -82,7 +82,7 @@ class TorchHubModel(base.BaseModel[torch.Tensor, torch.Tensor]):
                 )
 
             return list(
-                self.model.get_intermediate_layers(
+                self.model.get_intermediate_layers(  # type: ignore
                     tensor,
                     self._out_indices,
                     reshape=True,
