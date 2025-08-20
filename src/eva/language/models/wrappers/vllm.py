@@ -1,6 +1,6 @@
 """LLM wrapper for vLLM models."""
 
-from typing import Any, Dict, List, Sequence
+from typing import Any, Dict, List
 
 from loguru import logger
 from typing_extensions import override
@@ -11,17 +11,20 @@ try:
     from vllm.transformers_utils.tokenizer import AnyTokenizer  # type: ignore
 except ImportError as e:
     raise ImportError(
-        "vLLM is required for VLLMTextModel but not installed. "
+        "vLLM is required for VllmModel but not installed. "
         "vLLM must be installed manually as it requires CUDA and is not included in dependencies. "
         "Install with: pip install vllm "
         "Note: vLLM requires Linux with CUDA support for optimal performance. "
         "For alternatives, consider using HuggingFaceModel or LiteLLMModel."
     ) from e
 
-from eva.core.models.wrappers import base
+from eva.language.data.messages import MessageSeries
+from eva.language.models.typings import TextBatch
+from eva.language.models.wrappers import base
+from eva.language.utils.text import messages as message_utils
 
 
-class VLLMTextModel(base.BaseModel):
+class VllmModel(base.LanguageModel):
     """Wrapper class for using vLLM for text generation.
 
     This wrapper loads a vLLM model, sets up the tokenizer and sampling
@@ -34,6 +37,7 @@ class VLLMTextModel(base.BaseModel):
         self,
         model_name_or_path: str,
         model_kwargs: Dict[str, Any] | None = None,
+        system_prompt: str | None = None,
         generation_kwargs: Dict[str, Any] | None = None,
     ) -> None:
         """Initializes the vLLM model wrapper.
@@ -44,12 +48,13 @@ class VLLMTextModel(base.BaseModel):
             model_kwargs: Arguments required to initialize the vLLM model,
                 see [link](https://github.com/vllm-project/vllm/blob/main/vllm/entrypoints/llm.py)
                 for more information.
+            system_prompt: System prompt to use.
             generation_kwargs: Arguments required to generate the output,
                 need to align with the arguments of
                 [vllm.SamplingParams](https://github.com/vllm-project/vllm/blob/main/vllm/sampling_params.py).
 
         """
-        super().__init__()
+        super().__init__(system_prompt=system_prompt)
         self._model_name_or_path = model_name_or_path
         self._model_kwargs = model_kwargs or {}
         self._generation_kwargs = generation_kwargs or {}
@@ -71,11 +76,11 @@ class VLLMTextModel(base.BaseModel):
             raise RuntimeError("Model not initialized")
         self._llm_tokenizer = self._llm_model.get_tokenizer()
 
-    def _apply_chat_template(self, prompts: Sequence[str]) -> list[TokensPrompt]:
+    def _encode_messages(self, messages: List[MessageSeries]) -> List[TokensPrompt]:
         """Apply chat template to the messages.
 
         Args:
-            prompts: List of raw user strings.
+            messages: List of raw user strings.
 
         Returns:
             List of encoded messages.
@@ -90,7 +95,11 @@ class VLLMTextModel(base.BaseModel):
         if not hasattr(self._llm_tokenizer, "chat_template"):
             raise ValueError("Tokenizer does not have a chat template.")
 
-        chat_messages = [[{"role": "user", "content": p}] for p in prompts]
+        chat_messages = [
+            [{"role": m.role, "content": m.content}]
+            for message_series in messages
+            for m in message_series
+        ]
         encoded_messages = self._llm_tokenizer.apply_chat_template(
             chat_messages,  # type: ignore
             tokenize=True,
@@ -131,11 +140,30 @@ class VLLMTextModel(base.BaseModel):
 
         return result
 
-    def generate(self, prompts: List[str]) -> List[str]:
+    @override
+    def format_inputs(self, batch: TextBatch) -> List[TokensPrompt]:
+        """Formats inputs for vLLM models.
+
+        Args:
+            batch: A batch of text and image inputs.
+
+        Returns:
+            List of formatted prompts.
+        """
+        message_batch, _, _ = TextBatch(*batch)
+        message_batch = message_utils.batch_insert_system_message(
+            message_batch, self.system_message
+        )
+        message_batch = list(map(message_utils.combine_system_messages, message_batch))
+
+        return self._encode_messages(message_batch)
+
+    @override
+    def model_forward(self, batch: List[TokensPrompt]) -> List[str]:
         """Generates text for the given prompt using the vLLM model.
 
         Args:
-            prompts: A list of string prompts for generation.
+            batch: A list encoded / tokenized messages (TokensPrompt objects).
 
         Returns:
             The generated text response.
@@ -144,6 +172,5 @@ class VLLMTextModel(base.BaseModel):
         if self._llm_model is None:
             raise RuntimeError("Model not initialized")
 
-        prompt_tokens = self._apply_chat_template(prompts)
-        outputs = self._llm_model.generate(prompt_tokens, SamplingParams(**self._generation_kwargs))
+        outputs = self._llm_model.generate(batch, SamplingParams(**self._generation_kwargs))
         return [output.outputs[0].text for output in outputs]

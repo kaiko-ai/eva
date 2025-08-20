@@ -5,7 +5,7 @@ from eva.language.models.modules import LanguageModule
 from eva.language.models.wrappers import HuggingFaceModel, LiteLLMModel
 
 try:
-    from eva.language.models.wrappers import VLLMTextModel
+    from eva.language.models.wrappers import VllmModel
 
     __all__ = [
         "modules",
@@ -13,7 +13,7 @@ try:
         "networks",
         "HuggingFaceModel",
         "LiteLLMModel",
-        "VLLMTextModel",
+        "VllmModel",
         "LanguageModule",
     ]
 except ImportError:
