@@ -48,10 +48,10 @@ First, update the config to use the HuggingFace wrapper:
 
 ```yaml
 model:
-  class_path: eva.language.models.TextModule
+  class_path: eva.language.models.LanguageModule
   init_args:
     model:
-      class_path: eva.language.models.HuggingFaceTextModel
+      class_path: eva.language.models.HuggingFaceModel
       init_args:
         model_name_or_path: meta-llama/Llama-3.2-1B-Instruct
 ```
@@ -77,10 +77,10 @@ For larger models that require specialized infrastructure, you'll need to:
 
 ```yaml
 model:
-  class_path: eva.language.models.TextModule
+  class_path: eva.language.models.LanguageModule
   init_args:
     model:
-      class_path: eva.language.models.VLLMTextModel
+      class_path: eva.language.models.VllmModel
       init_args:
         model_name_or_path: meta-llama/Llama-2-70b-chat-hf
 ```
@@ -134,7 +134,7 @@ prompt: "Instruction: You are an expert in biomedical research. Please carefully
 #### Model configuration (LiteLLM):
 ```yaml
 model:
-  class_path: eva.language.models.LiteLLMTextModel
+  class_path: eva.language.models.LiteLLMModel
   init_args:
     model_name_or_path: ${oc.env:MODEL_NAME, anthropic/claude-3-7-sonnet-latest}
 ```
