@@ -4,7 +4,9 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
+from eva.language.data.messages import UserMessage
 from eva.language.models import HuggingFaceModel
+from eva.language.models.typings import TextBatch
 
 
 @pytest.mark.parametrize(
@@ -52,8 +54,9 @@ def test_real_small_hf_model_generation(
             generation_kwargs=generate_kwargs,
         )
 
-        output1 = model([prompt])[0]
-        output2 = model([prompt])[0]
+        batch = TextBatch(text=[[UserMessage(content=prompt)]], target=None, metadata={})
+        output1 = model(batch)[0]
+        output2 = model(batch)[0]
 
         assert isinstance(output1, str) and output1, "First output should be a non-empty string."
         assert isinstance(output2, str) and output2, "Second output should be a non-empty string."

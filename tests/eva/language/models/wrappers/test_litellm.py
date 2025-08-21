@@ -2,15 +2,17 @@
 
 import pytest
 
+from eva.language.data.messages import UserMessage
 from eva.language.models import LiteLLMModel
+from eva.language.models.typings import TextBatch
 
-DUMMY_RESPONSE = {"choices": [{"message": {"content": "Test response"}}]}
+DUMMY_RESPONSE = {"choices": [{"message": {"content": "Test response", "role": "assistant"}}]}
 
 
 def test_generate(model_instance):
     """Test that the generate method returns the expected dummy response."""
-    prompts = ["Hello, world!"]
-    result = model_instance(prompts)
+    batch = TextBatch(text=[[UserMessage(content="Hello, world!")]], target=None, metadata={})
+    result = model_instance(batch)
     assert result == ["Test response"]
 
 
