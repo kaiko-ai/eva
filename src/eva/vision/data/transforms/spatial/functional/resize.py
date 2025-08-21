@@ -1,4 +1,4 @@
-"""Image resizing utilities."""
+"""Functional resizing utilities."""
 
 import io
 from typing import Tuple

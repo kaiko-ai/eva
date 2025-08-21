@@ -7,7 +7,7 @@ from torchvision import tv_tensors
 from torchvision.transforms import v2
 from typing_extensions import override
 
-from eva.multimodal.utils.image.resize import resize_to_max_bytes
+from eva.vision.data.transforms.spatial import functional
 
 
 class Resize(v2.Transform):
@@ -48,7 +48,7 @@ class Resize(v2.Transform):
         if size is not None:
             self.resize_fn = v2.Resize(size=size)
         elif max_bytes is not None:
-            self.resize_fn = functools.partial(resize_to_max_bytes, max_bytes=max_bytes)
+            self.resize_fn = functools.partial(functional.resize_to_max_bytes, max_bytes=max_bytes)
 
     @functools.singledispatchmethod
     @override
