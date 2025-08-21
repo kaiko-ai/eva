@@ -126,11 +126,6 @@ Once the evaluation is complete:
 
 The PubMedQA config demonstrates several important concepts:
 
-#### Text prompting:
-```yaml
-prompt: "Instruction: You are an expert in biomedical research. Please carefully read the question and the relevant context and answer with yes, no, or maybe. Only answer with one of these three words."
-```
-
 #### Model configuration (LiteLLM):
 ```yaml
 model:
@@ -163,14 +158,6 @@ postprocess:
 ```
 
 ## Advanced usage
-
-### Custom prompts
-
-You can experiment with different prompting strategies by modifying the prompt in the config file. For example, you might try:
-
-- Chain-of-thought prompting
-- Few-shot examples
-- Different output formats
 
 ### Model comparison
 
