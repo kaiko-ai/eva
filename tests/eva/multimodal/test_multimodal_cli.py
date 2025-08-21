@@ -1,20 +1,21 @@
-"""Tests regarding eva's CLI commands on language datasets."""
+"""Tests regarding eva's CLI commands on multimodal datasets."""
 
 import os
 from unittest import mock
 from unittest.mock import patch
 
 import pytest
-from datasets import Dataset
 
-from eva.language.data import datasets
+from eva.multimodal.data import datasets
 from tests.eva import _cli
+
+BATCH_SIZE = 2
 
 
 @pytest.mark.parametrize(
     "configuration_file",
     [
-        "configs/language/pathology/online/multiple_choice/pubmedqa.yaml",
+        "configs/multimodal/pathology/online/multiple_choice/patch_camelyon.yaml",
     ],
 )
 def test_configuration_initialization(configuration_file: str, lib_path: str) -> None:
@@ -32,12 +33,12 @@ def test_configuration_initialization(configuration_file: str, lib_path: str) ->
 @pytest.mark.parametrize(
     "configuration_file",
     [
-        "configs/language/pathology/online/multiple_choice/pubmedqa.yaml",
+        "configs/multimodal/pathology/online/multiple_choice/patch_camelyon.yaml",
     ],
 )
 def test_validate_from_configuration(configuration_file: str, lib_path: str) -> None:
     """Tests CLI `validate` command with a given configuration file."""
-    with mock.patch.dict(os.environ, {"N_RUNS": "1", "BATCH_SIZE": "2"}):
+    with mock.patch.dict(os.environ, {"N_RUNS": "1", "BATCH_SIZE": f"{BATCH_SIZE}"}):
         _cli.run_cli_from_main(
             cli_args=[
                 "validate",
@@ -48,27 +49,22 @@ def test_validate_from_configuration(configuration_file: str, lib_path: str) -> 
 
 
 @pytest.fixture(autouse=True)
+def skip_dataset_validation() -> None:
+    """Mocks the validation step of the datasets."""
+    datasets.PatchCamelyon.validate = mock.MagicMock(return_value=None)
+
+
+@pytest.fixture(autouse=True)
 def mock_dependencies():
     """Mocks external dependencies to avoid API calls and downloads."""
 
-    def _fake_completion(_model, _messages, **_kwargs):
-        return {"choices": [{"message": {"content": "yes", "role": "assistant"}}]}
-
-    def _fake_prepare_data(self):
-        # Create a minimal fake dataset matching PubMedQA format
-        self.dataset = Dataset.from_dict(
-            {
-                "QUESTION": ["Test question?"],
-                "CONTEXTS": [["Test context"]],
-                "final_decision": ["yes"],
-            }
-        )
+    def _fake_completion():
+        return {"choices": [{"message": {"content": "A", "role": "assistant"}}]}
 
     with (
-        patch.object(datasets.PubMedQA, "prepare_data", _fake_prepare_data),
         patch(
             "eva.language.models.wrappers.litellm.batch_completion",
-            lambda **_kwargs: [_fake_completion(None, None)],
+            lambda **_kwargs: [_fake_completion()] * BATCH_SIZE,
         ),
         mock.patch.dict(os.environ, {"OPENAI_API_KEY": "dummy-key"}),
         mock.patch.dict(os.environ, {"ANTHROPIC_API_KEY": "dummy-key"}),
