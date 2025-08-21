@@ -15,6 +15,7 @@ class PathoR13b(wrappers.HuggingFaceModel):
 
     def __init__(
         self,
+        system_prompt: str | None = None,
         cache_dir: str | None = None,
         attn_implementation: str = "flash_attention_2",
     ):
@@ -42,4 +43,5 @@ class PathoR13b(wrappers.HuggingFaceModel):
                 "padding_side": "left",
                 "max_pixels": 451584,  # 672*672
             },
+            system_prompt=system_prompt,
         )

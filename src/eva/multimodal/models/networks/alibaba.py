@@ -11,7 +11,10 @@ class Qwen25VL7BInstruct(wrappers.HuggingFaceModel):
     """Qwen2.5-VL 7B Instruct model."""
 
     def __init__(
-        self, cache_dir: str | None = None, attn_implementation: str = "flash_attention_2"
+        self,
+        system_prompt: str | None = None,
+        cache_dir: str | None = None,
+        attn_implementation: str = "flash_attention_2",
     ):
         """Initialize the model."""
         super().__init__(
@@ -32,4 +35,5 @@ class Qwen25VL7BInstruct(wrappers.HuggingFaceModel):
                 "padding_side": "left",
                 "max_pixels": 451584,  # 672*672
             },
+            system_prompt=system_prompt,
         )
