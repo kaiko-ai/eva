@@ -8,6 +8,7 @@ import torch
 from datasets import Dataset
 
 from eva.language.data import datasets
+from eva.language.data.messages import Message
 
 
 @pytest.mark.parametrize(
@@ -35,10 +36,12 @@ def test_sample(pubmedqa_dataset: datasets.PubMedQA, index: int) -> None:
     assert isinstance(sample, tuple)
     assert len(sample) == 3
 
-    text, target, metadata = sample
-    assert isinstance(text, str)
-    assert text.startswith("Question: ")
-    assert "Context: " in text
+    messages, target, metadata = sample
+    assert isinstance(messages, list)
+    assert all(isinstance(item, Message) for item in messages)
+
+    assert messages[0].content.startswith("Question: ")
+    assert "Context: " in messages[0].content
 
     assert isinstance(target, torch.Tensor)
     assert target in [0, 1, 2]

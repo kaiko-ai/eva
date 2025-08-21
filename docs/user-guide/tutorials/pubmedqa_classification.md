@@ -48,10 +48,10 @@ First, update the config to use the HuggingFace wrapper:
 
 ```yaml
 model:
-  class_path: eva.language.models.TextModule
+  class_path: eva.language.models.LanguageModule
   init_args:
     model:
-      class_path: eva.language.models.HuggingFaceTextModel
+      class_path: eva.language.models.HuggingFaceModel
       init_args:
         model_name_or_path: meta-llama/Llama-3.2-1B-Instruct
 ```
@@ -77,10 +77,10 @@ For larger models that require specialized infrastructure, you'll need to:
 
 ```yaml
 model:
-  class_path: eva.language.models.TextModule
+  class_path: eva.language.models.LanguageModule
   init_args:
     model:
-      class_path: eva.language.models.VLLMTextModel
+      class_path: eva.language.models.VllmModel
       init_args:
         model_name_or_path: meta-llama/Llama-2-70b-chat-hf
 ```
@@ -126,15 +126,10 @@ Once the evaluation is complete:
 
 The PubMedQA config demonstrates several important concepts:
 
-#### Text prompting:
-```yaml
-prompt: "Instruction: You are an expert in biomedical research. Please carefully read the question and the relevant context and answer with yes, no, or maybe. Only answer with one of these three words."
-```
-
 #### Model configuration (LiteLLM):
 ```yaml
 model:
-  class_path: eva.language.models.LiteLLMTextModel
+  class_path: eva.language.models.LiteLLMModel
   init_args:
     model_name_or_path: ${oc.env:MODEL_NAME, anthropic/claude-3-7-sonnet-latest}
 ```
@@ -163,14 +158,6 @@ postprocess:
 ```
 
 ## Advanced usage
-
-### Custom prompts
-
-You can experiment with different prompting strategies by modifying the prompt in the config file. For example, you might try:
-
-- Chain-of-thought prompting
-- Few-shot examples
-- Different output formats
 
 ### Model comparison
 

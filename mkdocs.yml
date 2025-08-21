@@ -152,3 +152,14 @@ nav:
       - Models:
         - Networks: reference/language/models/networks.md
         - Wrappers: reference/language/models/wrappers.md
+    - Multimodal:
+      - reference/multimodal/index.md
+      - Data:
+        - reference/multimodal/data/index.md
+        - reference/multimodal/data/datasets.md
+      - Models:
+        - Modules: reference/multimodal/models/modules.md
+        - Networks: reference/multimodal/models/networks.md
+        - Wrappers: reference/multimodal/models/wrappers.md
+      - Utils:
+        - Image: reference/multimodal/utils/image.md

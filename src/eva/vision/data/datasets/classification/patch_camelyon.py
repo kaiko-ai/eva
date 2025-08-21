@@ -61,6 +61,13 @@ class PatchCamelyon(vision.VisionDataset[tv_tensors.Image, torch.Tensor]):
     ]
     """Test resources."""
 
+    _expected_length = {
+        "train": 262144,
+        "val": 32768,
+        "test": 32768,
+    }
+    """Expected dataset length for each split."""
+
     _license: str = (
         "Creative Commons Zero v1.0 Universal (https://choosealicense.com/licenses/cc0-1.0/)"
     )
@@ -113,14 +120,9 @@ class PatchCamelyon(vision.VisionDataset[tv_tensors.Image, torch.Tensor]):
 
     @override
     def validate(self) -> None:
-        expected_length = {
-            "train": 262144,
-            "val": 32768,
-            "test": 32768,
-        }
         _validators.check_dataset_integrity(
             self,
-            length=expected_length.get(self._split, 0),
+            length=self._expected_length.get(self._split, 0),
             n_classes=2,
             first_and_last_labels=("no_tumor", "tumor"),
         )

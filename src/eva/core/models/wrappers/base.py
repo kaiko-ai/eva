@@ -25,7 +25,7 @@ class BaseModel(nn.Module, Generic[InputType, OutputType]):
 
         self._output_transforms = transforms
 
-        self._model: Callable[..., OutputType] | nn.Module
+        self.model: Callable[..., OutputType] | nn.Module
 
     @override
     def forward(self, tensor: InputType) -> OutputType:
@@ -43,7 +43,7 @@ class BaseModel(nn.Module, Generic[InputType, OutputType]):
         Args:
             tensor: The input tensor to the model.
         """
-        return self._model(tensor)
+        return self.model(tensor)
 
     def _apply_transforms(self, tensor: OutputType) -> OutputType:
         if self._output_transforms is not None:

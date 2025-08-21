@@ -75,6 +75,11 @@ vision = [
 language = [
     "datasets<4.0.0,>=2.19.0",
     "litellm>=1.61.8",
+    "backoff>=2.2.1",
+]
+multimodal = [
+    "litellm>=1.61.8",
+    "backoff>=2.2.1",
 ]
 all = [
     "h5py>=3.10.0",
@@ -91,6 +96,7 @@ all = [
     "einops>=0.8.1",
     "datasets<4.0.0,>=2.19.0",
     "litellm>=1.61.8",
+    "backoff>=2.2.1",
 ]
 
 [project.scripts]

@@ -52,12 +52,12 @@ class TorchHubModel(base.BaseModel[torch.Tensor, torch.Tensor]):
         self._trust_repo = trust_repo
         self._model_kwargs = model_kwargs or {}
 
-        self.load_model()
+        self.model = self.load_model()
 
     @override
-    def load_model(self) -> None:
+    def load_model(self) -> nn.Module:
         """Builds and loads the torch.hub model."""
-        self._model: nn.Module = torch.hub.load(
+        model: nn.Module = torch.hub.load(
             repo_or_dir=self._repo_or_dir,
             model=self._model_name,
             trust_repo=self._trust_repo,
@@ -66,21 +66,23 @@ class TorchHubModel(base.BaseModel[torch.Tensor, torch.Tensor]):
         )  # type: ignore
 
         if self._checkpoint_path:
-            _utils.load_model_weights(self._model, self._checkpoint_path)
+            _utils.load_model_weights(model, self._checkpoint_path)
 
         TorchHubModel.__name__ = self._model_name
+
+        return model
 
     @override
     def model_forward(self, tensor: torch.Tensor) -> torch.Tensor | List[torch.Tensor]:
         if self._out_indices is not None:
-            if not hasattr(self._model, "get_intermediate_layers"):
+            if not hasattr(self.model, "get_intermediate_layers"):
                 raise ValueError(
                     "Only models with `get_intermediate_layers` are supported "
                     "when using `out_indices`."
                 )
 
             return list(
-                self._model.get_intermediate_layers(
+                self.model.get_intermediate_layers(  # type: ignore
                     tensor,
                     self._out_indices,
                     reshape=True,
@@ -89,4 +91,4 @@ class TorchHubModel(base.BaseModel[torch.Tensor, torch.Tensor]):
                 )
             )
 
-        return self._model(tensor)
+        return self.model(tensor)

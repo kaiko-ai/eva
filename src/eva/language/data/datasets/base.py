@@ -10,4 +10,4 @@ DataSample = TypeVar("DataSample")
 
 
 class LanguageDataset(base.MapDataset, abc.ABC, Generic[DataSample]):
-    """Base dataset class for text tasks."""
+    """Base dataset class for language tasks."""

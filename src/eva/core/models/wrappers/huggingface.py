@@ -4,6 +4,7 @@ from typing import Any, Callable, Dict
 
 import torch
 import transformers
+from torch import nn
 from typing_extensions import override
 
 from eva.core.models.wrappers import base
@@ -33,12 +34,10 @@ class HuggingFaceModel(base.BaseModel[torch.Tensor, torch.Tensor]):
         self._model_name_or_path = model_name_or_path
         self._model_kwargs = model_kwargs or {}
 
-        self.load_model()
+        self.model = self.load_model()
 
     @override
-    def load_model(self) -> None:
+    def load_model(self) -> nn.Module:
         # Use safetensors to avoid torch.load security vulnerability
         model_kwargs = {"use_safetensors": True, **self._model_kwargs}
-        self._model = transformers.AutoModel.from_pretrained(
-            self._model_name_or_path, **model_kwargs
-        )
+        return transformers.AutoModel.from_pretrained(self._model_name_or_path, **model_kwargs)

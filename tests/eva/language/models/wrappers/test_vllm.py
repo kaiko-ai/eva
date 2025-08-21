@@ -3,7 +3,7 @@
 import pytest
 
 try:
-    from eva.language.models.wrappers.vllm import VLLMTextModel
+    from eva.language.models.wrappers.vllm import VllmModel
 except ImportError:
     pytest.skip("vLLM not available", allow_module_level=True)
 
@@ -81,8 +81,8 @@ def mock_vllm_imports(monkeypatch):
 
 
 def test_initialization(mock_vllm_imports):
-    """Tests VLLMTextModel initialization."""
-    model = VLLMTextModel(
+    """Tests VllmModel initialization."""
+    model = VllmModel(
         model_name_or_path="test/model",
         model_kwargs={"max_model_len": 1024},
         generation_kwargs={"max_tokens": 100},
@@ -95,7 +95,7 @@ def test_initialization(mock_vllm_imports):
 
 def test_lazy_loading(mock_vllm_imports):
     """Tests lazy model loading."""
-    model = VLLMTextModel("test/model")
+    model = VllmModel("test/model")
     assert model._llm_model is None
 
     model.load_model()
@@ -105,7 +105,7 @@ def test_lazy_loading(mock_vllm_imports):
 
 def test_generate(mock_vllm_imports):
     """Tests text generation."""
-    model = VLLMTextModel("test/model")
+    model = VllmModel("test/model")
     prompts = ["Hello", "How are you?"]
 
     results = model(prompts)
@@ -116,7 +116,7 @@ def test_generate(mock_vllm_imports):
 
 def test_chat_template_application(mock_vllm_imports):
     """Tests chat template application."""
-    model = VLLMTextModel("test/model")
+    model = VllmModel("test/model")
     prompts = ["Hello world"]
 
     token_prompts = model._apply_chat_template(prompts)
@@ -137,7 +137,7 @@ def test_double_bos_removal(mock_vllm_imports, monkeypatch):
     def mock_get_tokenizer():
         return MockTokenizerDoubleBOS()
 
-    model = VLLMTextModel("test/model")
+    model = VllmModel("test/model")
     model.load_model()
     monkeypatch.setattr(model._llm_model, "get_tokenizer", mock_get_tokenizer)
     model._llm_tokenizer = mock_get_tokenizer()
@@ -165,7 +165,7 @@ def test_no_chat_template_error(mock_vllm_imports, monkeypatch):
             """Initialize tokenizer without chat template."""
             pass
 
-    model = VLLMTextModel("test/model")
+    model = VllmModel("test/model")
     model.load_model()
     monkeypatch.setattr(model._llm_model, "get_tokenizer", lambda: MockTokenizerNoTemplate())
     model._llm_tokenizer = MockTokenizerNoTemplate()
