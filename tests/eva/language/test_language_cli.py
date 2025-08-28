@@ -14,7 +14,7 @@ from tests.eva import _cli
 @pytest.mark.parametrize(
     "configuration_file",
     [
-        "configs/language/pubmedqa.yaml",
+        "configs/language/pathology/online/multiple_choice/pubmedqa.yaml",
     ],
 )
 def test_configuration_initialization(configuration_file: str, lib_path: str) -> None:
@@ -32,7 +32,7 @@ def test_configuration_initialization(configuration_file: str, lib_path: str) ->
 @pytest.mark.parametrize(
     "configuration_file",
     [
-        "configs/language/pubmedqa.yaml",
+        "configs/language/pathology/online/multiple_choice/pubmedqa.yaml",
     ],
 )
 def test_validate_from_configuration(configuration_file: str, lib_path: str) -> None:
@@ -52,7 +52,7 @@ def mock_dependencies():
     """Mocks external dependencies to avoid API calls and downloads."""
 
     def _fake_completion(_model, _messages, **_kwargs):
-        return {"choices": [{"message": {"content": "yes"}}]}
+        return {"choices": [{"message": {"content": "yes", "role": "assistant"}}]}
 
     def _fake_prepare_data(self):
         # Create a minimal fake dataset matching PubMedQA format
@@ -71,5 +71,6 @@ def mock_dependencies():
             lambda **_kwargs: [_fake_completion(None, None)],
         ),
         mock.patch.dict(os.environ, {"OPENAI_API_KEY": "dummy-key"}),
+        mock.patch.dict(os.environ, {"ANTHROPIC_API_KEY": "dummy-key"}),
     ):
         yield

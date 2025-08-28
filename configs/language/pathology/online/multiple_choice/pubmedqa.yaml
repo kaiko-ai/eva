@@ -6,16 +6,13 @@ trainer:
     default_root_dir: ${oc.env:OUTPUT_ROOT, logs/${oc.env:MODEL_NAME, anthropic-claude-3-7-sonnet-latest}/pubmedqa}
     checkpoint_type: null
 model:
-  class_path: eva.language.models.TextModule
+  class_path: eva.language.models.LanguageModule
   init_args:
-    prompt: "Instruction: Carefully read the question and the provided context. Answer with one word: 'yes', 'no', or 'maybe'. Answer: "
     model:
-      class_path: eva.language.models.LiteLLMTextModel
+      class_path: eva.language.models.wrappers.ModelFromRegistry
       init_args:
-        model_name_or_path: ${oc.env:MODEL_NAME, anthropic/claude-3-7-sonnet-latest}
-        model_kwargs:
-          temperature: 0.0 # should be strictly positive for HF models
-          # max_new_tokens: 1 # used for HF
+        model_name: ${oc.env:MODEL_NAME, anthropic/claude-3-7-sonnet-20250219}
+        model_extra_kwargs: ${oc.env:MODEL_EXTRA_KWARGS, null}
     metrics:
       common:
         - class_path: eva.metrics.MulticlassClassificationMetrics
@@ -25,6 +22,9 @@ model:
     postprocess:
       predictions_transforms:
         - class_path: eva.language.utils.str_to_int_tensor.CastStrToIntTensor
+          init_args:
+            mapping: {"no": 0, "yes": 1, "maybe": 2}
+            case_sensitive: false
 data:
   class_path: eva.DataModule
   init_args:
@@ -44,4 +44,4 @@ data:
         batch_size: &BATCH_SIZE ${oc.env:BATCH_SIZE, 16}
         num_workers: &N_DATA_WORKERS ${oc.env:N_DATA_WORKERS, 1}
         shuffle: false
-        collate_fn: eva.core.data.dataloaders.text_collate_fn
+        collate_fn: eva.language.data.dataloaders.text_collate

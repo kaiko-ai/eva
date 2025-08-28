@@ -1,11 +1,12 @@
 """Language Model Wrappers API."""
 
-from eva.language.models.wrappers.huggingface import HuggingFaceTextModel
-from eva.language.models.wrappers.litellm import LiteLLMTextModel
+from eva.language.models.wrappers.from_registry import ModelFromRegistry
+from eva.language.models.wrappers.huggingface import HuggingFaceModel
+from eva.language.models.wrappers.litellm import LiteLLMModel
 
 try:
-    from eva.language.models.wrappers.vllm import VLLMTextModel
+    from eva.language.models.wrappers.vllm import VllmModel
 
-    __all__ = ["HuggingFaceTextModel", "LiteLLMTextModel", "VLLMTextModel"]
+    __all__ = ["HuggingFaceModel", "LiteLLMModel", "VllmModel", "ModelFromRegistry"]
 except ImportError:
-    __all__ = ["HuggingFaceTextModel", "LiteLLMTextModel"]
+    __all__ = ["HuggingFaceModel", "LiteLLMModel", "ModelFromRegistry"]

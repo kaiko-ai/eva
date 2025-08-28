@@ -41,12 +41,12 @@ class ModelFromFunction(base.BaseModel[torch.Tensor, torch.Tensor]):
         self._arguments = arguments
         self._checkpoint_path = checkpoint_path
 
-        self.load_model()
+        self.model = self.load_model()
 
     @override
-    def load_model(self) -> None:
+    def load_model(self) -> nn.Module:
         class_path = jsonargparse.class_from_function(self._path, func_return=nn.Module)
         model = class_path(**self._arguments or {})
         if self._checkpoint_path is not None:
             _utils.load_model_weights(model, self._checkpoint_path)
-        self._model = model
+        return model
