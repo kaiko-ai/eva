@@ -35,7 +35,6 @@ class HuggingFaceModel(base.VisionLanguageModel):
         system_prompt: str | None = None,
         processor_kwargs: Dict[str, Any] | None = None,
         generation_kwargs: Dict[str, Any] | None = None,
-        image_token: str | None = None,
     ):
         """Initialize the HuggingFace model wrapper.
 
@@ -46,7 +45,6 @@ class HuggingFaceModel(base.VisionLanguageModel):
             system_prompt: System prompt to use.
             processor_kwargs: Additional processor arguments.
             generation_kwargs: Additional generation arguments.
-            image_token: Token to use for images.
         """
         super().__init__(system_prompt=system_prompt)
 
@@ -55,7 +53,6 @@ class HuggingFaceModel(base.VisionLanguageModel):
         self.base_model_class = model_class
         self.processor_kwargs = processor_kwargs or {}
         self.generation_kwargs = generation_kwargs or {}
-        self.image_token = image_token
 
         self.processor = self.load_processor()
         self.model = self.load_model()
@@ -94,7 +91,6 @@ class HuggingFaceModel(base.VisionLanguageModel):
                     functools.partial(
                         message_utils.format_huggingface_message,
                         with_images=with_images,
-                        image_token=self.image_token,
                     ),
                     message_batch,
                 )

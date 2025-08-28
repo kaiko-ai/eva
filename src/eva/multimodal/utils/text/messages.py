@@ -10,7 +10,7 @@ from eva.multimodal.utils import image as image_utils
 
 
 def format_huggingface_message(
-    message: MessageSeries, with_images: bool = False, image_token: str | None = None
+    message: MessageSeries, with_images: bool = False
 ) -> List[Dict[str, Any]]:
     """Formats a message series into a format suitable for Huggingface models."""
     if not with_images:
