@@ -15,12 +15,12 @@ def format_huggingface_message(
 ) -> List[Dict[str, Any]]:
     """Formats a message series into a format suitable for Huggingface models."""
     if not with_images:
-        return language_utils.format_message(message)
+        return language_utils.format_chat_message(message)
 
     formatted_message = []
     for item in message:
         if item.role == "system":
-            formatted_message += language_utils.format_message([item])
+            formatted_message += language_utils.format_chat_message([item])
         else:
             formatted_message.append(
                 {
@@ -52,12 +52,12 @@ def format_litellm_message(
         A list of formatted message dictionaries.
     """
     if image is None:
-        return language_utils.format_message(message)
+        return language_utils.format_chat_message(message)
 
     formatted_message = []
     for item in message:
         if item.role == "system":
-            formatted_message += language_utils.format_message([item])
+            formatted_message += language_utils.format_chat_message([item])
         else:
             formatted_message.append(
                 {

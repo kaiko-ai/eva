@@ -17,8 +17,8 @@ class Resize(v2.Transform):
     1. Spatial resizing: Resize to a specific (height, width) dimension
     2. Byte-based resizing: Resize to fit within a maximum byte size
 
-    The latter is particularly useful for API models that have strict
-    byte size limits for image inputs.
+    The latter is particularly useful for API models (e.g. Claude 3.7) that
+    have strict byte size limits for image inputs.
     """
 
     def __init__(self, size: tuple[int, int] | None = None, max_bytes: int | None = None) -> None:

@@ -60,9 +60,17 @@ class HuggingFaceModel(base.LanguageModel):
     def format_inputs(self, batch: TextBatch) -> List[List[Dict[str, Any]]] | List[str]:
         """Formats inputs for HuggingFace models.
 
+        Note: If multiple system messages are present, they will be combined
+        into a single message, given that many models only support a single
+        system prompt.
+
         Args:
             batch: A batch of text and image inputs.
 
+        Returns:
+            When in chat mode, returns a batch of message series following
+            OpenAI's API format {"role": "user", "content": "..."}, for non-chat
+            models returns a list of plain text strings.
         """
         message_batch, _, _ = TextBatch(*batch)
         message_batch = message_utils.batch_insert_system_message(
@@ -71,7 +79,7 @@ class HuggingFaceModel(base.LanguageModel):
         message_batch = list(map(message_utils.combine_system_messages, message_batch))
 
         if self._chat_mode:
-            return list(map(message_utils.format_message, message_batch))
+            return list(map(message_utils.format_chat_message, message_batch))
         else:
             return list(map(message_utils.merge_message_contents, message_batch))
 

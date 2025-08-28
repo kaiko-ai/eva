@@ -27,6 +27,7 @@ model:
         - class_path: eva.language.utils.str_to_int_tensor.CastStrToIntTensor
           init_args:
             mapping: {"A": 0, "B": 1}
+            case_sensitive: false
 data:
   class_path: eva.DataModule
   init_args:

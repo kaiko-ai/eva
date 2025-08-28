@@ -82,7 +82,7 @@ class LiteLLMModel(base.LanguageModel):
         )
         message_batch = list(map(message_utils.combine_system_messages, message_batch))
 
-        return list(map(message_utils.format_message, message_batch))
+        return list(map(message_utils.format_chat_message, message_batch))
 
     @override
     @backoff.on_exception(

@@ -6,7 +6,7 @@ from typing import Any, Dict, List
 from eva.language.data.messages import MessageSeries, SystemMessage
 
 
-def format_message(message: MessageSeries) -> List[Dict[str, Any]]:
+def format_chat_message(message: MessageSeries) -> List[Dict[str, Any]]:
     """Formats a message series into a format following OpenAI's API specification."""
     return [{"role": item.role, "content": item.content} for item in message]
 

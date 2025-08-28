@@ -76,7 +76,7 @@ class VllmModel(base.LanguageModel):
             raise RuntimeError("Model not initialized")
         self._llm_tokenizer = self._llm_model.get_tokenizer()
 
-    def _encode_messages(self, messages: List[MessageSeries]) -> List[TokensPrompt]:
+    def _tokenize_messages(self, messages: List[MessageSeries]) -> List[TokensPrompt]:
         """Apply chat template to the messages.
 
         Args:
@@ -95,11 +95,8 @@ class VllmModel(base.LanguageModel):
         if not hasattr(self._llm_tokenizer, "chat_template"):
             raise ValueError("Tokenizer does not have a chat template.")
 
-        chat_messages = [
-            [{"role": m.role, "content": m.content}]
-            for message_series in messages
-            for m in message_series
-        ]
+        chat_messages = list(map(message_utils.format_chat_message, messages))
+
         encoded_messages = self._llm_tokenizer.apply_chat_template(
             chat_messages,  # type: ignore
             tokenize=True,
@@ -156,7 +153,7 @@ class VllmModel(base.LanguageModel):
         )
         message_batch = list(map(message_utils.combine_system_messages, message_batch))
 
-        return self._encode_messages(message_batch)
+        return self._tokenize_messages(message_batch)
 
     @override
     def model_forward(self, batch: List[TokensPrompt]) -> List[str]:
