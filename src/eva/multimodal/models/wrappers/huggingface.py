@@ -171,4 +171,14 @@ class HuggingFaceModel(base.VisionLanguageModel):
         Returns:
             A list of decoded text responses.
         """
-        return self.processor.batch_decode(output[:, instruction_length:], skip_special_tokens=True)  # type: ignore
+        decoded_input = self.processor.batch_decode(  # type: ignore
+            output[:, :instruction_length], skip_special_tokens=True
+        )
+        decoded_output = self.processor.batch_decode(  # type: ignore
+            output[:, instruction_length:], skip_special_tokens=True
+        )
+
+        logger.debug(f"Decoded input: {decoded_input}")
+        logger.debug(f"Decoded output: {decoded_output}")
+
+        return decoded_output
