@@ -2,10 +2,9 @@
 
 import abc
 from pathlib import Path
-from typing import Any, Callable, Dict, Generic
+from typing import Any, Dict, Generic
 
 import pandas as pd
-from loguru import logger
 from typing_extensions import override
 
 from eva.language.data.datasets.base import LanguageDataset
@@ -24,7 +23,6 @@ class TextPredictionDataset(
         prediction_column: str = "prediction",
         target_column: str = "target",
         metadata_columns: list[str] | None = None,
-        pre_transforms: Callable | None = None,
         transforms: TransformsSchema | None = None,
     ):
         """Initialize the dataset.
@@ -34,9 +32,6 @@ class TextPredictionDataset(
             prediction_column: The name of the prediction column.
             target_column: The name of the label column.
             metadata_columns: List of column names to include in metadata.
-            pre_transforms: A callable to apply to each row in the dataframe loaded from
-                the provided .parquet file in the `prepare_data` method. Note that this
-                method should either accept and return a pandas Series or a dictionary.
             transforms: The transforms to apply to the text and target when
                 loading the samples.
         """
@@ -46,10 +41,22 @@ class TextPredictionDataset(
         self.prediction_column = prediction_column
         self.target_column = target_column
         self.metadata_columns = metadata_columns
-        self.pre_transforms = pre_transforms
         self.transforms = transforms
 
         self._data: pd.DataFrame
+
+    @override
+    def __len__(self) -> int:
+        return len(self._data)
+
+    @override
+    def __getitem__(self, index: int) -> PredictionSample[TargetType]:
+        item = PredictionSample(
+            prediction=self.load_prediction(index),
+            target=self.load_target(index),
+            metadata=self.load_metadata(index) or {},
+        )
+        return self._apply_transforms(item)
 
     @override
     def configure(self) -> None:
@@ -65,10 +72,6 @@ class TextPredictionDataset(
             case _:
                 raise ValueError(f"Unsupported file extension: {extension}")
 
-        if self.pre_transforms is not None:
-            logger.info("Applying dataset pre-transforms ...")
-            self._data = pd.DataFrame(self._data.apply(self._apply_pre_transform, axis=1))
-
     @override
     def validate(self) -> None:
         if self.prediction_column not in self._data.columns:
@@ -79,27 +82,6 @@ class TextPredictionDataset(
             missing_columns = set(self.metadata_columns) - set(self._data.columns)
             if missing_columns:
                 raise ValueError(f"Metadata columns {missing_columns} not found.")
-
-    def _apply_pre_transform(self, row: pd.Series) -> pd.Series:
-        if self.pre_transforms:
-            try:
-                row = self.pre_transforms(row)
-            except Exception:
-                row = self.pre_transforms(row.to_dict())
-        return pd.Series(row)
-
-    @override
-    def __len__(self) -> int:
-        return len(self._data)
-
-    @override
-    def __getitem__(self, index: int) -> PredictionSample[TargetType]:
-        item = PredictionSample(
-            prediction=self.load_prediction(index),
-            target=self.load_target(index),
-            metadata=self.load_metadata(index) or {},
-        )
-        return self._apply_transforms(item)
 
     def load_metadata(self, index: int) -> Dict[str, Any] | None:
         """Returns the metadata for the given index."""
