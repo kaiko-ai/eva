@@ -52,7 +52,7 @@ class TextPredictionDataset(
         self._data: pd.DataFrame
 
     @override
-    def setup(self) -> None:
+    def configure(self) -> None:
         extension = Path(self.path).suffix
 
         match extension:
@@ -69,10 +69,8 @@ class TextPredictionDataset(
             logger.info("Applying dataset pre-transforms ...")
             self._data = pd.DataFrame(self._data.apply(self._apply_pre_transform, axis=1))
 
-        self._validate_columns()
-
-    def _validate_columns(self) -> None:
-        """Validates that required columns exist in the dataframe."""
+    @override
+    def validate(self) -> None:
         if self.prediction_column not in self._data.columns:
             raise ValueError(f"Label column '{self.prediction_column}' not found.")
         if self.target_column not in self._data.columns:
