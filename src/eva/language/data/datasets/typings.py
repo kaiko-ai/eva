@@ -21,3 +21,16 @@ class TextSample(NamedTuple, Generic[TargetType]):
 
     metadata: dict[str, Any] | None
     """Additional metadata."""
+
+
+class PredictionSample(NamedTuple, Generic[TargetType]):
+    """Text sample with target and metadata."""
+
+    prediction: TargetType
+    """Prediction data."""
+
+    target: TargetType
+    """Target data."""
+
+    metadata: dict[str, Any] | None
+    """Additional metadata."""

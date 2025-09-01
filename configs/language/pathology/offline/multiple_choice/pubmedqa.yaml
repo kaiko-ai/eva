@@ -12,7 +12,7 @@ trainer:
           output_dir: &PREDICTIONS_OUTPUT_DIR ${oc.env:PREDICTIONS_OUTPUT_DIR, ./predictions/${oc.env:MODEL_NAME, anthropic-claude-3-7-sonnet-latest}/pubmedqa}
           dataloader_idx_map:
             0: val
-          save_format: ${oc.env:PREDICTIONS_SAVE_FORMAT, jsonl}
+          save_format: &PREDICTIONS_SAVE_FORMAT ${oc.env:PREDICTIONS_SAVE_FORMAT, jsonl}
           model:
             class_path: eva.language.models.wrappers.ModelFromRegistry
             init_args:
@@ -20,7 +20,7 @@ trainer:
               model_extra_kwargs: ${oc.env:MODEL_EXTRA_KWARGS, null}
           overwrite: false
 model:
-  class_path: eva.language.models.LanguageModule
+  class_path: eva.language.models.OfflineLanguageModule
   init_args:
     metrics:
       common:
@@ -38,10 +38,13 @@ data:
   class_path: eva.DataModule
   init_args:
     datasets:
-      val: null # TODO
+      val:
+        class_path: eva.language.datasets.TextPredictionDataset
+        init_args: &DATASET_ARGS
+          path: ${oc.env:PREDICTIONS_OUTPUT_DIR, ./predictions/${oc.env:MODEL_NAME, anthropic-claude-3-7-sonnet-latest}/pubmedqa}/manifest.${oc.env:PREDICTIONS_SAVE_FORMAT, jsonl}
       predict:
         - class_path: eva.language.datasets.PubMedQA
-          init_args: &DATASET_ARGS
+          init_args: &PREDICT_DATASET_ARGS
             root: ${oc.env:DATA_ROOT, ./data/pubmedqa}
             split: val
             download: ${oc.env:DOWNLOAD_DATA, false}

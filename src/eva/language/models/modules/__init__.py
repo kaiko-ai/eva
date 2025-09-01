@@ -1,5 +1,5 @@
 """Language Networks API."""
 
-from eva.language.models.modules.language import LanguageModule
+from eva.language.models.modules.language import LanguageModule, OfflineLanguageModule
 
-__all__ = ["LanguageModule"]
+__all__ = ["LanguageModule", "OfflineLanguageModule"]
