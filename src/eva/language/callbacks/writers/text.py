@@ -90,7 +90,7 @@ class TextPredictionWriter(callbacks.BasePredictionWriter, abc.ABC):
         batch_idx: int,
         dataloader_idx: int,
     ) -> None:
-        text_batch, target_batch, metadata_batch = TextBatch(*batch)
+        text_batch, target_batch, metadata_batch = self._unpack_batch(batch)
         has_target = target_batch is not None
         split = self.dataloader_idx_map.get(dataloader_idx, "")
 
@@ -166,3 +166,7 @@ class TextPredictionWriter(callbacks.BasePredictionWriter, abc.ABC):
                 targets, predictions = outputs["targets"], outputs["predictions"]
 
         return _to_list(targets), _to_list(predictions)
+
+    def _unpack_batch(self, batch: TextBatch) -> Tuple[list, list | None, dict | None]:
+        text_batch, target_batch, metadata_batch = TextBatch(*batch)
+        return text_batch, target_batch, metadata_batch
