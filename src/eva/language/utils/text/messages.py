@@ -65,3 +65,8 @@ def batch_insert_system_message(
     return list(
         map(functools.partial(insert_system_message, system_message=system_message), messages)
     )
+
+
+def messages_to_string(messages: MessageSeries) -> str:
+    """Convert a MessageSeries object to a string."""
+    return " ".join(f"{message.role.upper()}: {message.content}" for message in messages)

@@ -1,0 +1,61 @@
+---
+trainer:
+  class_path: eva.Trainer
+  init_args:
+    n_runs: &N_RUNS ${oc.env:N_RUNS, 1}
+    default_root_dir: ${oc.env:OUTPUT_ROOT, logs/${oc.env:MODEL_NAME, anthropic-claude-3-7-sonnet-latest}/pubmedqa}
+    checkpoint_type: null
+    callbacks:
+      - class_path: eva.callbacks.ConfigurationLogger
+      - class_path: eva.language.callbacks.writers.TextPredictionWriter
+        init_args:
+          output_dir: &PREDICTIONS_OUTPUT_DIR ${oc.env:PREDICTIONS_OUTPUT_DIR, ./predictions/${oc.env:MODEL_NAME, anthropic-claude-3-7-sonnet-latest}/pubmedqa}
+          dataloader_idx_map:
+            0: val
+          save_format: ${oc.env:PREDICTIONS_SAVE_FORMAT, jsonl}
+          model:
+            class_path: eva.language.models.wrappers.ModelFromRegistry
+            init_args:
+              model_name: ${oc.env:MODEL_NAME, anthropic/claude-3-7-sonnet-20250219}
+              model_extra_kwargs: ${oc.env:MODEL_EXTRA_KWARGS, null}
+          overwrite: false
+model:
+  class_path: eva.language.models.LanguageModule
+  init_args:
+    metrics:
+      common:
+        - class_path: eva.metrics.MulticlassClassificationMetrics
+          init_args:
+            num_classes: 3
+            input_type: "discrete"
+    postprocess:
+      predictions_transforms:
+        - class_path: eva.language.utils.str_to_int_tensor.CastStrToIntTensor
+          init_args:
+            mapping: {"no": 0, "yes": 1, "maybe": 2}
+            case_sensitive: false
+data:
+  class_path: eva.DataModule
+  init_args:
+    datasets:
+      val: null # TODO
+      predict:
+        - class_path: eva.language.datasets.PubMedQA
+          init_args: &DATASET_ARGS
+            root: ${oc.env:DATA_ROOT, ./data/pubmedqa}
+            split: val
+            download: ${oc.env:DOWNLOAD_DATA, false}
+            # Set `download: true` to download the dataset from https://huggingface.co/datasets/bigbio/pubmed_qa
+            # The PubMedQA dataset is distributed under the following license: MIT License
+            # See (https://github.com/pubmedqa/pubmedqa/blob/master/LICENSE)
+            max_samples: 4
+    dataloaders:
+      val:
+        batch_size: &BATCH_SIZE ${oc.env:BATCH_SIZE, 256}
+        num_workers: &N_DATA_WORKERS ${oc.env:N_DATA_WORKERS, 1}
+        shuffle: false
+        collate_fn: eva.language.data.dataloaders.text_collate
+      predict:
+        batch_size: &PREDICT_BATCH_SIZE ${oc.env:PREDICT_BATCH_SIZE, 16}
+        num_workers: *N_DATA_WORKERS
+        collate_fn: eva.language.data.dataloaders.text_collate

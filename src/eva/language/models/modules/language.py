@@ -17,7 +17,7 @@ class LanguageModule(module.ModelModule):
 
     def __init__(
         self,
-        model: nn.Module,
+        model: nn.Module | None,
         metrics: metrics_lib.MetricsSchema | None = None,
         postprocess: batch_postprocess.BatchPostProcess | None = None,
     ) -> None:
@@ -34,7 +34,7 @@ class LanguageModule(module.ModelModule):
 
     @override
     def forward(self, batch: TextBatch, *args: Any, **kwargs: Any) -> List[str]:
-        return self.model(batch)
+        return self.model(batch) if self.model is not None else []
 
     @override
     def validation_step(self, batch: TextBatch, *args: Any, **kwargs: Any) -> STEP_OUTPUT:

@@ -5,6 +5,8 @@ trainer:
     n_runs: &N_RUNS ${oc.env:N_RUNS, 1}
     default_root_dir: ${oc.env:OUTPUT_ROOT, logs/${oc.env:MODEL_NAME, anthropic-claude-3-7-sonnet-latest}/pubmedqa}
     checkpoint_type: null
+    callbacks:
+      - class_path: eva.callbacks.ConfigurationLogger
 model:
   class_path: eva.language.models.LanguageModule
   init_args:
