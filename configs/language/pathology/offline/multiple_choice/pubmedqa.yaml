@@ -12,6 +12,7 @@ trainer:
           output_dir: &PREDICTIONS_OUTPUT_DIR ${oc.env:PREDICTIONS_OUTPUT_DIR, ./predictions/${oc.env:MODEL_NAME, anthropic-claude-3-7-sonnet-latest}/pubmedqa}
           dataloader_idx_map:
             0: val
+            1: test
           save_format: &PREDICTIONS_SAVE_FORMAT ${oc.env:PREDICTIONS_SAVE_FORMAT, jsonl}
           model:
             class_path: eva.language.models.wrappers.ModelFromRegistry
@@ -42,6 +43,12 @@ data:
         class_path: eva.language.datasets.TextPredictionDataset
         init_args: &DATASET_ARGS
           path: ${oc.env:PREDICTIONS_OUTPUT_DIR, ./predictions/${oc.env:MODEL_NAME, anthropic-claude-3-7-sonnet-latest}/pubmedqa}/manifest.${oc.env:PREDICTIONS_SAVE_FORMAT, jsonl}
+          split: val
+      test:
+        class_path: eva.language.datasets.TextPredictionDataset
+        init_args:
+          <<: *DATASET_ARGS
+          split: test
       predict:
         - class_path: eva.language.datasets.PubMedQA
           init_args: &PREDICT_DATASET_ARGS
@@ -51,13 +58,19 @@ data:
             # Set `download: true` to download the dataset from https://huggingface.co/datasets/bigbio/pubmed_qa
             # The PubMedQA dataset is distributed under the following license: MIT License
             # See (https://github.com/pubmedqa/pubmedqa/blob/master/LICENSE)
-            max_samples: 4
+            max_samples: 500
+        - class_path: eva.language.datasets.PubMedQA
+          init_args:
+            <<: *PREDICT_DATASET_ARGS
+            split: test
     dataloaders:
-      val:
+      val: &DATALOADER_ARGS
         batch_size: &BATCH_SIZE ${oc.env:BATCH_SIZE, 256}
         num_workers: &N_DATA_WORKERS ${oc.env:N_DATA_WORKERS, 1}
         shuffle: false
         collate_fn: eva.language.data.dataloaders.text_collate
+      test:
+        <<: *DATALOADER_ARGS
       predict:
         batch_size: &PREDICT_BATCH_SIZE ${oc.env:PREDICT_BATCH_SIZE, 16}
         num_workers: *N_DATA_WORKERS

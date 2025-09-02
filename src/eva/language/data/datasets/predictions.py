@@ -2,7 +2,7 @@
 
 import abc
 from pathlib import Path
-from typing import Any, Dict, Generic
+from typing import Any, Dict, Generic, Literal
 
 import pandas as pd
 from typing_extensions import override
@@ -23,6 +23,7 @@ class TextPredictionDataset(
         prediction_column: str = "prediction",
         target_column: str = "target",
         metadata_columns: list[str] | None = None,
+        split: Literal["train", "val", "test"] | None = None,
         transforms: TransformsSchema | None = None,
     ):
         """Initialize the dataset.
@@ -32,6 +33,8 @@ class TextPredictionDataset(
             prediction_column: The name of the prediction column.
             target_column: The name of the label column.
             metadata_columns: List of column names to include in metadata.
+            split: The dataset split to use (train, val, test). If not specified,
+                the entire dataset will be used.
             transforms: The transforms to apply to the text and target when
                 loading the samples.
         """
@@ -41,6 +44,7 @@ class TextPredictionDataset(
         self.prediction_column = prediction_column
         self.target_column = target_column
         self.metadata_columns = metadata_columns
+        self.split = split
         self.transforms = transforms
 
         self._data: pd.DataFrame
@@ -71,6 +75,9 @@ class TextPredictionDataset(
                 self._data = pd.read_parquet(self.path)
             case _:
                 raise ValueError(f"Unsupported file extension: {extension}")
+
+        if self.split is not None:
+            self._data = self._data[self._data["split"] == self.split].reset_index(drop=True)
 
     @override
     def validate(self) -> None:
