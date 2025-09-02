@@ -32,5 +32,8 @@ class PredictionSample(NamedTuple, Generic[TargetType]):
     target: TargetType
     """Target data."""
 
+    text: MessageSeries | None
+    """Conversation messages that were used as input."""
+
     metadata: dict[str, Any] | None
     """Additional metadata."""

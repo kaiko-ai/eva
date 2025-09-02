@@ -32,5 +32,8 @@ class PredictionBatch(NamedTuple, Generic[TargetType]):
     target: TargetType
     """Target data."""
 
+    text: List[MessageSeries] | None
+    """Conversation messages that were used as input."""
+
     metadata: Dict[str, Any] | None
     """Additional metadata."""

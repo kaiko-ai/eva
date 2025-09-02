@@ -10,6 +10,8 @@ from typing_extensions import override
 from eva.language.data.datasets.base import LanguageDataset
 from eva.language.data.datasets.schemas import TransformsSchema
 from eva.language.data.datasets.typings import PredictionSample, TargetType
+from eva.language.data.messages import MessageSeries, UserMessage
+from eva.language.utils.text import messages as message_utils
 
 
 class TextPredictionDataset(
@@ -22,6 +24,7 @@ class TextPredictionDataset(
         path: str,
         prediction_column: str = "prediction",
         target_column: str = "target",
+        text_column: str | None = None,
         metadata_columns: list[str] | None = None,
         split: Literal["train", "val", "test"] | None = None,
         transforms: TransformsSchema | None = None,
@@ -32,6 +35,8 @@ class TextPredictionDataset(
             path: The path to the manifest file holding the predictions & targets.
             prediction_column: The name of the prediction column.
             target_column: The name of the label column.
+            text_column: The name of the column with the text inputs that were used
+                to generate the predictions.
             metadata_columns: List of column names to include in metadata.
             split: The dataset split to use (train, val, test). If not specified,
                 the entire dataset will be used.
@@ -43,6 +48,7 @@ class TextPredictionDataset(
         self.path = path
         self.prediction_column = prediction_column
         self.target_column = target_column
+        self.text_column = text_column
         self.metadata_columns = metadata_columns
         self.split = split
         self.transforms = transforms
@@ -58,6 +64,7 @@ class TextPredictionDataset(
         item = PredictionSample(
             prediction=self.load_prediction(index),
             target=self.load_target(index),
+            text=self.load_text(index),
             metadata=self.load_metadata(index) or {},
         )
         return self._apply_transforms(item)
@@ -90,6 +97,26 @@ class TextPredictionDataset(
             if missing_columns:
                 raise ValueError(f"Metadata columns {missing_columns} not found.")
 
+    def load_prediction(self, index: int) -> TargetType:
+        """Returns the prediction for the given index."""
+        return self._data.iloc[index][self.prediction_column]
+
+    def load_target(self, index: int) -> TargetType:
+        """Returns the target for the given index."""
+        return self._data.iloc[index][self.target_column]
+
+    def load_text(self, index: int) -> MessageSeries | None:
+        """Returns the text for the given index."""
+        if self.text_column is None:
+            return None
+
+        text = self._data.iloc[index][self.text_column]
+
+        try:
+            return message_utils.deserialize(self._data.iloc[index][self.text_column])
+        except Exception:
+            return [UserMessage(content=text)]
+
     def load_metadata(self, index: int) -> Dict[str, Any] | None:
         """Returns the metadata for the given index."""
         if self.metadata_columns is None:
@@ -98,19 +125,12 @@ class TextPredictionDataset(
         row = self._data.iloc[index]
         return {col: row[col] for col in self.metadata_columns}
 
-    def load_target(self, index: int) -> TargetType:
-        """Returns the target for the given index."""
-        return self._data.iloc[index][self.target_column]
-
-    def load_prediction(self, index: int) -> TargetType:
-        """Returns the prediction for the given index."""
-        return self._data.iloc[index][self.prediction_column]
-
     def _apply_transforms(
         self, sample: PredictionSample[TargetType]
     ) -> PredictionSample[TargetType]:
         """Applies the dataset transforms to the prediction and target."""
         if self.transforms:
+            text = self.transforms.text(sample.text) if self.transforms.text else sample.text
             prediction = (
                 self.transforms.prediction(sample.prediction)
                 if self.transforms.prediction
@@ -122,6 +142,7 @@ class TextPredictionDataset(
             return PredictionSample(
                 prediction=prediction,
                 target=target,
+                text=text,
                 metadata=sample.metadata,
             )
         return sample

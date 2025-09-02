@@ -43,6 +43,7 @@ class TextPredictionWriter(callbacks.BasePredictionWriter, abc.ABC):
         metadata_keys: List[str] | None = None,
         include_input: bool = True,
         overwrite: bool = False,
+        apply_postprocess: bool = False,
         save_format: Literal["jsonl", "parquet", "csv"] = "jsonl",
     ) -> None:
         """Initializes a new callback.
@@ -58,6 +59,7 @@ class TextPredictionWriter(callbacks.BasePredictionWriter, abc.ABC):
             overwrite: Whether to overwrite if embeddings are already present in the specified
                 output directory. If set to `False`, an error will be raised if embeddings are
                 already present (recommended).
+            apply_postprocess: Whether to apply the postprocesses specified in the model module.
             save_format: The file format to use for saving the manifest file with the predictions.
         """
         super().__init__()
@@ -67,6 +69,7 @@ class TextPredictionWriter(callbacks.BasePredictionWriter, abc.ABC):
         self.metadata_keys = metadata_keys
         self.include_input = include_input
         self.overwrite = overwrite
+        self.apply_postprocess = apply_postprocess
         self.save_format = save_format
 
         self._manifest_path = os.path.join(self.output_dir, f"manifest.{self.save_format}")
@@ -95,6 +98,7 @@ class TextPredictionWriter(callbacks.BasePredictionWriter, abc.ABC):
         split = self.dataloader_idx_map.get(dataloader_idx, "")
 
         prediction_batch = self._get_predictions(batch)
+
         target_batch, prediction_batch = self._apply_postprocess(
             pl_module, target_batch, prediction_batch
         )
@@ -156,7 +160,7 @@ class TextPredictionWriter(callbacks.BasePredictionWriter, abc.ABC):
                 return data.cpu().tolist()
             return data
 
-        if hasattr(pl_module, "postprocess"):
+        if self.apply_postprocess and hasattr(pl_module, "postprocess"):
             if (
                 isinstance(pl_module.postprocess, module_utils.BatchPostProcess)
                 and pl_module.postprocess.predictions_transforms is not None
