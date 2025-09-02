@@ -77,7 +77,7 @@ class TextPredictionDataset(
                 raise ValueError(f"Unsupported file extension: {extension}")
 
         if self.split is not None:
-            self._data = self._data[self._data["split"] == self.split].reset_index(drop=True)
+            self._data = self._data[self._data["split"] == self.split].reset_index(drop=True)  # type: ignore
 
     @override
     def validate(self) -> None:

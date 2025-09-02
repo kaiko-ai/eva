@@ -1,7 +1,16 @@
 """Types and classes for conversation messages in a multimodal context."""
 
 import dataclasses
+import enum
 from typing import Any, Dict, List
+
+
+class Role(str, enum.Enum):
+    """Roles for messages in a conversation."""
+
+    USER = "user"
+    ASSISTANT = "assistant"
+    SYSTEM = "system"
 
 
 @dataclasses.dataclass
@@ -20,21 +29,21 @@ class Message:
 class UserMessage(Message):
     """User message in a conversation."""
 
-    role: str = "user"
+    role: str = Role.USER
 
 
 @dataclasses.dataclass
 class AssistantMessage(Message):
     """Assistant message in a conversation."""
 
-    role: str = "assistant"
+    role: str = Role.ASSISTANT
 
 
 @dataclasses.dataclass
 class SystemMessage(Message):
     """System message in a conversation."""
 
-    role: str = "system"
+    role: str = Role.SYSTEM
 
 
 @dataclasses.dataclass

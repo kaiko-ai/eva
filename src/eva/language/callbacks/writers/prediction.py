@@ -9,18 +9,15 @@ import pandas as pd
 import torch
 from lightning.pytorch import callbacks
 from torch import nn
-from typing_extensions import override
+from typing_extensions import NotRequired, override
 
 from eva.core.models.modules import utils as module_utils
-from eva.language import utils
 from eva.language.models.typings import TextBatch
+from eva.language.utils.text import messages as message_utils
 
 
 class ManifestEntry(TypedDict):
     """A single entry in the manifest file."""
-
-    text: str
-    """The input text data."""
 
     prediction: str
     """The predicted text."""
@@ -28,7 +25,10 @@ class ManifestEntry(TypedDict):
     target: str
     """The ground truth text."""
 
-    split: str
+    text: NotRequired[str]
+    """The input text data."""
+
+    split: NotRequired[str]
     """The dataset split (e.g. train, val, test)."""
 
 
@@ -101,7 +101,7 @@ class TextPredictionWriter(callbacks.BasePredictionWriter, abc.ABC):
 
         for i in range(len(batch_indices)):
             entry: ManifestEntry = {
-                "text": utils.messages_to_string(text_batch[i]),
+                "text": message_utils.serialize(text_batch[i]),
                 "prediction": str(prediction_batch[i]),
                 "target": str(target_batch[i]) if has_target else "",
                 "split": split if split else "",

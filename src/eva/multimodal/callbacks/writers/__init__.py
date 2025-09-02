@@ -1,5 +1,5 @@
 """Multimodal writers callbacks API."""
 
-from eva.multimodal.callbacks.writers.text import TextPredictionWriter
+from eva.multimodal.callbacks.writers.prediction import TextPredictionWriter
 
 __all__ = ["TextPredictionWriter"]

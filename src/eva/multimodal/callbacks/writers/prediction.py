@@ -34,6 +34,6 @@ class TextPredictionWriter(writers.TextPredictionWriter):
         )
 
     @override
-    def _unpack_batch(self, batch: TextImageBatch) -> Tuple[list, list | None, dict | None]:
+    def _unpack_batch(self, batch: TextImageBatch) -> Tuple[list, list | None, dict | None]:  # type: ignore
         text_batch, _, target_batch, metadata_batch = TextImageBatch(*batch)
         return text_batch, target_batch, metadata_batch
