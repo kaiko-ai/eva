@@ -1,6 +1,7 @@
 """Tests regarding eva's CLI commands on language datasets."""
 
 import os
+import tempfile
 from unittest import mock
 from unittest.mock import patch
 
@@ -15,6 +16,7 @@ from tests.eva import _cli
     "configuration_file",
     [
         "configs/language/pathology/online/multiple_choice/pubmedqa.yaml",
+        "configs/language/pathology/offline/multiple_choice/pubmedqa.yaml",
     ],
 )
 def test_configuration_initialization(configuration_file: str, lib_path: str) -> None:
@@ -45,6 +47,34 @@ def test_validate_from_configuration(configuration_file: str, lib_path: str) -> 
                 os.path.join(lib_path, configuration_file),
             ]
         )
+
+
+@pytest.mark.parametrize(
+    "configuration_file",
+    [
+        "configs/language/pathology/offline/multiple_choice/pubmedqa.yaml",
+    ],
+)
+def test_predict_validate_from_configuration(configuration_file: str, lib_path: str) -> None:
+    """Tests CLI `predict` and `validate` commands with a given configuration file."""
+    with tempfile.TemporaryDirectory() as output_dir:
+        with mock.patch.dict(
+            os.environ, {"N_RUNS": "1", "BATCH_SIZE": "2", "PREDICTIONS_OUTPUT_DIR": output_dir}
+        ):
+            _cli.run_cli_from_main(
+                cli_args=[
+                    "predict",
+                    "--config",
+                    os.path.join(lib_path, configuration_file),
+                ]
+            )
+            _cli.run_cli_from_main(
+                cli_args=[
+                    "validate",
+                    "--config",
+                    os.path.join(lib_path, configuration_file),
+                ]
+            )
 
 
 @pytest.fixture(autouse=True)

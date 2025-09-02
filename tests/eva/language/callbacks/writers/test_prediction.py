@@ -230,4 +230,4 @@ class FakeTextDataset(boring_classes.RandomDataset, datasets.Dataset):
         text = [UserMessage(content=f"Sample text {self._split}-{index}")]
         target = f"target_{index}"
         metadata = {"example_metadata": f"metadata_{index}"}
-        return TextSample(text=text, target=target, metadata=metadata)
+        return TextSample(text=text, target=target, metadata=metadata)  # type: ignore

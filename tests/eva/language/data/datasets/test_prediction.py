@@ -93,6 +93,7 @@ def test_with_metadata_columns(assets_path: Path, file_format: str) -> None:
     dataset.setup()
 
     sample = dataset[0]
+    assert isinstance(sample.metadata, dict)
     assert "split" in sample.metadata
     assert sample.metadata["split"] == "val"
 

@@ -1,6 +1,7 @@
 """Tests regarding eva's CLI commands on multimodal datasets."""
 
 import os
+import tempfile
 from unittest import mock
 from unittest.mock import patch
 
@@ -46,6 +47,53 @@ def test_validate_from_configuration(configuration_file: str, lib_path: str) -> 
                 os.path.join(lib_path, configuration_file),
             ]
         )
+
+
+@pytest.mark.parametrize(
+    "configuration_file",
+    [
+        "configs/multimodal/pathology/online/multiple_choice/patch_camelyon.yaml",
+    ],
+)
+def test_test_from_configuration(configuration_file: str, lib_path: str) -> None:
+    """Tests CLI `test` command with a given configuration file."""
+    with mock.patch.dict(os.environ, {"N_RUNS": "1", "BATCH_SIZE": f"{BATCH_SIZE}"}):
+        _cli.run_cli_from_main(
+            cli_args=[
+                "test",
+                "--config",
+                os.path.join(lib_path, configuration_file),
+            ]
+        )
+
+
+@pytest.mark.parametrize(
+    "configuration_file",
+    [
+        "configs/multimodal/pathology/offline/multiple_choice/patch_camelyon.yaml",
+    ],
+)
+def test_predict_validate_from_configuration(configuration_file: str, lib_path: str) -> None:
+    """Tests CLI `predict` and `validate` commands with a given configuration file."""
+    with tempfile.TemporaryDirectory() as output_dir:
+        with mock.patch.dict(
+            os.environ,
+            {"N_RUNS": "1", "PREDICT_BATCH_SIZE": "2", "PREDICTIONS_OUTPUT_DIR": output_dir},
+        ):
+            _cli.run_cli_from_main(
+                cli_args=[
+                    "predict",
+                    "--config",
+                    os.path.join(lib_path, configuration_file),
+                ]
+            )
+            _cli.run_cli_from_main(
+                cli_args=[
+                    "validate",
+                    "--config",
+                    os.path.join(lib_path, configuration_file),
+                ]
+            )
 
 
 @pytest.fixture(autouse=True)
