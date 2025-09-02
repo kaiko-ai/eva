@@ -140,6 +140,8 @@ class Interface:
         data: datamodules.DataModule,
     ) -> None:
         """Runs validation & test stages."""
+        if getattr(data.datasets, "val", None) is None:
+            raise ValueError("The provided data module does not contain a validation dataset.")
         if getattr(data.datasets, "test", None) is None:
             raise ValueError("The provided data module does not contain a test dataset.")
 
