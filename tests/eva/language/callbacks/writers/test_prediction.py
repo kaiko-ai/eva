@@ -3,11 +3,12 @@
 import functools
 import os
 import tempfile
-from typing import List, Literal
+from typing import List, Literal, cast
 
 import lightning.pytorch as pl
 import pandas as pd
 import pytest
+from lightning.pytorch import Callback
 from lightning.pytorch.demos import boring_classes
 from torch import nn
 from typing_extensions import override
@@ -32,7 +33,7 @@ def test_prediction_writer(
     datamodule: datamodules.DataModule,
     model: pl.LightningModule,
     text_generation_model: nn.Module,
-    save_format: str,
+    save_format: Literal["jsonl", "parquet", "csv"],
     include_input: bool,
 ) -> None:
     """Tests the text prediction writer callback.
@@ -63,7 +64,7 @@ def test_prediction_writer_overwrite_protection(
     datamodule: datamodules.DataModule,
     model: pl.LightningModule,
     text_generation_model: nn.Module,
-    save_format: str,
+    save_format: Literal["jsonl", "parquet", "csv"],
 ) -> None:
     """Tests that the writer raises an error when overwrite is False and files exist."""
     with tempfile.TemporaryDirectory() as output_dir:
@@ -88,7 +89,7 @@ def test_prediction_writer_overwrite_protection(
 
 
 def _init_and_run_trainer(
-    callbacks: List[pl.callbacks.Callback],
+    callbacks: List[Callback],
     model: pl.LightningModule,
     datamodule: datamodules.DataModule,
 ):
@@ -106,7 +107,7 @@ def _init_and_run_trainer(
 def _check_manifest(
     output_dir: str,
     datamodule: datamodules.DataModule,
-    save_format: str,
+    save_format: Literal["jsonl", "parquet", "csv"],
     include_input: bool = True,
 ):
     """Checks if the manifest file contains the expected entries."""
@@ -114,12 +115,15 @@ def _check_manifest(
     assert os.path.isfile(manifest_path)
 
     # Load manifest based on format
-    if save_format == "jsonl":
-        df_manifest = pd.read_json(manifest_path, lines=True)
-    elif save_format == "csv":
-        df_manifest = pd.read_csv(manifest_path)
-    elif save_format == "parquet":
-        df_manifest = pd.read_parquet(manifest_path)
+    match save_format:
+        case "jsonl":
+            df_manifest = pd.read_json(manifest_path, lines=True)
+        case "csv":
+            df_manifest = pd.read_csv(manifest_path)
+        case "parquet":
+            df_manifest = pd.read_parquet(manifest_path)
+        case _:
+            raise ValueError(f"Unsupported save format: {save_format}")
 
     # Check expected columns
     expected_columns = ["text", "prediction", "target", "split", "example_metadata"]
@@ -150,7 +154,7 @@ def model(text_generation_model: nn.Module) -> pl.LightningModule:
 
 
 @pytest.fixture(scope="function")
-def dataset(n_samples: int) -> List[datasets.Dataset]:
+def dataset(n_samples: int) -> List[datasets.TorchDataset]:
     """Fake dataset fixture."""
     Dataset = functools.partial(
         FakeTextDataset,
@@ -164,7 +168,7 @@ def dataset(n_samples: int) -> List[datasets.Dataset]:
 
 
 @pytest.fixture(scope="function")
-def datamodule(batch_size: int, dataset: List[datasets.Dataset]) -> datamodules.DataModule:
+def datamodule(batch_size: int, dataset: List[datasets.TorchDataset]) -> datamodules.DataModule:
     """Returns a DataModule fixture."""
     dataloader = dataloaders.DataLoader(
         batch_size=batch_size,
@@ -175,7 +179,9 @@ def datamodule(batch_size: int, dataset: List[datasets.Dataset]) -> datamodules.
         collate_fn=text_collate,
     )
     return datamodules.DataModule(
-        datasets=datamodules.DatasetsSchema(train=dataset[0], val=dataset[1], predict=dataset),
+        datasets=datamodules.DatasetsSchema(
+            train=dataset[0], val=dataset[1], predict=cast(List[datasets.TorchDataset], dataset)
+        ),
         dataloaders=datamodules.DataloadersSchema(
             train=dataloader,
             val=dataloader,
