@@ -5,6 +5,8 @@ from typing import Any, Dict
 
 from loguru import logger
 
+from eva.core.utils import requirements
+
 
 def rename_active_run(name: str) -> None:
     """Renames the current run."""
@@ -12,7 +14,8 @@ def rename_active_run(name: str) -> None:
 
     if wandb.run:
         wandb.run.name = name
-        wandb.run.save()
+        if requirements.below("wandb", "0.21.0"):
+            wandb.run.save()
     else:
         logger.warning("No active wandb run found that could be renamed.")
 
