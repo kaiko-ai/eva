@@ -75,7 +75,6 @@ class TextDataset(LanguageDataset[TextSample[TargetType]], abc.ABC, Generic[Targ
 
         Args:
             sample: The text sample..
-            target: The target label.
 
         Returns:
             The transformed sample.

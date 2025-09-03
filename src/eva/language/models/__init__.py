@@ -1,7 +1,7 @@
 """Language Models API."""
 
 from eva.language.models import modules, networks, wrappers
-from eva.language.models.modules import LanguageModule
+from eva.language.models.modules import LanguageModule, OfflineLanguageModule
 from eva.language.models.wrappers import HuggingFaceModel, LiteLLMModel
 
 try:
@@ -15,6 +15,7 @@ try:
         "LiteLLMModel",
         "VllmModel",
         "LanguageModule",
+        "OfflineLanguageModule",
     ]
 except ImportError:
     __all__ = [
@@ -24,4 +25,5 @@ except ImportError:
         "HuggingFaceModel",
         "LiteLLMModel",
         "LanguageModule",
+        "OfflineLanguageModule",
     ]

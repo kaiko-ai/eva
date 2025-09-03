@@ -21,3 +21,19 @@ class TextBatch(NamedTuple, Generic[TargetType]):
 
     metadata: Dict[str, Any] | None
     """Additional metadata."""
+
+
+class PredictionBatch(NamedTuple, Generic[TargetType]):
+    """Text sample with target and metadata."""
+
+    prediction: TargetType
+    """Prediction data."""
+
+    target: TargetType
+    """Target data."""
+
+    text: List[MessageSeries] | None
+    """Conversation messages that were used as input."""
+
+    metadata: Dict[str, Any] | None
+    """Additional metadata."""

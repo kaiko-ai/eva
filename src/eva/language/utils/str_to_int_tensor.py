@@ -63,7 +63,10 @@ class CastStrToIntTensor:
             ValueError: If any value cannot be mapped to an integer.
         """
         return torch.tensor(
-            [self._cast_single(v) for v in (values if isinstance(values, list) else [values])],
+            [
+                self._cast_single(v)
+                for v in (values if isinstance(values, list | tuple) else [values])
+            ],
             dtype=torch.int,
         )
 

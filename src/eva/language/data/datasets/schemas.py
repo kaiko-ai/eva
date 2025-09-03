@@ -13,3 +13,6 @@ class TransformsSchema:
 
     target: Callable | None = None
     """Target transformation"""
+
+    prediction: Callable | None = None
+    """Prediction transformation"""

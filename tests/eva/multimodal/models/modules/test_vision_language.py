@@ -75,7 +75,7 @@ def test_init_attributes(model):
     module_instance = VisionLanguageModule(model=model)
     assert module_instance.model is model
     assert module_instance.metrics is not None  # MetricModule is created by default
-    assert module_instance._postprocess is not None  # BatchPostProcess is created by default
+    assert module_instance.postprocess is not None  # BatchPostProcess is created by default
 
 
 def test_batch_step_without_targets(vision_language_module):

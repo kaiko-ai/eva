@@ -33,8 +33,8 @@ class ModelModule(pl.LightningModule):
         super().__init__()
 
         self._metrics = metrics or self.default_metrics
-        self._postprocess = postprocess or self.default_postprocess
 
+        self.postprocess = postprocess or self.default_postprocess
         self.metrics = metrics_lib.MetricModule.from_schema(self._metrics)
 
     @property
@@ -133,7 +133,7 @@ class ModelModule(pl.LightningModule):
         Returns:
             The updated outputs.
         """
-        self._postprocess(outputs)
+        self.postprocess(outputs)
         return memory.recursive_detach(outputs, to_cpu=self.metrics_device.type == "cpu")
 
     def _forward_and_log_metrics(
