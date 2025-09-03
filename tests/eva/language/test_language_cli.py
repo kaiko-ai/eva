@@ -104,3 +104,9 @@ def mock_dependencies():
         mock.patch.dict(os.environ, {"ANTHROPIC_API_KEY": "dummy-key"}),
     ):
         yield
+
+
+@pytest.fixture(autouse=True)
+def skip_dataset_validation() -> None:
+    """Mocks the validation step of the datasets."""
+    datasets.PubMedQA.validate = mock.MagicMock(return_value=None)
