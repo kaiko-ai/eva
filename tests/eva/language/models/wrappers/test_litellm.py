@@ -2,15 +2,17 @@
 
 import pytest
 
-from eva.language.models import LiteLLMTextModel
+from eva.language.data.messages import UserMessage
+from eva.language.models import LiteLLMModel
+from eva.language.models.typings import TextBatch
 
-DUMMY_RESPONSE = {"choices": [{"message": {"content": "Test response"}}]}
+DUMMY_RESPONSE = {"choices": [{"message": {"content": "Test response", "role": "assistant"}}]}
 
 
 def test_generate(model_instance):
     """Test that the generate method returns the expected dummy response."""
-    prompts = ["Hello, world!"]
-    result = model_instance(prompts)
+    batch = TextBatch(text=[[UserMessage(content="Hello, world!")]], target=None, metadata={})
+    result = model_instance(batch)
     assert result == ["Test response"]
 
 
@@ -31,9 +33,9 @@ def fake_completion(monkeypatch):
 
 @pytest.fixture
 def model_instance(fake_completion):  # noqa: ARG001
-    """Fixture to instantiate the LiteLLMTextModel with a valid model name.
+    """Fixture to instantiate the LiteLLMModel with a valid model name.
 
     Using a valid model name (like 'openai/gpt-3.5-turbo') helps pass provider lookup.
     fake_completion dependency ensures mocking is set up before model creation.
     """
-    return LiteLLMTextModel("openai/gpt-3.5-turbo", model_kwargs={"temperature": 0.7})
+    return LiteLLMModel("openai/gpt-3.5-turbo", model_kwargs={"temperature": 0.7})

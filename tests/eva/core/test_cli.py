@@ -1,4 +1,4 @@
-"""Tests regarding the EVA `fit` CLI command on core datasets."""
+"""Tests regarding the eva `fit` CLI command on core datasets."""
 
 import os
 

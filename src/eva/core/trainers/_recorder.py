@@ -86,10 +86,13 @@ class SessionRecorder:
 
     def update(
         self,
-        validation_scores: _EVALUATE_OUTPUT,
+        validation_scores: _EVALUATE_OUTPUT | None = None,
         test_scores: _EVALUATE_OUTPUT | None = None,
     ) -> None:
         """Updates the state of the tracked metrics in-place."""
+        if validation_scores is None and test_scores is None:
+            raise ValueError("At least one of validation_scores or test_scores must be provided.")
+
         self._update_validation_metrics(validation_scores)
         self._update_test_metrics(test_scores)
 
@@ -117,9 +120,10 @@ class SessionRecorder:
         self._validation_metrics = []
         self._test_metrics = []
 
-    def _update_validation_metrics(self, metrics: _EVALUATE_OUTPUT) -> None:
+    def _update_validation_metrics(self, metrics: _EVALUATE_OUTPUT | None) -> None:
         """Updates the validation metrics in-place."""
-        self._validation_metrics = _update_session_metrics(self._validation_metrics, metrics)
+        if metrics:
+            self._validation_metrics = _update_session_metrics(self._validation_metrics, metrics)
 
     def _update_test_metrics(self, metrics: _EVALUATE_OUTPUT | None) -> None:
         """Updates the test metrics in-place."""

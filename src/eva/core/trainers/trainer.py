@@ -8,6 +8,7 @@ from lightning.pytorch import loggers as pl_loggers
 from lightning.pytorch import trainer as pl_trainer
 from lightning.pytorch.utilities import argparse
 from lightning_fabric.utilities import cloud_io
+from lightning_utilities.core.rank_zero import rank_zero_only
 from typing_extensions import override
 
 from eva.core import loggers as eva_loggers
@@ -66,6 +67,7 @@ class Trainer(pl_trainer.Trainer):
     def log_dir(self) -> str | None:
         return self.strategy.broadcast(self._log_dir)
 
+    @rank_zero_only
     def init_logger_run(self, run_id: int | None) -> None:
         """Setup the loggers & log directories when starting a new run.
 

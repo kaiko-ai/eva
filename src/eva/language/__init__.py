@@ -1,6 +1,7 @@
 """eva language API."""
 
 try:
+    from eva.language import models
     from eva.language.data import datasets
 except ImportError as e:
     msg = (
@@ -10,4 +11,4 @@ except ImportError as e:
     )
     raise ImportError(str(e) + "\n\n" + msg) from e
 
-__all__ = ["datasets"]
+__all__ = ["models", "datasets"]

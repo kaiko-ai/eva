@@ -77,7 +77,9 @@ class DataLoader:
             shuffle=self.shuffle,
             sampler=sampler or self.sampler,
             batch_sampler=self.batch_sampler,
-            num_workers=self.num_workers or multiprocessing.cpu_count(),
+            num_workers=(
+                multiprocessing.cpu_count() if self.num_workers is None else self.num_workers
+            ),
             collate_fn=self.collate_fn,
             pin_memory=self.pin_memory,
             drop_last=self.drop_last,

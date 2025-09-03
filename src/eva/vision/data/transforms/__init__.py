@@ -13,10 +13,11 @@ from eva.vision.data.transforms.intensity import (
     RandShiftIntensity,
     ScaleIntensityRange,
 )
-from eva.vision.data.transforms.spatial import RandFlip, RandRotate90, Spacing
+from eva.vision.data.transforms.spatial import RandFlip, RandRotate90, Resize, Spacing
 from eva.vision.data.transforms.utility import EnsureChannelFirst
 
 __all__ = [
+    "Resize",
     "ResizeAndCrop",
     "Squeeze",
     "CropForeground",

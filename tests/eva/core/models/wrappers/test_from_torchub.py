@@ -8,6 +8,7 @@ import torch
 from eva.core.models import wrappers
 
 
+@pytest.mark.skip(reason="Test triggers rate limits")
 @pytest.mark.parametrize(
     "model_name, repo_or_dir, out_indices, model_kwargs, "
     "input_tensor, expected_len, expected_shape",

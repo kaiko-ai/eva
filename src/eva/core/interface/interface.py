@@ -102,11 +102,54 @@ class Interface:
             model: The model module to use but not modify.
             data: The data module containing validation data.
         """
+        if getattr(data.datasets, "val", None) is None:
+            raise ValueError("The provided data module does not contain a validation dataset.")
+
         eva_trainer.run_evaluation_session(
             base_trainer=trainer,
             base_model=model,
             datamodule=data,
             stages=["validate"],
+            n_runs=trainer.n_runs,
+            verbose=trainer.n_runs > 1,
+        )
+
+    def test(
+        self,
+        trainer: eva_trainer.Trainer,
+        model: modules.ModelModule,
+        data: datamodules.DataModule,
+    ) -> None:
+        """Same as validate, but runs the test stage."""
+        if getattr(data.datasets, "test", None) is None:
+            raise ValueError("The provided data module does not contain a test dataset.")
+
+        eva_trainer.run_evaluation_session(
+            base_trainer=trainer,
+            base_model=model,
+            datamodule=data,
+            stages=["test"],
+            n_runs=trainer.n_runs,
+            verbose=trainer.n_runs > 1,
+        )
+
+    def validate_test(
+        self,
+        trainer: eva_trainer.Trainer,
+        model: modules.ModelModule,
+        data: datamodules.DataModule,
+    ) -> None:
+        """Runs validation & test stages."""
+        if getattr(data.datasets, "val", None) is None:
+            raise ValueError("The provided data module does not contain a validation dataset.")
+        if getattr(data.datasets, "test", None) is None:
+            raise ValueError("The provided data module does not contain a test dataset.")
+
+        eva_trainer.run_evaluation_session(
+            base_trainer=trainer,
+            base_model=model,
+            datamodule=data,
+            stages=["validate", "test"],
             n_runs=trainer.n_runs,
             verbose=trainer.n_runs > 1,
         )

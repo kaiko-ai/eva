@@ -10,10 +10,19 @@ from loguru import logger
 from typing_extensions import override
 
 from eva.language.data.datasets.classification import base
+from eva.language.data.messages import MessageSeries, UserMessage
 
 
 class PubMedQA(base.TextClassification):
     """Dataset class for PubMedQA question answering task."""
+
+    _expected_dataset_lengths: Dict[str | None, int] = {
+        "train": 450,
+        "val": 50,
+        "test": 500,
+        None: 500,
+    }
+    """Expected dataset lengths for the splits and complete dataset."""
 
     _license: str = "MIT License (https://github.com/pubmedqa/pubmedqa/blob/master/LICENSE)"
     """Dataset license."""
@@ -52,7 +61,14 @@ class PubMedQA(base.TextClassification):
         """
         dataset_name = "bigbio/pubmed_qa"
         config_name = "pubmed_qa_labeled_fold0_source"
-        split = (self._split or "train+test+validation") if self._split != "val" else "validation"
+
+        match self._split:
+            case "val":
+                split = "validation"
+            case None:
+                split = "train+test+validation"
+            case _:
+                split = self._split
 
         if self._download:
             logger.info("Downloading dataset from HuggingFace Hub")
@@ -88,7 +104,7 @@ class PubMedQA(base.TextClassification):
         dataset_path = None
 
         if self._root:
-            dataset_path = self._root
+            dataset_path = os.path.join(self._root, self._split) if self._split else self._root
             os.makedirs(self._root, exist_ok=True)
 
         try:
@@ -103,6 +119,15 @@ class PubMedQA(base.TextClassification):
         except Exception as e:
             raise RuntimeError(f"Failed to prepare dataset: {e}") from e
 
+    @override
+    def validate(self) -> None:
+        if len(self) != self._expected_dataset_lengths[self._split]:
+            raise ValueError(
+                f"Dataset length mismatch for split '{self._split}': "
+                f"expected {self._expected_dataset_lengths[self._split]}, "
+                f"but got {len(self)}"
+            )
+
     @property
     @override
     def classes(self) -> List[str]:
@@ -114,11 +139,18 @@ class PubMedQA(base.TextClassification):
         return {"no": 0, "yes": 1, "maybe": 2}
 
     @override
-    def load_text(self, index: int) -> str:
+    def load_text(self, index: int) -> MessageSeries:
         if index < 0 or index >= len(self.dataset):
             raise IndexError(f"Index {index} out of range for dataset of size {len(self.dataset)}")
         sample = dict(self.dataset[index])
-        return f"Question: {sample['QUESTION']}\nContext: " + " ".join(sample["CONTEXTS"])
+        return [
+            UserMessage(
+                content=f"Question: {sample['QUESTION']}\nContext: "
+                + " ".join(sample["CONTEXTS"])
+                + "\nInstruction: Carefully read the question and the provided context. "
+                + "Answer with one word: 'yes', 'no', or 'maybe'. Answer: "
+            )
+        ]
 
     @override
     def load_target(self, index: int) -> torch.Tensor:

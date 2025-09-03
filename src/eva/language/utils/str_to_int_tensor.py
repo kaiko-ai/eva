@@ -16,11 +16,11 @@ class CastStrToIntTensor:
     Supports single values, lists of strings, or lists of integers.
 
     Example:
-        >>> # Default mapping for yes/no/maybe classification
-        >>> transform = CastStrToIntTensor()
-        >>> transform(['yes', 'no', 'maybe'])
+        >>> # Default mapping for A/B/C classification
+        >>> transform = CastStrToIntTensor(mapping={"A": 0, "B": 1, "C": 2})
+        >>> transform(['B', 'A', 'C'])
         tensor([1, 0, 2])
-        >>> transform('yes')
+        >>> transform('B')
         tensor([1])
 
         >>> # Custom mapping
@@ -29,20 +29,25 @@ class CastStrToIntTensor:
         tensor([1, 0])
     """
 
-    def __init__(self, mapping: Dict[str, int] | None = None):
-        """Initialize the transform with a regex-to-integer mapping.
+    def __init__(
+        self, mapping: Dict[str, int], standalone_words: bool = True, case_sensitive: bool = True
+    ) -> None:
+        r"""Initialize the transform with a regex-to-integer mapping.
 
         Args:
             mapping: Dictionary mapping regex patterns to integers. If None, uses default
                     yes/no/maybe mapping: {'no': 0, 'yes': 1, 'maybe': 2}
+            standalone_words: If True, patterns are treated as standalone words (e.g., '\bno\b').
+            case_sensitive: If True, regex patterns are case-sensitive.
         """
-        if mapping is None:
-            self.mapping = {r"\bno\b": 0, r"\byes\b": 1, r"\bmaybe\b": 2}
-        else:
-            self.mapping = mapping
+        self.mapping = mapping
+
+        if standalone_words:
+            self.mapping = {rf"\b{k}\b": v for k, v in mapping.items()}
 
         self.compiled_patterns = [
-            (re.compile(pattern, re.IGNORECASE), value) for pattern, value in self.mapping.items()
+            (re.compile(pattern, 0 if case_sensitive else re.IGNORECASE), value)
+            for pattern, value in self.mapping.items()
         ]
 
     def __call__(self, values: Union[str, List[str], List[int]]) -> torch.Tensor:
@@ -58,7 +63,10 @@ class CastStrToIntTensor:
             ValueError: If any value cannot be mapped to an integer.
         """
         return torch.tensor(
-            [self._cast_single(v) for v in (values if isinstance(values, list) else [values])],
+            [
+                self._cast_single(v)
+                for v in (values if isinstance(values, list | tuple) else [values])
+            ],
             dtype=torch.int,
         )
 
