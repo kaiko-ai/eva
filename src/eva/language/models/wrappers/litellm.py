@@ -1,77 +1,112 @@
-"""LLM wrapper for litellm models."""
+"""LiteLLM language model wrapper."""
 
+import logging
 from typing import Any, Dict, List
 
-from litellm import batch_completion  # type: ignore
+import backoff
+import litellm
+from litellm import batch_completion
+from litellm.exceptions import (
+    APIConnectionError,
+    InternalServerError,
+    RateLimitError,
+    ServiceUnavailableError,
+    Timeout,
+)
 from loguru import logger
 from typing_extensions import override
 
-from eva.core.models.wrappers import base
+from eva.language.models.typings import TextBatch
+from eva.language.models.wrappers import base
+from eva.language.utils.text import messages as message_utils
+
+RETRYABLE_ERRORS = (
+    RateLimitError,
+    Timeout,
+    InternalServerError,
+    APIConnectionError,
+    ServiceUnavailableError,
+)
 
 
-class LiteLLMTextModel(base.BaseModel[List[str], List[str]]):
-    """Wrapper class for using litellm for chat-based text generation.
-
-    This wrapper uses litellm's `completion` function which accepts a list of
-    message dicts. The `forward` method converts a string prompt into a chat
-    message with a default "user" role, optionally prepends a system message,
-    and includes an API key if provided.
-    """
+class LiteLLMModel(base.LanguageModel):
+    """Wrapper class for LiteLLM language models."""
 
     def __init__(
         self,
-        model_name_or_path: str,
+        model_name: str,
         model_kwargs: Dict[str, Any] | None = None,
-    ) -> None:
-        """Initializes the litellm chat model wrapper.
+        system_prompt: str | None = None,
+        log_level: int | None = logging.INFO,
+    ):
+        """Initialize the LiteLLM Wrapper.
 
         Args:
-            model_name_or_path: The model identifier (or name) for litellm
-                (e.g.,"openai/gpt-4o" or "anthropic/claude-3-sonnet-20240229").
+            model_name: The name of the model to use.
             model_kwargs: Additional keyword arguments to pass during
                 generation (e.g., `temperature`, `max_tokens`).
+            system_prompt: The system prompt to use (optional).
+            log_level: Optional logging level for LiteLLM. Defaults to WARNING.
         """
-        super().__init__()
-        self._model_name_or_path = model_name_or_path
-        self._model_kwargs = model_kwargs or {}
-        self.load_model()
+        super().__init__(system_prompt=system_prompt)
+
+        self.model_name = model_name
+        self.model_kwargs = model_kwargs or {}
+
+        litellm.suppress_debug_info = True
+
+        if log_level is not None:
+            logging.getLogger("LiteLLM").setLevel(log_level)
 
     @override
-    def load_model(self) -> None:
-        """Prepares the litellm model.
-
-        Note:
-            litellm doesn't require an explicit loading step; models are called
-            directly during generation. This method exists for API consistency.
-        """
-        pass
-
-    @override
-    def model_forward(self, prompts: List[str]) -> List[str]:
-        """Generates text using litellm.
+    def format_inputs(self, batch: TextBatch) -> List[List[Dict[str, Any]]]:
+        """Formats inputs for LiteLLM.
 
         Args:
-            prompts: A list of prompts to be converted into a "user" message.
+            batch: A batch of text inputs.
 
         Returns:
-            A list of generated text responses. Failed generations will contain
-            error messages instead of generated text.
+            A list of messages in the following format:
+            [
+                {
+                    "role": ...
+                    "content": ...
+                },
+                ...
+            ]
         """
-        messages = [[{"role": "user", "content": prompt}] for prompt in prompts]
+        message_batch, _, _ = TextBatch(*batch)
 
-        responses = batch_completion(
-            model=self._model_name_or_path,
-            messages=messages,
-            **self._model_kwargs,
+        message_batch = message_utils.batch_insert_system_message(
+            message_batch, self.system_message
         )
+        message_batch = list(map(message_utils.combine_system_messages, message_batch))
 
-        results = []
-        for i, response in enumerate(responses):
-            if isinstance(response, Exception):
-                error_msg = f"Error generating text for prompt {i}: {response}"
-                logger.error(error_msg)
-                raise RuntimeError(error_msg)
-            else:
-                results.append(response["choices"][0]["message"]["content"])
+        return list(map(message_utils.format_chat_message, message_batch))
 
-        return results
+    @override
+    @backoff.on_exception(
+        backoff.expo,
+        RETRYABLE_ERRORS,
+        max_tries=20,
+        jitter=backoff.full_jitter,
+        on_backoff=lambda details: logger.warning(
+            f"Retrying due to {details.get('exception') or 'Unknown error'}"
+        ),
+    )
+    def model_forward(self, batch: List[List[Dict[str, Any]]]) -> List[str]:
+        """Generates output text through API calls via LiteLLM's batch completion functionality."""
+        outputs = batch_completion(model=self.model_name, messages=batch, **self.model_kwargs)
+        self._raise_exceptions(outputs)
+
+        return [
+            output["choices"][0]["message"]["content"]
+            for output in outputs
+            if output["choices"][0]["message"]["role"] == "assistant"
+        ]
+
+    def _raise_exceptions(self, outputs: list):
+        for output in outputs:
+            if isinstance(output, Exception):
+                logger.error(f"Model {self.model_name} encountered an error: {output}")
+                raise output

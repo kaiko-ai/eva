@@ -31,7 +31,7 @@ hide:
 
 _Oncology FM Evaluation Framework by [kaiko.ai](https://www.kaiko.ai/)_
 
-*eva* currently supports performance evaluation for vision Foundation Models ("FMs") and supervised machine learning models on WSI (patch- and slide-level), radiology image segmentation, and text classification tasks.
+*eva* currently supports performance evaluation for Foundation Models ("FMs") accross multiple oncology domains and data modalities.
 
 With *eva* we provide the open-source community with an easy-to-use framework that follows industry best practices to deliver a robust, reproducible and fair evaluation benchmark across FMs of different sizes and architectures.
 
@@ -68,6 +68,11 @@ Supported datasets & tasks include:
 *Text classification datasets*
 
 -	**[PubMedQA](datasets/pubmedqa.md)**: Medical question answering classification
+
+*Multimodal datasets*
+
+-	**[PatchCamelyon (image-text)](datasets/patch_camelyon.md)**: Vision-language benchmark variation for the popular vision Patch Camelyon task, where the goal is to classify breast cancer patches, using both the image and a text prompt.
+
 
 To evaluate FMs, *eva* provides support for different model-formats, including models trained with PyTorch, models available on HuggingFace and ONNX-models. For other formats custom wrappers can be implemented.
 
