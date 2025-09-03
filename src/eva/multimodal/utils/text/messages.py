@@ -5,7 +5,7 @@ from typing import Any, Dict, List
 from torchvision import tv_tensors
 
 from eva.language import utils as language_utils
-from eva.language.data.messages import MessageSeries
+from eva.language.data.messages import MessageSeries, Role
 from eva.multimodal.utils import image as image_utils
 
 
@@ -18,7 +18,7 @@ def format_huggingface_message(
 
     formatted_message = []
     for item in message:
-        if item.role == "system":
+        if item.role == Role.SYSTEM:
             formatted_message += language_utils.format_chat_message([item])
         else:
             formatted_message.append(
@@ -53,7 +53,7 @@ def format_litellm_message(
 
     formatted_message = []
     for item in message:
-        if item.role == "system":
+        if item.role == Role.SYSTEM:
             formatted_message += language_utils.format_chat_message([item])
         else:
             formatted_message.append(

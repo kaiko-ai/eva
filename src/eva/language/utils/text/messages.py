@@ -33,11 +33,11 @@ def combine_system_messages(message: MessageSeries, join_char: str = "\n") -> Me
         A new message series with system messages combined into one and the
         remaining messages unchanged.
     """
-    system_messages = list(filter(lambda item: item.role == "system", message))
+    system_messages = list(filter(lambda item: item.role == Role.SYSTEM, message))
     if len(system_messages) == 0:
         return message
 
-    non_system_messages = list(filter(lambda item: item.role != "system", message))
+    non_system_messages = list(filter(lambda item: item.role != Role.SYSTEM, message))
     return [
         SystemMessage(content=merge_message_contents(system_messages, join_char=join_char))
     ] + non_system_messages
