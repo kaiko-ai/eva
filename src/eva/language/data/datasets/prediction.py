@@ -36,7 +36,10 @@ class TextPredictionDataset(
             prediction_column: The name of the prediction column.
             target_column: The name of the label column.
             text_column: The name of the column with the text inputs that were used
-                to generate the predictions.
+                to generate the predictions. If the text column contains chat message
+                json format ([{"role": ..., "content": ...}]), it will be deserialized into
+                a list of Message objects. Otherwise, the content is interpreted as a
+                single user message.
             metadata_columns: List of column names to include in metadata.
             split: The dataset split to use (train, val, test). If not specified,
                 the entire dataset will be used.
