@@ -66,7 +66,6 @@ class OfflineLanguageModule(module.ModelModule):
         """Initializes the text inference module.
 
         Args:
-            model: Model instance to use for forward pass.
             metrics: Metrics schema for evaluation.
             postprocess: A helper function to post-process model outputs before evaluation.
         """
