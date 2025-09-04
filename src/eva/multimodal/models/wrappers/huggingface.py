@@ -147,10 +147,10 @@ class HuggingFaceModel(base.VisionLanguageModel):
 
     def load_processor(self) -> Callable:
         """Initialize the processor."""
-        if "model_name_or_path" not in self.processor_kwargs:
-            self.processor_kwargs["model_name_or_path"] = self.model_name_or_path
-
-        return transformers.AutoProcessor.from_pretrained(**self.processor_kwargs)
+        return transformers.AutoProcessor.from_pretrained(
+            self.processor_kwargs.pop("model_name_or_path", self.model_name_or_path),
+            **self.processor_kwargs,
+        )
 
     def _unpack_batch(self, batch: TextImageBatch | TextBatch) -> tuple:
         if isinstance(batch, TextImageBatch):
