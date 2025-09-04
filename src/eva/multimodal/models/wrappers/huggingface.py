@@ -148,7 +148,7 @@ class HuggingFaceModel(base.VisionLanguageModel):
     def load_processor(self) -> Callable:
         """Initialize the processor."""
         return transformers.AutoProcessor.from_pretrained(
-            self.model_name_or_path,
+            self.processor_kwargs.pop("model_name_or_path", self.model_name_or_path),
             **self.processor_kwargs,
         )
 
