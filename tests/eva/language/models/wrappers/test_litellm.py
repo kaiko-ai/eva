@@ -13,7 +13,7 @@ def test_generate(model_instance):
     """Test that the generate method returns the expected dummy response."""
     batch = TextBatch(text=[[UserMessage(content="Hello, world!")]], target=None, metadata={})
     result = model_instance(batch)
-    assert result == ["Test response"]
+    assert result == {"generated_text": ["Test response"]}
 
 
 @pytest.fixture

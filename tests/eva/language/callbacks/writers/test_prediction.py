@@ -18,6 +18,7 @@ from eva.language.callbacks.writers import prediction as prediction_writer
 from eva.language.data.dataloaders import text_collate
 from eva.language.data.datasets.typings import TextSample
 from eva.language.data.messages import UserMessage
+from eva.language.models.typings import ModelOutput
 
 
 @pytest.mark.parametrize(
@@ -198,7 +199,7 @@ class FakeTextModel(nn.Module):
         text_batch, _, _ = batch
         batch_size = len(text_batch)
         predictions = [f"prediction_{i}" for i in range(batch_size)]
-        return predictions
+        return ModelOutput(generated_text=predictions)
 
 
 class FakeLightningModule(pl.LightningModule):
@@ -209,9 +210,9 @@ class FakeLightningModule(pl.LightningModule):
         super().__init__()
         self.text_model = text_model
 
-    def forward(self, x):
+    def forward(self, x) -> ModelOutput:
         """Forward pass."""
-        return self.text_model(x)
+        return ModelOutput(generated_text=self.text_model(x))
 
     def predict_step(self, batch, batch_idx, dataloader_idx=0):
         """Prediction step."""
