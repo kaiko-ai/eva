@@ -111,7 +111,8 @@ class ABMIL(torch.nn.Module):
         attention_result = torch.matmul(torch.transpose(attention_weights, 1, 2), input_tensor)
         # (batch_size, 1, hidden_size_attention)
 
-        attention_result = torch.squeeze(attention_result, 1)  # (batch_size, hidden_size_attention)
+        attention_result = torch.squeeze(attention_result, 1)
+        # (batch_size, hidden_size_attention)
 
         return self.classifier(attention_result)  # (batch_size, output_size)
 
