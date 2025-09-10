@@ -47,6 +47,7 @@ class LanguageModule(module.ModelModule):
     def _batch_step(self, batch: TextBatch) -> STEP_OUTPUT:
         text, targets, metadata = TextBatch(*batch)
         output = self.forward(batch)
+
         return {
             "inputs": text,
             "predictions": output.pop("generated_text"),  # type: ignore
