@@ -10,6 +10,7 @@ from eva.core.metrics import structs as metrics_lib
 from eva.core.models.modules import module
 from eva.core.models.modules.utils import batch_postprocess
 from eva.language.models.typings import ModelOutput, PredictionBatch, TextBatch
+from eva.language.utils import messages as message_utils
 
 
 class LanguageModule(module.ModelModule):
@@ -87,7 +88,7 @@ class OfflineLanguageModule(module.ModelModule):
     def _batch_step(self, batch: PredictionBatch) -> STEP_OUTPUT:
         predictions, targets, text, metadata = PredictionBatch(*batch)
         return {
-            "inputs": text,
+            "inputs": list(map(message_utils.messages_to_string, text)),
             "predictions": predictions,
             "targets": targets,
             "metadata": metadata,

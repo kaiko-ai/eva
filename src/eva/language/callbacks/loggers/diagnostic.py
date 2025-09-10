@@ -3,33 +3,16 @@
 import abc
 import os
 from collections import deque
-from typing import List, TypedDict
 
 import lightning.pytorch as pl
 from lightning.pytorch import callbacks
 from loguru import logger
-from typing_extensions import NotRequired, override
+from typing_extensions import override
 
 from eva.core.loggers import log
 from eva.core.metrics import structs as metrics_lib
 from eva.language.models.typings import TextBatch
 from eva.multimodal.models.typings import TextImageBatch
-
-
-class LoggingEntry(TypedDict):
-    """A single entry in the logging file."""
-
-    prompt: str
-    """The input prompt text."""
-
-    response: str
-    """The generated response text."""
-
-    expected: str
-    """The expected response text."""
-
-    objects: NotRequired[List[str]]
-    """A list of objects detected in the input."""
 
 
 class DiagnosticLoggerCallback(callbacks.Callback, abc.ABC):
