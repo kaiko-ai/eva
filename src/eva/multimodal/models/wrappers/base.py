@@ -1,16 +1,17 @@
 """Base class for vision language model wrappers."""
 
 import abc
-from typing import Any, Callable, List
+from typing import Any, Callable
 
 from typing_extensions import override
 
 from eva.core.models.wrappers import base
 from eva.language.data.messages import ModelSystemMessage
+from eva.language.models.typings import ModelOutput
 from eva.multimodal.models.typings import TextImageBatch
 
 
-class VisionLanguageModel(base.BaseModel[TextImageBatch, List[str]]):
+class VisionLanguageModel(base.BaseModel[TextImageBatch, ModelOutput]):
     """Base class for multimodal models.
 
     Classes that inherit from this should implement the following methods:
@@ -36,7 +37,7 @@ class VisionLanguageModel(base.BaseModel[TextImageBatch, List[str]]):
         self.system_message = ModelSystemMessage(content=system_prompt) if system_prompt else None
 
     @override
-    def forward(self, batch: TextImageBatch) -> List[str]:
+    def forward(self, batch: TextImageBatch) -> ModelOutput:
         """Forward pass of the model."""
         inputs = self.format_inputs(batch)
         return super().forward(inputs)

@@ -1,16 +1,16 @@
 """Base class for language model wrappers."""
 
 import abc
-from typing import Any, Callable, List
+from typing import Any, Callable
 
 from typing_extensions import override
 
 from eva.core.models.wrappers import base
 from eva.language.data.messages import ModelSystemMessage
-from eva.language.models.typings import TextBatch
+from eva.language.models.typings import ModelOutput, TextBatch
 
 
-class LanguageModel(base.BaseModel[TextBatch, List[str]]):
+class LanguageModel(base.BaseModel[TextBatch, ModelOutput]):
     """Base class for language models.
 
     Classes that inherit from this should implement the following methods:
@@ -36,7 +36,7 @@ class LanguageModel(base.BaseModel[TextBatch, List[str]]):
         self.system_message = ModelSystemMessage(content=system_prompt) if system_prompt else None
 
     @override
-    def forward(self, batch: TextBatch) -> List[str]:
+    def forward(self, batch: TextBatch) -> ModelOutput:
         """Forward pass of the model."""
         inputs = self.format_inputs(batch)
         return super().forward(inputs)

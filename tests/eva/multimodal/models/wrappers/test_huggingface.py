@@ -23,7 +23,10 @@ def test_huggingface_model_generation(model_name: str, model_class: str, with_im
     mock_processor = MagicMock()
     mock_processor.chat_template = "template"
     mock_processor.apply_chat_template.return_value = "formatted text"
-    mock_processor.return_value.to.return_value = {"input_ids": torch.tensor([[1, 2, 3]])}
+    mock_processor.return_value.to.return_value = {
+        "input_ids": torch.tensor([[1, 2, 3]]),
+        "attention_mask": torch.tensor([[1, 1, 1]]),
+    }
     mock_processor.batch_decode.side_effect = [[""], ["Generated response"]]
 
     mock_model = MagicMock()
@@ -50,7 +53,12 @@ def test_huggingface_model_generation(model_name: str, model_class: str, with_im
         )
 
         result = model(batch)
-        assert result == ["Generated response"]
+        assert isinstance(result, dict)
+        assert "generated_text" in result
+        assert "input_ids" in result
+        assert "output_ids" in result
+        assert "attention_mask" in result
+        assert result["generated_text"] == ["Generated response"]
         assert mock_model.generate.called
 
 
@@ -62,6 +70,7 @@ def test_format_inputs_with_image():
     mock_processor.return_value.to.return_value = {
         "input_ids": torch.tensor([[1, 2, 3]]),
         "pixel_values": torch.rand(1, 3, 224, 224),
+        "attention_mask": torch.tensor([[1, 1, 1]]),
     }
 
     mock_model = MagicMock()
