@@ -10,6 +10,7 @@ from eva.core.metrics import structs as metrics_lib
 from eva.core.models.modules import module
 from eva.core.models.modules.utils import batch_postprocess
 from eva.language.models.typings import ModelOutput
+from eva.language.utils import messages as message_utils
 from eva.multimodal.models.typings import TextImageBatch
 
 
@@ -49,7 +50,7 @@ class VisionLanguageModule(module.ModelModule):
         text, _, targets, metadata = TextImageBatch(*batch)
         output = self.forward(batch)
         return {
-            "inputs": text,
+            "inputs": list(map(message_utils.messages_to_string, text)),
             "predictions": output.pop("generated_text"),  # type: ignore
             "targets": targets,
             "metadata": metadata,
