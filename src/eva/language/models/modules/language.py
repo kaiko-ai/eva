@@ -88,7 +88,9 @@ class OfflineLanguageModule(module.ModelModule):
     def _batch_step(self, batch: PredictionBatch) -> STEP_OUTPUT:
         predictions, targets, text, metadata = PredictionBatch(*batch)
         return {
-            "inputs": list(map(message_utils.messages_to_string, text)),
+            "inputs": (
+                list(map(message_utils.messages_to_string, text)) if text is not None else None
+            ),
             "predictions": predictions,
             "targets": targets,
             "metadata": metadata,
