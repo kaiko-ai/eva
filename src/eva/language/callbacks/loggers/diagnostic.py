@@ -2,29 +2,20 @@
 
 import abc
 import os
-from typing import List, Sequence, TypedDict
+from collections import deque
+from typing import Callable, List, Sequence, TypedDict
 
 import lightning.pytorch as pl
 import torch
 from lightning.pytorch import callbacks
+from lightning.pytorch.utilities.types import STEP_OUTPUT
+from loguru import logger
 from typing_extensions import NotRequired, override
 
-from eva.language.models.typings import TextBatch
-from lightning.pytorch.utilities.types import STEP_OUTPUT
-from eva.multimodal.models.typings import TextImageBatch
 from eva.core.loggers import log
-from collections import deque
-from loguru import logger
-
-## THINGS NEEDED:
-## DECODING OUTPUT - TAKE FROM CURRENT MODULE
-## STORING RESULTS - DEQUEUE LIKE IN CURRENT MODULE
-## LOGGING - TAKE FROM CURRENT MODULE, BASED ON INTERNAL STATES
-## END GOAL: WORKING LOGGING + CLEAN MODULE
-
-
-## FOLLOW-UP PR:
-## IMPLEMENT METRIC BUFFER
+from eva.core.metrics import structs as metrics_lib
+from eva.language.models.typings import TextBatch
+from eva.multimodal.models.typings import TextImageBatch
 
 
 class LoggingEntry(TypedDict):
@@ -54,18 +45,8 @@ class DiagnosticLoggerCallback(callbacks.Callback, abc.ABC):
         """Initializes a new callback.
 
         Args:
-            output_dir: The directory where the embeddings will be saved.
-            model: The model instance used to generate the predictions.
-            dataloader_idx_map: A dictionary mapping dataloader indices to their respective
-                names (e.g. train, val, test).
-            metadata_keys: An optional list of keys to extract from the batch metadata and store
-                as additional columns in the manifest file.
-            include_input: Whether to include the original input text messages in the output.
-            overwrite: Whether to overwrite if embeddings are already present in the specified
-                output directory. If set to `False`, an error will be raised if embeddings are
-                already present (recommended).
-            apply_postprocess: Whether to apply the postprocesses specified in the model module.
-            save_format: The file format to use for saving the manifest file with the predictions.
+            log_generations: Whether to log the generated text & samplewise metrics.
+            log_sample_size: The number of samples to log if `log_generations` is True
         """
         super().__init__()
 
@@ -109,15 +90,22 @@ class DiagnosticLoggerCallback(callbacks.Callback, abc.ABC):
                 "prompt": str(decoded_input[i]),
                 "response": str(decoded_output[i]),
                 "expected": str(target_batch[i]) if target_batch is not None else "",
-                "objects": metadata_batch["objects"][i] if metadata_batch and "objects" in metadata_batch else [],
+                "objects": (
+                    metadata_batch["objects"][i]
+                    if metadata_batch and "objects" in metadata_batch
+                    else []
+                ),
             }
 
             self._data.update(entry)
 
-    def _decode_output(self, processor, output: torch.Tensor, instruction_length: int) -> List[str]:
+    def _decode_output(
+        self, processor: Callable, output: torch.Tensor, instruction_length: int
+    ) -> List[str]:
         """Decode the model's batch output to text.
 
         Args:
+            processor: The processor used for decoding.
             output: The raw output from the model.
             instruction_length: The length of the instruction in the input.
 
@@ -132,18 +120,19 @@ class DiagnosticLoggerCallback(callbacks.Callback, abc.ABC):
         )
 
         return decoded_input, decoded_output
-    
+
+    @override
     def on_validation_epoch_end(self, trainer, pl_module):
         self._log_generations(trainer, pl_module.metrics.validation_metrics)
         return super().on_validation_epoch_end(trainer, pl_module)
 
+    @override
     def on_test_epoch_end(self, trainer, pl_module):
         self._log_generations(trainer, pl_module.metrics.test_metrics)
         return super().on_test_epoch_end(trainer, pl_module)
 
     def _log_generations(self, trainer, metrics: metrics_lib.MetricCollection | None):
         """Logs the generated text & samplewise metrics."""
-
         # Log scores from metrics
         if metrics is not None:
             for metric in metrics.children():
@@ -157,7 +146,7 @@ class DiagnosticLoggerCallback(callbacks.Callback, abc.ABC):
                         if attribute_name not in self._data
                         else attribute_name
                     )
-                    self._data[key] = attribute_value[-self.log_sample_size:]
+                    self._data[key] = attribute_value[-self.log_sample_size :]
 
         # Remove keys with value length 0 and log a warning
         keys_to_remove = [k for k, v in self._data.items() if len(v) == 0]
@@ -175,11 +164,10 @@ class DiagnosticLoggerCallback(callbacks.Callback, abc.ABC):
             trainer.loggers,
             tag=f"test/{self.task_name} scored generations",
             columns=list(self._data.keys()),
-            data=[list(item) for item in zip(*self._data.values())],
+            data=[list(item) for item in zip(*self._data.values(), strict=False)],
         )
 
     def _unpack_batch(self, batch: TextImageBatch | TextBatch):
         if isinstance(batch, TextImageBatch):
             return batch.text, batch.image, batch.target, batch.metadata
         return batch.text, None, batch.target, batch.metadata
-
