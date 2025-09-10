@@ -50,7 +50,7 @@ class LanguageModule(module.ModelModule):
         output = self.forward(batch)
 
         return {
-            "inputs": text,
+            "inputs": list(map(message_utils.messages_to_string, text)),
             "predictions": output.pop("generated_text"),  # type: ignore
             "targets": targets,
             "metadata": metadata,
