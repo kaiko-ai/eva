@@ -1,6 +1,5 @@
 """Tests the language model module."""
 
-
 import pytest
 from typing_extensions import override
 
