@@ -16,7 +16,7 @@ from litellm.exceptions import (
 from loguru import logger
 from typing_extensions import override
 
-from eva.language.models.typings import TextBatch
+from eva.language.models.typings import ModelOutput, TextBatch
 from eva.language.models.wrappers import base
 from eva.language.utils.text import messages as message_utils
 
@@ -94,16 +94,17 @@ class LiteLLMModel(base.LanguageModel):
             f"Retrying due to {details.get('exception') or 'Unknown error'}"
         ),
     )
-    def model_forward(self, batch: List[List[Dict[str, Any]]]) -> List[str]:
+    def model_forward(self, batch: List[List[Dict[str, Any]]]) -> ModelOutput:
         """Generates output text through API calls via LiteLLM's batch completion functionality."""
         outputs = batch_completion(model=self.model_name, messages=batch, **self.model_kwargs)
         self._raise_exceptions(outputs)
 
-        return [
+        generated_text = [
             output["choices"][0]["message"]["content"]
             for output in outputs
             if output["choices"][0]["message"]["role"] == "assistant"
         ]
+        return ModelOutput(generated_text=generated_text)
 
     def _raise_exceptions(self, outputs: list):
         for output in outputs:

@@ -6,6 +6,7 @@ from typing import Any, Dict, List
 from typing_extensions import override
 
 from eva.language.models import wrappers as language_wrappers
+from eva.language.models.typings import ModelOutput
 from eva.language.utils.text import messages as language_message_utils
 from eva.multimodal.models.typings import TextImageBatch
 from eva.multimodal.models.wrappers import base
@@ -52,5 +53,5 @@ class LiteLLMModel(base.VisionLanguageModel):
         return list(map(message_utils.format_litellm_message, message_batch, image_batch))
 
     @override
-    def model_forward(self, batch: List[List[Dict[str, Any]]]) -> List[str]:
+    def model_forward(self, batch: List[List[Dict[str, Any]]]) -> ModelOutput:
         return self.language_model.model_forward(batch)

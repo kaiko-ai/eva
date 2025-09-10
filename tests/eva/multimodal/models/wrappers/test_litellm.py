@@ -20,7 +20,7 @@ def test_generate_with_image(model_instance, sample_image):
         metadata={},
     )
     result = model_instance(batch)
-    assert result == ["Test response"]
+    assert result["generated_text"] == ["Test response"]
 
 
 def test_generate_without_image(model_instance):
@@ -34,7 +34,7 @@ def test_generate_without_image(model_instance):
         metadata={},
     )
     result = model_instance(batch)
-    assert result == ["Test response"]
+    assert result["generated_text"] == ["Test response"]
 
 
 def test_format_inputs_with_image(model_instance, sample_image):

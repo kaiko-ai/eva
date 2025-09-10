@@ -5,7 +5,7 @@ from typing import Any, Callable, Dict, List, Literal
 from transformers.pipelines import pipeline
 from typing_extensions import override
 
-from eva.language.models.typings import TextBatch
+from eva.language.models.typings import ModelOutput, TextBatch
 from eva.language.models.wrappers import base
 from eva.language.utils.text import messages as message_utils
 
@@ -84,7 +84,7 @@ class HuggingFaceModel(base.LanguageModel):
             return list(map(message_utils.merge_message_contents, message_batch))
 
     @override
-    def model_forward(self, prompts: List[str]) -> List[str]:
+    def model_forward(self, prompts: List[str]) -> ModelOutput:
         """Generates text using the pipeline.
 
         Args:
@@ -96,10 +96,12 @@ class HuggingFaceModel(base.LanguageModel):
         outputs = self.model(prompts, return_full_text=False, **self._generation_kwargs)
         if outputs is None:
             raise ValueError("Outputs from the model are None.")
+
         results = []
         for output in outputs:
             if isinstance(output, list):
                 results.append(output[0]["generated_text"])  # type: ignore
             else:
                 results.append(output["generated_text"])  # type: ignore
-        return results
+
+        return ModelOutput(generated_text=results)

@@ -55,14 +55,18 @@ def test_real_small_hf_model_generation(
         )
 
         batch = TextBatch(text=[[UserMessage(content=prompt)]], target=None, metadata={})
-        output1 = model(batch)[0]
-        output2 = model(batch)[0]
+        output1 = model(batch)
+        output2 = model(batch)
 
-        assert isinstance(output1, str) and output1, "First output should be a non-empty string."
-        assert isinstance(output2, str) and output2, "Second output should be a non-empty string."
+        assert isinstance(output1, dict) and "generated_text" in output1
+        assert isinstance(output2, dict) and "generated_text" in output2
 
         if expect_deterministic:
-            assert output1 == output2, "Outputs should be identical when do_sample is False."
+            assert (
+                output1["generated_text"] == output2["generated_text"]
+            ), "Outputs should be identical when do_sample is False."
         else:
             # For non-deterministic, outputs should differ
-            assert output1 != output2, "Outputs should differ when do_sample is True."
+            assert (
+                output1["generated_text"] != output2["generated_text"]
+            ), "Outputs should differ when do_sample is True."

@@ -1,30 +1,25 @@
 """Tests the language model module."""
 
 import pytest
-from torch import nn
+from typing_extensions import override
 
+from eva.language.data.messages import UserMessage
 from eva.language.models import LanguageModule
-from eva.language.models.typings import TextBatch
+from eva.language.models.typings import ModelOutput, TextBatch
+from eva.language.models.wrappers.base import LanguageModel
 
 
-def test_forward(language_module):
+def test_forward(language_module, batch: TextBatch):
     """Test the forward method of the LanguageModule class."""
-    input_text = ["Hello world"]
     expected = ["Dummy response Nr. 0"]
-    result = language_module.forward(input_text)
-    assert result == expected
+    output = language_module.forward(batch)
+    assert output["generated_text"] == expected
 
 
-def test_validation_step(language_module, model):
+def test_validation_step(language_module, batch: TextBatch):
     """Test the validation_step method of the LanguageModule class."""
-    data = ["What is the capital of France?"]
-    targets = ["Paris"]
-    metadata = [{"id": 1}]
-    batch = (data, targets, metadata)
-
     # The module creates messages list: [str(d) + "\n" + prompt for d in data]
-    expected_messages = [f"Dummy response Nr. {i}" for i in range(len(batch))]
-    expected_predictions = model(expected_messages)
+    expected_predictions = [f"Dummy response Nr. {i}" for i in range(len(batch.text))]
 
     output = language_module.validation_step(batch)
 
@@ -32,8 +27,8 @@ def test_validation_step(language_module, model):
     assert "targets" in output
     assert "metadata" in output
     assert output["predictions"] == expected_predictions
-    assert output["targets"] == targets
-    assert output["metadata"] == metadata
+    assert output["targets"] == batch.target
+    assert output["metadata"] == batch.metadata
 
 
 def test_init_attributes(model):
@@ -42,18 +37,33 @@ def test_init_attributes(model):
     assert module_instance.model is model
 
 
-class DummyModel(nn.Module):
+class DummyModel(LanguageModel):
     """A simple text model for testing purposes."""
 
-    def forward(self, batch: TextBatch) -> list[str]:
-        """Generate some text based on the input prompt."""
-        return [f"Dummy response Nr. {i}" for i in range(len(batch))]
+    @override
+    def format_inputs(self, batch: TextBatch) -> TextBatch:
+        return batch
+
+    @override
+    def model_forward(self, batch: TextBatch) -> ModelOutput:
+        """Generate text responses based on the batch size."""
+        text, _, _ = batch
+        return ModelOutput(generated_text=[f"Dummy response Nr. {i}" for i in range(len(text))])
+
+
+@pytest.fixture
+def batch():
+    """Return a dummy TextBatch for testing."""
+    data = "What is the capital of France?"
+    targets = ["Paris"]
+    metadata = {"id": [1]}
+    return TextBatch(text=[[UserMessage(content=data)]], target=targets, metadata=metadata)
 
 
 @pytest.fixture
 def model():
     """Return a dummy model instance."""
-    return DummyModel()
+    return DummyModel(system_prompt=None)
 
 
 @pytest.fixture

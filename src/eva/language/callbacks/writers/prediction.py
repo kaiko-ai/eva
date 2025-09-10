@@ -134,12 +134,18 @@ class TextPredictionWriter(callbacks.BasePredictionWriter, abc.ABC):
 
     def _get_predictions(self, batch: TextBatch) -> List[str]:
         with torch.no_grad():
-            predictions = self.model(batch)
+            output = self.model(batch)
 
-        if not isinstance(predictions, list) or not all(isinstance(p, str) for p in predictions):
-            raise ValueError("The model's output should be a list of strings.")
+        if (
+            not isinstance(output, dict)
+            or "generated_text" not in output
+            or not all(isinstance(p, str) for p in output["generated_text"])
+        ):
+            raise ValueError(
+                f"A dictionary with 'generated_text' key is expected, got {type(output)}"
+            )
 
-        return predictions
+        return output["generated_text"]
 
     def _check_if_exists(self) -> None:
         """Checks if the output directory already exists and if it should be overwritten."""

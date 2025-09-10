@@ -9,7 +9,7 @@ from loguru import logger
 from torch import nn
 from typing_extensions import override
 
-from eva.language.models.typings import TextBatch
+from eva.language.models.typings import ModelOutput, TextBatch
 from eva.language.utils.text import messages as language_message_utils
 from eva.multimodal.models.typings import TextImageBatch
 from eva.multimodal.models.wrappers import base
@@ -110,7 +110,7 @@ class HuggingFaceModel(base.VisionLanguageModel):
         return self.processor(**processor_inputs).to(self.model.device)  # type: ignore
 
     @override
-    def model_forward(self, batch: Dict[str, torch.Tensor]) -> List[str]:
+    def model_forward(self, batch: Dict[str, torch.Tensor]) -> ModelOutput:
         """Generates text output from the model. Is called by the `generate` method.
 
         Args:
@@ -121,8 +121,14 @@ class HuggingFaceModel(base.VisionLanguageModel):
         Returns:
             A dictionary containing the processed input and the model's output.
         """
-        output = self.model.generate(**batch, **self.generation_kwargs)  # type: ignore
-        return self._decode_output(output, batch["input_ids"].shape[-1])
+        output_ids = self.model.generate(**batch, **self.generation_kwargs)  # type: ignore
+
+        return ModelOutput(
+            generated_text=self._decode_output(output_ids, batch["input_ids"].shape[-1]),
+            input_ids=batch.get("input_ids"),
+            output_ids=output_ids,
+            attention_mask=batch.get("attention_mask"),
+        )
 
     @override
     def load_model(self) -> nn.Module:
