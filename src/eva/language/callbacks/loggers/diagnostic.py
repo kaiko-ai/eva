@@ -3,12 +3,11 @@
 import abc
 import os
 from collections import deque
-from typing import Callable, List, Sequence, TypedDict
+from typing import Callable, List, Tuple, TypedDict
 
 import lightning.pytorch as pl
 import torch
 from lightning.pytorch import callbacks
-from lightning.pytorch.utilities.types import STEP_OUTPUT
 from loguru import logger
 from typing_extensions import NotRequired, override
 
@@ -67,41 +66,9 @@ class DiagnosticLoggerCallback(callbacks.Callback, abc.ABC):
     def _batch_step(self, trainer: pl.Trainer, pl_module: pl.LightningModule) -> None:
         pass
 
-    @override
-    def on_test_batch_end(
-        self,
-        trainer: pl.Trainer,
-        pl_module: pl.LightningModule,
-        outputs: STEP_OUTPUT,
-        batch_indices: Sequence[int],
-        batch: TextBatch,
-        batch_idx: int,
-        dataloader_idx: int,
-    ) -> None:
-
-        text_batch, target_batch, metadata_batch = self._unpack_batch(batch)
-
-        decoded_input, decoded_output = self._decode_output(
-            pl_module.model.processor, outputs["output_ids"], outputs["input_ids"].shape[-1]
-        )
-
-        for i in range(len(batch_indices)):
-            entry: LoggingEntry = {
-                "prompt": str(decoded_input[i]),
-                "response": str(decoded_output[i]),
-                "expected": str(target_batch[i]) if target_batch is not None else "",
-                "objects": (
-                    metadata_batch["objects"][i]
-                    if metadata_batch and "objects" in metadata_batch
-                    else []
-                ),
-            }
-
-            self._data.update(entry)
-
     def _decode_output(
         self, processor: Callable, output: torch.Tensor, instruction_length: int
-    ) -> List[str]:
+    ) -> Tuple[List[str], List[str]]:
         """Decode the model's batch output to text.
 
         Args:
@@ -119,7 +86,7 @@ class DiagnosticLoggerCallback(callbacks.Callback, abc.ABC):
             output[:, instruction_length:], skip_special_tokens=True
         )
 
-        return decoded_input, decoded_output
+        return decoded_input, decoded_output  # type: ignore
 
     @override
     def on_validation_epoch_end(self, trainer, pl_module):
