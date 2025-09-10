@@ -45,7 +45,6 @@ data:
         init_args:
           <<: *DATASET_ARGS
           split: test
-          max_samples: 10
     dataloaders:
       val: &DATALOADER_ARGS
         batch_size: &BATCH_SIZE ${oc.env:BATCH_SIZE, 16}
