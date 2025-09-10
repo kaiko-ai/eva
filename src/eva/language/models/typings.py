@@ -50,7 +50,7 @@ class ModelOutput(TypedDict):
     """The token ids of the input text."""
 
     output_ids: NotRequired[torch.Tensor | None]
-    """The token ids of the output text."""
+    """The token ids of the model output (usually containing both input and prediction)."""
 
     attention_mask: NotRequired[torch.Tensor | None]
     """The attention mask for the input tokens."""
