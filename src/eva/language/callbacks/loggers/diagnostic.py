@@ -13,7 +13,7 @@ from eva.core.metrics import structs as metrics_lib
 
 
 class DiagnosticLoggerCallback(callbacks.Callback, abc.ABC):
-    """Callback for logging diagnostic information during training and evaluation."""
+    """Callback for logging diagnostic language information during training and evaluation."""
 
     def __init__(
         self,

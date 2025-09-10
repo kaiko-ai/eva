@@ -8,7 +8,7 @@ from eva.language.callbacks.loggers.diagnostic import (
 
 
 class DiagnosticLoggerCallback(BaseDiagnosticLoggerCallback):
-    """Callback for logging diagnostic information during training and evaluation."""
+    """Callback for logging diagnostic multimodal information during training and evaluation."""
 
     def __init__(
         self,
