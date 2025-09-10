@@ -4,7 +4,6 @@ import abc
 import os
 from collections import deque
 
-import lightning.pytorch as pl
 from lightning.pytorch import callbacks
 from loguru import logger
 from typing_extensions import override
@@ -35,18 +34,13 @@ class DiagnosticLoggerCallback(callbacks.Callback, abc.ABC):
         self.log_sample_size = log_sample_size
         self.log_counter = 0
 
-        self.log_sample_size = log_sample_size
         if self.log_generations:
             self._data = {
                 "prompt": deque(maxlen=log_sample_size),
                 "response": deque(maxlen=log_sample_size),
                 "expected": deque(maxlen=log_sample_size),
-                "objects": deque(maxlen=log_sample_size),
             }
             self.task_name = os.getenv("TASK_NAME", "multimodal")
-
-    def _batch_step(self, trainer: pl.Trainer, pl_module: pl.LightningModule) -> None:
-        pass
 
     @override
     def on_validation_end(self, trainer, pl_module):
