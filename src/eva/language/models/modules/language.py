@@ -49,7 +49,7 @@ class LanguageModule(module.ModelModule):
         output = self.forward(batch)
         return {
             "inputs": text,
-            "predictions": output.pop("generated_text"),
+            "predictions": output.pop("generated_text"),  # type: ignore
             "targets": targets,
             "metadata": metadata,
         } | output

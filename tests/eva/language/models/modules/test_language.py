@@ -54,7 +54,7 @@ class DummyModel(LanguageModel):
 @pytest.fixture
 def batch():
     """Return a dummy TextBatch for testing."""
-    data = ["What is the capital of France?"]
+    data = "What is the capital of France?"
     targets = ["Paris"]
     metadata = {"id": [1]}
     return TextBatch(text=[[UserMessage(content=data)]], target=targets, metadata=metadata)
