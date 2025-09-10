@@ -10,8 +10,6 @@ from typing_extensions import override
 
 from eva.core.loggers import log
 from eva.core.metrics import structs as metrics_lib
-from eva.language.models.typings import TextBatch
-from eva.multimodal.models.typings import TextImageBatch
 
 
 class DiagnosticLoggerCallback(callbacks.Callback, abc.ABC):
@@ -87,8 +85,3 @@ class DiagnosticLoggerCallback(callbacks.Callback, abc.ABC):
             columns=list(self._data.keys()),
             data=[list(item) for item in zip(*self._data.values(), strict=False)],
         )
-
-    def _unpack_batch(self, batch: TextImageBatch | TextBatch):
-        if isinstance(batch, TextImageBatch):
-            return batch.text, batch.image, batch.target, batch.metadata
-        return batch.text, None, batch.target, batch.metadata
