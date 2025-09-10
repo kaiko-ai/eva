@@ -119,7 +119,7 @@ class HuggingFaceModel(base.VisionLanguageModel):
                 - "image": List of image tensors.
 
         Returns:
-            A dictionary containing the processed input and the model's output.
+            A dictionary containing the generated text and input + output tokens
         """
         output_ids = self.model.generate(**batch, **self.generation_kwargs)  # type: ignore
 
@@ -173,14 +173,6 @@ class HuggingFaceModel(base.VisionLanguageModel):
         Returns:
             A list of decoded text responses.
         """
-        decoded_input = self.processor.batch_decode(  # type: ignore
-            output[:, :instruction_length], skip_special_tokens=True
-        )
-        decoded_output = self.processor.batch_decode(  # type: ignore
+        return self.processor.batch_decode(  # type: ignore
             output[:, instruction_length:], skip_special_tokens=True
         )
-
-        logger.debug(f"Decoded input: {decoded_input}")
-        logger.debug(f"Decoded output: {decoded_output}")
-
-        return decoded_output
