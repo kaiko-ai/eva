@@ -89,14 +89,14 @@ class DiagnosticLoggerCallback(callbacks.Callback, abc.ABC):
         return decoded_input, decoded_output  # type: ignore
 
     @override
-    def on_validation_epoch_end(self, trainer, pl_module):
+    def on_validation_end(self, trainer, pl_module):
         self._log_generations(trainer, pl_module.metrics.validation_metrics)
-        return super().on_validation_epoch_end(trainer, pl_module)
+        return super().on_validation_end(trainer, pl_module)
 
     @override
-    def on_test_epoch_end(self, trainer, pl_module):
+    def on_test_end(self, trainer, pl_module):
         self._log_generations(trainer, pl_module.metrics.test_metrics)
-        return super().on_test_epoch_end(trainer, pl_module)
+        return super().on_test_end(trainer, pl_module)
 
     def _log_generations(self, trainer, metrics: metrics_lib.MetricCollection | None):
         """Logs the generated text & samplewise metrics."""
