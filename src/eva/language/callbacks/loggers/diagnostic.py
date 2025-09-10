@@ -3,10 +3,9 @@
 import abc
 import os
 from collections import deque
-from typing import Callable, List, Tuple, TypedDict
+from typing import List, TypedDict
 
 import lightning.pytorch as pl
-import torch
 from lightning.pytorch import callbacks
 from loguru import logger
 from typing_extensions import NotRequired, override
@@ -65,28 +64,6 @@ class DiagnosticLoggerCallback(callbacks.Callback, abc.ABC):
 
     def _batch_step(self, trainer: pl.Trainer, pl_module: pl.LightningModule) -> None:
         pass
-
-    def _decode_output(
-        self, processor: Callable, output: torch.Tensor, instruction_length: int
-    ) -> Tuple[List[str], List[str]]:
-        """Decode the model's batch output to text.
-
-        Args:
-            processor: The processor used for decoding.
-            output: The raw output from the model.
-            instruction_length: The length of the instruction in the input.
-
-        Returns:
-            A list of decoded text responses.
-        """
-        decoded_input = processor.batch_decode(  # type: ignore
-            output[:, :instruction_length], skip_special_tokens=True
-        )
-        decoded_output = processor.batch_decode(  # type: ignore
-            output[:, instruction_length:], skip_special_tokens=True
-        )
-
-        return decoded_input, decoded_output  # type: ignore
 
     @override
     def on_validation_end(self, trainer, pl_module):
