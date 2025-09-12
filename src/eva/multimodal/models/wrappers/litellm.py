@@ -10,6 +10,7 @@ from eva.language.models.typings import ModelOutput
 from eva.language.utils.text import messages as language_message_utils
 from eva.multimodal.models.typings import TextImageBatch
 from eva.multimodal.models.wrappers import base
+from eva.multimodal.utils.batch import unpack_batch
 from eva.multimodal.utils.text import messages as message_utils
 
 
@@ -43,7 +44,7 @@ class LiteLLMModel(base.VisionLanguageModel):
 
     @override
     def format_inputs(self, batch: TextImageBatch) -> List[List[Dict[str, Any]]]:
-        message_batch, image_batch, _, _ = TextImageBatch(*batch)
+        message_batch, image_batch, _, _ = unpack_batch(batch)
 
         message_batch = language_message_utils.batch_insert_system_message(
             message_batch, self.system_message
