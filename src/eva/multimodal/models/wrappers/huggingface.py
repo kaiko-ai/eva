@@ -36,6 +36,7 @@ class HuggingFaceModel(base.VisionLanguageModel):
         system_prompt: str | None = None,
         processor_kwargs: Dict[str, Any] | None = None,
         generation_kwargs: Dict[str, Any] | None = None,
+        image_key: str = "image",
     ):
         """Initialize the HuggingFace model wrapper.
 
@@ -46,6 +47,7 @@ class HuggingFaceModel(base.VisionLanguageModel):
             system_prompt: System prompt to use.
             processor_kwargs: Additional processor arguments.
             generation_kwargs: Additional generation arguments.
+            image_key: The key used for image inputs in the chat template.
         """
         super().__init__(system_prompt=system_prompt)
 
@@ -54,6 +56,7 @@ class HuggingFaceModel(base.VisionLanguageModel):
         self.base_model_class = model_class
         self.processor_kwargs = processor_kwargs or {}
         self.generation_kwargs = generation_kwargs or {}
+        self.image_key = image_key
 
         self.processor = self.load_processor()
         self.model = self.load_model()
@@ -106,7 +109,7 @@ class HuggingFaceModel(base.VisionLanguageModel):
         }
 
         if with_images:
-            processor_inputs["image"] = [[image] for image in image_batch]
+            processor_inputs[self.image_key] = [[image] for image in image_batch]
 
         return self.processor(**processor_inputs).to(self.model.device)  # type: ignore
 
