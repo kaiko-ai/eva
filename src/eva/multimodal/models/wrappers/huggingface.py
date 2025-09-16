@@ -13,6 +13,7 @@ from eva.language.models.typings import ModelOutput, TextBatch
 from eva.language.utils.text import messages as language_message_utils
 from eva.multimodal.models.typings import TextImageBatch
 from eva.multimodal.models.wrappers import base
+from eva.multimodal.utils.batch import unpack_batch
 from eva.multimodal.utils.text import messages as message_utils
 
 
@@ -75,7 +76,7 @@ class HuggingFaceModel(base.VisionLanguageModel):
                 "pixel_values": ...
             }
         """
-        message_batch, image_batch, _, _ = self._unpack_batch(batch)
+        message_batch, image_batch, _, _ = unpack_batch(batch)
         with_images = image_batch is not None
 
         message_batch = language_message_utils.batch_insert_system_message(
@@ -160,11 +161,6 @@ class HuggingFaceModel(base.VisionLanguageModel):
             self.processor_kwargs.pop("model_name_or_path", self.model_name_or_path),
             **self.processor_kwargs,
         )
-
-    def _unpack_batch(self, batch: TextImageBatch | TextBatch) -> tuple:
-        if isinstance(batch, TextImageBatch):
-            return batch.text, batch.image, batch.target, batch.metadata
-        return batch.text, None, batch.target, batch.metadata
 
     def _decode_output(self, output: torch.Tensor, instruction_length: int) -> List[str]:
         """Decode the model's batch output to text.
