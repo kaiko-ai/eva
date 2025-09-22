@@ -9,7 +9,7 @@ from eva.vision.data.datasets.classification.gleason_arvaniti import GleasonArva
 from eva.vision.data.datasets.classification.mhist import MHIST
 from eva.vision.data.datasets.classification.panda import PANDA, PANDASmall
 from eva.vision.data.datasets.classification.patch_camelyon import PatchCamelyon
-from eva.vision.data.datasets.classification.tiger_tumour import TIGERTumour
+from eva.vision.data.datasets.classification.tiger_wsibulk import TIGERWsiBulk
 from eva.vision.data.datasets.classification.unitopatho import UniToPatho
 from eva.vision.data.datasets.classification.wsi import WsiClassificationDataset
 
@@ -27,5 +27,5 @@ __all__ = [
     "PANDA",
     "PANDASmall",
     "Camelyon16",
-    "TIGERTumour",
+    "TIGERWsiBulk",
 ]

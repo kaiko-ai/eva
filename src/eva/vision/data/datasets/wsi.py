@@ -179,7 +179,11 @@ class MultiWsiDataset(base.MapDataset):
         """Loads the metadata for the patch at the specified index."""
         dataset_index, sample_index = self._get_dataset_idx(index), self._get_sample_idx(index)
         patch_metadata = self.datasets[dataset_index].load_metadata(sample_index)
-        return {"wsi_id": self.filename(index).split(".")[0]} | patch_metadata
+        return {
+            "wsi_id": self.filename(index).split(".")[0],
+            "slide_idx": dataset_index,
+            "patch_idx": sample_index,
+        } | patch_metadata
 
     def _load_datasets(self) -> list[WsiDataset]:
         logger.info(f"Initializing dataset with {len(self._file_paths)} WSIs ...")
