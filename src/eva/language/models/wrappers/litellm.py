@@ -32,6 +32,14 @@ RETRYABLE_ERRORS = (
 class LiteLLMModel(base.LanguageModel):
     """Wrapper class for LiteLLM language models."""
 
+    _default_model_kwargs = {
+        "temperature": 0.0,
+        "max_completion_tokens": 1024,
+        "top_p": 1.0,
+        "seed": 42,
+    }
+    """Default API model parameters for evaluation."""
+
     def __init__(
         self,
         model_name: str,
@@ -51,7 +59,7 @@ class LiteLLMModel(base.LanguageModel):
         super().__init__(system_prompt=system_prompt)
 
         self.model_name = model_name
-        self.model_kwargs = model_kwargs or {}
+        self.model_kwargs = self._default_model_kwargs | (model_kwargs or {})
 
         if "temperature" not in self.model_kwargs:
             self.model_kwargs["temperature"] = 0.0
