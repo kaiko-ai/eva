@@ -19,7 +19,7 @@ trainer:
           filename: best
           save_last: ${oc.env:SAVE_LAST, false}
           save_top_k: 1
-          monitor: &MONITOR_METRIC ${oc.env:MONITOR_METRIC, val/MeanAbsoluteError}
+          monitor: &MONITOR_METRIC ${oc.env:MONITOR_METRIC, val/MAE}
           mode: &MONITOR_METRIC_MODE ${oc.env:MONITOR_METRIC_MODE, max}
       - class_path: lightning.pytorch.callbacks.EarlyStopping
         init_args:
@@ -53,8 +53,6 @@ model:
       class_path: eva.vision.models.networks.ABMIL
       init_args:
         input_size: ${oc.env:IN_FEATURES, 384}
-        output_size: &NUM_CLASSES 1
-        # task: regression
     criterion: torch.nn.MSELoss
     optimizer:
       class_path: torch.optim.AdamW
@@ -83,7 +81,9 @@ data:
             init_args:
               pad_size: &N_PATCHES ${oc.env:N_PATCHES, 200}
           target_transforms:
-            class_path: eva.core.data.transforms.dtype.SqueezeTensor
+            class_path: eva.vision.data.transforms.common.Squeeze
+            init_args:
+              dim: -1
       val:
         class_path: eva.datasets.MultiEmbeddingsRegressionDataset
         init_args:

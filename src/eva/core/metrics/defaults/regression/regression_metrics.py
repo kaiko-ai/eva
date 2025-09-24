@@ -26,8 +26,12 @@ class RegressionMetrics(structs.MetricCollection):
             postfix: A string to append after metric names.
         """
         super().__init__(
-            metrics=[MeanAbsoluteError(), MeanSquaredError(squared=False), R2Score()],
+            metrics={
+                "MAE": MeanAbsoluteError(),
+                "RMSE": MeanSquaredError(squared=False),
+                "R2": R2Score(),
+            },
             prefix=prefix,
             postfix=postfix,
-            compute_groups=[["MeanAbsoluteError", "MeanSquaredError", "R2Score"]],
+            compute_groups=[["MAE", "RMSE", "R2"]],
         )
