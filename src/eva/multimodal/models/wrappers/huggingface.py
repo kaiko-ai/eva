@@ -32,6 +32,7 @@ class HuggingFaceModel(base.VisionLanguageModel):
         "temperature": 0.0,
         "max_new_tokens": 1024,
         "do_sample": False,
+        "top_p": 1.0,
     }
     """Default HF model parameters for evaluation."""
 
