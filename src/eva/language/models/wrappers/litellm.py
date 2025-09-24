@@ -53,6 +53,9 @@ class LiteLLMModel(base.LanguageModel):
         self.model_name = model_name
         self.model_kwargs = model_kwargs or {}
 
+        if "temperature" not in self.model_kwargs:
+            self.model_kwargs["temperature"] = 0.0
+
         litellm.suppress_debug_info = True
 
         if log_level is not None:
