@@ -104,7 +104,7 @@ class BreaKHis(vision.VisionDataset[tv_tensors.Image, torch.Tensor]):
     @property
     def _dataset_path(self) -> str:
         """Returns the path of the image data of the dataset."""
-        return os.path.join(self._root, "BreaKHis_v1", "histology_slides")
+        return os.path.join(self._root, "histology_slides")
 
     @functools.cached_property
     def _image_files(self) -> List[str]:
@@ -142,6 +142,8 @@ class BreaKHis(vision.VisionDataset[tv_tensors.Image, torch.Tensor]):
             n_classes=4,
             first_and_last_labels=("TA", "DC"),
         )
+        if not os.path.exists(self._dataset_path):
+            raise RuntimeError(f"Dataset not found at '{self._dataset_path}'.")
 
     @override
     def load_data(self, index: int) -> tv_tensors.Image:
