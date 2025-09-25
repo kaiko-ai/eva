@@ -66,9 +66,6 @@ class HuggingFaceModel(base.VisionLanguageModel):
         self.generation_kwargs = self._default_generation_kwargs | (generation_kwargs or {})
         self.image_key = image_key
 
-        if "temperature" not in self.generation_kwargs:
-            self.generation_kwargs["temperature"] = 0.0
-
         self.processor = self.load_processor()
         self.model = self.load_model()
 
