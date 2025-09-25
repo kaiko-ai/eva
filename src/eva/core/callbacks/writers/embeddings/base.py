@@ -17,6 +17,7 @@ from eva.core import utils
 from eva.core.callbacks.writers.embeddings.typings import QUEUE_ITEM
 from eva.core.models.modules.typings import INPUT_BATCH
 from eva.core.utils import multiprocessing as eva_multiprocessing
+from eva.core.utils import distributed as dist_utils
 
 
 class EmbeddingsWriter(callbacks.BasePredictionWriter, abc.ABC):
@@ -140,7 +141,7 @@ class EmbeddingsWriter(callbacks.BasePredictionWriter, abc.ABC):
 
     @override
     def on_predict_end(self, trainer: pl.Trainer, pl_module: pl.LightningModule) -> None:
-        if dist.is_available() and dist.is_initialized():
+        if dist_utils.is_distributed():
             dist.barrier()
 
         if self._is_rank_zero and self._write_queue is not None:
@@ -151,7 +152,7 @@ class EmbeddingsWriter(callbacks.BasePredictionWriter, abc.ABC):
 
     def _gather_queue_items(self, items: List[QUEUE_ITEM]) -> List[QUEUE_ITEM]:
         """Gather queue items across distributed ranks, returning only on rank zero."""
-        if not (dist.is_available() and dist.is_initialized()):
+        if not dist_utils.is_distributed():
             return items
 
         world_size = dist.get_world_size()
