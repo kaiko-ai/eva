@@ -16,8 +16,8 @@ from typing_extensions import override
 from eva.core import utils
 from eva.core.callbacks.writers.embeddings.typings import QUEUE_ITEM
 from eva.core.models.modules.typings import INPUT_BATCH
-from eva.core.utils import multiprocessing as eva_multiprocessing
 from eva.core.utils import distributed as dist_utils
+from eva.core.utils import multiprocessing as eva_multiprocessing
 
 
 class EmbeddingsWriter(callbacks.BasePredictionWriter, abc.ABC):
@@ -159,7 +159,7 @@ class EmbeddingsWriter(callbacks.BasePredictionWriter, abc.ABC):
         object_list: List[List[QUEUE_ITEM]] = [[] for _ in range(world_size)]
         dist.all_gather_object(object_list, items)
 
-        if dist.get_rank() == 0:
+        if self._is_rank_zero:
             gathered: List[QUEUE_ITEM] = []
             for rank_items in object_list:
                 gathered.extend(rank_items)

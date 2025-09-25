@@ -1,3 +1,5 @@
+"""Utility functions for distributed training."""
+
 import torch.distributed as dist
 
 
