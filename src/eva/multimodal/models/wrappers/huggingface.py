@@ -28,6 +28,14 @@ class HuggingFaceModel(base.VisionLanguageModel):
         generation_kwargs: Additional generation arguments.
     """
 
+    _default_generation_kwargs = {
+        "temperature": 0.0,
+        "max_new_tokens": 1024,
+        "do_sample": False,
+        "top_p": 1.0,
+    }
+    """Default HF model parameters for evaluation."""
+
     def __init__(
         self,
         model_name_or_path: str,
@@ -55,7 +63,7 @@ class HuggingFaceModel(base.VisionLanguageModel):
         self.model_kwargs = model_kwargs or {}
         self.base_model_class = model_class
         self.processor_kwargs = processor_kwargs or {}
-        self.generation_kwargs = generation_kwargs or {}
+        self.generation_kwargs = self._default_generation_kwargs | (generation_kwargs or {})
         self.image_key = image_key
 
         self.processor = self.load_processor()

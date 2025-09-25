@@ -13,6 +13,14 @@ from eva.language.utils.text import messages as message_utils
 class HuggingFaceModel(base.LanguageModel):
     """Wrapper class for loading HuggingFace `transformers` models using pipelines."""
 
+    _default_generation_kwargs = {
+        "temperature": 0.0,
+        "max_new_tokens": 1024,
+        "do_sample": False,
+        "top_p": 1.0,
+    }
+    """Default HF model parameters for evaluation."""
+
     def __init__(
         self,
         model_name_or_path: str,
@@ -41,7 +49,7 @@ class HuggingFaceModel(base.LanguageModel):
         self._model_name_or_path = model_name_or_path
         self._task = task
         self._model_kwargs = model_kwargs or {}
-        self._generation_kwargs = generation_kwargs or {}
+        self._generation_kwargs = self._default_generation_kwargs | (generation_kwargs or {})
         self._chat_mode = chat_mode
 
         self.model = self.load_model()

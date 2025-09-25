@@ -36,4 +36,5 @@ class Qwen25VL7BInstruct(wrappers.HuggingFaceModel):
                 "max_pixels": 451584,  # 672*672
             },
             system_prompt=system_prompt,
+            image_key="images",
         )
