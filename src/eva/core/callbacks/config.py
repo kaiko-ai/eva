@@ -9,6 +9,7 @@ from typing import Any, Dict, List
 import lightning.pytorch as pl
 import yaml
 from lightning_fabric.utilities import cloud_io
+from lightning.pytorch.utilities.rank_zero import rank_zero_only
 from loguru import logger as cli_logger
 from omegaconf import OmegaConf
 from typing_extensions import TypeGuard, override
@@ -33,6 +34,7 @@ class ConfigurationLogger(pl.Callback):
         self._verbose = verbose
 
     @override
+    @rank_zero_only
     def setup(
         self,
         trainer: pl.Trainer,
