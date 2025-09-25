@@ -21,6 +21,7 @@ To run a session and pass extra arguments:
 """
 
 import os
+import shutil
 
 import nox
 
@@ -90,6 +91,7 @@ def test_core(session: nox.Session) -> None:
     args = session.posargs or ["--cov"]
     session.run_always("pdm", "install", "--group", "test", external=True)
     session.run("pytest", os.path.join("tests", "eva", "core"), *args)
+    _delete_venv(session)
 
 
 @nox.session(python=PYTHON_VERSIONS, tags=["unit-tests", "tests"])
@@ -98,6 +100,7 @@ def test_vision(session: nox.Session) -> None:
     args = session.posargs or ["--cov"]
     session.run_always("pdm", "install", "--group", "test", "--group", "vision", external=True)
     session.run("pytest", os.path.join("tests", "eva", "vision"), *args)
+    _delete_venv(session)
 
 
 @nox.session(python=PYTHON_VERSIONS, tags=["unit-tests", "tests"])
@@ -106,6 +109,7 @@ def test_language(session: nox.Session) -> None:
     args = session.posargs or ["--cov"]
     session.run_always("pdm", "install", "--group", "test", "--group", "language", external=True)
     session.run("pytest", os.path.join("tests", "eva", "language"), *args)
+    _delete_venv(session)
 
 
 @nox.session(python=PYTHON_VERSIONS, tags=["unit-tests", "tests"])
@@ -114,6 +118,7 @@ def test_all(session: nox.Session) -> None:
     args = session.posargs or ["--cov"]
     session.run_always("pdm", "install", "--group", "test", "--group", "all", external=True)
     session.run("pytest", *args)
+    _delete_venv(session)
 
 
 @nox.session(python=PYTHON_VERSIONS, tags=["ci"])
@@ -170,3 +175,8 @@ def build(session: nox.Session) -> None:
 def publish(session: nox.Session) -> None:
     """Builds and publishes the source and wheel distributions."""
     session.run("pdm", "publish")
+
+
+def _delete_venv(session: nox.Session) -> None:
+    """Deletes the virtualenv of a session to free up space."""
+    shutil.rmtree(session.virtualenv.location, ignore_errors=True)
