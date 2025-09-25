@@ -39,8 +39,9 @@ class ConfigurationLogger(pl.Callback):
         pl_module: pl.LightningModule,
         stage: str | None = None,
     ) -> None:
-        log_dir = trainer.log_dir
-        if not _logdir_exists(log_dir):
+        if not trainer.is_global_zero or not _logdir_exists(
+            log_dir := trainer.log_dir, self._verbose
+        ):
             return
 
         configuration = _load_submitted_config()
@@ -130,7 +131,7 @@ def _type_resolver(mapping: Dict[str, Any]) -> Dict[str, Any]:
     for key, value in mapping.items():
         if isinstance(value, dict):
             formatted_value = _type_resolver(value)
-        elif isinstance(value, list) and isinstance(value[0], dict):
+        elif isinstance(value, list) and value and isinstance(value[0], dict):
             formatted_value = [_type_resolver(subvalue) for subvalue in value]
         else:
             try:
@@ -138,10 +139,7 @@ def _type_resolver(mapping: Dict[str, Any]) -> Dict[str, Any]:
                 formatted_value = (
                     value if isinstance(parsed_value, BuiltinFunctionType) else parsed_value
                 )
-
             except Exception:
                 formatted_value = value
-
         mapping[key] = formatted_value
-
     return mapping
