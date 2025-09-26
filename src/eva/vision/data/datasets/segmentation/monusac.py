@@ -15,6 +15,7 @@ from torchvision import tv_tensors
 from torchvision.datasets import utils
 from typing_extensions import override
 
+from eva.core import utils as core_utils
 from eva.core.utils.progress_bar import tqdm
 from eva.vision.data.datasets import _validators, structs, vision
 from eva.vision.utils import io
@@ -55,6 +56,7 @@ class MoNuSAC(vision.VisionDataset[tv_tensors.Image, tv_tensors.Mask]):
         root: str,
         split: Literal["train", "test"],
         export_masks: bool = True,
+        processed_dir: str | None = None,
         download: bool = False,
         transforms: Callable | None = None,
     ) -> None:
@@ -66,6 +68,8 @@ class MoNuSAC(vision.VisionDataset[tv_tensors.Image, tv_tensors.Mask]):
             split: Dataset split to use.
             export_masks: Whether to export, save and use the semantic label masks
                 from disk.
+            processed_dir: Directory where to store the processed masks.
+                Only used if `export_masks` is `True`.
             download: Whether to download the data for the specified split.
                 Note that the download will be executed only by additionally
                 calling the :meth:`prepare_data` method and if the data does not
@@ -79,6 +83,9 @@ class MoNuSAC(vision.VisionDataset[tv_tensors.Image, tv_tensors.Mask]):
         self._split = split
         self._export_masks = export_masks
         self._download = download
+        self._processed_dir = processed_dir or os.path.join(
+            core_utils.home_dir(), "data", "processed", "monusac"
+        )
 
     @property
     @override
@@ -155,10 +162,7 @@ class MoNuSAC(vision.VisionDataset[tv_tensors.Image, tv_tensors.Mask]):
 
     def _export_semantic_label_masks(self) -> None:
         """Export semantic label masks to disk."""
-        mask_files = [
-            (index, filename.replace(".tif", ".npy"))
-            for index, filename in enumerate(self._image_files)
-        ]
+        mask_files = [(i, self._processed_filename(i)) for i in range(len(self._image_files))]
         to_export = filter(lambda x: not os.path.isfile(x[1]), mask_files)
         for sample_index, filename in tqdm(
             list(to_export),
@@ -166,6 +170,7 @@ class MoNuSAC(vision.VisionDataset[tv_tensors.Image, tv_tensors.Mask]):
             leave=False,
         ):
             semantic_labels = self._get_semantic_mask(sample_index)
+            os.makedirs(os.path.dirname(filename), exist_ok=True)
             np.save(filename, semantic_labels)
 
     def _load_semantic_mask_file(self, index: int) -> npt.NDArray[Any]:
@@ -177,8 +182,7 @@ class MoNuSAC(vision.VisionDataset[tv_tensors.Image, tv_tensors.Mask]):
         Returns:
             Loaded mask as a numpy array.
         """
-        mask_filename = self._image_files[index].replace(".tif", ".npy")
-        return np.load(mask_filename)
+        return np.load(self._processed_filename(index))
 
     def _get_semantic_mask(self, index: int) -> npt.NDArray[Any]:
         """Builds and loads the semantic label mask from the XML annotations.
@@ -215,6 +219,11 @@ class MoNuSAC(vision.VisionDataset[tv_tensors.Image, tv_tensors.Mask]):
                 semantic_labels[fill_col_coords, fill_row_coords] = class_id
 
         return semantic_labels
+
+    def _processed_filename(self, index: int) -> str:
+        """Returns the path of the processed mask for a given index."""
+        relative_path = os.path.relpath(self._image_files[index], self._root)
+        return os.path.join(self._processed_dir, relative_path).replace(".tif", ".npy")
 
     def _download_dataset(self) -> None:
         """Downloads the dataset."""
