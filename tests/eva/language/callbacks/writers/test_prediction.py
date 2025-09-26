@@ -127,9 +127,12 @@ def _check_manifest(
             raise ValueError(f"Unsupported save format: {save_format}")
 
     # Check expected columns
-    expected_columns = ["text", "prediction", "target", "split", "example_metadata"]
+    expected_columns = ["prediction", "target", "split", "example_metadata"]
     for column in expected_columns:
         assert column in df_manifest.columns
+
+    if include_input:
+        assert "text" in df_manifest.columns
 
     # Check number of entries
     total_samples = sum(len(ds) for ds in datamodule.datasets.predict)  # type: ignore
