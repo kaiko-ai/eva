@@ -108,7 +108,7 @@ class CoNSeP(wsi.MultiWsiDataset, vision.VisionDataset[tv_tensors.Image, tv_tens
             n_classes=5,
             first_and_last_labels=((self.classes[0], self.classes[-1])),
         )
-        n_expected = self._expected_dataset_lengths[None]
+        n_expected = self._expected_dataset_lengths[self._split]
         if len(self._file_paths) != n_expected:
             raise ValueError(
                 f"Expected {n_expected} images, found {len(self._file_paths)} in {self._root}."
