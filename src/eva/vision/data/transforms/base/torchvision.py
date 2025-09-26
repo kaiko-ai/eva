@@ -9,7 +9,7 @@ from torchvision.transforms import v2
 class TorchvisionTransformV2(v2.Transform, abc.ABC):
     """Wrapper for torchvision.v2.Transform.
 
-    This class ensures compatibility both with >=0.21.0 and older versions.
+    This class ensures compatibility both with >=0.21.0 and older versions,
     as torchvision 0.21.0 introduced a new transform API where they
     renamed the following methods:
 
