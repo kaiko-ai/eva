@@ -6,6 +6,8 @@ trainer:
     max_epochs: &MAX_EPOCHS 1
     limit_train_batches: 2
     limit_val_batches: 2
+    accelerator: ${oc.env:ACCELERATOR, auto}
+    devices: ${oc.env:NUM_DEVICES, 1}
     callbacks:
       - class_path: lightning.pytorch.callbacks.LearningRateMonitor
         init_args:

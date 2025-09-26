@@ -7,6 +7,8 @@ trainer:
     limit_train_batches: 2
     limit_val_batches: 2
     checkpoint_type: ${oc.env:CHECKPOINT_TYPE, last}
+    accelerator: ${oc.env:ACCELERATOR, auto}
+    devices: ${oc.env:NUM_DEVICES, 1}
     callbacks:
       - class_path: eva.callbacks.ConfigurationLogger
       - class_path: eva.callbacks.ClassificationEmbeddingsWriter
