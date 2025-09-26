@@ -5,13 +5,13 @@ from typing import Any, Dict, Tuple
 
 from monai.transforms.intensity import array as monai_intensity_transforms
 from torchvision import tv_tensors
-from torchvision.transforms import v2
 from typing_extensions import override
 
 from eva.vision.data import tv_tensors as eva_tv_tensors
+from eva.vision.data.transforms import base
 
 
-class ScaleIntensityRange(v2.Transform):
+class ScaleIntensityRange(base.TorchvisionTransformV2):
     """Intensity scaling transform.
 
     Scaling from [a_min, a_max] to [b_min, b_max] with clip option.
@@ -46,11 +46,11 @@ class ScaleIntensityRange(v2.Transform):
 
     @functools.singledispatchmethod
     @override
-    def _transform(self, inpt: Any, params: Dict[str, Any]) -> Any:
+    def transform(self, inpt: Any, params: Dict[str, Any]) -> Any:
         return inpt
 
-    @_transform.register(tv_tensors.Image)
-    @_transform.register(eva_tv_tensors.Volume)
+    @transform.register(tv_tensors.Image)
+    @transform.register(eva_tv_tensors.Volume)
     def _(self, inpt: tv_tensors.Image, params: Dict[str, Any]) -> Any:
         inpt_scaled = self._scale_intensity_range(inpt)
         return tv_tensors.wrap(inpt_scaled, like=inpt)

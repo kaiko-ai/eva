@@ -2,10 +2,10 @@
 
 import abc
 
-from torchvision.transforms import v2
+from eva.vision.data.transforms.base.torchvision import TorchvisionTransformV2
 
 
-class RandomMonaiTransform(v2.Transform, abc.ABC):
+class RandomMonaiTransform(TorchvisionTransformV2, abc.ABC):
     """Base class for MONAI transform wrappers."""
 
     @abc.abstractmethod
