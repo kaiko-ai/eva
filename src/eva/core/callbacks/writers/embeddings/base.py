@@ -81,8 +81,7 @@ class EmbeddingsWriter(callbacks.BasePredictionWriter, abc.ABC):
 
     @override
     def on_predict_start(self, trainer: pl.Trainer, pl_module: pl.LightningModule) -> None:
-        self._is_rank_zero = bool(getattr(trainer, "is_global_zero", True))
-
+        self._is_rank_zero = trainer.is_global_zero
         if self._is_rank_zero:
             self._check_if_exists()
             self._initialize_write_process()
