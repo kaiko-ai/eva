@@ -19,6 +19,6 @@ class Squeeze(v2.Transform):
         super().__init__()
         self._dim = dim
 
-    def _transform(self, inpt: Any, params: dict[str, Any]) -> Any:
+    def transform(self, inpt: Any, params: dict[str, Any]) -> Any:
         output = torch.squeeze(inpt) if self._dim is None else torch.squeeze(inpt, dim=self._dim)
         return tv_tensors.wrap(output, like=inpt)

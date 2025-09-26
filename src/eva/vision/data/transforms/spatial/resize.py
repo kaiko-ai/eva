@@ -52,11 +52,11 @@ class Resize(v2.Transform):
 
     @functools.singledispatchmethod
     @override
-    def _transform(self, inpt: Any, params: Dict[str, Any]) -> Any:
+    def transform(self, inpt: Any, params: Dict[str, Any]) -> Any:
         return inpt
 
-    @_transform.register(tv_tensors.Image)
-    @_transform.register(tv_tensors.Mask)
+    @transform.register(tv_tensors.Image)
+    @transform.register(tv_tensors.Mask)
     def _(self, inpt: Any, params: Dict[str, Any]) -> Any:
         inpt_resized = self.resize_fn(inpt) if self.resize_fn is not None else inpt
         return tv_tensors.wrap(inpt_resized, like=inpt)

@@ -40,12 +40,12 @@ class EnsureChannelFirst(v2.Transform):
 
     @functools.singledispatchmethod
     @override
-    def _transform(self, inpt: Any, params: Dict[str, Any]) -> Any:
+    def transform(self, inpt: Any, params: Dict[str, Any]) -> Any:
         return inpt
 
-    @_transform.register(tv_tensors.Image)
-    @_transform.register(eva_tv_tensors.Volume)
-    @_transform.register(tv_tensors.Mask)
+    @transform.register(tv_tensors.Image)
+    @transform.register(eva_tv_tensors.Volume)
+    @transform.register(tv_tensors.Mask)
     def _(self, inpt: Any, params: Dict[str, Any]) -> Any:
         inpt_channel_first = self._ensure_channel_first(inpt)
         return tv_tensors.wrap(inpt_channel_first, like=inpt)

@@ -74,19 +74,20 @@ class CropForeground(v2.Transform):
             **pad_kwargs,
         )
 
-    def _get_params(self, flat_inputs: List[Any]) -> Dict[str, Any]:
+    @override
+    def make_params(self, flat_inputs: List[Any]) -> Dict[str, Any]:
         volume = next(inpt for inpt in flat_inputs if isinstance(inpt, eva_tv_tensors.Volume))
         box_start, box_end = self._foreground_crop.compute_bounding_box(volume)
         return {"box_start": box_start, "box_end": box_end}
 
     @functools.singledispatchmethod
     @override
-    def _transform(self, inpt: Any, params: Dict[str, Any]) -> Any:
+    def transform(self, inpt: Any, params: Dict[str, Any]) -> Any:
         return inpt
 
-    @_transform.register(tv_tensors.Image)
-    @_transform.register(eva_tv_tensors.Volume)
-    @_transform.register(tv_tensors.Mask)
+    @transform.register(tv_tensors.Image)
+    @transform.register(eva_tv_tensors.Volume)
+    @transform.register(tv_tensors.Mask)
     def _(self, inpt: Any, params: Dict[str, Any]) -> Any:
         inpt_foreground_cropped = self._foreground_crop.crop_pad(
             inpt, params["box_start"], params["box_end"]

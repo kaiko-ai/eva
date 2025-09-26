@@ -36,18 +36,19 @@ class RandRotate90(v2.Transform):
             prob=prob, max_k=max_k, spatial_axes=spatial_axes
         )
 
-    def _get_params(self, flat_inputs: List[Any]) -> Dict[str, Any]:
+    @override
+    def make_params(self, flat_inputs: List[Any]) -> Dict[str, Any]:
         self._rotate.randomize()
         return {}
 
     @functools.singledispatchmethod
     @override
-    def _transform(self, inpt: Any, params: Dict[str, Any]) -> Any:
+    def transform(self, inpt: Any, params: Dict[str, Any]) -> Any:
         return inpt
 
-    @_transform.register(tv_tensors.Image)
-    @_transform.register(eva_tv_tensors.Volume)
-    @_transform.register(tv_tensors.Mask)
+    @transform.register(tv_tensors.Image)
+    @transform.register(eva_tv_tensors.Volume)
+    @transform.register(tv_tensors.Mask)
     def _(self, inpt: Any, params: Dict[str, Any]) -> Any:
         inpt_rotated = self._rotate(img=inpt, randomize=False)
         return tv_tensors.wrap(inpt_rotated, like=inpt)

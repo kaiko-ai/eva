@@ -43,7 +43,8 @@ class Spacing(v2.Transform):
         self._spacing = monai_spatial_transforms.Spacing(pixdim=pixdim, recompute_affine=True)
         self._affine = None
 
-    def _get_params(self, flat_inputs: List[Any]) -> Dict[str, Any]:
+    @override
+    def make_params(self, flat_inputs: List[Any]) -> Dict[str, Any]:
         self._affine = next(
             inpt.affine for inpt in flat_inputs if isinstance(inpt, eva_tv_tensors.Volume)
         )
@@ -51,17 +52,17 @@ class Spacing(v2.Transform):
 
     @functools.singledispatchmethod
     @override
-    def _transform(self, inpt: Any, params: Dict[str, Any]) -> Any:
+    def transform(self, inpt: Any, params: Dict[str, Any]) -> Any:
         return inpt
 
-    @_transform.register(eva_tv_tensors.Volume)
+    @transform.register(eva_tv_tensors.Volume)
     def _(self, inpt: eva_tv_tensors.Volume, params: Dict[str, Any]) -> Any:
         inpt_spacing = self._spacing(inpt.to_meta_tensor(), mode="bilinear")
         if not isinstance(inpt_spacing, meta_tensor.MetaTensor):
             raise ValueError(f"Expected MetaTensor, got {type(inpt_spacing)}")
         return eva_tv_tensors.Volume.from_meta_tensor(inpt_spacing)
 
-    @_transform.register(tv_tensors.Mask)
+    @transform.register(tv_tensors.Mask)
     def _(self, inpt: Any, params: Dict[str, Any]) -> Any:
         inpt_spacing = self._spacing(
             meta_tensor.MetaTensor(inpt, affine=self._affine), mode="nearest"

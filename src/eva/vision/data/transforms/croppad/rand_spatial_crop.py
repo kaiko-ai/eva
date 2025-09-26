@@ -62,19 +62,20 @@ class RandSpatialCrop(v2.Transform):
         """Set the random state for the transform."""
         self._rand_spatial_crop.set_random_state(seed)
 
-    def _get_params(self, flat_inputs: List[Any]) -> Dict[str, Any]:
+    @override
+    def make_params(self, flat_inputs: List[Any]) -> Dict[str, Any]:
         t, h, w = tv_utils.query_chw(flat_inputs)
         self._rand_spatial_crop.randomize((t, h, w))
         return {}
 
     @functools.singledispatchmethod
     @override
-    def _transform(self, inpt: Any, params: Dict[str, Any]) -> Any:
+    def transform(self, inpt: Any, params: Dict[str, Any]) -> Any:
         return inpt
 
-    @_transform.register(tv_tensors.Image)
-    @_transform.register(eva_tv_tensors.Volume)
-    @_transform.register(tv_tensors.Mask)
+    @transform.register(tv_tensors.Image)
+    @transform.register(eva_tv_tensors.Volume)
+    @transform.register(tv_tensors.Mask)
     def _(self, inpt: Any, params: Dict[str, Any]) -> Any:
         slices = self._get_crop_slices()
         inpt_rand_crop = self._cropper(inpt, slices=slices)
