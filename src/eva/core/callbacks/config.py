@@ -9,11 +9,13 @@ from typing import Any, Dict, List
 import lightning.pytorch as pl
 import yaml
 from lightning_fabric.utilities import cloud_io
+from loguru import logger
 from loguru import logger as cli_logger
 from omegaconf import OmegaConf
 from typing_extensions import TypeGuard, override
 
 from eva.core import loggers
+from eva.core.utils import distributed as dist_utils
 
 
 class ConfigurationLogger(pl.Callback):
@@ -39,6 +41,11 @@ class ConfigurationLogger(pl.Callback):
         pl_module: pl.LightningModule,
         stage: str | None = None,
     ) -> None:
+        if dist_utils.is_distributed():
+            logger.info("ConfigurationLogger skipped as not supported in distributed mode.")
+            # TODO: Enabling leads to deadlocks in DDP mode, but I could not yet figure out why.
+            return
+
         if not trainer.is_global_zero or not _logdir_exists(
             log_dir := trainer.log_dir, self._verbose
         ):

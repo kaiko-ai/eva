@@ -62,5 +62,7 @@ To customize runs, without the need of creating custom config-files, you can ove
 | `TQDM_REFRESH_RATE`     | `str`   | Determines at which rate (in number of batches) the progress bars get updated. Set it to 0 to disable the progress bar. |
 | `N_DATA_WORKERS`        | `str`   | How many subprocesses to use for the torch dataloaders. Set to `null` to use the number of cpu cores. |
 | `METRICS_DEVICE`        | `str`   | Specifies the device on which to compute the metrics. If not set, will use the same device as used for training. |
+| `NUM_DEVICES`           | `str`   | The number of devices (GPUs) to use for training. |
+| `ACCELERATOR`           | `str`   | The accelerator to use for training (e.g. "cpu", "gpu"). |
 | `CHECKPOINT_TYPE`       | `str`   | Set to "best" or "last", to select which checkpoint to load for evaluations on validation & test sets after training. |
 | `PATIENCE`       | `int`   | Number of checks with no improvement after which training will be stopped (early stopping). |

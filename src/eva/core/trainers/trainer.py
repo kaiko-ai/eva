@@ -31,6 +31,8 @@ class Trainer(pl_trainer.Trainer):
         default_root_dir: str = "logs",
         n_runs: int = 1,
         checkpoint_type: Literal["best", "last"] = "best",
+        accelerator: str = "auto",
+        devices: int = 1,
         **kwargs: Any,
     ) -> None:
         """Initializes the trainer.
@@ -45,9 +47,17 @@ class Trainer(pl_trainer.Trainer):
             n_runs: The amount of runs (fit and evaluate) to perform in an evaluation session.
             checkpoint_type: Wether to load the "best" or "last" checkpoint saved by the checkpoint
                 callback for evaluations on validation & test sets.
+            accelerator: The accelerator to use for training (e.g. "cpu", "gpu").
+            devices: The number of devices (GPUs) to use for training.
             kwargs: Kew-word arguments of ::class::`lightning.pytorch.Trainer`.
         """
-        super().__init__(*args, default_root_dir=default_root_dir, **kwargs)
+        super().__init__(
+            *args,
+            default_root_dir=default_root_dir,
+            accelerator=accelerator,
+            devices=devices,
+            **kwargs,
+        )
 
         self.checkpoint_type = checkpoint_type
         self.n_runs = n_runs

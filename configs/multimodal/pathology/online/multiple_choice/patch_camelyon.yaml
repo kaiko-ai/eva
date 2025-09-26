@@ -2,6 +2,7 @@ trainer:
   class_path: eva.Trainer
   init_args:
     accelerator: ${oc.env:ACCELERATOR, auto}
+    devices: ${oc.env:NUM_DEVICES, 1}
     n_runs: &N_RUNS ${oc.env:N_RUNS, 2}
     default_root_dir: ${oc.env:OUTPUT_ROOT, logs/${oc.env:MODEL_NAME, anthropic-claude-3-7-sonnet-latest}/pubmedqa}
     precision: bf16

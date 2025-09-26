@@ -6,6 +6,8 @@ trainer:
     default_root_dir: &OUTPUT_ROOT ${oc.env:OUTPUT_ROOT, logs/${oc.env:MODEL_NAME, dino_vits16}/online/patch_camelyon}
     max_steps: &MAX_STEPS ${oc.env:MAX_STEPS, 12500}
     checkpoint_type: ${oc.env:CHECKPOINT_TYPE, best}
+    accelerator: ${oc.env:ACCELERATOR, auto}
+    devices: ${oc.env:NUM_DEVICES, 1}
     callbacks:
       - class_path: eva.callbacks.ConfigurationLogger
       - class_path: lightning.pytorch.callbacks.TQDMProgressBar
