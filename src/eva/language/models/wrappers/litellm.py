@@ -62,6 +62,7 @@ class LiteLLMModel(base.LanguageModel):
         self.model_kwargs = self._default_model_kwargs | (model_kwargs or {})
 
         litellm.suppress_debug_info = True
+        litellm.drop_params = True
 
         if log_level is not None:
             logging.getLogger("LiteLLM").setLevel(log_level)
