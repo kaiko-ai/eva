@@ -6,13 +6,13 @@ from typing import Any, Dict, Sequence
 from monai.transforms.croppad import array as monai_croppad_transforms
 from monai.utils.enums import Method, PytorchPadMode
 from torchvision import tv_tensors
-from torchvision.transforms import v2
 from typing_extensions import override
 
 from eva.vision.data import tv_tensors as eva_tv_tensors
+from eva.vision.data.transforms import base
 
 
-class SpatialPad(v2.Transform):
+class SpatialPad(base.TorchvisionTransformV2):
     """Performs padding to the data.
 
     Padding is applied symmetric for all sides or all on one side for each dimension.

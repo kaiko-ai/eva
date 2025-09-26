@@ -5,7 +5,7 @@ from typing import Any, Dict, List, Sequence
 
 import torch
 from monai.config.type_definitions import NdarrayOrTensor
-from monai.transforms.croppad import array as monai_croppadtransforms
+from monai.transforms.croppad import array as monai_croppad_transforms
 from torchvision import tv_tensors
 from typing_extensions import override
 
@@ -37,7 +37,7 @@ class RandCropByLabelClasses(base.RandomMonaiTransform):
         """Initializes the transform."""
         super().__init__()
 
-        self._rand_crop = monai_croppadtransforms.RandCropByLabelClasses(
+        self._rand_crop = monai_croppad_transforms.RandCropByLabelClasses(
             spatial_size=spatial_size,
             ratios=ratios,
             label=label,

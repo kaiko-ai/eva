@@ -5,13 +5,13 @@ from typing import Any, Dict, List
 
 from monai.transforms.spatial import array as monai_spatial_transforms
 from torchvision import tv_tensors
-from torchvision.transforms import v2
 from typing_extensions import override
 
 from eva.vision.data import tv_tensors as eva_tv_tensors
+from eva.vision.data.transforms import base
 
 
-class RandRotate90(v2.Transform):
+class RandRotate90(base.TorchvisionTransformV2):
     """Rotate input tensors by 90 degrees."""
 
     def __init__(

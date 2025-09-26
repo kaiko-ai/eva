@@ -5,13 +5,13 @@ from typing import Any, Dict, Tuple
 
 from monai.transforms.intensity import array as monai_intensity_transforms
 from torchvision import tv_tensors
-from torchvision.transforms import v2
 from typing_extensions import override
 
 from eva.vision.data import tv_tensors as eva_tv_tensors
+from eva.vision.data.transforms import base
 
 
-class ScaleIntensityRange(v2.Transform):
+class ScaleIntensityRange(base.TorchvisionTransformV2):
     """Intensity scaling transform.
 
     Scaling from [a_min, a_max] to [b_min, b_max] with clip option.

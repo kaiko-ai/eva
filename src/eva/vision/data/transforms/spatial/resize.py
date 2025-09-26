@@ -7,10 +7,11 @@ from torchvision import tv_tensors
 from torchvision.transforms import v2
 from typing_extensions import override
 
+from eva.vision.data.transforms import base
 from eva.vision.data.transforms.spatial import functional
 
 
-class Resize(v2.Transform):
+class Resize(base.TorchvisionTransformV2):
     """Resize transform for images with spatial or byte-based constraints.
 
     This transform provides two mutually exclusive modes of resizing:

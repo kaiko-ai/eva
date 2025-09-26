@@ -5,14 +5,14 @@ from typing import Any, Dict, List, Sequence, Tuple
 
 from monai.transforms.croppad import array as monai_croppad_transforms
 from torchvision import tv_tensors
-from torchvision.transforms import v2
 from torchvision.transforms.v2 import _utils as tv_utils
 from typing_extensions import override
 
 from eva.vision.data import tv_tensors as eva_tv_tensors
+from eva.vision.data.transforms import base
 
 
-class RandSpatialCrop(v2.Transform):
+class RandSpatialCrop(base.TorchvisionTransformV2):
     """Crop image with random size or specific size ROI.
 
     It can crop at a random position as center or at the image center.

@@ -6,13 +6,13 @@ from typing import Any, Dict, List, Sequence
 import torch
 from monai.transforms.spatial import array as monai_spatial_transforms
 from torchvision import tv_tensors
-from torchvision.transforms import v2
 from typing_extensions import override
 
 from eva.vision.data import tv_tensors as eva_tv_tensors
+from eva.vision.data.transforms import base
 
 
-class RandFlip(v2.Transform):
+class RandFlip(base.TorchvisionTransformV2):
     """Randomly flips the image along axes."""
 
     def __init__(
