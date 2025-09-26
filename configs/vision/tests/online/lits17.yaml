@@ -2,7 +2,7 @@
 trainer:
   class_path: eva.Trainer
   init_args:
-    accelerator: cpu
+    accelerator: ${oc.env:ACCELERATOR, auto}
     devices: ${oc.env:NUM_DEVICES, 1}
     n_runs: &N_RUNS ${oc.env:N_RUNS, 1}
     default_root_dir: &LIGHTNING_ROOT ${oc.env:LIGHTNING_ROOT, logs/test/online/lits17}
