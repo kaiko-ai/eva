@@ -19,7 +19,7 @@ class TorchvisionTransformV2(v2.Transform, abc.ABC):
 
     def make_params(self, flat_inputs: List[Any]) -> Dict[str, Any]:
         """Called internally before calling transform() on each input."""
-        raise NotImplementedError
+        return {}
 
     def _get_params(self, flat_inputs: List[Any]) -> Dict[str, Any]:
         return self.make_params(flat_inputs)
