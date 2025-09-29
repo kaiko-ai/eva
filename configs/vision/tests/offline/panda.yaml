@@ -74,7 +74,8 @@ data:
       predict:
         - class_path: eva.vision.datasets.PANDA
           init_args: &PREDICT_DATASET_ARGS
-            root: ${oc.env:TESTS_ROOT, tests/eva}/assets/vision/datasets/panda
+            root: &DATA_ROOT ${oc.env:TESTS_ROOT, tests/eva}/assets/vision/datasets/panda
+            download_dir: *DATA_ROOT
             sampler:
               class_path: eva.vision.data.wsi.patching.samplers.ForegroundGridSampler
               init_args:
