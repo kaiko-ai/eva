@@ -43,7 +43,7 @@ model:
     head:
       class_path: torch.nn.Linear
       init_args:
-        in_features: 384
+        in_features: ${oc.env:IN_FEATURES, 192}
         out_features: 1
     criterion: torch.nn.BCEWithLogitsLoss
     optimizer:

@@ -71,6 +71,7 @@ def vit_tiny_patch16_224_random(
     return timm.create_model(
         model_name="vit_tiny_patch16_224",
         pretrained=False,
+        num_classes=0,
         features_only=out_indices is not None,
         out_indices=out_indices,
         dynamic_img_size=dynamic_img_size,

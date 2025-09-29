@@ -29,7 +29,7 @@ model:
     head:
       class_path: eva.vision.models.networks.ABMIL
       init_args:
-        input_size: ${oc.env:IN_FEATURES, 384}
+        input_size: ${oc.env:IN_FEATURES, 192}
         output_size: &NUM_CLASSES 6
     criterion: torch.nn.CrossEntropyLoss
     optimizer:
