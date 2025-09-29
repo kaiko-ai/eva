@@ -4,6 +4,7 @@ from collections import defaultdict
 from typing import Dict, Iterator, List, Union
 
 import numpy as np
+import torch
 from loguru import logger
 from typing_extensions import override
 
@@ -62,24 +63,31 @@ class BalancedSampler(SamplerWithDataSource[int]):
         super().set_dataset(data_source)
         self._make_indices()
 
+    def _get_class_idx(self, idx):
+        """Load and validate the class index for a given sample index."""
+        if hasattr(self.data_source, "load_target"):
+            target = self.data_source.load_target(idx)  # type: ignore
+        else:
+            _, target, _ = DataSample(*self.data_source[idx])
+
+        if target is None:
+            raise ValueError("The dataset must return non-empty targets.")
+
+        if isinstance(target, str):
+            return target
+
+        if isinstance(target, torch.Tensor):
+            if target.numel() != 1:
+                raise ValueError("The dataset must return a single & scalar target.")
+            return int(target.item())
+
+        raise ValueError("Unsupported target type. Expected str or tensor-like object.")
+
     def _make_indices(self):
         """Samples the indices for each class in the dataset."""
         self._class_indices.clear()
         for idx in tqdm(range(len(self.data_source)), desc="Fetching class indices for sampler"):
-            if hasattr(self.data_source, "load_target"):
-                target = self.data_source.load_target(idx)  # type: ignore
-            else:
-                _, target, _ = DataSample(*self.data_source[idx])
-            if target is None:
-                raise ValueError("The dataset must return non-empty targets.")
-            if isinstance(target, str):
-                class_idx = target
-            elif hasattr(target, 'numel') and hasattr(target, 'item'):
-                if target.numel() != 1:
-                    raise ValueError("The dataset must return a single & scalar target.")
-                class_idx = int(target.item())
-            else:
-                raise ValueError("Unsupported target type. Expected str or tensor-like object.")
+            class_idx = self._get_class_idx(idx)
             self._class_indices[class_idx].append(idx)
 
         if not self._replacement:
