@@ -15,7 +15,7 @@ from eva.vision.data import transforms as eva_transforms
 from eva.vision.data.wsi.patching import samplers
 
 TARGET_SIZE = 224
-DEFAULT_ARGS = {
+_DEFAULT_KWARGS = {
     "width": 16,
     "height": 16,
     "target_mpp": 0.5,
@@ -25,11 +25,11 @@ DEFAULT_ARGS = {
 }
 
 
-def test_split_and_expected_shapes(root: str):
+def test_split_and_expected_shapes(root: str, kwargs: dict[str, Any]):
     """Test loading the dataset with different splits."""
-    train_dataset = datasets.PANDA(root=root, split="train", **DEFAULT_ARGS)
-    val_dataset = datasets.PANDA(root=root, split="val", **DEFAULT_ARGS)
-    test_dataset = datasets.PANDA(root=root, split="test", **DEFAULT_ARGS)
+    train_dataset = datasets.PANDA(root=root, split="train", **kwargs)
+    val_dataset = datasets.PANDA(root=root, split="val", **kwargs)
+    test_dataset = datasets.PANDA(root=root, split="test", **kwargs)
     _setup_datasets(train_dataset, val_dataset, test_dataset)
 
     assert len(train_dataset.datasets) == 6
@@ -46,9 +46,9 @@ def test_split_and_expected_shapes(root: str):
 
 
 @pytest.mark.parametrize("split", ["train", "val", "test", None])
-def test_filenames(root: str, split: Literal["train", "val", "test"]):
+def test_filenames(root: str, kwargs: dict[str, Any], split: Literal["train", "val", "test"]):
     """Tests that the number of filenames matches the dataset size."""
-    dataset = datasets.PANDA(root=root, split=split, **DEFAULT_ARGS)
+    dataset = datasets.PANDA(root=root, split=split, **kwargs)
     _setup_datasets(dataset)
 
     filenames = set()
@@ -58,15 +58,15 @@ def test_filenames(root: str, split: Literal["train", "val", "test"]):
     assert len(filenames) == len(dataset.datasets)
 
 
-def test_same_split_same_seed(root: str, seed: int = 42):
+def test_same_split_same_seed(root: str, kwargs: dict[str, Any], seed: int = 42):
     """Test that the generated split is deterministic when using the same seed."""
     sampler1 = samplers.GridSampler(seed=seed)
     sampler2 = samplers.GridSampler(seed=seed)
     dataset1 = datasets.PANDA(
-        root=root, split="train", seed=seed, **(DEFAULT_ARGS | {"sampler": sampler1})
+        root=root, split="train", seed=seed, **(kwargs | {"sampler": sampler1})
     )
     dataset2 = datasets.PANDA(
-        root=root, split="train", seed=seed, **(DEFAULT_ARGS | {"sampler": sampler2})
+        root=root, split="train", seed=seed, **(kwargs | {"sampler": sampler2})
     )
     _setup_datasets(dataset1, dataset2)
 
@@ -81,10 +81,10 @@ def test_same_split_same_seed(root: str, seed: int = 42):
         assert dataset1.datasets[i]._coords.x_y[: len(expected_coords[i])] == expected_coords[i]
 
 
-def test_different_seed_different_split(root: str):
+def test_different_seed_different_split(root: str, kwargs: dict[str, Any]):
     """Test that the generated split is different when using a different seed."""
-    dataset1 = datasets.PANDA(root=root, split="train", seed=42, **DEFAULT_ARGS)
-    dataset2 = datasets.PANDA(root=root, split="train", seed=43, **DEFAULT_ARGS)
+    dataset1 = datasets.PANDA(root=root, split="train", seed=42, **kwargs)
+    dataset2 = datasets.PANDA(root=root, split="train", seed=43, **kwargs)
     _setup_datasets(dataset1, dataset2)
 
     assert len(dataset1) == len(dataset2)
@@ -107,6 +107,12 @@ def _check_batch_shape(batch: Any):
     assert "width" in metadata
     assert "height" in metadata
     assert "level_idx" in metadata
+
+
+@pytest.fixture
+def kwargs(root: str) -> dict[str, Any]:
+    """Provides dataset arguments with the temporary download directory."""
+    return _DEFAULT_KWARGS | {"download_dir": root}
 
 
 @pytest.fixture
