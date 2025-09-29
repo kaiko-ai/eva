@@ -10,6 +10,8 @@ hide:
 
 We evaluated the following FMs on a variety of WSI classification & segmentation tasks. We report *Balanced Accuracy* for binary & multiclass tasks and Dice Score (without background) for segmentation tasks. The score shows the average performance over 5 runs for patch-level classification & segmentation tasks, and 20 runs for slide-level (due to higher standard deviation among runs). Note the leaderboard orders from best to worst according to the average performance across all tasks, excluding BACH (not comparable due to uncommon MPP after resizing).
 
+<center>
+
 <br/>
 
 ![Screenshot](images/leaderboards/pathology.svg)
@@ -60,6 +62,9 @@ We selected this approach to prioritize reliable, robust and fair FM-evaluation 
 We evaluate both 2D and 3D FMs on different radiology segmentation tasks.
 We report *Balanced Accuracy* for binary & multiclass tasks and Dice Score (without background) for segmentation tasks. The score shows the average performance over 5 runs. Note the leaderboard orders from best to worst according to the average performance across all tasks.
 
+
+<center>
+
 <br/>
 
 ![Screenshot](images/leaderboards/radiology.svg)
@@ -67,6 +72,8 @@ We report *Balanced Accuracy* for binary & multiclass tasks and Dice Score (with
 <br/>
 
 </center>
+
+(ViT-B16 (DINO) acts as a 2D baseline, remaining models are 3D.)
 
 
 ### Evaluation protocol
