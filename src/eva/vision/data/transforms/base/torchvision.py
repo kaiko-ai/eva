@@ -13,7 +13,7 @@ class TorchvisionTransformV2(v2.Transform, abc.ABC):
     as torchvision 0.21.0 introduced a new transform API where they
     renamed the following methods:
 
-    - `get_params` -> `make_params`
+    - `_get_params` -> `make_params`
     - `_transform` -> `transform`
     """
 
