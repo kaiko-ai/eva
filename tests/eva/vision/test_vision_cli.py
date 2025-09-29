@@ -102,6 +102,29 @@ def test_predict_fit_from_configuration(configuration_file: str, lib_path: str) 
             )
 
 
+@pytest.mark.skipif(not os.getenv("CI"), reason="Runs only in CI")
+@pytest.mark.parametrize(
+    "configuration_file",
+    [
+        "configs/vision/tests/offline/patch_camelyon.yaml",
+    ],
+)
+def test_predict_fit_from_configuration_ddp(configuration_file: str, lib_path: str) -> None:
+    """Tests CLI `predict_fit` command with a given configuration file using DDP strategy."""
+    _skip_dataset_validation()
+    with tempfile.TemporaryDirectory() as output_dir:
+        with mock.patch.dict(
+            os.environ, {"EMBEDDINGS_ROOT": output_dir, "STRATEGY": "ddp", "NUM_DEVICES": "2"}
+        ):
+            _cli.run_cli_from_main(
+                cli_args=[
+                    "predict_fit",
+                    "--config",
+                    os.path.join(lib_path, configuration_file),
+                ]
+            )
+
+
 def _skip_dataset_validation() -> None:
     """Mocks the validation step of the datasets."""
     datasets.PatchCamelyon.validate = mock.MagicMock(return_value=None)
