@@ -11,6 +11,8 @@ trainer:
     checkpoint_type: ${oc.env:CHECKPOINT_TYPE, best}
     num_sanity_val_steps: 0
     log_every_n_steps: ${oc.env:LOG_EVERY_N_STEPS, 100}
+    accelerator: ${oc.env:ACCELERATOR, auto}
+    devices: ${oc.env:NUM_DEVICES, 1}
     callbacks:
       - class_path: eva.callbacks.ConfigurationLogger
       - class_path: lightning.pytorch.callbacks.TQDMProgressBar
