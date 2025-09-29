@@ -12,6 +12,7 @@ from torchvision.datasets import utils
 from torchvision.transforms.v2 import functional
 from typing_extensions import override
 
+from eva.core import utils as core_utils
 from eva.core.data import splitting
 from eva.vision.data.datasets import _validators, structs, vision, wsi
 from eva.vision.data.wsi.patching import samplers
@@ -50,6 +51,7 @@ class PANDA(wsi.MultiWsiDataset, vision.VisionDataset[tv_tensors.Image, torch.Te
         image_transforms: Callable | None = None,
         coords_path: str | None = None,
         seed: int = 42,
+        download_dir: str | None = None,
     ) -> None:
         """Initializes the dataset.
 
@@ -64,10 +66,13 @@ class PANDA(wsi.MultiWsiDataset, vision.VisionDataset[tv_tensors.Image, torch.Te
             image_transforms: Transforms to apply to the extracted image patches.
             coords_path: File path to save the patch coordinates as .csv.
             seed: Random seed for reproducibility.
+            download_dir: Directory to download the dataset resources to. If None,
+                defaults to eva's home directory.
         """
         self._split = split
         self._root = root
         self._seed = seed
+        self._download_dir = download_dir or os.path.join(core_utils.home_dir(), "data", "panda")
 
         self._download_resources()
 
@@ -92,7 +97,7 @@ class PANDA(wsi.MultiWsiDataset, vision.VisionDataset[tv_tensors.Image, torch.Te
     @functools.cached_property
     def annotations(self) -> pd.DataFrame:
         """Loads the dataset labels."""
-        path = os.path.join(self._root, "train_with_noisy_labels.csv")
+        path = os.path.join(self._download_dir, "train_with_noisy_labels.csv")
         return pd.read_csv(path, index_col="image_id")
 
     @override
@@ -100,14 +105,16 @@ class PANDA(wsi.MultiWsiDataset, vision.VisionDataset[tv_tensors.Image, torch.Te
         _validators.check_dataset_exists(self._root, False)
 
         if not os.path.isdir(os.path.join(self._root, "train_images")):
-            raise FileNotFoundError("'train_images' directory not found in the root folder.")
-        if not os.path.isfile(os.path.join(self._root, "train_with_noisy_labels.csv")):
-            raise FileNotFoundError("'train.csv' file not found in the root folder.")
+            raise FileNotFoundError(f"'train_images' dir not found in folder: {self._root}")
+        if not os.path.isfile(os.path.join(self._download_dir, "train_with_noisy_labels.csv")):
+            raise FileNotFoundError(
+                f"'train_with_noisy_labels.csv' file not found in folder: {self._download_dir}"
+            )
 
     def _download_resources(self) -> None:
         """Downloads the dataset resources."""
         for resource in self._resources:
-            utils.download_url(resource.url, self._root, resource.filename, resource.md5)
+            utils.download_url(resource.url, self._download_dir, resource.filename, resource.md5)
 
     @override
     def validate(self) -> None:
