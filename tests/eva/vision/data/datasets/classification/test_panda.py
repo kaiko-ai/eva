@@ -27,6 +27,7 @@ DEFAULT_ARGS = {
 
 def test_split_and_expected_shapes(root: str):
     """Test loading the dataset with different splits."""
+    DEFAULT_ARGS["download_dir"] = root
     train_dataset = datasets.PANDA(root=root, split="train", **DEFAULT_ARGS)
     val_dataset = datasets.PANDA(root=root, split="val", **DEFAULT_ARGS)
     test_dataset = datasets.PANDA(root=root, split="test", **DEFAULT_ARGS)
@@ -48,6 +49,7 @@ def test_split_and_expected_shapes(root: str):
 @pytest.mark.parametrize("split", ["train", "val", "test", None])
 def test_filenames(root: str, split: Literal["train", "val", "test"]):
     """Tests that the number of filenames matches the dataset size."""
+    DEFAULT_ARGS["download_dir"] = root
     dataset = datasets.PANDA(root=root, split=split, **DEFAULT_ARGS)
     _setup_datasets(dataset)
 
@@ -60,6 +62,7 @@ def test_filenames(root: str, split: Literal["train", "val", "test"]):
 
 def test_same_split_same_seed(root: str, seed: int = 42):
     """Test that the generated split is deterministic when using the same seed."""
+    DEFAULT_ARGS["download_dir"] = root
     sampler1 = samplers.GridSampler(seed=seed)
     sampler2 = samplers.GridSampler(seed=seed)
     dataset1 = datasets.PANDA(
@@ -83,6 +86,7 @@ def test_same_split_same_seed(root: str, seed: int = 42):
 
 def test_different_seed_different_split(root: str):
     """Test that the generated split is different when using a different seed."""
+    DEFAULT_ARGS["download_dir"] = root
     dataset1 = datasets.PANDA(root=root, split="train", seed=42, **DEFAULT_ARGS)
     dataset2 = datasets.PANDA(root=root, split="train", seed=43, **DEFAULT_ARGS)
     _setup_datasets(dataset1, dataset2)
