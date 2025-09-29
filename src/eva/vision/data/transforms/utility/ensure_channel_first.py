@@ -5,13 +5,13 @@ from typing import Any, Dict
 
 from monai.transforms.utility import array as monai_utility_transforms
 from torchvision import tv_tensors
-from torchvision.transforms import v2
 from typing_extensions import override
 
 from eva.vision.data import tv_tensors as eva_tv_tensors
+from eva.vision.data.transforms import base
 
 
-class EnsureChannelFirst(v2.Transform):
+class EnsureChannelFirst(base.TorchvisionTransformV2):
     """Adjust or add the channel dimension of input data to ensure `channel_first` shape."""
 
     def __init__(
@@ -40,12 +40,12 @@ class EnsureChannelFirst(v2.Transform):
 
     @functools.singledispatchmethod
     @override
-    def _transform(self, inpt: Any, params: Dict[str, Any]) -> Any:
+    def transform(self, inpt: Any, params: Dict[str, Any]) -> Any:
         return inpt
 
-    @_transform.register(tv_tensors.Image)
-    @_transform.register(eva_tv_tensors.Volume)
-    @_transform.register(tv_tensors.Mask)
+    @transform.register(tv_tensors.Image)
+    @transform.register(eva_tv_tensors.Volume)
+    @transform.register(tv_tensors.Mask)
     def _(self, inpt: Any, params: Dict[str, Any]) -> Any:
         inpt_channel_first = self._ensure_channel_first(inpt)
         return tv_tensors.wrap(inpt_channel_first, like=inpt)
