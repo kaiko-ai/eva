@@ -20,14 +20,10 @@ trainer:
             1: val
             2: test
           backbone:
-            class_path: eva.models.ModelFromFunction
+            class_path: eva.vision.models.ModelFromRegistry
             init_args:
-              path: torch.hub.load
-              arguments:
-                repo_or_dir: facebookresearch/dino:main
-                model: dino_vits16
-                pretrained: false
-              checkpoint_path: &CHECKPOINT_PATH ${oc.env:CHECKPOINT_PATH, null}
+              model_name: ${oc.env:MODEL_NAME, universal/vit_tiny_patch16_224_random}
+              model_extra_kwargs: ${oc.env:MODEL_EXTRA_KWARGS, null}
       - class_path: lightning.pytorch.callbacks.ModelCheckpoint
         init_args:
           filename: best

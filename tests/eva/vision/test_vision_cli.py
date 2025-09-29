@@ -118,3 +118,17 @@ def mock_download():
     """Mocks the download functions to avoid downloading resources when running tests."""
     with patch.object(datasets.PANDA, "_download_resources", return_value=None):
         yield
+
+
+@pytest.fixture(autouse=True)
+def mock_env():
+    """Mocks the environment variables."""
+    with mock.patch.dict(
+        os.environ,
+        {
+            "MODEL_NAME": "universal/vit_tiny_patch16_224_random",
+            "IN_FEATURES": "192",
+            "DOWNLOAD_DATA": "false",
+        },
+    ):
+        yield
