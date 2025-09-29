@@ -7,11 +7,13 @@ from typing import Any, Dict, List, Literal, Sequence, Tuple, TypedDict
 import lightning.pytorch as pl
 import pandas as pd
 import torch
+import torch.distributed as dist
 from lightning.pytorch import callbacks
 from torch import nn
 from typing_extensions import NotRequired, override
 
 from eva.core.models.modules import utils as module_utils
+from eva.core.utils import distributed as dist_utils
 from eva.language.models.typings import TextBatch
 from eva.language.utils.text import messages as message_utils
 
@@ -74,10 +76,14 @@ class TextPredictionWriter(callbacks.BasePredictionWriter, abc.ABC):
 
         self._manifest_path = os.path.join(self.output_dir, f"manifest.{self.save_format}")
         self._data: List[ManifestEntry] = []
+        self._is_rank_zero: bool = False
 
     @override
     def on_predict_start(self, trainer: pl.Trainer, pl_module: pl.LightningModule) -> None:
-        self._check_if_exists()
+        self._is_rank_zero = trainer.is_global_zero
+
+        if self._is_rank_zero:
+            self._check_if_exists()
 
         self.model = self.model.to(pl_module.device)
         self.model.eval()
@@ -105,11 +111,12 @@ class TextPredictionWriter(callbacks.BasePredictionWriter, abc.ABC):
 
         for i in range(len(batch_indices)):
             entry: ManifestEntry = {
-                "text": message_utils.serialize(text_batch[i]),
                 "prediction": str(prediction_batch[i]),
                 "target": str(target_batch[i]) if has_target else "",
                 "split": split if split else "",
             }
+            if self.include_input:
+                entry["text"] = message_utils.serialize(text_batch[i])
 
             if self.metadata_keys is not None and metadata_batch is not None:
                 for key in self.metadata_keys:
@@ -120,26 +127,45 @@ class TextPredictionWriter(callbacks.BasePredictionWriter, abc.ABC):
     @override
     def on_predict_end(self, trainer: pl.Trainer, pl_module: pl.LightningModule) -> None:
         """Saves the gathered predictions to a manifest file."""
-        df = pd.DataFrame(self._data)
+        if dist_utils.is_distributed():
+            dist.barrier()
+            data = self._gather_data_from_ranks()
+        else:
+            data = self._data
 
-        match self.save_format:
-            case "jsonl":
-                df.to_json(self._manifest_path, orient="records", lines=True)
-            case "parquet":
-                df.to_parquet(self._manifest_path, index=False)
-            case "csv":
-                df.to_csv(self._manifest_path, index=False)
-            case _:
-                raise ValueError(f"Unsupported save format: {self.save_format}")
+        if self._is_rank_zero:
+            df = pd.DataFrame(data)
+
+            match self.save_format:
+                case "jsonl":
+                    df.to_json(self._manifest_path, orient="records", lines=True)
+                case "parquet":
+                    df.to_parquet(self._manifest_path, index=False)
+                case "csv":
+                    df.to_csv(self._manifest_path, index=False)
+                case _:
+                    raise ValueError(f"Unsupported save format: {self.save_format}")
+
+    def _gather_data_from_ranks(self) -> List[ManifestEntry]:
+        world_size = dist.get_world_size()
+        gathered: List[List[ManifestEntry] | None] = [None] * world_size
+        dist.all_gather_object(gathered, self._data)
+        return [row for shard in gathered for row in (shard or [])]
 
     def _get_predictions(self, batch: TextBatch) -> List[str]:
         with torch.no_grad():
-            predictions = self.model(batch)
+            output = self.model(batch)
 
-        if not isinstance(predictions, list) or not all(isinstance(p, str) for p in predictions):
-            raise ValueError("The model's output should be a list of strings.")
+        if (
+            not isinstance(output, dict)
+            or "generated_text" not in output
+            or not all(isinstance(p, str) for p in output["generated_text"])
+        ):
+            raise ValueError(
+                f"A dictionary with 'generated_text' key is expected, got {type(output)}"
+            )
 
-        return predictions
+        return output["generated_text"]
 
     def _check_if_exists(self) -> None:
         """Checks if the output directory already exists and if it should be overwritten."""
@@ -150,7 +176,6 @@ class TextPredictionWriter(callbacks.BasePredictionWriter, abc.ABC):
                 "either means that the predictions have been computed before or that a "
                 "wrong output directory is being used."
             )
-        os.makedirs(self.output_dir, exist_ok=True)
 
     def _apply_postprocess(
         self, pl_module: pl.LightningModule, targets: Any, predictions: Any

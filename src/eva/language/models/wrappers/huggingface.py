@@ -5,13 +5,21 @@ from typing import Any, Callable, Dict, List, Literal
 from transformers.pipelines import pipeline
 from typing_extensions import override
 
-from eva.language.models.typings import TextBatch
+from eva.language.models.typings import ModelOutput, TextBatch
 from eva.language.models.wrappers import base
 from eva.language.utils.text import messages as message_utils
 
 
 class HuggingFaceModel(base.LanguageModel):
     """Wrapper class for loading HuggingFace `transformers` models using pipelines."""
+
+    _default_generation_kwargs = {
+        "temperature": 0.0,
+        "max_new_tokens": 1024,
+        "do_sample": False,
+        "top_p": 1.0,
+    }
+    """Default HF model parameters for evaluation."""
 
     def __init__(
         self,
@@ -41,7 +49,7 @@ class HuggingFaceModel(base.LanguageModel):
         self._model_name_or_path = model_name_or_path
         self._task = task
         self._model_kwargs = model_kwargs or {}
-        self._generation_kwargs = generation_kwargs or {}
+        self._generation_kwargs = self._default_generation_kwargs | (generation_kwargs or {})
         self._chat_mode = chat_mode
 
         self.model = self.load_model()
@@ -84,7 +92,7 @@ class HuggingFaceModel(base.LanguageModel):
             return list(map(message_utils.merge_message_contents, message_batch))
 
     @override
-    def model_forward(self, prompts: List[str]) -> List[str]:
+    def model_forward(self, prompts: List[str]) -> ModelOutput:
         """Generates text using the pipeline.
 
         Args:
@@ -96,10 +104,12 @@ class HuggingFaceModel(base.LanguageModel):
         outputs = self.model(prompts, return_full_text=False, **self._generation_kwargs)
         if outputs is None:
             raise ValueError("Outputs from the model are None.")
+
         results = []
         for output in outputs:
             if isinstance(output, list):
                 results.append(output[0]["generated_text"])  # type: ignore
             else:
                 results.append(output["generated_text"])  # type: ignore
-        return results
+
+        return ModelOutput(generated_text=results)

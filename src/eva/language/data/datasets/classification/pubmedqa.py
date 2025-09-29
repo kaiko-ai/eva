@@ -121,7 +121,7 @@ class PubMedQA(base.TextClassification):
 
     @override
     def validate(self) -> None:
-        if len(self) != self._expected_dataset_lengths[self._split]:
+        if len(self) != (self._max_samples or self._expected_dataset_lengths[self._split]):
             raise ValueError(
                 f"Dataset length mismatch for split '{self._split}': "
                 f"expected {self._expected_dataset_lengths[self._split]}, "

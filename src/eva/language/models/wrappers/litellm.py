@@ -16,7 +16,7 @@ from litellm.exceptions import (
 from loguru import logger
 from typing_extensions import override
 
-from eva.language.models.typings import TextBatch
+from eva.language.models.typings import ModelOutput, TextBatch
 from eva.language.models.wrappers import base
 from eva.language.utils.text import messages as message_utils
 
@@ -31,6 +31,14 @@ RETRYABLE_ERRORS = (
 
 class LiteLLMModel(base.LanguageModel):
     """Wrapper class for LiteLLM language models."""
+
+    _default_model_kwargs = {
+        "temperature": 0.0,
+        "max_completion_tokens": 1024,
+        "top_p": 1.0,
+        "seed": 42,
+    }
+    """Default API model parameters for evaluation."""
 
     def __init__(
         self,
@@ -51,9 +59,10 @@ class LiteLLMModel(base.LanguageModel):
         super().__init__(system_prompt=system_prompt)
 
         self.model_name = model_name
-        self.model_kwargs = model_kwargs or {}
+        self.model_kwargs = self._default_model_kwargs | (model_kwargs or {})
 
         litellm.suppress_debug_info = True
+        litellm.drop_params = True
 
         if log_level is not None:
             logging.getLogger("LiteLLM").setLevel(log_level)
@@ -94,16 +103,17 @@ class LiteLLMModel(base.LanguageModel):
             f"Retrying due to {details.get('exception') or 'Unknown error'}"
         ),
     )
-    def model_forward(self, batch: List[List[Dict[str, Any]]]) -> List[str]:
+    def model_forward(self, batch: List[List[Dict[str, Any]]]) -> ModelOutput:
         """Generates output text through API calls via LiteLLM's batch completion functionality."""
         outputs = batch_completion(model=self.model_name, messages=batch, **self.model_kwargs)
         self._raise_exceptions(outputs)
 
-        return [
+        generated_text = [
             output["choices"][0]["message"]["content"]
             for output in outputs
             if output["choices"][0]["message"]["role"] == "assistant"
         ]
+        return ModelOutput(generated_text=generated_text)
 
     def _raise_exceptions(self, outputs: list):
         for output in outputs:

@@ -106,7 +106,7 @@ class BTCV(VisionDataset[eva_tv_tensors.Volume, tv_tensors.Mask]):
 
     @override
     def validate(self) -> None:
-        requirements.check_dependencies(requirements={"torch": "2.5.1", "torchvision": "0.20.1"})
+        requirements.check_min_versions(requirements={"torch": "2.5.1", "torchvision": "0.20.1"})
 
         def _valid_sample(index: int) -> bool:
             """Indicates if the sample files exist and are reachable."""

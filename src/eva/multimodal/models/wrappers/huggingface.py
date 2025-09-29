@@ -9,10 +9,11 @@ from loguru import logger
 from torch import nn
 from typing_extensions import override
 
-from eva.language.models.typings import TextBatch
+from eva.language.models.typings import ModelOutput, TextBatch
 from eva.language.utils.text import messages as language_message_utils
 from eva.multimodal.models.typings import TextImageBatch
 from eva.multimodal.models.wrappers import base
+from eva.multimodal.utils.batch import unpack_batch
 from eva.multimodal.utils.text import messages as message_utils
 
 
@@ -27,6 +28,14 @@ class HuggingFaceModel(base.VisionLanguageModel):
         generation_kwargs: Additional generation arguments.
     """
 
+    _default_generation_kwargs = {
+        "temperature": 0.0,
+        "max_new_tokens": 1024,
+        "do_sample": False,
+        "top_p": 1.0,
+    }
+    """Default HF model parameters for evaluation."""
+
     def __init__(
         self,
         model_name_or_path: str,
@@ -35,6 +44,7 @@ class HuggingFaceModel(base.VisionLanguageModel):
         system_prompt: str | None = None,
         processor_kwargs: Dict[str, Any] | None = None,
         generation_kwargs: Dict[str, Any] | None = None,
+        image_key: str = "image",
     ):
         """Initialize the HuggingFace model wrapper.
 
@@ -45,6 +55,7 @@ class HuggingFaceModel(base.VisionLanguageModel):
             system_prompt: System prompt to use.
             processor_kwargs: Additional processor arguments.
             generation_kwargs: Additional generation arguments.
+            image_key: The key used for image inputs in the chat template.
         """
         super().__init__(system_prompt=system_prompt)
 
@@ -52,7 +63,8 @@ class HuggingFaceModel(base.VisionLanguageModel):
         self.model_kwargs = model_kwargs or {}
         self.base_model_class = model_class
         self.processor_kwargs = processor_kwargs or {}
-        self.generation_kwargs = generation_kwargs or {}
+        self.generation_kwargs = self._default_generation_kwargs | (generation_kwargs or {})
+        self.image_key = image_key
 
         self.processor = self.load_processor()
         self.model = self.load_model()
@@ -72,7 +84,7 @@ class HuggingFaceModel(base.VisionLanguageModel):
                 "pixel_values": ...
             }
         """
-        message_batch, image_batch, _, _ = self._unpack_batch(batch)
+        message_batch, image_batch, _, _ = unpack_batch(batch)
         with_images = image_batch is not None
 
         message_batch = language_message_utils.batch_insert_system_message(
@@ -105,12 +117,12 @@ class HuggingFaceModel(base.VisionLanguageModel):
         }
 
         if with_images:
-            processor_inputs["image"] = [[image] for image in image_batch]
+            processor_inputs[self.image_key] = [[image] for image in image_batch]
 
         return self.processor(**processor_inputs).to(self.model.device)  # type: ignore
 
     @override
-    def model_forward(self, batch: Dict[str, torch.Tensor]) -> List[str]:
+    def model_forward(self, batch: Dict[str, torch.Tensor]) -> ModelOutput:
         """Generates text output from the model. Is called by the `generate` method.
 
         Args:
@@ -121,8 +133,14 @@ class HuggingFaceModel(base.VisionLanguageModel):
         Returns:
             A dictionary containing the processed input and the model's output.
         """
-        output = self.model.generate(**batch, **self.generation_kwargs)  # type: ignore
-        return self._decode_output(output, batch["input_ids"].shape[-1])
+        output_ids = self.model.generate(**batch, **self.generation_kwargs)  # type: ignore
+
+        return ModelOutput(
+            generated_text=self._decode_output(output_ids, batch["input_ids"].shape[-1]),
+            input_ids=batch.get("input_ids"),
+            output_ids=output_ids,
+            attention_mask=batch.get("attention_mask"),
+        )
 
     @override
     def load_model(self) -> nn.Module:
@@ -148,14 +166,9 @@ class HuggingFaceModel(base.VisionLanguageModel):
     def load_processor(self) -> Callable:
         """Initialize the processor."""
         return transformers.AutoProcessor.from_pretrained(
-            self.model_name_or_path,
+            self.processor_kwargs.pop("model_name_or_path", self.model_name_or_path),
             **self.processor_kwargs,
         )
-
-    def _unpack_batch(self, batch: TextImageBatch | TextBatch) -> tuple:
-        if isinstance(batch, TextImageBatch):
-            return batch.text, batch.image, batch.target, batch.metadata
-        return batch.text, None, batch.target, batch.metadata
 
     def _decode_output(self, output: torch.Tensor, instruction_length: int) -> List[str]:
         """Decode the model's batch output to text.

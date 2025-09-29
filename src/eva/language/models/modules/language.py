@@ -1,6 +1,6 @@
 """Model module for language models."""
 
-from typing import Any, List
+from typing import Any
 
 from lightning.pytorch.utilities.types import STEP_OUTPUT
 from torch import nn
@@ -9,7 +9,7 @@ from typing_extensions import override
 from eva.core.metrics import structs as metrics_lib
 from eva.core.models.modules import module
 from eva.core.models.modules.utils import batch_postprocess
-from eva.language.models.typings import PredictionBatch, TextBatch
+from eva.language.models.typings import ModelOutput, PredictionBatch, TextBatch
 
 
 class LanguageModule(module.ModelModule):
@@ -33,7 +33,7 @@ class LanguageModule(module.ModelModule):
         self.model = model
 
     @override
-    def forward(self, batch: TextBatch, *args: Any, **kwargs: Any) -> List[str]:
+    def forward(self, batch: TextBatch, *args: Any, **kwargs: Any) -> ModelOutput:
         return self.model(batch)
 
     @override
@@ -46,13 +46,14 @@ class LanguageModule(module.ModelModule):
 
     def _batch_step(self, batch: TextBatch) -> STEP_OUTPUT:
         text, targets, metadata = TextBatch(*batch)
-        predictions = self.forward(batch)
+        output = self.forward(batch)
+
         return {
             "inputs": text,
-            "predictions": predictions,
+            "predictions": output.pop("generated_text"),  # type: ignore
             "targets": targets,
             "metadata": metadata,
-        }
+        } | output
 
 
 class OfflineLanguageModule(module.ModelModule):

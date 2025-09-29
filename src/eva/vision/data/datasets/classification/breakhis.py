@@ -101,11 +101,6 @@ class BreaKHis(vision.VisionDataset[tv_tensors.Image, torch.Tensor]):
     def class_to_idx(self) -> Dict[str, int]:
         return {label: index for index, label in enumerate(self.classes)}
 
-    @property
-    def _dataset_path(self) -> str:
-        """Returns the path of the image data of the dataset."""
-        return os.path.join(self._root, "BreaKHis_v1", "histology_slides")
-
     @functools.cached_property
     def _image_files(self) -> List[str]:
         """Return the list of image files in the dataset.
@@ -115,14 +110,14 @@ class BreaKHis(vision.VisionDataset[tv_tensors.Image, torch.Tensor]):
         """
         image_files = []
         for magnification in self._magnifications:
-            files_pattern = os.path.join(self._dataset_path, f"**/{magnification}", "*.png")
+            files_pattern = os.path.join(self._root, f"**/{magnification}", "*.png")
             image_files.extend(list(glob.glob(files_pattern, recursive=True)))
         return sorted(image_files)
 
     @override
     def filename(self, index: int) -> str:
         image_path = self._image_files[self._indices[index]]
-        return os.path.relpath(image_path, self._dataset_path)
+        return os.path.relpath(image_path, self._root)
 
     @override
     def prepare_data(self) -> None:
@@ -136,6 +131,8 @@ class BreaKHis(vision.VisionDataset[tv_tensors.Image, torch.Tensor]):
 
     @override
     def validate(self) -> None:
+        if not os.path.exists(self._root):
+            raise RuntimeError(f"Dataset not found at {self._root}.")
         _validators.check_dataset_integrity(
             self,
             length=self._expected_dataset_lengths[self._split],
@@ -164,7 +161,7 @@ class BreaKHis(vision.VisionDataset[tv_tensors.Image, torch.Tensor]):
     def _download_dataset(self) -> None:
         """Downloads the dataset."""
         for resource in self._resources:
-            if os.path.isdir(self._dataset_path):
+            if os.path.isdir(self._root):
                 continue
 
             self._print_license()

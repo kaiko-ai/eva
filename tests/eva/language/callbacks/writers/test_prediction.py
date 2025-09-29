@@ -18,6 +18,7 @@ from eva.language.callbacks.writers import prediction as prediction_writer
 from eva.language.data.dataloaders import text_collate
 from eva.language.data.datasets.typings import TextSample
 from eva.language.data.messages import UserMessage
+from eva.language.models.typings import ModelOutput
 
 
 @pytest.mark.parametrize(
@@ -126,9 +127,12 @@ def _check_manifest(
             raise ValueError(f"Unsupported save format: {save_format}")
 
     # Check expected columns
-    expected_columns = ["text", "prediction", "target", "split", "example_metadata"]
+    expected_columns = ["prediction", "target", "split", "example_metadata"]
     for column in expected_columns:
         assert column in df_manifest.columns
+
+    if include_input:
+        assert "text" in df_manifest.columns
 
     # Check number of entries
     total_samples = sum(len(ds) for ds in datamodule.datasets.predict)  # type: ignore
@@ -198,7 +202,7 @@ class FakeTextModel(nn.Module):
         text_batch, _, _ = batch
         batch_size = len(text_batch)
         predictions = [f"prediction_{i}" for i in range(batch_size)]
-        return predictions
+        return ModelOutput(generated_text=predictions)
 
 
 class FakeLightningModule(pl.LightningModule):
@@ -209,9 +213,9 @@ class FakeLightningModule(pl.LightningModule):
         super().__init__()
         self.text_model = text_model
 
-    def forward(self, x):
+    def forward(self, x) -> ModelOutput:
         """Forward pass."""
-        return self.text_model(x)
+        return ModelOutput(generated_text=self.text_model(x))
 
     def predict_step(self, batch, batch_idx, dataloader_idx=0):
         """Prediction step."""

@@ -7,6 +7,7 @@ from typing import Any, Dict, List, Sequence
 
 import lightning.pytorch as pl
 import torch
+import torch.distributed as dist
 from lightning.pytorch import callbacks
 from loguru import logger
 from torch import multiprocessing, nn
@@ -15,6 +16,7 @@ from typing_extensions import override
 from eva.core import utils
 from eva.core.callbacks.writers.embeddings.typings import QUEUE_ITEM
 from eva.core.models.modules.typings import INPUT_BATCH
+from eva.core.utils import distributed as dist_utils
 from eva.core.utils import multiprocessing as eva_multiprocessing
 
 
@@ -58,8 +60,9 @@ class EmbeddingsWriter(callbacks.BasePredictionWriter, abc.ABC):
         self._save_every_n = save_every_n
         self._metadata_keys = metadata_keys or []
 
-        self._write_queue: multiprocessing.Queue
-        self._write_process: eva_multiprocessing.Process
+        self._write_queue: multiprocessing.Queue | None = None
+        self._write_process: eva_multiprocessing.Process | None = None
+        self._is_rank_zero: bool = False
 
     @staticmethod
     @abc.abstractmethod
@@ -78,9 +81,13 @@ class EmbeddingsWriter(callbacks.BasePredictionWriter, abc.ABC):
 
     @override
     def on_predict_start(self, trainer: pl.Trainer, pl_module: pl.LightningModule) -> None:
-        self._check_if_exists()
-        self._initialize_write_process()
-        self._write_process.start()
+        self._is_rank_zero = trainer.is_global_zero
+        if self._is_rank_zero:
+            self._check_if_exists()
+            self._initialize_write_process()
+            if self._write_process is None or self._write_queue is None:
+                raise RuntimeError("Failed to initialize embedding writer process.")
+            self._write_process.start()
 
         if self._backbone is not None:
             self._backbone = self._backbone.to(pl_module.device)
@@ -106,6 +113,7 @@ class EmbeddingsWriter(callbacks.BasePredictionWriter, abc.ABC):
         with torch.no_grad():
             embeddings = self._get_embeddings(prediction)
 
+        queue_items: List[QUEUE_ITEM] = []
         for local_idx, global_idx in enumerate(batch_indices[: len(embeddings)]):
             data_name = dataset.filename(global_idx)
             save_name = os.path.splitext(data_name)[0] + ".pt"
@@ -121,15 +129,41 @@ class EmbeddingsWriter(callbacks.BasePredictionWriter, abc.ABC):
                 split=split,
                 metadata=item_metadata,
             )
-            self._write_queue.put(item)
+            queue_items.append(item)
 
-        self._write_process.check_exceptions()
+        gathered_items = self._gather_queue_items(queue_items)
+        if self._is_rank_zero:
+            for item in gathered_items:
+                self._write_queue.put(item)  # type: ignore
+                self._write_process.check_exceptions()  # type: ignore
 
     @override
     def on_predict_end(self, trainer: pl.Trainer, pl_module: pl.LightningModule) -> None:
-        self._write_queue.put(None)
-        self._write_process.join()
-        logger.info(f"Predictions and manifest saved to {self._output_dir}")
+        if dist_utils.is_distributed():
+            dist.barrier()
+
+        if self._is_rank_zero and self._write_queue is not None:
+            self._write_queue.put(None)
+            if self._write_process is not None:
+                self._write_process.join()
+            logger.info(f"Predictions and manifest saved to {self._output_dir}")
+
+    def _gather_queue_items(self, items: List[QUEUE_ITEM]) -> List[QUEUE_ITEM]:
+        """Gather queue items across distributed ranks, returning only on rank zero."""
+        if not dist_utils.is_distributed():
+            return items
+
+        world_size = dist.get_world_size()
+        object_list: List[List[QUEUE_ITEM]] = [[] for _ in range(world_size)]
+        dist.all_gather_object(object_list, items)
+
+        if self._is_rank_zero:
+            gathered: List[QUEUE_ITEM] = []
+            for rank_items in object_list:
+                gathered.extend(rank_items)
+            return gathered
+
+        return []
 
     def _initialize_write_process(self) -> None:
         self._write_queue = multiprocessing.Queue()

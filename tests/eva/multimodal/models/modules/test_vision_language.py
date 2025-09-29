@@ -1,13 +1,17 @@
 """Tests the vision-language model module."""
 
+from typing import Any
+
 import pytest
 import torch
-from torch import nn
 from torchvision import tv_tensors
+from typing_extensions import override
 
 from eva.language.data.messages import MessageSeries, UserMessage
+from eva.language.models.typings import ModelOutput
 from eva.multimodal.models.modules.vision_language import VisionLanguageModule
 from eva.multimodal.models.typings import TextImageBatch
+from eva.multimodal.models.wrappers.base import VisionLanguageModel
 
 
 def test_forward(vision_language_module):
@@ -20,8 +24,9 @@ def test_forward(vision_language_module):
         metadata={"id": [1]},
     )
     expected = ["Dummy response Nr. 0"]
-    result = vision_language_module.forward(batch)
-    assert result == expected
+    output = vision_language_module.forward(batch)
+    assert isinstance(output, dict)
+    assert output["generated_text"] == expected
 
 
 def test_validation_step(vision_language_module):
@@ -92,19 +97,24 @@ def test_batch_step_without_targets(vision_language_module):
     assert output["predictions"] == ["Dummy response Nr. 0"]
 
 
-class DummyVisionLanguageModel(nn.Module):
+class DummyVisionLanguageModel(VisionLanguageModel):
     """A simple vision-language model for testing purposes."""
 
-    def forward(self, batch: TextImageBatch) -> list[str]:
+    @override
+    def format_inputs(self, batch: TextImageBatch) -> Any:
+        return batch
+
+    @override
+    def model_forward(self, batch: TextImageBatch) -> ModelOutput:
         """Generate text responses based on the batch size."""
         text, images, _, _ = batch
-        return [f"Dummy response Nr. {i}" for i in range(len(text))]
+        return ModelOutput(generated_text=[f"Dummy response Nr. {i}" for i in range(len(text))])
 
 
 @pytest.fixture
 def model():
     """Return a dummy model instance."""
-    return DummyVisionLanguageModel()
+    return DummyVisionLanguageModel(system_prompt=None)
 
 
 @pytest.fixture
