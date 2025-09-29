@@ -46,14 +46,14 @@ model:
     encoder:
       class_path: eva.vision.models.ModelFromRegistry
       init_args:
-        model_name: ${oc.env:MODEL_NAME, universal/vit_small_patch16_224_dino}
+        model_name: ${oc.env:MODEL_NAME, universal/vit_tiny_patch16_224_random}
         model_kwargs:
           out_indices: ${oc.env:OUT_INDICES, 1}
         model_extra_kwargs: ${oc.env:MODEL_EXTRA_KWARGS, null}
     decoder:
       class_path: eva.vision.models.networks.decoders.segmentation.ConvDecoderWithImage
       init_args:
-        in_features: ${oc.env:IN_FEATURES, 384}
+        in_features: ${oc.env:IN_FEATURES, 192}
         num_classes: &NUM_CLASSES 5
     criterion:
       class_path: eva.vision.losses.DiceLoss
