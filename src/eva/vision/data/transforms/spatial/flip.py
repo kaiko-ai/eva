@@ -6,13 +6,13 @@ from typing import Any, Dict, List, Sequence
 import torch
 from monai.transforms.spatial import array as monai_spatial_transforms
 from torchvision import tv_tensors
-from torchvision.transforms import v2
 from typing_extensions import override
 
 from eva.vision.data import tv_tensors as eva_tv_tensors
+from eva.vision.data.transforms import base
 
 
-class RandFlip(v2.Transform):
+class RandFlip(base.TorchvisionTransformV2):
     """Randomly flips the image along axes."""
 
     def __init__(
@@ -45,23 +45,24 @@ class RandFlip(v2.Transform):
         else:
             self._flips = [monai_spatial_transforms.RandFlip(prob=prob, spatial_axis=spatial_axes)]
 
-    def _get_params(self, flat_inputs: List[Any]) -> Dict[str, Any]:
+    @override
+    def make_params(self, flat_inputs: List[Any]) -> Dict[str, Any]:
         for flip in self._flips:
             flip.randomize(None)
         return {}
 
     @functools.singledispatchmethod
     @override
-    def _transform(self, inpt: Any, params: Dict[str, Any]) -> Any:
+    def transform(self, inpt: Any, params: Dict[str, Any]) -> Any:
         return inpt
 
-    @_transform.register(tv_tensors.Image)
-    @_transform.register(eva_tv_tensors.Volume)
+    @transform.register(tv_tensors.Image)
+    @transform.register(eva_tv_tensors.Volume)
     def _(self, inpt: Any, params: Dict[str, Any]) -> Any:
         inpt_flipped = self._apply_flips(inpt)
         return tv_tensors.wrap(inpt_flipped, like=inpt)
 
-    @_transform.register(tv_tensors.Mask)
+    @transform.register(tv_tensors.Mask)
     def _(self, inpt: Any, params: Dict[str, Any]) -> Any:
         inpt_flipped = torch.tensor(self._apply_flips(inpt), dtype=torch.long)
         return tv_tensors.wrap(inpt_flipped, like=inpt)

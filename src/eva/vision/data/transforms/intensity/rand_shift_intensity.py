@@ -49,11 +49,11 @@ class RandShiftIntensity(base.RandomMonaiTransform):
 
     @functools.singledispatchmethod
     @override
-    def _transform(self, inpt: Any, params: Dict[str, Any]) -> Any:
+    def transform(self, inpt: Any, params: Dict[str, Any]) -> Any:
         return inpt
 
-    @_transform.register(tv_tensors.Image)
-    @_transform.register(eva_tv_tensors.Volume)
+    @transform.register(tv_tensors.Image)
+    @transform.register(eva_tv_tensors.Volume)
     def _(self, inpt: tv_tensors.Image, params: Dict[str, Any]) -> Any:
         inpt_scaled = self._rand_shift_intensity(inpt)
         return tv_tensors.wrap(inpt_scaled, like=inpt)

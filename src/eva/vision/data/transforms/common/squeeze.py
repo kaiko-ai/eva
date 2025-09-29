@@ -4,10 +4,12 @@ from typing import Any
 
 import torch
 from torchvision import tv_tensors
-from torchvision.transforms import v2
+from typing_extensions import override
+
+from eva.vision.data.transforms import base
 
 
-class Squeeze(v2.Transform):
+class Squeeze(base.TorchvisionTransformV2):
     """Squeezes the input tensor accross all or specified dimensions."""
 
     def __init__(self, dim: int | list[int] | None = None):
@@ -19,6 +21,7 @@ class Squeeze(v2.Transform):
         super().__init__()
         self._dim = dim
 
-    def _transform(self, inpt: Any, params: dict[str, Any]) -> Any:
+    @override
+    def transform(self, inpt: Any, params: dict[str, Any]) -> Any:
         output = torch.squeeze(inpt) if self._dim is None else torch.squeeze(inpt, dim=self._dim)
         return tv_tensors.wrap(output, like=inpt)
