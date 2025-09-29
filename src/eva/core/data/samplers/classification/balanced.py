@@ -1,7 +1,7 @@
 """Random class sampler for data loading."""
 
 from collections import defaultdict
-from typing import Dict, Iterator, List
+from typing import Dict, Iterator, List, Union
 
 import numpy as np
 from loguru import logger
@@ -32,7 +32,7 @@ class BalancedSampler(SamplerWithDataSource[int]):
         """
         self._num_samples = num_samples
         self._replacement = replacement
-        self._class_indices: Dict[int, List[int]] = defaultdict(list)
+        self._class_indices: Dict[Union[int, str], List[int]] = defaultdict(list)
         self._random_generator = np.random.default_rng(seed)
         self._indices: List[int] = []
 
@@ -72,10 +72,14 @@ class BalancedSampler(SamplerWithDataSource[int]):
                 _, target, _ = DataSample(*self.data_source[idx])
             if target is None:
                 raise ValueError("The dataset must return non-empty targets.")
-            if target.numel() != 1:
-                raise ValueError("The dataset must return a single & scalar target.")
-
-            class_idx = int(target.item())
+            if isinstance(target, str):
+                class_idx = target
+            elif hasattr(target, 'numel') and hasattr(target, 'item'):
+                if target.numel() != 1:
+                    raise ValueError("The dataset must return a single & scalar target.")
+                class_idx = int(target.item())
+            else:
+                raise ValueError("Unsupported target type. Expected str or tensor-like object.")
             self._class_indices[class_idx].append(idx)
 
         if not self._replacement:
