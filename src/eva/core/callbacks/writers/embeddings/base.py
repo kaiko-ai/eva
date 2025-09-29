@@ -132,11 +132,10 @@ class EmbeddingsWriter(callbacks.BasePredictionWriter, abc.ABC):
             queue_items.append(item)
 
         gathered_items = self._gather_queue_items(queue_items)
-        if self._is_rank_zero and self._write_queue is not None:
+        if self._is_rank_zero:
             for item in gathered_items:
-                self._write_queue.put(item)
-            if self._write_process is not None:
-                self._write_process.check_exceptions()
+                self._write_queue.put(item)  # type: ignore
+                self._write_process.check_exceptions()  # type: ignore
 
     @override
     def on_predict_end(self, trainer: pl.Trainer, pl_module: pl.LightningModule) -> None:
