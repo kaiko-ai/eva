@@ -83,13 +83,11 @@ class TIGERWsiBulk(tiger.TIGERBase):
             df = pd.read_csv(csv_path)
             n_rows = len(df)
 
-            print(f"Annotating split '{split}' with {n_rows} images...")
-
             for row in tqdm(df.itertuples(index=False), total=n_rows, desc=f"[{split}]"):
 
                 file_name = row.file
 
-                coords = PatchCoordinates.from_dict(row=row._asdict())
+                coords = PatchCoordinates(**row._asdict())
 
                 annotations.update(
                     self._process_patch_coordinates(file_name, coords, self._tumor_mask_threshold)
@@ -122,11 +120,11 @@ class TIGERWsiBulk(tiger.TIGERBase):
     def prepare_data(self) -> None:
         _validators.check_dataset_exists(self._root, False)
 
-    # @override
-    # def validate(self) -> None:
-    #     _validators.check_number_of_files(
-    #         self._file_paths, self._expected_dataset_lengths[self._split], self._split
-    #     )
+    @override
+    def validate(self) -> None:
+        _validators.check_number_of_files(
+            self._file_paths, self._expected_dataset_lengths[self._split], self._split
+        )
 
     @override
     def load_target(self, index: int) -> torch.Tensor:

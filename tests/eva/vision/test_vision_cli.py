@@ -41,6 +41,7 @@ from tests.eva import _cli
         "configs/vision/pathology/offline/classification/mhist.yaml",
         "configs/vision/pathology/offline/classification/panda.yaml",
         "configs/vision/pathology/offline/classification/patch_camelyon.yaml",
+        "configs/vision/pathology/offline/classification/tiger_wsibulk.yaml",
         "configs/vision/pathology/offline/classification/unitopatho.yaml",
         # segmentation
         "configs/vision/pathology/offline/segmentation/bcss.yaml",
@@ -86,6 +87,7 @@ def test_fit_from_configuration(configuration_file: str, lib_path: str) -> None:
         "configs/vision/tests/offline/patch_camelyon.yaml",
         "configs/vision/tests/offline/panda.yaml",
         "configs/vision/tests/offline/consep.yaml",
+        "configs/vision/tests/offline/tiger_wsibulk.yaml",
     ],
 )
 def test_predict_fit_from_configuration(configuration_file: str, lib_path: str) -> None:

@@ -39,7 +39,7 @@ training/
 	|	|	|___masks/	                            * Binary masks in TIF format					
 	|	|	|___xmls/                               * Not used in eva
 	|	|__images/									* Whole-Slide Images
-    |   │   ├── 103S.tiff
+    |   │   ├── 103S.tif
     │   |   └── ...						
 	|	|__tissue-masks/                            * Not used in eva	
 	|
@@ -47,10 +47,10 @@ training/
 	|
 	|_wsitils/	                                    * Used for regression task
 	|	|__images/									* Whole-slide images
-    |   │   ├── 104S.tiff
+    |   │   ├── 104S.tif
     │   |   └── ...									
 	|	|__tissue-masks/                            * Not used in eva
-	|	|__tiger-tils-scores-wsitils.csv            * Target variable file
+	|	|__tiger-til-scores-wsitils.csv             * Target variable file
 
 
 ## Download and preprocessing
@@ -66,7 +66,3 @@ With the AWS CLI installed, you can download the official training set (no AWS a
 These instructions can also be found on the official challenge page [here](https://tiger.grand-challenge.org/Data/)
 
 We then generate random stratified train / validation and test splits using a 0.7 / 0.15 / 0.15 ratio.
-
-
-
-

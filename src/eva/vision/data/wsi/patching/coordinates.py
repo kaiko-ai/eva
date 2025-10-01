@@ -84,26 +84,6 @@ class PatchCoordinates:
             coord_dict = {key: coord_dict[key] for key in include_keys}
         return coord_dict
 
-    @classmethod
-    def from_dict(cls, row: Dict[str, Any]) -> "PatchCoordinates":
-        """Create PatchCoordinates directly from a dictionary row.
-
-        Args:
-            row: A dict with keys {file, x_y, width, height, level_idx}.
-                 `x_y` should be a stringified list of (x, y) tuples.
-        """
-        # Parsing the x_y string into a proper format
-        x_y = row["x_y"]
-        x_y = ast.literal_eval(x_y)
-
-        return cls(
-            x_y=x_y,
-            width=int(row["width"]),
-            height=int(row["height"]),
-            level_idx=int(row["level_idx"]),
-            mask=None,
-        )
-
 
 @functools.lru_cache(LRU_CACHE_SIZE)
 def get_cached_coords(

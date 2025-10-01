@@ -26,6 +26,5 @@ __all__ = [
     "WsiClassificationDataset",
     "PANDA",
     "PANDASmall",
-    "Camelyon16",
     "TIGERWsiBulk",
 ]
