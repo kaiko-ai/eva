@@ -25,8 +25,8 @@ class TIGERBase(
     _train_split_ratio: float = 0.7
     _val_split_ratio: float = 0.15
 
-    # target microns per pixel (mpp) for patches.
     _target_mpp: float = 0.5
+    '''Target microns per pixel (mpp) for patches'''
 
     def __init__(
         self,

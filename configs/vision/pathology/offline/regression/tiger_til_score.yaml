@@ -20,7 +20,7 @@ trainer:
           save_last: ${oc.env:SAVE_LAST, false}
           save_top_k: 1
           monitor: &MONITOR_METRIC ${oc.env:MONITOR_METRIC, val/MAE}
-          mode: &MONITOR_METRIC_MODE ${oc.env:MONITOR_METRIC_MODE, max}
+          mode: &MONITOR_METRIC_MODE ${oc.env:MONITOR_METRIC_MODE, min}
       - class_path: lightning.pytorch.callbacks.EarlyStopping
         init_args:
           min_delta: 0
@@ -104,7 +104,6 @@ data:
                 max_samples: *N_PATCHES
             width: 224
             height: 224
-            target_mpp: 0.5
             split: train
             coords_path: ${data.init_args.datasets.train.init_args.root}/coords_${.split}.csv
             image_transforms:
