@@ -11,6 +11,7 @@ from typing_extensions import override
 
 from eva.language.data.datasets.classification import base
 from eva.language.data.messages import MessageSeries, UserMessage
+from eva.language.prompts import templates
 
 
 class PubMedQA(base.TextClassification):
@@ -26,6 +27,14 @@ class PubMedQA(base.TextClassification):
 
     _license: str = "MIT License (https://github.com/pubmedqa/pubmedqa/blob/master/LICENSE)"
     """Dataset license."""
+
+    _prompt_template = templates.JsonAnswerPromptTemplate(use_option_letters=False)
+    """Prompt template for formatting questions and context."""
+
+    _prompt_preamble: str = (
+        "Read the provided question and context carefully and provide the best answer."
+    )
+    """Default preamble for the prompt template."""
 
     def __init__(
         self,
@@ -143,14 +152,13 @@ class PubMedQA(base.TextClassification):
         if index < 0 or index >= len(self.dataset):
             raise IndexError(f"Index {index} out of range for dataset of size {len(self.dataset)}")
         sample = dict(self.dataset[index])
-        return [
-            UserMessage(
-                content=f"Question: {sample['QUESTION']}\nContext: "
-                + " ".join(sample["CONTEXTS"])
-                + "\nInstruction: Carefully read the question and the provided context. "
-                + "Answer with one word: 'yes', 'no', or 'maybe'. Answer: "
-            )
-        ]
+        prompt = self._prompt_template.render(
+            preamble=self._prompt_preamble,
+            question=sample["QUESTION"],
+            context=sample["CONTEXTS"],
+            answer_options=self.classes,
+        )
+        return [UserMessage(content=prompt)]
 
     @override
     def load_target(self, index: int) -> torch.Tensor:

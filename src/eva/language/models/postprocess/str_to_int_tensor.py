@@ -1,4 +1,4 @@
-"""Transform utilities for post-processing predictions."""
+"""Postprocessing transforms for casting string predictions to integer tensors."""
 
 import re
 from typing import Any, Dict, List, Union

@@ -20,12 +20,12 @@ class JsonAnswerPromptTemplate(base.PromptTemplate):
         {{ preamble }}
 
         Question: {{ question }}
-        Context: {{ context }}
+        Context:
+        {{ context }}
 
         IMPORTANT: Respond with a valid JSON object where the "{{ answer_key }}" key
         contains your chosen answer, and "{{ reason_key }}" should contain a brief
         explanation for why the provided answer was chosen. 
-        
         {% if use_option_letters %}
         The value for "{{ answer_key }}" must be the letter (e.g., "A", "B", "C", ...)
         corresponding to your chosen option from the list below:
@@ -50,12 +50,6 @@ class JsonAnswerPromptTemplate(base.PromptTemplate):
 
     _default_reason_key: str = "reason"
     """Default key name for the reasoning in the JSON output."""
-
-    _default_preamble: str = (
-        "Review the following question and context carefully and "
-        "provide the best answer and a concise justification."
-    )
-    """Default preamble text to include at the top of the prompt."""
 
     _default_reason: str = "The reason why the given answer was chosen."
     """Default reasoning string for the example JSON."""
@@ -112,7 +106,7 @@ class JsonAnswerPromptTemplate(base.PromptTemplate):
         jinja_template = Template(self.template)
         rendered = jinja_template.render(
             question=question.strip(),
-            context=context.strip(),
+            context=_format_context(context),
             answer_options=_format_answer_options(
                 answer_options, use_option_letters=self.use_option_letters
             ),
@@ -122,7 +116,7 @@ class JsonAnswerPromptTemplate(base.PromptTemplate):
                 example_answer if isinstance(example_answer, str) else answer_options[0]
             ).strip(),
             example_reason=(example_reason or self._default_reason).strip(),
-            preamble=(preamble or self._default_preamble).strip(),
+            preamble=(preamble or "").strip(),
             use_option_letters=self.use_option_letters,
         )
 
@@ -146,3 +140,18 @@ def _format_answer_options(options: Sequence[str], use_option_letters: bool) -> 
         return "\n".join(f"{letters[i]}. {opt.strip()}" for i, opt in enumerate(options))
     else:
         return "\n".join(f"- {opt.strip()}" for i, opt in enumerate(options))
+
+
+def _format_context(context: str | Sequence[str]) -> str:
+    """Formats the context for inclusion in the prompt.
+
+    Args:
+        context: The context string or list of context strings. If a list is provided,
+                 the contexts will be formatted as a bullet point list.
+
+    Returns:
+        The formatted context string.
+    """
+    if not isinstance(context, list):
+        context = [context]  # type: ignore[assignment]
+    return "\n".join(f"- {item.strip()}" for item in context if item.strip())
