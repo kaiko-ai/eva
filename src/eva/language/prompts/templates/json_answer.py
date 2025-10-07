@@ -20,18 +20,15 @@ class JsonAnswerPromptTemplate(base.PromptTemplate):
         {{ preamble }}
 
         Question: {{ question }}
-        Context:
-        {{ context }}
-
-        Instruction: 
+        Context: {{ context }}
 
         IMPORTANT: Respond with a valid JSON object where the "{{ answer_key }}" key
         contains your chosen answer, and "{{ reason_key }}" should contain a brief
         explanation for why the provided answer was chosen. 
         
         {% if use_option_letters %}
-        The value for "{{ answer_key }}" must be the letter (e.g., "A", "B", "C") corresponding
-        to your chosen option from the list below:
+        The value for "{{ answer_key }}" must be the letter (e.g., "A", "B", "C", ...)
+        corresponding to your chosen option from the list below:
         {% else %}
         The value for "{{ answer_key }}" must exactly match one of the options listed below:
         {% endif %}
@@ -67,8 +64,6 @@ class JsonAnswerPromptTemplate(base.PromptTemplate):
         self,
         answer_key: str | None = None,
         reason_key: str | None = None,
-        default_reason: str | None = None,
-        template: str | None = None,
         use_option_letters: bool = True,
     ) -> None:
         """Initializes the prompt template.
@@ -76,15 +71,15 @@ class JsonAnswerPromptTemplate(base.PromptTemplate):
         Args:
             answer_key: Key name for the answer in the JSON output. Defaults to "answer".
             reason_key: Key name for the reasoning in the JSON output. Defaults to "reason".
-            default_reason: Default reasoning string for the example JSON.
-                Defaults to a generic explanation.
+            example_reason: Default reasoning string to provide in the `answer_key` for
+                the example JSON object in the prompt.
             template: Custom template string to use instead of the default.
             use_option_letters: Whether to prefix options with letters (A, B, C, ...).
         """
+        super().__init__()
+
         self.answer_key = answer_key or self._default_answer_key
         self.reason_key = reason_key or self._default_reason_key
-        self.default_reason = default_reason or self._default_reason
-        self.template = template or self.template
         self.use_option_letters = use_option_letters
 
     @override
@@ -124,10 +119,10 @@ class JsonAnswerPromptTemplate(base.PromptTemplate):
             answer_key=self.answer_key,
             reason_key=self.reason_key,
             example_answer=(
-                example_answer.strip() if isinstance(example_answer, str) else answer_options[0]
-            ),
-            example_reason=(example_reason or self.default_reason).strip(),
-            preamble=preamble or self._default_preamble,
+                example_answer if isinstance(example_answer, str) else answer_options[0]
+            ).strip(),
+            example_reason=(example_reason or self._default_reason).strip(),
+            preamble=(preamble or self._default_preamble).strip(),
             use_option_letters=self.use_option_letters,
         )
 
