@@ -28,7 +28,7 @@ class PubMedQA(base.TextClassification):
     _license: str = "MIT License (https://github.com/pubmedqa/pubmedqa/blob/master/LICENSE)"
     """Dataset license."""
 
-    _prompt_template = templates.JsonAnswerPromptTemplate(use_option_letters=False)
+    _prompt_template = templates.JsonMultipleChoicePromptTemplate()
     """Prompt template for formatting questions and context."""
 
     _prompt_preamble: str = (

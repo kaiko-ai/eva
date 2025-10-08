@@ -138,23 +138,29 @@ model:
 ```yaml
 postprocess:
   predictions_transforms:
-    - class_path: eva.language.utils.str_to_int_tensor.CastStrToIntTensor
+    - class_path: eva.language.utils.str_to_int_tensor.ExtractAnswerFromJson
+      init_args:
+        mapping: {"no": 0, "yes": 1, "maybe": 2}
+        answer_key: answer
 ```
 
-This converts the model's text output (yes/no/maybe) to integer tensors for evaluation using regex mapping:
-- "no" → 0
-- "yes" → 1  
-- "maybe" → 2
+This postprocess parses the JSON response returned by the model and maps the `answer`
+field to integer labels:
+- `"no"` → 0
+- `"yes"` → 1  
+- `"maybe"` → 2
 
 Custom mappings are also supported by providing a mapping dictionary during initialization:
 ```yaml
 postprocess:
   predictions_transforms:
-    - class_path: eva.language.utils.str_to_int_tensor.CastStrToIntTensor
+    - class_path: eva.language.utils.str_to_int_tensor.ExtractAnswerFromJson
       init_args:
         mapping:
-          "positive|good": 1
-          "negative|bad": 0
+          "positive": 1
+          "negative": 0
+        answer_key: answer
+        case_sensitive: false
 ```
 
 ## Advanced usage

@@ -6,22 +6,18 @@ from torchvision import tv_tensors
 from typing_extensions import override
 
 from eva.language.data.messages import MessageSeries, UserMessage
+from eva.language.prompts.templates.json import JsonMultipleChoicePromptTemplate
 from eva.multimodal.data.datasets.schemas import TransformsSchema
 from eva.multimodal.data.datasets.text_image import TextImageDataset
 from eva.vision.data import datasets as vision_datasets
+from eva.vision.data.datasets import _validators
 
 
 class PatchCamelyon(TextImageDataset[int], vision_datasets.PatchCamelyon):
     """PatchCamelyon image classification using a multiple choice text prompt."""
 
-    _default_prompt = (
-        "You are a pathology expert helping pathologists to analyze images of tissue samples.\n"
-        "Question: Does this image show metastatic breast tissue?\n"
-        "Options: A: no, B: yes\n"
-        "Only answer with a single letter without further explanation. "
-        "Please always provide an answer, even if you are not sure.\n"
-        "Answer: "
-    )
+    _prompt_template = JsonMultipleChoicePromptTemplate()
+    _question: str = "Does this image show metastatic breast tissue?"
 
     def __init__(
         self,
@@ -29,7 +25,6 @@ class PatchCamelyon(TextImageDataset[int], vision_datasets.PatchCamelyon):
         split: Literal["train", "val", "test"],
         download: bool = False,
         transforms: TransformsSchema | None = None,
-        prompt: str | None = None,
         max_samples: int | None = None,
     ) -> None:
         """Initializes the dataset.
@@ -43,25 +38,47 @@ class PatchCamelyon(TextImageDataset[int], vision_datasets.PatchCamelyon):
                 calling the :meth:`prepare_data` method.
             transforms: A function/transform which returns a transformed
                 version of the raw data samples.
-            prompt: The text prompt to use for classification (multple choice).
             max_samples: Maximum number of samples to use. If None, use all samples.
         """
         super().__init__(root=root, split=split, download=download, transforms=transforms)
 
         self.max_samples = max_samples
-        self.prompt = prompt or self._default_prompt
+        self.prompt = self._render_prompt()
 
         if self.max_samples is not None:
             self._expected_length = {split: max_samples}
 
+    def _render_prompt(self) -> str:
+        return self._prompt_template.render(
+            question=self._question,
+            context=None,
+            answer_options=self.classes,
+            example_answer=self.classes[0],
+            example_reason="Key visual evidence from the histopathology image.",
+        )
+
+    @property
+    @override
+    def classes(self) -> list[str]:
+        return ["no", "yes"]
+
     @property
     @override
     def class_to_idx(self) -> Dict[str, int]:
-        return {"A": 0, "B": 1}
+        return {label: idx for idx, label in enumerate(self.classes)}
 
     @override
     def __len__(self) -> int:
         return self.max_samples or self._fetch_dataset_length()
+
+    @override
+    def validate(self) -> None:
+        _validators.check_dataset_integrity(
+            self,
+            length=self._expected_length.get(self._split, 0),
+            n_classes=2,
+            first_and_last_labels=("no", "yes"),
+        )
 
     @override
     def load_text(self, index: int) -> MessageSeries:

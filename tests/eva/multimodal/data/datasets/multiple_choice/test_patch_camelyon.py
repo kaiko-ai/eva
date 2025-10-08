@@ -6,7 +6,7 @@ from typing import Literal
 import pytest
 from torchvision import tv_tensors
 
-from eva.language.data.messages import Message, UserMessage
+from eva.language.data.messages import UserMessage
 from eva.multimodal.data.datasets.multiple_choice import patch_camelyon
 from eva.multimodal.data.datasets.typings import TextImageSample
 
@@ -46,25 +46,6 @@ def test_sample(patch_camelyon_dataset: patch_camelyon.PatchCamelyon) -> None:
 
     # Test metadata
     assert sample.metadata is not None
-
-
-@pytest.mark.parametrize(
-    "split",
-    ["train", "val", "test"],
-)
-def test_custom_prompt(split: Literal["train", "val", "test"], assets_path: str) -> None:
-    """Tests the dataset with a custom prompt."""
-    custom_prompt = "Is this image showing cancer? Answer: "
-    dataset = patch_camelyon.PatchCamelyon(
-        root=os.path.join(assets_path, "vision", "datasets", "patch_camelyon"),
-        split=split,
-        prompt=custom_prompt,
-    )
-
-    sample = dataset[0]
-    assert isinstance(sample.text, list)
-    assert isinstance(sample.text[0], Message)
-    assert sample.text[0].content == custom_prompt
 
 
 @pytest.mark.parametrize(

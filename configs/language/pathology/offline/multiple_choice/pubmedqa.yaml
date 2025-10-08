@@ -35,8 +35,6 @@ model:
         - class_path: eva.language.models.postprocess.ExtractAnswerFromJson
           init_args:
             mapping: {"no": 0, "yes": 1, "maybe": 2}
-            answer_key: answer
-            case_sensitive: false
 data:
   class_path: eva.DataModule
   init_args:

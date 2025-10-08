@@ -28,6 +28,8 @@ class ExtractAnswerFromJson:
             raise_if_missing: Whether to raise an error if the answer key is missing
                 or if the extracted answer is not in the mapping. If False, will
                 return `missing_response` instead.
+            missing_response: The integer value to return if the answer is missing
+                and `raise_if_missing` is False.
         """
         if not mapping:
             raise ValueError("`mapping` must be a non-empty dictionary.")
@@ -64,7 +66,8 @@ class ExtractAnswerFromJson:
                 )
             else:
                 logger.warning(
-                    f"Answer '{answer}' not found in mapping, returning {self.missing_response} instead."
+                    f"Answer '{answer}' not found in mapping, "
+                    f"returning {self.missing_response} instead."
                 )
                 return self.missing_response
 

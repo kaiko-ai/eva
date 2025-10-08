@@ -1,4 +1,4 @@
-"""Prompt template utilities for language tasks (Jinja2 version)."""
+"""Prompt templates for multiple choice questions with JSON output."""
 
 from __future__ import annotations
 
@@ -12,16 +12,18 @@ from typing_extensions import override
 from eva.language.prompts.templates import base
 
 
-class JsonAnswerPromptTemplate(base.PromptTemplate):
-    """Prompt template enforcing JSON answers with configurable placeholders."""
+class JsonMultipleChoicePromptTemplate(base.PromptTemplate):
+    """Prompt template for multiple choice questions while enforcing JSON output."""
 
     template: str = textwrap.dedent(
         """\
         {{ preamble }}
 
         Question: {{ question }}
+        {% if context %}
         Context:
         {{ context }}
+        {% endif %}
 
         IMPORTANT: Respond with a valid JSON object where the "{{ answer_key }}" key
         contains your chosen answer, and "{{ reason_key }}" should contain a brief
@@ -58,7 +60,7 @@ class JsonAnswerPromptTemplate(base.PromptTemplate):
         self,
         answer_key: str | None = None,
         reason_key: str | None = None,
-        use_option_letters: bool = True,
+        use_option_letters: bool = False,
     ) -> None:
         """Initializes the prompt template.
 
@@ -81,7 +83,7 @@ class JsonAnswerPromptTemplate(base.PromptTemplate):
         self,
         *,
         question: str,
-        context: str,
+        context: str | Sequence[str] | None,
         answer_options: Sequence[str],
         example_answer: str | None = None,
         example_reason: str | None = None,
@@ -106,14 +108,16 @@ class JsonAnswerPromptTemplate(base.PromptTemplate):
         jinja_template = Template(self.template)
         rendered = jinja_template.render(
             question=question.strip(),
-            context=_format_context(context),
+            context=_format_context(context) if context else None,
             answer_options=_format_answer_options(
                 answer_options, use_option_letters=self.use_option_letters
             ),
             answer_key=self.answer_key,
             reason_key=self.reason_key,
             example_answer=(
-                example_answer if isinstance(example_answer, str) else answer_options[0]
+                example_answer
+                if isinstance(example_answer, str)
+                else (string.ascii_uppercase[0] if self.use_option_letters else answer_options[0])
             ).strip(),
             example_reason=(example_reason or self._default_reason).strip(),
             preamble=(preamble or "").strip(),

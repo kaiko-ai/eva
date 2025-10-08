@@ -1,6 +1,6 @@
 """Prompt templating API."""
 
 from eva.language.prompts.templates.base import PromptTemplate
-from eva.language.prompts.templates.json_answer import JsonAnswerPromptTemplate
+from eva.language.prompts.templates.json import JsonMultipleChoicePromptTemplate
 
-__all__ = ["PromptTemplate", "JsonAnswerPromptTemplate"]
+__all__ = ["PromptTemplate", "JsonMultipleChoicePromptTemplate"]
