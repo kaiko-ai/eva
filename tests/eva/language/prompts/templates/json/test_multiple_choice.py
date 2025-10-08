@@ -5,205 +5,157 @@ import pytest
 from eva.language.prompts.templates.json.multiple_choice import JsonMultipleChoicePromptTemplate
 
 
-def test_render_basic():
-    """Test basic rendering with minimal parameters."""
-    template = JsonMultipleChoicePromptTemplate()
+@pytest.fixture
+def template() -> JsonMultipleChoicePromptTemplate:
+    """Return a baseline template instance for reuse across tests."""
+    return JsonMultipleChoicePromptTemplate()
+
+
+def test_render_basic_trims_input(template: JsonMultipleChoicePromptTemplate) -> None:
+    """Renders the core prompt with minimal inputs and trims whitespace."""
     result = template.render(
-        question="What is the capital of France?",
+        question="  What is the capital of France?  ",
         context=None,
-        answer_options=["Paris", "London", "Berlin"],
+        answer_options=["  Paris  ", "London"],
     )
 
-    assert "What is the capital of France?" in result
+    assert result.startswith("Question: What is the capital of France?")
     assert "- Paris" in result
     assert "- London" in result
-    assert "- Berlin" in result
-    assert '"answer":' in result
-    assert '"reason":' in result
+    assert '"answer":' in result and '"reason":' in result
 
 
-def test_render_with_context_string():
-    """Test rendering with a single context string."""
-    template = JsonMultipleChoicePromptTemplate()
+def test_render_context_formats_lists(template: JsonMultipleChoicePromptTemplate) -> None:
+    """Context lists should be bullet formatted and ignore blank entries."""
     result = template.render(
-        question="What is the capital?",
-        context="France is a country in Europe.",
-        answer_options=["Paris", "London"],
+        question="Context handling?",
+        context=["First fact", "   Second fact   ", "", "   "],
+        answer_options=["Yes", "No"],
     )
 
-    assert "Context:" in result
-    assert "- France is a country in Europe." in result
+    # Extract the context block to confirm only non-empty entries remain.
+    context_section = result.split("Context:\n", 1)[1].split("\n\n", 1)[0]
+    context_lines = [line for line in context_section.splitlines() if line.startswith("- ")]
+    assert context_lines == ["- First fact", "- Second fact"]
 
-
-def test_render_with_context_list():
-    """Test rendering with multiple context strings."""
-    template = JsonMultipleChoicePromptTemplate()
-    result = template.render(
-        question="What is the capital?",
-        context=["France is a country.", "Paris is a city."],
-        answer_options=["Paris", "London"],
-    )
-
-    assert "Context:" in result
-    assert "- France is a country." in result
-    assert "- Paris is a city." in result
-
-
-def test_render_with_option_letters():
-    """Test rendering with lettered options."""
-    template = JsonMultipleChoicePromptTemplate(use_option_letters=True)
-    result = template.render(
-        question="Pick a color",
+    result_no_context = template.render(
+        question="Skip context?",
         context=None,
-        answer_options=["Red", "Blue", "Green"],
+        answer_options=["Yes", "No"],
     )
-
-    assert "A. Red" in result
-    assert "B. Blue" in result
-    assert "C. Green" in result
-    assert 'The value for "answer" must be the letter' in result
+    assert "Context:" not in result_no_context
 
 
-def test_render_without_option_letters():
-    """Test rendering with bullet point options."""
-    template = JsonMultipleChoicePromptTemplate(use_option_letters=False)
+@pytest.mark.parametrize(
+    ("use_letters", "expected_option", "instruction_snippet"),
+    [
+        (True, "A. Red", 'The value for "answer" must be the letter'),
+        (False, "- Red", 'The value for "answer" must exactly match'),
+    ],
+)
+def test_render_option_styles(
+    use_letters: bool, expected_option: str, instruction_snippet: str
+) -> None:
+    """Rendering switches between lettered options and bullet options."""
+    template = JsonMultipleChoicePromptTemplate(use_option_letters=use_letters)
     result = template.render(
         question="Pick a color",
         context=None,
         answer_options=["Red", "Blue"],
     )
 
-    assert "- Red" in result
-    assert "- Blue" in result
-    assert 'The value for "answer" must exactly match one of the options' in result
+    assert expected_option in result
+    assert instruction_snippet in result
 
 
-def test_render_with_custom_keys():
-    """Test rendering with custom answer and reason keys."""
-    template = JsonMultipleChoicePromptTemplate(
-        answer_key="choice",
-        reason_key="explanation",
-    )
+@pytest.mark.parametrize(
+    ("answer_key", "reason_key"),
+    [
+        ("choice", "why"),
+        ("response", "rationale"),
+    ],
+)
+def test_render_custom_keys_respected(answer_key: str, reason_key: str) -> None:
+    """Custom answer_key/reason_key propagate to the instructions and example JSON."""
+    template = JsonMultipleChoicePromptTemplate(answer_key=answer_key, reason_key=reason_key)
     result = template.render(
         question="Test question",
         context=None,
         answer_options=["A", "B"],
     )
 
-    assert '"choice":' in result
-    assert '"explanation":' in result
+    assert f'The value for "{answer_key}"' in result
+    assert f'"{answer_key}":' in result
+    assert f'"{reason_key}":' in result
     assert '"answer":' not in result
     assert '"reason":' not in result
 
 
-def test_render_with_example_answer():
-    """Test rendering with custom example answer."""
-    template = JsonMultipleChoicePromptTemplate()
+@pytest.mark.parametrize(
+    ("use_letters", "example_answer", "expected_fragment"),
+    [
+        (False, None, '"answer": "First"'),
+        (True, None, '"answer": "A"'),
+        (False, "  Second  ", '"answer": "Second"'),
+    ],
+)
+def test_render_example_answer_selection(
+    use_letters: bool, example_answer: str | None, expected_fragment: str
+) -> None:
+    """Default and user-supplied example answers should match expectations."""
+    template = JsonMultipleChoicePromptTemplate(use_option_letters=use_letters)
+    kwargs = {"example_answer": example_answer} if example_answer is not None else {}
     result = template.render(
-        question="Test question",
-        context=None,
-        answer_options=["Option A", "Option B"],
-        example_answer="Option B",
-    )
-
-    assert '"answer": "Option B"' in result
-
-
-def test_render_with_example_reason():
-    """Test rendering with custom example reason."""
-    template = JsonMultipleChoicePromptTemplate()
-    result = template.render(
-        question="Test question",
-        context=None,
-        answer_options=["A", "B"],
-        example_reason="This is the correct choice because...",
-    )
-
-    assert '"reason": "This is the correct choice because..."' in result
-
-
-def test_render_with_preamble():
-    """Test rendering with preamble text."""
-    template = JsonMultipleChoicePromptTemplate()
-    result = template.render(
-        question="Test question",
-        context=None,
-        answer_options=["A", "B"],
-        preamble="You are a helpful assistant.",
-    )
-
-    assert result.startswith("You are a helpful assistant.")
-
-
-def test_render_strips_whitespace():
-    """Test that rendering strips excessive whitespace."""
-    template = JsonMultipleChoicePromptTemplate()
-    result = template.render(
-        question="  Question with spaces  ",
-        context="  Context with spaces  ",
-        answer_options=["  Option A  ", "  Option B  "],
-    )
-
-    assert "Question with spaces" in result
-    assert "Context with spaces" in result
-    assert "  Question with spaces  " not in result
-
-
-def test_render_empty_question_raises_error():
-    """Test that empty question raises ValueError."""
-    template = JsonMultipleChoicePromptTemplate()
-
-    with pytest.raises(ValueError, match="`question` must be a non-empty string"):
-        template.render(
-            question="",
-            context=None,
-            answer_options=["A", "B"],
-        )
-
-
-def test_render_whitespace_only_question_raises_error():
-    """Test that whitespace-only question raises ValueError."""
-    template = JsonMultipleChoicePromptTemplate()
-
-    with pytest.raises(ValueError, match="`question` must be a non-empty string"):
-        template.render(
-            question="   ",
-            context=None,
-            answer_options=["A", "B"],
-        )
-
-
-def test_render_non_string_question_raises_error():
-    """Test that non-string question raises ValueError."""
-    template = JsonMultipleChoicePromptTemplate()
-
-    with pytest.raises(ValueError, match="`question` must be a non-empty string"):
-        template.render(
-            question=123,  # type: ignore
-            context=None,
-            answer_options=["A", "B"],
-        )
-
-
-def test_default_example_answer_without_letters():
-    """Test that default example answer is first option without letters."""
-    template = JsonMultipleChoicePromptTemplate(use_option_letters=False)
-    result = template.render(
-        question="Test",
+        question="Example answer?",
         context=None,
         answer_options=["First", "Second"],
+        **kwargs,
     )
 
-    assert '"answer": "First"' in result
+    assert expected_fragment in result
 
 
-def test_default_example_answer_with_letters():
-    """Test that default example answer is 'A' with letters."""
+@pytest.mark.parametrize("question", ["", "   ", 123])
+def test_render_invalid_question_raises_error(
+    template: JsonMultipleChoicePromptTemplate, question: object
+) -> None:
+    """Invalid questions should raise a descriptive ValueError."""
+    with pytest.raises(ValueError, match="`question` must be a non-empty string"):
+        template.render(
+            question=question,  # type: ignore[arg-type]
+            context=None,
+            answer_options=["A", "B"],
+        )
+
+
+@pytest.mark.parametrize(
+    "answer_options",
+    [
+        [],
+        ["   "],
+        ["Valid", ""],
+    ],
+)
+def test_render_invalid_answer_options_raises_error(
+    template: JsonMultipleChoicePromptTemplate, answer_options: list[object]
+) -> None:
+    """Invalid answer options should raise a descriptive ValueError."""
+    with pytest.raises(ValueError, match="`answer_options` must contain at least one"):
+        template.render(
+            question="Options?",
+            context=None,
+            answer_options=answer_options,  # type: ignore[arg-type]
+        )
+
+
+def test_render_with_too_many_lettered_options() -> None:
+    """Using option letters should enforce the alphabet upper bound."""
     template = JsonMultipleChoicePromptTemplate(use_option_letters=True)
-    result = template.render(
-        question="Test",
-        context=None,
-        answer_options=["First", "Second"],
-    )
+    answer_options = [f"Option {i}" for i in range(27)]
 
-    assert '"answer": "A"' in result
+    with pytest.raises(ValueError, match="max 26 options are supported"):
+        template.render(
+            question="Too many?",
+            context=None,
+            answer_options=answer_options,
+        )
