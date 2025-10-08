@@ -48,7 +48,6 @@ data:
               init_args:
                 size: ${oc.env:RESIZE_DIM, null}
                 max_bytes: ${oc.env:IMAGE_MAX_BYTES, null}
-          # max_samples: 4
       test:
         class_path: eva.multimodal.data.datasets.PatchCamelyon
         init_args:
@@ -63,9 +62,9 @@ data:
         <<: *DATALOADER_ARGS
     samplers:
       val: &SAMPLER_ARGS
-        class_path: eva.core.data.samplers.RandomSampler
+        class_path: eva.core.data.samplers.BalancedSampler
         init_args:
           seed: ${oc.env:SAMPLER_SEED, 42}
-          num_samples: ${oc.env:NUM_SAMPLES, 500}
+          num_samples: ${oc.env:NUM_SAMPLES, 250}
       test:
         <<: *SAMPLER_ARGS
