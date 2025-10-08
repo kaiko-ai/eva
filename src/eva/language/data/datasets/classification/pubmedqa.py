@@ -21,7 +21,7 @@ class PubMedQA(base.TextClassification):
         "train": 450,
         "val": 50,
         "test": 500,
-        None: 500,
+        None: 1000,
     }
     """Expected dataset lengths for the splits and complete dataset."""
 

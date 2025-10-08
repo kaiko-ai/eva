@@ -34,7 +34,10 @@ def test_sample(patch_camelyon_dataset: patch_camelyon.PatchCamelyon) -> None:
     assert isinstance(sample.text, list)
     assert len(sample.text) == 1
     assert isinstance(sample.text[0], UserMessage)
-    assert "metastatic breast tissue" in sample.text[0].content
+    content = sample.text[0].content
+    assert content.startswith("Question:")
+    assert "metastatic breast tissue" in content
+    assert "IMPORTANT: Respond with a valid JSON object" in content
 
     # Test image component
     assert isinstance(sample.image, tv_tensors.Image)
@@ -70,7 +73,7 @@ def test_class_to_idx(assets_path: str) -> None:
         root=os.path.join(assets_path, "vision", "datasets", "patch_camelyon"),
         split="train",
     )
-    assert dataset.class_to_idx == {"A": 0, "B": 1}
+    assert dataset.class_to_idx == {"no": 0, "yes": 1}
 
 
 @pytest.fixture(scope="function")

@@ -40,8 +40,10 @@ def test_sample(pubmedqa_dataset: datasets.PubMedQA, index: int) -> None:
     assert isinstance(messages, list)
     assert all(isinstance(item, Message) for item in messages)
 
-    assert messages[0].content.startswith("Question: ")
-    assert "Context: " in messages[0].content
+    content = messages[0].content
+    assert content.startswith(pubmedqa_dataset._prompt_preamble)
+    assert "Question:" in content
+    assert "Context:" in content
 
     assert isinstance(target, torch.Tensor)
     assert target in [0, 1, 2]
