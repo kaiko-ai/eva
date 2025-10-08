@@ -133,3 +133,4 @@ data:
         class_path: eva.core.data.samplers.classification.BalancedSampler
         init_args:
           num_samples: 10
+          reset_generator: false  # Set to false to sample new indices every evaluation run

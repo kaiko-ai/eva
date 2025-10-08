@@ -23,19 +23,32 @@ class BalancedSampler(SamplerWithDataSource[int]):
     3. Samples of different classes appear in random order
     """
 
-    def __init__(self, num_samples: int, replacement: bool = False, seed: int | None = 42):
+    def __init__(
+        self,
+        num_samples: int,
+        replacement: bool = False,
+        seed: int | None = 42,
+        reset_generator: bool = True,
+    ) -> None:
         """Initializes the balanced sampler.
 
         Args:
             num_samples: The number of samples to draw per class.
             replacement: samples are drawn on-demand with replacement if ``True``, default=``False``
             seed: Random seed for reproducibility.
+            reset_generator: Whether to reset the random number generator
+                when setting the dataset. This ensures that repeated runs that share the same
+                sampler instance will start from the same seed.
         """
         self._num_samples = num_samples
         self._replacement = replacement
         self._class_indices: Dict[Union[int, str], List[int]] = defaultdict(list)
-        self._random_generator = np.random.default_rng(seed)
+        self._seed = seed
+        self._reset_generator = reset_generator
         self._indices: List[int] = []
+        self._random_generator: np.random.Generator
+
+        self._set_generator()
 
     def __len__(self) -> int:
         """Returns the total number of samples."""
@@ -61,6 +74,8 @@ class BalancedSampler(SamplerWithDataSource[int]):
                 fewer samples than `num_samples` and `replacement` is `False`.
         """
         super().set_dataset(data_source)
+        if self._reset_generator:
+            self._set_generator()
         self._make_indices()
 
     def _get_class_idx(self, idx):
@@ -73,7 +88,7 @@ class BalancedSampler(SamplerWithDataSource[int]):
         if target is None:
             raise ValueError("The dataset must return non-empty targets.")
 
-        if isinstance(target, str):
+        if isinstance(target, str) or isinstance(target, int):
             return target
 
         if isinstance(target, torch.Tensor):
@@ -107,3 +122,10 @@ class BalancedSampler(SamplerWithDataSource[int]):
             self._indices.extend(sampled_indices)
         self._random_generator.shuffle(self._indices)
         logger.debug(f"Sampled indices: {self._indices}")
+
+    def _set_generator(self) -> None:
+        """Recreate the RNG so repeated runs reuse the same seed."""
+        if self._seed is None:
+            self._random_generator = np.random.default_rng()
+            return
+        self._random_generator = np.random.default_rng(self._seed)
