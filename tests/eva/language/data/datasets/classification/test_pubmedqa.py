@@ -41,7 +41,7 @@ def test_sample(pubmedqa_dataset: datasets.PubMedQA, index: int) -> None:
     assert all(isinstance(item, Message) for item in messages)
 
     content = messages[0].content
-    assert content.startswith(pubmedqa_dataset._prompt_preamble)
+    assert content.startswith(pubmedqa_dataset.prompt_render_kwargs["preamble"])
     assert "Question:" in content
     assert "Context:" in content
 

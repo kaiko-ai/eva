@@ -2,7 +2,7 @@
 
 import os
 import random
-from typing import Dict, List, Literal
+from typing import Any, Dict, List, Literal
 
 import torch
 from datasets import Dataset, load_dataset, load_from_disk
@@ -28,13 +28,14 @@ class PubMedQA(base.TextClassification):
     _license: str = "MIT License (https://github.com/pubmedqa/pubmedqa/blob/master/LICENSE)"
     """Dataset license."""
 
-    _prompt_template = templates.JsonMultipleChoicePromptTemplate()
-    """Prompt template for formatting questions and context."""
+    _default_prompt_template = templates.JsonMultipleChoicePromptTemplate()
+    """Default prompt template for formatting questions and context."""
 
-    _prompt_preamble: str = (
-        "Read the provided question and context carefully and provide the best answer."
-    )
-    """Default preamble for the prompt template."""
+    _default_render_kwargs = {
+        "preamble": "Read the provided question and context carefully and provide the best answer.",
+        "answer_options": ["no", "yes", "maybe"],
+    }
+    """Default kwargs for the template.render() call."""
 
     def __init__(
         self,
@@ -42,6 +43,8 @@ class PubMedQA(base.TextClassification):
         split: Literal["train", "val", "test"] | None = None,
         download: bool = False,
         max_samples: int | None = None,
+        prompt_template: templates.PromptTemplate | None = None,
+        prompt_render_kwargs: Dict[str, Any] | None = None,
     ) -> None:
         """Initialize the PubMedQA dataset.
 
@@ -51,6 +54,9 @@ class PubMedQA(base.TextClassification):
                 If None, it will use "train+test+validation".
             download: Whether to download the dataset if not found locally. Default is False.
             max_samples: Maximum number of samples to use. If None, use all samples.
+            prompt_template: The template to use for rendering prompts. If None, uses the
+                default template which enforces JSON output.
+            prompt_render_kwargs: The kwargs to use when rendering the prompt template.
         """
         super().__init__()
 
@@ -58,6 +64,10 @@ class PubMedQA(base.TextClassification):
         self._split = split
         self._download = download
         self._max_samples = max_samples
+
+        self.prompt_template = prompt_template or self._default_prompt_template
+        self.prompt_render_kwargs = prompt_render_kwargs or self._default_render_kwargs
+        prompt_render_kwargs = prompt_render_kwargs or self._default_render_kwargs
 
     def _load_dataset(self, dataset_path: str | None) -> Dataset:
         """Loads the PubMedQA dataset from the local cache or downloads it.
@@ -152,11 +162,10 @@ class PubMedQA(base.TextClassification):
         if index < 0 or index >= len(self.dataset):
             raise IndexError(f"Index {index} out of range for dataset of size {len(self.dataset)}")
         sample = dict(self.dataset[index])
-        prompt = self._prompt_template.render(
-            preamble=self._prompt_preamble,
+        prompt = self.prompt_template.render(
             question=sample["QUESTION"],
             context=sample["CONTEXTS"],
-            answer_options=self.classes,
+            **self.prompt_render_kwargs,
         )
         return [UserMessage(content=prompt)]
 

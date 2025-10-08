@@ -6,7 +6,7 @@ from torchvision import tv_tensors
 from typing_extensions import override
 
 from eva.language.data.messages import MessageSeries, UserMessage
-from eva.language.prompts.templates.json import JsonMultipleChoicePromptTemplate
+from eva.language.prompts import templates
 from eva.multimodal.data.datasets.schemas import TransformsSchema
 from eva.multimodal.data.datasets.text_image import TextImageDataset
 from eva.vision.data import datasets as vision_datasets
@@ -16,8 +16,16 @@ from eva.vision.data.datasets import _validators
 class PatchCamelyon(TextImageDataset[int], vision_datasets.PatchCamelyon):
     """PatchCamelyon image classification using a multiple choice text prompt."""
 
-    _prompt_template = JsonMultipleChoicePromptTemplate()
-    _question: str = "Does this image show metastatic breast tissue?"
+    _default_prompt_template = templates.JsonMultipleChoicePromptTemplate()
+    """Default prompt template for formatting questions and context."""
+
+    _default_render_kwargs = {
+        "question": "Does this image show metastatic breast tissue?",
+        "context": None,
+        "answer_options": ["no", "yes"],
+        "example_reason": "Key visual evidence from the histopathology image.",
+    }
+    """Default kwargs for the template.render() call."""
 
     def __init__(
         self,
@@ -26,6 +34,8 @@ class PatchCamelyon(TextImageDataset[int], vision_datasets.PatchCamelyon):
         download: bool = False,
         transforms: TransformsSchema | None = None,
         max_samples: int | None = None,
+        prompt_template: templates.PromptTemplate | None = None,
+        prompt_render_kwargs: Dict[str, Any] | None = None,
     ) -> None:
         """Initializes the dataset.
 
@@ -39,23 +49,20 @@ class PatchCamelyon(TextImageDataset[int], vision_datasets.PatchCamelyon):
             transforms: A function/transform which returns a transformed
                 version of the raw data samples.
             max_samples: Maximum number of samples to use. If None, use all samples.
+            prompt_template: The template to use for rendering prompts. If None, uses the
+                default template which enforces JSON output.
+            prompt_render_kwargs: The kwargs to use when rendering the prompt template.
         """
         super().__init__(root=root, split=split, download=download, transforms=transforms)
 
         self.max_samples = max_samples
-        self.prompt = self._render_prompt()
 
         if self.max_samples is not None:
             self._expected_length = {split: max_samples}
 
-    def _render_prompt(self) -> str:
-        return self._prompt_template.render(
-            question=self._question,
-            context=None,
-            answer_options=self.classes,
-            example_answer=self.classes[0],
-            example_reason="Key visual evidence from the histopathology image.",
-        )
+        prompt_template = prompt_template or self._default_prompt_template
+        prompt_render_kwargs = prompt_render_kwargs or self._default_render_kwargs
+        self.prompt = prompt_template.render(**prompt_render_kwargs)
 
     @property
     @override
