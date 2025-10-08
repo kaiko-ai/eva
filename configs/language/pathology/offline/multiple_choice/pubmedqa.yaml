@@ -35,6 +35,8 @@ model:
         - class_path: eva.language.models.postprocess.ExtractAnswerFromJson
           init_args:
             mapping: {"no": 0, "yes": 1, "maybe": 2}
+            missing_limit: 5
+            missing_response: 2
 data:
   class_path: eva.DataModule
   init_args:

@@ -18,6 +18,7 @@ class ExtractAnswerFromJson:
         case_sensitive: bool = False,
         raise_if_missing: bool = True,
         missing_response: int = -1,
+        missing_limit: int = 5,
     ) -> None:
         """Initialize the transform.
 
@@ -25,11 +26,14 @@ class ExtractAnswerFromJson:
             mapping: Mapping from answer strings to integer IDs.
             answer_key: The key within the JSON object that stores the answer.
             case_sensitive: Whether to treat mappings as case sensitive.
-            raise_if_missing: Whether to raise an error if the answer key is missing
-                or if the extracted answer is not in the mapping. If False, will
-                return `missing_response` instead.
+            raise_if_missing: Whether to raise an error if an answer is missing
+                or not found in the mapping. If False, will return `missing_response`
+                instead.
             missing_response: The integer value to return if the answer is missing
-                and `raise_if_missing` is False.
+                and `raise_if_missing` is False or the number of missing answers
+                are still below `missing_limit`.
+            missing_limit: The maximum number of missing responses before raising
+                an error, if `raise_if_missing` is True.
         """
         if not mapping:
             raise ValueError("`mapping` must be a non-empty dictionary.")
@@ -38,7 +42,9 @@ class ExtractAnswerFromJson:
         self.case_sensitive = case_sensitive
         self.raise_if_missing = raise_if_missing
         self.missing_response = missing_response
+        self.missing_limit = missing_limit
 
+        self.missing_count = 0
         self.mapping = {k if case_sensitive else k.lower(): v for k, v in mapping.items()}
 
     def __call__(self, values: Union[str, List[str]]) -> torch.Tensor:
@@ -47,13 +53,24 @@ class ExtractAnswerFromJson:
             values = [values]
 
         jsons = list(map(json_utils.extract_json, values))
-        answers = list(map(self._extract_answer, jsons))
+        answers = list(map(self._extract_answer, jsons))  # type: ignore
 
         return torch.tensor(answers, dtype=torch.int)
 
-    def _extract_answer(self, json_obj: Dict[str, str]) -> int:
+    def _extract_answer(self, json_obj: Dict[str, str] | None) -> int:
+        if json_obj is None:
+            self.missing_count += 1
+            if self.raise_if_missing and self.missing_count > self.missing_limit:
+                raise ValueError(f"Found {self.missing_count} responses without JSON objects.")
+            else:
+                logger.warning(
+                    f"Found response without JSON object, returning {self.missing_response}."
+                )
+                return self.missing_response
+
         if self.answer_key not in json_obj:
             raise ValueError(f"Provided JSON is missing the '{self.answer_key}' key")
+
         answer = json_obj[self.answer_key].strip()
 
         if not self.case_sensitive:
@@ -69,6 +86,7 @@ class ExtractAnswerFromJson:
                     f"Answer '{answer}' not found in mapping, "
                     f"returning {self.missing_response} instead."
                 )
+                self.missing_count += 1
                 return self.missing_response
 
         return self.mapping[answer]

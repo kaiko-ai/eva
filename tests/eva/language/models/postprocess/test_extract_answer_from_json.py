@@ -71,6 +71,19 @@ def test_missing_answer_key_raises(transform: ExtractAnswerFromJson) -> None:
         transform('{"not_answer": "Yes"}')
 
 
+def test_missing_limit_raises_after_threshold() -> None:
+    """Missing JSON responses should respect the configured missing_limit."""
+    transform = ExtractAnswerFromJson(
+        mapping={"no": 0, "yes": 1},
+        missing_limit=3,
+        missing_response=-99,
+    )
+    assert transform("unknown").tolist() == [-99]
+    assert transform(["unknown", "unknown"]).tolist() == [-99, -99]
+    with pytest.raises(ValueError, match="Found 4 responses without JSON objects."):
+        transform("unknown")
+
+
 def test_init_requires_non_empty_mapping() -> None:
     """An empty mapping should be rejected at construction time."""
     with pytest.raises(ValueError, match="`mapping` must be a non-empty dictionary."):
