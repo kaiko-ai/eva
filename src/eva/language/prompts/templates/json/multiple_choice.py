@@ -26,7 +26,7 @@ class JsonMultipleChoicePromptTemplate(base.PromptTemplate):
         {% endif %}
 
         IMPORTANT: Respond with a valid JSON object where the "{{ answer_key }}" key
-        contains your chosen answer, and "{{ reason_key }}" should contain a brief
+        contains your answer, and "{{ reason_key }}" should contain a brief
         explanation for why the provided answer was chosen. 
         {% if use_option_letters %}
         The value for "{{ answer_key }}" must be the letter (e.g., "A", "B", "C", ...)
