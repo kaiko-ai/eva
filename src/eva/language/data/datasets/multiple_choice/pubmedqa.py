@@ -2,7 +2,7 @@
 
 import os
 import random
-from typing import Any, Any, Dict, List, Literal
+from typing import Any, Dict, List, Literal
 
 import torch
 from datasets import Dataset, load_dataset, load_from_disk
@@ -68,7 +68,6 @@ class PubMedQA(base.TextClassification):
 
         self.prompt_template = prompt_template or self._default_prompt_template
         self.prompt_render_kwargs = prompt_render_kwargs or self._default_render_kwargs
-        prompt_render_kwargs = prompt_render_kwargs or self._default_render_kwargs
 
     def _load_dataset(self, dataset_path: str | None) -> Dataset:
         """Loads the PubMedQA dataset from the local cache or downloads it.

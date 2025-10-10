@@ -6,18 +6,18 @@ import textwrap
 from typing import Sequence
 
 from jinja2 import Template
-from typing_extensions import override, NotRequired, TypedDict
+from typing_extensions import override
 
 from eva.language.prompts.templates import base, typings
 from eva.language.utils.text import format as format_utils
 
 
-
 class FreeFormQuestionPromptTemplate(base.PromptTemplate):
     """Prompt template for free-form questions."""
 
-    template = textwrap.dedent("""\
-        {{ preamble | default("Please answer the following questions based on the provided context.") }}
+    template = textwrap.dedent(
+        """\
+        {{ preamble }}
 
         {% if examples -%}
         Below are some examples:
@@ -42,7 +42,8 @@ class FreeFormQuestionPromptTemplate(base.PromptTemplate):
         {% endif -%}
 
         Answer:
-        """)
+        """
+    )
     """Base template to be rendered via Jinja2."""
 
     def __init__(self) -> None:
@@ -54,7 +55,7 @@ class FreeFormQuestionPromptTemplate(base.PromptTemplate):
         self,
         *,
         question: str,
-        context: str | Sequence[str] | None,
+        context: str | Sequence[str] | None = None,
         examples: Sequence[typings.QuestionAnswerExample] | None = None,
         preamble: str | None = None,
     ) -> str:
@@ -84,22 +85,35 @@ class FreeFormQuestionPromptTemplate(base.PromptTemplate):
 
         return textwrap.dedent(rendered).strip() + "\n"
 
-    def _validate_and_format_examples(self, examples: Sequence[typings.QuestionAnswerExample] | None) -> Sequence[typings.QuestionAnswerExample] | None:
+    def _validate_and_format_examples(
+        self, examples: Sequence[typings.QuestionAnswerExample] | None
+    ) -> Sequence[typings.QuestionAnswerExample] | None:
         """Validates the format of the provided examples."""
         if examples is not None:
             if not isinstance(examples, Sequence):
-                raise ValueError("`examples` must be a sequence of dictionaries, got {type(examples)}.")
+                raise ValueError(
+                    "`examples` must be a sequence of dictionaries, got {type(examples)}."
+                )
 
             for idx, ex in enumerate(examples):
                 if not isinstance(ex, dict):
                     raise ValueError(f"Example at index {idx} is not a dictionary.")
-                if "question" not in ex or not isinstance(ex["question"], str) or not ex["question"].strip():
+                if (
+                    "question" not in ex
+                    or not isinstance(ex["question"], str)
+                    or not ex["question"].strip()
+                ):
                     raise ValueError(f"Example at index {idx} is missing a valid 'question' key.")
-                if "answer" not in ex or not isinstance(ex["answer"], str) or not ex["answer"].strip():
+                if (
+                    "answer" not in ex
+                    or not isinstance(ex["answer"], str)
+                    or not ex["answer"].strip()
+                ):
                     raise ValueError(f"Example at index {idx} is missing a valid 'answer' key.")
                 if "context" in ex:
-                    if (not isinstance(ex["context"], str) and not isinstance(ex["context"], Sequence)):
+                    if not isinstance(ex["context"], str) and not isinstance(
+                        ex["context"], Sequence
+                    ):
                         raise ValueError(f"Example at index {idx} has an invalid 'context' key.")
                     ex["context"] = format_utils.format_as_bullet_points(ex["context"])
         return examples
-

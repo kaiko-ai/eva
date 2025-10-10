@@ -145,4 +145,3 @@ def _format_answer_options(options: Sequence[str], use_option_letters: bool) -> 
         return "\n".join(f"{letters[i]}. {opt.strip()}" for i, opt in enumerate(options))
     else:
         return "\n".join(f"- {opt.strip()}" for i, opt in enumerate(options))
-
