@@ -29,14 +29,14 @@ model:
       common:
         - class_path: eva.metrics.MulticlassClassificationMetrics
           init_args:
-            num_classes: 2
+            num_classes: 3
             input_type: "discrete"
     postprocess:
       predictions_transforms:
-        - class_path: eva.language.utils.str_to_int_tensor.CastStrToIntTensor
+        - class_path: eva.language.models.postprocess.ExtractAnswerFromJson
           init_args:
-            mapping: {"A": 0, "B": 1}
-            case_sensitive: false
+            mapping: {"no": 0, "yes": 1, "missing_answer": 2}
+            missing_response: 2
 data:
   class_path: eva.DataModule
   init_args:
@@ -67,7 +67,6 @@ data:
                 init_args:
                   size: ${oc.env:RESIZE_DIM, null}
                   max_bytes: ${oc.env:IMAGE_MAX_BYTES, null}
-            max_samples: 500
         - class_path: eva.multimodal.data.datasets.PatchCamelyon
           init_args:
             <<: *PREDICTION_DATASET_ARGS
@@ -83,3 +82,11 @@ data:
         batch_size: &PREDICT_BATCH_SIZE ${oc.env:PREDICT_BATCH_SIZE, 16}
         num_workers: *N_DATA_WORKERS
         collate_fn: eva.multimodal.data.dataloaders.text_image_collate
+    samplers:
+      val: &SAMPLER_ARGS
+        class_path: eva.core.data.samplers.BalancedSampler
+        init_args:
+          seed: ${oc.env:SAMPLER_SEED, 42}
+          num_samples: ${oc.env:NUM_SAMPLES, 250}
+      test:
+        <<: *SAMPLER_ARGS

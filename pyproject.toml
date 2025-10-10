@@ -76,10 +76,12 @@ language = [
     "datasets<4.0.0,>=2.19.0",
     "litellm>=1.61.8",
     "backoff>=2.2.1",
+    "json-repair>=0.52.0",
 ]
 multimodal = [
     "litellm>=1.61.8",
     "backoff>=2.2.1",
+    "json-repair>=0.52.0",
 ]
 all = [
     "h5py>=3.10.0",
@@ -97,6 +99,7 @@ all = [
     "datasets<4.0.0,>=2.19.0",
     "litellm>=1.61.8",
     "backoff>=2.2.1",
+    "json-repair>=0.52.0",
 ]
 
 [project.scripts]

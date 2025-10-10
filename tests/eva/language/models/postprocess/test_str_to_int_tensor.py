@@ -3,7 +3,7 @@
 import pytest
 import torch
 
-from eva.language.utils.str_to_int_tensor import CastStrToIntTensor
+from eva.language.models.postprocess import CastStrToIntTensor
 
 DEFAULT_MAPPING = {"no": 0, "yes": 1, "maybe": 2}
 

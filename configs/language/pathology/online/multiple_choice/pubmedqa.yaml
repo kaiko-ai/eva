@@ -25,10 +25,11 @@ model:
             input_type: "discrete"
     postprocess:
       predictions_transforms:
-        - class_path: eva.language.utils.str_to_int_tensor.CastStrToIntTensor
+        - class_path: eva.language.models.postprocess.ExtractAnswerFromJson
           init_args:
             mapping: {"no": 0, "yes": 1, "maybe": 2}
-            case_sensitive: false
+            missing_limit: 5
+            missing_response: 2
 data:
   class_path: eva.DataModule
   init_args:
@@ -55,5 +56,3 @@ data:
         collate_fn: eva.language.data.dataloaders.text_collate
       test:
         <<: *DATALOADER_ARGS
-
-
