@@ -1,4 +1,4 @@
-"""Prompt templates for multiple choice questions with JSON output."""
+"""Prompt templates for multiple choice questions without strict formatting requirements."""
 
 from __future__ import annotations
 

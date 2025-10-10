@@ -1,4 +1,4 @@
-"""Tests for JSON multiple choice prompt template."""
+"""Tests for raw multiple choice prompt template."""
 
 import pytest
 
