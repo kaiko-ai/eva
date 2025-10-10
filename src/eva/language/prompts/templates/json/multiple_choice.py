@@ -125,7 +125,7 @@ class JsonMultipleChoicePromptTemplate(base.PromptTemplate):
             use_option_letters=self.use_option_letters,
         )
 
-        return textwrap.dedent(rendered).strip() + "\n"
+        return format_utils.remove_multi_blank_lines(textwrap.dedent(rendered).strip()) + "\n"
 
 
 def _format_answer_options(options: Sequence[str], use_option_letters: bool) -> str:

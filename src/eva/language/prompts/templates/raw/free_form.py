@@ -19,27 +19,27 @@ class FreeFormQuestionPromptTemplate(base.PromptTemplate):
         """\
         {{ preamble }}
 
-        {% if examples -%}
+        {% if examples %}
         Below are some examples:
 
-        {% for ex in examples -%}
+        {% for ex in examples %}
+        Example {{ loop.index }}:
         Question: {{ ex.question }}
-        {% if ex.context -%}
+        {% if ex.context %}
         Context:
-        {{ ex.context.strip() }}
-        {% endif -%}
+        {{ ex.context }}
+        {% endif %}
         Answer: {{ ex.answer }}
-
         ---
-        {% endfor -%}
+        {% endfor %}
         Now please answer the following question:
 
-        {% endif -%}
+        {% endif %}
         Question: {{ question }}
-        {% if context -%}
+        {% if context %}
         Context:
-        {{ context.strip() }}
-        {% endif -%}
+        {{ context }}
+        {% endif %}
 
         Answer:
         """
@@ -83,7 +83,7 @@ class FreeFormQuestionPromptTemplate(base.PromptTemplate):
             preamble=(preamble or "").strip(),
         )
 
-        return textwrap.dedent(rendered).strip() + "\n"
+        return format_utils.remove_multi_blank_lines(textwrap.dedent(rendered).strip()) + "\n"
 
     def _validate_and_format_examples(
         self, examples: Sequence[typings.QuestionAnswerExample] | None
