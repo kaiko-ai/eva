@@ -2,7 +2,7 @@
 
 import os
 import random
-from typing import Any, Dict, List, Literal
+from typing import Any, Any, Dict, List, Literal
 
 import torch
 from datasets import Dataset, load_dataset, load_from_disk
@@ -12,6 +12,7 @@ from typing_extensions import override
 from eva.language.data.datasets.classification import base
 from eva.language.data.messages import MessageSeries, UserMessage
 from eva.language.prompts import templates
+from eva.language.prompts.templates.preambles import DEFAULT_QA_PREAMBLE
 
 
 class PubMedQA(base.TextClassification):
@@ -32,7 +33,7 @@ class PubMedQA(base.TextClassification):
     """Default prompt template for formatting questions and context."""
 
     _default_render_kwargs = {
-        "preamble": "Read the provided question and context carefully and provide the best answer.",
+        "preamble": DEFAULT_QA_PREAMBLE,
         "answer_options": ["no", "yes", "maybe"],
     }
     """Default kwargs for the template.render() call."""
