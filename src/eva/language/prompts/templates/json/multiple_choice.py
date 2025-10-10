@@ -10,6 +10,7 @@ from jinja2 import Template
 from typing_extensions import override
 
 from eva.language.prompts.templates import base
+from eva.language.utils.text import format as format_utils
 
 
 class JsonMultipleChoicePromptTemplate(base.PromptTemplate):
@@ -108,7 +109,7 @@ class JsonMultipleChoicePromptTemplate(base.PromptTemplate):
         jinja_template = Template(self.template)
         rendered = jinja_template.render(
             question=question.strip(),
-            context=_format_context(context) if context else None,
+            context=format_utils.format_as_bullet_points(context) if context else None,
             answer_options=_format_answer_options(
                 answer_options, use_option_letters=self.use_option_letters
             ),
@@ -145,17 +146,3 @@ def _format_answer_options(options: Sequence[str], use_option_letters: bool) -> 
     else:
         return "\n".join(f"- {opt.strip()}" for i, opt in enumerate(options))
 
-
-def _format_context(context: str | Sequence[str]) -> str:
-    """Formats the context for inclusion in the prompt.
-
-    Args:
-        context: The context string or list of context strings. If a list is provided,
-                 the contexts will be formatted as a bullet point list.
-
-    Returns:
-        The formatted context string.
-    """
-    if not isinstance(context, list):
-        context = [context]  # type: ignore[assignment]
-    return "\n".join(f"- {item.strip()}" for item in context if item.strip())
