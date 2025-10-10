@@ -38,7 +38,7 @@ class QuiltVQA(TextImageDataset[str]):
     def __init__(
         self,
         root: str | None = None,
-        split: Literal["train", "val", "test"] | None = None,
+        split: Literal["test"] | None = None,
         download: bool = False,
         max_samples: int | None = None,
         prompt_template: templates.PromptTemplate | None = None,
@@ -89,6 +89,8 @@ class QuiltVQA(TextImageDataset[str]):
 
     @override
     def validate(self) -> None:
+        if self._split not in ["test", None]:
+            raise ValueError(f"Available splits are ['test', None], but got '{self._split}'")
         if len(self) != (self._max_samples or self._expected_dataset_lengths[self._split]):
             raise ValueError(
                 f"Dataset length mismatch for split '{self._split}': "
@@ -144,7 +146,8 @@ class QuiltVQA(TextImageDataset[str]):
             logger.info("Downloading dataset from HuggingFace Hub")
             raw_dataset = load_dataset(
                 dataset_name,
-                split="train",  # dataset has only train split
+                split="train",
+                # labelled as "train" but this loads the test file quiltvqa_test_w_ans.json
                 trust_remote_code=True,
                 download_mode="reuse_dataset_if_exists",
             )
