@@ -7,6 +7,7 @@ from typing_extensions import override
 
 from eva.language.data.messages import MessageSeries, UserMessage
 from eva.language.prompts import templates
+from eva.language.prompts.templates.preambles import DEFAULT_QA_PREAMBLE
 from eva.multimodal.data.datasets.schemas import TransformsSchema
 from eva.multimodal.data.datasets.text_image import TextImageDataset
 from eva.vision.data import datasets as vision_datasets
@@ -20,6 +21,7 @@ class PatchCamelyon(TextImageDataset[int], vision_datasets.PatchCamelyon):
     """Default prompt template for formatting questions and context."""
 
     _default_render_kwargs = {
+        "preamble": DEFAULT_QA_PREAMBLE,
         "question": "Does this image show metastatic breast tissue?",
         "context": None,
         "answer_options": ["no", "yes"],
