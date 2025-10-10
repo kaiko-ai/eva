@@ -72,6 +72,7 @@ Supported datasets & tasks include:
 *Multimodal datasets*
 
 -	**[PatchCamelyon (image-text)](datasets/patch_camelyon.md)**: Vision-language benchmark variation for the popular vision Patch Camelyon task, where the goal is to classify breast cancer patches, using both the image and a text prompt.
+-	**[QuiltVQA (image-text)](datasets/quilt_vqa.md)**: Visual question answering for histopathology images
 
 
 To evaluate FMs, *eva* provides support for different model-formats, including models trained with PyTorch, models available on HuggingFace and ONNX-models. For other formats custom wrappers can be implemented.

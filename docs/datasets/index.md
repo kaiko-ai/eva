@@ -44,4 +44,11 @@
 
 | Dataset | #Samples | Task | Domain | Download provided |
 |---------|----------|------|---------|-------------------|
-| [PubMedQA](pubmedqa.md) | 1,000 | Classification (3 classes) | Biomedical Q&A | Yes |
+| [PubMedQA](pubmedqa.md) | 1,000 | Multiple Choice | Biomedical Q&A | Yes |
+
+
+## Multimodal Datasets Overview
+| Dataset | #Samples | Modality | Task | Domain | Download provided |
+|---------|----------|----------|------|--------|-------------------|
+| [PatchCamelyon](patch_camelyon.md) | 500 | Image + Text | Multiple Choice | Breast Cancer | Yes |
+| [QuiltVQA](quilt_vqa.md) | 985 | Image + Text | Free-form VQA | Histopathology | Yes |
