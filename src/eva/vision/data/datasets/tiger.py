@@ -28,7 +28,7 @@ class TIGERBase(
     _test_split_ratio: float = 0.15
 
     _target_mpp: float = 0.5
-    '''Target microns per pixel (mpp) for patches.'''
+    """Target microns per pixel (mpp) for patches."""
 
     def __init__(
         self,
@@ -113,16 +113,20 @@ class TIGERBase(
             raise FileNotFoundError(f"No .tif files found in {image_dir}")
 
         train_indices, val_indices, test_indices = splitting.random_split(
-            all_paths, self._train_split_ratio, self._val_split_ratio, self._test_split_ratio, self._seed
+            all_paths,
+            self._train_split_ratio,
+            self._val_split_ratio,
+            self._test_split_ratio,
+            self._seed,
         )
 
         if split == "train":
-            selected_paths = all_paths[train_indices[0] : train_indices[1]]
+            selected_paths = [all_paths[i] for i in train_indices]
         elif split == "val":
-            selected_paths = all_paths[val_indices[0] : val_indices[1]]
+            selected_paths = [all_paths[i] for i in val_indices]
         elif split == "test":
-            selected_paths = all_paths[test_indices[0] : test_indices[1]]
-        elif split is None:
+            selected_paths = [all_paths[i] for i in test_indices]
+        else:
             selected_paths = all_paths
 
         return [os.path.relpath(path, self._root) for path in selected_paths]

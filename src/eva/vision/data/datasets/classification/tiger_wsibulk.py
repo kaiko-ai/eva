@@ -1,5 +1,6 @@
 """tiger_wsibulk dataset class."""
 
+import ast
 import functools
 import os
 from pathlib import Path
@@ -87,7 +88,14 @@ class TIGERWsiBulk(tiger.TIGERBase):
 
                 file_name = row.file
 
-                coords = PatchCoordinates(**row._asdict())
+                row_dict = row._asdict()
+                coords = PatchCoordinates(
+                    x_y=ast.literal_eval(row_dict["x_y"]) if isinstance(row_dict["x_y"], str) else row_dict["x_y"],
+                    width=int(row_dict["width"]),
+                    height=int(row_dict["height"]),
+                    level_idx=int(row_dict["level_idx"]),
+                    mask=None,
+)
 
                 annotations.update(
                     self._process_patch_coordinates(file_name, coords, self._tumor_mask_threshold)
