@@ -28,6 +28,9 @@ class JsonMultipleChoicePromptTemplate(base.PromptTemplate):
         IMPORTANT: Respond with a valid JSON object where the "{{ answer_key }}" key
         contains your answer, and "{{ reason_key }}" should contain a brief
         explanation for why the provided answer was chosen. 
+        {% if enable_cot -%}
+        Think step-by-step inside <think>...</think> tags before giving your final answer.
+        {%- endif -%}
         {% if use_option_letters %}
         The value for "{{ answer_key }}" must be the letter (e.g., "A", "B", "C", ...)
         corresponding to your chosen option from the list below:
@@ -61,6 +64,7 @@ class JsonMultipleChoicePromptTemplate(base.PromptTemplate):
         answer_key: str | None = None,
         reason_key: str | None = None,
         use_option_letters: bool = False,
+        enable_cot: bool = False,
     ) -> None:
         """Initializes the prompt template.
 
@@ -71,12 +75,14 @@ class JsonMultipleChoicePromptTemplate(base.PromptTemplate):
                 the example JSON object in the prompt.
             template: Custom template string to use instead of the default.
             use_option_letters: Whether to prefix options with letters (A, B, C, ...).
+            enable_cot: Whether to explicitly prompt the model to use reasoning/CoT for answering.
         """
         super().__init__()
 
         self.answer_key = answer_key or self._default_answer_key
         self.reason_key = reason_key or self._default_reason_key
         self.use_option_letters = use_option_letters
+        self.enable_cot = enable_cot
 
     @override
     def render(
@@ -122,6 +128,112 @@ class JsonMultipleChoicePromptTemplate(base.PromptTemplate):
             example_reason=(example_reason or self._default_reason).strip(),
             preamble=(preamble or "").strip(),
             use_option_letters=self.use_option_letters,
+            enable_cot=self.enable_cot,
+        )
+
+        return textwrap.dedent(rendered).strip() + "\n"
+
+
+class RawMultipleChoicePromptTemplate(base.PromptTemplate):
+    """Prompt template for multiple choice questions only requiring the final answer to be last."""
+
+    template: str = textwrap.dedent(
+        """\
+        {{ preamble }}
+
+        Question: {{ question }}
+        {% if context %}
+        Context:
+        {{ context }}
+        {% endif %}
+        Provide a brief explanation for your choice before stating your final answer.
+        {% if enable_cot -%}
+        Think step-by-step inside <think>...</think> tags before giving your answer.
+        {% endif %}
+        {%- if use_option_letters -%}
+        Select the letter (e.g., "A", "B", "C", ...) corresponding to one of the options below:
+        {% else %}Select exactly one of the options listed below:
+        {% endif %}
+        {{ answer_options }}
+
+        IMPORTANT: You must provide your reasoning first.
+        Then end your response with only your final choice
+        {%- if use_option_letters %} letter
+        {%- else %} exactly as written above
+        {%- endif -%}
+        . Do not add any text after that final response.
+
+        Example answer:
+        {{ example_response }}
+
+        Answer:
+        """
+    )
+    """Base template to be rendered via Jinja2."""
+
+    _default_reason: str = "The reason why the given answer was chosen."
+
+    def __init__(
+        self,
+        use_option_letters: bool = False,
+        enable_cot: bool = False,
+    ) -> None:
+        """Initializes the prompt template.
+
+        Args:
+            use_option_letters: Whether to prefix options with letters (A, B, C, ...).
+            enable_cot: Whether to explicitly prompt the model to use reasoning/CoT for answering.
+        """
+        super().__init__()
+
+        self.use_option_letters = use_option_letters
+        self.enable_cot = enable_cot
+
+    @override
+    def render(
+        self,
+        *,
+        question: str,
+        context: str | Sequence[str] | None,
+        answer_options: Sequence[str],
+        example_answer: str | None = None,
+        example_reason: str | None = None,
+        preamble: str | None = None,
+    ) -> str:
+        """Render the template with provided values.
+
+        Args:
+            question: The question to ask the model.
+            context: Supporting context text(s) for the question.
+            answer_options: Allowed answer options.
+            example_answer: Optional example answer. Defaults to first option.
+            example_reason: Example reasoning string.
+            preamble: Optional preamble text to include at the top of the prompt.
+
+        Returns:
+            The rendered prompt string.
+        """
+        if not isinstance(question, str) or not question.strip():
+            raise ValueError("`question` must be a non-empty string.")
+
+        example_answer = (
+            example_answer
+            if isinstance(example_answer, str)
+            else (string.ascii_uppercase[0] if self.use_option_letters else answer_options[0])
+        ).strip()
+        example_reason = example_reason or self._default_reason
+
+        jinja_template = Template(self.template)
+        rendered = jinja_template.render(
+            question=question.strip(),
+            context=_format_context(context) if context else None,
+            answer_options=_format_answer_options(
+                answer_options, use_option_letters=self.use_option_letters
+            ),
+            preamble=(preamble or "").strip(),
+            use_option_letters=self.use_option_letters,
+            enable_cot=self.enable_cot,
+            example_response="\n".join([example_reason, example_answer]),
         )
 
         return textwrap.dedent(rendered).strip() + "\n"
