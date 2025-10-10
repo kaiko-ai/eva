@@ -13,8 +13,8 @@ class ExtractAnswerFromJson:
 
     def __init__(
         self,
-        mapping: Dict[str, int],
         answer_key: str = "answer",
+        mapping: Dict[str, int] | None = None,
         case_sensitive: bool = False,
         raise_if_missing: bool = True,
         missing_response: int = -1,
@@ -35,19 +35,18 @@ class ExtractAnswerFromJson:
             missing_limit: The maximum number of missing responses before raising
                 an error, if `raise_if_missing` is True.
         """
-        if not mapping:
-            raise ValueError("`mapping` must be a non-empty dictionary.")
-
         self.answer_key = answer_key
         self.case_sensitive = case_sensitive
         self.raise_if_missing = raise_if_missing
         self.missing_response = missing_response
         self.missing_limit = missing_limit
+        self.mapping = mapping
 
         self.missing_count = 0
-        self.mapping = {k if case_sensitive else k.lower(): v for k, v in mapping.items()}
+        if mapping:
+            self.mapping = {k if case_sensitive else k.lower(): v for k, v in mapping.items()}
 
-    def __call__(self, values: Union[str, List[str]]) -> torch.Tensor:
+    def __call__(self, values: Union[str, List[str]]) -> torch.Tensor | List[str]:
         """Convert JSON string(s) to a tensor of integer labels."""
         if not isinstance(values, (list, tuple)):
             values = [values]
@@ -55,9 +54,12 @@ class ExtractAnswerFromJson:
         jsons = list(map(json_utils.extract_json, values))
         answers = list(map(self._extract_answer, jsons))  # type: ignore
 
-        return torch.tensor(answers, dtype=torch.int)
+        # check if all answers are integers
+        if all(isinstance(ans, int) for ans in answers):
+            return torch.tensor(answers, dtype=torch.int)
+        return [str(ans) for ans in answers]
 
-    def _extract_answer(self, json_obj: Dict[str, str] | None) -> int:
+    def _extract_answer(self, json_obj: Dict[str, str] | None) -> int | str:
         if json_obj is None:
             self.missing_count += 1
             if self.raise_if_missing and self.missing_count > self.missing_limit:
@@ -71,22 +73,24 @@ class ExtractAnswerFromJson:
         if self.answer_key not in json_obj:
             raise ValueError(f"Provided JSON is missing the '{self.answer_key}' key")
 
-        answer = json_obj[self.answer_key].strip()
+        answer = str(json_obj[self.answer_key]).strip()
 
         if not self.case_sensitive:
             answer = answer.lower()
 
-        if answer not in self.mapping:
-            if self.raise_if_missing:
-                raise ValueError(
-                    f"Answer '{answer}' not found in mapping: {list(self.mapping.keys())}"
-                )
-            else:
-                logger.warning(
-                    f"Answer '{answer}' not found in mapping, "
-                    f"returning {self.missing_response} instead."
-                )
-                self.missing_count += 1
-                return self.missing_response
+        if self.mapping:
+            if answer not in self.mapping:
+                if self.raise_if_missing:
+                    raise ValueError(
+                        f"Answer '{answer}' not found in mapping: {list(self.mapping.keys())}"
+                    )
+                else:
+                    logger.warning(
+                        f"Answer '{answer}' not found in mapping, "
+                        f"returning {self.missing_response} instead."
+                    )
+                    self.missing_count += 1
+                    return self.missing_response
+            return self.mapping[answer]
 
-        return self.mapping[answer]
+        return answer
