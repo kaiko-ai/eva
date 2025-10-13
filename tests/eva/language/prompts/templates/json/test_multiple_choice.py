@@ -113,6 +113,7 @@ def test_render_example_answer_selection(
         question="Example answer?",
         context=None,
         answer_options=["First", "Second"],
+        enable_cot=False,
         **kwargs,
     )
 
