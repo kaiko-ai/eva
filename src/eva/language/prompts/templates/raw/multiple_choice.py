@@ -33,7 +33,7 @@ class RawMultipleChoicePromptTemplate(base.PromptTemplate):
         IMPORTANT: You must provide your reasoning first.
         Then end your response with only your final choice
         {%- if use_option_letters %} letter
-        {%- else %} exactly as written above
+        {%- else %} exactly as written below
         {%- endif %}.
         Do not add any text after that final response.
         {% if use_option_letters %}
