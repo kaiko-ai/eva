@@ -1,5 +1,7 @@
 """Tests for ExtractAnswerFromJson post-processing transform."""
 
+import re
+
 import pytest
 import torch
 
@@ -9,7 +11,7 @@ from eva.language.models.postprocess.extract_answer_from_json import ExtractAnsw
 @pytest.fixture
 def transform() -> ExtractAnswerFromJson:
     """Return a baseline transform with case-insensitive defaults."""
-    return ExtractAnswerFromJson(mapping={"Yes": 1, "No": 0})
+    return ExtractAnswerFromJson(mapping={"Yes": 1, "No": 0}, missing_limit=0)
 
 
 def test_call_single_string_returns_tensor(transform: ExtractAnswerFromJson) -> None:
@@ -17,7 +19,7 @@ def test_call_single_string_returns_tensor(transform: ExtractAnswerFromJson) -> 
     tensor = transform('{"answer": "  YES  "}')
 
     assert tensor.tolist() == [1]
-    assert tensor.dtype == torch.int
+    assert tensor.dtype == torch.long
 
 
 def test_call_list_parses_code_fences(transform: ExtractAnswerFromJson) -> None:
@@ -45,11 +47,11 @@ def test_custom_answer_key_respected() -> None:
 
 def test_case_sensitive_behavior() -> None:
     """Case-sensitive mode should only match exact variants."""
-    transform = ExtractAnswerFromJson(mapping={"Yes": 1}, case_sensitive=True)
+    transform = ExtractAnswerFromJson(mapping={"yes": 1}, case_sensitive=True, missing_limit=0)
 
-    assert transform('{"answer": "Yes"}').tolist() == [1]
-    with pytest.raises(ValueError, match="Answer 'yes' not found in mapping"):
-        transform('{"answer": "yes"}')
+    assert transform('{"answer": "yes"}').tolist() == [1]
+    with pytest.raises(ValueError, match=re.escape("Answer 'Yes' not found in mapping: ['yes']")):
+        transform('{"answer": "Yes"}')
 
 
 def test_missing_answer_maps_to_fallback_when_allowed() -> None:
@@ -67,7 +69,7 @@ def test_missing_answer_maps_to_fallback_when_allowed() -> None:
 
 def test_missing_answer_key_raises(transform: ExtractAnswerFromJson) -> None:
     """Responses without the answer key should raise a descriptive error."""
-    with pytest.raises(ValueError, match="Provided JSON is missing the 'answer' key"):
+    with pytest.raises(ValueError, match="Found 1 responses without JSON objects"):
         transform('{"not_answer": "Yes"}')
 
 
