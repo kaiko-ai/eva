@@ -1,5 +1,7 @@
 """Prompt templates for multiple choice questions without strict formatting requirements."""
 
+# ruff: noqa: E501
+
 from __future__ import annotations
 
 import string
@@ -27,12 +29,11 @@ class RawMultipleChoicePromptTemplate(base.PromptTemplate):
         {% endif %}
         Provide a brief explanation for your choice before stating your final answer.
 
-        {% if enable_cot %}
+        {%- if enable_cot %}
         Think step-by-step inside <think>...</think> tags before giving your answer.
         {% endif %}
 
-        IMPORTANT: You must provide your reasoning first.
-        Then end your response with only your final choice
+        IMPORTANT: You must provide your reasoning first. Then end your response with only your final choice
         {%- if use_option_letters %} letter
         {%- else %} exactly as written below
         {%- endif %}.
@@ -97,9 +98,6 @@ class RawMultipleChoicePromptTemplate(base.PromptTemplate):
         if not isinstance(question, str) or not question.strip():
             raise ValueError("`question` must be a non-empty string.")
 
-        answer_options = format_utils.format_as_bullet_points(
-            answer_options, style="letters" if self.use_option_letters else "bullets"
-        )
         example_answer = (
             example_answer
             if isinstance(example_answer, str)
@@ -110,27 +108,30 @@ class RawMultipleChoicePromptTemplate(base.PromptTemplate):
         jinja_template = Template(self.template)
         rendered = jinja_template.render(
             question=question.strip(),
-            context=_format_context(context) if context else None,
-            answer_options=answer_options,
+            context=(
+                format_utils.format_as_bullet_points(context, style="bullets") if context else None
+            ),
+            answer_options=format_utils.format_as_bullet_points(
+                answer_options, style="letters" if self.use_option_letters else "bullets"
+            ),
             preamble=(preamble or "").strip(),
             use_option_letters=self.use_option_letters,
             enable_cot=self.enable_cot,
-            example_response="\n".join([example_reason, example_answer]),
+            example_response=" ".join([example_reason, example_answer]),
         )
 
         return format_utils.remove_multi_blank_lines(textwrap.dedent(rendered).strip()) + "\n"
 
 
-def _format_context(context: str | Sequence[str]) -> str:
-    """Formats the context for inclusion in the prompt.
-
-    Args:
-        context: The context string or list of context strings. If a list is provided,
-                 the contexts will be formatted as a bullet point list.
-
-    Returns:
-        The formatted context string.
-    """
-    if not isinstance(context, list):
-        context = [context]  # type: ignore[assignment]
-    return "\n".join(f"- {item.strip()}" for item in context if item.strip())
+if __name__ == "__main__":
+    # Example usage
+    template = RawMultipleChoicePromptTemplate(use_option_letters=False, enable_cot=False)
+    prompt = template.render(
+        question="What is the capital of France?",
+        context=["France is a country in Europe.", "The Eiffel Tower is located in Paris."],
+        answer_options=["Berlin", "Madrid", "Paris", "Rome"],
+        example_reason="Paris is the capital of France.",
+        example_answer="C",
+        preamble="You are a helpful assistant.",
+    )
+    print(prompt)
