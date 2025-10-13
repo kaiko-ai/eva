@@ -1,4 +1,6 @@
-from typing import List, Sequence, Tuple
+"""G-Eval LLM Judge implementation."""
+
+from typing import Any, List, Sequence, Tuple
 
 from typing_extensions import override
 
@@ -10,28 +12,46 @@ from eva.language.models.postprocess import ExtractAnswerFromJson
 from eva.language.models.typings import PredictionBatch, TextBatch
 
 
-class GEvalJudge(base.LLMJudge[float]):
+class GEvalJudge(base.LLMJudge[int]):
+    """G-Eval LLM Judge.
+
+    This is a simplified version of the original G-Eval framework:
+    - Evaluation Steps are provided as input to the prompt, rather than
+        being produced on-the-fly by the model.
+    - No confidence weighted scoring (this requires access log probabilities,
+        which is not available for many API models).
+
+    Source: https://arxiv.org/abs/2303.16634
+    """
+
+    _default_model = "google/gemini-2.5-flash-lite"
+
     def __init__(
         self,
-        model: wrappers.LanguageModel,
+        model: wrappers.LanguageModel | str | None,
         evaluation_steps: Sequence[str],
         score_range: Tuple[int, int] = (0, 10),
+        score_explanation: str = "where higher is better.",
     ):
         """Initializes the G-Eval LLM Judge with a model and prompt template.
 
         Args:
-            model: The language model to use for evaluation.
-            prompt_template: The template to use for the prompt.
+            model: An instance of the language model to use, or the
+                name of the model to load from the registry.
+            evaluation_steps: The steps to guide the evaluation.
+            score_range: The range of possible scores (min, max).
+            score_explanation: Explanation of what the score means.
         """
-        super().__init__(model=model, prompt_template=GEvalPromptTemplate())
+        super().__init__(model=self._load_model(model), prompt_template=GEvalPromptTemplate())
 
         self.evaluation_steps = evaluation_steps
         self.score_range = score_range
+        self.score_explanation = score_explanation
 
         self.answer_extractor = ExtractAnswerFromJson(answer_key="score")
 
     @override
-    def evaluate(self, batch: PredictionBatch[List[str]]) -> List[float]:
+    def evaluate(self, batch: PredictionBatch[List[str]]) -> List[int]:
         """Evaluates a batch of predictions.
 
         Args:
@@ -47,7 +67,7 @@ class GEvalJudge(base.LLMJudge[float]):
                 target=target,
                 evaluation_steps=self.evaluation_steps,
                 score_range=self.score_range,
-                rubric=None,
+                score_explanation=self.score_explanation,
             )
 
             prompts.append([UserMessage(content=prompt)])
@@ -55,43 +75,17 @@ class GEvalJudge(base.LLMJudge[float]):
         judge_batch = TextBatch(text=prompts, target=None, metadata=None)
 
         outputs = self.model(judge_batch)
-        scores = self.answer_extractor(outputs["generated_text"])
+        results = self.answer_extractor(outputs["generated_text"])
 
-        # TODO: Parse the score from the model output
-        # return [float(score) for score in scores]
-        return scores
+        return list(map(self._cast_to_int, results))
 
+    def _load_model(self, model: wrappers.LanguageModel | str | None) -> wrappers.LanguageModel:
+        if model is None or isinstance(model, str):
+            return wrappers.ModelFromRegistry(model or self._default_model)  # type: ignore
+        return model
 
-if __name__ == "__main__":
-    from eva.language.models import wrappers
-
-    model = wrappers.ModelFromRegistry("google/gemini-2.5-flash-lite")
-
-    test_input = TextBatch(
-        text=[[UserMessage(content="What is the capital of France?")]],
-        target=[None],
-        metadata=None,
-    )
-
-    output = model(test_input)
-    print(output)
-
-    judge = GEvalJudge(
-        model=model,
-        evaluation_steps=[
-            "Correctness: Is the answer factually accurate?",
-            "Completeness: Does the answer fully address the question?",
-            "Conciseness: Is the answer clear and to the point?",
-        ],
-        score_range=(0, 10),
-    )
-
-    judge_input = PredictionBatch(
-        prediction=["The capital of France is Paris."],
-        target=["Paris is the capital city of France."],
-        metadata=None,
-        text=None,
-    )
-
-    scores = judge.evaluate(judge_input)
-    print(scores)
+    def _cast_to_int(self, result: Any) -> int:
+        try:
+            return int(result)
+        except ValueError as e:
+            raise ValueError(f"Score must be an integer, got {result}") from e

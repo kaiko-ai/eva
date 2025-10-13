@@ -1,3 +1,4 @@
+# noqa: E501
 """Prompt templates for G-Eval LLM Judge metric."""
 
 from __future__ import annotations
@@ -12,16 +13,21 @@ from eva.language.prompts.templates import base
 
 
 class GEvalPromptTemplate(base.PromptTemplate):
-    """Prompt template for G-Eval LLM Judge metric."""
+    """Prompt template for G-Eval LLM Judge metric.
+
+    The template being used here was strongly inspired
+    by https://github.com/confident-ai/deepeval.
+    """
 
     template: str = textwrap.dedent(
-        """You are an evaluator. Given the following {{ dependencies }}, assess the response below and return a JSON object with two fields:
+        """\
+        You are an evaluator. Given the following evaluation steps, assess the Model Response below and return a JSON object with two fields:
 
         - `"score"`: an integer between {{ score_range[0] }} and {{ score_range[1] }}, {{ score_explanation }}.
         - `"reason"`: a brief explanation for why the score was given. This must mention specific strengths or shortcomings, referencing relevant details from the input. Do **not** quote the score itself in the explanation.
 
         Your explanation should:
-        - {{ reasoning_expectation }}
+        - Be specific and grounded in the evaluation steps.
         - Mention key details from the test case parameters.
         - Be concise, clear, and focused on the evaluation logic.
 
@@ -32,8 +38,7 @@ class GEvalPromptTemplate(base.PromptTemplate):
         Evaluation Steps:
         {{ evaluation_steps }}
 
-        {{ rubric_text }}
-        Model Prediction:
+        Model Response:
         {{ prediction }}
 
         Ground Truth:
@@ -67,61 +72,46 @@ class GEvalPromptTemplate(base.PromptTemplate):
         target: str,
         evaluation_steps: Sequence[str],
         score_range: Tuple[int, int],
-        rubric: str | None = None,
+        score_explanation: str,
         additional_context: str | Sequence[str] | None = None,
     ) -> str:
         """Render the template with provided values.
 
         Args:
+            prediction: The model's prediction to evaluate.
+            target: The ground truth target to compare against.
+            evaluation_steps: The steps to guide the evaluation.
+            score_range: The range of possible scores (min, max).
+            score_explanation: Explanation of what the score means.
+            additional_context: Any additional context to include in the prompt.
 
         Returns:
             The rendered prompt string.
         """
-        rubric_text = f"Rubric:\n{rubric}\n" if rubric else ""
-        dependencies = "evaluation steps and rubric" if rubric else "evaluation steps"
-        score_explanation = (
-            "based on the rubric provided"
-            if rubric
-            else f"with {score_range[1]} indicating strong alignment with the evaluation steps and {score_range[0]} indicating no alignment"
-        )
-        reasoning_expectation = (
-            "Be specific and grounded in the evaluation steps and rubric."
-            if rubric
-            else "Be specific and grounded in the evaluation steps."
-        )
-
         jinja_template = Template(self.template)
         rendered = jinja_template.render(
-            dependencies=dependencies,
             score_range=score_range,
             score_explanation=score_explanation,
-            reasoning_expectation=reasoning_expectation,
-            evaluation_steps="\n".join(
-                f"- {step.strip()}" for step in evaluation_steps
-            ),  # TODO: use bullet point helper instead with numbers
-            rubric_text=rubric_text,
+            evaluation_steps=_format_numbered_list(evaluation_steps),
             prediction=prediction,
             target=target,
             parameters=None,
             additional_context=additional_context,
         )
 
-        # TODO: remove multi blank lines here
+        # TODO: remove multi blank lines here (wait for https://github.com/kaiko-ai/eva/pull/912 to be merged)
         return textwrap.dedent(rendered).strip() + "\n"
 
 
-if __name__ == "__main__":
-    template = GEvalPromptTemplate()
-    prompt = template.render(
-        prediction="The capital of France is Paris.",
-        target="Paris is the capital city of France.",
-        evaluation_steps=[
-            "Check if the answer correctly identifies the capital city of France.",
-            "Verify that the answer is concise and directly addresses the question.",
-            "Ensure that the answer does not include any irrelevant information.",
-        ],
-        score_range=(0, 10),
-        rubric=None,
-        additional_context=None,
-    )
-    print(prompt)
+def _format_numbered_list(items: Sequence[str]) -> str:
+    """Return items as a numbered bullet point list."""
+    # TODO: move this to utils & combine with existing bullet point formatting function
+    # (wait for https://github.com/kaiko-ai/eva/pull/912 to be merged)
+    formatted = []
+    for i, item in enumerate(items, start=1):
+        if not isinstance(item, str):
+            raise TypeError(f"Expected evaluation step to be a string, got {type(item)}")
+        stripped = item.strip()
+        if stripped:
+            formatted.append(f"{i}. {stripped}")
+    return "\n".join(formatted)

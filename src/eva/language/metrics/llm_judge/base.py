@@ -21,8 +21,8 @@ class LLMJudge(Generic[JudgeOutput], abc.ABC):
         """Initializes the LLMJudge with a model name and prompt template.
 
         Args:
-            model_name: The name of the model to use for evaluation. It requires prepending
-                the API provider such as "gemini/gemini-2.5-flash-lite" for Gemini.
+            model: An instance of the language model to use, or the
+                name of the model to load from the registry.
             api_kwargs: Additional keyword arguments for the API.
             prompt_template: The template to use for the prompt.
         """
@@ -37,9 +37,7 @@ class LLMJudge(Generic[JudgeOutput], abc.ABC):
         """Evaluates a batch of predictions.
 
         Args:
-            predictions: A list of model predictions to evaluate.
-            targets: A list of ground truth targets to compare against (optional).
-            contexts: A list of additional contexts to consider during evaluation (optional).
+            batch: A batch containing predictions & targets.
 
         Returns:
             A list of evaluation results, one for each prediction.
