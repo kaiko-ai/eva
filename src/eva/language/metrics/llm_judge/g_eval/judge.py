@@ -8,8 +8,8 @@ from eva.language.data.messages import UserMessage
 from eva.language.metrics.llm_judge import base
 from eva.language.metrics.llm_judge.g_eval.template import GEvalPromptTemplate
 from eva.language.models import wrappers
-from eva.language.models.postprocess import ExtractAnswerFromJson
 from eva.language.models.typings import PredictionBatch, TextBatch
+from eva.language.utils.text import json as json_utils
 
 
 class GEvalJudge(base.LLMJudge[int]):
@@ -48,17 +48,16 @@ class GEvalJudge(base.LLMJudge[int]):
         self.score_range = score_range
         self.score_explanation = score_explanation
 
-        self.answer_extractor = ExtractAnswerFromJson(answer_key="score")
-
     @override
-    def evaluate(self, batch: PredictionBatch[List[str]]) -> List[int]:
+    def evaluate(self, batch: PredictionBatch[List[str]]) -> List[int | None]:
         """Evaluates a batch of predictions.
 
         Args:
             batch: A batch of predictions to evaluate against their corresponding targets.
 
         Returns:
-            The evaluation result as a float score.
+            The numerical score of the evaluation. Returns None for samples where
+            the score could not be extracted.
         """
         prompts = []
         for prediction, target in zip(batch.prediction, batch.target, strict=False):
@@ -73,19 +72,25 @@ class GEvalJudge(base.LLMJudge[int]):
             prompts.append([UserMessage(content=prompt)])
 
         judge_batch = TextBatch(text=prompts, target=None, metadata=None)
-
         outputs = self.model(judge_batch)
-        results = self.answer_extractor(outputs["generated_text"])
 
-        return list(map(self._cast_to_int, results))
+        results = list(map(self._parse_output, outputs["generated_text"]))
+        scores, reasons = zip(*results, strict=False)
+
+        return list(scores)
 
     def _load_model(self, model: wrappers.LanguageModel | str | None) -> wrappers.LanguageModel:
         if model is None or isinstance(model, str):
             return wrappers.ModelFromRegistry(model or self._default_model)  # type: ignore
         return model
 
-    def _cast_to_int(self, result: Any) -> int:
-        try:
-            return int(result)
-        except ValueError as e:
-            raise ValueError(f"Score must be an integer, got {result}") from e
+    def _parse_output(self, output: Any) -> Tuple[int | None, str]:
+        json = json_utils.extract_json(output)
+
+        if json is not None:
+            if "score" not in json or "reason" not in json:
+                raise ValueError("Extracted JSON is missing required 'score' or 'reason' fields.")
+
+            return int(json["score"]), str(json["reason"])
+        else:
+            return None, "Failed to extract JSON from model output."

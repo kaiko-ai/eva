@@ -72,3 +72,21 @@ class GEvalCorrectness(torchmetrics.Metric):
     @override
     def compute(self) -> torch.Tensor:
         return self.total / self.count
+
+
+if __name__ == "__main__":
+    from eva.language.models import wrappers
+
+    metric = GEvalCorrectness(model=None)
+    preds = [
+        "The capital of France is Paris.",
+        "The capital of Germany is Munich.",
+        "The capital of Italy is Rome.",
+    ]
+    targets = [
+        "The capital of France is Paris.",
+        "The capital of Germany is Berlin.",
+        "The capital of Italy is Rome.",
+    ]
+    metric.update(preds, targets)
+    print(f"G-Eval Correctness: {metric.compute().item():.4f}")
