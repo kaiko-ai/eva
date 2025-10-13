@@ -1,5 +1,6 @@
-# noqa: E501
 """Prompt templates for G-Eval LLM Judge metric."""
+
+# ruff: noqa: E501
 
 from __future__ import annotations
 
@@ -99,7 +100,8 @@ class GEvalPromptTemplate(base.PromptTemplate):
             additional_context=additional_context,
         )
 
-        # TODO: remove multi blank lines here (wait for https://github.com/kaiko-ai/eva/pull/912 to be merged)
+        # TODO: remove multi blank lines here
+        # (wait for https://github.com/kaiko-ai/eva/pull/912 to be merged)
         return textwrap.dedent(rendered).strip() + "\n"
 
 

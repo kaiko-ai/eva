@@ -18,17 +18,23 @@ class GEvalCorrectness(torchmetrics.Metric):
     """The score range for the G-Eval judge."""
 
     _score_explanation: str = (
-        "and is calculated as the sum of three binary criteria: Factuality, Completeness, and Consistency with the Ground Truth"
+        "and is calculated as the sum of three binary criteria: "
+        "Factuality, Completeness, and Consistency with the Ground Truth"
     )
 
     _evaluation_steps: List[str] = [
         (
-            "Read the Model Response and Ground Truth carefully, and assess the following three criteria:\n"
+            "Read the Model Response and Ground Truth carefully, "
+            "and assess the following three criteria:\n"
             "- Factuality: Is the Model Response factually correct?\n"
             "- Completeness: Is the Model Response complete?\n"
-            "- Consistency: Are all facts in the Model Response consistent with the Ground Truth?"
+            "- Consistency: Are all facts in the Model Response "
+            "consistent with the Ground Truth?"
         ),
-        "For each of the above three criteria assign 1 point if the criterion is met, else 0 points.",
+        (
+            "For each of the above three criteria assign 1 point "
+            "if the criterion is met, else 0 points."
+        ),
     ]
     """The evaluation steps to be used by the G-Eval judge."""
 
@@ -37,7 +43,7 @@ class GEvalCorrectness(torchmetrics.Metric):
 
     def __init__(self, model: wrappers.LanguageModel | str | None):
         """Initializes the metric.
-        
+
         Args:
             model: An instance of the language model to use, or the
                 name of the model to load from the registry.
