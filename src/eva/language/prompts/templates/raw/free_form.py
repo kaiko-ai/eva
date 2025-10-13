@@ -32,7 +32,10 @@ class FreeFormQuestionPromptTemplate(base.PromptTemplate):
         Answer: {{ ex.answer }}
         ---
         {% endfor %}
-        Now please answer the following question:
+        Now please answer the following question.
+        {% if enable_cot %}
+        Think step-by-step inside <think>...</think> tags before giving your answer.
+        {% endif %}
 
         {% endif %}
         Question: {{ question }}
@@ -46,9 +49,14 @@ class FreeFormQuestionPromptTemplate(base.PromptTemplate):
     )
     """Base template to be rendered via Jinja2."""
 
-    def __init__(self) -> None:
-        """Initializes the prompt template."""
+    def __init__(self, enable_cot: bool = False) -> None:
+        """Initializes the prompt template.
+
+        Args:
+            enable_cot: Whether to explicitly prompt the model to use reasoning/CoT for answering.
+        """
         super().__init__()
+        self.enable_cot = enable_cot
 
     @override
     def render(
@@ -81,6 +89,7 @@ class FreeFormQuestionPromptTemplate(base.PromptTemplate):
             context=format_utils.format_as_bullet_points(context) if context else None,
             examples=self._validate_and_format_examples(examples),
             preamble=(preamble or "").strip(),
+            enable_cot=self.enable_cot,
         )
 
         return format_utils.remove_multi_blank_lines(textwrap.dedent(rendered).strip()) + "\n"

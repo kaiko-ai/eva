@@ -10,6 +10,7 @@ from jinja2 import Template
 from typing_extensions import override
 
 from eva.language.prompts.templates import base
+from eva.language.utils.text import format as format_utils
 
 
 class RawMultipleChoicePromptTemplate(base.PromptTemplate):
@@ -26,9 +27,9 @@ class RawMultipleChoicePromptTemplate(base.PromptTemplate):
         {% endif %}
         Provide a brief explanation for your choice before stating your final answer.
 
-        {%- if enable_cot %}
+        {% if enable_cot %}
         Think step-by-step inside <think>...</think> tags before giving your answer.
-        {%- endif %}
+        {% endif %}
 
         IMPORTANT: You must provide your reasoning first.
         Then end your response with only your final choice
@@ -96,8 +97,8 @@ class RawMultipleChoicePromptTemplate(base.PromptTemplate):
         if not isinstance(question, str) or not question.strip():
             raise ValueError("`question` must be a non-empty string.")
 
-        answer_options = _format_answer_options(
-            answer_options, use_option_letters=self.use_option_letters
+        answer_options = format_utils.format_as_bullet_points(
+            answer_options, style="letters" if self.use_option_letters else "bullets"
         )
         example_answer = (
             example_answer
@@ -117,26 +118,7 @@ class RawMultipleChoicePromptTemplate(base.PromptTemplate):
             example_response="\n".join([example_reason, example_answer]),
         )
 
-        return textwrap.dedent(rendered).strip() + "\n"
-
-
-def _format_answer_options(options: Sequence[str], use_option_letters: bool) -> str:
-    """Format answer options for inclusion in the prompt.
-
-    Args:
-        options: List of answer options.
-        use_option_letters: Whether to prefix options with letters (A, B, C, ...).
-    """
-    if not options or not all(isinstance(opt, str) and opt.strip() for opt in options):
-        raise ValueError("`answer_options` must contain at least one non-empty option.")
-
-    if use_option_letters:
-        letters = string.ascii_uppercase
-        if len(options) > len(letters):
-            raise ValueError(f"If using option letters, max {len(letters)} options are supported.")
-        return "\n".join(f"{letters[i]}. {opt.strip()}" for i, opt in enumerate(options))
-    else:
-        return "\n".join(f"- {opt.strip()}" for i, opt in enumerate(options))
+        return format_utils.remove_multi_blank_lines(textwrap.dedent(rendered).strip()) + "\n"
 
 
 def _format_context(context: str | Sequence[str]) -> str:

@@ -1,21 +1,41 @@
 """Text formatting utilities."""
 
 import re
-from typing import Sequence
+import string
+from typing import Literal, Sequence
 
 
-def format_as_bullet_points(content: str | Sequence[str]) -> str:
-    """Formats the given content as bullet points.
+def format_as_bullet_points(
+    options: Sequence[str],
+    style: Literal["bullets", "letters", "numbers"] = "bullets",
+) -> str:
+    """Format answer options for inclusion in a prompt.
 
     Args:
-        content: A string or a sequence of strings to format as bullet points.
+        options: List of answer options (non-empty strings).
+        style: Format type — "bullets", "letters", or "numbers".
 
     Returns:
-        The formatted bullet point string.
+        A formatted string with one option per line, prefixed accordingly.
     """
-    if not isinstance(content, list):
-        content = [content]  # type: ignore
-    return "\n".join(f"- {item.strip()}" for item in content if item.strip())
+    if not options or not all(isinstance(opt, str) and opt.strip() for opt in options):
+        raise ValueError("`options` must contain at least one non-empty string.")
+
+    match style:
+        case "letters":
+            letters = string.ascii_uppercase
+            if len(options) > len(letters):
+                raise ValueError(f"Maximum {len(letters)} options supported for letter format.")
+            return "\n".join(f"{letters[i]}. {opt.strip()}" for i, opt in enumerate(options))
+
+        case "numbers":
+            return "\n".join(f"{i+1}. {opt.strip()}" for i, opt in enumerate(options))
+
+        case "bullets":
+            return "\n".join(f"- {opt.strip()}" for opt in options)
+
+        case _:
+            raise ValueError("Invalid style. Choose from 'bullets', 'letters', or 'numbers'.")
 
 
 def remove_multi_blank_lines(text: str) -> str:
