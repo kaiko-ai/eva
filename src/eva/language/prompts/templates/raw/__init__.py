@@ -1,5 +1,6 @@
-"""Prompt templates with raw answer formats."""
+"""Prompt templating API."""
 
 from eva.language.prompts.templates.raw.free_form import FreeFormQuestionPromptTemplate
+from eva.language.prompts.templates.raw.multiple_choice import RawMultipleChoicePromptTemplate
 
-__all__ = ["FreeFormQuestionPromptTemplate"]
+__all__ = ["RawMultipleChoicePromptTemplate", "FreeFormQuestionPromptTemplate"]
