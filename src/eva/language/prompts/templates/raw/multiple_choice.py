@@ -81,6 +81,7 @@ class RawMultipleChoicePromptTemplate(base.PromptTemplate):
         example_answer: str | None = None,
         example_reason: str | None = None,
         preamble: str | None = None,
+        enable_cot: bool | None = None,
     ) -> str:
         """Render the template with provided values.
 
@@ -91,6 +92,7 @@ class RawMultipleChoicePromptTemplate(base.PromptTemplate):
             example_answer: Optional example answer. Defaults to first option.
             example_reason: Example reasoning string.
             preamble: Optional preamble text to include at the top of the prompt.
+            enable_cot: Optionally override the instance's CoT setting for this render call.
 
         Returns:
             The rendered prompt string.
@@ -116,7 +118,7 @@ class RawMultipleChoicePromptTemplate(base.PromptTemplate):
             ),
             preamble=(preamble or "").strip(),
             use_option_letters=self.use_option_letters,
-            enable_cot=self.enable_cot,
+            enable_cot=self.enable_cot if enable_cot is None else enable_cot,
             example_response=" ".join([example_reason, example_answer]),
         )
 
@@ -133,5 +135,6 @@ if __name__ == "__main__":
         example_reason="Paris is the capital of France.",
         example_answer="C",
         preamble="You are a helpful assistant.",
+        enable_cot=True,
     )
     print(prompt)

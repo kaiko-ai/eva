@@ -66,6 +66,7 @@ class FreeFormQuestionPromptTemplate(base.PromptTemplate):
         context: str | Sequence[str] | None = None,
         examples: Sequence[typings.QuestionAnswerExample] | None = None,
         preamble: str | None = None,
+        enable_cot: bool | None = None,
     ) -> str:
         """Render the template with provided values.
 
@@ -76,6 +77,7 @@ class FreeFormQuestionPromptTemplate(base.PromptTemplate):
                 Expected format is a list of dicts with 'question', 'answer', and
                 optional 'context' keys.
             preamble: Optional preamble text to include at the top of the prompt.
+            enable_cot: Optionally override the instance's CoT setting for this render call.
 
         Returns:
             The rendered prompt string.
@@ -89,7 +91,7 @@ class FreeFormQuestionPromptTemplate(base.PromptTemplate):
             context=format_utils.format_as_bullet_points(context) if context else None,
             examples=self._validate_and_format_examples(examples),
             preamble=(preamble or "").strip(),
-            enable_cot=self.enable_cot,
+            enable_cot=self.enable_cot if enable_cot is None else enable_cot,
         )
 
         return format_utils.remove_multi_blank_lines(textwrap.dedent(rendered).strip()) + "\n"

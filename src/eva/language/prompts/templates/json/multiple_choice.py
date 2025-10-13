@@ -95,6 +95,7 @@ class JsonMultipleChoicePromptTemplate(base.PromptTemplate):
         example_answer: str | None = None,
         example_reason: str | None = None,
         preamble: str | None = None,
+        enable_cot: bool | None = None,
     ) -> str:
         """Render the template with provided values.
 
@@ -105,6 +106,7 @@ class JsonMultipleChoicePromptTemplate(base.PromptTemplate):
             example_answer: Optional example answer for the JSON snippet. Defaults to first option.
             example_reason: Example reasoning string.
             preamble: Optional preamble text to include at the top of the prompt.
+            enable_cot: Optionally override the instance's CoT setting for this render call.
 
         Returns:
             The rendered prompt string.
@@ -129,7 +131,7 @@ class JsonMultipleChoicePromptTemplate(base.PromptTemplate):
             example_reason=(example_reason or self._default_reason).strip(),
             preamble=(preamble or "").strip(),
             use_option_letters=self.use_option_letters,
-            enable_cot=self.enable_cot,
+            enable_cot=self.enable_cot if enable_cot is None else enable_cot,
         )
 
         return format_utils.remove_multi_blank_lines(textwrap.dedent(rendered).strip()) + "\n"
