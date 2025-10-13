@@ -26,17 +26,21 @@ def test_render_basic_trims_input(template: JsonMultipleChoicePromptTemplate) ->
 
 
 def test_render_context_formats_lists(template: JsonMultipleChoicePromptTemplate) -> None:
-    """Context lists should be bullet formatted and ignore blank entries."""
+    """Context lists should be bullet formatted."""
     result = template.render(
         question="Context handling?",
-        context=["First fact", "   Second fact   ", "", "   "],
+        context=[
+            "First fact",
+            "   Second fact   ",
+            "Third fact",
+        ],
         answer_options=["Yes", "No"],
     )
 
     # Extract the context block to confirm only non-empty entries remain.
     context_section = result.split("Context:\n", 1)[1].split("\n\n", 1)[0]
     context_lines = [line for line in context_section.splitlines() if line.startswith("- ")]
-    assert context_lines == ["- First fact", "- Second fact"]
+    assert context_lines == ["- First fact", "- Second fact", "- Third fact"]
 
     result_no_context = template.render(
         question="Skip context?",

@@ -19,7 +19,7 @@ def format_as_bullet_points(
         A formatted string with one option per line, prefixed accordingly.
     """
     if not options or not all(isinstance(opt, str) and opt.strip() for opt in options):
-        raise ValueError("`options` must contain at least one non-empty string.")
+        raise ValueError(f"`options` must be all non-empty strings, got {options}.")
 
     match style:
         case "letters":

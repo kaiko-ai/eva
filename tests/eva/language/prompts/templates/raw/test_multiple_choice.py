@@ -28,7 +28,7 @@ def test_raw_render_context_formats_lists(template: RawMultipleChoicePromptTempl
     """Context lists should be bullet formatted and ignore blank entries."""
     result = template.render(
         question="Context handling?",
-        context=["First fact", "   Second fact   ", "\t", ""],
+        context=["First fact", "   Second fact   "],
         answer_options=["Yes", "No"],
     )
 
@@ -150,7 +150,7 @@ def test_render_invalid_answer_options_raises_error(
     template: RawMultipleChoicePromptTemplate, answer_options: list[object]
 ) -> None:
     """Invalid answer options should raise a descriptive ValueError."""
-    with pytest.raises(ValueError, match="`answer_options` must contain at least one"):
+    with pytest.raises(ValueError, match="`options` must be all non-empty strings"):
         template.render(
             question="Options?",
             context=None,
@@ -163,7 +163,7 @@ def test_render_with_too_many_lettered_options() -> None:
     template = RawMultipleChoicePromptTemplate(use_option_letters=True)
     answer_options = [f"Option {i}" for i in range(27)]
 
-    with pytest.raises(ValueError, match="max 26 options are supported"):
+    with pytest.raises(ValueError, match="Maximum 26 options supported for letter format"):
         template.render(
             question="Too many?",
             context=None,

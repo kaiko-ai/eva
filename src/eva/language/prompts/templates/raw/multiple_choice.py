@@ -100,6 +100,9 @@ class RawMultipleChoicePromptTemplate(base.PromptTemplate):
         if not isinstance(question, str) or not question.strip():
             raise ValueError("`question` must be a non-empty string.")
 
+        answer_options = format_utils.format_as_bullet_points(
+            answer_options, style="letters" if self.use_option_letters else "bullets"
+        )
         example_answer = (
             example_answer
             if isinstance(example_answer, str)
@@ -113,9 +116,7 @@ class RawMultipleChoicePromptTemplate(base.PromptTemplate):
             context=(
                 format_utils.format_as_bullet_points(context, style="bullets") if context else None
             ),
-            answer_options=format_utils.format_as_bullet_points(
-                answer_options, style="letters" if self.use_option_letters else "bullets"
-            ),
+            answer_options=answer_options,
             preamble=(preamble or "").strip(),
             use_option_letters=self.use_option_letters,
             enable_cot=self.enable_cot if enable_cot is None else enable_cot,
@@ -123,18 +124,3 @@ class RawMultipleChoicePromptTemplate(base.PromptTemplate):
         )
 
         return format_utils.remove_multi_blank_lines(textwrap.dedent(rendered).strip()) + "\n"
-
-
-if __name__ == "__main__":
-    # Example usage
-    template = RawMultipleChoicePromptTemplate(use_option_letters=False, enable_cot=False)
-    prompt = template.render(
-        question="What is the capital of France?",
-        context=["France is a country in Europe.", "The Eiffel Tower is located in Paris."],
-        answer_options=["Berlin", "Madrid", "Paris", "Rome"],
-        example_reason="Paris is the capital of France.",
-        example_answer="C",
-        preamble="You are a helpful assistant.",
-        enable_cot=True,
-    )
-    print(prompt)
