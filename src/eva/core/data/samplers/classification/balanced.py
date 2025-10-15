@@ -1,3 +1,5 @@
+""""Balanced class sampler for data loading."""
+
 from loguru import logger
 from typing_extensions import override
 
@@ -55,6 +57,8 @@ class BalancedSampler(ClassificationSampler):
                 class_indices, size=self._num_samples, replace=self._replacement
             ).tolist()
             self._indices.extend(sampled_indices)
-        
+
         self._random_generator.shuffle(self._indices)
-        logger.debug(f"Sampled {len(self._indices)} indices from {len(self._class_indices)} classes")
+        logger.debug(
+            f"Sampled {len(self._indices)} indices from {len(self._class_indices)} classes"
+        )

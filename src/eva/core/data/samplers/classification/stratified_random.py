@@ -1,4 +1,4 @@
-"""Classification samplers for data loading."""
+"""Stratified random sampler for classification tasks."""
 
 import numpy as np
 from loguru import logger
@@ -26,7 +26,8 @@ class StratifiedRandomSampler(ClassificationSampler):
         """Initializes the stratified random sampler.
 
         Args:
-            num_samples: The total number of samples to draw across all classes. If None, defaults to the dataset size.
+            num_samples: The total number of samples to draw across all classes. If None, defaults
+                to the dataset size.
             replacement: samples are drawn on-demand with replacement if ``True``, default=``False``
             seed: Random seed for reproducibility.
             reset_generator: Whether to reset the random number generator
@@ -46,13 +47,15 @@ class StratifiedRandomSampler(ClassificationSampler):
         total_dataset_samples = len(self.data_source)
 
         if not self._num_samples:
-            self._num_samples = total_dataset_samples  # Set here as data_source is not available in __init__
+            self._num_samples = (
+                total_dataset_samples  # Set here as data_source is not available in __init__
+            )
             self._replacement = False  # No replacement if sampling entire dataset
-        
+
         self._indices = []
         samples_allocated = 0
         class_list = sorted(self._class_indices.keys())
-        
+
         for i, class_idx in enumerate(class_list):
             class_indices = self._class_indices[class_idx]
             class_size = len(class_indices)
@@ -63,7 +66,7 @@ class StratifiedRandomSampler(ClassificationSampler):
             else:
                 class_proportion = class_size / total_dataset_samples
                 samples_for_class = int(np.round(class_proportion * self._num_samples))
-            
+
             if not self._replacement:
                 if samples_for_class > class_size:
                     logger.warning(
@@ -71,16 +74,14 @@ class StratifiedRandomSampler(ClassificationSampler):
                         f"{class_size}. Using all available samples."
                     )
                     samples_for_class = class_size
-            
+
             if samples_for_class > 0:
                 sampled_indices = self._random_generator.choice(
-                    class_indices, 
-                    size=samples_for_class, 
-                    replace=self._replacement
+                    class_indices, size=samples_for_class, replace=self._replacement
                 ).tolist()
                 self._indices.extend(sampled_indices)
                 samples_allocated += samples_for_class
-        
+
         self._random_generator.shuffle(self._indices)
-        
+
         logger.debug(f"Sampled {len(self._indices)} indices maintaining class proportions")

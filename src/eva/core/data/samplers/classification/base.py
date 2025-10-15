@@ -1,3 +1,5 @@
+"""Base class for classification-based samplers."""
+
 from abc import ABC, abstractmethod
 from collections import defaultdict
 from typing import Dict, Iterator, List, Union
@@ -66,13 +68,13 @@ class ClassificationSampler(SamplerWithDataSource[int], ABC):
 
     def _get_class_idx(self, idx: int) -> Union[int, str]:
         """Load and validate the class index for a given sample index.
-        
+
         Args:
             idx: Index of the sample in the dataset.
-            
+
         Returns:
             The class label (int or str) for the sample.
-            
+
         Raises:
             ValueError: If target is None, not scalar, or unsupported type.
         """
@@ -104,7 +106,7 @@ class ClassificationSampler(SamplerWithDataSource[int], ABC):
     @abstractmethod
     def _sample_indices(self) -> None:
         """Sample indices according to the sampling strategy.
-        
+
         This method should populate self._indices with the sampled indices.
         Subclasses must implement this method to define their specific sampling strategy.
         """

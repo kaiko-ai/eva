@@ -5,4 +5,10 @@ from eva.core.data.samplers.classification.stratified_random import StratifiedRa
 from eva.core.data.samplers.random import RandomSampler
 from eva.core.data.samplers.sampler import Sampler, SamplerWithDataSource
 
-__all__ = ["Sampler", "SamplerWithDataSource", "RandomSampler", "BalancedSampler", "StratifiedRandomSampler"]
+__all__ = [
+    "Sampler",
+    "SamplerWithDataSource",
+    "RandomSampler",
+    "BalancedSampler",
+    "StratifiedRandomSampler",
+]
