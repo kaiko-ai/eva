@@ -6,33 +6,33 @@ from typing import Literal, Sequence
 
 
 def format_list_items(
-    options: Sequence[str],
+    items: Sequence[str],
     style: Literal["bullets", "letters", "numbers"] = "bullets",
 ) -> str:
-    """Format answer options for inclusion in a prompt.
+    """Format list items.
 
     Args:
-        options: List of answer options (non-empty strings).
+        items: List of answer items (non-empty strings).
         style: Format type — "bullets", "letters", or "numbers".
 
     Returns:
-        A formatted string with one option per line, prefixed accordingly.
+        A formatted string with one item per line, prefixed accordingly.
     """
-    if not options or not all(isinstance(opt, str) and opt.strip() for opt in options):
-        raise ValueError(f"`options` must be all non-empty strings, got {options}.")
+    if not items or not all(isinstance(it, str) and it.strip() for it in items):
+        raise ValueError(f"`items` must be all non-empty strings, got {items}.")
 
     match style:
         case "letters":
             letters = string.ascii_uppercase
-            if len(options) > len(letters):
-                raise ValueError(f"Maximum {len(letters)} options supported for letter format.")
-            return "\n".join(f"{letters[i]}. {opt.strip()}" for i, opt in enumerate(options))
+            if len(items) > len(letters):
+                raise ValueError(f"Maximum {len(letters)} itions supported for letter format.")
+            return "\n".join(f"{letters[i]}. {it.strip()}" for i, it in enumerate(items))
 
         case "numbers":
-            return "\n".join(f"{i+1}. {opt.strip()}" for i, opt in enumerate(options))
+            return "\n".join(f"{i+1}. {it.strip()}" for i, it in enumerate(items))
 
         case "bullets":
-            return "\n".join(f"- {opt.strip()}" for opt in options)
+            return "\n".join(f"- {it.strip()}" for it in items)
 
         case _:
             raise ValueError("Invalid style. Choose from 'bullets', 'letters', or 'numbers'.")
