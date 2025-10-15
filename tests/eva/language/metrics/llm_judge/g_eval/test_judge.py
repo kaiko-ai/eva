@@ -7,7 +7,6 @@ from eva.language.models.typings import PredictionBatch
 
 def test_g_eval_judge_evaluate_flow(dummy_language_model: wrappers.LanguageModel) -> None:
     """Test the main evaluation flow with a dummy model."""
-    # Setup
     judge = GEvalJudge(
         model=dummy_language_model,
         evaluation_steps=["Check factual accuracy", "Evaluate completeness"],
@@ -22,10 +21,8 @@ def test_g_eval_judge_evaluate_flow(dummy_language_model: wrappers.LanguageModel
         metadata=None,
     )
 
-    # Execute
     scores = judge.evaluate(batch)
 
-    # Verify
     assert len(scores) == 2
     assert scores[0] == 8
     assert scores[1] == 5
