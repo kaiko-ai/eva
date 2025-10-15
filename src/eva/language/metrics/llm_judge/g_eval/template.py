@@ -29,7 +29,7 @@ class GEvalPromptTemplate(base.PromptTemplate):
 
         Your explanation should:
         - Be specific and grounded in the evaluation steps.
-        - Mention key details from the model response and ground truth.
+        - Mention key details from the Model Response and Ground Truth.
         - Be concise, clear, and focused on the evaluation logic.
 
         Only return valid JSON. Do **not** include any extra commentary or text.
