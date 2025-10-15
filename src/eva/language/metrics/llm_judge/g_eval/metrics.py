@@ -38,28 +38,28 @@ class GEvalCorrectness(torchmetrics.Metric):
     _scoring_criteria: str = "\n".join(
         [
             (
-                "5 (Excellent): Model response captures all key facts from ground truth "
+                "5 (Excellent): Model Response captures all key facts from Ground Truth "
                 "accurately. Information is complete and correct, with no factual errors or "
                 "contradictions. May use different wording but conveys equivalent meaning."
             ),
             (
-                "4 (Good): Model response captures most key facts correctly with no significant "
+                "4 (Good): Model Response captures most key facts correctly with no significant "
                 "errors. May miss 1-2 minor details, but all major points are present and accurate."
             ),
             (
-                "3 (Acceptable): Model response captures about half of the key information "
+                "3 (Acceptable): Model Response captures about half of the key information "
                 "accurately. Some important facts are missing, or there are minor inaccuracies, "
-                "but no major contradictions with ground truth."
+                "but no major contradictions with Ground Truth."
             ),
             (
-                "2 (Poor): Model response captures only a small portion of key facts. Major "
+                "2 (Poor): Model Response captures only a small portion of key facts. Major "
                 "information is missing and may contain factual errors or contradictions with "
-                "ground truth."
+                "Ground Truth."
             ),
             (
-                "1 (Very Poor): Model response is largely incorrect or incomplete, missing "
+                "1 (Very Poor): Model Response is largely incorrect or incomplete, missing "
                 "most key facts. Contains significant factual errors or contradictions with "
-                "ground truth."
+                "Ground Truth."
             ),
         ]
     )
