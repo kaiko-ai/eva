@@ -151,7 +151,7 @@ def test_render_invalid_answer_options_raises_error(
     template: RawMultipleChoicePromptTemplate, answer_options: list[object]
 ) -> None:
     """Invalid answer options should raise a descriptive ValueError."""
-    with pytest.raises(ValueError, match="`options` must be all non-empty strings"):
+    with pytest.raises(ValueError, match="`items` must be all non-empty strings"):
         template.render(
             question="Options?",
             context=None,
@@ -164,7 +164,7 @@ def test_render_with_too_many_lettered_options() -> None:
     template = RawMultipleChoicePromptTemplate(use_option_letters=True)
     answer_options = [f"Option {i}" for i in range(27)]
 
-    with pytest.raises(ValueError, match="Maximum 26 options supported for letter format"):
+    with pytest.raises(ValueError, match="Maximum 26 items supported for letter format"):
         template.render(
             question="Too many?",
             context=None,

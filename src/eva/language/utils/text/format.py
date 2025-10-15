@@ -25,7 +25,7 @@ def format_list_items(
         case "letters":
             letters = string.ascii_uppercase
             if len(items) > len(letters):
-                raise ValueError(f"Maximum {len(letters)} itions supported for letter format.")
+                raise ValueError(f"Maximum {len(letters)} items supported for letter format.")
             return "\n".join(f"{letters[i]}. {it.strip()}" for i, it in enumerate(items))
 
         case "numbers":

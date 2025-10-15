@@ -86,24 +86,3 @@ class FreeFormQuestionPromptTemplate(base.PromptTemplate):
         )
 
         return format_utils.remove_multi_blank_lines(textwrap.dedent(rendered).strip()) + "\n"
-
-
-if __name__ == "__main__":
-    prompt = FreeFormQuestionPromptTemplate(enable_cot=True)
-    print(
-        prompt.render(
-            question="What is the capital of France?",
-            context=["France is a country in Europe.", "The capital of France is Paris."],
-            examples=[
-                {
-                    "question": "What is 2 + 2?",
-                    "answer": "4",
-                },
-                {
-                    "question": "What is the capital of Germany?",
-                    "answer": "Berlin",
-                },
-            ],
-            preamble="You are a helpful assistant.",
-        )
-    )
