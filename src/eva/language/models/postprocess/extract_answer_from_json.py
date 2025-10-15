@@ -8,7 +8,7 @@ from loguru import logger
 from eva.language.utils.text import json as json_utils
 
 
-class ExtractAnswerFromJson:
+class ExtractDiscreteAnswerFromJson:
     """Extracts discrete answers from JSON responses and casts them to int tensors."""
 
     def __init__(
