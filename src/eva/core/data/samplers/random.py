@@ -1,6 +1,5 @@
 """Random sampler for data loading."""
 
-import numpy as np
 from typing import Optional
 
 import torch
@@ -29,7 +28,7 @@ class RandomSampler(data.RandomSampler, SamplerWithDataSource[int]):
         Args:
             replacement: Samples are drawn on-demand with replacement if ``True``, default=``False``
             num_samples: Number of samples to draw, default=``len(dataset)``.
-            sample_ratio: Alternative to num_samples, specifies the fraction of the dataset to sample.
+            sample_ratio: Alternative to num_samples, specifies the dataset fraction to sample.
                 If both num_samples and sample_ratio are provided, num_samples takes precedence.
             seed: Optional seed for the random number generator.
             reset_generator: Whether to reset the random number generator
@@ -53,7 +52,9 @@ class RandomSampler(data.RandomSampler, SamplerWithDataSource[int]):
         num_samples = self._num_samples
         if num_samples is None and self._sample_ratio is not None:
             dataset_size = len(data_source)
-            num_samples = int(np.round(dataset_size * self._sample_ratio))
+            num_samples = int(round(dataset_size * self._sample_ratio))
+        if num_samples is None and self._sample_ratio is None:
+            num_samples = len(data_source)
 
         super().__init__(
             data_source,

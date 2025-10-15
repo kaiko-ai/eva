@@ -1,6 +1,5 @@
 """Stratified random sampler for classification tasks."""
 
-import numpy as np
 from loguru import logger
 from typing_extensions import override
 
@@ -29,7 +28,7 @@ class StratifiedRandomSampler(ClassificationSampler):
         Args:
             num_samples: The total number of samples to draw across all classes. If None, defaults
                 to the dataset size.
-            sample_ratio: Alternative to num_samples, specifies the fraction of the dataset to sample.
+            sample_ratio: Alternative to num_samples, specifies the dataset fraction to sample.
                 If both num_samples and sample_ratio are provided, num_samples takes precedence.
             replacement: samples are drawn on-demand with replacement if ``True``, default=``False``
             seed: Random seed for reproducibility.
@@ -47,7 +46,7 @@ class StratifiedRandomSampler(ClassificationSampler):
         if self._num_samples is not None:
             return self._num_samples
         if self._sample_ratio is not None:
-            return int(np.round(dataset_size * self._sample_ratio))
+            return int(round(dataset_size * self._sample_ratio))
         return dataset_size
 
     @override
@@ -58,7 +57,7 @@ class StratifiedRandomSampler(ClassificationSampler):
         if self._num_samples is not None:
             total_samples_to_draw = self._num_samples
         elif self._sample_ratio is not None:
-            total_samples_to_draw = int(np.round(total_dataset_samples * self._sample_ratio))
+            total_samples_to_draw = int(round(total_dataset_samples * self._sample_ratio))
         else:
             self._indices = [idx for indices in self._class_indices.values() for idx in indices]
             self._random_generator.shuffle(self._indices)
@@ -76,7 +75,7 @@ class StratifiedRandomSampler(ClassificationSampler):
                 samples_for_class = total_samples_to_draw - samples_allocated
             else:
                 class_proportion = class_size / total_dataset_samples
-                samples_for_class = int(np.round(class_proportion * total_samples_to_draw))
+                samples_for_class = int(round(class_proportion * total_samples_to_draw))
 
             if not self._replacement and samples_for_class > class_size:
                 logger.warning(
