@@ -34,16 +34,20 @@ class StratifiedRandomSampler(ClassificationSampler):
                 sampler instance will start from the same seed.
         """
         super().__init__(replacement=replacement, seed=seed, reset_generator=reset_generator)
-        self._num_samples = num_samples if num_samples is not None else len(self.data_source)
+        self._num_samples = num_samples
 
     def __len__(self) -> int:
         """Returns the total number of samples."""
-        return self._num_samples
+        return self._num_samples or len(self.data_source)
 
     @override
     def _sample_indices(self) -> None:
         """Sample indices proportionally from each class to maintain class distribution."""
         total_dataset_samples = len(self.data_source)
+
+        if not self._num_samples:
+            self._num_samples = total_dataset_samples  # Set here as data_source is not available in __init__
+            self._replacement = False  # No replacement if sampling entire dataset
         
         self._indices = []
         samples_allocated = 0
