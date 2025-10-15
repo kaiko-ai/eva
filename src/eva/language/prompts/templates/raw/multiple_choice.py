@@ -118,7 +118,7 @@ class RawMultipleChoicePromptTemplate(base.PromptTemplate):
             preamble=(preamble or "").strip(),
             use_option_letters=self.use_option_letters,
             enable_cot=self.enable_cot if enable_cot is None else enable_cot,
-            example_response=" ".join([example_reason, example_answer]),
+            example_response="\n".join([example_reason, example_answer]),
         )
 
         return format_utils.remove_multi_blank_lines(textwrap.dedent(rendered).strip()) + "\n"
