@@ -39,15 +39,26 @@ class GEvalPromptTemplate(base.PromptTemplate):
         Evaluation Steps:
         {{ evaluation_steps }}
 
+        {% if scoring_criteria %}
+        Scoring Criteria:
+        {{ scoring_criteria }}
+        {% endif %}
+
         Model Response:
         {{ prediction }}
 
         Ground Truth:
         {{ target }}
 
+        {% if parameters %}
         Parameters:
         {{ parameters }}
+        {% endif %}
+
+        {% if additional_context %}
+        Additional Context:
         {{ additional_context }}
+        {% endif %}
 
         ---
         **Example JSON:**
@@ -74,6 +85,7 @@ class GEvalPromptTemplate(base.PromptTemplate):
         evaluation_steps: Sequence[str],
         score_range: Tuple[int, int],
         score_explanation: str,
+        scoring_criteria: str | None = None,
         additional_context: str | Sequence[str] | None = None,
     ) -> str:
         """Render the template with provided values.
@@ -84,6 +96,7 @@ class GEvalPromptTemplate(base.PromptTemplate):
             evaluation_steps: The steps to guide the evaluation.
             score_range: The range of possible scores (min, max).
             score_explanation: Explanation of what the score means.
+            scoring_criteria: The detailed scoring criteria to include in the prompt.
             additional_context: Any additional context to include in the prompt.
 
         Returns:
@@ -93,6 +106,7 @@ class GEvalPromptTemplate(base.PromptTemplate):
         rendered = jinja_template.render(
             score_range=score_range,
             score_explanation=score_explanation,
+            scoring_criteria=scoring_criteria,
             evaluation_steps=_format_numbered_list(evaluation_steps),
             prediction=prediction,
             target=target,

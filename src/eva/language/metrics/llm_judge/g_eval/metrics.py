@@ -1,5 +1,6 @@
 """G-Eval Metric Implementations."""
 
+import textwrap
 from typing import List, Tuple
 
 import torch
@@ -14,29 +15,26 @@ from eva.language.models.typings import PredictionBatch
 class GEvalCorrectness(torchmetrics.Metric):
     """A version of the G-Eval metric focusing on answer correctness."""
 
-    _score_range: Tuple[int, int] = (0, 3)
+    _score_range: Tuple[int, int] = (1, 5)
     """The score range for the G-Eval judge."""
 
-    _score_explanation: str = (
-        "and is calculated as the sum of three binary criteria: "
-        "Factuality, Completeness, and Consistency with the Ground Truth"
-    )
-
     _evaluation_steps: List[str] = [
-        (
-            "Read the Model Response and Ground Truth carefully, "
-            "and assess the following three criteria:\n"
-            "- Factuality: Is the Model Response factually correct?\n"
-            "- Completeness: Is the Model Response complete?\n"
-            "- Consistency: Are all facts in the Model Response "
-            "consistent with the Ground Truth?"
-        ),
-        (
-            "For each of the above three criteria assign 1 point "
-            "if the criterion is met, else 0 points."
-        ),
+        "Read the Model Response and Ground Truth carefully",
+        "Identify Key Facts: Extract all important facts, claims, and information from the Ground Truth response.",
+        "Assess Correctness & Completeness: For each key fact in the Ground Truth, determine if it appears in the Model Response (exactly or paraphrased), and evaluate whether all essential information from Ground Truth is present.",
+        "Identify Errors: Note any factual contradictions or inaccuracies in the Model Response compared to Ground Truth.",
     ]
     """The evaluation steps to be used by the G-Eval judge."""
+
+    _scoring_criteria: str = textwrap.dedent(
+        """
+        5 (Excellent): Model response captures all key facts from ground truth accurately. Information is complete and correct, with no factual errors or contradictions. May use different wording but conveys equivalent meaning.
+        4 (Good): Model response captures most key facts correctly with no significant errors. May miss 1-2 minor details, but all major points are present and accurate.
+        3 (Acceptable): Model response captures approximately half of the key information accurately. Some important facts are missing, or there are minor inaccuracies, but no major contradictions with ground truth.
+        2 (Poor): Model response captures only a small portion of key facts, with major information missing. May contain factual errors or contradictions that misalign with ground truth.
+        1 (Very Poor): Model response is largely incorrect or incomplete, missing most key facts. Contains significant factual errors or contradictions with ground truth.
+        """
+    )
 
     total: torch.Tensor
     count: torch.Tensor
@@ -53,7 +51,7 @@ class GEvalCorrectness(torchmetrics.Metric):
             model=model,
             evaluation_steps=self._evaluation_steps,
             score_range=self._score_range,
-            score_explanation=self._score_explanation,
+            scoring_criteria=self._scoring_criteria,
         )
 
         self.add_state("total", default=torch.tensor(0.0), dist_reduce_fx="sum")
@@ -72,21 +70,3 @@ class GEvalCorrectness(torchmetrics.Metric):
     @override
     def compute(self) -> torch.Tensor:
         return self.total / self.count
-
-
-if __name__ == "__main__":
-    from eva.language.models import wrappers
-
-    metric = GEvalCorrectness(model=None)
-    preds = [
-        "The capital of France is Paris.",
-        "The capital of Germany is Munich.",
-        "The capital of Italy is Rome.",
-    ]
-    targets = [
-        "The capital of France is Paris.",
-        "The capital of Germany is Berlin.",
-        "The capital of Italy is Rome.",
-    ]
-    metric.update(preds, targets)
-    print(f"G-Eval Correctness: {metric.compute().item():.4f}")

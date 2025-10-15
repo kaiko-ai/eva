@@ -31,7 +31,8 @@ class GEvalJudge(base.LLMJudge[int]):
         model: wrappers.LanguageModel | str | None,
         evaluation_steps: Sequence[str],
         score_range: Tuple[int, int] = (0, 10),
-        score_explanation: str = "where higher is better.",
+        score_explanation: str = "where higher is better",
+        scoring_criteria: str | None = None,
     ):
         """Initializes the G-Eval LLM Judge with a model and prompt template.
 
@@ -41,12 +42,14 @@ class GEvalJudge(base.LLMJudge[int]):
             evaluation_steps: The steps to guide the evaluation.
             score_range: The range of possible scores (min, max).
             score_explanation: Explanation of what the score means.
+            scoring_criteria: The detailed scoring criteria to include in the prompt.
         """
         super().__init__(model=self._load_model(model), prompt_template=GEvalPromptTemplate())
 
         self.evaluation_steps = evaluation_steps
         self.score_range = score_range
         self.score_explanation = score_explanation
+        self.scoring_criteria = scoring_criteria
 
     @override
     def evaluate(self, batch: PredictionBatch[List[str]]) -> List[int | None]:
@@ -67,6 +70,7 @@ class GEvalJudge(base.LLMJudge[int]):
                 evaluation_steps=self.evaluation_steps,
                 score_range=self.score_range,
                 score_explanation=self.score_explanation,
+                scoring_criteria=self.scoring_criteria,
             )
 
             prompts.append([UserMessage(content=prompt)])
@@ -91,6 +95,10 @@ class GEvalJudge(base.LLMJudge[int]):
             if "score" not in json or "reason" not in json:
                 raise ValueError("Extracted JSON is missing required 'score' or 'reason' fields.")
 
-            return int(json["score"]), str(json["reason"])
+            score = int(json["score"])
+            if not (self.score_range[0] <= score <= self.score_range[1]):
+                raise ValueError(f"Score {score} is out of the expected range {self.score_range}.")
+
+            return score, str(json["reason"])
         else:
             return None, "Failed to extract JSON from model output."
