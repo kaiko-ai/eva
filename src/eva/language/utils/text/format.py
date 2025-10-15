@@ -5,7 +5,7 @@ import string
 from typing import Literal, Sequence
 
 
-def format_as_bullet_points(
+def format_list_items(
     options: Sequence[str],
     style: Literal["bullets", "letters", "numbers"] = "bullets",
 ) -> str:

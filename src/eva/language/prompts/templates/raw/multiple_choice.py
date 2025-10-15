@@ -100,7 +100,7 @@ class RawMultipleChoicePromptTemplate(base.PromptTemplate):
         if not isinstance(question, str) or not question.strip():
             raise ValueError("`question` must be a non-empty string.")
 
-        answer_options = format_utils.format_as_bullet_points(
+        answer_options = format_utils.format_list_items(
             answer_options, style="letters" if self.use_option_letters else "bullets"
         )
         example_answer = (
@@ -114,7 +114,7 @@ class RawMultipleChoicePromptTemplate(base.PromptTemplate):
         rendered = jinja_template.render(
             question=question.strip(),
             context=(
-                format_utils.format_as_bullet_points(context, style="bullets") if context else None
+                format_utils.format_list_items(context, style="bullets") if context else None
             ),
             answer_options=answer_options,
             preamble=(preamble or "").strip(),

@@ -117,7 +117,7 @@ class JsonMultipleChoicePromptTemplate(base.PromptTemplate):
         jinja_template = Template(self.template)
         rendered = jinja_template.render(
             question=question.strip(),
-            context=format_utils.format_as_bullet_points(context) if context else None,
+            context=format_utils.format_list_items(context) if context else None,
             answer_options=_format_answer_options(
                 answer_options, use_option_letters=self.use_option_letters
             ),
