@@ -1,6 +1,5 @@
 """G-Eval Metric Implementations."""
 
-import textwrap
 from typing import List, Tuple
 
 import torch
@@ -20,20 +19,49 @@ class GEvalCorrectness(torchmetrics.Metric):
 
     _evaluation_steps: List[str] = [
         "Read the Model Response and Ground Truth carefully",
-        "Identify Key Facts: Extract all important facts, claims, and information from the Ground Truth response.",
-        "Assess Correctness & Completeness: For each key fact in the Ground Truth, determine if it appears in the Model Response (exactly or paraphrased), and evaluate whether all essential information from Ground Truth is present.",
-        "Identify Errors: Note any factual contradictions or inaccuracies in the Model Response compared to Ground Truth.",
+        (
+            "Identify Key Facts: Extract all important facts, claims, and information "
+            "from the Ground Truth response."
+        ),
+        (
+            "Assess Correctness & Completeness: For each key fact in the Ground Truth, "
+            "determine if it appears in the Model Response (exactly or paraphrased), "
+            "and evaluate whether all essential information from Ground Truth is present."
+        ),
+        (
+            "Identify Errors: Note any factual contradictions or inaccuracies in the "
+            "Model Response compared to Ground Truth."
+        ),
     ]
     """The evaluation steps to be used by the G-Eval judge."""
 
-    _scoring_criteria: str = textwrap.dedent(
-        """
-        5 (Excellent): Model response captures all key facts from ground truth accurately. Information is complete and correct, with no factual errors or contradictions. May use different wording but conveys equivalent meaning.
-        4 (Good): Model response captures most key facts correctly with no significant errors. May miss 1-2 minor details, but all major points are present and accurate.
-        3 (Acceptable): Model response captures approximately half of the key information accurately. Some important facts are missing, or there are minor inaccuracies, but no major contradictions with ground truth.
-        2 (Poor): Model response captures only a small portion of key facts, with major information missing. May contain factual errors or contradictions that misalign with ground truth.
-        1 (Very Poor): Model response is largely incorrect or incomplete, missing most key facts. Contains significant factual errors or contradictions with ground truth.
-        """
+    _scoring_criteria: str = "\n".join(
+        [
+            (
+                "5 (Excellent): Model response captures all key facts from ground truth "
+                "accurately. Information is complete and correct, with no factual errors or "
+                "contradictions. May use different wording but conveys equivalent meaning."
+            ),
+            (
+                "4 (Good): Model response captures most key facts correctly with no significant "
+                "errors. May miss 1-2 minor details, but all major points are present and accurate."
+            ),
+            (
+                "3 (Acceptable): Model response captures about half of the key information "
+                "accurately. Some important facts are missing, or there are minor inaccuracies, "
+                "but no major contradictions with ground truth."
+            ),
+            (
+                "2 (Poor): Model response captures only a small portion of key facts. Major "
+                "information is missing and may contain factual errors or contradictions with "
+                "ground truth."
+            ),
+            (
+                "1 (Very Poor): Model response is largely incorrect or incomplete, missing "
+                "most key facts. Contains significant factual errors or contradictions with "
+                "ground truth."
+            ),
+        ]
     )
 
     total: torch.Tensor
