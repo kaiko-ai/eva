@@ -1,6 +1,6 @@
 """Typings for prompt templates."""
 
-from typing_extensions import List, NotRequired, TypedDict
+from typing_extensions import TypedDict
 
 
 class QuestionAnswerExample(TypedDict):
@@ -8,4 +8,3 @@ class QuestionAnswerExample(TypedDict):
 
     question: str
     answer: str
-    context: NotRequired[str | List[str]]

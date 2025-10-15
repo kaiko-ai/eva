@@ -25,10 +25,6 @@ class FreeFormQuestionPromptTemplate(base.PromptTemplate):
         {% for ex in examples %}
         Example {{ loop.index }}:
         Question: {{ ex.question }}
-        {% if ex.context %}
-        Context:
-        {{ ex.context }}
-        {% endif %}
         Answer: {{ ex.answer }}
         ---
         {% endfor %}
@@ -39,11 +35,6 @@ class FreeFormQuestionPromptTemplate(base.PromptTemplate):
 
         {% endif %}
         Question: {{ question }}
-        {% if context %}
-        Context:
-        {{ context }}
-        {% endif %}
-
         Answer:
         """
     )
@@ -89,42 +80,30 @@ class FreeFormQuestionPromptTemplate(base.PromptTemplate):
         rendered = jinja_template.render(
             question=question.strip(),
             context=format_utils.format_list_items(context) if context else None,
-            examples=self._validate_and_format_examples(examples),
+            examples=examples,
             preamble=(preamble or "").strip(),
             enable_cot=self.enable_cot if enable_cot is None else enable_cot,
         )
 
         return format_utils.remove_multi_blank_lines(textwrap.dedent(rendered).strip()) + "\n"
 
-    def _validate_and_format_examples(
-        self, examples: Sequence[typings.QuestionAnswerExample] | None
-    ) -> Sequence[typings.QuestionAnswerExample] | None:
-        """Validates the format of the provided examples."""
-        if examples is not None:
-            if not isinstance(examples, Sequence):
-                raise ValueError(
-                    "`examples` must be a sequence of dictionaries, got {type(examples)}."
-                )
 
-            for idx, ex in enumerate(examples):
-                if not isinstance(ex, dict):
-                    raise ValueError(f"Example at index {idx} is not a dictionary.")
-                if (
-                    "question" not in ex
-                    or not isinstance(ex["question"], str)
-                    or not ex["question"].strip()
-                ):
-                    raise ValueError(f"Example at index {idx} is missing a valid 'question' key.")
-                if (
-                    "answer" not in ex
-                    or not isinstance(ex["answer"], str)
-                    or not ex["answer"].strip()
-                ):
-                    raise ValueError(f"Example at index {idx} is missing a valid 'answer' key.")
-                if "context" in ex:
-                    if not isinstance(ex["context"], str) and not isinstance(
-                        ex["context"], Sequence
-                    ):
-                        raise ValueError(f"Example at index {idx} has an invalid 'context' key.")
-                    ex["context"] = format_utils.format_list_items(ex["context"])
-        return examples
+if __name__ == "__main__":
+    prompt = FreeFormQuestionPromptTemplate(enable_cot=True)
+    print(
+        prompt.render(
+            question="What is the capital of France?",
+            context=["France is a country in Europe.", "The capital of France is Paris."],
+            examples=[
+                {
+                    "question": "What is 2 + 2?",
+                    "answer": "4",
+                },
+                {
+                    "question": "What is the capital of Germany?",
+                    "answer": "Berlin",
+                },
+            ],
+            preamble="You are a helpful assistant.",
+        )
+    )
