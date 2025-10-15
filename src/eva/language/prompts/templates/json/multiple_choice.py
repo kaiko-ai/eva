@@ -30,7 +30,7 @@ class JsonMultipleChoicePromptTemplate(base.PromptTemplate):
         contains your answer, and "{{ reason_key }}" should contain a brief
         explanation for why the provided answer was chosen. 
         {% if enable_cot -%}
-        Think step-by-step inside <think>...</think> tags before giving your final answer.
+        Think step-by-step before giving your final answer.
         {%- endif -%}
         {% if use_option_letters %}
         The value for "{{ answer_key }}" must be the letter (e.g., "A", "B", "C", ...)

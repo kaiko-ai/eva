@@ -123,8 +123,8 @@ def test_render_example_answer_selection(
 @pytest.mark.parametrize(
     ("enable_cot", "expected_fragment"),
     [
-        (False, "<think>"),
-        (True, "<think>"),
+        (False, "Think step-by-step"),
+        (True, "Think step-by-step"),
     ],
 )
 def test_render_enable_cot(enable_cot: bool, expected_fragment: str) -> None:

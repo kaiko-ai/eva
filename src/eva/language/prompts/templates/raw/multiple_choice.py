@@ -30,7 +30,7 @@ class RawMultipleChoicePromptTemplate(base.PromptTemplate):
         Provide a brief explanation for your choice before stating your final answer.
 
         {%- if enable_cot %}
-        Think step-by-step inside <think>...</think> tags before giving your answer.
+        Think step-by-step before giving your final answer.
         {% endif %}
 
         IMPORTANT: You must provide your reasoning first. Then end your response with only your final choice

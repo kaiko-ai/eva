@@ -34,7 +34,7 @@ class FreeFormQuestionPromptTemplate(base.PromptTemplate):
         {% endfor %}
         Now please answer the following question.
         {%- if enable_cot %}
-        Think step-by-step inside <think>...</think> tags before giving your answer.
+        Think step-by-step before giving your final answer.
         {% endif %}
 
         {% endif %}
