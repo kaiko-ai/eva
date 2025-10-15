@@ -10,6 +10,7 @@ from jinja2 import Template
 from typing_extensions import override
 
 from eva.language.prompts.templates import base
+from eva.language.utils.text import format as format_utils
 
 
 class JsonMultipleChoicePromptTemplate(base.PromptTemplate):
@@ -29,7 +30,7 @@ class JsonMultipleChoicePromptTemplate(base.PromptTemplate):
         contains your answer, and "{{ reason_key }}" should contain a brief
         explanation for why the provided answer was chosen. 
         {% if enable_cot -%}
-        Think step-by-step inside <think>...</think> tags before giving your final answer.
+        Think step-by-step before giving your final answer.
         {%- endif -%}
         {% if use_option_letters %}
         The value for "{{ answer_key }}" must be the letter (e.g., "A", "B", "C", ...)
@@ -94,6 +95,7 @@ class JsonMultipleChoicePromptTemplate(base.PromptTemplate):
         example_answer: str | None = None,
         example_reason: str | None = None,
         preamble: str | None = None,
+        enable_cot: bool | None = None,
     ) -> str:
         """Render the template with provided values.
 
@@ -104,6 +106,7 @@ class JsonMultipleChoicePromptTemplate(base.PromptTemplate):
             example_answer: Optional example answer for the JSON snippet. Defaults to first option.
             example_reason: Example reasoning string.
             preamble: Optional preamble text to include at the top of the prompt.
+            enable_cot: Optionally override the instance's CoT setting for this render call.
 
         Returns:
             The rendered prompt string.
@@ -114,7 +117,7 @@ class JsonMultipleChoicePromptTemplate(base.PromptTemplate):
         jinja_template = Template(self.template)
         rendered = jinja_template.render(
             question=question.strip(),
-            context=_format_context(context) if context else None,
+            context=format_utils.format_list_items(context) if context else None,
             answer_options=_format_answer_options(
                 answer_options, use_option_letters=self.use_option_letters
             ),
@@ -128,10 +131,10 @@ class JsonMultipleChoicePromptTemplate(base.PromptTemplate):
             example_reason=(example_reason or self._default_reason).strip(),
             preamble=(preamble or "").strip(),
             use_option_letters=self.use_option_letters,
-            enable_cot=self.enable_cot,
+            enable_cot=self.enable_cot if enable_cot is None else enable_cot,
         )
 
-        return textwrap.dedent(rendered).strip() + "\n"
+        return format_utils.remove_multi_blank_lines(textwrap.dedent(rendered).strip()) + "\n"
 
 
 def _format_answer_options(options: Sequence[str], use_option_letters: bool) -> str:
@@ -151,18 +154,3 @@ def _format_answer_options(options: Sequence[str], use_option_letters: bool) -> 
         return "\n".join(f"{letters[i]}. {opt.strip()}" for i, opt in enumerate(options))
     else:
         return "\n".join(f"- {opt.strip()}" for i, opt in enumerate(options))
-
-
-def _format_context(context: str | Sequence[str]) -> str:
-    """Formats the context for inclusion in the prompt.
-
-    Args:
-        context: The context string or list of context strings. If a list is provided,
-                 the contexts will be formatted as a bullet point list.
-
-    Returns:
-        The formatted context string.
-    """
-    if not isinstance(context, list):
-        context = [context]  # type: ignore[assignment]
-    return "\n".join(f"- {item.strip()}" for item in context if item.strip())
