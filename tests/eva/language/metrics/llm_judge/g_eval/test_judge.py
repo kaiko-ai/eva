@@ -5,10 +5,10 @@ from eva.language.models import wrappers
 from eva.language.models.typings import PredictionBatch
 
 
-def test_g_eval_judge_evaluate_flow(dummy_language_model: wrappers.LanguageModel) -> None:
+def test_g_eval_judge_evaluate_flow(dummy_judge_model: wrappers.LanguageModel) -> None:
     """Test the main evaluation flow with a dummy model."""
     judge = GEvalJudge(
-        model=dummy_language_model,
+        model=dummy_judge_model,
         evaluation_steps=["Check factual accuracy", "Evaluate completeness"],
         score_range=(0, 10),
         score_explanation="where higher is better",

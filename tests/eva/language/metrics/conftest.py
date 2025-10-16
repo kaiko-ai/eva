@@ -9,7 +9,7 @@ from eva.language.models.typings import ModelOutput, TextBatch
 from eva.language.models.wrappers.base import LanguageModel
 
 
-class DummyLanguageModel(LanguageModel):
+class DummyJudgeModel(LanguageModel):
     """Dummy language model that returns configurable responses."""
 
     def __init__(self, responses: list[str] | None = None) -> None:
@@ -41,6 +41,6 @@ class DummyLanguageModel(LanguageModel):
 
 
 @pytest.fixture
-def dummy_language_model() -> DummyLanguageModel:
-    """Fixture for dummy language model for testing."""
-    return DummyLanguageModel()
+def dummy_judge_model() -> DummyJudgeModel:
+    """Fixture providing a dummy judge model instance."""
+    return DummyJudgeModel()
