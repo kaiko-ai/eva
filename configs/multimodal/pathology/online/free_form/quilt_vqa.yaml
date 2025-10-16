@@ -26,6 +26,7 @@ model:
               init_args:
                 model_name: ${oc.env:JUDGE_MODEL_NAME, google/gemini-2.5-flash-lite}
                 model_extra_kwargs: ${oc.env:JUDGE_MODEL_EXTRA_KWARGS, null}
+            missing_limit: ${oc.env:MISSING_LIMIT, 5}
 data:
   class_path: eva.DataModule
   init_args:

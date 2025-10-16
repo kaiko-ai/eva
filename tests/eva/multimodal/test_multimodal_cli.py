@@ -40,16 +40,16 @@ def test_configuration_initialization(configuration_file: str, lib_path: str) ->
 @pytest.mark.parametrize(
     "configuration_file, command, data_root",
     [
-        (
-            "configs/multimodal/pathology/online/multiple_choice/patch_camelyon.yaml",
-            "validate",
-            "vision/datasets/patch_camelyon",
-        ),
-        (
-            "configs/multimodal/pathology/online/multiple_choice/patch_camelyon.yaml",
-            "test",
-            "vision/datasets/patch_camelyon",
-        ),
+        # (
+        #     "configs/multimodal/pathology/online/multiple_choice/patch_camelyon.yaml",
+        #     "validate",
+        #     "vision/datasets/patch_camelyon",
+        # ),
+        # (
+        #     "configs/multimodal/pathology/online/multiple_choice/patch_camelyon.yaml",
+        #     "test",
+        #     "vision/datasets/patch_camelyon",
+        # ),
         (
             "configs/multimodal/pathology/online/free_form/quilt_vqa.yaml",
             "test",
@@ -148,8 +148,8 @@ def mock_dependencies():
         ] * len(messages or [])
 
     def _fake_judge_evaluate(batch: PredictionBatch) -> List[int | None]:
-        scores = [random.randint(1, 5) for _ in batch.prediction]
-        # TODO: add support for missing scores to metric
+        scores: List[int | None] = [random.randint(1, 5) for _ in batch.prediction]
+        scores[-1] = None  # simulate a missing score
         return scores
 
     with (

@@ -35,8 +35,8 @@ model:
         - class_path: eva.language.models.postprocess.ExtractDiscreteAnswerFromJson
           init_args:
             mapping: {"no": 0, "yes": 1, "maybe": 2}
-            missing_limit: 5
-            missing_response: 2
+            missing_limit: ${oc.env:MISSING_LIMIT, 5}
+            missing_response: ${oc.env:MISSING_RESPONSE, 2}
 data:
   class_path: eva.DataModule
   init_args:
