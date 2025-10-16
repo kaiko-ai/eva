@@ -4,6 +4,7 @@ from typing import List, Tuple
 
 import torch
 import torchmetrics
+from torch import nn
 from typing_extensions import override
 
 from eva.language.metrics.llm_judge.g_eval.judge import GEvalJudge
@@ -67,7 +68,7 @@ class GEvalCorrectness(torchmetrics.Metric):
     total: torch.Tensor
     count: torch.Tensor
 
-    def __init__(self, model: wrappers.LanguageModel | str | None):
+    def __init__(self, model: wrappers.LanguageModel | nn.Module | str | None):
         """Initializes the metric.
 
         Args:

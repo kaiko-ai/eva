@@ -54,7 +54,7 @@ data:
       predict:
         - class_path: eva.multimodal.data.datasets.PatchCamelyon
           init_args: &PREDICTION_DATASET_ARGS
-            root: ${oc.env:DATA_ROOT, /mnt/localdisk/data/patch_camelyon}
+            root: ${oc.env:DATA_ROOT, .data/patch_camelyon}
             split: val
             download: ${oc.env:DOWNLOAD_DATA, false}
             # Set `download: true` to download the dataset from https://zenodo.org/records/1494286
