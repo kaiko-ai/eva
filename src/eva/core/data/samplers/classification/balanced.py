@@ -25,7 +25,7 @@ class BalancedSampler(SamplerWithDataSource[int]):
 
     def __init__(
         self,
-        num_samples: int,
+        num_samples: int | None,
         replacement: bool = False,
         seed: int | None = 42,
         reset_generator: bool = True,
@@ -52,6 +52,8 @@ class BalancedSampler(SamplerWithDataSource[int]):
 
     def __len__(self) -> int:
         """Returns the total number of samples."""
+        if self._num_samples is None:
+            return len(self.data_source)
         return self._num_samples * len(self._class_indices)
 
     def __iter__(self) -> Iterator[int]:
@@ -100,6 +102,9 @@ class BalancedSampler(SamplerWithDataSource[int]):
 
     def _make_indices(self):
         """Samples the indices for each class in the dataset."""
+        if self._num_samples is None:
+            self._indices = list(self._random_generator.permutation(len(self.data_source)))
+            return
         self._class_indices.clear()
         for idx in tqdm(range(len(self.data_source)), desc="Fetching class indices for sampler"):
             class_idx = self._get_class_idx(idx)

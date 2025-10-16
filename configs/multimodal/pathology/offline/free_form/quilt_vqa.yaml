@@ -1,0 +1,75 @@
+trainer:
+  class_path: eva.Trainer
+  init_args:
+    accelerator: ${oc.env:ACCELERATOR, auto}
+    devices: ${oc.env:NUM_DEVICES, 1}
+    n_runs: &N_RUNS ${oc.env:N_RUNS, 2}
+    default_root_dir: ${oc.env:OUTPUT_ROOT, logs/${oc.env:MODEL_NAME, anthropic-claude-3-7-sonnet-latest}/multimodal/quilt_vqa}
+    precision: bf16
+    checkpoint_type: null
+    callbacks:
+      - class_path: eva.callbacks.ConfigurationLogger
+      - class_path: eva.multimodal.callbacks.writers.TextPredictionWriter
+        init_args:
+          output_dir: &PREDICTIONS_OUTPUT_DIR ${oc.env:PREDICTIONS_OUTPUT_DIR, ./predictions/${oc.env:MODEL_NAME, anthropic-claude-3-7-sonnet-latest}/multimodal/quilt_vqa}
+          dataloader_idx_map:
+            0: test
+          save_format: &PREDICTIONS_SAVE_FORMAT ${oc.env:PREDICTIONS_SAVE_FORMAT, jsonl}
+          model:
+            class_path: eva.multimodal.models.wrappers.ModelFromRegistry
+            init_args:
+              model_name: ${oc.env:MODEL_NAME, anthropic/claude-3-7-sonnet-20250219}
+              model_extra_kwargs: ${oc.env:MODEL_EXTRA_KWARGS, null}
+          overwrite: false
+model:
+  class_path: eva.language.models.OfflineLanguageModule
+  init_args:
+    metrics:
+      common:
+        - class_path: eva.language.metrics.GEvalCorrectness
+          init_args:
+            model:
+              class_path: eva.language.models.wrappers.ModelFromRegistry
+              init_args:
+                model_name: ${oc.env:JUDGE_MODEL_NAME, google/gemini-2.5-flash-lite}
+                model_extra_kwargs: ${oc.env:JUDGE_MODEL_EXTRA_KWARGS, null}
+data:
+  class_path: eva.DataModule
+  init_args:
+    datasets:
+      test:
+        class_path: eva.language.datasets.TextPredictionDataset
+        init_args:
+          path: ${oc.env:PREDICTIONS_OUTPUT_DIR, ./predictions/${oc.env:MODEL_NAME, anthropic-claude-3-7-sonnet-latest}/multimodal/quilt_vqa}/manifest.${oc.env:PREDICTIONS_SAVE_FORMAT, jsonl}
+          split: test
+      predict:
+        - class_path: eva.multimodal.data.datasets.QuiltVQA
+          init_args:
+            root: ${oc.env:DATA_ROOT, .data/quilt_vqa}
+            split: test
+            download: ${oc.env:DOWNLOAD_DATA, false}
+            # Set `download: true` to download the dataset from https://huggingface.co/datasets/wisdomik/Quilt_VQA
+            # The QuiltVQA dataset is distributed under the following license: 
+            # "CC-BY-NC-ND-3.0"
+            # (see: https://creativecommons.org/licenses/by-nc-nd/3.0/ch/deed.de)
+            transforms:
+              image:
+                class_path: eva.vision.data.transforms.Resize
+                init_args:
+                  size: ${oc.env:RESIZE_DIM, null}
+                  max_bytes: ${oc.env:IMAGE_MAX_BYTES, null}
+    dataloaders:
+      test:
+        batch_size: ${oc.env:BATCH_SIZE, 256}
+        num_workers: &N_DATA_WORKERS ${oc.env:N_DATA_WORKERS, 1}
+        collate_fn: eva.language.data.dataloaders.prediction_collate
+      predict:
+        batch_size: ${oc.env:PREDICT_BATCH_SIZE, 16}
+        num_workers: *N_DATA_WORKERS
+        collate_fn: eva.multimodal.data.dataloaders.text_image_collate
+    samplers:
+      predict:
+        class_path: eva.core.data.samplers.RandomSampler
+        init_args:
+          seed: ${oc.env:SAMPLER_SEED, 42}
+          num_samples: ${oc.env:NUM_SAMPLES, null}

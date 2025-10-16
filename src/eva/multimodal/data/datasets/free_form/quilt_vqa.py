@@ -83,10 +83,11 @@ class QuiltVQA(TextImageDataset[str]):
         If not cached, it downloads the dataset into `self._root`.
         """
         dataset_path = None
-
         if self._root:
-            dataset_path = os.path.join(self._root, self._split) if self._split else self._root
-            os.makedirs(self._root, exist_ok=True)
+            if os.path.exists(os.path.join(self._root, "test")):
+                dataset_path = os.path.join(self._root, "test")
+            else:
+                dataset_path = self._root
 
         self.dataset = self._load_dataset(dataset_path)
 
@@ -155,6 +156,7 @@ class QuiltVQA(TextImageDataset[str]):
                 download_mode="reuse_dataset_if_exists",
             )
             if dataset_path:
+                os.makedirs(dataset_path, exist_ok=True)
                 raw_dataset.save_to_disk(dataset_path)  # type: ignore
                 logger.info(f"Dataset saved to: {dataset_path}")
         else:

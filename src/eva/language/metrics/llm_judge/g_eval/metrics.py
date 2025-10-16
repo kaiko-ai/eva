@@ -91,6 +91,7 @@ class GEvalCorrectness(torchmetrics.Metric):
     def update(self, preds: List[str], targets: List[str]):
         batch = PredictionBatch(prediction=preds, target=targets, text=None, metadata=None)
         scores = self.judge.evaluate(batch)
+        # TODO: filter & count None scores
 
         scores_t = torch.as_tensor(scores, dtype=torch.float, device=self.device)
         self.total += scores_t.sum()

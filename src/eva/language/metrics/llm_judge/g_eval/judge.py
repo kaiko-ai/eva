@@ -2,6 +2,7 @@
 
 from typing import Any, List, Sequence, Tuple
 
+from loguru import logger
 from torch import nn
 from typing_extensions import override
 
@@ -78,6 +79,14 @@ class GEvalJudge(base.LLMJudge[int]):
 
         judge_batch = TextBatch(text=prompts, target=None, metadata=None)
         outputs = self.model(judge_batch)
+        logger.debug(
+            "\n".join(
+                [
+                    f"prompt:\n{prompt[0].content}\noutput:\n{output}"
+                    for prompt, output in zip(prompts, outputs["generated_text"], strict=False)
+                ]
+            )
+        )
 
         results = list(map(self._parse_output, outputs["generated_text"]))
         scores, reasons = zip(*results, strict=False)
