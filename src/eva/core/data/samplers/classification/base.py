@@ -63,7 +63,7 @@ class ClassificationSampler(SamplerWithDataSource[int], ABC):
         super().set_dataset(data_source)
         if self._reset_generator:
             self._set_generator()
-        self._build_target_indices()
+        self._build_class_to_indices()
         self._sample_indices()
 
     def _get_class(self, index: int) -> Union[int, str]:
@@ -96,7 +96,7 @@ class ClassificationSampler(SamplerWithDataSource[int], ABC):
 
         raise ValueError("Unsupported target type. Expected str or tensor-like object.")
 
-    def _build_class_indices(self) -> None:
+    def _build_class_to_indices(self) -> None:
         """Build a mapping from class to sample indices."""
         self._class_to_indices.clear()
         for idx in tqdm(range(len(self.data_source)), desc="Fetching class indices for sampler"):

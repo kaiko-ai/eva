@@ -67,8 +67,8 @@ class StratifiedRandomSampler(ClassificationSampler):
         samples_allocated = 0
         class_list = sorted(self._class_to_indices.keys())
 
-        for i, class_idx in enumerate(class_list):
-            class_indices = self._class_to_indices[class_idx]
+        for i, class_id in enumerate(class_list):
+            class_indices = self._class_to_indices[class_id]
             class_size = len(class_indices)
 
             if i == len(class_list) - 1:
@@ -79,7 +79,7 @@ class StratifiedRandomSampler(ClassificationSampler):
 
             if not self._replacement and samples_for_class > class_size:
                 logger.warning(
-                    f"Class {class_idx} requested {samples_for_class} samples but only has "
+                    f"Class {class_id} requested {samples_for_class} samples but only has "
                     f"{class_size}. Using all available samples."
                 )
                 samples_for_class = class_size
