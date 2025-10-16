@@ -11,6 +11,7 @@ from jinja2 import Template
 from typing_extensions import override
 
 from eva.language.prompts.templates import base
+from eva.language.utils.text import format as format_utils
 
 
 class GEvalPromptTemplate(base.PromptTemplate):
@@ -107,27 +108,10 @@ class GEvalPromptTemplate(base.PromptTemplate):
             score_range=score_range,
             score_explanation=score_explanation,
             scoring_criteria=scoring_criteria,
-            evaluation_steps=_format_numbered_list(evaluation_steps),
+            evaluation_steps=format_utils.format_list_items(evaluation_steps, style="numbers"),
             prediction=prediction,
             target=target,
             parameters=None,
             additional_context=additional_context,
         )
-
-        # TODO: remove multi blank lines here
-        # (wait for https://github.com/kaiko-ai/eva/pull/912 to be merged)
-        return textwrap.dedent(rendered).strip() + "\n"
-
-
-def _format_numbered_list(items: Sequence[str]) -> str:
-    """Return items as a numbered bullet point list."""
-    # TODO: move this to utils & combine with existing bullet point formatting function
-    # (wait for https://github.com/kaiko-ai/eva/pull/912 to be merged)
-    formatted = []
-    for i, item in enumerate(items, start=1):
-        if not isinstance(item, str):
-            raise TypeError(f"Expected evaluation step to be a string, got {type(item)}")
-        stripped = item.strip()
-        if stripped:
-            formatted.append(f"{i}. {stripped}")
-    return "\n".join(formatted)
+        return format_utils.remove_multi_blank_lines(textwrap.dedent(rendered).strip() + "\n")

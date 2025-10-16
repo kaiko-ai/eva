@@ -121,4 +121,4 @@ class RawMultipleChoicePromptTemplate(base.PromptTemplate):
             example_response="\n".join([example_reason, example_answer]),
         )
 
-        return format_utils.remove_multi_blank_lines(textwrap.dedent(rendered).strip()) + "\n"
+        return format_utils.remove_multi_blank_lines(textwrap.dedent(rendered).strip() + "\n")
