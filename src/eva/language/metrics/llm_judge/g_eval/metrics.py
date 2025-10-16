@@ -111,6 +111,7 @@ class GEvalCorrectness(torchmetrics.Metric):
 
         self.missing_count += sum(1 for s in scores if s is None)
         scores = [s for s in scores if s is not None]
+        self._raise_if_missing()
 
         if len(scores) > 0:
             scores_t = torch.as_tensor(scores, dtype=torch.float, device=self.device)
@@ -119,10 +120,12 @@ class GEvalCorrectness(torchmetrics.Metric):
 
     @override
     def compute(self) -> torch.Tensor:
+        self._raise_if_missing()
+        return self.total / self.count
+
+    def _raise_if_missing(self) -> None:
         if self.raise_if_missing and self.missing_count > self.missing_limit:
             raise ValueError(
-                f"Number of missing scores ({self.missing_count}) exceeded the limit "
-                f"({self.missing_limit})."
+                f"Found {self.missing_count} missing scores, which "
+                f"exceeds the limit of {self.missing_limit}."
             )
-
-        return self.total / self.count
