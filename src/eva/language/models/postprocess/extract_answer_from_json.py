@@ -1,6 +1,6 @@
 """Postprocessing transforms for extracting answers from JSON responses."""
 
-from typing import Dict, List, Union
+from typing import Any, Dict, List, Union
 
 import torch
 from loguru import logger
@@ -8,7 +8,7 @@ from loguru import logger
 from eva.language.utils.text import json as json_utils
 
 
-class ExtractAnswerFromJson:
+class ExtractDiscreteAnswerFromJson:
     """Extracts discrete answers from JSON responses and casts them to int tensors."""
 
     def __init__(
@@ -35,7 +35,7 @@ class ExtractAnswerFromJson:
             missing_limit: The maximum number of missing responses before raising
                 an error, if `raise_if_missing` is True.
         """
-        if not mapping:
+        if not isinstance(mapping, dict) or len(mapping) == 0:
             raise ValueError("`mapping` must be a non-empty dictionary.")
 
         self.answer_key = answer_key
@@ -55,38 +55,34 @@ class ExtractAnswerFromJson:
         jsons = list(map(json_utils.extract_json, values))
         answers = list(map(self._extract_answer, jsons))  # type: ignore
 
-        return torch.tensor(answers, dtype=torch.int)
+        return torch.tensor(answers, dtype=torch.long)
 
     def _extract_answer(self, json_obj: Dict[str, str] | None) -> int:
-        if json_obj is None:
+        if json_obj is None or self.answer_key not in json_obj:
             self.missing_count += 1
             if self.raise_if_missing and self.missing_count > self.missing_limit:
                 raise ValueError(f"Found {self.missing_count} responses without JSON objects.")
             else:
                 logger.warning(
-                    f"Found response without JSON object, returning {self.missing_response}."
+                    f"Failed to extract answer from response: {json_obj}, "
+                    f"returning {self.missing_response} instead."
                 )
                 return self.missing_response
 
-        if self.answer_key not in json_obj:
-            raise ValueError(f"Provided JSON is missing the '{self.answer_key}' key")
+        return self._apply_mapping(json_obj[self.answer_key])
 
-        answer = json_obj[self.answer_key].strip()
-
-        if not self.case_sensitive:
-            answer = answer.lower()
-
-        if answer not in self.mapping:
-            if self.raise_if_missing:
+    def _apply_mapping(self, value: Any) -> int:
+        key = value if self.case_sensitive else str(value).strip().lower()
+        if key not in self.mapping:
+            if self.raise_if_missing and self.missing_count >= self.missing_limit:
                 raise ValueError(
-                    f"Answer '{answer}' not found in mapping: {list(self.mapping.keys())}"
+                    f"Answer '{key}' not found in mapping: {list(self.mapping.keys())}"
                 )
             else:
                 logger.warning(
-                    f"Answer '{answer}' not found in mapping, "
+                    f"Answer '{key}' not found in mapping, "
                     f"returning {self.missing_response} instead."
                 )
                 self.missing_count += 1
                 return self.missing_response
-
-        return self.mapping[answer]
+        return self.mapping[key]
