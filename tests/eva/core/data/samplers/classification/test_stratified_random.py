@@ -16,11 +16,11 @@ def test_stratified_sampling():
     sampler.set_dataset(dataset)
 
     indices = list(sampler)
-    class_counts = Counter(DataSample(*dataset[i]).targets.item() for i in indices)
+    class_counts = Counter(DataSample(*dataset[i]).targets.item() for i in indices)  # type: ignore
 
     assert len(indices) == 30
-    for class_idx in range(3):
-        assert 9 <= class_counts[class_idx] <= 11  # ~10 samples per class
+    for class_id in range(3):
+        assert 9 <= class_counts[class_id] <= 11  # ~10 samples per class
 
 
 def test_stratified_sampling_with_exact_proportions():
@@ -30,11 +30,11 @@ def test_stratified_sampling_with_exact_proportions():
     sampler.set_dataset(dataset)
 
     indices = list(sampler)
-    class_counts = Counter(DataSample(*dataset[i]).targets.item() for i in indices)
+    class_counts = Counter(DataSample(*dataset[i]).targets.item() for i in indices)  # type: ignore
 
     assert len(indices) == 40
-    for class_idx in range(4):
-        assert class_counts[class_idx] == 10  # Exactly 10 samples per class
+    for class_id in range(4):
+        assert class_counts[class_id] == 10  # Exactly 10 samples per class
 
 
 def test_stratified_sampling_with_imbalanced_dataset():
@@ -48,7 +48,7 @@ def test_stratified_sampling_with_imbalanced_dataset():
     sampler.set_dataset(dataset)
 
     indices = list(sampler)
-    class_counts = Counter(DataSample(*dataset[i]).targets.item() for i in indices)
+    class_counts = Counter(DataSample(*dataset[i]).targets.item() for i in indices)  # type: ignore
 
     assert len(indices) == 50
     assert 24 <= class_counts[0] <= 26  # ~25 samples for class 0
@@ -63,11 +63,11 @@ def test_sample_ratio():
     sampler.set_dataset(dataset)
 
     indices = list(sampler)
-    class_counts = Counter(DataSample(*dataset[i]).targets.item() for i in indices)
+    class_counts = Counter(DataSample(*dataset[i]).targets.item() for i in indices)  # type: ignore
 
     assert len(indices) == 60
-    for class_idx in range(3):
-        assert 19 <= class_counts[class_idx] <= 21  # ~20 samples per class
+    for class_id in range(3):
+        assert 19 <= class_counts[class_id] <= 21  # ~20 samples per class
 
 
 def test_sample_ratio_with_rounding():
