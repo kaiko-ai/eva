@@ -37,13 +37,13 @@ class BalancedSampler(ClassificationSampler):
 
     def __len__(self) -> int:
         """Returns the total number of samples."""
-        return self._num_samples * len(self._class_indices)
+        return self._num_samples * len(self._class_to_indices)
 
     @override
     def _sample_indices(self) -> None:
         """Sample equal number of indices from each class."""
         if not self._replacement:
-            for class_idx, indices in self._class_indices.items():
+            for class_idx, indices in self._class_to_indices.items():
                 if len(indices) < self._num_samples:
                     raise ValueError(
                         f"Class {class_idx} has only {len(indices)} samples, "
@@ -51,8 +51,8 @@ class BalancedSampler(ClassificationSampler):
                     )
 
         self._indices = []
-        for class_idx in self._class_indices:
-            class_indices = self._class_indices[class_idx]
+        for class_idx in self._class_to_indices:
+            class_indices = self._class_to_indices[class_idx]
             sampled_indices = self._random_generator.choice(
                 class_indices, size=self._num_samples, replace=self._replacement
             ).tolist()
@@ -60,5 +60,5 @@ class BalancedSampler(ClassificationSampler):
 
         self._random_generator.shuffle(self._indices)
         logger.debug(
-            f"Sampled {len(self._indices)} indices from {len(self._class_indices)} classes"
+            f"Sampled {len(self._indices)} indices from {len(self._class_to_indices)} classes"
         )

@@ -37,7 +37,7 @@ class ClassificationSampler(SamplerWithDataSource[int], ABC):
                 sampler instance will start from the same seed.
         """
         self._replacement = replacement
-        self._class_indices: Dict[Union[int, str], List[int]] = defaultdict(list)
+        self._class_to_indices: Dict[Union[int, str], List[int]] = defaultdict(list)
         self._seed = seed
         self._reset_generator = reset_generator
         self._indices: List[int] = []
@@ -63,14 +63,14 @@ class ClassificationSampler(SamplerWithDataSource[int], ABC):
         super().set_dataset(data_source)
         if self._reset_generator:
             self._set_generator()
-        self._build_class_indices()
+        self._build_target_indices()
         self._sample_indices()
 
-    def _get_class_idx(self, idx: int) -> Union[int, str]:
-        """Load and validate the class index for a given sample index.
+    def _get_class(self, index: int) -> Union[int, str]:
+        """Load and validate the class for a given sample index.
 
         Args:
-            idx: Index of the sample in the dataset.
+            index: Index of the sample in the dataset.
 
         Returns:
             The class label (int or str) for the sample.
@@ -79,9 +79,9 @@ class ClassificationSampler(SamplerWithDataSource[int], ABC):
             ValueError: If target is None, not scalar, or unsupported type.
         """
         if hasattr(self.data_source, "load_target"):
-            target = self.data_source.load_target(idx)  # type: ignore
+            target = self.data_source.load_target(index)  # type: ignore
         else:
-            _, target, _ = DataSample(*self.data_source[idx])
+            _, target, _ = DataSample(*self.data_source[index])
 
         if target is None:
             raise ValueError("The dataset must return non-empty targets.")
@@ -97,11 +97,11 @@ class ClassificationSampler(SamplerWithDataSource[int], ABC):
         raise ValueError("Unsupported target type. Expected str or tensor-like object.")
 
     def _build_class_indices(self) -> None:
-        """Build a mapping from class labels to sample indices."""
-        self._class_indices.clear()
+        """Build a mapping from class to sample indices."""
+        self._class_to_indices.clear()
         for idx in tqdm(range(len(self.data_source)), desc="Fetching class indices for sampler"):
-            class_idx = self._get_class_idx(idx)
-            self._class_indices[class_idx].append(idx)
+            class_id = self._get_class(idx)
+            self._class_to_indices[class_id].append(idx)
 
     @abstractmethod
     def _sample_indices(self) -> None:

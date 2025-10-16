@@ -59,16 +59,16 @@ class StratifiedRandomSampler(ClassificationSampler):
         elif self._sample_ratio is not None:
             total_samples_to_draw = int(round(total_dataset_samples * self._sample_ratio))
         else:
-            self._indices = [idx for indices in self._class_indices.values() for idx in indices]
+            self._indices = [idx for indices in self._class_to_indices.values() for idx in indices]
             self._random_generator.shuffle(self._indices)
             return
 
         self._indices = []
         samples_allocated = 0
-        class_list = sorted(self._class_indices.keys())
+        class_list = sorted(self._class_to_indices.keys())
 
         for i, class_idx in enumerate(class_list):
-            class_indices = self._class_indices[class_idx]
+            class_indices = self._class_to_indices[class_idx]
             class_size = len(class_indices)
 
             if i == len(class_list) - 1:
