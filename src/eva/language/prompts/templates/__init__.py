@@ -2,5 +2,6 @@
 
 from eva.language.prompts.templates.base import PromptTemplate
 from eva.language.prompts.templates.json import JsonMultipleChoicePromptTemplate
+from eva.language.prompts.templates.raw.free_form import FreeFormQuestionPromptTemplate
 
-__all__ = ["PromptTemplate", "JsonMultipleChoicePromptTemplate"]
+__all__ = ["PromptTemplate", "JsonMultipleChoicePromptTemplate", "FreeFormQuestionPromptTemplate"]
