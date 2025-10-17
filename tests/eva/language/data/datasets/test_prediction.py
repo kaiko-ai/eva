@@ -1,5 +1,6 @@
 """TextPredictionDataset tests."""
 
+import tempfile
 from pathlib import Path
 
 import pytest
@@ -98,16 +99,20 @@ def test_with_metadata_columns(assets_path: Path, file_format: str) -> None:
     assert sample.metadata["split"] == "val"
 
 
-@pytest.mark.parametrize("file_format", ["jsonl"])
-def test_unsupported_format(assets_path: Path, file_format: str) -> None:
+@pytest.mark.parametrize("file_format", ["txt"])
+def test_unsupported_format(file_format: str) -> None:
     """Tests configuration with unsupported file format."""
-    dataset = TextPredictionDataset(
-        path="dummy.txt",
-        prediction_column="prediction",
-        target_column="target",
-    )
-    with pytest.raises(ValueError, match="Unsupported file extension"):
-        dataset.configure()
+    # create dummy.txt file (using temp file fixtures)
+
+    with tempfile.NamedTemporaryFile(suffix=f".{file_format}") as f:
+        f.write(b"dummy content")
+        dataset = TextPredictionDataset(
+            path=f.name,
+            prediction_column="prediction",
+            target_column="target",
+        )
+        with pytest.raises(ValueError, match="Unsupported file extension"):
+            dataset.configure()
 
 
 @pytest.mark.parametrize("file_format", ["jsonl"])

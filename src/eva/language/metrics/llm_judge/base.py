@@ -3,6 +3,8 @@
 import abc
 from typing import Generic, List, TypeVar
 
+from torch import nn
+
 from eva.language.models import wrappers
 from eva.language.models.typings import PredictionBatch
 from eva.language.prompts import templates
@@ -15,7 +17,7 @@ class LLMJudge(Generic[JudgeOutput], abc.ABC):
 
     def __init__(
         self,
-        model: wrappers.LanguageModel,
+        model: wrappers.LanguageModel | nn.Module,
         prompt_template: templates.PromptTemplate,
     ):
         """Initializes the LLMJudge with a model name and prompt template.

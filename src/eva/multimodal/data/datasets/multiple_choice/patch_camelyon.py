@@ -48,8 +48,7 @@ class PatchCamelyon(TextImageDataset[int], vision_datasets.PatchCamelyon):
             download: Whether to download the data for the specified split.
                 Note that the download will be executed only by additionally
                 calling the :meth:`prepare_data` method.
-            transforms: A function/transform which returns a transformed
-                version of the raw data samples.
+            transforms: Transforms to apply to the data samples.
             max_samples: Maximum number of samples to use. If None, use all samples.
             prompt_template: The template to use for rendering prompts. If None, uses the
                 default template which enforces JSON output.

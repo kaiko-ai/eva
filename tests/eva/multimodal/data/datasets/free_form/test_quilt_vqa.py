@@ -1,10 +1,9 @@
 """QuiltVQA dataset tests."""
 
-from unittest import mock
+import os
 
 import pytest
 from datasets import Dataset
-from PIL import Image
 from torchvision import tv_tensors
 
 from eva.language.data.messages import Message
@@ -13,7 +12,7 @@ from eva.multimodal.data import datasets
 
 @pytest.mark.parametrize(
     "split, expected_length",
-    [("test", 985), (None, 985)],
+    [("test", 5), (None, 5)],
 )
 def test_length(quiltvqa_dataset: datasets.QuiltVQA, expected_length: int) -> None:
     """Tests the length of the dataset."""
@@ -24,7 +23,7 @@ def test_length(quiltvqa_dataset: datasets.QuiltVQA, expected_length: int) -> No
     "split, index",
     [
         ("test", 0),
-        ("test", 10),
+        ("test", 3),
         (None, 0),
     ],
 )
@@ -121,23 +120,14 @@ def test_index_out_of_range(quiltvqa_dataset: datasets.QuiltVQA) -> None:
 
 
 @pytest.fixture(scope="function")
-def quiltvqa_dataset(split: None) -> datasets.QuiltVQA:
+def quiltvqa_dataset(split: None, assets_path: str) -> datasets.QuiltVQA:
     """QuiltVQA dataset fixture with mocked download."""
-    # Create a mock dataset to avoid actual download
-    mock_dataset = Dataset.from_dict(
-        {
-            "question": ["What is shown in this image?"] * 985,
-            "answer": ["A medical image"] * 985,
-            "image": [Image.new("RGB", (224, 224))] * 985,
-            "answer_type": ["descriptive"] * 985,
-            "context": ["medical context"] * 985,
-        }
+    dataset = datasets.QuiltVQA(
+        root=os.path.join(assets_path, "multimodal", "datasets", "quilt_vqa", "test"),
+        split=split,
+        download=False,
     )
-
-    dataset = datasets.QuiltVQA(split=split, download=False)
-
-    # Mock the _load_dataset method to return our mock dataset
-    with mock.patch.object(dataset, "_load_dataset", return_value=mock_dataset):
-        dataset.prepare_data()
+    dataset.prepare_data()
+    dataset.configure()
 
     return dataset
