@@ -33,7 +33,7 @@ model:
             input_type: "discrete"
     postprocess:
       predictions_transforms:
-        - class_path: eva.language.models.postprocess.ExtractAnswerFromJson
+        - class_path: eva.language.models.postprocess.ExtractDiscreteAnswerFromJson
           init_args:
             mapping: {"no": 0, "yes": 1, "missing_answer": 2}
             missing_response: 2
