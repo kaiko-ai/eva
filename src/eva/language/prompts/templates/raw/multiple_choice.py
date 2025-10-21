@@ -1,5 +1,7 @@
 """Prompt templates for multiple choice questions without strict formatting requirements."""
 
+# ruff: noqa: E501
+
 from __future__ import annotations
 
 import string
@@ -10,6 +12,7 @@ from jinja2 import Template
 from typing_extensions import override
 
 from eva.language.prompts.templates import base
+from eva.language.utils.text import format as format_utils
 
 
 class RawMultipleChoicePromptTemplate(base.PromptTemplate):
@@ -27,11 +30,10 @@ class RawMultipleChoicePromptTemplate(base.PromptTemplate):
         Provide a brief explanation for your choice before stating your final answer.
 
         {%- if enable_cot %}
-        Think step-by-step inside <think>...</think> tags before giving your answer.
-        {%- endif %}
+        Think step-by-step before giving your final answer.
+        {% endif %}
 
-        IMPORTANT: You must provide your reasoning first.
-        Then end your response with only your final choice
+        IMPORTANT: You must provide your reasoning first. Then end your response with only your final choice
         {%- if use_option_letters %} letter
         {%- else %} exactly as written below
         {%- endif %}.
@@ -79,6 +81,7 @@ class RawMultipleChoicePromptTemplate(base.PromptTemplate):
         example_answer: str | None = None,
         example_reason: str | None = None,
         preamble: str | None = None,
+        enable_cot: bool | None = None,
     ) -> str:
         """Render the template with provided values.
 
@@ -89,6 +92,7 @@ class RawMultipleChoicePromptTemplate(base.PromptTemplate):
             example_answer: Optional example answer. Defaults to first option.
             example_reason: Example reasoning string.
             preamble: Optional preamble text to include at the top of the prompt.
+            enable_cot: Optionally override the instance's CoT setting for this render call.
 
         Returns:
             The rendered prompt string.
@@ -96,8 +100,8 @@ class RawMultipleChoicePromptTemplate(base.PromptTemplate):
         if not isinstance(question, str) or not question.strip():
             raise ValueError("`question` must be a non-empty string.")
 
-        answer_options = _format_answer_options(
-            answer_options, use_option_letters=self.use_option_letters
+        answer_options = format_utils.format_list_items(
+            answer_options, style="letters" if self.use_option_letters else "bullets"
         )
         example_answer = (
             example_answer
@@ -109,46 +113,12 @@ class RawMultipleChoicePromptTemplate(base.PromptTemplate):
         jinja_template = Template(self.template)
         rendered = jinja_template.render(
             question=question.strip(),
-            context=_format_context(context) if context else None,
+            context=(format_utils.format_list_items(context, style="bullets") if context else None),
             answer_options=answer_options,
             preamble=(preamble or "").strip(),
             use_option_letters=self.use_option_letters,
-            enable_cot=self.enable_cot,
+            enable_cot=self.enable_cot if enable_cot is None else enable_cot,
             example_response="\n".join([example_reason, example_answer]),
         )
 
-        return textwrap.dedent(rendered).strip() + "\n"
-
-
-def _format_answer_options(options: Sequence[str], use_option_letters: bool) -> str:
-    """Format answer options for inclusion in the prompt.
-
-    Args:
-        options: List of answer options.
-        use_option_letters: Whether to prefix options with letters (A, B, C, ...).
-    """
-    if not options or not all(isinstance(opt, str) and opt.strip() for opt in options):
-        raise ValueError("`answer_options` must contain at least one non-empty option.")
-
-    if use_option_letters:
-        letters = string.ascii_uppercase
-        if len(options) > len(letters):
-            raise ValueError(f"If using option letters, max {len(letters)} options are supported.")
-        return "\n".join(f"{letters[i]}. {opt.strip()}" for i, opt in enumerate(options))
-    else:
-        return "\n".join(f"- {opt.strip()}" for i, opt in enumerate(options))
-
-
-def _format_context(context: str | Sequence[str]) -> str:
-    """Formats the context for inclusion in the prompt.
-
-    Args:
-        context: The context string or list of context strings. If a list is provided,
-                 the contexts will be formatted as a bullet point list.
-
-    Returns:
-        The formatted context string.
-    """
-    if not isinstance(context, list):
-        context = [context]  # type: ignore[assignment]
-    return "\n".join(f"- {item.strip()}" for item in context if item.strip())
+        return format_utils.remove_multi_blank_lines(textwrap.dedent(rendered).strip() + "\n")
