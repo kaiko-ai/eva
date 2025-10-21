@@ -88,13 +88,26 @@ def _logdir_exists(logdir: str | None, verbose: bool = True) -> TypeGuard[str]:
 
 
 def _load_submitted_config() -> Dict[str, Any]:
-    """Retrieves and loads the submitted configuration.
+    """Retrieves and loads the submitted configuration with CLI overrides.
 
     Returns:
-        The path to the configuration file.
+        The resolved configuration as a dictionary.
     """
     config_paths = _fetch_submitted_config_path()
-    return _load_yaml_files(config_paths)
+    cli_overrides = _parse_cli_overrides()
+    return _load_yaml_files(config_paths, cli_overrides)
+
+
+def _parse_cli_overrides() -> List[str]:
+    """Parses CLI override arguments from sys.argv for trainer, model, and data."""
+    argv = sys.argv[1:]
+    valid_prefixes = ("--trainer.", "--model.", "--data.")
+
+    return [
+        f"{arg[2:]}={argv[i+1]}"
+        for i, arg in enumerate(argv[:-1])
+        if arg.startswith(valid_prefixes) and not argv[i + 1].startswith("--")
+    ]
 
 
 def _fetch_submitted_config_path() -> List[str]:
@@ -106,24 +119,31 @@ def _fetch_submitted_config_path() -> List[str]:
     return list(filter(lambda f: f.endswith(".yaml"), sys.argv))
 
 
-def _load_yaml_files(paths: List[str]) -> Dict[str, Any]:
-    """Loads yaml files and merge them from multiple paths.
+def _load_yaml_files(paths: List[str], cli_overrides: List[str] | None = None) -> Dict[str, Any]:
+    """Loads yaml files and merge them from multiple paths with CLI overrides.
 
     Args:
         paths: The paths to the yaml files.
+        cli_overrides: Optional list of CLI overrides in dotlist format
+            (e.g., ["trainer.n_runs=3"]).
 
     Returns:
         The merged configurations as a dictionary.
     """
-    merged_config = {}
+    merged_config = OmegaConf.create({})
+
     for config_path in paths:
         fs = cloud_io.get_filesystem(config_path)
         with fs.open(config_path, "r") as file:
             omegaconf_file = OmegaConf.load(file)  # type: ignore
-            config_dict = OmegaConf.to_object(omegaconf_file)  # type: ignore
-            parsed_config = _type_resolver(config_dict)  # type: ignore
-            merged_config.update(parsed_config)
-    return merged_config
+            merged_config = OmegaConf.merge(merged_config, omegaconf_file)
+
+    if cli_overrides:
+        cli_config = OmegaConf.from_dotlist(cli_overrides)
+        merged_config = OmegaConf.merge(merged_config, cli_config)
+
+    config_dict = OmegaConf.to_object(merged_config)  # type: ignore
+    return _type_resolver(config_dict)  # type: ignore
 
 
 def _type_resolver(mapping: Dict[str, Any]) -> Dict[str, Any]:
