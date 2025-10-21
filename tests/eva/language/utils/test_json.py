@@ -26,7 +26,7 @@ from eva.language.utils.text.json import extract_json
         # Whitespace and formatting
         ('{ "answer" :  "Yes"  }', {"answer": "Yes"}),
         (
-            '{\n    "answer": "Yes",\n    "confidence": "high",\n    "reasoning": "Because it makes sense"\n}',
+            '{\n    "answer": "Yes",\n    "confidence": "high",\n    "reasoning": "Because it makes sense"\n}',  # noqa: E501
             {"answer": "Yes", "confidence": "high", "reasoning": "Because it makes sense"},
         ),
         # Complex structures
