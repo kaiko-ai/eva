@@ -22,12 +22,19 @@ class Resize(base.TorchvisionTransformV2):
     have strict byte size limits for image inputs.
     """
 
-    def __init__(self, size: tuple[int, int] | None = None, max_bytes: int | None = None) -> None:
+    def __init__(
+        self,
+        size: tuple[int, int] | None = None,
+        max_size: int | None = None,
+        max_bytes: int | None = None,
+    ) -> None:
         """Initializes the transform.
 
         Args:
             size: Target size as (height, width) tuple for spatial resizing.
                 If provided, max_bytes must be None.
+            max_size: Maximum allowed size for the image.
+                If provided, size must be None. Must be a positive integer.
             max_bytes: Maximum allowed byte size for the image.
                 If provided, size must be None. Must be a positive integer.
 
@@ -35,19 +42,25 @@ class Resize(base.TorchvisionTransformV2):
             ValueError: If both size and max_bytes are provided, or if max_bytes
                 is not a positive integer.
         """
-        if size is not None and max_bytes is not None:
-            raise ValueError("Cannot provide both 'size' and 'max_bytes' parameters.")
+        if (size is not None and max_bytes is not None) or (
+            max_size is not None and max_bytes is not None
+        ):
+            raise ValueError(
+                "Cannot provide spatial size parameters 'size'/'max_size'"
+                " and 'max_bytes' at the same time."
+            )
         if max_bytes is not None and max_bytes <= 0:
             raise ValueError("'max_bytes' must be a positive integer.")
 
         super().__init__()
 
         self.size = size
+        self.max_size = max_size
         self.max_bytes = max_bytes
         self.resize_fn = None
 
-        if size is not None:
-            self.resize_fn = v2.Resize(size=size)
+        if size is not None or max_size is not None:
+            self.resize_fn = v2.Resize(size=size, max_size=max_size)
         elif max_bytes is not None:
             self.resize_fn = functools.partial(functional.resize_to_max_bytes, max_bytes=max_bytes)
 
