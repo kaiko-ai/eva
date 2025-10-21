@@ -48,8 +48,8 @@ def test_raw_render_context_formats_lists(template: RawMultipleChoicePromptTempl
 @pytest.mark.parametrize(
     ("use_letters", "expected_option", "instruction_snippet"),
     [
-        (True, "A. Red", "your final choice letter"),
-        (False, "- Red", "your final choice exactly as written below"),
+        (True, "A. Red", "your final answer letter"),
+        (False, "- Red", "your final answer exactly as written below"),
     ],
 )
 def test_raw_render_option_styles(
