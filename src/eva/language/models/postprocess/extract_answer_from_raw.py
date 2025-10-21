@@ -47,7 +47,6 @@ class ExtractDiscreteAnswerFromRaw(ExtractDiscreteAnswerFromStructuredOutput):
             lookback_words: Number of words to examine from the end of the response
                 when searching for the answer. Default is 10.
         """
-        # Validate that all mapping keys are single words
         for key in mapping:
             if not isinstance(key, str) or " " in key.strip():
                 raise ValueError(
