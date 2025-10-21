@@ -28,7 +28,7 @@ class XmlMultipleChoicePromptTemplate(base.PromptTemplate):
         {{ context }}
         {% endif %}
 
-        IMPORTANT: Provide your final answer within <{{ answer_tag }}></{{ answer_tag }}> tags.
+        IMPORTANT: Provide your final answer within <{{ answer_key }}></{{ answer_key }}> tags.
         {% if enable_cot -%}
         Think step-by-step before giving your final answer.
         {%- endif -%}
@@ -41,7 +41,7 @@ class XmlMultipleChoicePromptTemplate(base.PromptTemplate):
         {{ answer_options }}
 
         Example Answer:
-        Your explanation for why you chose this answer can go here... <{{ answer_tag }}>{{ example_answer }}</{{ answer_tag }}>
+        Your explanation for why you chose this answer can go here... <{{ answer_key }}>{{ example_answer }}</{{ answer_key }}>
 
         Answer:
         """
@@ -52,20 +52,20 @@ class XmlMultipleChoicePromptTemplate(base.PromptTemplate):
         self,
         use_option_letters: bool = False,
         enable_cot: bool = False,
-        answer_tag: str = "answer",
+        answer_key: str = "answer",
     ) -> None:
         """Initializes the prompt template.
 
         Args:
             use_option_letters: Whether to prefix options with letters (A, B, C, ...).
             enable_cot: Whether to explicitly prompt the model to use reasoning/CoT for answering.
-            answer_tag: The XML tag name to use for the answer.
+            answer_key: The XML tag name to use for the answer.
         """
         super().__init__()
 
         self.use_option_letters = use_option_letters
         self.enable_cot = enable_cot
-        self.answer_tag = answer_tag
+        self.answer_key = answer_key
 
     @override
     def render(
@@ -109,7 +109,7 @@ class XmlMultipleChoicePromptTemplate(base.PromptTemplate):
             preamble=(preamble or "").strip(),
             use_option_letters=self.use_option_letters,
             enable_cot=self.enable_cot if enable_cot is None else enable_cot,
-            answer_tag=self.answer_tag,
+            answer_key=self.answer_key,
         )
 
         return format_utils.remove_multi_blank_lines(textwrap.dedent(rendered).strip() + "\n")
