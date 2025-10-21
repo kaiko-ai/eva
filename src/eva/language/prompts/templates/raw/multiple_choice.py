@@ -33,7 +33,7 @@ class RawMultipleChoicePromptTemplate(base.PromptTemplate):
         Think step-by-step before giving your final answer.
         {% endif %}
 
-        IMPORTANT: You must provide your reasoning first, then end your response with only your final answer.
+        IMPORTANT: You must provide your reasoning first, then end your response with only your final answer
         {%- if use_option_letters %} letter
         {%- else %} exactly as written below
         {%- endif %}.
