@@ -1,4 +1,4 @@
-"""Prompt templates for multiple choice questions with JSON output."""
+"""Prompt templates for multiple choice questions with XML output."""
 
 # ruff: noqa: E501
 
@@ -15,8 +15,8 @@ from eva.language.prompts.templates import base
 from eva.language.utils.text import format as format_utils
 
 
-class JsonMultipleChoicePromptTemplate(base.PromptTemplate):
-    """Prompt template for multiple choice questions while enforcing JSON output."""
+class XmlMultipleChoicePromptTemplate(base.PromptTemplate):
+    """Prompt template for multiple choice questions while enforcing XML output."""
 
     template: str = textwrap.dedent(
         """\
@@ -28,50 +28,44 @@ class JsonMultipleChoicePromptTemplate(base.PromptTemplate):
         {{ context }}
         {% endif %}
 
-        IMPORTANT: Respond with a valid JSON object where the "{{ answer_key }}" key contains your answer.
+        IMPORTANT: Provide your final answer within <{{ answer_tag }}></{{ answer_tag }}> tags.
         {% if enable_cot -%}
         Think step-by-step before giving your final answer.
         {%- endif -%}
         {% if use_option_letters %}
-        The value for "{{ answer_key }}" must be the letter (e.g., "A", "B", "C", ...)
+        The answer must be the letter (e.g., "A", "B", "C", ...)
         corresponding to your chosen option from the list below:
         {% else %}
-        The value for "{{ answer_key }}" must exactly match one of the options listed below:
+        The answer must exactly match one of the options listed below:
         {% endif %}
         {{ answer_options }}
 
-        Example JSON Answer:
-        Your explanation for why you chose this answer can go here...
-        {{ '{' }}
-            "{{ answer_key }}": "{{ example_answer }}"
-        {{ '}' }}
+        Example Answer:
+        Your explanation for why you chose this answer can go here... <{{ answer_tag }}>{{ example_answer }}</{{ answer_tag }}>
 
         Answer:
         """
     )
     """Base template to be rendered via Jinja2."""
 
-    _default_answer_key: str = "answer"
-    """Default key name for the answer in the JSON output."""
-
     def __init__(
         self,
-        answer_key: str | None = None,
         use_option_letters: bool = False,
         enable_cot: bool = False,
+        answer_tag: str = "answer",
     ) -> None:
         """Initializes the prompt template.
 
         Args:
-            answer_key: Key name for the answer in the JSON output. Defaults to "answer".
             use_option_letters: Whether to prefix options with letters (A, B, C, ...).
             enable_cot: Whether to explicitly prompt the model to use reasoning/CoT for answering.
+            answer_tag: The XML tag name to use for the answer.
         """
         super().__init__()
 
-        self.answer_key = answer_key or self._default_answer_key
         self.use_option_letters = use_option_letters
         self.enable_cot = enable_cot
+        self.answer_tag = answer_tag
 
     @override
     def render(
@@ -90,7 +84,7 @@ class JsonMultipleChoicePromptTemplate(base.PromptTemplate):
             question: The question to ask the model.
             context: Supporting context text(s) for the question.
             answer_options: Allowed answer options.
-            example_answer: Optional example answer for the JSON snippet. Defaults to first option.
+            example_answer: Optional example answer for the XML snippet. Defaults to first option.
             preamble: Optional preamble text to include at the top of the prompt.
             enable_cot: Optionally override the instance's CoT setting for this render call.
 
@@ -107,7 +101,6 @@ class JsonMultipleChoicePromptTemplate(base.PromptTemplate):
             answer_options=format_utils.format_list_items(
                 answer_options, style="letters" if self.use_option_letters else "bullets"
             ),
-            answer_key=self.answer_key,
             example_answer=(
                 example_answer
                 if isinstance(example_answer, str)
@@ -116,6 +109,7 @@ class JsonMultipleChoicePromptTemplate(base.PromptTemplate):
             preamble=(preamble or "").strip(),
             use_option_letters=self.use_option_letters,
             enable_cot=self.enable_cot if enable_cot is None else enable_cot,
+            answer_tag=self.answer_tag,
         )
 
         return format_utils.remove_multi_blank_lines(textwrap.dedent(rendered).strip() + "\n")
