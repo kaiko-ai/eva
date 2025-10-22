@@ -1,0 +1,53 @@
+{
+  "builder_name": "parquet",
+  "citation": "",
+  "config_name": "default",
+  "dataset_name": "quilt_vqa",
+  "dataset_size": 225634303,
+  "description": "",
+  "download_checksums": {
+    "hf://datasets/wisdomik/Quilt_VQA@340d0014d30d1fc502e0da66b6ee90f253a2f03e/data/train-00000-of-00001-e5107276f24d7201.parquet": {
+      "num_bytes": 222944861,
+      "checksum": null
+    }
+  },
+  "download_size": 222944861,
+  "features": {
+    "image": {
+      "_type": "Image"
+    },
+    "question": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "answer": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "answer_type": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "context": {
+      "dtype": "string",
+      "_type": "Value"
+    }
+  },
+  "homepage": "",
+  "license": "",
+  "size_in_bytes": 448579164,
+  "splits": {
+    "train": {
+      "name": "train",
+      "num_bytes": 225634303,
+      "num_examples": 985,
+      "dataset_name": "quilt_vqa"
+    }
+  },
+  "version": {
+    "version_str": "0.0.0",
+    "major": 0,
+    "minor": 0,
+    "patch": 0
+  }
+}

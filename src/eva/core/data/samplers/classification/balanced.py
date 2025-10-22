@@ -17,7 +17,7 @@ class BalancedSampler(ClassificationSampler):
 
     def __init__(
         self,
-        num_samples: int,
+        num_samples: int | None,
         replacement: bool = False,
         seed: int | None = 42,
         reset_generator: bool = True,
@@ -25,7 +25,8 @@ class BalancedSampler(ClassificationSampler):
         """Initializes the balanced sampler.
 
         Args:
-            num_samples: The number of samples to draw per class.
+            num_samples: The number of samples to draw per class. if None, sampling will
+                be disabled and the whole dataset will be used (shuffled).
             replacement: samples are drawn on-demand with replacement if ``True``, default=``False``
             seed: Random seed for reproducibility.
             reset_generator: Whether to reset the random number generator
@@ -37,11 +38,16 @@ class BalancedSampler(ClassificationSampler):
 
     def __len__(self) -> int:
         """Returns the total number of samples."""
+        if self._num_samples is None:
+            return len(self.data_source)
         return self._num_samples * len(self._class_to_indices)
 
     @override
     def _sample_indices(self) -> None:
         """Sample equal number of indices from each class."""
+        if self._num_samples is None:
+            self._indices = list(self._random_generator.permutation(len(self.data_source)))
+            return
         if not self._replacement:
             for class_id, indices in self._class_to_indices.items():
                 if len(indices) < self._num_samples:

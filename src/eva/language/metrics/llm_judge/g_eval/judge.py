@@ -2,6 +2,8 @@
 
 from typing import Any, List, Sequence, Tuple
 
+from loguru import logger
+from torch import nn
 from typing_extensions import override
 
 from eva.language.data.messages import UserMessage
@@ -28,7 +30,7 @@ class GEvalJudge(base.LLMJudge[int]):
 
     def __init__(
         self,
-        model: wrappers.LanguageModel | str | None,
+        model: wrappers.LanguageModel | nn.Module | str | None,
         evaluation_steps: Sequence[str],
         score_range: Tuple[int, int] = (0, 10),
         score_explanation: str = "where higher is better",
@@ -77,13 +79,21 @@ class GEvalJudge(base.LLMJudge[int]):
 
         judge_batch = TextBatch(text=prompts, target=None, metadata=None)
         outputs = self.model(judge_batch)
+        logger.debug(
+            "\n".join(
+                [
+                    f"prompt:\n{prompt[0].content}\noutput:\n{output}"
+                    for prompt, output in zip(prompts, outputs["generated_text"], strict=False)
+                ]
+            )
+        )
 
         results = list(map(self._parse_output, outputs["generated_text"]))
         scores, reasons = zip(*results, strict=False)
 
         return list(scores)
 
-    def _load_model(self, model: wrappers.LanguageModel | str | None) -> wrappers.LanguageModel:
+    def _load_model(self, model: wrappers.LanguageModel | nn.Module | str | None) -> nn.Module:
         if model is None or isinstance(model, str):
             return wrappers.ModelFromRegistry(model or self._default_model)  # type: ignore
         return model

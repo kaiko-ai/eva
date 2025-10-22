@@ -1,6 +1,6 @@
 """Postprocessing transforms for extracting answers from JSON responses."""
 
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List
 
 import torch
 from loguru import logger
@@ -47,7 +47,7 @@ class ExtractDiscreteAnswerFromJson:
         self.missing_count = 0
         self.mapping = {k if case_sensitive else k.lower(): v for k, v in mapping.items()}
 
-    def __call__(self, values: Union[str, List[str]]) -> torch.Tensor:
+    def __call__(self, values: str | List[str]) -> torch.Tensor:
         """Convert JSON string(s) to a tensor of integer labels."""
         if not isinstance(values, (list, tuple)):
             values = [values]

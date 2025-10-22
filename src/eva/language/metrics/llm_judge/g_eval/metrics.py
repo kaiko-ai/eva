@@ -4,6 +4,7 @@ from typing import List, Tuple
 
 import torch
 import torchmetrics
+from torch import nn
 from typing_extensions import override
 
 from eva.language.metrics.llm_judge.g_eval.judge import GEvalJudge
@@ -66,13 +67,24 @@ class GEvalCorrectness(torchmetrics.Metric):
 
     total: torch.Tensor
     count: torch.Tensor
+    missing_count: torch.Tensor
 
-    def __init__(self, model: wrappers.LanguageModel | str | None):
+    def __init__(
+        self,
+        model: wrappers.LanguageModel | nn.Module | str | None,
+        raise_if_missing: bool = True,
+        missing_limit: int = 5,
+    ):
         """Initializes the metric.
 
         Args:
             model: An instance of the language model to use, or the
                 name of the model to load from the registry.
+            raise_if_missing: Whether to raise an error if an answer is missing
+                or not found in the mapping. If False, will return `missing_response`
+                instead.
+            missing_limit: The maximum number of missing responses before raising
+                an error, if `raise_if_missing` is True.
         """
         super().__init__()
         self.judge = GEvalJudge(
@@ -82,8 +94,14 @@ class GEvalCorrectness(torchmetrics.Metric):
             scoring_criteria=self._scoring_criteria,
         )
 
+        self.raise_if_missing = raise_if_missing
+        self.missing_limit = missing_limit
+
         self.add_state("total", default=torch.tensor(0.0), dist_reduce_fx="sum")
         self.add_state("count", default=torch.tensor(0, dtype=torch.long), dist_reduce_fx="sum")
+        self.add_state(
+            "missing_count", default=torch.tensor(0, dtype=torch.long), dist_reduce_fx="sum"
+        )
 
     @override
     @torch.no_grad()
@@ -91,10 +109,23 @@ class GEvalCorrectness(torchmetrics.Metric):
         batch = PredictionBatch(prediction=preds, target=targets, text=None, metadata=None)
         scores = self.judge.evaluate(batch)
 
-        scores_t = torch.as_tensor(scores, dtype=torch.float, device=self.device)
-        self.total += scores_t.sum()
-        self.count += scores_t.numel()
+        self.missing_count += sum(1 for s in scores if s is None)
+        scores = [s for s in scores if s is not None]
+        self._raise_if_missing()
+
+        if len(scores) > 0:
+            scores_t = torch.as_tensor(scores, dtype=torch.float, device=self.device)
+            self.total += scores_t.sum()
+            self.count += scores_t.numel()
 
     @override
     def compute(self) -> torch.Tensor:
+        self._raise_if_missing()
         return self.total / self.count
+
+    def _raise_if_missing(self) -> None:
+        if self.raise_if_missing and self.missing_count > self.missing_limit:
+            raise ValueError(
+                f"Found {self.missing_count} missing scores, which "
+                f"exceeds the limit of {self.missing_limit}."
+            )

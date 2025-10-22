@@ -1,6 +1,7 @@
 """Dataset class for loading pre-generated text predictions."""
 
 import abc
+import os
 from pathlib import Path
 from typing import Any, Dict, Generic, Literal
 
@@ -75,6 +76,12 @@ class TextPredictionDataset(
     @override
     def configure(self) -> None:
         extension = Path(self.path).suffix
+
+        if not os.path.isfile(self.path):
+            raise ValueError(
+                f"File {self.path} does not exist. Make sure that you have generated "
+                "the predictions previously and set the correct path."
+            )
 
         match extension:
             case ".jsonl":

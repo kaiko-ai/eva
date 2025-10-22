@@ -11,6 +11,7 @@ from typing_extensions import override
 
 from eva.language.data.messages import MessageSeries, UserMessage
 from eva.language.prompts import templates
+from eva.multimodal.data.datasets.schemas import TransformsSchema
 from eva.multimodal.data.datasets.text_image import TextImageDataset
 from eva.multimodal.prompts.templates.preambles import DEFAULT_VQA_PREAMBLE
 
@@ -21,7 +22,7 @@ class QuiltVQA(TextImageDataset[str]):
     Source: https://huggingface.co/datasets/wisdomik/Quilt_VQA
     """
 
-    _expected_dataset_lengths: Dict[str | None, int] = {None: 985}
+    _expected_dataset_lengths: Dict[str | None, int] = {"test": 985, None: 985}
     """Expected dataset lengths for the splits and complete dataset."""
 
     _license: str = "CC-BY-NC-ND-3.0 (https://creativecommons.org/licenses/by-nc-nd/3.0/ch/deed.de)"
@@ -40,6 +41,7 @@ class QuiltVQA(TextImageDataset[str]):
         root: str | None = None,
         split: Literal["test"] | None = None,
         download: bool = False,
+        transforms: TransformsSchema | None = None,
         max_samples: int | None = None,
         prompt_template: templates.PromptTemplate | None = None,
         prompt_render_kwargs: Dict[str, Any] | None = None,
@@ -48,14 +50,15 @@ class QuiltVQA(TextImageDataset[str]):
 
         Args:
             root: Directory to cache the dataset. If None, no local caching is used.
-            split: Valid splits among ["train", "val", "test"]. If None, uses the entire dataset.
+            split: Valid splits among ["test"]. If None, uses the entire dataset.
             download: Whether to download the dataset if not found locally. Default is False.
+            transforms: Transforms to apply to the data samples.
             max_samples: Maximum number of samples to use. If None, use all samples.
             prompt_template: The template to use for rendering prompts. If None, uses the
                 default template which enforces JSON output.
             prompt_render_kwargs: The kwargs to use when rendering the prompt template.
         """
-        super().__init__()
+        super().__init__(transforms=transforms)
 
         self._root = root
         self._split = split
@@ -80,10 +83,11 @@ class QuiltVQA(TextImageDataset[str]):
         If not cached, it downloads the dataset into `self._root`.
         """
         dataset_path = None
-
         if self._root:
-            dataset_path = os.path.join(self._root, self._split) if self._split else self._root
-            os.makedirs(self._root, exist_ok=True)
+            if os.path.exists(os.path.join(self._root, "test")):
+                dataset_path = os.path.join(self._root, "test")
+            else:
+                dataset_path = self._root
 
         self.dataset = self._load_dataset(dataset_path)
 
@@ -152,6 +156,7 @@ class QuiltVQA(TextImageDataset[str]):
                 download_mode="reuse_dataset_if_exists",
             )
             if dataset_path:
+                os.makedirs(dataset_path, exist_ok=True)
                 raw_dataset.save_to_disk(dataset_path)  # type: ignore
                 logger.info(f"Dataset saved to: {dataset_path}")
         else:

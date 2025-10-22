@@ -36,7 +36,8 @@ model:
         - class_path: eva.language.models.postprocess.ExtractDiscreteAnswerFromJson
           init_args:
             mapping: {"no": 0, "yes": 1, "missing_answer": 2}
-            missing_response: 2
+            missing_limit: ${oc.env:MISSING_LIMIT, 5}
+            missing_response: ${oc.env:MISSING_RESPONSE, 2}
 data:
   class_path: eva.DataModule
   init_args:
@@ -54,7 +55,7 @@ data:
       predict:
         - class_path: eva.multimodal.data.datasets.PatchCamelyon
           init_args: &PREDICTION_DATASET_ARGS
-            root: ${oc.env:DATA_ROOT, /mnt/localdisk/data/patch_camelyon}
+            root: ${oc.env:DATA_ROOT, .data/patch_camelyon}
             split: val
             download: ${oc.env:DOWNLOAD_DATA, false}
             # Set `download: true` to download the dataset from https://zenodo.org/records/1494286
@@ -73,20 +74,18 @@ data:
             split: test
     dataloaders:
       val: &DATALOADER_ARGS
-        batch_size: &BATCH_SIZE ${oc.env:BATCH_SIZE, 256}
+        batch_size: ${oc.env:BATCH_SIZE, 256}
         num_workers: &N_DATA_WORKERS ${oc.env:N_DATA_WORKERS, 1}
         collate_fn: eva.language.data.dataloaders.prediction_collate
       test:
         <<: *DATALOADER_ARGS
       predict:
-        batch_size: &PREDICT_BATCH_SIZE ${oc.env:PREDICT_BATCH_SIZE, 16}
+        batch_size: ${oc.env:PREDICT_BATCH_SIZE, 16}
         num_workers: *N_DATA_WORKERS
         collate_fn: eva.multimodal.data.dataloaders.text_image_collate
     samplers:
-      val: &SAMPLER_ARGS
+      predict:
         class_path: eva.core.data.samplers.BalancedSampler
         init_args:
           seed: ${oc.env:SAMPLER_SEED, 42}
           num_samples: ${oc.env:NUM_SAMPLES, 250}
-      test:
-        <<: *SAMPLER_ARGS
