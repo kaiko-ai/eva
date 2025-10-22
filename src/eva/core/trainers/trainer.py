@@ -61,8 +61,8 @@ class Trainer(pl_trainer.Trainer):
 
         self.checkpoint_type = checkpoint_type
         self.n_runs = n_runs
-        self.session_id: str = _logging.generate_session_id()
 
+        self._session_id: str = _logging.generate_session_id()
         self._log_dir: str = self.default_log_dir
 
         self.init_logger_run(0)
@@ -70,7 +70,7 @@ class Trainer(pl_trainer.Trainer):
     @property
     def default_log_dir(self) -> str:
         """Returns the default log directory."""
-        return os.path.join(self.default_root_dir, self.session_id)
+        return os.path.join(self.default_root_dir, self._session_id)
 
     @property
     @override
@@ -85,7 +85,7 @@ class Trainer(pl_trainer.Trainer):
             run_id: The id of the current run.
         """
         subdirectory = f"run_{run_id}" if run_id is not None else ""
-        self._log_dir = os.path.join(self.default_root_dir, self.session_id, subdirectory)
+        self._log_dir = os.path.join(self.default_root_dir, self._session_id, subdirectory)
 
         enabled_loggers = []
         for logger in self.loggers or []:
@@ -97,11 +97,11 @@ class Trainer(pl_trainer.Trainer):
                     continue
                 else:
                     logger._root_dir = self.default_root_dir
-                    logger._name = self.session_id
+                    logger._name = self._session_id
                     logger._version = subdirectory
             elif isinstance(logger, pl_loggers.WandbLogger):
                 task_name = self.default_root_dir.split("/")[-1]
-                run_name = os.getenv("WANDB_RUN_NAME", f"{task_name}_{self.session_id}")
+                run_name = os.getenv("WANDB_RUN_NAME", f"{task_name}_{self._session_id}")
                 wandb_utils.init_run(f"{run_name}_{run_id}", logger._wandb_init)
             enabled_loggers.append(logger)
 
@@ -110,7 +110,7 @@ class Trainer(pl_trainer.Trainer):
             tag="session_info",
             parameters={
                 "session_info": {
-                    "session_id": self.session_id,
+                    "session_id": self._session_id,
                     "run_id": run_id,
                     "log_dir": self._log_dir,
                 }
