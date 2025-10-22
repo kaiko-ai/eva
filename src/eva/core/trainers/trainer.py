@@ -105,6 +105,17 @@ class Trainer(pl_trainer.Trainer):
                 wandb_utils.init_run(f"{run_name}_{run_id}", logger._wandb_init)
             enabled_loggers.append(logger)
 
+        eva_loggers.log_parameters(
+            enabled_loggers,
+            tag="session_info",
+            parameters={
+                "session_info": {
+                    "session_id": self._session_id,
+                    "run_id": run_id,
+                    "log_dir": self._log_dir,
+                }
+            },
+        )
         self._loggers = enabled_loggers or [eva_loggers.DummyLogger(self._log_dir)]
 
     def finish_logger_run(self, run_id: int | None) -> None:
