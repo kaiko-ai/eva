@@ -57,4 +57,5 @@ data:
         class_path: eva.core.data.samplers.RandomSampler
         init_args:
           seed: ${oc.env:SAMPLER_SEED, 42}
+          sample_ratio: ${oc.env:SAMPLE_RATIO, null}
           num_samples: ${oc.env:NUM_SAMPLES, null}
