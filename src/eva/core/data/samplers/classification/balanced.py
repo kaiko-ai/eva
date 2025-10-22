@@ -25,7 +25,8 @@ class BalancedSampler(ClassificationSampler):
         """Initializes the balanced sampler.
 
         Args:
-            num_samples: The number of samples to draw per class.
+            num_samples: The number of samples to draw per class. if None, sampling will
+                be disabled and the whole dataset will be used (shuffled).
             replacement: samples are drawn on-demand with replacement if ``True``, default=``False``
             seed: Random seed for reproducibility.
             reset_generator: Whether to reset the random number generator
