@@ -135,7 +135,8 @@ def _fetch_submitted_config_path() -> List[str]:
     Returns:
         The path to the configuration file.
     """
-    return list(filter(lambda f: f.endswith(".yaml"), sys.argv))
+    config_paths = list(filter(lambda f: f.endswith(".yaml"), sys.argv))
+    return [p.replace("--config=", "") for p in config_paths]
 
 
 def _load_yaml_files(paths: List[str], cli_overrides: List[str] | None = None) -> Dict[str, Any]:
