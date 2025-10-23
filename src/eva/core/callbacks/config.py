@@ -99,15 +99,34 @@ def _load_submitted_config() -> Dict[str, Any]:
 
 
 def _parse_cli_overrides() -> List[str]:
-    """Parses CLI override arguments from sys.argv for trainer, model, and data."""
+    """Parses CLI override arguments from sys.argv for trainer, model, and data.
+
+    Supports the following formats:
+    - Space-separated: --trainer.arg value
+    - Equals-separated: --trainer.arg=value
+    """
     argv = sys.argv[1:]
     valid_prefixes = ("--trainer.", "--model.", "--data.")
+    overrides = []
 
-    return [
-        f"{arg[2:]}={argv[i+1]}"
-        for i, arg in enumerate(argv[:-1])
-        if arg.startswith(valid_prefixes) and not argv[i + 1].startswith("--")
-    ]
+    i = 0
+    while i < len(argv):
+        arg = argv[i]
+
+        if arg.startswith(valid_prefixes):
+            if "=" in arg:
+                key, value = arg.split("=", 1)
+                overrides.append(f"{key[2:]}={value}")
+                i += 1
+            elif i + 1 < len(argv) and not argv[i + 1].startswith("--"):
+                overrides.append(f"{arg[2:]}={argv[i + 1]}")
+                i += 2
+            else:
+                i += 1
+        else:
+            i += 1
+
+    return overrides
 
 
 def _fetch_submitted_config_path() -> List[str]:
