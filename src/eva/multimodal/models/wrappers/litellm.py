@@ -51,6 +51,10 @@ class LiteLLMModel(base.VisionLanguageModel):
         )
         message_batch = list(map(language_message_utils.combine_system_messages, message_batch))
 
+        # Handle text-only inputs where image_batch is None
+        if image_batch is None:
+            image_batch = [None] * len(message_batch)
+
         return list(map(message_utils.format_litellm_message, message_batch, image_batch))
 
     @override
