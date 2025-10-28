@@ -6,15 +6,21 @@ on:
     branches:
       - main
 
-permissions:
-  id-token: write
-  contents: write
+concurrency:
+  group: "${{ github.workflow }}-${{ github.ref }}"
+  cancel-in-progress: true
+
+permissions: {}
 
 jobs:
-  release-pypi:
+  deploy-docs:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # Needed for pushing to GitHub Pages
     steps:
-      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4
+      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
+        with:
+          persist-credentials: false
       - name: Setting up PDM
         uses: pdm-project/setup-pdm@94a823180e06fcde4ad29308721954a521c96ed0 # v4
         with:
