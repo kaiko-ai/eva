@@ -22,7 +22,9 @@ jobs:
     steps:
       - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
         with:
-          persist-credentials: false
+          # Needed to push to gh-pages branch
+          # IMPORTANT: Avoid publishing the .git/ folder to prevent leaking credentials
+          persist-credentials: true
       - name: Setting up PDM
         uses: pdm-project/setup-pdm@94a823180e06fcde4ad29308721954a521c96ed0 # v4
         with:
