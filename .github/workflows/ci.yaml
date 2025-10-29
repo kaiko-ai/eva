@@ -4,13 +4,22 @@ name: CI
 on:
   pull_request:
     branches:
+      - "**"
+
+concurrency:
+  group: "${{ github.workflow }}-${{ github.ref }}"
+  cancel-in-progress: true
+
+permissions: {}
 
 jobs:
   quality:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+        with:
+          persist-credentials: false
       - name: Setting up PDM
         uses: pdm-project/setup-pdm@94a823180e06fcde4ad29308721954a521c96ed0 # v4
         with:
@@ -28,9 +37,9 @@ jobs:
     strategy:
       matrix:
         os:
-        - ubuntu-latest
+          - ubuntu-latest
         python-version:
-        - "3.10"
+          - "3.10"
     runs-on: ${{ matrix.os }}
     steps:
       - name: Install OS dependencies
@@ -40,9 +49,10 @@ jobs:
           sudo add-apt-repository ppa:openslide/openslide
           sudo apt install -y openslide-tools
       - name: Checkout
-        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
         with:
           lfs: true
+          persist-credentials: false
       - name: Setting up PDM
         uses: pdm-project/setup-pdm@94a823180e06fcde4ad29308721954a521c96ed0 # v4
         with:
@@ -58,7 +68,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+        with:
+          persist-credentials: false
       - name: Setting up PDM
         uses: pdm-project/setup-pdm@94a823180e06fcde4ad29308721954a521c96ed0 # v4
         with:
@@ -76,9 +88,13 @@ jobs:
         run: nox -s docs -- deploy --update-aliases dev
   security:
     runs-on: ubuntu-latest
+    permissions:
+      security-events: write # Needed for uploading SARIF reports
     steps:
       - name: Checkout
-        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+        with:
+          persist-credentials: false
       - name: Perform gitleaks checks
         run: |
           # Download and check
@@ -93,3 +109,9 @@ jobs:
             --config .gitleaks.toml \
             --gitleaks-ignore-path .gitleaksignore \
             --no-git
+      - name: Perform GitHub actions and workflows SAST
+        uses: zizmorcore/zizmor-action@e673c3917a1aef3c65c972347ed84ccd013ecda4 # v0.2.0
+        with:
+          min-severity: low
+          persona: pedantic
+          version: latest

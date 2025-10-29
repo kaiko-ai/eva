@@ -6,20 +6,23 @@ on:
     tags:
       - "*"
 
-permissions:
-  id-token: write
-  contents: write
-  pull-requests: write
+concurrency:
+  group: "${{ github.workflow }}"
+  cancel-in-progress: true
+
+permissions: {}
 
 jobs:
   release-pypi:
     runs-on: ubuntu-latest
     permissions:
-      id-token: write
-      contents: write
-      pull-requests: write
+      id-token: write # Needed for publishing to PyPI
+      contents: write # Needed for pushing to GitHub Pages
+      pull-requests: write # Needed for creating version bump PR
     steps:
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+        with:
+          persist-credentials: false
       - name: Setting up PDM
         uses: pdm-project/setup-pdm@94a823180e06fcde4ad29308721954a521c96ed0 # v4
         with:
@@ -35,7 +38,7 @@ jobs:
           git config user.name "GitHub Action"
       - name: Bumping version
         run: |
-          nox -s bump -- to "${{ github.ref_name }}"
+          nox -s bump -- to "${GITHUB_REF_NAME}"
       - name: Build artifacts
         run: |
           nox -s build
@@ -46,7 +49,7 @@ jobs:
       - name: Build Release Docs
         run: |
           git fetch origin gh-pages:gh-pages
-          tag="${{ github.ref_name }}"
+          tag="${GITHUB_REF_NAME}"
           DOC_VERSION=${tag%.*}
           nox -s docs -- deploy --alias-type=copy --update-aliases "$DOC_VERSION"
           git push origin gh-pages
@@ -63,9 +66,9 @@ jobs:
           title: "bump version to ${{ github.ref_name }} [skip ci]"
           body: |
             This PR updates the pyproject.toml with the new version number.
-            
+
             Version: ${{ github.ref_name }}
-            
+
             *Automated PR created by the Release workflow*
           branch: bump-version-${{ github.ref_name }}
           base: main
