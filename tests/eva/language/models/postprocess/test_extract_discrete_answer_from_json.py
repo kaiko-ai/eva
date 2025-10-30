@@ -5,7 +5,9 @@ import re
 import pytest
 import torch
 
-from eva.language.models.postprocess.extract_answer_from_json import ExtractDiscreteAnswerFromJson
+from eva.language.models.postprocess.extract_answer.json.discrete import (
+    ExtractDiscreteAnswerFromJson,
+)
 
 
 @pytest.fixture

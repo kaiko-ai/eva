@@ -3,7 +3,7 @@
 import pytest
 import torch
 
-from eva.language.models.postprocess.extract_answer_from_raw import ExtractDiscreteAnswerFromRaw
+from eva.language.models.postprocess.extract_answer.raw.discrete import ExtractDiscreteAnswerFromRaw
 
 
 @pytest.fixture

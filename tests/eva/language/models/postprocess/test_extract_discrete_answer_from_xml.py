@@ -5,7 +5,7 @@ import re
 import pytest
 import torch
 
-from eva.language.models.postprocess.extract_answer_from_xml import ExtractDiscreteAnswerFromXml
+from eva.language.models.postprocess.extract_answer.xml.discrete import ExtractDiscreteAnswerFromXml
 
 
 @pytest.fixture

@@ -61,11 +61,12 @@ def test_render_option_styles(
     use_letters: bool, expected_option: str, instruction_snippet: str
 ) -> None:
     """Rendering switches between lettered options and bullet options."""
-    template = JsonMultipleChoicePromptTemplate(use_option_letters=use_letters)
+    template = JsonMultipleChoicePromptTemplate()
     result = template.render(
         question="Pick a color",
         context=None,
         answer_options=["Red", "Blue"],
+        use_option_letters=use_letters,
     )
 
     assert expected_option in result
@@ -75,11 +76,12 @@ def test_render_option_styles(
 @pytest.mark.parametrize(("answer_key"), ["choice", "response"])
 def test_render_custom_keys_respected(answer_key: str) -> None:
     """Custom answer_key propagate to the instructions and example JSON."""
-    template = JsonMultipleChoicePromptTemplate(answer_key=answer_key)
+    template = JsonMultipleChoicePromptTemplate()
     result = template.render(
         question="Test question",
         context=None,
         answer_options=["A", "B"],
+        answer_key=answer_key,
     )
 
     assert f'The value for "{answer_key}"' in result
@@ -99,13 +101,14 @@ def test_render_example_answer_selection(
     use_letters: bool, example_answer: str | None, expected_fragment: str
 ) -> None:
     """Default and user-supplied example answers should match expectations."""
-    template = JsonMultipleChoicePromptTemplate(use_option_letters=use_letters)
+    template = JsonMultipleChoicePromptTemplate()
     kwargs = {"example_answer": example_answer} if example_answer is not None else {}
     result = template.render(
         question="Example answer?",
         context=None,
         answer_options=["First", "Second"],
         enable_cot=False,
+        use_option_letters=use_letters,
         **kwargs,
     )
 
@@ -121,11 +124,12 @@ def test_render_example_answer_selection(
 )
 def test_render_enable_cot(enable_cot: bool, expected_fragment: str) -> None:
     """Prompt with enable_cot should contain a fragment asking the model to use thinking/CoT."""
-    template = JsonMultipleChoicePromptTemplate(enable_cot=enable_cot)
+    template = JsonMultipleChoicePromptTemplate()
     result = template.render(
         question="Example answer?",
         context=None,
         answer_options=["First", "Second"],
+        enable_cot=enable_cot,
     )
     if enable_cot:
         assert expected_fragment in result
@@ -168,7 +172,7 @@ def test_render_invalid_answer_options_raises_error(
 
 def test_render_with_too_many_lettered_options() -> None:
     """Using option letters should enforce the alphabet upper bound."""
-    template = JsonMultipleChoicePromptTemplate(use_option_letters=True)
+    template = JsonMultipleChoicePromptTemplate()
     answer_options = [f"Option {i}" for i in range(27)]
 
     with pytest.raises(ValueError, match="Maximum 26 items supported for letter format."):
@@ -176,4 +180,5 @@ def test_render_with_too_many_lettered_options() -> None:
             question="Too many?",
             context=None,
             answer_options=answer_options,
+            use_option_letters=True,
         )
