@@ -1,7 +1,7 @@
 """Image resize transforms."""
 
 import functools
-from typing import Any, Dict
+from typing import Any, Dict, Sequence
 
 from torchvision import tv_tensors
 from torchvision.transforms import v2
@@ -22,12 +22,13 @@ class Resize(base.TorchvisionTransformV2):
     have strict byte size limits for image inputs.
     """
 
-    def __init__(self, size: tuple[int, int] | None = None, max_bytes: int | None = None) -> None:
+    def __init__(
+        self, size: int | Sequence[int] | None = None, max_bytes: int | None = None
+    ) -> None:
         """Initializes the transform.
 
         Args:
-            size: Target size as (height, width) tuple for spatial resizing.
-                If provided, max_bytes must be None.
+            size: Desired output size, e.g. (height, width) tuple.
             max_bytes: Maximum allowed byte size for the image.
                 If provided, size must be None. Must be a positive integer.
 
