@@ -1,4 +1,4 @@
-""""Raw text extraction utilities."""
+"""Raw text extraction utilities."""
 
 import re
 
@@ -30,6 +30,7 @@ def extract_raw(value: str, options: list[str] | None = None) -> dict | None:
 
         if extracted_answer:
             return {"answer": extracted_answer.upper()}
+
         return None
 
     except Exception as e:
@@ -61,7 +62,7 @@ def _extract_answer_from_options(text: str, options: list[str] | None = None) ->
         options: List of valid options. If None, defaults to A-Z.
 
     Returns:
-        The extracted option letter or None if no valid answer found.
+        The extracted option or None if no valid answer found.
     """
     if not text:
         return None
@@ -69,17 +70,25 @@ def _extract_answer_from_options(text: str, options: list[str] | None = None) ->
     if options is None:
         options = [chr(i) for i in range(ord("A"), ord("Z") + 1)]
 
-    option_pattern = "|".join([re.escape(opt.lower()) for opt in options])
+    # Distinguish between single-character and multi-character options
+    all_single_char = all(len(opt) == 1 for opt in options)
+    option_regex = (
+        f"([{''.join(re.escape(opt.lower()) for opt in options)}])"
+        if all_single_char
+        else f"({'|'.join(re.escape(opt.lower()) for opt in options)})"
+    )
+
     patterns = [
-        rf"(?:answer|choice)\s*:?\s*([{option_pattern}])\b",
-        rf"(?:^|\s)([{option_pattern}])[.:]?\s*$",
-        rf"(?:correct|right)\s+(?:answer|choice|option)\s*:?\s*([{option_pattern}])\b",
-        rf"(?:^|\s)([{option_pattern}])(?=\s*[.:]|$)",
+        rf"(?:answer|choice)\s*:?\s*{option_regex}\b",
+        rf"(?:^|\s){option_regex}[.:]?\s*$",
+        rf"(?:correct|right)\s+(?:answer|choice|option)\s*:?\s*{option_regex}\b",
+        rf"(?:^|\s){option_regex}(?=\s*[.:]|$)",
     ]
 
     for pattern in patterns:
         matches = re.finditer(pattern, text, re.IGNORECASE | re.MULTILINE)
         match_list = list(matches)
+
         if match_list:
             return match_list[-1].group(1).upper()
 

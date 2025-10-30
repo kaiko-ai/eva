@@ -139,10 +139,22 @@ def test_init_requires_non_empty_mapping() -> None:
         ExtractDiscreteAnswerFromRaw(mapping={})
 
 
-def test_init_rejects_multi_word_keys() -> None:
-    """Multi-word mapping keys should be rejected at construction time."""
-    with pytest.raises(ValueError, match="All mapping keys must be single words"):
-        ExtractDiscreteAnswerFromRaw(mapping={"Option A": 0, "Option B": 1})
+def test_supports_multi_word_keys() -> None:
+    """Multi-word mapping keys should be supported and work correctly."""
+    transform = ExtractDiscreteAnswerFromRaw(
+        mapping={"Option A": 0, "Option B": 1, "True": 2, "False": 3}, missing_limit=0
+    )
+
+    test_cases = [
+        ("The answer is Option A", [0]),
+        ("I choose Option B", [1]),
+        ("Answer: True", [2]),
+        ("The correct choice is False", [3]),
+    ]
+
+    for text, expected in test_cases:
+        tensor = transform(text)
+        assert tensor.tolist() == expected, f"Failed for text: '{text}'"
 
 
 def test_prioritizes_last_occurrence() -> None:
