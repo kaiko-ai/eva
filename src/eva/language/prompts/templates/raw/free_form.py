@@ -5,19 +5,29 @@ from __future__ import annotations
 import textwrap
 from typing import Sequence
 
+from eva.language.prompts.templates import base, typings
+from eva.language.utils.text import format as format_utils
 from jinja2 import Template
 from typing_extensions import override
 
-from eva.language.prompts.templates import base, typings
-from eva.language.utils.text import format as format_utils
 
-
-class FreeFormQuestionPromptTemplate(base.PromptTemplate):
+class RawFreeFormQuestionPromptTemplate(base.PromptTemplate):
     """Prompt template for free-form questions."""
 
     template = textwrap.dedent(
         """\
         {{ preamble }}
+
+        Question: {{ question }}
+        {% if context %}
+        Context:
+        {{ context }}
+        {% endif %}
+
+        {%- if enable_cot %}
+        Think step-by-step before giving your final answer.
+        {% endif %}
+        IMPORTANT: You must provide your reasoning first, then end your response with your final answer.
 
         {% if examples %}
         Below are some examples:
@@ -28,13 +38,13 @@ class FreeFormQuestionPromptTemplate(base.PromptTemplate):
         Answer: {{ ex.answer }}
         ---
         {% endfor %}
-        Now please answer the following question.
-        {%- if enable_cot %}
-        Think step-by-step before giving your final answer.
+        Now please answer the initial question.
+        {% else %}
+        Example Answer:
+        Your explanation for why you chose this answer can go here...
+        Your answer here
         {% endif %}
 
-        {% endif %}
-        Question: {{ question }}
         Answer:
         """
     )
@@ -64,9 +74,8 @@ class FreeFormQuestionPromptTemplate(base.PromptTemplate):
         Args:
             question: The question to ask the model.
             context: Supporting context text(s) for the question.
-            examples: A sequence of question & answer pairs to include as examples.
-                Expected format is a list of dicts with 'question', 'answer', and
-                optional 'context' keys.
+            examples: Optional list of example question-answer pairs.
+                Each example should be a dict with 'question' and 'answer' keys.
             preamble: Optional preamble text to include at the top of the prompt.
             enable_cot: Optionally override the instance's CoT setting for this render call.
 

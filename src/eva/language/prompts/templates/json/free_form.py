@@ -13,13 +13,12 @@ from jinja2 import Template
 from typing_extensions import override
 
 
-class JsonMultipleChoicePromptTemplate(base.PromptTemplate):
-    """Prompt template for multiple choice questions while enforcing JSON output."""
+class JsonFreeFormPromptTemplate(base.PromptTemplate):
+    """Prompt template for free-form questions while enforcing JSON output."""
 
     template: str = textwrap.dedent(
         """\
         {{ preamble }}
-
 
         Question: {{ question }}
         {% if context %}
@@ -30,14 +29,7 @@ class JsonMultipleChoicePromptTemplate(base.PromptTemplate):
         IMPORTANT: Respond with a valid JSON object where the "{{ answer_key }}" key contains your answer.
         {% if enable_cot -%}
         Think step-by-step before giving your final answer.
-        {%- endif -%}
-        {% if use_option_letters %}
-        The value for "{{ answer_key }}" must be the letter (e.g., "A", "B", "C", ...)
-        corresponding to your chosen option from the list below:
-        {% else %}
-        The value for "{{ answer_key }}" must exactly match one of the options listed below:
-        {% endif %}
-        {{ answer_options }}
+        {%- endif %}
 
         {% if examples %}
         Below are some examples:
@@ -77,10 +69,8 @@ class JsonMultipleChoicePromptTemplate(base.PromptTemplate):
         *,
         question: str,
         context: str | Sequence[str] | None,
-        answer_options: Sequence[str],
         examples: Sequence[typings.QuestionAnswerExample] | None = None,
         preamble: str | None = None,
-        use_option_letters: bool | None = None,
         enable_cot: bool | None = None,
         answer_key: str | None = None,
     ) -> str:
@@ -89,12 +79,9 @@ class JsonMultipleChoicePromptTemplate(base.PromptTemplate):
         Args:
             question: The question to ask the model.
             context: Supporting context text(s) for the question.
-            answer_options: Allowed answer options.
-            examples: A sequence of question & answer pairs to include as examples.
-                Expected format is a list of dicts with 'question', 'answer', and
-                optional 'context' keys.
+            examples: Optional list of example question-answer pairs.
+                Each example should be a dict with 'question' and 'answer' keys.
             preamble: Optional preamble text to include at the top of the prompt.
-            use_option_letters: Whether to prefix options with letters (A, B, C, ...).
             enable_cot: Whether to explicitly prompt the model to use reasoning/CoT for answering.
             answer_key: Key name for the answer in the JSON output. Defaults to "answer".
 
@@ -108,13 +95,9 @@ class JsonMultipleChoicePromptTemplate(base.PromptTemplate):
         rendered = jinja_template.render(
             question=question.strip(),
             context=format_utils.format_list_items(context) if context else None,
-            answer_options=format_utils.format_list_items(
-                answer_options, style="letters" if use_option_letters else "bullets"
-            ),
             answer_key=answer_key or self._default_answer_key,
             examples=examples,
             preamble=(preamble or "").strip(),
-            use_option_letters=use_option_letters,
             enable_cot=enable_cot,
         )
 

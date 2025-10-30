@@ -1,4 +1,4 @@
-"""Prompt templates for multiple choice questions with JSON output."""
+"""Prompt templates for multiple choice questions with XML output."""
 
 # ruff: noqa: E501
 
@@ -13,13 +13,12 @@ from jinja2 import Template
 from typing_extensions import override
 
 
-class JsonMultipleChoicePromptTemplate(base.PromptTemplate):
-    """Prompt template for multiple choice questions while enforcing JSON output."""
+class XmlMultipleChoicePromptTemplate(base.PromptTemplate):
+    """Prompt template for multiple choice questions while enforcing XML output."""
 
     template: str = textwrap.dedent(
         """\
         {{ preamble }}
-
 
         Question: {{ question }}
         {% if context %}
@@ -27,15 +26,15 @@ class JsonMultipleChoicePromptTemplate(base.PromptTemplate):
         {{ context }}
         {% endif %}
 
-        IMPORTANT: Respond with a valid JSON object where the "{{ answer_key }}" key contains your answer.
+        IMPORTANT: Provide your final answer within <{{ answer_key }}></{{ answer_key }}> tags.
         {% if enable_cot -%}
         Think step-by-step before giving your final answer.
         {%- endif -%}
         {% if use_option_letters %}
-        The value for "{{ answer_key }}" must be the letter (e.g., "A", "B", "C", ...)
+        The answer must be the letter (e.g., "A", "B", "C", ...)
         corresponding to your chosen option from the list below:
         {% else %}
-        The value for "{{ answer_key }}" must exactly match one of the options listed below:
+        The answer must exactly match one of the options listed below:
         {% endif %}
         {{ answer_options }}
 
@@ -50,11 +49,8 @@ class JsonMultipleChoicePromptTemplate(base.PromptTemplate):
         {% endfor %}
         Now please answer the initial question.
         {% else %}
-        Example JSON Answer:
-        Your explanation for why you chose this answer can go here...
-        {{ '{' }}
-            "{{ answer_key }}": "Your answer here"
-        {{ '}' }}
+        Example Answer:
+        Your explanation for why you chose this answer can go here... <{{ answer_key }}>Your answer here</{{ answer_key }}>
         {% endif %}
 
         Answer:
@@ -63,7 +59,7 @@ class JsonMultipleChoicePromptTemplate(base.PromptTemplate):
     """Base template to be rendered via Jinja2."""
 
     _default_answer_key: str = "answer"
-    """Default key name for the answer in the JSON output."""
+    """Default key name for the answer in the XML output."""
 
     def __init__(
         self,
@@ -96,7 +92,7 @@ class JsonMultipleChoicePromptTemplate(base.PromptTemplate):
             preamble: Optional preamble text to include at the top of the prompt.
             use_option_letters: Whether to prefix options with letters (A, B, C, ...).
             enable_cot: Whether to explicitly prompt the model to use reasoning/CoT for answering.
-            answer_key: Key name for the answer in the JSON output. Defaults to "answer".
+            answer_key: Key name for the answer in the XML output. Defaults to "answer".
 
         Returns:
             The rendered prompt string.
