@@ -23,21 +23,23 @@ class Resize(base.TorchvisionTransformV2):
     """
 
     def __init__(
-        self, size: int | Sequence[int] | None = None, max_bytes: int | None = None
+        self,
+        size: int | Sequence[int] | None = None,
+        max_bytes: int | None = None,
+        max_size: int | None = None,
     ) -> None:
         """Initializes the transform.
 
         Args:
             size: Desired output size, e.g. (height, width) tuple.
-            max_bytes: Maximum allowed byte size for the image.
-                If provided, size must be None. Must be a positive integer.
+            max_bytes: Maximum allowed byte size for the image. If both `size` and
+                `max_bytes` are provided, `max_bytes` takes precedence.
+            max_size: The maximum allowed for the longer edge of the resized image.
 
         Raises:
             ValueError: If both size and max_bytes are provided, or if max_bytes
                 is not a positive integer.
         """
-        if size is not None and max_bytes is not None:
-            raise ValueError("Cannot provide both 'size' and 'max_bytes' parameters.")
         if max_bytes is not None and max_bytes <= 0:
             raise ValueError("'max_bytes' must be a positive integer.")
 
@@ -45,12 +47,13 @@ class Resize(base.TorchvisionTransformV2):
 
         self.size = size
         self.max_bytes = max_bytes
+        self.max_size = max_size
         self.resize_fn = None
 
-        if size is not None:
-            self.resize_fn = v2.Resize(size=size)
-        elif max_bytes is not None:
+        if max_bytes is not None:
             self.resize_fn = functools.partial(functional.resize_to_max_bytes, max_bytes=max_bytes)
+        elif size is not None:
+            self.resize_fn = v2.Resize(size=size, max_size=max_size)
 
     @functools.singledispatchmethod
     @override
