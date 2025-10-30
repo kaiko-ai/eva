@@ -27,9 +27,11 @@ model:
       predictions_transforms:
         - class_path: eva.language.models.postprocess.ExtractDiscreteAnswerFromJson
           init_args:
-            mapping: {"no": 0, "yes": 1, "maybe": 2}
-            missing_limit: ${oc.env:MISSING_LIMIT, 5}
-            missing_response: ${oc.env:MISSING_RESPONSE, 2}
+            answer_format: ${oc.env:ANSWER_FORMAT, json}
+            extract_kwargs:
+              mapping: {"no": 0, "yes": 1, "maybe": 2}
+              missing_limit: ${oc.env:MISSING_LIMIT, 5}
+              missing_response: ${oc.env:MISSING_RESPONSE, 2}
 data:
   class_path: eva.DataModule
   init_args:
@@ -43,6 +45,10 @@ data:
           # Set `download: true` to download the dataset from https://huggingface.co/datasets/bigbio/pubmed_qa
           # The PubMedQA dataset is distributed under the following license: MIT License
           # See (https://github.com/pubmedqa/pubmedqa/blob/master/LICENSE)
+          prompt_template:
+            class_path: eva.language.prompts.templates.MultipleChoicePromptTemplate
+            init_args:
+              answer_format: ${oc.env:ANSWER_FORMAT, json}
       test:
         class_path: eva.language.datasets.PubMedQA
         init_args:
