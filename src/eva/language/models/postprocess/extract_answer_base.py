@@ -1,15 +1,14 @@
-"""Postprocessing transforms for extracting answers from JSON responses."""
+"""Base classes for postprocessing transforms."""
 
-from typing import Any, Dict, List
+from abc import ABC, abstractmethod
+from typing import Any, Dict, List, Union
 
 import torch
 from loguru import logger
 
-from eva.language.utils.text import json as json_utils
 
-
-class ExtractDiscreteAnswerFromJson:
-    """Extracts discrete answers from JSON responses and casts them to int tensors."""
+class ExtractDiscreteAnswerFromStructuredOutput(ABC):
+    """Base class for extracting discrete answers from structured output formats."""
 
     def __init__(
         self,
@@ -24,7 +23,7 @@ class ExtractDiscreteAnswerFromJson:
 
         Args:
             mapping: Mapping from answer strings to integer IDs.
-            answer_key: The key within the JSON object that stores the answer.
+            answer_key: The key/tag within the structured object that stores the answer.
             case_sensitive: Whether to treat mappings as case sensitive.
             raise_if_missing: Whether to raise an error if an answer is missing
                 or not found in the mapping. If False, will return `missing_response`
@@ -47,29 +46,44 @@ class ExtractDiscreteAnswerFromJson:
         self.missing_count = 0
         self.mapping = {k if case_sensitive else k.lower(): v for k, v in mapping.items()}
 
-    def __call__(self, values: str | List[str]) -> torch.Tensor:
-        """Convert JSON string(s) to a tensor of integer labels."""
+    @abstractmethod
+    def _extract_structured_data(self, value: str) -> Dict[str, str] | None:
+        """Extract structured data from a string.
+
+        Args:
+            value: The input string containing structured data.
+
+        Returns:
+            Dict[str, str] | None: The extracted structured data as a dictionary
+                or None if extraction failed.
+        """
+        pass
+
+    def __call__(self, values: Union[str, List[str]]) -> torch.Tensor:
+        """Convert structured string(s) to a tensor of integer labels."""
         if not isinstance(values, (list, tuple)):
             values = [values]
 
-        jsons = list(map(json_utils.extract_json, values))
-        answers = list(map(self._extract_answer, jsons))  # type: ignore
+        structured_data = list(map(self._extract_structured_data, values))
+        answers = list(map(self._extract_answer, structured_data))
 
         return torch.tensor(answers, dtype=torch.long)
 
-    def _extract_answer(self, json_obj: Dict[str, str] | None) -> int:
-        if json_obj is None or self.answer_key not in json_obj:
+    def _extract_answer(self, structured_obj: Dict[str, str] | None) -> int:
+        if structured_obj is None or self.answer_key not in structured_obj:
             self.missing_count += 1
             if self.raise_if_missing and self.missing_count > self.missing_limit:
-                raise ValueError(f"Found {self.missing_count} responses without JSON objects.")
+                raise ValueError(
+                    f"Found {self.missing_count} responses without valid structured data."
+                )
             else:
                 logger.warning(
-                    f"Failed to extract answer from response: {json_obj}, "
+                    f"Failed to extract answer from response: {structured_obj}, "
                     f"returning {self.missing_response} instead."
                 )
                 return self.missing_response
 
-        return self._apply_mapping(json_obj[self.answer_key])
+        return self._apply_mapping(structured_obj[self.answer_key])
 
     def _apply_mapping(self, value: Any) -> int:
         key = value if self.case_sensitive else str(value).strip().lower()

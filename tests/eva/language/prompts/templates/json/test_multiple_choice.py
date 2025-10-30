@@ -22,7 +22,7 @@ def test_render_basic_trims_input(template: JsonMultipleChoicePromptTemplate) ->
     assert result.startswith("Question: What is the capital of France?")
     assert "- Paris" in result
     assert "- London" in result
-    assert '"answer":' in result and '"reason":' in result
+    assert '"answer":' in result
 
 
 def test_render_context_formats_lists(template: JsonMultipleChoicePromptTemplate) -> None:
@@ -72,16 +72,10 @@ def test_render_option_styles(
     assert instruction_snippet in result
 
 
-@pytest.mark.parametrize(
-    ("answer_key", "reason_key"),
-    [
-        ("choice", "why"),
-        ("response", "rationale"),
-    ],
-)
-def test_render_custom_keys_respected(answer_key: str, reason_key: str) -> None:
-    """Custom answer_key/reason_key propagate to the instructions and example JSON."""
-    template = JsonMultipleChoicePromptTemplate(answer_key=answer_key, reason_key=reason_key)
+@pytest.mark.parametrize(("answer_key"), ["choice", "response"])
+def test_render_custom_keys_respected(answer_key: str) -> None:
+    """Custom answer_key propagate to the instructions and example JSON."""
+    template = JsonMultipleChoicePromptTemplate(answer_key=answer_key)
     result = template.render(
         question="Test question",
         context=None,
@@ -90,9 +84,7 @@ def test_render_custom_keys_respected(answer_key: str, reason_key: str) -> None:
 
     assert f'The value for "{answer_key}"' in result
     assert f'"{answer_key}":' in result
-    assert f'"{reason_key}":' in result
     assert '"answer":' not in result
-    assert '"reason":' not in result
 
 
 @pytest.mark.parametrize(
@@ -166,7 +158,7 @@ def test_render_invalid_answer_options_raises_error(
     template: JsonMultipleChoicePromptTemplate, answer_options: list[object]
 ) -> None:
     """Invalid answer options should raise a descriptive ValueError."""
-    with pytest.raises(ValueError, match="`answer_options` must contain at least one"):
+    with pytest.raises(ValueError, match="`items` must be all non-empty strings"):
         template.render(
             question="Options?",
             context=None,
@@ -179,7 +171,7 @@ def test_render_with_too_many_lettered_options() -> None:
     template = JsonMultipleChoicePromptTemplate(use_option_letters=True)
     answer_options = [f"Option {i}" for i in range(27)]
 
-    with pytest.raises(ValueError, match="max 26 options are supported"):
+    with pytest.raises(ValueError, match="Maximum 26 items supported for letter format."):
         template.render(
             question="Too many?",
             context=None,

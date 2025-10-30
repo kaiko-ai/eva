@@ -71,7 +71,7 @@ def test_missing_answer_maps_to_fallback_when_allowed() -> None:
 
 def test_missing_answer_key_raises(transform: ExtractDiscreteAnswerFromJson) -> None:
     """Responses without the answer key should raise a descriptive error."""
-    with pytest.raises(ValueError, match="Found 1 responses without JSON objects"):
+    with pytest.raises(ValueError, match="Found 1 responses without valid structured data"):
         transform('{"not_answer": "Yes"}')
 
 
@@ -84,7 +84,7 @@ def test_missing_limit_raises_after_threshold() -> None:
     )
     assert transform("unknown").tolist() == [-99]
     assert transform(["unknown", "unknown"]).tolist() == [-99, -99]
-    with pytest.raises(ValueError, match="Found 4 responses without JSON objects."):
+    with pytest.raises(ValueError, match="Found 4 responses without valid structured data."):
         transform("unknown")
 
 
