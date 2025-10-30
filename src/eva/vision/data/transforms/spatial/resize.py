@@ -53,7 +53,7 @@ class Resize(base.TorchvisionTransformV2):
         if max_bytes is not None:
             self.resize_fn = functools.partial(functional.resize_to_max_bytes, max_bytes=max_bytes)
         elif size is not None or max_size is not None:
-            self.resize_fn = v2.Resize(size=size, max_size=max_size)
+            self.resize_fn = v2.Resize(size=size, max_size=max_size)  # type: ignore
 
     @functools.singledispatchmethod
     @override
