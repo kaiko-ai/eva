@@ -1,3 +1,8 @@
-from eva.language.data import datasets
+"""API for extracting answers from model outputs."""
 
-__all__ = ["datasets"]
+from eva.language.models.postprocess.extract_answer.factory import (
+    ExtractAnswer,
+    ExtractDiscreteAnswer,
+)
+
+__all__ = ["ExtractAnswer", "ExtractDiscreteAnswer"]

@@ -1,7 +1,6 @@
 """Prompt templating API."""
 
 from eva.language.prompts.templates.base import PromptTemplate
-
 from eva.language.prompts.templates.factory import (
     FreeFormQuestionPromptTemplate,
     MultipleChoicePromptTemplate,
@@ -24,6 +23,7 @@ __all__ = [
     "RawFreeFormQuestionPromptTemplate",
     "FreeFormQuestionPromptTemplate",
     "MultipleChoicePromptTemplate",
-    "PromptTemplate", 
+    "PromptTemplate",
     "JsonMultipleChoicePromptTemplate",
-    "FreeFormQuestionPromptTemplate"]
+    "FreeFormQuestionPromptTemplate",
+]

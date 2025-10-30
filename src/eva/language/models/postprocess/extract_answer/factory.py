@@ -1,10 +1,8 @@
-"""Routers for dynamically selecting extraction models based on environment variables."""
+"""Factory module for creating answer extractors based on answer format."""
 
 from typing import Literal
 
-from eva.language.models.postprocess.extract_answer.base import (
-    ExtractAnswerFromStructuredOutput,
-)
+from eva.language.models.postprocess.extract_answer.base import ExtractAnswerFromStructuredOutput
 from eva.language.models.postprocess.extract_answer.json import (
     ExtractAnswerFromJson,
     ExtractDiscreteAnswerFromJson,
@@ -20,9 +18,12 @@ from eva.language.models.postprocess.extract_answer.xml import (
 
 
 class ExtractDiscreteAnswer:
+    """Factory for creating discrete answer extractors."""
+
     def __new__(
         cls, answer_format: Literal["json", "xml", "raw"], extract_kwargs: dict
     ) -> ExtractAnswerFromStructuredOutput:
+        """Create an extractor based on the answer format."""
         match answer_format:
             case "json":
                 return ExtractDiscreteAnswerFromJson(**extract_kwargs)
@@ -35,9 +36,12 @@ class ExtractDiscreteAnswer:
 
 
 class ExtractAnswer:
+    """Factory for creating answer extractors."""
+
     def __new__(
         cls, answer_format: Literal["json", "xml", "raw"], extract_kwargs: dict
     ) -> ExtractAnswerFromStructuredOutput:
+        """Create an extractor based on the answer format."""
         match answer_format:
             case "json":
                 return ExtractAnswerFromJson(**extract_kwargs)

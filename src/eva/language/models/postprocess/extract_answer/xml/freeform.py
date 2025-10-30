@@ -4,9 +4,7 @@ from typing import Dict
 
 from typing_extensions import override
 
-from eva.language.models.postprocess.extract_answer.base import (
-    ExtractAnswerFromStructuredOutput,
-)
+from eva.language.models.postprocess.extract_answer.base import ExtractAnswerFromStructuredOutput
 from eva.language.utils.text import xml as xml_utils
 
 

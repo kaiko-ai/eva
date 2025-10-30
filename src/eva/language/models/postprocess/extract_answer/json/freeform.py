@@ -2,12 +2,10 @@
 
 from typing import Dict
 
-from eva.language.utils.text import json as json_utils
 from typing_extensions import override
 
-from eva.language.models.postprocess.extract_answer.base import (
-    ExtractAnswerFromStructuredOutput,
-)
+from eva.language.models.postprocess.extract_answer.base import ExtractAnswerFromStructuredOutput
+from eva.language.utils.text import json as json_utils
 
 
 class ExtractAnswerFromJson(ExtractAnswerFromStructuredOutput):

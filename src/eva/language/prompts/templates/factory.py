@@ -3,7 +3,6 @@
 from typing import Literal
 
 from eva.language.prompts.templates.base import PromptTemplate
-
 from eva.language.prompts.templates.json import (
     JsonFreeFormPromptTemplate,
     JsonMultipleChoicePromptTemplate,
@@ -24,6 +23,7 @@ class FreeFormQuestionPromptTemplate(PromptTemplate):
     def __new__(
         cls, answer_format: Literal["json", "xml", "raw"], **template_kwargs
     ) -> PromptTemplate:
+        """Create a free-form question prompt template based on the answer format."""
         match answer_format:
             case "json":
                 return JsonFreeFormPromptTemplate(**template_kwargs)
@@ -41,6 +41,7 @@ class MultipleChoicePromptTemplate(PromptTemplate):
     def __new__(
         cls, answer_format: Literal["json", "xml", "raw"], **template_kwargs
     ) -> PromptTemplate:
+        """Create a multiple-choice prompt template based on the answer format."""
         match answer_format:
             case "json":
                 return JsonMultipleChoicePromptTemplate(**template_kwargs)

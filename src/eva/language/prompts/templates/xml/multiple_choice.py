@@ -7,10 +7,11 @@ from __future__ import annotations
 import textwrap
 from typing import Sequence
 
-from eva.language.prompts.templates import base, typings
-from eva.language.utils.text import format as format_utils
 from jinja2 import Template
 from typing_extensions import override
+
+from eva.language.prompts.templates import base, typings
+from eva.language.utils.text import format as format_utils
 
 
 class XmlMultipleChoicePromptTemplate(base.PromptTemplate):
