@@ -13,7 +13,9 @@ from eva.language.utils.text.raw import extract_raw
         ("My choice is B", {"answer": "B"}),
         ("Answer: C", {"answer": "C"}),
         ("The correct answer is D.", {"answer": "D"}),
-        ("Final answer: E", {"answer": "E"}),
+        ("A", {"answer": "A"}),
+        ("B.", {"answer": "B"}),
+        ("C) Answer text here", {"answer": "C"}),
         # Different answer formats
         ("I choose answer A", {"answer": "A"}),
         ("The right choice is B", {"answer": "B"}),
@@ -217,6 +219,10 @@ def test_extract_raw_pattern_variations() -> None:
         # With periods
         ("answer A.", {"answer": "A"}),
         ("choice B:", {"answer": "B"}),
+        # With brackets
+        ("A) Melanoma", {"answer": "A"}),
+        ("B)", {"answer": "B"}),
+        ("**C) Adenoma** is the correct answer", {"answer": "C"}),
     ]
 
     for text, expected in patterns:
@@ -275,3 +281,78 @@ def test_extract_raw_mixed_option_lengths() -> None:
     for text, expected in test_cases:
         result = extract_raw(text, options)
         assert result == expected, f"Failed for text: '{text}'"
+
+
+@pytest.mark.parametrize(
+    ("text", "case_sensitive", "expected"),
+    [
+        # Case insensitive behavior
+        ("The answer is Yes", False, {"answer": "YES"}),
+        ("I choose yes", False, {"answer": "YES"}),
+        ("Answer: YES", False, {"answer": "YES"}),
+        ("The answer is No", False, {"answer": "NO"}),
+        ("I choose no", False, {"answer": "NO"}),
+        ("Answer: NO", False, {"answer": "NO"}),
+        # Case sensitive behavior - should only match exact case
+        ("The answer is Yes", True, {"answer": "Yes"}),  # Exact match
+        ("I choose yes", True, None),  # Wrong case, should not match
+        ("Answer: YES", True, None),  # Wrong case, should not match
+        ("The answer is No", True, {"answer": "No"}),  # Exact match
+        ("I choose no", True, None),  # Wrong case, should not match
+        ("Answer: NO", True, None),  # Wrong case, should not match
+        ("The answer is Maybe", True, {"answer": "Maybe"}),  # Exact match
+        ("I choose maybe", True, None),  # Wrong case, should not match
+    ],
+)
+def test_extract_raw_case_sensitive_behavior(
+    text: str, case_sensitive: bool, expected: dict | None
+) -> None:
+    """Should handle case sensitivity properly."""
+    options = ["Yes", "No", "Maybe"]
+    result = extract_raw(text, options, case_sensitive=case_sensitive)
+    assert result == expected
+
+
+def test_extract_raw_default_case_insensitive() -> None:
+    """Should default to case insensitive behavior."""
+    options = ["Yes", "No", "Maybe"]
+    test_cases = [
+        ("The answer is Yes", {"answer": "YES"}),
+        ("I choose yes", {"answer": "YES"}),
+        ("Answer: YES", {"answer": "YES"}),
+        ("The answer is No", {"answer": "NO"}),
+        ("I choose no", {"answer": "NO"}),
+        ("Answer: NO", {"answer": "NO"}),
+    ]
+
+    for text, expected in test_cases:
+        result = extract_raw(text, options)  # No case_sensitive parameter
+        assert result == expected, f"Default case insensitive failed for text: '{text}'"
+
+
+@pytest.mark.parametrize(
+    ("text", "case_sensitive", "expected"),
+    [
+        # Case insensitive behavior
+        ("answer: A", False, {"answer": "A"}),
+        ("answer: a", False, {"answer": "A"}),
+        ("answer: b", False, {"answer": "B"}),
+        ("answer: B", False, {"answer": "B"}),
+        ("answer: c", False, {"answer": "C"}),
+        ("answer: C", False, {"answer": "C"}),
+        # Case sensitive behavior - should only match exact case
+        ("answer: A", True, {"answer": "A"}),  # Exact match
+        ("answer: a", True, None),  # Wrong case
+        ("answer: b", True, {"answer": "b"}),  # Exact match
+        ("answer: B", True, None),  # Wrong case
+        ("answer: C", True, {"answer": "C"}),  # Exact match
+        ("answer: c", True, None),  # Wrong case
+    ],
+)
+def test_extract_raw_case_sensitive_single_char(
+    text: str, case_sensitive: bool, expected: dict | None
+) -> None:
+    """Should handle case sensitivity with single character options."""
+    options = ["A", "b", "C"]
+    result = extract_raw(text, options, case_sensitive=case_sensitive)
+    assert result == expected

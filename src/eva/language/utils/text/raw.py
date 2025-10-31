@@ -5,31 +5,77 @@ import re
 from loguru import logger
 
 
-def extract_raw(value: str, options: list[str] | None = None) -> dict | None:
-    """Extract multiple-choice answer from model response text.
+def extract_raw(
+    text: str,
+    answer_options: list[str] | None = None,
+    answer_key: str = "answer",
+    case_sensitive: bool = False,
+    tail_length: int = 10,
+) -> dict | None:
+    """Extract multiple-choice answer from model response text using regex patterns.
 
-    Focuses on the last few lines of the response where models typically place their final answer.
+    Extracts answers by focusing on the last `tail_length` words of the response
+    where models typically place final answers. The function cleans the text
+    (removes extra whitespace and asterisks), then applies multiple regex patterns
+    to find answer options. Returns the last match found to prioritize final answers.
+
+    Supported answer patterns:
+    - Explicit markers: "answer: A", "choice: B"
+    - Standalone options: "...reasoning. C", "D.", "E"
+    - Prefixed answers: "the correct answer is B", "the right choice is C"
+    - Options with punctuation: "(A)", "B:", "C."
+
+    Handles both single-character (A, B, C) and multi-character (Yes, No) options.
 
     Args:
-        value: The input string containing the model's response.
-        options: Optional list of valid multiple-choice options (e.g., ["A", "B", "C"]).
-                If None, will attempt to extract any single letter options.
+        text: The input string containing the model's response.
+        answer_options: List of valid options. If None, extracts any letter A-Z.
+        answer_key: The key to use in the returned dictionary.
+        case_sensitive: Whether to treat matching as case sensitive.
+        tail_length: Number of words from the end to examine for extraction.
 
     Returns:
-        Dict[str, str] | None: Dictionary with 'answer' key containing the extracted option,
-                              or None if extraction failed.
+        Dictionary with answer_key mapped to extracted option, or None if no match.
+
+    Examples:
+        >>> extract_raw("After analysis, my answer is B")
+        {'answer': 'B'}
+
+        >>> extract_raw("The answer is: a")
+        {'answer': 'A'}
+
+        >>> extract_raw("Therefore, the answer is Yes", answer_options=["Yes", "No"])
+        {'answer': 'Yes'}
+
+        >>> extract_raw("My choice is B", answer_key="selected_option")
+        {'selected_option': 'B'}
+
+        >>> extract_raw("I think A but actually B", tail_length=5)
+        {'answer': 'B'}
+
+        >>> extract_raw("The answer is **B**")
+        {'answer': 'B'}
+
+        >>> extract_raw("Some text without an answer")
+        None
     """
-    if not value or not isinstance(value, str):
+    if not text or not isinstance(text, str):
         return None
 
     try:
-        text = value.strip()
-        tail_text = _get_text_tail(text)
+        text = text.strip()
+        tail_text = _get_text_tail(text, max_words=tail_length)
         cleaned_text = _clean_string(tail_text)
-        extracted_answer = _extract_answer_from_options(cleaned_text, options)
+
+        if answer_options is not None:
+            options = answer_options
+        else:
+            options = [chr(i) for i in range(ord("A"), ord("Z") + 1)]
+        extracted_answer = _extract_answer_from_options(cleaned_text, options, case_sensitive)
 
         if extracted_answer:
-            return {"answer": extracted_answer.upper()}
+            result = extracted_answer if case_sensitive else extracted_answer.upper()
+            return {answer_key: result}
 
         return None
 
@@ -38,10 +84,10 @@ def extract_raw(value: str, options: list[str] | None = None) -> dict | None:
         return None
 
 
-def _get_text_tail(text: str, max_chars: int = 100) -> str:
-    """Get the last `max_chars` characters from the input text."""
-    match = re.search(r".{0," + str(max_chars) + r"}$", text, flags=re.DOTALL)
-    return match.group(0) if match else text
+def _get_text_tail(text: str, max_words: int = 10) -> str:
+    """Get the last `max_words` words from the input text."""
+    words = text.split()
+    return " ".join(words[-max_words:]) if words else text
 
 
 def _clean_string(string: str) -> str:
@@ -54,12 +100,15 @@ def _clean_string(string: str) -> str:
     return string.strip()
 
 
-def _extract_answer_from_options(text: str, options: list[str] | None = None) -> str | None:
+def _extract_answer_from_options(
+    text: str, options: list[str], case_sensitive: bool = False
+) -> str | None:
     """Extract the final answer from multiple-choice text.
 
     Args:
         text: Cleaned text to extract answer from.
-        options: List of valid options. If None, defaults to A-Z.
+        options: List of valid options.
+        case_sensitive: Whether to treat matching as case sensitive.
 
     Returns:
         The extracted option or None if no valid answer found.
@@ -67,29 +116,23 @@ def _extract_answer_from_options(text: str, options: list[str] | None = None) ->
     if not text:
         return None
 
-    if options is None:
-        options = [chr(i) for i in range(ord("A"), ord("Z") + 1)]
-
     # Distinguish between single-character and multi-character options
     all_single_char = all(len(opt) == 1 for opt in options)
-    option_regex = (
-        f"([{''.join(re.escape(opt.lower()) for opt in options)}])"
-        if all_single_char
-        else f"({'|'.join(re.escape(opt.lower()) for opt in options)})"
-    )
-
+    esc_opts = [re.escape(opt) for opt in options]
+    option_regex = f"([{''.join(esc_opts)}])" if all_single_char else f"({'|'.join(esc_opts)})"
     patterns = [
         rf"(?:answer|choice)\s*:?\s*{option_regex}\b",
         rf"(?:^|\s){option_regex}[.:]?\s*$",
         rf"(?:correct|right)\s+(?:answer|choice|option)\s*:?\s*{option_regex}\b",
-        rf"(?:^|\s){option_regex}(?=\s*[.:]|$)",
+        rf"(?:^|\s){option_regex}(?=\s*[.:)]|$)",
     ]
 
+    flags = re.MULTILINE if case_sensitive else re.IGNORECASE | re.MULTILINE
     for pattern in patterns:
-        matches = re.finditer(pattern, text, re.IGNORECASE | re.MULTILINE)
+        matches = re.finditer(pattern, text, flags)
         match_list = list(matches)
 
         if match_list:
-            return match_list[-1].group(1).upper()
+            return match_list[-1].group(1)
 
     return None

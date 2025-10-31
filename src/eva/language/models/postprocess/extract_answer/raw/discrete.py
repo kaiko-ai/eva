@@ -23,4 +23,9 @@ class ExtractDiscreteAnswerFromRaw(ExtractDiscreteAnswerFromStructuredOutput):
         Returns:
             Dict[str, str] | None: The extracted raw object or None if extraction failed.
         """
-        return raw_utils.extract_raw(value, list(self.mapping.keys()))
+        return raw_utils.extract_raw(
+            text=value,
+            answer_options=list(self.mapping.keys()),
+            answer_key=self.answer_key,
+            case_sensitive=self.case_sensitive,
+        )
