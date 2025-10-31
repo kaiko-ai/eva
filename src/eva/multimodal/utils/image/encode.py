@@ -38,8 +38,8 @@ def _encode_base64(
 
     Args:
         image: Image tensor to encode.
-        file_format: Either "png" (lossless) or "jpeg" (lossy). Defaults to "png".
-            Can be overridden by the BASE64_IMAGE_FORMAT environment variable.
+        file_format: Either "png" (lossless) or "jpeg" (lossy). Can be overridden
+            by the BASE64_IMAGE_FORMAT environment variable.
         optimize: If True, performs an extra optimization pass for slightly smaller files
             at the cost of slower encoding.
         compress_level: PNG-only. Compression level (0-9); lower is faster, but results
