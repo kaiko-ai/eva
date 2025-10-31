@@ -4,6 +4,7 @@
 
 from __future__ import annotations
 
+import string
 import textwrap
 from typing import Sequence
 
@@ -46,7 +47,7 @@ class JsonFreeFormPromptTemplate(base.PromptTemplate):
         Example JSON Answer:
         Your explanation for why you chose this answer can go here...
         {{ '{' }}
-            "{{ answer_key }}": "Your answer here"
+            "{{ answer_key }}": "{{ example_answer }}"
         {{ '}' }}
         {% endif %}
 
@@ -71,6 +72,7 @@ class JsonFreeFormPromptTemplate(base.PromptTemplate):
         question: str,
         context: str | Sequence[str] | None,
         examples: Sequence[typings.QuestionAnswerExample] | None = None,
+        example_answer: str | None = None,
         preamble: str | None = None,
         enable_cot: bool | None = None,
         answer_key: str | None = None,
@@ -82,6 +84,7 @@ class JsonFreeFormPromptTemplate(base.PromptTemplate):
             context: Supporting context text(s) for the question.
             examples: Optional list of example question-answer pairs.
                 Each example should be a dict with 'question' and 'answer' keys.
+            example_answer: Optional example answer for the JSON snippet. Defaults to first option.
             preamble: Optional preamble text to include at the top of the prompt.
             enable_cot: Whether to explicitly prompt the model to use reasoning/CoT for answering.
             answer_key: Key name for the answer in the JSON output. Defaults to "answer".
@@ -98,6 +101,7 @@ class JsonFreeFormPromptTemplate(base.PromptTemplate):
             context=format_utils.format_list_items(context) if context else None,
             answer_key=answer_key or self._default_answer_key,
             examples=examples,
+            example_answer=example_answer,
             preamble=(preamble or "").strip(),
             enable_cot=enable_cot,
         )

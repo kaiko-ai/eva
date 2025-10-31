@@ -44,7 +44,7 @@ class XmlFreeFormPromptTemplate(base.PromptTemplate):
         {% else %}
         Example Answer:
         Your explanation for why you chose this answer can go here...
-        <{{ answer_key }}>Your answer here</{{ answer_key }}>
+        <{{ answer_key }}>{{ example_answer }}</{{ answer_key }}>
         {% endif %}
 
         Answer:
@@ -68,6 +68,7 @@ class XmlFreeFormPromptTemplate(base.PromptTemplate):
         question: str,
         context: str | Sequence[str] | None = None,
         examples: Sequence[dict[str, str]] | None = None,
+        example_answer: str | None = None,
         preamble: str | None = None,
         enable_cot: bool | None = None,
         answer_key: str | None = None,
@@ -79,6 +80,7 @@ class XmlFreeFormPromptTemplate(base.PromptTemplate):
             context: Supporting context text(s) for the question.
             examples: Optional list of example question-answer pairs.
                 Each example should be a dict with 'question' and 'answer' keys.
+            example_answer: Optional example answer for the XML snippet. Defaults to first option.
             preamble: Optional preamble text to include at the top of the prompt.
             enable_cot: Whether to explicitly prompt the model to use reasoning/CoT for answering.
             answer_key: Key name for the answer in the XML output. Defaults to "answer".
@@ -94,6 +96,7 @@ class XmlFreeFormPromptTemplate(base.PromptTemplate):
             question=question.strip(),
             context=format_utils.format_list_items(context) if context else None,
             examples=examples,
+            example_answer=example_answer,
             answer_key=answer_key or self._default_answer_key,
             preamble=(preamble or "").strip(),
             enable_cot=enable_cot,

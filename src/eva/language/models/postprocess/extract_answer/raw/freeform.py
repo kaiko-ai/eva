@@ -13,7 +13,7 @@ class ExtractAnswerFromRaw(ExtractAnswerFromStructuredOutput):
 
     @override
     def _extract_structured_data(self, value: str) -> Dict[str, str] | None:
-        """Extract raw data from a string.
+        """Extract unstructured data (e.g., single letters or words) from a string using regex.
 
         Args:
             value: The input string containing raw text.

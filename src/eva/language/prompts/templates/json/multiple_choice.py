@@ -4,6 +4,7 @@
 
 from __future__ import annotations
 
+import string
 import textwrap
 from typing import Sequence
 
@@ -54,7 +55,7 @@ class JsonMultipleChoicePromptTemplate(base.PromptTemplate):
         Example JSON Answer:
         Your explanation for why you chose this answer can go here...
         {{ '{' }}
-            "{{ answer_key }}": "Your answer here"
+            "{{ answer_key }}": "{{ example_answer }}"
         {{ '}' }}
         {% endif %}
 
@@ -80,6 +81,7 @@ class JsonMultipleChoicePromptTemplate(base.PromptTemplate):
         context: str | Sequence[str] | None,
         answer_options: Sequence[str],
         examples: Sequence[typings.QuestionAnswerExample] | None = None,
+        example_answer: str | None = None,
         preamble: str | None = None,
         use_option_letters: bool | None = None,
         enable_cot: bool | None = None,
@@ -94,6 +96,7 @@ class JsonMultipleChoicePromptTemplate(base.PromptTemplate):
             examples: A sequence of question & answer pairs to include as examples.
                 Expected format is a list of dicts with 'question', 'answer', and
                 optional 'context' keys.
+            example_answer: Optional example answer for the JSON snippet. Defaults to first option.
             preamble: Optional preamble text to include at the top of the prompt.
             use_option_letters: Whether to prefix options with letters (A, B, C, ...).
             enable_cot: Whether to explicitly prompt the model to use reasoning/CoT for answering.
@@ -114,6 +117,11 @@ class JsonMultipleChoicePromptTemplate(base.PromptTemplate):
             ),
             answer_key=answer_key or self._default_answer_key,
             examples=examples,
+            example_answer=(
+                example_answer
+                if isinstance(example_answer, str)
+                else (string.ascii_uppercase[0] if use_option_letters else answer_options[0])
+            ).strip(),
             preamble=(preamble or "").strip(),
             use_option_letters=use_option_letters,
             enable_cot=enable_cot,

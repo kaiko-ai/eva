@@ -45,7 +45,7 @@ class RawFreeFormQuestionPromptTemplate(base.PromptTemplate):
         {% else %}
         Example Answer:
         Your explanation for why you chose this answer can go here...
-        Your answer here
+        {{ example_answer }}
         {% endif %}
 
         Answer:
@@ -69,6 +69,7 @@ class RawFreeFormQuestionPromptTemplate(base.PromptTemplate):
         question: str,
         context: str | Sequence[str] | None = None,
         examples: Sequence[typings.QuestionAnswerExample] | None = None,
+        example_answer: str | None = None,
         preamble: str | None = None,
         enable_cot: bool | None = None,
     ) -> str:
@@ -79,6 +80,7 @@ class RawFreeFormQuestionPromptTemplate(base.PromptTemplate):
             context: Supporting context text(s) for the question.
             examples: Optional list of example question-answer pairs.
                 Each example should be a dict with 'question' and 'answer' keys.
+            example_answer: Optional example answer for the raw snippet. Defaults to first option.
             preamble: Optional preamble text to include at the top of the prompt.
             enable_cot: Optionally override the instance's CoT setting for this render call.
 
@@ -93,6 +95,7 @@ class RawFreeFormQuestionPromptTemplate(base.PromptTemplate):
             question=question.strip(),
             context=format_utils.format_list_items(context) if context else None,
             examples=examples,
+            example_answer=example_answer,
             preamble=(preamble or "").strip(),
             enable_cot=self.enable_cot if enable_cot is None else enable_cot,
         )

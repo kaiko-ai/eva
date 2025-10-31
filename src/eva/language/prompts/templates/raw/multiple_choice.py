@@ -4,6 +4,7 @@
 
 from __future__ import annotations
 
+import string
 import textwrap
 from typing import Sequence
 
@@ -58,7 +59,7 @@ class RawMultipleChoicePromptTemplate(base.PromptTemplate):
         {% else %}
         Example Answer:
         Your explanation for why you chose this answer can go here...
-        Your answer here
+        {{ example_answer }}
         {% endif %}
 
         Answer:
@@ -80,6 +81,7 @@ class RawMultipleChoicePromptTemplate(base.PromptTemplate):
         context: str | Sequence[str] | None,
         answer_options: Sequence[str],
         examples: Sequence[typings.QuestionAnswerExample] | None = None,
+        example_answer: str | None = None,
         preamble: str | None = None,
         use_option_letters: bool | None = None,
         enable_cot: bool | None = None,
@@ -93,6 +95,7 @@ class RawMultipleChoicePromptTemplate(base.PromptTemplate):
             examples: A sequence of question & answer pairs to include as examples.
                 Expected format is a list of dicts with 'question', 'answer', and
                 optional 'context' keys.
+            example_answer: Optional example answer for the raw snippet. Defaults to first option.
             preamble: Optional preamble text to include at the top of the prompt.
             use_option_letters: Whether to prefix options with letters (A, B, C, ...).
             enable_cot: Optionally override the instance's CoT setting for this render call.
@@ -111,6 +114,11 @@ class RawMultipleChoicePromptTemplate(base.PromptTemplate):
                 answer_options, style="letters" if use_option_letters else "bullets"
             ),
             examples=examples,
+            example_answer=(
+                example_answer
+                if isinstance(example_answer, str)
+                else (string.ascii_uppercase[0] if use_option_letters else answer_options[0])
+            ).strip(),
             preamble=(preamble or "").strip(),
             use_option_letters=use_option_letters,
             enable_cot=enable_cot,
