@@ -20,6 +20,18 @@ class XmlFreeFormPromptTemplate(base.PromptTemplate):
         """\
         {{ preamble }}
 
+        {% if examples %}
+        Below are some examples of how to answer questions:
+
+        {% for ex in examples %}
+        Example {{ loop.index }}:
+        Question: {{ ex.question }}
+        Answer: {{ ex.answer }}
+        ---
+        {% endfor %}
+        Now please answer the following question.
+        {% endif %}
+
         Question: {{ question }}
         {% if context %}
         Context:
@@ -31,17 +43,7 @@ class XmlFreeFormPromptTemplate(base.PromptTemplate):
         Think step-by-step before giving your final answer.
         {%- endif %}
 
-        {% if examples %}
-        Below are some examples:
-
-        {% for ex in examples %}
-        Example {{ loop.index }}:
-        Question: {{ ex.question }}
-        Answer: {{ ex.answer }}
-        ---
-        {% endfor %}
-        Now please answer the initial question.
-        {% else %}
+        {% if not examples %}
         Example Answer:
         Your explanation for why you chose this answer can go here...
         <{{ answer_key }}>{{ example_answer }}</{{ answer_key }}>
