@@ -39,13 +39,12 @@ class RawMultipleChoicePromptTemplate(base.PromptTemplate):
         Context:
         {{ context }}
         {% endif %}
-        Provide a brief explanation for your choice before stating your final answer.
 
         {%- if enable_cot %}
-        Think step-by-step before giving your final answer.
-        {% endif %}
-
-        IMPORTANT: You must provide your reasoning first, then end your response with only your final answer
+        IMPORTANT: Think step-by-step before giving your final answer. Provide your reasoning first, then end your response with only your final answer
+        {%- else -%}
+        IMPORTANT: End your response with only your final answer
+        {%- endif -%}
         {%- if use_option_letters %} letter
         {%- else %} exactly as written below
         {%- endif %}.

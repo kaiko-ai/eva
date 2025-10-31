@@ -38,9 +38,10 @@ class XmlFreeFormPromptTemplate(base.PromptTemplate):
         {{ context }}
         {% endif %}
 
+        {% if enable_cot -%}
+        IMPORTANT:  Think step-by-step before giving your final answer, then provide your final answer within <{{ answer_key }}></{{ answer_key }}> tags.
+        {%- else -%}
         IMPORTANT: Provide your final answer within <{{ answer_key }}></{{ answer_key }}> tags.
-        {% if enable_cot and not examples -%}
-        Think step-by-step before giving your final answer.
         {%- endif %}
 
         {% if not examples %}

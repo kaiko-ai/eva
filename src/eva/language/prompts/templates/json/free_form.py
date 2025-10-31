@@ -39,9 +39,10 @@ class JsonFreeFormPromptTemplate(base.PromptTemplate):
         {{ context }}
         {% endif %}
 
-        IMPORTANT: Respond with a valid JSON object where the "{{ answer_key }}" key contains your answer.
         {% if enable_cot -%}
-        Think step-by-step before giving your final answer.
+        IMPORTANT: Think step-by-step before giving your final answer. First provide your reasoning, then respond with a valid JSON object where the "{{ answer_key }}" key contains your final answer.
+        {%- else -%}
+        IMPORTANT: Respond with a valid JSON object where the "{{ answer_key }}" key contains your final answer.
         {%- endif %}
 
        {% if not examples %}

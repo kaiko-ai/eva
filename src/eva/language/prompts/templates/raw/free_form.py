@@ -40,9 +40,10 @@ class RawFreeFormQuestionPromptTemplate(base.PromptTemplate):
         {% endif %}
 
         {%- if enable_cot %}
-        Think step-by-step before giving your final answer.
-        {% endif %}
-        IMPORTANT: You must provide your reasoning first, then end your response with your final answer.
+        IMPORTANT: Think step-by-step before giving your final answer. Provide your reasoning first, then end your response with your final answer.
+        {%- else -%}
+        IMPORTANT: Respond in free form text, and make sure that your final answer is the last part of your response.
+        {%- endif %}
 
         {% if not examples %}
         Example Answer:

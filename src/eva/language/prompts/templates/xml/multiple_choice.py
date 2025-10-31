@@ -40,9 +40,10 @@ class XmlMultipleChoicePromptTemplate(base.PromptTemplate):
         {{ context }}
         {% endif %}
 
-        IMPORTANT: Provide your final answer within <{{ answer_key }}></{{ answer_key }}> tags.
         {% if enable_cot -%}
-        Think step-by-step before giving your final answer.
+        IMPORTANT:  Think step-by-step before giving your final answer, then provide your final answer within <{{ answer_key }}></{{ answer_key }}> tags.
+        {%- else -%}
+        IMPORTANT: Provide your final answer within <{{ answer_key }}></{{ answer_key }}> tags.
         {%- endif -%}
         {% if use_option_letters %}
         The answer must be the letter (e.g., "A", "B", "C", ...)
