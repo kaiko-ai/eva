@@ -8,7 +8,6 @@ from eva.language.models.postprocess.extract_answer.json import (
     ExtractDiscreteAnswerFromJson,
 )
 from eva.language.models.postprocess.extract_answer.raw import (
-    ExtractAnswerFromRaw,
     ExtractDiscreteAnswerFromRaw,
 )
 from eva.language.models.postprocess.extract_answer.xml import (
@@ -39,7 +38,7 @@ class ExtractAnswer:
     """Factory for creating answer extractors."""
 
     def __new__(
-        cls, answer_format: Literal["json", "xml", "raw"], extract_kwargs: dict
+        cls, answer_format: Literal["json", "xml"], extract_kwargs: dict
     ) -> ExtractAnswerFromStructuredOutput:
         """Create an extractor based on the answer format."""
         match answer_format:
@@ -47,7 +46,5 @@ class ExtractAnswer:
                 return ExtractAnswerFromJson(**extract_kwargs)
             case "xml":
                 return ExtractAnswerFromXml(**extract_kwargs)
-            case "raw":
-                return ExtractAnswerFromRaw(**extract_kwargs)
             case _:
                 raise ValueError(f"Unknown answer format: {answer_format}")
