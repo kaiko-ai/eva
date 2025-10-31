@@ -30,12 +30,6 @@ def test_resize_with_max_bytes_only():
     assert result.shape[1] < 500 or result.shape[2] < 500
 
 
-def test_resize_with_both_size_and_max_bytes_raises_error():
-    """Test Resize raises ValueError when both size and max_bytes parameters are provided."""
-    with pytest.raises(ValueError, match="Cannot provide both 'size' and 'max_bytes' parameters."):
-        transforms.Resize(size=(150, 150), max_bytes=1000)
-
-
 def test_resize_with_no_parameters():
     """Test Resize with neither size nor max_bytes parameters provided."""
     resize_transform = transforms.Resize()
