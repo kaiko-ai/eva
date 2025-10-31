@@ -9,7 +9,7 @@ from typing import Sequence
 from jinja2 import Template
 from typing_extensions import override
 
-from eva.language.prompts.templates import base
+from eva.language.prompts.templates import base, typings
 from eva.language.utils.text import format as format_utils
 
 
@@ -70,7 +70,7 @@ class XmlFreeFormPromptTemplate(base.PromptTemplate):
         *,
         question: str,
         context: str | Sequence[str] | None = None,
-        examples: Sequence[dict[str, str]] | None = None,
+        examples: Sequence[typings.QuestionAnswerExample] | None = None,
         example_answer: str | None = None,
         preamble: str | None = None,
         enable_cot: bool | None = None,
@@ -82,7 +82,7 @@ class XmlFreeFormPromptTemplate(base.PromptTemplate):
             question: The question to ask the model.
             context: Supporting context text(s) for the question.
             examples: Optional list of example question-answer pairs.
-                Each example should be a dict with 'question' and 'answer' keys.
+                Each example should be a QuestionAnswerExample with 'question' and 'answer' keys.
             example_answer: Optional example answer for the XML snippet. Defaults to first option.
             preamble: Optional preamble text to include at the top of the prompt.
             enable_cot: Whether to explicitly prompt the model to use reasoning/CoT for answering.

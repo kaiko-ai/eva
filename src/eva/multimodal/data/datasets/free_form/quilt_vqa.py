@@ -28,8 +28,8 @@ class QuiltVQA(TextImageDataset[str]):
     _license: str = "CC-BY-NC-ND-3.0 (https://creativecommons.org/licenses/by-nc-nd/3.0/ch/deed.de)"
     """Dataset license."""
 
-    _default_prompt_template: templates.PromptTemplate = templates.FreeFormQuestionPromptTemplate(
-        answer_format="raw"
+    _default_prompt_template: templates.PromptTemplate = (
+        templates.RawFreeFormQuestionPromptTemplate()
     )
     """Default prompt template for formatting questions and context."""
 
