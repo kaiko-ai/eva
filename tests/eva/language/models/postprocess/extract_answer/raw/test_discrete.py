@@ -81,26 +81,6 @@ def test_case_sensitive_behavior() -> None:
         transform("My answer is Yes")
 
 
-def test_lookback_words_parameter() -> None:
-    """Should only search within the specified lookback window."""
-    transform = ExtractDiscreteAnswerFromRaw(
-        mapping={"Yes": 1, "No": 0}, lookback_words=3, missing_limit=0
-    )
-
-    # "Yes" is within the last 3 words
-    assert transform("I think the answer might be Yes").tolist() == [1]
-
-    # Neither "Yes" nor "No" is within the last 3 words
-    with pytest.raises(ValueError, match="Found 1 responses without valid structured data"):
-        transform("I think Yes is the correct final answer here")
-
-
-def test_lookback_words_must_be_positive() -> None:
-    """lookback_words must be at least 1."""
-    with pytest.raises(ValueError, match="`lookback_words` must be at least 1"):
-        ExtractDiscreteAnswerFromRaw(mapping={"Yes": 1}, lookback_words=0)
-
-
 def test_missing_answer_maps_to_fallback_when_allowed() -> None:
     """Missing answers should return the configured fallback when raising is disabled."""
     transform = ExtractDiscreteAnswerFromRaw(
@@ -161,7 +141,6 @@ def test_prioritizes_last_occurrence() -> None:
     """When multiple valid answers appear, should prioritize the last one."""
     transform = ExtractDiscreteAnswerFromRaw(
         mapping={"Yes": 1, "No": 0},
-        lookback_words=20,
         missing_limit=0,
     )
 
@@ -213,7 +192,6 @@ def test_answer_with_letter_options(response: str, expected: list[int]) -> None:
     """Should work with letter-based answers (A, B, C, D)."""
     transform = ExtractDiscreteAnswerFromRaw(
         mapping={"A": 0, "B": 1, "C": 2, "D": 3},
-        lookback_words=5,
         missing_limit=0,
     )
 
@@ -225,7 +203,6 @@ def test_robust_to_similar_words() -> None:
     # "yesterday" contains "yes" but shouldn't match
     transform = ExtractDiscreteAnswerFromRaw(
         mapping={"Yes": 1, "No": 0},
-        lookback_words=5,
         raise_if_missing=False,
         missing_answer=-1,
     )

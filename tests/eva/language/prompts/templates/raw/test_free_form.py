@@ -2,6 +2,7 @@
 
 import pytest
 
+from eva.language.prompts.templates import typings
 from eva.language.prompts.templates.raw.free_form import RawFreeFormQuestionPromptTemplate
 
 
@@ -71,8 +72,14 @@ def test_render_with_examples() -> None:
     """Template should render examples when provided."""
     template = RawFreeFormQuestionPromptTemplate()
     examples = [
-        {"question": "What is 2+2?", "answer": "4"},
-        {"question": "What color is the sky?", "answer": "Blue"},
+        typings.QuestionAnswerExample(
+            question="What is 2+2?",
+            answer="4",
+        ),
+        typings.QuestionAnswerExample(
+            question="What color is the sky?",
+            answer="Blue",
+        ),
     ]
 
     result = template.render(

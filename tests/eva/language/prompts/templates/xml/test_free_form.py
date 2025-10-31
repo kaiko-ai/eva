@@ -2,6 +2,7 @@
 
 import pytest
 
+from eva.language.prompts.templates import typings
 from eva.language.prompts.templates.xml.free_form import XmlFreeFormPromptTemplate
 
 
@@ -88,8 +89,14 @@ def test_render_with_examples() -> None:
     """Template should render examples when provided."""
     template = XmlFreeFormPromptTemplate()
     examples = [
-        {"question": "What is 2+2?", "answer": "4"},
-        {"question": "What color is the sky?", "answer": "Blue"},
+        typings.QuestionAnswerExample(
+            question="What is 2+2?",
+            answer="4",
+        ),
+        typings.QuestionAnswerExample(
+            question="What color is the sky?",
+            answer="Blue",
+        ),
     ]
 
     result = template.render(
@@ -154,7 +161,12 @@ def test_render_invalid_question_raises_error(
 def test_render_enable_cot_with_examples_hides_instruction() -> None:
     """When examples are provided, CoT instruction should be hidden even if enable_cot is True."""
     template = XmlFreeFormPromptTemplate()
-    examples = [{"question": "Test?", "answer": "Yes"}]
+    examples = [
+        typings.QuestionAnswerExample(
+            question="Test?",
+            answer="Yes",
+        ),
+    ]
 
     result = template.render(
         question="Test question",

@@ -102,14 +102,13 @@ def test_render_example_answer_selection(
 ) -> None:
     """Default and user-supplied example answers should match expectations."""
     template = JsonMultipleChoicePromptTemplate()
-    kwargs = {"example_answer": example_answer} if example_answer is not None else {}
     result = template.render(
         question="Example answer?",
         context=None,
         answer_options=["First", "Second"],
         enable_cot=False,
         use_option_letters=use_letters,
-        **kwargs,
+        example_answer=example_answer,
     )
 
     assert expected_fragment in result
