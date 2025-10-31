@@ -61,7 +61,7 @@ def test_missing_answer_maps_to_fallback_when_allowed() -> None:
     transform = ExtractDiscreteAnswerFromXml(
         mapping={"yes": 1},
         raise_if_missing=False,
-        missing_response=-42,
+        missing_answer=-42,
     )
 
     tensor = transform("<answer>maybe</answer>")
@@ -80,7 +80,7 @@ def test_missing_limit_raises_after_threshold() -> None:
     transform = ExtractDiscreteAnswerFromXml(
         mapping={"no": 0, "yes": 1},
         missing_limit=3,
-        missing_response=-99,
+        missing_answer=-99,
     )
     assert transform("unknown").tolist() == [-99]
     assert transform(["unknown", "unknown"]).tolist() == [-99, -99]
@@ -116,12 +116,12 @@ def test_whitespace_in_answer_is_stripped(transform: ExtractDiscreteAnswerFromXm
     assert tensor.tolist() == [1]
 
 
-def test_invalid_xml_returns_missing_response() -> None:
-    """Invalid XML should return missing_response when raise_if_missing is False."""
+def test_invalid_xml_returns_missing_answer() -> None:
+    """Invalid XML should return missing_answer when raise_if_missing is False."""
     transform = ExtractDiscreteAnswerFromXml(
         mapping={"yes": 1, "no": 0},
         raise_if_missing=False,
-        missing_response=-1,
+        missing_answer=-1,
     )
 
     tensor = transform("This is not XML at all")

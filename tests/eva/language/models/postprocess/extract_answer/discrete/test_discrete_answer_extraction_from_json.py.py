@@ -63,7 +63,7 @@ def test_missing_answer_maps_to_fallback_when_allowed() -> None:
     transform = ExtractDiscreteAnswerFromJson(
         mapping={"yes": 1},
         raise_if_missing=False,
-        missing_response=-42,
+        missing_answer=-42,
     )
 
     tensor = transform('{"answer": "maybe"}')
@@ -82,7 +82,7 @@ def test_missing_limit_raises_after_threshold() -> None:
     transform = ExtractDiscreteAnswerFromJson(
         mapping={"no": 0, "yes": 1},
         missing_limit=3,
-        missing_response=-99,
+        missing_answer=-99,
     )
     assert transform("unknown").tolist() == [-99]
     assert transform(["unknown", "unknown"]).tolist() == [-99, -99]

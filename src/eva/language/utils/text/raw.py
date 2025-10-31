@@ -28,7 +28,7 @@ def extract_raw(
     Handles both single-character (A, B, C) and multi-character (Yes, No) options.
 
     Args:
-        text: The input string containing the model's response.
+        text: The input string containing the model answer.
         answer_options: List of valid options. If None, extracts any letter A-Z.
         answer_key: The key to use in the returned dictionary.
         case_sensitive: Whether to treat matching as case sensitive.

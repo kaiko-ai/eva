@@ -106,7 +106,7 @@ def test_missing_answer_maps_to_fallback_when_allowed() -> None:
     transform = ExtractDiscreteAnswerFromRaw(
         mapping={"yes": 1, "no": 0},
         raise_if_missing=False,
-        missing_response=-42,
+        missing_answer=-42,
     )
 
     tensor = transform("I don't know the answer to this question")
@@ -125,7 +125,7 @@ def test_missing_limit_raises_after_threshold() -> None:
     transform = ExtractDiscreteAnswerFromRaw(
         mapping={"no": 0, "yes": 1},
         missing_limit=3,
-        missing_response=-99,
+        missing_answer=-99,
     )
     assert transform("unknown").tolist() == [-99]
     assert transform(["unknown", "unknown"]).tolist() == [-99, -99]
@@ -190,12 +190,12 @@ def test_whitespace_handling(
     "response",
     ["", "   "],
 )
-def test_empty_string_returns_missing_response(response: str) -> None:
+def test_empty_string_returns_missing_answer(response: str) -> None:
     """Empty strings should be treated as missing answers."""
     transform = ExtractDiscreteAnswerFromRaw(
         mapping={"Yes": 1},
         raise_if_missing=False,
-        missing_response=-1,
+        missing_answer=-1,
     )
 
     assert transform(response).tolist() == [-1]
@@ -227,7 +227,7 @@ def test_robust_to_similar_words() -> None:
         mapping={"Yes": 1, "No": 0},
         lookback_words=5,
         raise_if_missing=False,
-        missing_response=-1,
+        missing_answer=-1,
     )
 
     assert transform("This happened yesterday").tolist() == [-1]

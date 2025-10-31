@@ -16,7 +16,7 @@ class ExtractAnswerFromStructuredOutput(ABC):
         answer_key: str = "answer",
         case_sensitive: bool = False,
         raise_if_missing: bool = True,
-        missing_response: int = -1,
+        missing_answer: int = -1,
         missing_limit: int = 5,
     ) -> None:
         """Initialize the transform.
@@ -25,9 +25,9 @@ class ExtractAnswerFromStructuredOutput(ABC):
             answer_key: The key/tag within the structured object that stores the answer.
             case_sensitive: Whether to treat mappings as case sensitive.
             raise_if_missing: Whether to raise an error if an answer is missing
-                or not found in the mapping. If False, will return `missing_response`
+                or not found in the mapping. If False, will return `missing_answer`
                 instead.
-            missing_response: The integer value to return if the answer is missing
+            missing_answer: The integer value to return if the answer is missing
                 and `raise_if_missing` is False or the number of missing answers
                 are still below `missing_limit`.
             missing_limit: The maximum number of missing responses before raising
@@ -36,7 +36,7 @@ class ExtractAnswerFromStructuredOutput(ABC):
         self.answer_key = answer_key
         self.case_sensitive = case_sensitive
         self.raise_if_missing = raise_if_missing
-        self.missing_response = int(missing_response)
+        self.missing_answer = int(missing_answer)
         self.missing_limit = int(missing_limit)
         self.missing_count = 0
 
@@ -51,6 +51,7 @@ class ExtractAnswerFromStructuredOutput(ABC):
             Dict[str, str] | None: The extracted structured data as a dictionary
                 or None if extraction failed.
         """
+        raise NotImplementedError("Subclasses must implement this method.")
 
     def __call__(self, values: Union[str, List[str]]) -> List[Dict[str, str] | None]:
         """Convert structured string(s) to a tensor of integer labels."""
@@ -69,7 +70,7 @@ class ExtractDiscreteAnswerFromStructuredOutput(ExtractAnswerFromStructuredOutpu
         answer_key: str = "answer",
         case_sensitive: bool = False,
         raise_if_missing: bool = True,
-        missing_response: int = -1,
+        missing_answer: int = -1,
         missing_limit: int = 5,
     ) -> None:
         """Initialize the transform.
@@ -79,9 +80,9 @@ class ExtractDiscreteAnswerFromStructuredOutput(ExtractAnswerFromStructuredOutpu
             answer_key: The key/tag within the structured object that stores the answer.
             case_sensitive: Whether to treat mappings as case sensitive.
             raise_if_missing: Whether to raise an error if an answer is missing
-                or not found in the mapping. If False, will return `missing_response`
+                or not found in the mapping. If False, will return `missing_answer`
                 instead.
-            missing_response: The integer value to return if the answer is missing
+            missing_answer: The integer value to return if the answer is missing
                 and `raise_if_missing` is False or the number of missing answers
                 are still below `missing_limit`.
             missing_limit: The maximum number of missing responses before raising
@@ -94,14 +95,14 @@ class ExtractDiscreteAnswerFromStructuredOutput(ExtractAnswerFromStructuredOutpu
             answer_key=answer_key,
             case_sensitive=case_sensitive,
             raise_if_missing=raise_if_missing,
-            missing_response=missing_response,
+            missing_answer=missing_answer,
             missing_limit=missing_limit,
         )
 
         self.mapping = {k if case_sensitive else k.lower(): v for k, v in mapping.items()}
 
     @override
-    def __call__(self, values: Union[str, List[str]]) -> Dict[str, Any]:
+    def __call__(self, values: Union[str, List[str]]) -> torch.Tensor:
         """Convert structured string(s) to a tensor of integer labels."""
         structured_data = super().__call__(values)
         answers = list(map(self._extract_answer, structured_data))
@@ -120,9 +121,9 @@ class ExtractDiscreteAnswerFromStructuredOutput(ExtractAnswerFromStructuredOutpu
                 )
             logger.warning(
                 f"Failed to extract answer from response: {structured_obj}, "
-                f"returning {self.missing_response} instead."
+                f"returning {self.missing_answer} instead."
             )
-            return self.missing_response
+            return self.missing_answer
 
         return self._apply_mapping(structured_obj[self.answer_key])
 
@@ -134,8 +135,8 @@ class ExtractDiscreteAnswerFromStructuredOutput(ExtractAnswerFromStructuredOutpu
                     f"Answer '{key}' not found in mapping: {list(self.mapping.keys())}"
                 )
             logger.warning(
-                f"Answer '{key}' not found in mapping, returning {self.missing_response} instead."
+                f"Answer '{key}' not found in mapping, returning {self.missing_answer} instead."
             )
             self.missing_count += 1
-            return self.missing_response
+            return self.missing_answer
         return self.mapping[key]

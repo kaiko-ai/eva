@@ -16,7 +16,7 @@ class ExtractDiscreteAnswerFromStructuredOutput(ABC):
         answer_key: str = "answer",
         case_sensitive: bool = False,
         raise_if_missing: bool = True,
-        missing_response: int = -1,
+        missing_answer: int = -1,
         missing_limit: int = 5,
     ) -> None:
         """Initialize the transform.
@@ -26,9 +26,9 @@ class ExtractDiscreteAnswerFromStructuredOutput(ABC):
             answer_key: The key/tag within the structured object that stores the answer.
             case_sensitive: Whether to treat mappings as case sensitive.
             raise_if_missing: Whether to raise an error if an answer is missing
-                or not found in the mapping. If False, will return `missing_response`
+                or not found in the mapping. If False, will return `missing_answer`
                 instead.
-            missing_response: The integer value to return if the answer is missing
+            missing_answer: The integer value to return if the answer is missing
                 and `raise_if_missing` is False or the number of missing answers
                 are still below `missing_limit`.
             missing_limit: The maximum number of missing responses before raising
@@ -40,7 +40,7 @@ class ExtractDiscreteAnswerFromStructuredOutput(ABC):
         self.answer_key = answer_key
         self.case_sensitive = case_sensitive
         self.raise_if_missing = raise_if_missing
-        self.missing_response = missing_response
+        self.missing_answer = missing_answer
         self.missing_limit = missing_limit
 
         self.missing_count = 0
@@ -79,9 +79,9 @@ class ExtractDiscreteAnswerFromStructuredOutput(ABC):
             else:
                 logger.warning(
                     f"Failed to extract answer from response: {structured_obj}, "
-                    f"returning {self.missing_response} instead."
+                    f"returning {self.missing_answer} instead."
                 )
-                return self.missing_response
+                return self.missing_answer
 
         return self._apply_mapping(structured_obj[self.answer_key])
 
@@ -95,8 +95,8 @@ class ExtractDiscreteAnswerFromStructuredOutput(ABC):
             else:
                 logger.warning(
                     f"Answer '{key}' not found in mapping, "
-                    f"returning {self.missing_response} instead."
+                    f"returning {self.missing_answer} instead."
                 )
                 self.missing_count += 1
-                return self.missing_response
+                return self.missing_answer
         return self.mapping[key]
