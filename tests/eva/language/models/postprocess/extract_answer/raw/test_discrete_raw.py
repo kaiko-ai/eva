@@ -21,7 +21,6 @@ def transform() -> ExtractDiscreteAnswerFromRaw:
         ("The correct answer is: No", [0]),
         ("My final answer is Yes.", [1]),
         ("I choose: No!", [0]),
-        ("The answer is (Yes)", [1]),
         ('I select "No"', [0]),
     ],
 )

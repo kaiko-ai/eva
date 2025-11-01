@@ -124,7 +124,7 @@ def _extract_answer_from_options(
         rf"(?:answer|choice)\s*:?\s*{option_regex}\b",
         rf"(?:^|\s){option_regex}[.:]?\s*$",
         rf"(?:correct|right)\s+(?:answer|choice|option)\s*:?\s*{option_regex}\b",
-        rf"(?:^|\s){option_regex}(?=\s*[.:)]|$)",
+        rf"(?:^|\s){option_regex}(?=\s*[.:)!]|$)",
     ]
 
     flags = re.MULTILINE if case_sensitive else re.IGNORECASE | re.MULTILINE
