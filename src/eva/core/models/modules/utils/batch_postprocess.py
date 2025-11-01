@@ -58,7 +58,7 @@ def _apply_transforms(tensor: torch.Tensor, transforms: List[Transform]) -> torc
     """
 
     def apply_transform(tensor: torch.Tensor, transform: Transform) -> torch.Tensor:
-        if isinstance(transform, type) or isinstance(transform, functools.partial):
+        if isinstance(transform, type):
             transform = transform()
         return transform(tensor)
 
