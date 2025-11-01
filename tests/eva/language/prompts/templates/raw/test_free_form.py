@@ -143,29 +143,7 @@ def test_render_invalid_question_raises_error(
 
 def test_render_instance_enable_cot() -> None:
     """Template instance with enable_cot should always include CoT instruction."""
-    template = RawFreeFormQuestionPromptTemplate(enable_cot=True)
-    result = template.render(
-        question="Test question",
-        context=None,
-    )
-
-    assert "Think step-by-step" in result
-
-
-def test_render_override_instance_enable_cot() -> None:
-    """Render-time enable_cot parameter should override instance setting."""
-    # Instance has enable_cot=True, but we override with False
-    template = RawFreeFormQuestionPromptTemplate(enable_cot=True)
-    result = template.render(
-        question="Test question",
-        context=None,
-        enable_cot=False,
-    )
-
-    assert "Think step-by-step" not in result
-
-    # Instance has enable_cot=False, but we override with True
-    template = RawFreeFormQuestionPromptTemplate(enable_cot=False)
+    template = RawFreeFormQuestionPromptTemplate()
     result = template.render(
         question="Test question",
         context=None,
