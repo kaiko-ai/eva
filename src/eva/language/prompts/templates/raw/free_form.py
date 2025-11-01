@@ -95,7 +95,7 @@ class RawFreeFormQuestionPromptTemplate(base.PromptTemplate):
             examples=examples,
             example_answer=example_answer,
             preamble=(preamble or "").strip(),
-            enable_cot=self.enable_cot if enable_cot is None else enable_cot,
+            enable_cot=enable_cot if enable_cot is None else enable_cot,
         )
 
         return format_utils.remove_multi_blank_lines(textwrap.dedent(rendered).strip() + "\n")
