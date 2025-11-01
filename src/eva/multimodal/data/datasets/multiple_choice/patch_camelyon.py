@@ -25,7 +25,7 @@ class PatchCamelyon(TextImageDataset[int], vision_datasets.PatchCamelyon):
         "question": "Does this image show metastatic breast tissue?",
         "context": None,
         "answer_options": ["no", "yes"],
-        "example_reason": "Key visual evidence from the histopathology image.",
+        "example_answer": "yes",
     }
     """Default kwargs for the template.render() call."""
 

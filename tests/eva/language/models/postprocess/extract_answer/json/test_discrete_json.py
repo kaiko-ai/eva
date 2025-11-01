@@ -1,11 +1,14 @@
 """Tests for ExtractDiscreteAnswerFromJson post-processing transform."""
 
 import re
+from typing import cast
 
 import pytest
 import torch
 
-from eva.language.models.postprocess.extract_answer_from_json import ExtractDiscreteAnswerFromJson
+from eva.language.models.postprocess.extract_answer.json.discrete import (
+    ExtractDiscreteAnswerFromJson,
+)
 
 
 @pytest.fixture
@@ -16,33 +19,37 @@ def transform() -> ExtractDiscreteAnswerFromJson:
 
 def test_call_single_string_returns_tensor(transform: ExtractDiscreteAnswerFromJson) -> None:
     """A single JSON string should yield an int tensor with trimmed, casefolded lookup."""
-    tensor = transform('{"answer": "  YES  "}')
+    result = transform('{"answer": "  YES  "}')
+    predictions = cast(torch.Tensor, result["predictions"])
 
-    assert tensor.tolist() == [1]
-    assert tensor.dtype == torch.long
+    assert predictions.tolist() == [1]
+    assert predictions.dtype == torch.long
 
 
 def test_call_list_parses_code_fences(transform: ExtractDiscreteAnswerFromJson) -> None:
     """Lists of responses should parse markdown fenced JSON and preserve order."""
-    tensor = transform(['```json\n{"answer": "No"}\n```', '{"answer": "Yes"}'])
+    result = transform(['```json\n{"answer": "No"}\n```', '{"answer": "Yes"}'])
+    predictions = cast(torch.Tensor, result["predictions"])
 
-    assert tensor.tolist() == [0, 1]
+    assert predictions.tolist() == [0, 1]
 
 
 def test_call_ignores_surrounding_text(transform: ExtractDiscreteAnswerFromJson) -> None:
     """Noise around the JSON blob should be ignored by extract_json."""
     raw_response = "Final thoughts:\n" "```json\n" '{"answer": "Yes"}\n' "```\n" "Thank you!"
-    tensor = transform(raw_response)
+    result = transform(raw_response)
+    predictions = cast(torch.Tensor, result["predictions"])
 
-    assert tensor.tolist() == [1]
+    assert predictions.tolist() == [1]
 
 
 def test_custom_answer_key_respected() -> None:
     """Custom answer_key should be used when extracting responses."""
     transform = ExtractDiscreteAnswerFromJson(mapping={"blue": 2}, answer_key="choice")
-    tensor = transform('{"choice": "Blue"}')
+    result = transform('{"choice": "Blue"}')
+    predictions = cast(torch.Tensor, result["predictions"])
 
-    assert tensor.tolist() == [2]
+    assert predictions.tolist() == [2]
 
 
 def test_case_sensitive_behavior() -> None:
@@ -51,7 +58,8 @@ def test_case_sensitive_behavior() -> None:
         mapping={"yes": 1}, case_sensitive=True, missing_limit=0
     )
 
-    assert transform('{"answer": "yes"}').tolist() == [1]
+    predictions = cast(torch.Tensor, transform('{"answer": "yes"}')["predictions"])
+    assert predictions.tolist() == [1]
     with pytest.raises(ValueError, match=re.escape("Answer 'Yes' not found in mapping: ['yes']")):
         transform('{"answer": "Yes"}')
 
@@ -61,17 +69,18 @@ def test_missing_answer_maps_to_fallback_when_allowed() -> None:
     transform = ExtractDiscreteAnswerFromJson(
         mapping={"yes": 1},
         raise_if_missing=False,
-        missing_response=-42,
+        missing_answer=-42,
     )
 
-    tensor = transform('{"answer": "maybe"}')
+    result = transform('{"answer": "maybe"}')
+    predictions = cast(torch.Tensor, result["predictions"])
 
-    assert tensor.tolist() == [-42]
+    assert predictions.tolist() == [-42]
 
 
 def test_missing_answer_key_raises(transform: ExtractDiscreteAnswerFromJson) -> None:
     """Responses without the answer key should raise a descriptive error."""
-    with pytest.raises(ValueError, match="Found 1 responses without JSON objects"):
+    with pytest.raises(ValueError, match="Found 1 responses without valid structured data"):
         transform('{"not_answer": "Yes"}')
 
 
@@ -80,11 +89,13 @@ def test_missing_limit_raises_after_threshold() -> None:
     transform = ExtractDiscreteAnswerFromJson(
         mapping={"no": 0, "yes": 1},
         missing_limit=3,
-        missing_response=-99,
+        missing_answer=-99,
     )
-    assert transform("unknown").tolist() == [-99]
-    assert transform(["unknown", "unknown"]).tolist() == [-99, -99]
-    with pytest.raises(ValueError, match="Found 4 responses without JSON objects."):
+    predictions1 = cast(torch.Tensor, transform("unknown")["predictions"])
+    assert predictions1.tolist() == [-99]
+    predictions2 = cast(torch.Tensor, transform(["unknown", "unknown"])["predictions"])
+    assert predictions2.tolist() == [-99, -99]
+    with pytest.raises(ValueError, match="Found 4 responses without valid structured data."):
         transform("unknown")
 
 

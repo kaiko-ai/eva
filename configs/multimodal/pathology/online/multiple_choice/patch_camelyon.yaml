@@ -25,11 +25,13 @@ model:
             input_type: "discrete"
     postprocess:
       predictions_transforms:
-        - class_path: eva.language.models.postprocess.ExtractDiscreteAnswerFromJson
+        - class_path: eva.language.models.postprocess.ExtractDiscreteAnswer
           init_args:
-            mapping: {"no": 0, "yes": 1, "missing_answer": 2}
-            missing_limit: ${oc.env:MISSING_LIMIT, 5}
-            missing_response: ${oc.env:MISSING_RESPONSE, 2}
+            answer_format: ${oc.env:ANSWER_FORMAT, json}
+            extract_kwargs:
+              mapping: {"no": 0, "yes": 1, "missing_answer": 2}
+              missing_limit: ${oc.env:MISSING_LIMIT, 5}
+              missing_answer: ${oc.env:MISSING_ANSWER, 2}
 data:
   class_path: eva.DataModule
   init_args:
@@ -44,6 +46,10 @@ data:
           # The PatchCamelyon dataset is distributed under the following license: 
           # "Creative Commons Zero v1.0 Universal"
           # (see: https://choosealicense.com/licenses/cc0-1.0/)
+          prompt_template:
+            class_path: eva.language.prompts.templates.MultipleChoicePromptTemplate
+            init_args:
+              answer_format: ${oc.env:ANSWER_FORMAT, json}
           transforms:
             image:
               class_path: eva.vision.data.transforms.Resize
