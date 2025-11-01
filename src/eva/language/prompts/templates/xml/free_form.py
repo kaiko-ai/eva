@@ -13,7 +13,7 @@ from eva.language.prompts.templates import base, typings
 from eva.language.utils.text import format as format_utils
 
 
-class XmlFreeFormPromptTemplate(base.PromptTemplate):
+class XmlFreeFormQuestionPromptTemplate(base.PromptTemplate):
     """Prompt template for freeform questions while enforcing XML output."""
 
     template: str = textwrap.dedent(

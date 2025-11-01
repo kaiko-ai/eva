@@ -6,7 +6,7 @@ from eva.language.prompts.templates.factory import (
     MultipleChoicePromptTemplate,
 )
 from eva.language.prompts.templates.json import (
-    JsonFreeFormPromptTemplate,
+    JsonFreeFormQuestionPromptTemplate,
     JsonMultipleChoicePromptTemplate,
 )
 from eva.language.prompts.templates.raw import (
@@ -19,7 +19,7 @@ __all__ = [
     "JsonMultipleChoicePromptTemplate",
     "RawMultipleChoicePromptTemplate",
     "XmlMultipleChoicePromptTemplate",
-    "JsonFreeFormPromptTemplate",
+    "JsonFreeFormQuestionPromptTemplate",
     "RawFreeFormQuestionPromptTemplate",
     "FreeFormQuestionPromptTemplate",
     "MultipleChoicePromptTemplate",

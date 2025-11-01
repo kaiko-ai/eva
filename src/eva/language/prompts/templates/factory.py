@@ -4,7 +4,7 @@ from typing import Literal
 
 from eva.language.prompts.templates.base import PromptTemplate
 from eva.language.prompts.templates.json import (
-    JsonFreeFormPromptTemplate,
+    JsonFreeFormQuestionPromptTemplate,
     JsonMultipleChoicePromptTemplate,
 )
 from eva.language.prompts.templates.raw import (
@@ -12,7 +12,7 @@ from eva.language.prompts.templates.raw import (
     RawMultipleChoicePromptTemplate,
 )
 from eva.language.prompts.templates.xml import (
-    XmlFreeFormPromptTemplate,
+    XmlFreeFormQuestionPromptTemplate,
     XmlMultipleChoicePromptTemplate,
 )
 
@@ -26,9 +26,9 @@ class FreeFormQuestionPromptTemplate(PromptTemplate):
         """Create a free-form question prompt template based on the answer format."""
         match answer_format:
             case "json":
-                return JsonFreeFormPromptTemplate(**template_kwargs)
+                return JsonFreeFormQuestionPromptTemplate(**template_kwargs)
             case "xml":
-                return XmlFreeFormPromptTemplate(**template_kwargs)
+                return XmlFreeFormQuestionPromptTemplate(**template_kwargs)
             case "raw":
                 return RawFreeFormQuestionPromptTemplate(**template_kwargs)
             case _:

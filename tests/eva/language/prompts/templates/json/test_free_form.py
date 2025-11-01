@@ -3,16 +3,16 @@
 import pytest
 
 from eva.language.prompts.templates import typings
-from eva.language.prompts.templates.json.free_form import JsonFreeFormPromptTemplate
+from eva.language.prompts.templates.json.free_form import JsonFreeFormQuestionPromptTemplate
 
 
 @pytest.fixture
-def template() -> JsonFreeFormPromptTemplate:
+def template() -> JsonFreeFormQuestionPromptTemplate:
     """Return a baseline template instance for reuse across tests."""
-    return JsonFreeFormPromptTemplate()
+    return JsonFreeFormQuestionPromptTemplate()
 
 
-def test_render_basic_trims_input(template: JsonFreeFormPromptTemplate) -> None:
+def test_render_basic_trims_input(template: JsonFreeFormQuestionPromptTemplate) -> None:
     """Renders the core prompt with minimal inputs and trims whitespace."""
     result = template.render(
         question="  What is the meaning of life?  ",
@@ -25,7 +25,7 @@ def test_render_basic_trims_input(template: JsonFreeFormPromptTemplate) -> None:
     assert "Example JSON Answer:" in result
 
 
-def test_render_context_formats_lists(template: JsonFreeFormPromptTemplate) -> None:
+def test_render_context_formats_lists(template: JsonFreeFormQuestionPromptTemplate) -> None:
     """Context lists should be bullet formatted."""
     result = template.render(
         question="Context handling?",
@@ -51,7 +51,7 @@ def test_render_context_formats_lists(template: JsonFreeFormPromptTemplate) -> N
 @pytest.mark.parametrize(("answer_key"), ["choice", "response"])
 def test_render_custom_keys_respected(answer_key: str) -> None:
     """Custom answer_key propagate to the instructions and example JSON."""
-    template = JsonFreeFormPromptTemplate()
+    template = JsonFreeFormQuestionPromptTemplate()
     result = template.render(
         question="Test question",
         context=None,
@@ -71,7 +71,7 @@ def test_render_custom_keys_respected(answer_key: str) -> None:
 )
 def test_render_enable_cot(enable_cot: bool, expected_fragment: str) -> None:
     """Prompt with enable_cot should contain a fragment asking the model to use thinking/CoT."""
-    template = JsonFreeFormPromptTemplate()
+    template = JsonFreeFormQuestionPromptTemplate()
     result = template.render(
         question="Example answer?",
         context=None,
@@ -85,7 +85,7 @@ def test_render_enable_cot(enable_cot: bool, expected_fragment: str) -> None:
 
 def test_render_with_examples() -> None:
     """Template should render examples when provided."""
-    template = JsonFreeFormPromptTemplate()
+    template = JsonFreeFormQuestionPromptTemplate()
     examples = [
         typings.QuestionAnswerExample(
             question="What is 2+2?",
@@ -118,7 +118,7 @@ def test_render_with_examples() -> None:
 
 def test_render_without_examples() -> None:
     """Template should show default example format when no examples provided."""
-    template = JsonFreeFormPromptTemplate()
+    template = JsonFreeFormQuestionPromptTemplate()
 
     result = template.render(
         question="Test question",
@@ -132,7 +132,7 @@ def test_render_without_examples() -> None:
 
 def test_render_with_preamble() -> None:
     """Template should include preamble when provided."""
-    template = JsonFreeFormPromptTemplate()
+    template = JsonFreeFormQuestionPromptTemplate()
     preamble = "You are a helpful assistant."
 
     result = template.render(
@@ -146,7 +146,7 @@ def test_render_with_preamble() -> None:
 
 @pytest.mark.parametrize("question", ["", "   ", 123])
 def test_render_invalid_question_raises_error(
-    template: JsonFreeFormPromptTemplate, question: object
+    template: JsonFreeFormQuestionPromptTemplate, question: object
 ) -> None:
     """Invalid questions should raise a descriptive ValueError."""
     with pytest.raises(ValueError, match="`question` must be a non-empty string"):

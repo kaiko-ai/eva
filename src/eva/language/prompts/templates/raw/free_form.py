@@ -56,14 +56,9 @@ class RawFreeFormQuestionPromptTemplate(base.PromptTemplate):
     )
     """Base template to be rendered via Jinja2."""
 
-    def __init__(self, enable_cot: bool = False) -> None:
-        """Initializes the prompt template.
-
-        Args:
-            enable_cot: Whether to explicitly prompt the model to use reasoning/CoT for answering.
-        """
+    def __init__(self) -> None:
+        """Initializes the prompt template."""
         super().__init__()
-        self.enable_cot = enable_cot
 
     @override
     def render(

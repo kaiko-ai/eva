@@ -14,7 +14,7 @@ from eva.language.prompts.templates import base, typings
 from eva.language.utils.text import format as format_utils
 
 
-class JsonFreeFormPromptTemplate(base.PromptTemplate):
+class JsonFreeFormQuestionPromptTemplate(base.PromptTemplate):
     """Prompt template for free-form questions while enforcing JSON output."""
 
     template: str = textwrap.dedent(
