@@ -4,6 +4,8 @@ import pytest
 
 from eva.language.utils.text.raw import extract_raw
 
+A_TO_Z_OPTIONS = [chr(i) for i in range(ord("A"), ord("Z") + 1)]
+
 
 @pytest.mark.parametrize(
     ("text", "expected"),
@@ -43,7 +45,7 @@ from eva.language.utils.text.raw import extract_raw
 )
 def test_extract_raw_basic_patterns(text: str, expected: dict) -> None:
     """Should extract answers from various basic patterns."""
-    result = extract_raw(text)
+    result = extract_raw(text, A_TO_Z_OPTIONS)
     assert result == expected
 
 
@@ -92,7 +94,7 @@ def test_extract_raw_with_options(text: str, options: list[str], expected: dict 
 )
 def test_extract_raw_default_options(text: str, expected: dict | None) -> None:
     """Should default to A-Z options when none provided."""
-    result = extract_raw(text)
+    result = extract_raw(text, A_TO_Z_OPTIONS)
     assert result == expected
 
 
@@ -110,7 +112,7 @@ def test_extract_raw_default_options(text: str, expected: dict | None) -> None:
 )
 def test_extract_raw_priority_last_occurrence(text: str, expected: dict) -> None:
     """Should prioritize the last match within each pattern tried."""
-    result = extract_raw(text)
+    result = extract_raw(text, A_TO_Z_OPTIONS)
     assert result == expected
 
 
@@ -132,7 +134,7 @@ def test_extract_raw_priority_last_occurrence(text: str, expected: dict) -> None
 )
 def test_extract_raw_text_cleaning(text: str, expected: dict) -> None:
     """Should clean text by removing asterisks and normalizing whitespace."""
-    result = extract_raw(text)
+    result = extract_raw(text, A_TO_Z_OPTIONS)
     assert result == expected
 
 
@@ -149,7 +151,7 @@ def test_extract_raw_text_cleaning(text: str, expected: dict) -> None:
 )
 def test_extract_raw_invalid_input(invalid_input) -> None:
     """Should return None for invalid inputs."""
-    result = extract_raw(invalid_input)
+    result = extract_raw(invalid_input, A_TO_Z_OPTIONS)
     assert result is None
 
 
@@ -167,7 +169,7 @@ def test_extract_raw_invalid_input(invalid_input) -> None:
 )
 def test_extract_raw_no_valid_answer(text: str) -> None:
     """Should return None when no valid answer pattern is found."""
-    result = extract_raw(text)
+    result = extract_raw(text, A_TO_Z_OPTIONS)
     assert result is None
 
 
@@ -175,12 +177,12 @@ def test_extract_raw_tail_extraction() -> None:
     """Should only examine the last 100 characters of long text."""
     # Create text longer than 100 chars with answer at the beginning (should be ignored)
     long_text_start = "The answer is A. " + "This is filler text. " * 10 + "More text here."
-    result = extract_raw(long_text_start)
+    result = extract_raw(long_text_start, A_TO_Z_OPTIONS)
     assert result is None  # A should not be found in the tail
 
     # Create text with answer in the tail (should be found)
     long_text_end = "This is filler text. " * 10 + "The final answer is B."
-    result = extract_raw(long_text_end)
+    result = extract_raw(long_text_end, A_TO_Z_OPTIONS)
     assert result == {"answer": "B"}
 
 
@@ -194,7 +196,7 @@ def test_extract_raw_case_insensitive_matching() -> None:
     ]
 
     for text, expected in test_cases:
-        result = extract_raw(text)
+        result = extract_raw(text, A_TO_Z_OPTIONS)
         assert result == expected
 
 
@@ -226,7 +228,7 @@ def test_extract_raw_pattern_variations() -> None:
     ]
 
     for text, expected in patterns:
-        result = extract_raw(text)
+        result = extract_raw(text, A_TO_Z_OPTIONS)
         assert result == expected, f"Failed for text: '{text}'"
 
 

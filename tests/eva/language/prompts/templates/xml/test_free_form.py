@@ -105,14 +105,14 @@ def test_render_with_examples() -> None:
         examples=examples,
     )
 
-    assert "Below are some examples:" in result
+    assert "Below are some examples of how to answer questions:" in result
     assert "Example 1:" in result
     assert "What is 2+2?" in result
     assert "Answer: 4" in result
     assert "Example 2:" in result
     assert "What color is the sky?" in result
     assert "Answer: Blue" in result
-    assert "Now please answer the initial question." in result
+    assert "Now please answer the following question." in result
 
     # Should not show default example format when examples are provided
     assert "Example Answer:" not in result
@@ -158,8 +158,8 @@ def test_render_invalid_question_raises_error(
         )
 
 
-def test_render_enable_cot_with_examples_hides_instruction() -> None:
-    """When examples are provided, CoT instruction should be hidden even if enable_cot is True."""
+def test_render_enable_cot_with_examples_shows_instruction() -> None:
+    """When examples are provided, CoT instruction should still be shown if enable_cot is True."""
     template = XmlFreeFormQuestionPromptTemplate()
     examples = [
         typings.QuestionAnswerExample(
@@ -175,6 +175,6 @@ def test_render_enable_cot_with_examples_hides_instruction() -> None:
         enable_cot=True,
     )
 
-    # CoT instruction should not appear when examples are provided
-    assert "Think step-by-step" not in result
-    assert "Below are some examples:" in result
+    # CoT instruction should appear even when examples are provided
+    assert "Think step-by-step" in result
+    assert "Below are some examples of how to answer questions:" in result

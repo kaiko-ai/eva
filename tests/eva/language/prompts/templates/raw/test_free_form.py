@@ -20,7 +20,7 @@ def test_render_basic_trims_input(template: RawFreeFormQuestionPromptTemplate) -
     )
 
     assert result.startswith("Question: What is the meaning of life?")
-    assert "IMPORTANT: You must provide your reasoning first" in result
+    assert "IMPORTANT: Respond in free form text, and make sure that your final answer is the last part of your response." in result
     assert "Example Answer:" in result
 
 
@@ -88,14 +88,14 @@ def test_render_with_examples() -> None:
         examples=examples,
     )
 
-    assert "Below are some examples:" in result
+    assert "Below are some examples of how to answer questions:" in result
     assert "Example 1:" in result
     assert "What is 2+2?" in result
     assert "Answer: 4" in result
     assert "Example 2:" in result
     assert "What color is the sky?" in result
     assert "Answer: Blue" in result
-    assert "Now please answer the initial question." in result
+    assert "Now please answer the following question." in result
 
     # Should not show default example format when examples are provided
     assert "Example Answer:" not in result
