@@ -7,7 +7,7 @@ from loguru import logger
 
 def extract_raw(
     text: str,
-    answer_options: list[str] | None = None,
+    answer_options: list[str],
     answer_key: str = "answer",
     case_sensitive: bool = False,
     tail_length: int = 10,
@@ -66,12 +66,9 @@ def extract_raw(
         text = text.strip()
         tail_text = _get_text_tail(text, max_words=tail_length)
         cleaned_text = _clean_string(tail_text)
-
-        if answer_options is not None:
-            options = answer_options
-        else:
-            options = [chr(i) for i in range(ord("A"), ord("Z") + 1)]
-        extracted_answer = _extract_answer_from_options(cleaned_text, options, case_sensitive)
+        extracted_answer = _extract_answer_from_options(
+            cleaned_text, answer_options, case_sensitive
+        )
 
         if extracted_answer:
             result = extracted_answer if case_sensitive else extracted_answer.upper()

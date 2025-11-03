@@ -2,7 +2,7 @@
 
 import pytest
 
-from eva.language.models.postprocess.extract_answer.xml.freeform import ExtractAnswerFromXml
+from eva.language.models.postprocess.extract_answer.xml.free_form import ExtractAnswerFromXml
 
 
 @pytest.fixture

@@ -53,7 +53,6 @@ class JsonMultipleChoicePromptTemplate(base.PromptTemplate):
         {% endif %}
         {{ answer_options }}
 
-
         {% if not examples %}
         Example JSON Answer:
         Your explanation for why you chose this answer can go here...

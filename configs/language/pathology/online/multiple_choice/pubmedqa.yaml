@@ -25,7 +25,7 @@ model:
             input_type: "discrete"
     postprocess:
       predictions_transforms:
-        - class_path: eva.language.models.postprocess.ExtractDiscreteAnswerFromJson
+        - class_path: eva.language.models.postprocess.ExtractDiscreteAnswer
           init_args:
             answer_format: ${oc.env:ANSWER_FORMAT, json}
             extract_kwargs:

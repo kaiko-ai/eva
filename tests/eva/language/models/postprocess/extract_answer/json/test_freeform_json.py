@@ -2,7 +2,7 @@
 
 import pytest
 
-from eva.language.models.postprocess.extract_answer.json.freeform import ExtractAnswerFromJson
+from eva.language.models.postprocess.extract_answer.json.free_form import ExtractAnswerFromJson
 
 
 @pytest.fixture

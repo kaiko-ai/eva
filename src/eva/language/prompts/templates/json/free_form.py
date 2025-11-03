@@ -45,7 +45,7 @@ class JsonFreeFormQuestionPromptTemplate(base.PromptTemplate):
         IMPORTANT: Respond with a valid JSON object where the "{{ answer_key }}" key contains your final answer.
         {%- endif %}
 
-       {% if not examples %}
+        {% if not examples %}
         Example JSON Answer:
         Your explanation for why you chose this answer can go here...
         {{ '{' }}
