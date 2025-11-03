@@ -118,10 +118,10 @@ def _extract_answer_from_options(
     esc_opts = [re.escape(opt) for opt in options]
     option_regex = f"([{''.join(esc_opts)}])" if all_single_char else f"({'|'.join(esc_opts)})"
     patterns = [
-        rf"(?:answer|choice)\s*:?\s*{option_regex}\b",
-        rf"(?:^|\s){option_regex}[.:]?\s*$",
-        rf"(?:correct|right)\s+(?:answer|choice|option)\s*:?\s*{option_regex}\b",
-        rf"(?:^|\s){option_regex}(?=\s*[.:)!]|$)",
+        rf"(?:answer|choice|select)\s*:?\s*[\"']?{option_regex}[\"']?\b",
+        rf"(?:^|\s)[\"']?{option_regex}[\"']?[.:]?\s*$",
+        rf"(?:correct|right)\s+(?:answer|choice|option)\s*:?\s*[\"']?{option_regex}[\"']?\b",
+        rf"(?:^|\s)[\"']?{option_regex}[\"']?(?=\s*[.:)!]|$)",
     ]
 
     flags = re.MULTILINE if case_sensitive else re.IGNORECASE | re.MULTILINE
