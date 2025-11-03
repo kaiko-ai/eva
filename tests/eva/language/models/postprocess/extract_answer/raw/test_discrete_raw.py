@@ -1,7 +1,5 @@
 """Tests for ExtractDiscreteAnswerFromRaw post-processing transform."""
 
-from typing import cast
-
 import pytest
 import torch
 
@@ -29,10 +27,9 @@ def test_extract_answer_from_response(
 ) -> None:
     """Should extract answers from various response formats."""
     result = transform(response)
-    predictions = cast(torch.Tensor, result["predictions"])
 
-    assert predictions.tolist() == expected
-    assert predictions.dtype == torch.long
+    assert result.tolist() == expected
+    assert result.dtype == torch.long
 
 
 def test_call_list_preserves_order(transform: ExtractDiscreteAnswerFromRaw) -> None:
@@ -44,9 +41,8 @@ def test_call_list_preserves_order(transform: ExtractDiscreteAnswerFromRaw) -> N
             "Analysis complete. No",
         ]
     )
-    predictions = cast(torch.Tensor, result["predictions"])
 
-    assert predictions.tolist() == [0, 1, 0]
+    assert result.tolist() == [0, 1, 0]
 
 
 def test_call_ignores_preceding_text(transform: ExtractDiscreteAnswerFromRaw) -> None:
@@ -60,9 +56,8 @@ def test_call_ignores_preceding_text(transform: ExtractDiscreteAnswerFromRaw) ->
     Based on all of the above, my answer is Yes.
     """
     result = transform(raw_response)
-    predictions = cast(torch.Tensor, result["predictions"])
 
-    assert predictions.tolist() == [1]
+    assert result.tolist() == [1]
 
 
 @pytest.mark.parametrize(
@@ -71,8 +66,8 @@ def test_call_ignores_preceding_text(transform: ExtractDiscreteAnswerFromRaw) ->
 )
 def test_case_insensitive_matching(transform: ExtractDiscreteAnswerFromRaw, response: str) -> None:
     """Should match answers regardless of case by default."""
-    predictions = cast(torch.Tensor, transform(response)["predictions"])
-    assert predictions.tolist() == [1]
+    result = transform(response)
+    assert result.tolist() == [1]
 
 
 def test_case_sensitive_behavior() -> None:
@@ -81,8 +76,8 @@ def test_case_sensitive_behavior() -> None:
         mapping={"yes": 1, "no": 0}, case_sensitive=True, missing_limit=0
     )
 
-    predictions = cast(torch.Tensor, transform("My answer is yes")["predictions"])
-    assert predictions.tolist() == [1]
+    result = transform("My answer is yes")
+    assert result.tolist() == [1]
     with pytest.raises(ValueError, match="Found 1 responses without valid structured data"):
         transform("My answer is Yes")
 
@@ -96,9 +91,8 @@ def test_missing_answer_maps_to_fallback_when_allowed() -> None:
     )
 
     result = transform("I don't know the answer to this question")
-    predictions = cast(torch.Tensor, result["predictions"])
 
-    assert predictions.tolist() == [-42]
+    assert result.tolist() == [-42]
 
 
 def test_missing_answer_raises(transform: ExtractDiscreteAnswerFromRaw) -> None:
@@ -114,10 +108,10 @@ def test_missing_limit_raises_after_threshold() -> None:
         missing_limit=3,
         missing_answer=-99,
     )
-    predictions1 = cast(torch.Tensor, transform("unknown")["predictions"])
-    assert predictions1.tolist() == [-99]
-    predictions2 = cast(torch.Tensor, transform(["unknown", "unknown"])["predictions"])
-    assert predictions2.tolist() == [-99, -99]
+    result1 = transform("unknown")
+    assert result1.tolist() == [-99]
+    result2 = transform(["unknown", "unknown"])
+    assert result2.tolist() == [-99, -99]
     with pytest.raises(ValueError, match="Found 4 responses without valid structured data"):
         transform("unknown")
 
@@ -143,8 +137,7 @@ def test_supports_multi_word_keys() -> None:
 
     for text, expected in test_cases:
         result = transform(text)
-        predictions = cast(torch.Tensor, result["predictions"])
-        assert predictions.tolist() == expected, f"Failed for text: '{text}'"
+        assert result.tolist() == expected, f"Failed for text: '{text}'"
 
 
 def test_prioritizes_last_occurrence() -> None:
@@ -156,9 +149,8 @@ def test_prioritizes_last_occurrence() -> None:
 
     # "No" appears last within the lookback window
     result = transform("Initially I thought Yes but actually No")
-    predictions = cast(torch.Tensor, result["predictions"])
 
-    assert predictions.tolist() == [0]
+    assert result.tolist() == [0]
 
 
 @pytest.mark.parametrize(
@@ -173,8 +165,8 @@ def test_whitespace_handling(
     transform: ExtractDiscreteAnswerFromRaw, response: str, expected: list[int]
 ) -> None:
     """Should handle various whitespace patterns."""
-    predictions = cast(torch.Tensor, transform(response)["predictions"])
-    assert predictions.tolist() == expected
+    result = transform(response)
+    assert result.tolist() == expected
 
 
 @pytest.mark.parametrize(
@@ -189,8 +181,8 @@ def test_empty_string_returns_missing_answer(response: str) -> None:
         missing_answer=-1,
     )
 
-    predictions = cast(torch.Tensor, transform(response)["predictions"])
-    assert predictions.tolist() == [-1]
+    result = transform(response)
+    assert result.tolist() == [-1]
 
 
 @pytest.mark.parametrize(
@@ -208,8 +200,8 @@ def test_answer_with_letter_options(response: str, expected: list[int]) -> None:
         missing_limit=0,
     )
 
-    predictions = cast(torch.Tensor, transform(response)["predictions"])
-    assert predictions.tolist() == expected
+    result = transform(response)
+    assert result.tolist() == expected
 
 
 def test_robust_to_similar_words() -> None:
@@ -221,5 +213,5 @@ def test_robust_to_similar_words() -> None:
         missing_answer=-1,
     )
 
-    predictions = cast(torch.Tensor, transform("This happened yesterday")["predictions"])
-    assert predictions.tolist() == [-1]
+    result = transform("This happened yesterday")
+    assert result.tolist() == [-1]

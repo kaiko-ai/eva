@@ -102,17 +102,12 @@ class ExtractDiscreteAnswerFromStructuredOutput(ExtractAnswerFromStructuredOutpu
         self.mapping = {k if case_sensitive else k.lower(): v for k, v in mapping.items()}
 
     @override
-    def __call__(
-        self, values: Union[str, List[str]]
-    ) -> Dict[str, Union[torch.Tensor, List[Dict[str, str] | None]]]:
+    def __call__(self, values: Union[str, List[str]]) -> torch.Tensor:
         """Convert structured string(s) to a tensor of integer labels."""
         structured_data = super().__call__(values)
         answers = list(map(self._extract_answer, structured_data))
 
-        return {
-            "predictions": torch.tensor(answers, dtype=torch.long),
-            "extracted_answers": structured_data,
-        }
+        return torch.tensor(answers, dtype=torch.long)
 
     def _extract_answer(self, structured_obj: Dict[str, str] | None) -> int:
         if structured_obj is None or self.answer_key not in structured_obj:
