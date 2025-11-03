@@ -9,7 +9,7 @@ from eva.language.utils.text import xml as xml_utils
 
 
 class ExtractAnswerFromXml(ExtractAnswerFromStructuredOutput):
-    """Extracts discrete answers from XML responses and casts them to int tensors."""
+    """Extracts answers from XML responses and returns structured data."""
 
     @override
     def _extract_structured_data(self, value: str) -> Dict[str, str] | None:

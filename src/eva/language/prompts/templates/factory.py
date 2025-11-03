@@ -23,7 +23,15 @@ class FreeFormQuestionPromptTemplate(PromptTemplate):
     def __new__(
         cls, answer_format: Literal["json", "xml", "raw"], **template_kwargs
     ) -> PromptTemplate:
-        """Create a free-form question prompt template based on the answer format."""
+        """Create a free-form question prompt template based on the answer format.
+
+        Args:
+            answer_format: The format to use for answers ('json', 'xml', or 'raw').
+            **template_kwargs: Keyword arguments passed to the template constructor.
+
+        Returns:
+            An appropriate prompt template instance for the specified format.
+        """
         match answer_format:
             case "json":
                 return JsonFreeFormQuestionPromptTemplate(**template_kwargs)
@@ -41,7 +49,15 @@ class MultipleChoicePromptTemplate(PromptTemplate):
     def __new__(
         cls, answer_format: Literal["json", "xml", "raw"], **template_kwargs
     ) -> PromptTemplate:
-        """Create a multiple-choice prompt template based on the answer format."""
+        """Create a multiple-choice prompt template based on the answer format.
+
+        Args:
+            answer_format: The format to use for answers ('json', 'xml', or 'raw').
+            **template_kwargs: Keyword arguments passed to the template constructor.
+
+        Returns:
+            An appropriate prompt template instance for the specified format.
+        """
         match answer_format:
             case "json":
                 return JsonMultipleChoicePromptTemplate(**template_kwargs)

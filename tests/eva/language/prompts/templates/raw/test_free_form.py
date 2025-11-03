@@ -20,7 +20,7 @@ def test_render_basic_trims_input(template: RawFreeFormQuestionPromptTemplate) -
     )
 
     assert result.startswith("Question: What is the meaning of life?")
-    assert "IMPORTANT: Respond in free form text, and make sure that your final answer..." in result
+    assert "IMPORTANT: Respond in free form text, and make sure that your final answer" in result
     assert "Example Answer:" in result
 
 

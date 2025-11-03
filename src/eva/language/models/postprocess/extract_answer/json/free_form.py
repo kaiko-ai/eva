@@ -9,7 +9,7 @@ from eva.language.utils.text import json as json_utils
 
 
 class ExtractAnswerFromJson(ExtractAnswerFromStructuredOutput):
-    """Extracts discrete answers from JSON responses and casts them to int tensors."""
+    """Extracts answers from JSON responses and returns structured data."""
 
     @override
     def _extract_structured_data(self, value: str) -> Dict[str, str] | None:

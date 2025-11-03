@@ -29,7 +29,7 @@ def extract_raw(
 
     Args:
         text: The input string containing the model answer.
-        answer_options: List of valid options. If None, extracts any letter A-Z.
+        answer_options: List of valid options to match against.
         answer_key: The key to use in the returned dictionary.
         case_sensitive: Whether to treat matching as case sensitive.
         tail_length: Number of words from the end to examine for extraction.

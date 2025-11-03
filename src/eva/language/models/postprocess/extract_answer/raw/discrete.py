@@ -1,4 +1,4 @@
-"""Postprocessing transforms for extracting answers from JSON responses."""
+"""Postprocessing transforms for extracting answers from raw text responses."""
 
 from typing import Dict
 
