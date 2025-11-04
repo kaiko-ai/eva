@@ -163,6 +163,7 @@ def docs(session: nox.Session) -> None:
     args = session.posargs or []
     session.run_always("pdm", "install", "--group", "docs", external=True)
     session.run("pdm", "run", "mike", *args)
+    _delete_venv(session)
 
 
 @nox.session
