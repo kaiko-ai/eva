@@ -34,6 +34,15 @@ jobs:
         uses: wntrblm/nox@a74da2c766d4e656d6105639926c31f3aa4a6ca1 # 2025.02.09
         with:
           python-versions: "3.10"
+      - name: Free up disk space
+        run: |
+          sudo rm -rf /usr/local/lib/android \
+                      /opt/ghc \
+                      /opt/hostedtoolcache/CodeQL \
+                      /usr/local/.ghcup
+          sudo docker system prune -af || true
+          sudo apt-get clean
+          sudo rm -rf /var/lib/apt/lists/*
       - name: Configure Git Credentials
         run: |
           git config user.email "action@github.com"
@@ -49,6 +58,8 @@ jobs:
           python -m pip install dist/*.whl
           eva --version
       - name: Build Release Docs
+        env:
+            PIP_NO_CACHE_DIR: "1"
         run: |
           git fetch origin gh-pages:gh-pages
           tag="${GITHUB_REF_NAME}"
