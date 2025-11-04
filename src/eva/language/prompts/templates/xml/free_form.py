@@ -1,7 +1,6 @@
-"""Prompt templates for free-form questions."""
+"""Prompt templates for freeform questions with XML output."""
 
 # ruff: noqa: E501
-
 from __future__ import annotations
 
 import textwrap
@@ -14,10 +13,10 @@ from eva.language.prompts.templates import base, typings
 from eva.language.utils.text import format as format_utils
 
 
-class RawFreeFormQuestionPromptTemplate(base.PromptTemplate):
-    """Prompt template for free-form questions."""
+class XmlFreeFormQuestionPromptTemplate(base.PromptTemplate):
+    """Prompt template for freeform questions while enforcing XML output."""
 
-    template = textwrap.dedent(
+    template: str = textwrap.dedent(
         """\
         {{ preamble }}
 
@@ -39,16 +38,16 @@ class RawFreeFormQuestionPromptTemplate(base.PromptTemplate):
         {{ context }}
         {% endif %}
 
-        {%- if enable_cot %}
-        IMPORTANT: Think step-by-step before giving your final answer. Provide your reasoning first, then end your response with your final answer.
+        {% if enable_cot -%}
+        IMPORTANT:  Think step-by-step before giving your final answer, then provide your final answer within <{{ answer_key }}></{{ answer_key }}> tags.
         {%- else -%}
-        IMPORTANT: Respond in free form text, and make sure that your final answer is the last part of your response.
+        IMPORTANT: Provide your final answer within <{{ answer_key }}></{{ answer_key }}> tags.
         {%- endif %}
 
         {% if not examples %}
         Example Answer:
         Your explanation for why you chose this answer can go here...
-        {{ example_answer }}
+        <{{ answer_key }}>{{ example_answer }}</{{ answer_key }}>
         {% endif %}
 
         Answer:
@@ -56,7 +55,12 @@ class RawFreeFormQuestionPromptTemplate(base.PromptTemplate):
     )
     """Base template to be rendered via Jinja2."""
 
-    def __init__(self) -> None:
+    _default_answer_key: str = "answer"
+    """Default key name for the answer in the XML output."""
+
+    def __init__(
+        self,
+    ) -> None:
         """Initializes the prompt template."""
         super().__init__()
 
@@ -70,6 +74,7 @@ class RawFreeFormQuestionPromptTemplate(base.PromptTemplate):
         example_answer: str | None = None,
         preamble: str | None = None,
         enable_cot: bool | None = None,
+        answer_key: str | None = None,
     ) -> str:
         """Render the template with provided values.
 
@@ -77,10 +82,11 @@ class RawFreeFormQuestionPromptTemplate(base.PromptTemplate):
             question: The question to ask the model.
             context: Supporting context text(s) for the question.
             examples: Optional list of example question-answer pairs.
-                Each example should be a dict with 'question' and 'answer' keys.
-            example_answer: Optional example answer for the raw snippet. Defaults to first option.
+                Each example should be a QuestionAnswerExample with 'question' and 'answer' keys.
+            example_answer: Optional example answer for the XML snippet. Defaults to first option.
             preamble: Optional preamble text to include at the top of the prompt.
-            enable_cot: Optionally override the instance's CoT setting for this render call.
+            enable_cot: Whether to explicitly prompt the model to use reasoning/CoT for answering.
+            answer_key: Key name for the answer in the XML output. Defaults to "answer".
 
         Returns:
             The rendered prompt string.
@@ -94,8 +100,8 @@ class RawFreeFormQuestionPromptTemplate(base.PromptTemplate):
             context=format_utils.format_list_items(context) if context else None,
             examples=examples,
             example_answer=example_answer,
+            answer_key=answer_key or self._default_answer_key,
             preamble=(preamble or "").strip(),
-            enable_cot=enable_cot if enable_cot is None else enable_cot,
+            enable_cot=enable_cot,
         )
-
         return format_utils.remove_multi_blank_lines(textwrap.dedent(rendered).strip() + "\n")

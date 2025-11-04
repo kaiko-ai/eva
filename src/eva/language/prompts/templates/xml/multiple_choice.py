@@ -1,4 +1,4 @@
-"""Prompt templates for multiple choice questions without strict formatting requirements."""
+"""Prompt templates for multiple choice questions with XML output."""
 
 # ruff: noqa: E501
 
@@ -15,8 +15,8 @@ from eva.language.prompts.templates import base, typings
 from eva.language.utils.text import format as format_utils
 
 
-class RawMultipleChoicePromptTemplate(base.PromptTemplate):
-    """Prompt template for multiple choice questions only requiring the final answer to be last."""
+class XmlMultipleChoicePromptTemplate(base.PromptTemplate):
+    """Prompt template for multiple choice questions while enforcing XML output."""
 
     template: str = textwrap.dedent(
         """\
@@ -40,32 +40,32 @@ class RawMultipleChoicePromptTemplate(base.PromptTemplate):
         {{ context }}
         {% endif %}
 
-        {%- if enable_cot %}
-        IMPORTANT: Think step-by-step before giving your final answer. Provide your reasoning first, then end your response with only your final answer
+        {% if enable_cot -%}
+        IMPORTANT:  Think step-by-step before giving your final answer, then provide your final answer within <{{ answer_key }}></{{ answer_key }}> tags.
         {%- else -%}
-        IMPORTANT: End your response with only your final answer
+        IMPORTANT: Provide your final answer within <{{ answer_key }}></{{ answer_key }}> tags.
         {%- endif -%}
-        {%- if use_option_letters %} letter
-        {%- else %} exactly as written below
-        {%- endif %}.
-        Do not add any text after that final response.
         {% if use_option_letters %}
-        Select the letter (e.g., "A", "B", "C", ...) corresponding to one of the options below:
+        The answer must be the letter (e.g., "A", "B", "C", ...)
+        corresponding to your chosen option from the list below:
         {% else %}
-        Select exactly one of the options listed below:
+        The answer must exactly match one of the options listed below:
         {% endif %}
         {{ answer_options }}
 
         {% if not examples %}
         Example Answer:
-        Your explanation for why you chose this answer can go here...
-        {{ example_answer }}
+        Your explanation for why you chose this answer can go here... 
+        <{{ answer_key }}>{{ example_answer }}</{{ answer_key }}>
         {% endif %}
 
         Answer:
         """
     )
     """Base template to be rendered via Jinja2."""
+
+    _default_answer_key: str = "answer"
+    """Default key name for the answer in the XML output."""
 
     def __init__(
         self,
@@ -85,6 +85,7 @@ class RawMultipleChoicePromptTemplate(base.PromptTemplate):
         preamble: str | None = None,
         use_option_letters: bool | None = None,
         enable_cot: bool | None = None,
+        answer_key: str | None = None,
     ) -> str:
         """Render the template with provided values.
 
@@ -95,10 +96,11 @@ class RawMultipleChoicePromptTemplate(base.PromptTemplate):
             examples: A sequence of question & answer pairs to include as examples.
                 Expected format is a list of dicts with 'question', 'answer', and
                 optional 'context' keys.
-            example_answer: Optional example answer for the raw snippet. Defaults to first option.
+            example_answer: Optional example answer for the XML snippet. Defaults to first option.
             preamble: Optional preamble text to include at the top of the prompt.
             use_option_letters: Whether to prefix options with letters (A, B, C, ...).
-            enable_cot: Optionally override the instance's CoT setting for this render call.
+            enable_cot: Whether to explicitly prompt the model to use reasoning/CoT for answering.
+            answer_key: Key name for the answer in the XML output. Defaults to "answer".
 
         Returns:
             The rendered prompt string.
@@ -113,6 +115,7 @@ class RawMultipleChoicePromptTemplate(base.PromptTemplate):
             answer_options=format_utils.format_list_items(
                 answer_options, style="letters" if use_option_letters else "bullets"
             ),
+            answer_key=answer_key or self._default_answer_key,
             examples=examples,
             example_answer=(
                 example_answer
