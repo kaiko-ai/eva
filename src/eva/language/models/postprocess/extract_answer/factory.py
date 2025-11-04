@@ -7,7 +7,10 @@ from eva.language.models.postprocess.extract_answer.json import (
     ExtractAnswerFromJson,
     ExtractDiscreteAnswerFromJson,
 )
-from eva.language.models.postprocess.extract_answer.raw import ExtractDiscreteAnswerFromRaw
+from eva.language.models.postprocess.extract_answer.raw import (
+    ExtractAnswerFromRaw,
+    ExtractDiscreteAnswerFromRaw,
+)
 from eva.language.models.postprocess.extract_answer.xml import (
     ExtractAnswerFromXml,
     ExtractDiscreteAnswerFromXml,
@@ -60,5 +63,7 @@ class ExtractAnswer:
                 return ExtractAnswerFromJson(**extract_kwargs)
             case "xml":
                 return ExtractAnswerFromXml(**extract_kwargs)
+            case "raw":
+                return ExtractAnswerFromRaw(**extract_kwargs)
             case _:
                 raise ValueError(f"Unknown answer format: {answer_format}")
