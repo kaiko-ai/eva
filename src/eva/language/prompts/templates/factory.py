@@ -2,6 +2,8 @@
 
 from typing import Literal
 
+from typing_extensions import override
+
 from eva.language.prompts.templates.base import PromptTemplate
 from eva.language.prompts.templates.json import (
     JsonFreeFormQuestionPromptTemplate,
@@ -42,6 +44,10 @@ class FreeFormQuestionPromptTemplate(PromptTemplate):
             case _:
                 raise ValueError(f"Unknown answer format: {answer_format}")
 
+    @override
+    def render(self, **kwargs) -> str:
+        raise NotImplementedError("Factory class should not be instantiated directly.")
+
 
 class MultipleChoicePromptTemplate(PromptTemplate):
     """Factory for Multiple Choice QA prompt templates based on answer format."""
@@ -67,3 +73,7 @@ class MultipleChoicePromptTemplate(PromptTemplate):
                 return RawMultipleChoicePromptTemplate(**template_kwargs)
             case _:
                 raise ValueError(f"Unknown answer format: {answer_format}")
+
+    @override
+    def render(self, **kwargs) -> str:
+        raise NotImplementedError("Factory class should not be instantiated directly.")
