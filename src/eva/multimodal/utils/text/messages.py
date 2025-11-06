@@ -6,7 +6,7 @@ from torchvision import tv_tensors
 
 from eva.language import utils as language_utils
 from eva.language.data.messages import MessageSeries, Role
-from eva.multimodal.utils import image as image_utils
+from eva.vision.utils import image as image_utils
 
 
 def format_huggingface_message(
