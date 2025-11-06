@@ -6,7 +6,7 @@ import pytest
 import torch
 from torchvision import tv_tensors
 
-from eva.vision.utils.image.encode import encode_image
+from eva.multimodal.utils.image.encode import encode_image
 
 
 def test_encode_image_base64():

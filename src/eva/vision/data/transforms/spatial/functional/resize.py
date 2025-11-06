@@ -1,36 +1,26 @@
 """Functional resizing utilities."""
 
 import io
+from typing import Tuple
 
+from PIL import Image
 from torchvision import tv_tensors
 from torchvision.transforms.v2 import functional as F
 
-from eva.vision.utils.image import encode as encode_utils
-
 
 def resize_to_max_bytes(image: tv_tensors.Image, max_bytes: int) -> tv_tensors.Image:
-    """Resize the image to fit within the specified byte size.
+    """Resize the image to fit within the specified byte size."""
+    image_pil = F.to_pil_image(image)
+    image_bytes = io.BytesIO()
+    image_pil.save(image_bytes, format="PNG", optimize=True)
 
-    Args:
-        image: The image tensor to resize.
-        max_bytes: The maximum allowed byte size for the image.
+    while image_bytes.tell() > max_bytes:
+        size: Tuple[int, int] = image_pil.size  # type: ignore
+        w, h = size
+        scale = (max_bytes / image_bytes.tell()) ** 0.5
+        new_size = (max(1, int(h * scale)), max(1, int(w * scale)))
+        image_pil = image_pil.resize(new_size, Image.Resampling.LANCZOS)
+        image_bytes = io.BytesIO()
+        image_pil.save(image_bytes, format="PNG", optimize=True)
 
-    Returns:
-        The resized image tensor.
-    """
-    image_bytes: io.BytesIO = encode_utils.get_image_buffer(image)
-    num_bytes = image_bytes.getbuffer().nbytes
-    h, w = image.shape[-2], image.shape[-1]
-
-    while num_bytes > max_bytes:
-        scale = (max_bytes / num_bytes) ** 0.5
-        new_h, new_w = max(1, int(h * scale)), max(1, int(w * scale))
-        if new_h == h and new_w == w:
-            break
-
-        image = tv_tensors.Image(F.resize(image, [new_h, new_w]))
-        image_bytes = encode_utils.get_image_buffer(image)
-        h, w = new_h, new_w
-        num_bytes = image_bytes.getbuffer().nbytes
-
-    return image
+    return tv_tensors.Image(F.pil_to_tensor(image_pil))

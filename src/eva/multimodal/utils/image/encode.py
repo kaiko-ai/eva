@@ -22,12 +22,12 @@ def encode_image(image: tv_tensors.Image, encoding: Literal["base64"], **kwargs)
     """
     match encoding:
         case "base64":
-            return encode_base64(image, **kwargs)
+            return _encode_base64(image, **kwargs)
         case _:
             raise ValueError(f"Unsupported encoding type: {encoding}. Supported: 'base64'")
 
 
-def encode_base64(
+def _encode_base64(
     image: tv_tensors.Image,
     file_format: Literal["png", "jpeg"] = "jpeg",
     optimize: bool = False,
@@ -50,24 +50,6 @@ def encode_base64(
     Returns:
         Base64-encoded string of the image in the chosen format.
     """
-    buf = get_image_buffer(
-        image,
-        file_format=file_format,
-        optimize=optimize,
-        compress_level=compress_level,
-        quality=quality,
-    )
-    return base64.b64encode(buf.getvalue()).decode("utf-8")
-
-
-def get_image_buffer(
-    image: tv_tensors.Image,
-    file_format: Literal["png", "jpeg"] = "jpeg",
-    optimize: bool = False,
-    compress_level: int = 4,
-    quality: int = 95,
-) -> io.BytesIO:
-    """Converts an image tensor into an in-memory file buffer in PNG or JPEG format."""
     buf = io.BytesIO()
     pil_img = F.to_pil_image(image)
 
@@ -80,4 +62,4 @@ def get_image_buffer(
             raise ValueError("Unsupported format: use 'png' or 'jpeg'.")
 
     buf.seek(0)
-    return buf
+    return base64.b64encode(buf.getvalue()).decode("utf-8")
