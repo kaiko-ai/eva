@@ -1,5 +1,6 @@
 """Message formatting utilities for multimodal models."""
 
+import os
 from typing import Any, Dict, List, Literal
 
 from torchvision import tv_tensors
@@ -53,6 +54,7 @@ def format_litellm_message(
     """
     if image is None:
         return language_utils.format_chat_message(message)
+    image_format = os.getenv("ENCODE_IMAGE_FORMAT", image_format).lower()  # type: ignore
 
     formatted_message = []
     for item in message:
