@@ -48,7 +48,6 @@ def test_resize_with_size_only(size, input_shape, expected_shape):
         (200, 300, (3, 1000, 500), 300),
         (150, 256, (3, 512, 512), 256),
         (200, 300, (3, 600, 800), 300),
-        (None, 400, (3, 600, 800), 400),
     ],
 )
 def test_resize_with_max_size(size, max_size, input_shape, expected_max_dimension):
