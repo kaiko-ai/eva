@@ -7,19 +7,24 @@ from torchvision import tv_tensors
 from torchvision.transforms import v2
 from typing_extensions import override
 
+from eva.core.utils import requirements
 from eva.vision.data.transforms import base
 from eva.vision.data.transforms.spatial import functional
 
 
 class Resize(base.TorchvisionTransformV2):
-    """Resize transform for images with spatial or byte-based constraints.
+    """Resize transform for images.
 
-    This transform provides two mutually exclusive modes of resizing:
-    1. Spatial resizing: Resize to a specific (height, width) dimension
-    2. Byte-based resizing: Resize to fit within a maximum byte size
+    This transform provides different modes of resizing:
+    1. Spatial resizing: Resize to a specific size dimension or
+       maximum size for the longer edge.
+    2. Byte-based resizing: Resize to fit within a maximum byte size.
 
-    The latter is particularly useful for API models (e.g. Claude 3.7) that
-    have strict byte size limits for image inputs.
+    If both spatial and byte-based constraints are provided, first the spatial
+    resizing is applied, followed by byte-based resizing. The reasoning behind
+    this is that byte-based resizing can be slow for large images, so first
+    applying the spatial resizing, and then applying byte-based (e.g. needed to
+    meet API image size limits) can be more efficient.
     """
 
     def __init__(
@@ -33,7 +38,7 @@ class Resize(base.TorchvisionTransformV2):
         Args:
             size: Desired output size, e.g. (height, width) tuple.
             max_bytes: Maximum allowed byte size for the image. If both `size` and
-                `max_bytes` are provided, `max_bytes` takes precedence.
+                `max_bytes` are provided, spatial resizing is applied first.
             max_size: The maximum allowed for the longer edge of the resized image.
 
         Raises:
@@ -48,12 +53,20 @@ class Resize(base.TorchvisionTransformV2):
         self.size = size
         self.max_bytes = max_bytes
         self.max_size = max_size
-        self.resize_fn = None
+        self.resize_fns = []
 
+        if size is not None or max_size is not None:
+            if requirements.below("torchvision", "0.19.0") and (
+                size is None and max_size is not None
+            ):
+                raise ValueError(
+                    "Setting `max_size` without `size` is only supported in torchvision>=0.19.0."
+                )
+            self.resize_fns.append(v2.Resize(size=size, max_size=max_size))  # type: ignore
         if max_bytes is not None:
-            self.resize_fn = functools.partial(functional.resize_to_max_bytes, max_bytes=max_bytes)
-        elif size is not None or max_size is not None:
-            self.resize_fn = v2.Resize(size=size, max_size=max_size)  # type: ignore
+            self.resize_fns.append(
+                functools.partial(functional.resize_to_max_bytes, max_bytes=max_bytes)
+            )
 
     @functools.singledispatchmethod
     @override
@@ -63,5 +76,8 @@ class Resize(base.TorchvisionTransformV2):
     @transform.register(tv_tensors.Image)
     @transform.register(tv_tensors.Mask)
     def _(self, inpt: Any, params: Dict[str, Any]) -> Any:
-        inpt_resized = self.resize_fn(inpt) if self.resize_fn is not None else inpt
-        return tv_tensors.wrap(inpt_resized, like=inpt)
+        if not self.resize_fns:
+            return inpt
+        for resize_fn in self.resize_fns:
+            inpt = resize_fn(inpt)
+        return tv_tensors.wrap(inpt, like=inpt)
