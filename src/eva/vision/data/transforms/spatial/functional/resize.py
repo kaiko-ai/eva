@@ -1,7 +1,5 @@
 """Functional resizing utilities."""
 
-import io
-
 from torchvision import tv_tensors
 from torchvision.transforms.v2 import functional as F
 
@@ -18,8 +16,7 @@ def resize_to_max_bytes(image: tv_tensors.Image, max_bytes: int) -> tv_tensors.I
     Returns:
         The resized image tensor.
     """
-    image_bytes: io.BytesIO = encode_utils.get_image_buffer(image)
-    num_bytes = image_bytes.getbuffer().nbytes
+    num_bytes = len(encode_utils.encode_image(image))
     h, w = image.shape[-2], image.shape[-1]
 
     while num_bytes > max_bytes:
@@ -29,8 +26,7 @@ def resize_to_max_bytes(image: tv_tensors.Image, max_bytes: int) -> tv_tensors.I
             break
 
         image = tv_tensors.Image(F.resize(image, [new_h, new_w]))
-        image_bytes = encode_utils.get_image_buffer(image)
         h, w = new_h, new_w
-        num_bytes = image_bytes.getbuffer().nbytes
+        num_bytes = len(encode_utils.encode_image(image))
 
     return image

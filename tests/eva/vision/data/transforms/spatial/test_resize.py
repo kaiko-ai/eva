@@ -5,6 +5,7 @@ import torch
 from torchvision import tv_tensors
 
 from eva.vision.data import transforms
+from eva.vision.utils.image import encode as encode_utils
 
 
 def test_resize_with_size_only():
@@ -23,10 +24,14 @@ def test_resize_with_max_bytes_only():
     resize_transform = transforms.Resize(max_bytes=1000)  # Very small size to force resizing
     test_image = tv_tensors.Image(torch.rand(3, 500, 500))
 
+    num_bytes_before = len(encode_utils.encode_image(test_image))
+    assert num_bytes_before > 1000
+
     result = resize_transform(test_image)
 
+    num_bytes_after = len(encode_utils.encode_image(result))
+    assert num_bytes_after <= 1000
     assert isinstance(result, tv_tensors.Image)
-    # Image should be smaller than original due to byte size constraint
     assert result.shape[1] < 500 or result.shape[2] < 500
 
 

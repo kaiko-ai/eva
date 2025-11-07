@@ -1,6 +1,6 @@
 """Message formatting utilities for multimodal models."""
 
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Literal
 
 from torchvision import tv_tensors
 
@@ -37,13 +37,16 @@ def format_huggingface_message(
 
 
 def format_litellm_message(
-    message: MessageSeries, image: tv_tensors.Image | None
+    message: MessageSeries,
+    image: tv_tensors.Image | None,
+    image_format: Literal["png", "jpeg"] = "jpeg",
 ) -> List[Dict[str, Any]]:
     """Format a message series for LiteLLM API.
 
     Args:
         message: The message series to format.
         image: Optional image to include in the message.
+        image_format: The image format to use for encoding, either "png" or "jpeg".
 
     Returns:
         A list of formatted message dictionaries.
@@ -68,8 +71,8 @@ def format_litellm_message(
                             "type": "image_url",
                             "image_url": {
                                 "url": (
-                                    f"data:image/png;base64,"
-                                    f"{image_utils.encode_image(image, encoding='base64')}"
+                                    f"data:image/{image_format};base64,"
+                                    f"{image_utils.encode_image(image, encoding='base64', file_format=image_format)}"  # noqa: E501
                                 )
                             },
                         },

@@ -9,25 +9,37 @@ from torchvision import tv_tensors
 from torchvision.transforms.v2 import functional as F
 
 
-def encode_image(image: tv_tensors.Image, encoding: Literal["base64"], **kwargs) -> str:
+def encode_image(
+    image: tv_tensors.Image,
+    encoding: Literal["base64"] = "base64",
+    file_format: Literal["png", "jpeg"] = "jpeg",
+    **kwargs,
+) -> str:
     """Encodes an image tensor into a string format.
 
     Args:
         image: The image tensor to encode.
         encoding: The encoding format to use. Currently only supports "base64".
+        file_format: The file format to encode the image as. Either "png" or "jpeg".
+            Can be overridden by the ENCODE_IMAGE_FORMAT environment variable.
         **kwargs: Additional keyword arguments to pass to the encoding function.
 
     Returns:
         An encoded string representation of the image.
     """
+    image_format = os.getenv("ENCODE_IMAGE_FORMAT", file_format).lower()
+
+    if image_format not in {"png", "jpeg"}:
+        raise ValueError("Unsupported format: use 'png' or 'jpeg'.")
+
     match encoding:
         case "base64":
-            return encode_base64(image, **kwargs)
+            return _encode_base64(image, file_format=image_format, **kwargs)  # type: ignore
         case _:
             raise ValueError(f"Unsupported encoding type: {encoding}. Supported: 'base64'")
 
 
-def encode_base64(
+def _encode_base64(
     image: tv_tensors.Image,
     file_format: Literal["png", "jpeg"] = "jpeg",
     optimize: bool = False,
@@ -38,8 +50,7 @@ def encode_base64(
 
     Args:
         image: Image tensor to encode.
-        file_format: Either "png" (lossless) or "jpeg" (lossy). Can be overridden
-            by the BASE64_IMAGE_FORMAT environment variable.
+        file_format: Either "png" (lossless) or "jpeg" (lossy).
         optimize: If True, performs an extra optimization pass for slightly smaller files
             at the cost of slower encoding.
         compress_level: PNG-only. Compression level (0-9); lower is faster, but results
@@ -50,7 +61,7 @@ def encode_base64(
     Returns:
         Base64-encoded string of the image in the chosen format.
     """
-    buf = get_image_buffer(
+    buf = _get_image_buffer(
         image,
         file_format=file_format,
         optimize=optimize,
@@ -60,7 +71,7 @@ def encode_base64(
     return base64.b64encode(buf.getvalue()).decode("utf-8")
 
 
-def get_image_buffer(
+def _get_image_buffer(
     image: tv_tensors.Image,
     file_format: Literal["png", "jpeg"] = "jpeg",
     optimize: bool = False,
@@ -71,7 +82,7 @@ def get_image_buffer(
     buf = io.BytesIO()
     pil_img = F.to_pil_image(image)
 
-    match os.getenv("BASE64_IMAGE_FORMAT", file_format).lower():
+    match file_format:
         case "jpeg":
             pil_img.convert("RGB").save(buf, format="JPEG", quality=quality, optimize=optimize)
         case "png":
