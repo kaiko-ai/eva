@@ -35,7 +35,6 @@ class LiteLLMModel(base.LanguageModel):
     _default_model_kwargs = {
         "temperature": 0.0,
         "max_completion_tokens": 1024,
-        "top_p": 1.0,
         "seed": 42,
     }
     """Default API model parameters for evaluation."""
