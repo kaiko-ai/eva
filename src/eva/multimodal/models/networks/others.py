@@ -5,6 +5,7 @@ import os
 import torch
 
 from eva.core.utils import requirements
+from eva.language.models.constants import MAX_NEW_TOKENS
 from eva.multimodal.models import wrappers
 from eva.multimodal.models.networks.registry import model_registry
 
@@ -35,7 +36,7 @@ class PathoR13b(wrappers.HuggingFaceModel):
                 "attn_implementation": attn_implementation,
             },
             generation_kwargs={
-                "max_new_tokens": 512,
+                "max_new_tokens": MAX_NEW_TOKENS,
                 "do_sample": False,
             },
             processor_kwargs={
@@ -45,4 +46,5 @@ class PathoR13b(wrappers.HuggingFaceModel):
             },
             system_prompt=system_prompt,
             image_key="images",
+            image_position="before_text",
         )

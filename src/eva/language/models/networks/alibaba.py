@@ -4,6 +4,7 @@ import torch
 
 from eva.core.utils import requirements
 from eva.language.models import wrappers
+from eva.language.models.constants import MAX_NEW_TOKENS
 from eva.language.models.networks.registry import model_registry
 
 
@@ -21,7 +22,7 @@ class Qwen205BInstruct(wrappers.HuggingFaceModel):
                 "cache_dir": cache_dir,
             },
             generation_kwargs={
-                "max_new_tokens": 512,
+                "max_new_tokens": MAX_NEW_TOKENS,
             },
             system_prompt=system_prompt,
             chat_mode=True,
