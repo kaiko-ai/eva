@@ -115,6 +115,7 @@ def infer_model(
     datamodule: datamodules.DataModule,
     *,
     return_predictions: bool = False,
+    enable_clone: bool = False,
 ) -> _PREDICT_OUTPUT | None:
     """Performs model inference.
 
@@ -123,8 +124,10 @@ def infer_model(
         model: The model module to use.
         datamodule: The data module.
         return_predictions: Whether to return the model predictions.
+        enable_clone: Whether to clone the trainer before inference.
     """
-    return _utils.clone(trainer).predict(
+    trainer = _utils.clone(trainer) if enable_clone else trainer
+    return trainer.predict(
         model=model,
         datamodule=datamodule,
         return_predictions=return_predictions,

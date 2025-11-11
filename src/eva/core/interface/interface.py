@@ -48,6 +48,7 @@ class Interface:
         trainer: eva_trainer.Trainer,
         model: modules.ModelModule,
         data: datamodules.DataModule,
+        enable_clone: bool = False,
     ) -> None:
         """Perform model prediction out-of-place.
 
@@ -57,12 +58,15 @@ class Interface:
             trainer: The base trainer to use but not modify.
             model: The model module to use but not modify.
             data: The data module.
+            enable_clone: Whether to clone the trainer before inference. This is required
+                e.g. when running other stages such as `fit` or `validate` after `predict`.
         """
         eva_trainer.infer_model(
             trainer=trainer,
             model=model,
             datamodule=data,
             return_predictions=False,
+            enable_clone=enable_clone,
         )
 
     def predict_fit(
@@ -82,7 +86,7 @@ class Interface:
             model: The model module to use but not modify.
             data: The data module.
         """
-        self.predict(trainer=trainer, model=model, data=data)
+        self.predict(trainer=trainer, model=model, data=data, enable_clone=True)
         self.fit(trainer=trainer, model=model, data=data)
 
     def validate(
