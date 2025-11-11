@@ -124,8 +124,7 @@ def infer_model(
         datamodule: The data module.
         return_predictions: Whether to return the model predictions.
     """
-    trainer = _utils.clone(trainer)
-    return trainer.predict(
+    return _utils.clone(trainer).predict(
         model=model,
         datamodule=datamodule,
         return_predictions=return_predictions,
