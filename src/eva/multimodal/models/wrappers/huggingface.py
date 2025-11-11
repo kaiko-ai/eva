@@ -1,7 +1,7 @@
 """HuggingFace Vision-Language Model Wrapper."""
 
 import functools
-from typing import Any, Callable, Dict, List
+from typing import Any, Callable, Dict, List, Literal
 
 import torch
 import transformers
@@ -9,6 +9,7 @@ from loguru import logger
 from torch import nn
 from typing_extensions import override
 
+from eva.language.models.constants import MAX_NEW_TOKENS
 from eva.language.models.typings import ModelOutput, TextBatch
 from eva.language.utils.text import messages as language_message_utils
 from eva.multimodal.models.typings import TextImageBatch
@@ -30,7 +31,7 @@ class HuggingFaceModel(base.VisionLanguageModel):
 
     _default_generation_kwargs = {
         "temperature": 0.0,
-        "max_new_tokens": 1024,
+        "max_new_tokens": MAX_NEW_TOKENS,
         "do_sample": False,
         "top_p": 1.0,
     }
@@ -45,6 +46,7 @@ class HuggingFaceModel(base.VisionLanguageModel):
         processor_kwargs: Dict[str, Any] | None = None,
         generation_kwargs: Dict[str, Any] | None = None,
         image_key: str = "image",
+        image_position: Literal["before_text", "after_text"] = "after_text",
     ):
         """Initialize the HuggingFace model wrapper.
 
@@ -56,6 +58,7 @@ class HuggingFaceModel(base.VisionLanguageModel):
             processor_kwargs: Additional processor arguments.
             generation_kwargs: Additional generation arguments.
             image_key: The key used for image inputs in the chat template.
+            image_position: Position of the image in the input sequence.
         """
         super().__init__(system_prompt=system_prompt)
 
@@ -65,6 +68,7 @@ class HuggingFaceModel(base.VisionLanguageModel):
         self.processor_kwargs = processor_kwargs or {}
         self.generation_kwargs = self._default_generation_kwargs | (generation_kwargs or {})
         self.image_key = image_key
+        self.image_position: Literal["before_text", "after_text"] = image_position
 
         self.processor = self.load_processor()
         self.model = self.load_model()
@@ -103,6 +107,7 @@ class HuggingFaceModel(base.VisionLanguageModel):
                     functools.partial(
                         message_utils.format_huggingface_message,
                         with_images=with_images,
+                        image_position=self.image_position,
                     ),
                     message_batch,
                 )
@@ -181,10 +186,10 @@ class HuggingFaceModel(base.VisionLanguageModel):
             A list of decoded text responses.
         """
         decoded_input = self.processor.batch_decode(  # type: ignore
-            output[:, :instruction_length], skip_special_tokens=True
+            output[:, :instruction_length], skip_special_tokens=False
         )
         decoded_output = self.processor.batch_decode(  # type: ignore
-            output[:, instruction_length:], skip_special_tokens=True
+            output[:, instruction_length:], skip_special_tokens=False
         )
 
         logger.debug(f"Decoded input: {decoded_input}")

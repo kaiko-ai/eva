@@ -5,6 +5,7 @@ from typing import Any, Callable, Dict, List, Literal
 from transformers.pipelines import pipeline
 from typing_extensions import override
 
+from eva.language.models.constants import MAX_NEW_TOKENS
 from eva.language.models.typings import ModelOutput, TextBatch
 from eva.language.models.wrappers import base
 from eva.language.utils.text import messages as message_utils
@@ -15,7 +16,7 @@ class HuggingFaceModel(base.LanguageModel):
 
     _default_generation_kwargs = {
         "temperature": 0.0,
-        "max_new_tokens": 1024,
+        "max_new_tokens": MAX_NEW_TOKENS,
         "do_sample": False,
         "top_p": 1.0,
     }
