@@ -2,7 +2,7 @@
 
 from typing import List, Literal, Tuple
 
-from lightning.pytorch.utilities.types import _EVALUATE_OUTPUT
+from lightning.pytorch.utilities.types import _EVALUATE_OUTPUT, _PREDICT_OUTPUT
 
 from eva.core.data import datamodules
 from eva.core.models import modules
@@ -79,7 +79,9 @@ def run_evaluation(
     """
     if not stages:
         stages = ["fit", "validate", "test"]
-    trainer, model = _utils.clone(base_trainer, base_model)
+    trainer = _utils.clone(base_trainer)
+    model = _utils.clone(base_model) if "fit" in stages else base_model
+
     model.configure_model()
 
     trainer.init_logger_run(run_id)
@@ -108,24 +110,21 @@ def run_evaluation(
 
 
 def infer_model(
-    base_trainer: eva_trainer.Trainer,
-    base_model: modules.ModelModule,
+    trainer: eva_trainer.Trainer,
+    model: modules.ModelModule,
     datamodule: datamodules.DataModule,
     *,
     return_predictions: bool = False,
-) -> None:
-    """Performs model inference out-of-place.
-
-    Note that the input `base_model` and `base_trainer` would
-    not be modified.
+) -> _PREDICT_OUTPUT | None:
+    """Performs model inference.
 
     Args:
-        base_trainer: The base trainer to use but not modify.
-        base_model: The model module to use but not modify.
+        trainer: The trainer to use.
+        model: The model module to use.
         datamodule: The data module.
         return_predictions: Whether to return the model predictions.
     """
-    trainer, model = _utils.clone(base_trainer, base_model)
+    trainer = _utils.clone(trainer)
     return trainer.predict(
         model=model,
         datamodule=datamodule,

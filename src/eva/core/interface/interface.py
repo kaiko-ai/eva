@@ -59,8 +59,8 @@ class Interface:
             data: The data module.
         """
         eva_trainer.infer_model(
-            base_trainer=trainer,
-            base_model=model,
+            trainer=trainer,
+            model=model,
             datamodule=data,
             return_predictions=False,
         )
