@@ -68,7 +68,7 @@ class HuggingFaceModel(base.VisionLanguageModel):
         self.processor_kwargs = processor_kwargs or {}
         self.generation_kwargs = self._default_generation_kwargs | (generation_kwargs or {})
         self.image_key = image_key
-        self.image_position = image_position
+        self.image_position: Literal["before_text", "after_text"] = image_position
 
         self.processor = self.load_processor()
         self.model = self.load_model()

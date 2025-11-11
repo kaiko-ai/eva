@@ -37,7 +37,7 @@ class LiteLLMModel(base.VisionLanguageModel):
             log_level: Optional logging level for LiteLLM. Defaults to WARNING.
         """
         super().__init__(system_prompt=system_prompt)
-        self.image_position = image_position
+        self.image_position: Literal["before_text", "after_text"] = image_position
 
         self.language_model = language_wrappers.LiteLLMModel(
             model_name=model_name,
