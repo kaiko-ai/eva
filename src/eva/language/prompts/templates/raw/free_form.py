@@ -46,9 +46,15 @@ class RawFreeFormQuestionPromptTemplate(base.PromptTemplate):
         {%- endif %}
 
         {% if not examples %}
+        {% if example_answer %}
         Example Answer:
-        Your explanation for why you chose this answer can go here...
+        {% if enable_cot %}
+        First, provide your reasoning for why you chose this answer here...
+        Then, provide your final answer: {{ example_answer }}
+        {% else %}
         {{ example_answer }}
+        {% endif %}
+        {% endif %}
         {% endif %}
 
         Answer:
