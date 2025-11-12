@@ -189,7 +189,7 @@ class HuggingFaceModel(base.VisionLanguageModel):
             output[:, :instruction_length], skip_special_tokens=False
         )
         decoded_output = self.processor.batch_decode(  # type: ignore
-            output[:, instruction_length:], skip_special_tokens=False
+            output[:, instruction_length:], skip_special_tokens=True
         )
 
         logger.debug(f"Decoded input: {decoded_input}")
