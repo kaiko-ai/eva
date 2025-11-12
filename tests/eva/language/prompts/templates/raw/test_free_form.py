@@ -21,7 +21,7 @@ def test_render_basic_trims_input(template: RawFreeFormQuestionPromptTemplate) -
 
     assert result.startswith("Question: What is the meaning of life?")
     assert "IMPORTANT: Respond in free form text, and make sure that your final answer" in result
-    assert "Example Answer:" in result
+    assert "Example Answer:" not in result
 
 
 def test_render_context_formats_lists(template: RawFreeFormQuestionPromptTemplate) -> None:
@@ -102,16 +102,14 @@ def test_render_with_examples() -> None:
 
 
 def test_render_without_examples() -> None:
-    """Template should show default example format when no examples provided."""
+    """Template should not show example format when no examples or example_answer provided."""
     template = RawFreeFormQuestionPromptTemplate()
 
     result = template.render(
         question="Test question",
         context=None,
     )
-
-    assert "Example Answer:" in result
-    assert "Your explanation for why you chose this answer can go here..." in result
+    assert "Example Answer:" not in result
     assert "Below are some examples:" not in result
 
 
@@ -150,4 +148,36 @@ def test_render_instance_enable_cot() -> None:
         enable_cot=True,
     )
 
+    assert "Think step-by-step" in result
+
+
+def test_render_with_example_answer() -> None:
+    """Template should show example answer when provided."""
+    template = RawFreeFormQuestionPromptTemplate()
+
+    result = template.render(
+        question="Test question",
+        context=None,
+        example_answer="42",
+    )
+
+    assert "Example Answer:" in result
+    assert "42" in result
+    assert "First, provide your reasoning" not in result
+
+
+def test_render_with_example_answer_and_cot() -> None:
+    """Template shows CoT-formatted example when example_answer and enable_cot are provided."""
+    template = RawFreeFormQuestionPromptTemplate()
+
+    result = template.render(
+        question="Test question",
+        context=None,
+        example_answer="42",
+        enable_cot=True,
+    )
+
+    assert "Example Answer:" in result
+    assert "First, provide your reasoning for why you chose this answer here..." in result
+    assert "Then, provide your final answer: 42" in result
     assert "Think step-by-step" in result
