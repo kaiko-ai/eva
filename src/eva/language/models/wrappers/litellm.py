@@ -16,6 +16,7 @@ from litellm.exceptions import (
 from loguru import logger
 from typing_extensions import override
 
+from eva.language.models.constants import MAX_NEW_TOKENS
 from eva.language.models.typings import ModelOutput, TextBatch
 from eva.language.models.wrappers import base
 from eva.language.utils.text import messages as message_utils
@@ -34,8 +35,7 @@ class LiteLLMModel(base.LanguageModel):
 
     _default_model_kwargs = {
         "temperature": 0.0,
-        "max_completion_tokens": 1024,
-        "top_p": 1.0,
+        "max_completion_tokens": MAX_NEW_TOKENS,
         "seed": 42,
     }
     """Default API model parameters for evaluation."""

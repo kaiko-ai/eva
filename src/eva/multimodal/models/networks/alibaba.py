@@ -2,6 +2,7 @@
 
 import torch
 
+from eva.language.models.constants import MAX_NEW_TOKENS
 from eva.multimodal.models import wrappers
 from eva.multimodal.models.networks.registry import model_registry
 
@@ -27,7 +28,7 @@ class Qwen25VL7BInstruct(wrappers.HuggingFaceModel):
                 "attn_implementation": attn_implementation,
             },
             generation_kwargs={
-                "max_new_tokens": 512,
+                "max_new_tokens": MAX_NEW_TOKENS,
                 "do_sample": False,
             },
             processor_kwargs={
@@ -37,4 +38,5 @@ class Qwen25VL7BInstruct(wrappers.HuggingFaceModel):
             },
             system_prompt=system_prompt,
             image_key="images",
+            image_position="before_text",
         )

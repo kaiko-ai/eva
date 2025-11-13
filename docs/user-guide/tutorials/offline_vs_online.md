@@ -7,7 +7,7 @@ If you haven't downloaded the config files yet, please download them from [GitHu
 
 For this tutorial we use the [BACH](../../datasets/bach.md) classification task which is available on [Zenodo](https://zenodo.org/records/3632035) and is distributed under [*Attribution-NonCommercial-ShareAlike 4.0 International*](https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode) license.
 
-To let *eva* automatically handle the dataset download, set `download: true` in `configs/vision/pathology/offline/classification/bach.yaml` (you may also enable automatic download by setting the environment variable `DOWNLOAD=true`). Additionally, you can set `DATA_ROOT` to configure the location of where the dataset will be downloaded to / loaded from during evaluation (the default is `./data` which will be used in the following examples).
+To let *eva* automatically handle the dataset download, set `download: true` in `configs/vision/pathology/offline/classification/bach.yaml` (you may also enable automatic download by setting the environment variable `DOWNLOAD_DATA=true`). Additionally, you can set `DATA_ROOT` to configure the location of where the dataset will be downloaded to / loaded from during evaluation (the default is `./data` which will be used in the following examples).
 
 Before doing so, please make sure that your use case is compliant with the dataset license. Note that not all datasets support automatic download.
 

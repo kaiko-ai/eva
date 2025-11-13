@@ -6,20 +6,25 @@ on:
     tags:
       - "*"
 
-permissions:
-  id-token: write
-  contents: write
-  pull-requests: write
+concurrency:
+  group: "${{ github.workflow }}"
+  cancel-in-progress: true
+
+permissions: {}
 
 jobs:
   release-pypi:
     runs-on: ubuntu-latest
     permissions:
-      id-token: write
-      contents: write
-      pull-requests: write
+      id-token: write # Needed for publishing to PyPI
+      contents: write # Needed for pushing to GitHub Pages
+      pull-requests: write # Needed for creating version bump PR
     steps:
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+        with:
+          # Needed to push to gh-pages branch
+          # IMPORTANT: Avoid publishing the .git/ folder to prevent leaking credentials
+          persist-credentials: true
       - name: Setting up PDM
         uses: pdm-project/setup-pdm@94a823180e06fcde4ad29308721954a521c96ed0 # v4
         with:
@@ -29,13 +34,22 @@ jobs:
         uses: wntrblm/nox@a74da2c766d4e656d6105639926c31f3aa4a6ca1 # 2025.02.09
         with:
           python-versions: "3.10"
+      - name: Free up disk space
+        run: |
+          sudo rm -rf /usr/local/lib/android \
+                      /opt/ghc \
+                      /opt/hostedtoolcache/CodeQL \
+                      /usr/local/.ghcup
+          sudo docker system prune -af || true
+          sudo apt-get clean
+          sudo rm -rf /var/lib/apt/lists/*
       - name: Configure Git Credentials
         run: |
           git config user.email "action@github.com"
           git config user.name "GitHub Action"
       - name: Bumping version
         run: |
-          nox -s bump -- to "${{ github.ref_name }}"
+          nox -s bump -- to "${GITHUB_REF_NAME}"
       - name: Build artifacts
         run: |
           nox -s build
@@ -44,9 +58,11 @@ jobs:
           python -m pip install dist/*.whl
           eva --version
       - name: Build Release Docs
+        env:
+            PIP_NO_CACHE_DIR: "1"
         run: |
           git fetch origin gh-pages:gh-pages
-          tag="${{ github.ref_name }}"
+          tag="${GITHUB_REF_NAME}"
           DOC_VERSION=${tag%.*}
           nox -s docs -- deploy --alias-type=copy --update-aliases "$DOC_VERSION"
           git push origin gh-pages
@@ -63,9 +79,9 @@ jobs:
           title: "bump version to ${{ github.ref_name }} [skip ci]"
           body: |
             This PR updates the pyproject.toml with the new version number.
-            
+
             Version: ${{ github.ref_name }}
-            
+
             *Automated PR created by the Release workflow*
           branch: bump-version-${{ github.ref_name }}
           base: main

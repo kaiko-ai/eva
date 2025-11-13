@@ -11,7 +11,7 @@ from typing import Sequence
 from jinja2 import Template
 from typing_extensions import override
 
-from eva.language.prompts.templates import base
+from eva.language.prompts.templates import base, typings
 from eva.language.utils.text import format as format_utils
 
 
@@ -22,18 +22,29 @@ class RawMultipleChoicePromptTemplate(base.PromptTemplate):
         """\
         {{ preamble }}
 
+        {% if examples %}
+        Below are some examples of how to answer questions:
+
+        {% for ex in examples %}
+        Example {{ loop.index }}:
+        Question: {{ ex.question }}
+        Answer: {{ ex.answer }}
+        ---
+        {% endfor %}
+        Now please answer the following question.
+        {% endif %}
+
         Question: {{ question }}
         {% if context %}
         Context:
         {{ context }}
         {% endif %}
-        Provide a brief explanation for your choice before stating your final answer.
 
         {%- if enable_cot %}
-        Think step-by-step before giving your final answer.
-        {% endif %}
-
-        IMPORTANT: You must provide your reasoning first. Then end your response with only your final choice
+        IMPORTANT: Think step-by-step before giving your final answer. Provide your reasoning first, then end your response with only your final answer
+        {%- else -%}
+        IMPORTANT: End your response with only your final answer
+        {%- endif -%}
         {%- if use_option_letters %} letter
         {%- else %} exactly as written below
         {%- endif %}.
@@ -45,31 +56,22 @@ class RawMultipleChoicePromptTemplate(base.PromptTemplate):
         {% endif %}
         {{ answer_options }}
 
-        Example answer:
-        {{ example_response }}
+        {% if not examples %}
+        Example Answer:
+        Your explanation for why you chose this answer can go here...
+        {{ example_answer }}
+        {% endif %}
 
         Answer:
         """
     )
     """Base template to be rendered via Jinja2."""
 
-    _default_reason: str = "The reason why the given answer was chosen."
-
     def __init__(
         self,
-        use_option_letters: bool = False,
-        enable_cot: bool = False,
     ) -> None:
-        """Initializes the prompt template.
-
-        Args:
-            use_option_letters: Whether to prefix options with letters (A, B, C, ...).
-            enable_cot: Whether to explicitly prompt the model to use reasoning/CoT for answering.
-        """
+        """Initializes the prompt template."""
         super().__init__()
-
-        self.use_option_letters = use_option_letters
-        self.enable_cot = enable_cot
 
     @override
     def render(
@@ -78,9 +80,10 @@ class RawMultipleChoicePromptTemplate(base.PromptTemplate):
         question: str,
         context: str | Sequence[str] | None,
         answer_options: Sequence[str],
+        examples: Sequence[typings.QuestionAnswerExample] | None = None,
         example_answer: str | None = None,
-        example_reason: str | None = None,
         preamble: str | None = None,
+        use_option_letters: bool | None = None,
         enable_cot: bool | None = None,
     ) -> str:
         """Render the template with provided values.
@@ -89,9 +92,12 @@ class RawMultipleChoicePromptTemplate(base.PromptTemplate):
             question: The question to ask the model.
             context: Supporting context text(s) for the question.
             answer_options: Allowed answer options.
-            example_answer: Optional example answer. Defaults to first option.
-            example_reason: Example reasoning string.
+            examples: A sequence of question & answer pairs to include as examples.
+                Expected format is a list of dicts with 'question', 'answer', and
+                optional 'context' keys.
+            example_answer: Optional example answer for the raw snippet. Defaults to first option.
             preamble: Optional preamble text to include at the top of the prompt.
+            use_option_letters: Whether to prefix options with letters (A, B, C, ...).
             enable_cot: Optionally override the instance's CoT setting for this render call.
 
         Returns:
@@ -100,25 +106,22 @@ class RawMultipleChoicePromptTemplate(base.PromptTemplate):
         if not isinstance(question, str) or not question.strip():
             raise ValueError("`question` must be a non-empty string.")
 
-        answer_options = format_utils.format_list_items(
-            answer_options, style="letters" if self.use_option_letters else "bullets"
-        )
-        example_answer = (
-            example_answer
-            if isinstance(example_answer, str)
-            else (string.ascii_uppercase[0] if self.use_option_letters else answer_options[0])
-        ).strip()
-        example_reason = example_reason or self._default_reason
-
         jinja_template = Template(self.template)
         rendered = jinja_template.render(
             question=question.strip(),
-            context=(format_utils.format_list_items(context, style="bullets") if context else None),
-            answer_options=answer_options,
+            context=format_utils.format_list_items(context) if context else None,
+            answer_options=format_utils.format_list_items(
+                answer_options, style="letters" if use_option_letters else "bullets"
+            ),
+            examples=examples,
+            example_answer=(
+                example_answer
+                if isinstance(example_answer, str)
+                else (string.ascii_uppercase[0] if use_option_letters else answer_options[0])
+            ).strip(),
             preamble=(preamble or "").strip(),
-            use_option_letters=self.use_option_letters,
-            enable_cot=self.enable_cot if enable_cot is None else enable_cot,
-            example_response="\n".join([example_reason, example_answer]),
+            use_option_letters=use_option_letters,
+            enable_cot=enable_cot,
         )
 
         return format_utils.remove_multi_blank_lines(textwrap.dedent(rendered).strip() + "\n")

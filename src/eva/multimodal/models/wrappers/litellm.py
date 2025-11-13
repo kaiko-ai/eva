@@ -1,7 +1,8 @@
 """LiteLLM vision-language model wrapper."""
 
+import functools
 import logging
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Literal
 
 from typing_extensions import override
 
@@ -22,6 +23,7 @@ class LiteLLMModel(base.VisionLanguageModel):
         model_name: str,
         model_kwargs: Dict[str, Any] | None = None,
         system_prompt: str | None = None,
+        image_position: Literal["before_text", "after_text"] = "after_text",
         log_level: int | None = logging.INFO,
     ):
         """Initialize the LiteLLM Wrapper.
@@ -31,9 +33,11 @@ class LiteLLMModel(base.VisionLanguageModel):
             model_kwargs: Additional keyword arguments to pass during
                 generation (e.g., `temperature`, `max_tokens`).
             system_prompt: The system prompt to use (optional).
+            image_position: Position of image relative to text ("before_text" or "after_text").
             log_level: Optional logging level for LiteLLM. Defaults to WARNING.
         """
         super().__init__(system_prompt=system_prompt)
+        self.image_position: Literal["before_text", "after_text"] = image_position
 
         self.language_model = language_wrappers.LiteLLMModel(
             model_name=model_name,
@@ -55,7 +59,15 @@ class LiteLLMModel(base.VisionLanguageModel):
         if image_batch is None:
             image_batch = [None] * len(message_batch)
 
-        return list(map(message_utils.format_litellm_message, message_batch, image_batch))
+        return list(
+            map(
+                functools.partial(
+                    message_utils.format_litellm_message, image_position=self.image_position
+                ),
+                message_batch,
+                image_batch,
+            )
+        )
 
     @override
     def model_forward(self, batch: List[List[Dict[str, Any]]]) -> ModelOutput:

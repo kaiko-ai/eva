@@ -7,7 +7,7 @@ You will need to download the config files and then in the following commands re
 
 Keep in mind:
 
-- Some datasets provide automatic download by setting the argument `download: true` (either modify the `.yaml` config file or set the environment variable `DOWNLOAD=true`), while other datasets need to be downloaded manually beforehand. Please review the instructions in the corresponding dataset [documentation](../../datasets/index.md).
+- Some datasets provide automatic download by setting the argument `download: true` (either modify the `.yaml` config file or set the environment variable `DOWNLOAD_DATA=true`), while other datasets need to be downloaded manually beforehand. Please review the instructions in the corresponding dataset [documentation](../../datasets/index.md).
 - The following `eva predict_fit` commands will store the generated embeddings to the `./data/embeddings` directory. To change this location you can alternatively set the `EMBEDDINGS_ROOT` environment variable.
 - Segmentation tasks need to be run in `online` mode because the decoder currently doesn't support evaluation with precomputed embeddings. In other words, use `fit --config .../online/<task>.yaml` instead of `predict_fit  --config .../offline/<task>.yam` here.
 

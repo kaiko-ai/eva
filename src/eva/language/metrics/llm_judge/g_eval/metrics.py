@@ -81,7 +81,7 @@ class GEvalCorrectness(torchmetrics.Metric):
             model: An instance of the language model to use, or the
                 name of the model to load from the registry.
             raise_if_missing: Whether to raise an error if an answer is missing
-                or not found in the mapping. If False, will return `missing_response`
+                or not found in the mapping. If False, will return `missing_answer`
                 instead.
             missing_limit: The maximum number of missing responses before raising
                 an error, if `raise_if_missing` is True.
