@@ -47,6 +47,7 @@ class HuggingFaceModel(base.VisionLanguageModel):
         generation_kwargs: Dict[str, Any] | None = None,
         image_key: str = "image",
         image_position: Literal["before_text", "after_text"] = "after_text",
+        initialize_model: bool = False, # TODO: default to True?
     ):
         """Initialize the HuggingFace model wrapper.
 
@@ -59,6 +60,8 @@ class HuggingFaceModel(base.VisionLanguageModel):
             generation_kwargs: Additional generation arguments.
             image_key: The key used for image inputs in the chat template.
             image_position: Position of the image in the input sequence.
+            initialize_model: Whether to load the model in __init__ or
+                delay until lightning's `configure_model` hook is called.
         """
         super().__init__(system_prompt=system_prompt)
 
@@ -68,10 +71,12 @@ class HuggingFaceModel(base.VisionLanguageModel):
         self.processor_kwargs = processor_kwargs or {}
         self.generation_kwargs = self._default_generation_kwargs | (generation_kwargs or {})
         self.image_key = image_key
+        self.is_loaded = False
         self.image_position: Literal["before_text", "after_text"] = image_position
 
         self.processor = self.load_processor()
-        self.model = self.load_model()
+        if initialize_model:
+            self.model = self.load_model()
 
     @override
     def format_inputs(self, batch: TextImageBatch | TextBatch) -> Dict[str, torch.Tensor]:
@@ -147,6 +152,11 @@ class HuggingFaceModel(base.VisionLanguageModel):
             attention_mask=batch.get("attention_mask"),
         )
 
+    def configure_model(self) -> None:
+        """Lightning hook to configure / load the model."""
+        if not self.is_loaded:
+            self.model = self.load_model()
+
     @override
     def load_model(self) -> nn.Module:
         """Setting up the model. Used for delayed model initialization.
@@ -165,6 +175,9 @@ class HuggingFaceModel(base.VisionLanguageModel):
 
         if not hasattr(model, "generate"):
             raise ValueError(f"Model {self.model_name_or_path} does not support generation. ")
+
+        model.eval()
+        self.is_loaded = True
 
         return model
 
