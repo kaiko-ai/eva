@@ -5,14 +5,13 @@ from typing import Any
 from lightning.pytorch.utilities.types import STEP_OUTPUT
 from torch import nn
 from typing_extensions import override
-from loguru import logger
 
 from eva.core.metrics import structs as metrics_lib
 from eva.core.models.modules import module
 from eva.core.models.modules.utils import batch_postprocess
 from eva.language.models.typings import ModelOutput
-from eva.multimodal.models.typings import TextImageBatch
 from eva.multimodal.models import wrappers
+from eva.multimodal.models.typings import TextImageBatch
 
 
 class VisionLanguageModule(module.ModelModule):
@@ -59,6 +58,8 @@ class VisionLanguageModule(module.ModelModule):
 
     @override
     def configure_model(self) -> None:
-        model = self.model.model if isinstance(self.model, wrappers.ModelFromRegistry) else self.model
+        model = (
+            self.model.model if isinstance(self.model, wrappers.ModelFromRegistry) else self.model
+        )
         if hasattr(model, "configure_model"):
             model.configure_model()  # type: ignore

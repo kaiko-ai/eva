@@ -47,7 +47,7 @@ class HuggingFaceModel(base.VisionLanguageModel):
         generation_kwargs: Dict[str, Any] | None = None,
         image_key: str = "image",
         image_position: Literal["before_text", "after_text"] = "after_text",
-        initialize_model: bool = False, # TODO: default to True?
+        initialize_model: bool = True,
     ):
         """Initialize the HuggingFace model wrapper.
 
@@ -176,7 +176,6 @@ class HuggingFaceModel(base.VisionLanguageModel):
         if not hasattr(model, "generate"):
             raise ValueError(f"Model {self.model_name_or_path} does not support generation. ")
 
-        model.eval()
         self.is_loaded = True
 
         return model
