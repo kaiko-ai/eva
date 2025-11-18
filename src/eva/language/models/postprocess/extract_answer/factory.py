@@ -3,6 +3,10 @@
 from typing import Literal
 
 from eva.language.models.postprocess.extract_answer.base import ExtractAnswerFromStructuredOutput
+from eva.language.models.postprocess.extract_answer.delimiter import (
+    ExtractAnswerFromDelimiter,
+    ExtractDiscreteAnswerFromDelimiter,
+)
 from eva.language.models.postprocess.extract_answer.json import (
     ExtractAnswerFromJson,
     ExtractDiscreteAnswerFromJson,
@@ -21,12 +25,12 @@ class ExtractDiscreteAnswer:
     """Factory for creating discrete answer extractors."""
 
     def __new__(
-        cls, answer_format: Literal["json", "xml", "raw"], extract_kwargs: dict
+        cls, answer_format: Literal["json", "xml", "raw", "delimiter"], extract_kwargs: dict
     ) -> ExtractAnswerFromStructuredOutput:
         """Create a discrete answer extractor based on the answer format.
 
         Args:
-            answer_format: The format of the answer to extract ('json', 'xml', or 'raw').
+            answer_format: The format of the answer to extract ('json', 'xml', 'raw', 'delimiter').
             extract_kwargs: Keyword arguments passed to the extractor constructor.
 
         Returns:
@@ -39,6 +43,8 @@ class ExtractDiscreteAnswer:
                 return ExtractDiscreteAnswerFromXml(**extract_kwargs)
             case "raw":
                 return ExtractDiscreteAnswerFromRaw(**extract_kwargs)
+            case "delimiter":
+                return ExtractDiscreteAnswerFromDelimiter(**extract_kwargs)
             case _:
                 raise ValueError(f"Unknown answer format: {answer_format}")
 
@@ -47,12 +53,12 @@ class ExtractAnswer:
     """Factory for creating answer extractors."""
 
     def __new__(
-        cls, answer_format: Literal["json", "xml"], extract_kwargs: dict
+        cls, answer_format: Literal["json", "xml", "raw", "delimiter"], extract_kwargs: dict
     ) -> ExtractAnswerFromStructuredOutput:
         """Create an answer extractor based on the answer format.
 
         Args:
-            answer_format: The format of the answer to extract ('json' or 'xml').
+            answer_format: The format of the answer to extract ('json', 'xml', 'raw', 'delimiter').
             extract_kwargs: Keyword arguments passed to the extractor constructor.
 
         Returns:
@@ -65,5 +71,7 @@ class ExtractAnswer:
                 return ExtractAnswerFromXml(**extract_kwargs)
             case "raw":
                 return ExtractAnswerFromRaw(**extract_kwargs)
+            case "delimiter":
+                return ExtractAnswerFromDelimiter(**extract_kwargs)
             case _:
                 raise ValueError(f"Unknown answer format: {answer_format}")
