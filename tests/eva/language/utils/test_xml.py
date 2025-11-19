@@ -26,7 +26,7 @@ from eva.language.utils.text.xml import extract_xml
         ("<answer>  Yes  </answer>", {"answer": "Yes"}),
         # Empty text
         ("<answer></answer>", {"answer": ""}),
-        # Special XML characters (ampersand and less-than)
+        # Special XML characters (& and <)
         (
             "<answer>H&E staining shows value <43</answer>",
             {"answer": "H&E staining shows value <43"},
