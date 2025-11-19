@@ -55,6 +55,9 @@ class LiteLLMModel(base.VisionLanguageModel):
         )
         message_batch = list(map(language_message_utils.combine_system_messages, message_batch))
 
+        if image_batch is None:
+            image_batch = [None] * len(message_batch)
+
         return list(
             map(
                 functools.partial(
