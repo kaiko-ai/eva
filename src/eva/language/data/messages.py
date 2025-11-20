@@ -12,6 +12,10 @@ class Role(str, enum.Enum):
     ASSISTANT = "assistant"
     SYSTEM = "system"
 
+    def __str__(self) -> str:
+        """String representation of the Role enum."""
+        return self.value
+
 
 @dataclasses.dataclass
 class Message:
