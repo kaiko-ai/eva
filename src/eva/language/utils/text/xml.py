@@ -2,6 +2,7 @@
 
 import re
 import xml.etree.ElementTree as ET  # nosec B405
+from html import escape
 from typing import Dict
 
 
@@ -24,7 +25,9 @@ def extract_xml(response: str, raise_if_missing: bool = False) -> Dict[str, str]
         else:
             xml_tags = re.findall(r"<(\w+)>(.*?)</\1>", response, flags=re.DOTALL)
             if xml_tags:
-                clean_response = "".join(f"<{tag}>{content}</{tag}>" for tag, content in xml_tags)
+                clean_response = "".join(
+                    f"<{tag}>{escape(content, quote=False)}</{tag}>" for tag, content in xml_tags
+                )
             else:
                 clean_response = response.strip()
 

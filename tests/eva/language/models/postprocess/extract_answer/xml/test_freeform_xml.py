@@ -104,11 +104,11 @@ def test_mixed_valid_invalid_responses() -> None:
 
 
 def test_nested_xml_structure(transform: ExtractAnswerFromXml) -> None:
-    """Should handle basic nested XML structures by flattening them."""
+    """Should handle basic nested XML structures by preserving them as text."""
     nested_xml = "<answer><text>Nested content</text></answer>"
     result = transform(nested_xml)
 
-    assert result == [{"answer": ""}]  # Inner content is not extracted in flat structure
+    assert result == [{"answer": "<text>Nested content</text>"}]
 
 
 def test_case_sensitivity_in_tags(transform: ExtractAnswerFromXml) -> None:
