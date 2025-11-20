@@ -13,7 +13,7 @@ from eva.language.utils.text.messages import (
     combine_system_messages,
     format_chat_message,
     insert_system_message,
-    merge_message_contents,
+    merge_messages,
 )
 
 
@@ -121,42 +121,42 @@ def test_combine_system_messages_only_system():
     assert combined[0].content == "First\nSecond\nThird"
 
 
-def test_merge_message_contents_single():
+def test_merge_messages_single():
     """Test merging contents of a single message."""
     messages: MessageSeries = [UserMessage(content="Hello")]
-    merged = merge_message_contents(messages)
+    merged = merge_messages(messages)
 
     assert merged == "Hello"
 
 
-def test_merge_message_contents_multiple():
+def test_merge_messages_multiple():
     """Test merging contents of multiple messages."""
     messages: MessageSeries = [
         SystemMessage(content="System"),
         UserMessage(content="User"),
         AssistantMessage(content="Assistant"),
     ]
-    merged = merge_message_contents(messages)
+    merged = merge_messages(messages)
 
     assert merged == "System\nUser\nAssistant"
 
 
-def test_merge_message_contents_custom_join_char():
+def test_merge_messages_custom_join_char():
     """Test merging contents with custom join character."""
     messages: MessageSeries = [
         UserMessage(content="First"),
         UserMessage(content="Second"),
         UserMessage(content="Third"),
     ]
-    merged = merge_message_contents(messages, join_char=" -> ")
+    merged = merge_messages(messages, join_char=" -> ")
 
     assert merged == "First -> Second -> Third"
 
 
-def test_merge_message_contents_empty():
+def test_merge_messages_empty():
     """Test merging empty message series."""
     messages: MessageSeries = []
-    merged = merge_message_contents(messages)
+    merged = merge_messages(messages)
 
     assert merged == ""
 

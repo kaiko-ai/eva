@@ -2,7 +2,7 @@
 
 import functools
 import json
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Union
 
 from eva.language.data.messages import (
     AssistantMessage,
@@ -39,34 +39,35 @@ def combine_system_messages(message: MessageSeries, join_char: str = "\n") -> Me
 
     non_system_messages = list(filter(lambda item: item.role != Role.SYSTEM, message))
     return [
-        SystemMessage(content=merge_message_contents(system_messages, join_char=join_char))
+        SystemMessage(content=merge_messages(system_messages, join_char=join_char))
     ] + non_system_messages
 
 
-def merge_message_contents(message: MessageSeries, join_char: str = "\n") -> str:
-    """Merges the all contents within a message series into a string.
+def merge_messages(
+    message: Union[MessageSeries, List[Dict[str, Any]]],
+    join_char: str = "\n",
+    roles: bool = False,
+) -> str:
+    """Merges all contents within a message series or list of message dicts into a string.
 
     Args:
-        message: The message series to combine.
+        message: The message series or list of message dicts to combine.
         join_char: The character to use to join the message contents. Default is newline.
+        roles: Whether to include roles in the merged string. Default is False.
 
     Returns:
         A string containing the combined message contents.
     """
-    return join_char.join(item.content for item in message)
 
+    def extract(item):
+        if isinstance(item, dict):
+            return item["role"], item["content"]
+        return item.role, item.content
 
-def merge_dict_contents(message: List[Dict[str, Any]], join_char: str = "\n") -> str:
-    """Merges the all contents within a list of message dicts into a string.
-
-    Args:
-        message: The list of message dicts to combine.
-        join_char: The character to use to join the message contents. Default is newline.
-
-    Returns:
-        A string containing the combined message contents.
-    """
-    return join_char.join(item["content"] for item in message)
+    if roles:
+        return join_char.join(f"{extract(item)[0]}: {extract(item)[1]}" for item in message)
+    else:
+        return join_char.join(extract(item)[1] for item in message)
 
 
 def insert_system_message(

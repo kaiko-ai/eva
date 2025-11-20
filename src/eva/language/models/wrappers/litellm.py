@@ -113,7 +113,7 @@ class LiteLLMModel(base.LanguageModel):
             for output in outputs
             if output["choices"][0]["message"]["role"] == "assistant"
         ]
-        input_text = [message_utils.merge_dict_contents(messages) for messages in batch]
+        input_text = [message_utils.merge_messages(messages, roles=True) for messages in batch]
         return ModelOutput(generated_text=generated_text, input_text=input_text)
 
     def _raise_exceptions(self, outputs: list):
