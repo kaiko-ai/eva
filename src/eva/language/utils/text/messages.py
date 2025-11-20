@@ -56,6 +56,19 @@ def merge_message_contents(message: MessageSeries, join_char: str = "\n") -> str
     return join_char.join(item.content for item in message)
 
 
+def merge_dict_contents(message: List[Dict[str, Any]], join_char: str = "\n") -> str:
+    """Merges the all contents within a list of message dicts into a string.
+
+    Args:
+        message: The list of message dicts to combine.
+        join_char: The character to use to join the message contents. Default is newline.
+
+    Returns:
+        A string containing the combined message contents.
+    """
+    return join_char.join(item["content"] for item in message)
+
+
 def insert_system_message(
     message: MessageSeries, system_message: SystemMessage | None
 ) -> MessageSeries:
