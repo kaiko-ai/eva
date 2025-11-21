@@ -34,10 +34,10 @@ def test_sample(patch_camelyon_dataset: patch_camelyon.PatchCamelyon) -> None:
     assert isinstance(sample.text, list)
     assert len(sample.text) == 1
     assert isinstance(sample.text[0], UserMessage)
-    content = sample.text[0].content
-    assert content.startswith("Question:")
+    content = str(sample.text[0].content)
+    assert content.startswith("Read the provided question")
     assert "metastatic breast tissue" in content
-    assert "IMPORTANT: Respond with a valid JSON object" in content
+    assert "IMPORTANT: Provide your final answer within a valid JSON object" in content
 
     # Test image component
     assert isinstance(sample.image, tv_tensors.Image)
