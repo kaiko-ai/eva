@@ -55,10 +55,12 @@ def test_huggingface_model_generation(model_name: str, model_class: str, with_im
         result = model(batch)
         assert isinstance(result, dict)
         assert "generated_text" in result
+        assert "input_text" in result
         assert "input_ids" in result
         assert "output_ids" in result
         assert "attention_mask" in result
         assert result["generated_text"] == ["Generated response"]
+        assert result["input_text"] == [""]
         assert mock_model.generate.called
 
 
@@ -105,8 +107,8 @@ def test_format_inputs_with_image():
         assert "input_ids" in formatted
 
 
-def test_decode_output():
-    """Test _decode_output correctly decodes model output."""
+def test_decode_ids():
+    """Test _decode_ids correctly decodes both input and output."""
     mock_processor = MagicMock()
     mock_processor.batch_decode.side_effect = [["Input text"], ["Output text"]]
 
@@ -127,7 +129,8 @@ def test_decode_output():
         output = torch.tensor([[1, 2, 3, 4, 5, 6]])
         instruction_length = 3
 
-        decoded = model._decode_output(output, instruction_length)
+        decoded_input, decoded_output = model._decode_ids(output, instruction_length)
 
-        assert decoded == ["Output text"]
+        assert decoded_input == ["Input text"]
+        assert decoded_output == ["Output text"]
         assert mock_processor.batch_decode.call_count == 2

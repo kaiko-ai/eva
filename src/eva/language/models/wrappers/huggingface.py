@@ -90,7 +90,7 @@ class HuggingFaceModel(base.LanguageModel):
         if self._chat_mode:
             return list(map(message_utils.format_chat_message, message_batch))
         else:
-            return list(map(message_utils.merge_message_contents, message_batch))
+            return list(map(message_utils.merge_messages, message_batch))
 
     @override
     def model_forward(self, prompts: List[str]) -> ModelOutput:

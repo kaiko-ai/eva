@@ -239,3 +239,39 @@ def test_batch_insert_system_message_empty_batch():
     result = batch_insert_system_message(batch_messages, system_msg)
 
     assert result == []
+
+
+def test_merge_messages_with_dict_input():
+    """Test merging messages when input is a list of dicts."""
+    messages = [
+        {"role": "system", "content": "System message"},
+        {"role": "user", "content": "User message"},
+        {"role": "assistant", "content": "Assistant message"},
+    ]
+    merged = merge_messages(messages)
+
+    assert merged == "System message\nUser message\nAssistant message"
+
+
+def test_merge_messages_with_dict_and_roles():
+    """Test merging messages from dicts with role prefixes."""
+    messages = [
+        {"role": "system", "content": "System message"},
+        {"role": "user", "content": "User message"},
+        {"role": "assistant", "content": "Assistant message"},
+    ]
+    merged = merge_messages(messages, roles=True)
+
+    assert merged == "system: System message\nuser: User message\nassistant: Assistant message"
+
+
+def test_merge_messages_with_roles():
+    """Test merging MessageSeries with role prefixes."""
+    messages: MessageSeries = [
+        SystemMessage(content="System prompt"),
+        UserMessage(content="Hello"),
+        AssistantMessage(content="Hi there"),
+    ]
+    merged = merge_messages(messages, roles=True)
+
+    assert merged == "system: System prompt\nuser: Hello\nassistant: Hi there"

@@ -2,7 +2,7 @@
 
 import pytest
 
-from eva.language.data.messages import UserMessage
+from eva.language.data.messages import AssistantMessage, SystemMessage, UserMessage
 from eva.language.models import LiteLLMModel
 from eva.language.models.typings import TextBatch
 
@@ -13,7 +13,29 @@ def test_generate(model_instance):
     """Test that the generate method returns the expected dummy response."""
     batch = TextBatch(text=[[UserMessage(content="Hello, world!")]], target=None, metadata={})
     result = model_instance(batch)
-    assert result == {"generated_text": ["Test response"]}
+    assert result["generated_text"] == ["Test response"]
+    assert result["input_text"] == ["user: Hello, world!"]
+
+
+def test_generate_multi_message(model_instance):
+    """Test input_text formatting for multi-message conversations."""
+    batch = TextBatch(
+        text=[
+            [
+                SystemMessage(content="You are helpful"),
+                UserMessage(content="What is 2+2?"),
+                AssistantMessage(content="4"),
+                UserMessage(content="What is 3+3?"),
+            ]
+        ],
+        target=None,
+        metadata={},
+    )
+    result = model_instance(batch)
+    assert result["generated_text"] == ["Test response"]
+    assert result["input_text"] == [
+        "system: You are helpful\nuser: What is 2+2?\nassistant: 4\nuser: What is 3+3?"
+    ]
 
 
 @pytest.fixture
