@@ -1,7 +1,7 @@
 """HuggingFace Vision-Language Model Wrapper."""
 
 import functools
-from typing import Any, Callable, Dict, List, Literal
+from typing import Any, Callable, Dict, List, Literal, Tuple
 
 import torch
 import transformers
@@ -139,10 +139,11 @@ class HuggingFaceModel(base.VisionLanguageModel):
             A dictionary containing the processed input and the model's output.
         """
         output_ids = self.model.generate(**batch, **self.generation_kwargs)  # type: ignore
+        decoded_input, decoded_output = self._decode_ids(output_ids, batch["input_ids"].shape[-1])
 
         return ModelOutput(
-            generated_text=self._decode_output(output_ids, batch["input_ids"].shape[-1]),
-            input_ids=batch.get("input_ids"),
+            generated_text=decoded_output,
+            input_text=decoded_input,
             output_ids=output_ids,
             attention_mask=batch.get("attention_mask"),
         )
@@ -175,15 +176,17 @@ class HuggingFaceModel(base.VisionLanguageModel):
             **self.processor_kwargs,
         )
 
-    def _decode_output(self, output: torch.Tensor, instruction_length: int) -> List[str]:
-        """Decode the model's batch output to text.
+    def _decode_ids(
+        self, output: torch.Tensor, instruction_length: int
+    ) -> Tuple[List[str], List[str]]:
+        """Decode the model's batch input and output to text.
 
         Args:
             output: The raw output from the model.
             instruction_length: The length of the instruction in the input.
 
         Returns:
-            A list of decoded text responses.
+            A tuple containing two lists, the decoded input and output texts.
         """
         decoded_input = self.processor.batch_decode(  # type: ignore
             output[:, :instruction_length], skip_special_tokens=False
@@ -195,4 +198,4 @@ class HuggingFaceModel(base.VisionLanguageModel):
         logger.debug(f"Decoded input: {decoded_input}")
         logger.debug(f"Decoded output: {decoded_output}")
 
-        return decoded_output
+        return decoded_input, decoded_output

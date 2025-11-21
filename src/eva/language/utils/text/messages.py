@@ -2,7 +2,7 @@
 
 import functools
 import json
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Union
 
 from eva.language.data.messages import (
     AssistantMessage,
@@ -54,6 +54,36 @@ def merge_message_contents(message: MessageSeries, join_char: str = "\n") -> str
         A string containing the combined message contents.
     """
     return join_char.join(item.content for item in message)
+
+
+def stringify_messages(
+    message: Union[MessageSeries, List[Dict[str, Any]]],
+    join_char: str = "\n",
+    include_roles: bool = False,
+) -> str:
+    """Merges all contents within a message series or list of message dicts into a string.
+
+    More general case of `merge_message_contents` that supports both MessageSeries
+    and list of message dicts, including optional roles in the merged string.
+
+    Args:
+        message: The message series or list of message dicts to combine.
+        join_char: The character to use to join the message contents. Default is newline.
+        include_roles: Whether to include roles in the merged string. Default is False.
+
+    Returns:
+        A string containing the combined message contents.
+    """
+
+    def extract(item):
+        if isinstance(item, dict):
+            return item["role"], item["content"]
+        return item.role, item.content
+
+    if include_roles:
+        return join_char.join(f"{extract(item)[0]}: {extract(item)[1]}" for item in message)
+    else:
+        return join_char.join(extract(item)[1] for item in message)
 
 
 def insert_system_message(

@@ -1,5 +1,6 @@
 """Tests for message formatting utilities."""
 
+import pytest
 import torch
 from torchvision import tv_tensors
 
@@ -44,14 +45,21 @@ def test_format_litellm_message_without_image():
     assert formatted[0]["content"] == "Hello"
 
 
-def test_format_litellm_message_with_image():
-    """Test formatting messages for LiteLLM with image."""
+@pytest.mark.parametrize(
+    "image_format,expected_prefix",
+    [
+        ("jpeg", "data:image/jpeg;base64,"),
+        ("png", "data:image/png;base64,"),
+    ],
+)
+def test_format_litellm_message_with_image(image_format, expected_prefix):
+    """Test formatting messages for LiteLLM with different image formats."""
     messages: MessageSeries = [
         SystemMessage(content="System prompt"),
         UserMessage(content="Describe this"),
     ]
     image = tv_tensors.Image(torch.rand(3, 224, 224))
-    formatted = format_litellm_message(messages, image=image)
+    formatted = format_litellm_message(messages, image=image, image_format=image_format)
 
     assert len(formatted) == 2
     assert formatted[0]["role"] == "system"
@@ -62,4 +70,4 @@ def test_format_litellm_message_with_image():
     assert formatted[1]["content"][0]["text"] == "Describe this"
     assert formatted[1]["content"][1]["type"] == "image_url"
     assert "url" in formatted[1]["content"][1]["image_url"]
-    assert formatted[1]["content"][1]["image_url"]["url"].startswith("data:image/png;base64,")
+    assert formatted[1]["content"][1]["image_url"]["url"].startswith(expected_prefix)
