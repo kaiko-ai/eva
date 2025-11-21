@@ -49,9 +49,6 @@ class ModelOutput(TypedDict):
     input_text: NotRequired[List[str]]
     """The input text provided to the model."""
 
-    input_ids: NotRequired[torch.Tensor | None]
-    """The token ids of the input text."""
-
     output_ids: NotRequired[torch.Tensor | None]
     """The token ids of the model output (usually containing both input and prediction)."""
 
