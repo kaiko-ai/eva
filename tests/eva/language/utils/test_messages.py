@@ -13,7 +13,8 @@ from eva.language.utils.text.messages import (
     combine_system_messages,
     format_chat_message,
     insert_system_message,
-    merge_messages,
+    merge_message_contents,
+    stringify_messages,
 )
 
 
@@ -121,42 +122,42 @@ def test_combine_system_messages_only_system():
     assert combined[0].content == "First\nSecond\nThird"
 
 
-def test_merge_messages_single():
+def test_merge_message_contents_single():
     """Test merging contents of a single message."""
     messages: MessageSeries = [UserMessage(content="Hello")]
-    merged = merge_messages(messages)
+    merged = merge_message_contents(messages)
 
     assert merged == "Hello"
 
 
-def test_merge_messages_multiple():
+def test_merge_message_contents_multiple():
     """Test merging contents of multiple messages."""
     messages: MessageSeries = [
         SystemMessage(content="System"),
         UserMessage(content="User"),
         AssistantMessage(content="Assistant"),
     ]
-    merged = merge_messages(messages)
+    merged = merge_message_contents(messages)
 
     assert merged == "System\nUser\nAssistant"
 
 
-def test_merge_messages_custom_join_char():
+def test_merge_message_contents_custom_join_char():
     """Test merging contents with custom join character."""
     messages: MessageSeries = [
         UserMessage(content="First"),
         UserMessage(content="Second"),
         UserMessage(content="Third"),
     ]
-    merged = merge_messages(messages, join_char=" -> ")
+    merged = merge_message_contents(messages, join_char=" -> ")
 
     assert merged == "First -> Second -> Third"
 
 
-def test_merge_messages_empty():
+def test_stringify_messages_empty():
     """Test merging empty message series."""
     messages: MessageSeries = []
-    merged = merge_messages(messages)
+    merged = stringify_messages(messages)
 
     assert merged == ""
 
@@ -241,37 +242,69 @@ def test_batch_insert_system_message_empty_batch():
     assert result == []
 
 
-def test_merge_messages_with_dict_input():
+def test_stringify_messages_single():
+    """Test merging contents of a single message."""
+    messages: MessageSeries = [UserMessage(content="Hello")]
+    merged = stringify_messages(messages)
+
+    assert merged == "Hello"
+
+
+def test_stringify_messages_multiple():
+    """Test merging contents of multiple messages."""
+    messages: MessageSeries = [
+        SystemMessage(content="System"),
+        UserMessage(content="User"),
+        AssistantMessage(content="Assistant"),
+    ]
+    merged = stringify_messages(messages)
+
+    assert merged == "System\nUser\nAssistant"
+
+
+def test_stringify_messages_custom_join_char():
+    """Test merging contents with custom join character."""
+    messages: MessageSeries = [
+        UserMessage(content="First"),
+        UserMessage(content="Second"),
+        UserMessage(content="Third"),
+    ]
+    merged = stringify_messages(messages, join_char=" -> ")
+
+    assert merged == "First -> Second -> Third"
+
+
+def test_stringify_messages_with_dict_input():
     """Test merging messages when input is a list of dicts."""
     messages = [
         {"role": "system", "content": "System message"},
         {"role": "user", "content": "User message"},
         {"role": "assistant", "content": "Assistant message"},
     ]
-    merged = merge_messages(messages)
+    merged = stringify_messages(messages)
 
     assert merged == "System message\nUser message\nAssistant message"
 
 
-def test_merge_messages_with_dict_and_roles():
+def test_stringify_messages_with_dict_and_with_roles():
     """Test merging messages from dicts with role prefixes."""
     messages = [
         {"role": "system", "content": "System message"},
         {"role": "user", "content": "User message"},
         {"role": "assistant", "content": "Assistant message"},
     ]
-    merged = merge_messages(messages, roles=True)
+    merged = stringify_messages(messages, include_roles=True)
 
     assert merged == "system: System message\nuser: User message\nassistant: Assistant message"
 
 
-def test_merge_messages_with_roles():
+def test_stringify_messages_with_roles():
     """Test merging MessageSeries with role prefixes."""
     messages: MessageSeries = [
         SystemMessage(content="System prompt"),
         UserMessage(content="Hello"),
         AssistantMessage(content="Hi there"),
     ]
-    merged = merge_messages(messages, roles=True)
+    merged = stringify_messages(messages, include_roles=True)
 
     assert merged == "system: System prompt\nuser: Hello\nassistant: Hi there"
