@@ -144,7 +144,6 @@ class HuggingFaceModel(base.VisionLanguageModel):
         return ModelOutput(
             generated_text=decoded_output,
             input_text=decoded_input,
-            input_ids=batch.get("input_ids"),
             output_ids=output_ids,
             attention_mask=batch.get("attention_mask"),
         )
