@@ -1,4 +1,4 @@
-"""LLM wrapper for vLLM models."""
+"""Language model wrapper for vLLM."""
 
 from typing import Any, Dict, List
 
@@ -69,8 +69,15 @@ class VllmModel(base.LanguageModel):
         self.model_kwargs = self._default_model_kwargs | (model_kwargs or {})
         self.generation_kwargs = self._default_generation_kwargs | (generation_kwargs or {})
 
-        self.model = self.load_model()
-        self.tokenizer = self.load_tokenizer()
+        self.model: LLM | None = None
+        self.tokenizer: Any | None = None
+
+    def configure_model(self):
+        """Use configure_model hook to load model in lazy fashion."""
+        if self.model is None:
+            self.model = self.load_model()
+        if self.tokenizer is None:
+            self.tokenizer = self.load_tokenizer()
 
     @override
     def load_model(self) -> LLM:

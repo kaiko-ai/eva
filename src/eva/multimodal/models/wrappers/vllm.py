@@ -1,9 +1,11 @@
 """Vision-language model wrapper for vLLM."""
 
+import os
 from typing import Any, Dict, List, Literal
 
 from typing_extensions import override
 
+from eva.language.models.constants import MAX_NEW_TOKENS
 from eva.multimodal.utils.batch import unpack_batch
 
 try:
@@ -19,9 +21,9 @@ except ImportError as e:
 
 
 import torchvision.transforms.functional as F
+from loguru import logger
 from transformers import AutoTokenizer
 
-from eva.language.models.constants import MAX_NEW_TOKENS
 from eva.language.models.typings import ModelOutput
 from eva.language.utils.text import messages as language_message_utils
 from eva.multimodal.models.typings import TextImageBatch
@@ -41,7 +43,6 @@ class VllmModel(base.VisionLanguageModel):
         "max_model_len": 32768,
         "gpu_memory_utilization": 0.95,
         "tensor_parallel_size": 1,
-        "dtype": "auto",
         "trust_remote_code": True,
     }
 
@@ -80,12 +81,21 @@ class VllmModel(base.VisionLanguageModel):
         self.model_kwargs = self._default_model_kwargs | (model_kwargs or {})
         self.generation_kwargs = self._default_generation_kwargs | (generation_kwargs or {})
 
-        self.model = self.load_model()
-        self.tokenizer = self.load_tokenizer()
+        self.model: LLM | None = None
+        self.tokenizer: Any | None = None
+
+    def configure_model(self):
+        """Use configure_model hook to load model in lazy fashion."""
+        if self.model is None:
+            self.model = self.load_model()
+        if self.tokenizer is None:
+            self.tokenizer = self.load_tokenizer()
 
     @override
     def load_model(self) -> LLM:
         """Loads the vLLM model."""
+        logger.info(f"Loading model with kwargs: {self.model_kwargs}")
+        logger.info(f"CUDA_VISIBLE_DEVICES: {os.environ.get('CUDA_VISIBLE_DEVICES')}")
         return LLM(model=self.model_name_or_path, **self.model_kwargs)
 
     def load_tokenizer(self) -> AutoTokenizer:

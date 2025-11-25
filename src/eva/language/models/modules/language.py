@@ -9,6 +9,7 @@ from typing_extensions import override
 from eva.core.metrics import structs as metrics_lib
 from eva.core.models.modules import module
 from eva.core.models.modules.utils import batch_postprocess
+from eva.language.models import wrappers
 from eva.language.models.typings import ModelOutput, PredictionBatch, TextBatch
 
 
@@ -31,6 +32,14 @@ class LanguageModule(module.ModelModule):
         super().__init__(metrics=metrics, postprocess=postprocess)
 
         self.model = model
+
+    @override
+    def configure_model(self) -> None:
+        model = (
+            self.model.model if isinstance(self.model, wrappers.ModelFromRegistry) else self.model
+        )
+        if hasattr(model, "configure_model"):
+            model.configure_model()  # type: ignore
 
     @override
     def forward(self, batch: TextBatch, *args: Any, **kwargs: Any) -> ModelOutput:
