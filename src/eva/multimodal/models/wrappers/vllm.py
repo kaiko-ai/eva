@@ -1,4 +1,4 @@
-"""LLM wrapper for vLLM models."""
+"""Vision-language model wrapper for vLLM."""
 
 from typing import Any, Dict, List, Literal
 
@@ -8,7 +8,6 @@ from eva.multimodal.utils.batch import unpack_batch
 
 try:
     from vllm import LLM, SamplingParams  # type: ignore
-    from vllm.inputs import TokensPrompt  # type: ignore
 except ImportError as e:
     raise ImportError(
         "vLLM is required for VllmModel but not installed. "
@@ -31,25 +30,24 @@ from eva.multimodal.utils.text import messages as message_utils
 
 
 class VllmModel(base.VisionLanguageModel):
-    """Wrapper class for using vLLM for text generation.
+    """Wrapper class for vision-language models using vLLM.
 
-    This wrapper loads a vLLM model, sets up the tokenizer and sampling
-    parameters, and uses a chat template to convert a plain string prompt
-    into the proper input format for vLLM generation. It then returns the
-    generated text response.
+    This wrapper supports both text-only and multimodal (text + image) inputs.
+    It loads a vLLM model, sets up the tokenizer and sampling parameters,
+    and uses a chat template to format inputs for generation.
     """
 
     _default_model_kwargs: Dict[str, Any] = {
-        "max_model_len": "32768",
-        "gpu_memory_utilization": 95,
+        "max_model_len": 32768,
+        "gpu_memory_utilization": 0.95,
         "tensor_parallel_size": 1,
         "dtype": "auto",
+        "trust_remote_code": True,
     }
 
     _default_generation_kwargs = {
         "temperature": 0.0,
-        "max_new_tokens": MAX_NEW_TOKENS,
-        "do_sample": False,
+        "max_tokens": MAX_NEW_TOKENS,
         "top_p": 1.0,
         "top_k": -1,
         "n": 1,
@@ -83,18 +81,20 @@ class VllmModel(base.VisionLanguageModel):
         self.generation_kwargs = self._default_generation_kwargs | (generation_kwargs or {})
 
         self.model = LLM(model=self.model_name_or_path, **self.model_kwargs)
-        self.tokenizer = AutoTokenizer.from_pretrained(self.model_name, trust_remote_code=True)
+        self.tokenizer = AutoTokenizer.from_pretrained(
+            self.model_name_or_path, trust_remote_code=True
+        )
 
     @override
     def format_inputs(self, batch: TextImageBatch) -> List[Dict[str, Any]]:
         """Formats inputs for vLLM models.
 
         Args:
-            batch: A batch of text and image inputs.
+            batch: A batch of text and optional image inputs.
 
         Returns:
-            A list of input dictionaries with "prompt" and "multi_modal_data" keys
-            to pass to vLLM's generate method.
+            A list of input dictionaries with "prompt" key and optional
+            "multi_modal_data" key (when images are present).
         """
         message_batch, image_batch, _, _ = unpack_batch(batch)
         with_images = image_batch is not None
@@ -107,9 +107,8 @@ class VllmModel(base.VisionLanguageModel):
         input_dicts = []
         if hasattr(self.tokenizer, "chat_template") and self.tokenizer.chat_template is not None:
             for messages, image in zip(
-                message_batch, image_batch or [] * len(message_batch), strict=False
+                message_batch, image_batch or [None] * len(message_batch), strict=False
             ):
-                pil_image = F.to_pil_image(image)
                 formatted_messages = message_utils.format_huggingface_message(
                     messages,
                     with_images=with_images,
@@ -120,26 +119,25 @@ class VllmModel(base.VisionLanguageModel):
                     tokenize=False,
                     add_generation_prompt=True,
                 )
-                input_dicts.append(
-                    {
-                        "prompt": templated_messages,
-                        "multi_modal_data": {"image": pil_image},
-                    }
-                )
+                input_dict: Dict[str, Any] = {"prompt": templated_messages}
+                if image is not None:
+                    input_dict["multi_modal_data"] = {"image": F.to_pil_image(image)}
+                input_dicts.append(input_dict)
         else:
             raise NotImplementedError("Currently only chat models are supported.")
 
         return input_dicts
 
     @override
-    def model_forward(self, batch: List[TokensPrompt]) -> ModelOutput:
-        """Generates text for the given prompt using the vLLM model.
+    def model_forward(self, batch: List[Dict[str, Any]]) -> ModelOutput:
+        """Generates text using the vLLM model.
 
         Args:
-            batch: A list encoded / tokenized messages (TokensPrompt objects).
+            batch: A list of input dictionaries containing "prompt" and
+                optional "multi_modal_data" keys (output of `format_inputs`).
 
         Returns:
-            The generated text response.
+            ModelOutput containing the generated text responses.
         """
         outputs = self.model.generate(
             batch, sampling_params=SamplingParams(**self.generation_kwargs)
