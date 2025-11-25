@@ -2,13 +2,10 @@
 
 from typing import Any, Dict, List
 
-from loguru import logger
 from typing_extensions import override
 
 try:
     from vllm import LLM, SamplingParams  # type: ignore
-    from vllm.inputs import TokensPrompt  # type: ignore
-    from vllm.transformers_utils.tokenizer import AnyTokenizer  # type: ignore
 except ImportError as e:
     raise ImportError(
         "vLLM is required for VllmModel but not installed. "
@@ -18,8 +15,10 @@ except ImportError as e:
         "For alternatives, consider using HuggingFaceModel or LiteLLMModel."
     ) from e
 
-from eva.language.data.messages import MessageSeries
-from eva.language.models.typings import TextBatch
+from transformers import AutoTokenizer
+
+from eva.language.models.constants import MAX_NEW_TOKENS
+from eva.language.models.typings import ModelOutput, TextBatch
 from eva.language.models.wrappers import base
 from eva.language.utils.text import messages as message_utils
 
@@ -28,10 +27,24 @@ class VllmModel(base.LanguageModel):
     """Wrapper class for using vLLM for text generation.
 
     This wrapper loads a vLLM model, sets up the tokenizer and sampling
-    parameters, and uses a chat template to convert a plain string prompt
-    into the proper input format for vLLM generation. It then returns the
-    generated text response.
+    parameters, and uses a chat template to format inputs for generation.
     """
+
+    _default_model_kwargs = {
+        "max_model_len": 32768,
+        "gpu_memory_utilization": 0.95,
+        "tensor_parallel_size": 1,
+        "dtype": "auto",
+        "trust_remote_code": True,
+    }
+
+    _default_generation_kwargs = {
+        "temperature": 0.0,
+        "max_tokens": MAX_NEW_TOKENS,
+        "top_p": 1.0,
+        "top_k": -1,
+        "n": 1,
+    }
 
     def __init__(
         self,
@@ -43,128 +56,80 @@ class VllmModel(base.LanguageModel):
         """Initializes the vLLM model wrapper.
 
         Args:
-            model_name_or_path: The model identifier (e.g., a Hugging Face
-             repo ID or local path).
+            model_name_or_path: The model identifier (e.g., a HuggingFace repo ID or local path).
             model_kwargs: Arguments required to initialize the vLLM model,
                 see [link](https://github.com/vllm-project/vllm/blob/main/vllm/entrypoints/llm.py)
                 for more information.
             system_prompt: System prompt to use.
-            generation_kwargs: Arguments required to generate the output,
-                need to align with the arguments of
-                [vllm.SamplingParams](https://github.com/vllm-project/vllm/blob/main/vllm/sampling_params.py).
-
+            generation_kwargs: Arguments required to generate the output.
+                See [vllm.SamplingParams](https://github.com/vllm-project/vllm/blob/main/vllm/sampling_params.py).
         """
         super().__init__(system_prompt=system_prompt)
-        self._model_name_or_path = model_name_or_path
-        self._model_kwargs = model_kwargs or {}
-        self._generation_kwargs = generation_kwargs or {}
+        self.model_name_or_path = model_name_or_path
+        self.model_kwargs = self._default_model_kwargs | (model_kwargs or {})
+        self.generation_kwargs = self._default_generation_kwargs | (generation_kwargs or {})
 
-        # Postpone heavy LLM initialisation to avoid pickling issues
-        self.model: LLM | None = None
-        self.tokenizer: AnyTokenizer | None = None
+        self.model = self.load_model()
+        self.tokenizer = self.load_tokenizer()
 
     @override
-    def load_model(self) -> None:
-        """Create the vLLM engine on first use.
+    def load_model(self) -> LLM:
+        """Loads the vLLM model."""
+        return LLM(model=self.model_name_or_path, **self.model_kwargs)
 
-        Important: Don't call this in __init__ to avoid pickling issues.
-        """
-        if self.model is not None:
-            return
-        model = LLM(model=self._model_name_or_path, **self._model_kwargs)
-
-        self.tokenizer = model.get_tokenizer()
-        self.model = model
-
-    def _tokenize_messages(self, messages: List[MessageSeries]) -> List[TokensPrompt]:
-        """Apply chat template to the messages.
-
-        Args:
-            messages: List of raw user strings.
-
-        Returns:
-            List of encoded messages.
+    def load_tokenizer(self) -> AutoTokenizer:
+        """Loads the tokenizer.
 
         Raises:
-            ValueError: If the tokenizer does not have a chat template.
+            NotImplementedError: If the tokenizer does not have a chat template.
         """
-        if self.tokenizer is None:
-            raise RuntimeError("Tokenizer not initialized")
-
-        if not hasattr(self.tokenizer, "chat_template"):
-            raise ValueError("Tokenizer does not have a chat template.")
-
-        chat_messages = list(map(message_utils.format_chat_message, messages))
-
-        encoded_messages = self.tokenizer.apply_chat_template(
-            chat_messages,  # type: ignore
-            tokenize=True,
-            add_generation_prompt=True,
-        )
-
-        # Check for double start token (BOS)
-        if (
-            hasattr(self.tokenizer, "bos_token_id")
-            and self.tokenizer.bos_token_id is not None
-            and isinstance(encoded_messages, list)
-            and len(encoded_messages) >= 2
-            and encoded_messages[0] == self.tokenizer.bos_token_id
-            and encoded_messages[1] == self.tokenizer.bos_token_id
-        ):
-
-            logger.warning("Found a double start token in the input_ids. Removing it.")
-            encoded_messages = encoded_messages[1:]
-
-        result = []
-        for encoded_message in encoded_messages:
-            if isinstance(encoded_message, (list, tuple)):
-                # Ensure all elements are integers
-                token_ids = [
-                    int(token) if isinstance(token, (int, str)) and str(token).isdigit() else 0
-                    for token in encoded_message
-                ]
-            else:
-                # Handle single token case
-                token_id = (
-                    int(encoded_message)
-                    if isinstance(encoded_message, (int, str)) and str(encoded_message).isdigit()
-                    else 0
-                )
-                token_ids = [token_id]
-
-            result.append(TokensPrompt(prompt_token_ids=token_ids))
-
-        return result
+        tokenizer = AutoTokenizer.from_pretrained(self.model_name_or_path, trust_remote_code=True)
+        if not hasattr(tokenizer, "chat_template") or tokenizer.chat_template is None:
+            raise NotImplementedError("Currently only chat models are supported.")
+        return tokenizer
 
     @override
-    def format_inputs(self, batch: TextBatch) -> List[TokensPrompt]:
+    def format_inputs(self, batch: TextBatch) -> List[Dict[str, Any]]:
         """Formats inputs for vLLM models.
 
         Args:
-            batch: A batch of text and image inputs.
+            batch: A batch of text inputs.
 
         Returns:
-            List of formatted prompts.
+            A list of input dictionaries with "prompt" key.
         """
-        self.load_model()
         message_batch, _, _ = TextBatch(*batch)
         message_batch = message_utils.batch_insert_system_message(
             message_batch, self.system_message
         )
         message_batch = list(map(message_utils.combine_system_messages, message_batch))
 
-        return self._tokenize_messages(message_batch)
+        input_dicts = []
+        for messages in message_batch:
+            formatted_messages = message_utils.format_chat_message(messages)
+            templated_messages = self.tokenizer.apply_chat_template(
+                formatted_messages,  # type: ignore
+                tokenize=False,
+                add_generation_prompt=True,
+            )
+            input_dicts.append({"prompt": templated_messages})
+
+        return input_dicts
 
     @override
-    def model_forward(self, batch: List[TokensPrompt]) -> List[str]:
-        """Generates text for the given prompt using the vLLM model.
+    def model_forward(self, batch: List[Dict[str, Any]]) -> ModelOutput:
+        """Generates text using the vLLM model.
 
         Args:
-            batch: A list encoded / tokenized messages (TokensPrompt objects).
+            batch: A list of input dictionaries containing "prompt" key
+                (output of `format_inputs`).
 
         Returns:
-            The generated text response.
+            ModelOutput containing the generated text responses.
         """
-        params = SamplingParams(**self._generation_kwargs)
-        outputs = self.model.generate(batch, params)  # type: ignore
-        return [output.outputs[0].text for output in outputs]
+        outputs = self.model.generate(
+            batch, sampling_params=SamplingParams(**self.generation_kwargs)
+        )
+        output_texts = [output.outputs[0].text for output in outputs]
+
+        return ModelOutput(generated_text=output_texts)

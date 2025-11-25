@@ -37,7 +37,7 @@ class VllmModel(base.VisionLanguageModel):
     and uses a chat template to format inputs for generation.
     """
 
-    _default_model_kwargs: Dict[str, Any] = {
+    _default_model_kwargs = {
         "max_model_len": 32768,
         "gpu_memory_utilization": 0.95,
         "tensor_parallel_size": 1,
@@ -80,10 +80,24 @@ class VllmModel(base.VisionLanguageModel):
         self.model_kwargs = self._default_model_kwargs | (model_kwargs or {})
         self.generation_kwargs = self._default_generation_kwargs | (generation_kwargs or {})
 
-        self.model = LLM(model=self.model_name_or_path, **self.model_kwargs)
-        self.tokenizer = AutoTokenizer.from_pretrained(
-            self.model_name_or_path, trust_remote_code=True
-        )
+        self.model = self.load_model()
+        self.tokenizer = self.load_tokenizer()
+
+    @override
+    def load_model(self) -> LLM:
+        """Loads the vLLM model."""
+        return LLM(model=self.model_name_or_path, **self.model_kwargs)
+
+    def load_tokenizer(self) -> AutoTokenizer:
+        """Loads the tokenizer.
+
+        Raises:
+            NotImplementedError: If the tokenizer does not have a chat template.
+        """
+        tokenizer = AutoTokenizer.from_pretrained(self.model_name_or_path, trust_remote_code=True)
+        if not hasattr(tokenizer, "chat_template") or tokenizer.chat_template is None:
+            raise NotImplementedError("Currently only chat models are supported.")
+        return tokenizer
 
     @override
     def format_inputs(self, batch: TextImageBatch) -> List[Dict[str, Any]]:
@@ -105,26 +119,23 @@ class VllmModel(base.VisionLanguageModel):
         message_batch = list(map(language_message_utils.combine_system_messages, message_batch))
 
         input_dicts = []
-        if hasattr(self.tokenizer, "chat_template") and self.tokenizer.chat_template is not None:
-            for messages, image in zip(
-                message_batch, image_batch or [None] * len(message_batch), strict=False
-            ):
-                formatted_messages = message_utils.format_huggingface_message(
-                    messages,
-                    with_images=with_images,
-                    image_position=self.image_position,
-                )
-                templated_messages = self.tokenizer.apply_chat_template(
-                    formatted_messages,  # type: ignore
-                    tokenize=False,
-                    add_generation_prompt=True,
-                )
-                input_dict: Dict[str, Any] = {"prompt": templated_messages}
-                if image is not None:
-                    input_dict["multi_modal_data"] = {"image": F.to_pil_image(image)}
-                input_dicts.append(input_dict)
-        else:
-            raise NotImplementedError("Currently only chat models are supported.")
+        for messages, image in zip(
+            message_batch, image_batch or [None] * len(message_batch), strict=False
+        ):
+            formatted_messages = message_utils.format_huggingface_message(
+                messages,
+                with_images=with_images,
+                image_position=self.image_position,
+            )
+            templated_messages = self.tokenizer.apply_chat_template(
+                formatted_messages,  # type: ignore
+                tokenize=False,
+                add_generation_prompt=True,
+            )
+            input_dict: Dict[str, Any] = {"prompt": templated_messages}
+            if image is not None:
+                input_dict["multi_modal_data"] = {"image": F.to_pil_image(image)}
+            input_dicts.append(input_dict)
 
         return input_dicts
 
