@@ -12,6 +12,9 @@ except ImportError as e:
         "Please install with: `pip install vllm`"
     ) from e
 
+import os
+
+from loguru import logger
 from transformers import AutoTokenizer
 
 from eva.language.models.constants import MAX_NEW_TOKENS
@@ -66,19 +69,21 @@ class VllmModel(base.LanguageModel):
         self.model_kwargs = self._default_model_kwargs | (model_kwargs or {})
         self.generation_kwargs = self._default_generation_kwargs | (generation_kwargs or {})
 
-        self.model: LLM | None = None
-        self.tokenizer: Any | None = None
+        self.model: LLM
+        self.tokenizer: AutoTokenizer
 
-    def configure_model(self):
+    def configure_model(self) -> None:
         """Use configure_model hook to load model in lazy fashion."""
-        if self.model is None:
+        if not hasattr(self, "model"):
             self.model = self.load_model()
-        if self.tokenizer is None:
+        if not hasattr(self, "tokenizer"):
             self.tokenizer = self.load_tokenizer()
 
     @override
     def load_model(self) -> LLM:
         """Loads the vLLM model."""
+        logger.info(f"Loading model with kwargs: {self.model_kwargs}")
+        logger.info(f"CUDA_VISIBLE_DEVICES: {os.environ.get('CUDA_VISIBLE_DEVICES')}")
         return LLM(model=self.model_name_or_path, **self.model_kwargs)
 
     def load_tokenizer(self) -> AutoTokenizer:
@@ -111,8 +116,8 @@ class VllmModel(base.LanguageModel):
         input_dicts = []
         for messages in message_batch:
             formatted_messages = message_utils.format_chat_message(messages)
-            templated_messages = self.tokenizer.apply_chat_template(
-                formatted_messages,  # type: ignore
+            templated_messages = self.tokenizer.apply_chat_template(  # type: ignore
+                formatted_messages,
                 tokenize=False,
                 add_generation_prompt=True,
             )

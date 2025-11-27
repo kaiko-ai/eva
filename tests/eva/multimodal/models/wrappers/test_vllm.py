@@ -1,17 +1,25 @@
-"""vLLM language wrapper tests."""
+"""vLLM multimodal wrapper tests."""
 
 from unittest.mock import MagicMock, patch
 
 import pytest
+import torch
+from torchvision import tv_tensors
 
 from eva.language.data.messages import UserMessage
-from eva.language.models.typings import TextBatch
 from eva.language.utils.imports import is_vllm_available
+from eva.multimodal.models.typings import TextImageBatch
 
 if not is_vllm_available():
     pytest.skip("vLLM not available", allow_module_level=True)
 
-from eva.language.models.wrappers.vllm import VllmModel
+from eva.multimodal.models.wrappers.vllm import VllmModel
+
+
+@pytest.fixture
+def sample_image():
+    """Create a sample image tensor for testing."""
+    return tv_tensors.Image(torch.rand(3, 224, 224))
 
 
 @pytest.fixture
@@ -71,7 +79,6 @@ def test_default_kwargs_preserved():
     assert model.model_kwargs["max_model_len"] == 32768
     assert model.model_kwargs["gpu_memory_utilization"] == 0.95
     assert model.model_kwargs["tensor_parallel_size"] == 1
-    assert model.model_kwargs["dtype"] == "auto"
     assert model.model_kwargs["trust_remote_code"] is True
     assert model.generation_kwargs["temperature"] == 0.0
     assert model.generation_kwargs["top_p"] == 1.0
@@ -122,10 +129,11 @@ def test_tokenizer_without_chat_template_raises():
             model.load_tokenizer()
 
 
-def test_format_inputs(model_instance):
-    """Test format_inputs properly formats messages."""
-    batch = TextBatch(
-        text=[[UserMessage(content="Hello, world!")]],
+def test_format_inputs_with_image(model_instance, sample_image):
+    """Test format_inputs properly formats messages with images."""
+    batch = TextImageBatch(
+        text=[[UserMessage(content="Describe this")]],
+        image=[sample_image],
         target=None,
         metadata={},
     )
@@ -135,15 +143,36 @@ def test_format_inputs(model_instance):
     assert isinstance(formatted, list)
     assert len(formatted) == 1
     assert "prompt" in formatted[0]
+    assert "multi_modal_data" in formatted[0]
+    assert "image" in formatted[0]["multi_modal_data"]
 
 
-def test_format_inputs_batch(model_instance):
+def test_format_inputs_without_image(model_instance):
+    """Test format_inputs properly formats messages without images."""
+    batch = TextImageBatch(
+        text=[[UserMessage(content="Hello, world!")]],
+        image=None,  # type: ignore[arg-type]
+        target=None,
+        metadata={},
+    )
+
+    formatted = model_instance.format_inputs(batch)
+
+    assert isinstance(formatted, list)
+    assert len(formatted) == 1
+    assert "prompt" in formatted[0]
+    assert "multi_modal_data" not in formatted[0]
+
+
+def test_format_inputs_batch(model_instance, sample_image):
     """Test format_inputs handles batch of multiple samples."""
-    batch = TextBatch(
+    image2 = tv_tensors.Image(torch.rand(3, 224, 224))
+    batch = TextImageBatch(
         text=[
-            [UserMessage(content="First message")],
-            [UserMessage(content="Second message")],
+            [UserMessage(content="First image")],
+            [UserMessage(content="Second image")],
         ],
+        image=[sample_image, image2],
         target=None,
         metadata={},
     )
@@ -152,9 +181,10 @@ def test_format_inputs_batch(model_instance):
 
     assert len(formatted) == 2
     assert all("prompt" in f for f in formatted)
+    assert all("multi_modal_data" in f for f in formatted)
 
 
-def test_model_forward(mock_llm, mock_tokenizer):
+def test_model_forward(mock_llm, mock_tokenizer, sample_image):
     """Test model_forward generates text correctly."""
     with (
         patch.object(VllmModel, "load_model", return_value=mock_llm),
@@ -163,7 +193,7 @@ def test_model_forward(mock_llm, mock_tokenizer):
         model = VllmModel(model_name_or_path="test-model")
         model.configure_model()
 
-        batch = [{"prompt": "test prompt"}]
+        batch = [{"prompt": "test prompt", "multi_modal_data": {"image": sample_image}}]
         result = model.model_forward(batch)
 
         assert "generated_text" in result
@@ -171,8 +201,8 @@ def test_model_forward(mock_llm, mock_tokenizer):
         mock_llm.generate.assert_called_once()
 
 
-def test_generate(mock_llm, mock_tokenizer):
-    """Test full generation pipeline."""
+def test_generate_with_image(mock_llm, mock_tokenizer, sample_image):
+    """Test full generation pipeline with image input."""
     with (
         patch.object(VllmModel, "load_model", return_value=mock_llm),
         patch.object(VllmModel, "load_tokenizer", return_value=mock_tokenizer),
@@ -183,8 +213,9 @@ def test_generate(mock_llm, mock_tokenizer):
         )
         model.configure_model()
 
-        batch = TextBatch(
-            text=[[UserMessage(content="Hello!")]],
+        batch = TextImageBatch(
+            text=[[UserMessage(content="What's in this image?")]],
+            image=[sample_image],
             target=None,
             metadata={},
         )
@@ -192,6 +223,21 @@ def test_generate(mock_llm, mock_tokenizer):
         result = model(batch)
 
         assert result["generated_text"] == ["Generated response"]
+
+
+def test_image_position_parameter():
+    """Test that image_position parameter is stored correctly."""
+    model_before = VllmModel(
+        model_name_or_path="test-model",
+        image_position="before_text",
+    )
+    model_after = VllmModel(
+        model_name_or_path="test-model",
+        image_position="after_text",
+    )
+
+    assert model_before.image_position == "before_text"
+    assert model_after.image_position == "after_text"
 
 
 def test_system_prompt_stored():

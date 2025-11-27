@@ -8,7 +8,7 @@ def is_vllm_available() -> bool:
         True if vLLM is installed, False otherwise.
     """
     try:
-        import vllm  # noqa: F401
+        import vllm  # type: ignore[import-not-found]  # noqa: F401
 
         from eva.language.models.wrappers import VllmModel  # noqa: F401
 

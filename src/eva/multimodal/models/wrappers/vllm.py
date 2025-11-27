@@ -74,18 +74,18 @@ class VllmModel(base.VisionLanguageModel):
         """
         super().__init__(system_prompt=system_prompt)
         self.model_name_or_path = model_name_or_path
-        self.image_position = image_position
+        self.image_position: Literal["before_text", "after_text"] = image_position
         self.model_kwargs = self._default_model_kwargs | (model_kwargs or {})
         self.generation_kwargs = self._default_generation_kwargs | (generation_kwargs or {})
 
-        self.model: LLM | None = None
-        self.tokenizer: Any | None = None
+        self.model: LLM
+        self.tokenizer: AutoTokenizer
 
-    def configure_model(self):
+    def configure_model(self) -> None:
         """Use configure_model hook to load model in lazy fashion."""
-        if self.model is None:
+        if not hasattr(self, "model"):
             self.model = self.load_model()
-        if self.tokenizer is None:
+        if not hasattr(self, "tokenizer"):
             self.tokenizer = self.load_tokenizer()
 
     @override
@@ -134,8 +134,8 @@ class VllmModel(base.VisionLanguageModel):
                 with_images=with_images,
                 image_position=self.image_position,
             )
-            templated_messages = self.tokenizer.apply_chat_template(
-                formatted_messages,  # type: ignore
+            templated_messages = self.tokenizer.apply_chat_template(  # type: ignore
+                formatted_messages,
                 tokenize=False,
                 add_generation_prompt=True,
             )
