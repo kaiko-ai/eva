@@ -35,9 +35,8 @@ class LanguageModule(module.ModelModule):
     @override
     def configure_model(self) -> None:
         from eva.language.models.wrappers.from_registry import ModelFromRegistry
-        model = (
-            self.model.model if isinstance(self.model, ModelFromRegistry) else self.model
-        )
+
+        model = self.model.model if isinstance(self.model, ModelFromRegistry) else self.model
         if hasattr(model, "configure_model"):
             model.configure_model()  # type: ignore
 
