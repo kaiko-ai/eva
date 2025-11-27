@@ -2,8 +2,8 @@
 
 from typing import Any, Dict, List
 
-from typing_extensions import override
 import torch
+from typing_extensions import override
 
 try:
     from vllm import LLM, SamplingParams  # type: ignore
@@ -45,7 +45,7 @@ class VllmModel(base.LanguageModel):
         "top_p": 1.0,
         "top_k": -1,
         "n": 1,
-        "seed": torch.initial_seed()
+        "seed": torch.initial_seed(),
     }
 
     def __init__(

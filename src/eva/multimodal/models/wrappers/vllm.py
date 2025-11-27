@@ -17,10 +17,10 @@ except ImportError as e:
     ) from e
 
 
+import torch
 import torchvision.transforms.functional as F
 from loguru import logger
 from transformers import AutoTokenizer
-import torch
 
 from eva.language.models.typings import ModelOutput
 from eva.language.utils.text import messages as language_message_utils
@@ -50,7 +50,7 @@ class VllmModel(base.VisionLanguageModel):
         "top_p": 1.0,
         "top_k": -1,
         "n": 1,
-        "seed": torch.initial_seed()
+        "seed": torch.initial_seed(),
     }
 
     def __init__(
