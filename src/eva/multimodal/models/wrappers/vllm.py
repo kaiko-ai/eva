@@ -12,11 +12,8 @@ try:
     from vllm import LLM, SamplingParams  # type: ignore
 except ImportError as e:
     raise ImportError(
-        "vLLM is required for VllmModel but not installed. "
-        "vLLM must be installed manually as it requires CUDA and is not included in dependencies. "
-        "Install with: pip install vllm "
-        "Note: vLLM requires Linux with CUDA support for optimal performance. "
-        "For alternatives, consider using HuggingFaceModel or LiteLLMModel."
+        "vLLM is required for using VllmModel but is not installed."
+        "Please install with: `pip install vllm`"
     ) from e
 
 

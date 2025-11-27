@@ -5,16 +5,9 @@ import os
 import torch
 
 from eva.language.models.constants import MAX_NEW_TOKENS
+from eva.language.utils import imports as import_utils
 from eva.multimodal.models import wrappers
 from eva.multimodal.models.networks.registry import model_registry
-
-VLLM_AVAILABLE = False
-try:
-    from eva.multimodal.models.wrappers.vllm import VllmModel  # noqa: F401
-
-    VLLM_AVAILABLE = True
-except ImportError:
-    pass
 
 
 @model_registry.register("alibaba/qwen2-5-vl-7b-instruct")
@@ -52,10 +45,10 @@ class Qwen25VL7BInstruct(wrappers.HuggingFaceModel):
         )
 
 
-if VLLM_AVAILABLE:
+if import_utils.is_vllm_available():
 
     @model_registry.register("alibaba/qwen2-5-vl-7b-instruct-vllm")
-    class Qwen25VL7BInstructVLLM(wrappers.VllmModel):
+    class Qwen25VL7BInstructVllm(wrappers.VllmModel):
         """Qwen2.5-VL 7B Instruct model."""
 
         def __init__(
