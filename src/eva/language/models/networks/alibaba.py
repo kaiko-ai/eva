@@ -12,18 +12,17 @@ from eva.language.models.networks.registry import model_registry
 class Qwen205BInstruct(wrappers.HuggingFaceModel):
     """Qwen2 0.5B Instruct model."""
 
-    def __init__(self, system_prompt: str | None = None, cache_dir: str | None = None):
+    def __init__(self, system_prompt: str | None = None):
         """Initialize the model."""
         requirements.check_min_versions(requirements={"torch": "2.5.1", "torchvision": "0.20.1"})
         super().__init__(
             model_name_or_path="Qwen/Qwen2-0.5B-Instruct",
+            model_class="AutoModelForCausalLM",
             model_kwargs={
                 "torch_dtype": torch.bfloat16,
-                "cache_dir": cache_dir,
             },
             generation_kwargs={
                 "max_new_tokens": MAX_NEW_TOKENS,
             },
             system_prompt=system_prompt,
-            chat_mode=True,
         )

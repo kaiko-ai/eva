@@ -3,10 +3,40 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
+import torch
 
 from eva.language.data.messages import UserMessage
 from eva.language.models import HuggingFaceModel
 from eva.language.models.typings import TextBatch
+
+
+@pytest.fixture
+def mock_tokenizer():
+    """Create a mock tokenizer."""
+    tokenizer = MagicMock()
+    tokenizer.chat_template = "mock_template"
+    tokenizer.apply_chat_template = MagicMock(return_value="formatted prompt")
+    tokenizer.batch_decode = MagicMock(
+        side_effect=lambda x, **kwargs: ["decoded text"] * x.shape[0]
+    )
+
+    # Mock the tokenizer call to return a BatchEncoding-like object
+    mock_encoding = MagicMock()
+    mock_encoding.__getitem__ = lambda self, key: torch.tensor([[1, 2, 3]])
+    mock_encoding.get = MagicMock(return_value=torch.tensor([[1, 1, 1]]))
+    mock_encoding.to = MagicMock(return_value=mock_encoding)
+    tokenizer.return_value = mock_encoding
+
+    return tokenizer
+
+
+@pytest.fixture
+def mock_model():
+    """Create a mock model."""
+    model = MagicMock()
+    model.device = torch.device("cpu")
+    model.generate = MagicMock(return_value=torch.tensor([[1, 2, 3, 4, 5, 6]]))
+    return model
 
 
 @pytest.mark.parametrize(
@@ -26,31 +56,61 @@ from eva.language.models.typings import TextBatch
         ),
     ],
 )
-def test_real_small_hf_model_generation(
+def test_huggingface_model_generation(
     model_name_or_path: str,
     prompt: str,
     generate_kwargs: dict,
     expect_deterministic: bool,
+    mock_tokenizer,
+    mock_model,
 ):
-    """Test HuggingFace model generation with mocked pipeline.
+    """Test HuggingFace model generation with mocked model and tokenizer.
 
     Tests the wrapper correctly handles generation parameters and returns
     expected output format for deterministic vs non-deterministic generation.
     """
-    mock_pipeline = MagicMock()
-
     if expect_deterministic:
-        mock_pipeline.return_value = [[{"generated_text": f"{prompt} generated"}]]
+        mock_model.generate.return_value = torch.tensor([[1, 2, 3, 4, 5, 6]])
     else:
-        mock_pipeline.side_effect = [
-            [[{"generated_text": f"{prompt} generated 1"}]],
-            [[{"generated_text": f"{prompt} generated 2"}]],
+        mock_model.generate.side_effect = [
+            torch.tensor([[1, 2, 3, 4, 5, 6]]),
+            torch.tensor([[1, 2, 3, 7, 8, 9]]),
         ]
 
-    with patch("eva.language.models.wrappers.huggingface.pipeline", return_value=mock_pipeline):
+    # Different decoded outputs for non-deterministic case
+    if not expect_deterministic:
+        mock_tokenizer.batch_decode.side_effect = [
+            ["input text"],
+            [f"{prompt} generated 1"],
+            ["input text"],
+            [f"{prompt} generated 2"],
+        ]
+    else:
+        mock_tokenizer.batch_decode.side_effect = [
+            ["input text"],
+            [f"{prompt} generated"],
+            ["input text"],
+            [f"{prompt} generated"],
+        ]
+
+    with (
+        patch(
+            "eva.language.models.wrappers.huggingface.transformers.AutoTokenizer.from_pretrained",
+            return_value=mock_tokenizer,
+        ),
+        patch(
+            "eva.language.models.wrappers.huggingface.transformers.AutoModelForCausalLM.from_pretrained",
+            return_value=mock_model,
+        ),
+        patch("eva.language.models.wrappers.huggingface.transformers") as mock_transformers,
+    ):
+        mock_transformers.AutoTokenizer.from_pretrained.return_value = mock_tokenizer
+        mock_transformers.AutoModelForCausalLM = MagicMock()
+        mock_transformers.AutoModelForCausalLM.from_pretrained.return_value = mock_model
+
         model = HuggingFaceModel(
             model_name_or_path=model_name_or_path,
-            task="text-generation",
+            model_class="AutoModelForCausalLM",
             generation_kwargs=generate_kwargs,
         )
 
@@ -66,7 +126,41 @@ def test_real_small_hf_model_generation(
                 output1["generated_text"] == output2["generated_text"]
             ), "Outputs should be identical when do_sample is False."
         else:
-            # For non-deterministic, outputs should differ
             assert (
                 output1["generated_text"] != output2["generated_text"]
             ), "Outputs should differ when do_sample is True."
+
+
+def test_huggingface_model_invalid_class():
+    """Test that an invalid model class raises ValueError."""
+    with patch(
+        "eva.language.models.wrappers.huggingface.transformers.AutoTokenizer.from_pretrained",
+        return_value=MagicMock(),
+    ):
+        with pytest.raises(ValueError, match="not found in transformers"):
+            HuggingFaceModel(
+                model_name_or_path="some-model",
+                model_class="NonExistentModelClass",
+            )
+
+
+def test_huggingface_model_no_generate_support(mock_tokenizer):
+    """Test that a model without generate method raises ValueError."""
+    mock_model = MagicMock(spec=[])  # Model without generate attribute
+
+    with (
+        patch(
+            "eva.language.models.wrappers.huggingface.transformers.AutoTokenizer.from_pretrained",
+            return_value=mock_tokenizer,
+        ),
+        patch("eva.language.models.wrappers.huggingface.transformers") as mock_transformers,
+    ):
+        mock_transformers.AutoTokenizer.from_pretrained.return_value = mock_tokenizer
+        mock_transformers.AutoModelForCausalLM = MagicMock()
+        mock_transformers.AutoModelForCausalLM.from_pretrained.return_value = mock_model
+
+        with pytest.raises(ValueError, match="does not support generation"):
+            HuggingFaceModel(
+                model_name_or_path="some-model",
+                model_class="AutoModelForCausalLM",
+            )
