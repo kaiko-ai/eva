@@ -45,6 +45,7 @@ class HuggingFaceModel(base.VisionLanguageModel):
 
         self.image_key = image_key
         self.image_position: Literal["before_text", "after_text"] = image_position
+        self.model_name_or_path = model_name_or_path
 
         self._language_model = language_wrappers.HuggingFaceModel(
             model_name_or_path=model_name_or_path,
