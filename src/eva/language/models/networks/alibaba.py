@@ -31,6 +31,26 @@ class Qwen205BInstruct(wrappers.HuggingFaceModel):
         )
 
 
+@model_registry.register("alibaba/qwen3-8b")
+class Qwen3_8B(wrappers.HuggingFaceModel):
+    """Qwen3 8B model."""
+
+    def __init__(self, system_prompt: str | None = None):
+        """Initialize the model."""
+        requirements.check_min_versions(requirements={"torch": "2.5.1", "torchvision": "0.20.1"})
+        super().__init__(
+            model_name_or_path="Qwen/Qwen3-8B",
+            model_class="AutoModelForCausalLM",
+            model_kwargs={
+                "torch_dtype": "auto",
+            },
+            generation_kwargs={
+                "max_new_tokens": MAX_NEW_TOKENS,
+            },
+            system_prompt=system_prompt,
+        )
+
+
 if import_utils.is_vllm_available():
 
     @model_registry.register("alibaba/qwen2-5-72b-instruct-vllm")
