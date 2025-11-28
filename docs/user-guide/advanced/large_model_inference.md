@@ -43,7 +43,7 @@ We recommend using big batch sizes in the lightning dataloader, since vLLM handl
 - Batched generation with configurable sampling parameters
 
 The `eva.language` and `eva.multimodal` modules have a separate `VllmModel` wrapper implementation, so for LLMs please use `eva.language.models.wrappers.VllmModel` and for VLM evaluation you can use `eva.multimodal.models.wrappers.VllmModel`.
-Note that `language` adnd `multimodal` models have separate model registries, so make sure to register your vLLM model in the correct registry.
+Note that `language` and `multimodal` models have separate model registries, so make sure to register your vLLM model in the correct registry.
 
 ## vLLM Settings
 
@@ -85,12 +85,14 @@ class YourModelVllm(wrappers.VllmModel):
         )
 ```
 
-After doing so, you can use this model by setting `MODEL_NAME="your-org/your-model-vllm"` in your evaluation command. Just make sure that you import your new model somewhere in a `__init__.py` or in your evaluation script such that the registration gets triggered.
+After doing so, you can use this model by setting `MODEL_NAME="your-org/your-model-vllm"` in your evaluation command. Just make sure that you import your new model / or the module where your model class is defined somewhere in a `__init__.py` or in your evaluation script such that the registration gets triggered.
 
 To set vLLM-specific parameters, pass them via the `model_kwargs` dictionary.
 To solve OOM issues, tuning `max_num_seqs` and `dtype` can help, depending on the model you want to load and the given hardware setup. 
 
 If you want to add an LLM, please use the corresponding `VllmModel` and `model_registry` from `eva.language` instead of `eva.multimodal`.
+
+Note that not all Huggingface compatible models are out-of-the box compatible with vLLM. Please refer to the [vLLM documentation](https://docs.vllm.ai/en/latest/) for a list of supported models. For custom models, you might need to implement your own vLLM compatible model class and registering it with vLLMs model registry (`vllm.ModelRegistry.register_model`) before using it with *eva*.
 
 ## Troubleshooting
 
@@ -99,7 +101,7 @@ If you want to add an LLM, please use the corresponding `VllmModel` and `model_r
 If you encounter OOM errors:
 
 1. Adjust parameters such as `tensor_parallel_size`, `max_model_len`, `gpu_memory_utilization`, `max_num_batched_tokens`. Those parameters you can set via `model_kwargs` when initializing the `VllmModel` wrapper.
-3. Make sure you use a recent vLLM version and matching torch & CUDA versions. Also enable V1 engine if not already done by setting `VLLM_USE_V1="1"`
+3. Make sure you use a recent vLLM version and matching torch & CUDA versions. Also enable V1 engine if you are using a vLLM version where this is not the default yet by setting `VLLM_USE_V1="1"` (this offers range of significant performance improvements to V0 engine).
 4. Monitor GPU memory usage (GPU memory utilization should be equally distributed across all used GPUs and below `gpu_memory_utilization`). If GPU memory only rises on a single GPU, that might indicate an issue with the tensor parallelism setup or vLLM not detecting all GPUs correctly.
 
 Reducing the dataloader batch size usually doesn't help, as vLLM handles batching internally. 

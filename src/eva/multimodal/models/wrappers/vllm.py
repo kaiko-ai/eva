@@ -65,6 +65,7 @@ class VllmModel(base.VisionLanguageModel):
 
         Args:
             model_name_or_path: The model identifier (e.g., a HuggingFace repo ID or local path).
+                Note that the model must be compatible with vLLM.
             model_kwargs: Arguments required to initialize the vLLM model,
                 see [link](https://github.com/vllm-project/vllm/blob/main/vllm/entrypoints/llm.py)
                 for more information.
