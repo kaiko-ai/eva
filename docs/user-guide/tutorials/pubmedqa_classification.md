@@ -70,20 +70,7 @@ pip install "transformers<4.45"
 
 ### 3. Using vLLM (cloud/distributed execution)
 
-For larger models that require specialized infrastructure, you'll need to:
-
-1. Set up a vLLM server in your cloud environment
-2. Update the config to use the vLLM wrapper:
-
-```yaml
-model:
-  class_path: eva.language.models.LanguageModule
-  init_args:
-    model:
-      class_path: eva.language.models.VllmModel
-      init_args:
-        model_name_or_path: meta-llama/Llama-2-70b-chat-hf
-```
+Please refer to the [Large Model Inference Guide](../advanced/large_model_inference.md) for instructions on setting up vLLM and running large scale models.
 
 ### 4. Basic evaluation with default configuration
 
