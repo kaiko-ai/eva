@@ -1,15 +1,12 @@
 """HuggingFace Vision-Language Model Wrapper."""
 
 import functools
-from typing import Any, Callable, Dict, List, Literal, Tuple
+from typing import Any, Dict, Literal
 
 import torch
-import transformers
-from loguru import logger
-from torch import nn
 from typing_extensions import override
 
-from eva.language.models.constants import MAX_NEW_TOKENS
+from eva.language.models import wrappers as language_wrappers
 from eva.language.models.typings import ModelOutput, TextBatch
 from eva.language.utils.text import messages as language_message_utils
 from eva.multimodal.models.typings import TextImageBatch
@@ -19,23 +16,7 @@ from eva.multimodal.utils.text import messages as message_utils
 
 
 class HuggingFaceModel(base.VisionLanguageModel):
-    """Lightweight wrapper for Huggingface VLMs.
-
-    Args:
-        model_name_or_path: The name of the model to use.
-        model_class: The class of the model to use.
-        model_kwargs: Additional model arguments.
-        processor_kwargs: Additional processor arguments.
-        generation_kwargs: Additional generation arguments.
-    """
-
-    _default_generation_kwargs = {
-        "temperature": 0.0,
-        "max_new_tokens": MAX_NEW_TOKENS,
-        "do_sample": False,
-        "top_p": 1.0,
-    }
-    """Default HF model parameters for evaluation."""
+    """Wrapper class for HuggingFace vision-language models."""
 
     def __init__(
         self,
@@ -62,16 +43,20 @@ class HuggingFaceModel(base.VisionLanguageModel):
         """
         super().__init__(system_prompt=system_prompt)
 
-        self.model_name_or_path = model_name_or_path
-        self.model_kwargs = model_kwargs or {}
-        self.base_model_class = model_class
-        self.processor_kwargs = processor_kwargs or {}
-        self.generation_kwargs = self._default_generation_kwargs | (generation_kwargs or {})
         self.image_key = image_key
         self.image_position: Literal["before_text", "after_text"] = image_position
 
-        self.processor = self.load_processor()
-        self.model = self.load_model()
+        self._language_model = language_wrappers.HuggingFaceModel(
+            model_name_or_path=model_name_or_path,
+            model_class=model_class,
+            model_kwargs=model_kwargs,
+            system_prompt=system_prompt,
+            processor_kwargs=processor_kwargs,
+            generation_kwargs=generation_kwargs,
+        )
+
+        self.processor = self._language_model.processor
+        self.model = self._language_model.model
 
     @override
     def format_inputs(self, batch: TextImageBatch | TextBatch) -> Dict[str, torch.Tensor]:
@@ -115,10 +100,9 @@ class HuggingFaceModel(base.VisionLanguageModel):
         else:
             raise NotImplementedError("Currently only chat models are supported.")
 
-        processor_inputs = {
+        processor_inputs: Dict[str, Any] = {
             "text": templated_text,
             "return_tensors": "pt",
-            **self.processor_kwargs,
         }
 
         if with_images:
@@ -128,74 +112,12 @@ class HuggingFaceModel(base.VisionLanguageModel):
 
     @override
     def model_forward(self, batch: Dict[str, torch.Tensor]) -> ModelOutput:
-        """Generates text output from the model. Is called by the `generate` method.
+        """Generates text output from the model.
 
         Args:
-            batch: A dictionary containing the input data, which may include:
-                - "text": List of messages formatted for the model.
-                - "image": List of image tensors.
+            batch: A dictionary containing the input data.
 
         Returns:
-            A dictionary containing the processed input and the model's output.
+            The model output containing generated text.
         """
-        output_ids = self.model.generate(**batch, **self.generation_kwargs)  # type: ignore
-        decoded_input, decoded_output = self._decode_ids(output_ids, batch["input_ids"].shape[-1])
-
-        return ModelOutput(
-            generated_text=decoded_output,
-            input_text=decoded_input,
-            output_ids=output_ids,
-            attention_mask=batch.get("attention_mask"),
-        )
-
-    @override
-    def load_model(self) -> nn.Module:
-        """Setting up the model. Used for delayed model initialization.
-
-        Raises:
-            ValueError: If the model class is not found in transformers or if the model
-                does not support gradient checkpointing but it is enabled.
-        """
-        logger.info(f"Configuring model: {self.model_name_or_path}")
-        if hasattr(transformers, self.base_model_class):
-            model_class = getattr(transformers, self.base_model_class)
-        else:
-            raise ValueError(f"Model class {self.base_model_class} not found in transformers")
-
-        model = model_class.from_pretrained(self.model_name_or_path, **self.model_kwargs)
-
-        if not hasattr(model, "generate"):
-            raise ValueError(f"Model {self.model_name_or_path} does not support generation. ")
-
-        return model
-
-    def load_processor(self) -> Callable:
-        """Initialize the processor."""
-        return transformers.AutoProcessor.from_pretrained(
-            self.processor_kwargs.pop("model_name_or_path", self.model_name_or_path),
-            **self.processor_kwargs,
-        )
-
-    def _decode_ids(
-        self, output: torch.Tensor, instruction_length: int
-    ) -> Tuple[List[str], List[str]]:
-        """Decode the model's batch input and output to text.
-
-        Args:
-            output: The raw output from the model.
-            instruction_length: The length of the instruction in the input.
-
-        Returns:
-            A tuple containing two lists, the decoded input and output texts.
-        """
-        decoded_input = self.processor.batch_decode(  # type: ignore
-            output[:, :instruction_length], skip_special_tokens=False
-        )
-        decoded_output = self.processor.batch_decode(  # type: ignore
-            output[:, instruction_length:], skip_special_tokens=True
-        )
-
-        logger.debug(f"Decoded input: {decoded_input}")
-        logger.debug(f"Decoded output: {decoded_output}")
-
-        return decoded_input, decoded_output
+        return self._language_model.model_forward(batch)

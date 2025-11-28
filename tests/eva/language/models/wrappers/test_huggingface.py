@@ -11,23 +11,23 @@ from eva.language.models.typings import TextBatch
 
 
 @pytest.fixture
-def mock_tokenizer():
-    """Create a mock tokenizer."""
-    tokenizer = MagicMock()
-    tokenizer.chat_template = "mock_template"
-    tokenizer.apply_chat_template = MagicMock(return_value="formatted prompt")
-    tokenizer.batch_decode = MagicMock(
+def mock_processor():
+    """Create a mock processor."""
+    processor = MagicMock()
+    processor.chat_template = "mock_template"
+    processor.apply_chat_template = MagicMock(return_value="formatted prompt")
+    processor.batch_decode = MagicMock(
         side_effect=lambda x, **kwargs: ["decoded text"] * x.shape[0]
     )
 
-    # Mock the tokenizer call to return a BatchEncoding-like object
+    # Mock the processor call to return a BatchEncoding-like object
     mock_encoding = MagicMock()
     mock_encoding.__getitem__ = lambda self, key: torch.tensor([[1, 2, 3]])
     mock_encoding.get = MagicMock(return_value=torch.tensor([[1, 1, 1]]))
     mock_encoding.to = MagicMock(return_value=mock_encoding)
-    tokenizer.return_value = mock_encoding
+    processor.return_value = mock_encoding
 
-    return tokenizer
+    return processor
 
 
 @pytest.fixture
@@ -61,7 +61,7 @@ def test_huggingface_model_generation(
     prompt: str,
     generate_kwargs: dict,
     expect_deterministic: bool,
-    mock_tokenizer,
+    mock_processor,
     mock_model,
 ):
     """Test HuggingFace model generation with mocked model and tokenizer.
@@ -79,14 +79,14 @@ def test_huggingface_model_generation(
 
     # Different decoded outputs for non-deterministic case
     if not expect_deterministic:
-        mock_tokenizer.batch_decode.side_effect = [
+        mock_processor.batch_decode.side_effect = [
             ["input text"],
             [f"{prompt} generated 1"],
             ["input text"],
             [f"{prompt} generated 2"],
         ]
     else:
-        mock_tokenizer.batch_decode.side_effect = [
+        mock_processor.batch_decode.side_effect = [
             ["input text"],
             [f"{prompt} generated"],
             ["input text"],
@@ -95,8 +95,8 @@ def test_huggingface_model_generation(
 
     with (
         patch(
-            "eva.language.models.wrappers.huggingface.transformers.AutoTokenizer.from_pretrained",
-            return_value=mock_tokenizer,
+            "eva.language.models.wrappers.huggingface.transformers.AutoProcessor.from_pretrained",
+            return_value=mock_processor,
         ),
         patch(
             "eva.language.models.wrappers.huggingface.transformers.AutoModelForCausalLM.from_pretrained",
@@ -104,7 +104,7 @@ def test_huggingface_model_generation(
         ),
         patch("eva.language.models.wrappers.huggingface.transformers") as mock_transformers,
     ):
-        mock_transformers.AutoTokenizer.from_pretrained.return_value = mock_tokenizer
+        mock_transformers.AutoProcessor.from_pretrained.return_value = mock_processor
         mock_transformers.AutoModelForCausalLM = MagicMock()
         mock_transformers.AutoModelForCausalLM.from_pretrained.return_value = mock_model
 
@@ -134,7 +134,7 @@ def test_huggingface_model_generation(
 def test_huggingface_model_invalid_class():
     """Test that an invalid model class raises ValueError."""
     with patch(
-        "eva.language.models.wrappers.huggingface.transformers.AutoTokenizer.from_pretrained",
+        "eva.language.models.wrappers.huggingface.transformers.AutoProcessor.from_pretrained",
         return_value=MagicMock(),
     ):
         with pytest.raises(ValueError, match="not found in transformers"):
@@ -144,18 +144,18 @@ def test_huggingface_model_invalid_class():
             )
 
 
-def test_huggingface_model_no_generate_support(mock_tokenizer):
+def test_huggingface_model_no_generate_support(mock_processor):
     """Test that a model without generate method raises ValueError."""
     mock_model = MagicMock(spec=[])  # Model without generate attribute
 
     with (
         patch(
-            "eva.language.models.wrappers.huggingface.transformers.AutoTokenizer.from_pretrained",
-            return_value=mock_tokenizer,
+            "eva.language.models.wrappers.huggingface.transformers.AutoProcessor.from_pretrained",
+            return_value=mock_processor,
         ),
         patch("eva.language.models.wrappers.huggingface.transformers") as mock_transformers,
     ):
-        mock_transformers.AutoTokenizer.from_pretrained.return_value = mock_tokenizer
+        mock_transformers.AutoProcessor.from_pretrained.return_value = mock_processor
         mock_transformers.AutoModelForCausalLM = MagicMock()
         mock_transformers.AutoModelForCausalLM.from_pretrained.return_value = mock_model
 

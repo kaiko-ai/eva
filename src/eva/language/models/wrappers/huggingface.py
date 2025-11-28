@@ -31,7 +31,7 @@ class HuggingFaceModel(base.LanguageModel):
         model_class: str,
         model_kwargs: Dict[str, Any] | None = None,
         system_prompt: str | None = None,
-        tokenizer_kwargs: Dict[str, Any] | None = None,
+        processor_kwargs: Dict[str, Any] | None = None,
         generation_kwargs: Dict[str, Any] | None = None,
     ) -> None:
         """Initializes the model.
@@ -43,7 +43,7 @@ class HuggingFaceModel(base.LanguageModel):
             model_class: The class of the model to use (e.g., "AutoModelForCausalLM").
             model_kwargs: Additional arguments for configuring the model.
             system_prompt: System prompt to use.
-            tokenizer_kwargs: Additional tokenizer arguments.
+            processor_kwargs: Additional processor/tokenizer arguments.
             generation_kwargs: Additional generation parameters (temperature, max_length, etc.).
         """
         super().__init__(system_prompt=system_prompt)
@@ -51,10 +51,10 @@ class HuggingFaceModel(base.LanguageModel):
         self._model_name_or_path = model_name_or_path
         self._model_class = model_class
         self._model_kwargs = model_kwargs or {}
-        self._tokenizer_kwargs = tokenizer_kwargs or {}
+        self._processor_kwargs = processor_kwargs or {}
         self._generation_kwargs = self._default_generation_kwargs | (generation_kwargs or {})
 
-        self.tokenizer = self.load_tokenizer()
+        self.processor = self.load_processor()
         self.model = self.load_model()
 
     @override
@@ -78,16 +78,19 @@ class HuggingFaceModel(base.LanguageModel):
 
         return model
 
-    def load_tokenizer(self) -> Callable:
-        """Initialize the tokenizer."""
-        tokenizer = transformers.AutoTokenizer.from_pretrained(
-            self._tokenizer_kwargs.pop("model_name_or_path", self._model_name_or_path),
-            **self._tokenizer_kwargs,
+    def load_processor(self) -> Callable:
+        """Initialize the processor.
+
+        Note: For text-only models, AutoProcessor returns the tokenizer.
+        """
+        processor = transformers.AutoProcessor.from_pretrained(
+            self._processor_kwargs.pop("model_name_or_path", self._model_name_or_path),
+            **self._processor_kwargs,
         )
-        # To ensure correcy generation with batched inputs of different lengths
-        if "CausalLM" in self._model_class:
-            tokenizer.padding_side = "left"
-        return tokenizer
+        # To ensure correct generation with batched inputs of different lengths
+        if "CausalLM" in self._model_class or "ConditionalGeneration" in self._model_class:
+            processor.padding_side = "left"
+        return processor
 
     @override
     def format_inputs(self, batch: TextBatch) -> Dict[str, torch.Tensor]:
@@ -113,9 +116,9 @@ class HuggingFaceModel(base.LanguageModel):
         )
         message_batch = list(map(message_utils.combine_system_messages, message_batch))
 
-        if self.tokenizer.chat_template is not None:  # type: ignore
+        if self.processor.chat_template is not None:  # type: ignore
             templated_text = [
-                self.tokenizer.apply_chat_template(  # type: ignore
+                self.processor.apply_chat_template(  # type: ignore
                     message_utils.format_chat_message(message),
                     add_generation_prompt=True,
                     tokenize=False,
@@ -125,13 +128,13 @@ class HuggingFaceModel(base.LanguageModel):
         else:
             templated_text = list(map(message_utils.merge_message_contents, message_batch))
 
-        tokenizer_inputs = {
+        processor_inputs = {
             "text": templated_text,
             "return_tensors": "pt",
             "padding": True,
         }
 
-        return self.tokenizer(**tokenizer_inputs).to(self.model.device)  # type: ignore
+        return self.processor(**processor_inputs).to(self.model.device)  # type: ignore
 
     @override
     def model_forward(self, batch: Dict[str, torch.Tensor]) -> ModelOutput:
@@ -165,10 +168,10 @@ class HuggingFaceModel(base.LanguageModel):
         Returns:
             A tuple containing two lists, the decoded input and output texts.
         """
-        decoded_input = self.tokenizer.batch_decode(  # type: ignore
+        decoded_input = self.processor.batch_decode(  # type: ignore
             output[:, :instruction_length], skip_special_tokens=False
         )
-        decoded_output = self.tokenizer.batch_decode(  # type: ignore
+        decoded_output = self.processor.batch_decode(  # type: ignore
             output[:, instruction_length:], skip_special_tokens=True
         )
 
