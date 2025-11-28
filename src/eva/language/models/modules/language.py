@@ -33,6 +33,14 @@ class LanguageModule(module.ModelModule):
         self.model = model
 
     @override
+    def configure_model(self) -> None:
+        from eva.language.models.wrappers.from_registry import ModelFromRegistry
+
+        model = self.model.model if isinstance(self.model, ModelFromRegistry) else self.model
+        if hasattr(model, "configure_model"):
+            model.configure_model()  # type: ignore
+
+    @override
     def forward(self, batch: TextBatch, *args: Any, **kwargs: Any) -> ModelOutput:
         return self.model(batch)
 

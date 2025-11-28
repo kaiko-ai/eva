@@ -1,9 +1,12 @@
-"""Language model wrapper for vLLM."""
+"""Vision-language model wrapper for vLLM."""
 
-from typing import Any, Dict, List
+import os
+from typing import Any, Dict, List, Literal
 
-import torch
 from typing_extensions import override
+
+from eva.language.models.constants import MAX_NEW_TOKENS
+from eva.multimodal.utils.batch import unpack_batch
 
 try:
     from vllm import LLM, SamplingParams  # type: ignore
@@ -13,29 +16,31 @@ except ImportError as e:
         "Please install with: `pip install vllm`"
     ) from e
 
-import os
 
+import torch
+import torchvision.transforms.functional as F
 from loguru import logger
 from transformers import AutoTokenizer
 
-from eva.language.models.constants import MAX_NEW_TOKENS
-from eva.language.models.typings import ModelOutput, TextBatch
-from eva.language.models.wrappers import base
-from eva.language.utils.text import messages as message_utils
+from eva.language.models.typings import ModelOutput
+from eva.language.utils.text import messages as language_message_utils
+from eva.multimodal.models.typings import TextImageBatch
+from eva.multimodal.models.wrappers import base
+from eva.multimodal.utils.text import messages as message_utils
 
 
-class VllmModel(base.LanguageModel):
-    """Wrapper class for using vLLM for text generation.
+class VllmModel(base.VisionLanguageModel):
+    """Wrapper class for vision-language models using vLLM.
 
-    This wrapper loads a vLLM model, sets up the tokenizer and sampling
-    parameters, and uses a chat template to format inputs for generation.
+    This wrapper supports both text-only and multimodal (text + image) inputs.
+    It loads a vLLM model, sets up the tokenizer and sampling parameters,
+    and uses a chat template to format inputs for generation.
     """
 
     _default_model_kwargs = {
         "max_model_len": 32768,
         "gpu_memory_utilization": 0.95,
         "tensor_parallel_size": 1,
-        "dtype": "auto",
         "trust_remote_code": True,
     }
 
@@ -54,11 +59,12 @@ class VllmModel(base.LanguageModel):
         model_kwargs: Dict[str, Any] | None = None,
         system_prompt: str | None = None,
         generation_kwargs: Dict[str, Any] | None = None,
+        image_position: Literal["before_text", "after_text"] = "after_text",
     ) -> None:
         """Initializes the vLLM model wrapper.
 
         Args:
-            model_name_or_path: The model identifier - e.g., a HuggingFace repo ID or local path).
+            model_name_or_path: The model identifier (e.g., a HuggingFace repo ID or local path).
                 Note that the model must be compatible with vLLM.
             model_kwargs: Arguments required to initialize the vLLM model,
                 see [link](https://github.com/vllm-project/vllm/blob/main/vllm/entrypoints/llm.py)
@@ -66,9 +72,12 @@ class VllmModel(base.LanguageModel):
             system_prompt: System prompt to use.
             generation_kwargs: Arguments required to generate the output.
                 See [vllm.SamplingParams](https://github.com/vllm-project/vllm/blob/main/vllm/sampling_params.py).
+            image_position: Position of the image in the input sequence.
+
         """
         super().__init__(system_prompt=system_prompt)
         self.model_name_or_path = model_name_or_path
+        self.image_position: Literal["before_text", "after_text"] = image_position
         self.model_kwargs = self._default_model_kwargs | (model_kwargs or {})
         self.generation_kwargs = self._default_generation_kwargs | (generation_kwargs or {})
 
@@ -101,30 +110,42 @@ class VllmModel(base.LanguageModel):
         return tokenizer
 
     @override
-    def format_inputs(self, batch: TextBatch) -> List[Dict[str, Any]]:
+    def format_inputs(self, batch: TextImageBatch) -> List[Dict[str, Any]]:
         """Formats inputs for vLLM models.
 
         Args:
-            batch: A batch of text inputs.
+            batch: A batch of text and optional image inputs.
 
         Returns:
-            A list of input dictionaries with "prompt" key.
+            A list of input dictionaries with "prompt" key and optional
+            "multi_modal_data" key (when images are present).
         """
-        message_batch, _, _ = TextBatch(*batch)
-        message_batch = message_utils.batch_insert_system_message(
+        message_batch, image_batch, _, _ = unpack_batch(batch)
+        with_images = image_batch is not None
+
+        message_batch = language_message_utils.batch_insert_system_message(
             message_batch, self.system_message
         )
-        message_batch = list(map(message_utils.combine_system_messages, message_batch))
+        message_batch = list(map(language_message_utils.combine_system_messages, message_batch))
 
         input_dicts = []
-        for messages in message_batch:
-            formatted_messages = message_utils.format_chat_message(messages)
+        for messages, image in zip(
+            message_batch, image_batch or [None] * len(message_batch), strict=False
+        ):
+            formatted_messages = message_utils.format_huggingface_message(
+                messages,
+                with_images=with_images,
+                image_position=self.image_position,
+            )
             templated_messages = self.tokenizer.apply_chat_template(  # type: ignore
                 formatted_messages,
                 tokenize=False,
                 add_generation_prompt=True,
             )
-            input_dicts.append({"prompt": templated_messages})
+            input_dict: Dict[str, Any] = {"prompt": templated_messages}
+            if image is not None:
+                input_dict["multi_modal_data"] = {"image": F.to_pil_image(image)}
+            input_dicts.append(input_dict)
 
         return input_dicts
 
@@ -133,8 +154,8 @@ class VllmModel(base.LanguageModel):
         """Generates text using the vLLM model.
 
         Args:
-            batch: A list of input dictionaries containing "prompt" key
-                (output of `format_inputs`).
+            batch: A list of input dictionaries containing "prompt" and
+                optional "multi_modal_data" keys (output of `format_inputs`).
 
         Returns:
             ModelOutput containing the generated text responses.
