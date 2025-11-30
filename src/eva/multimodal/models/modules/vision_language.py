@@ -63,3 +63,11 @@ class VisionLanguageModule(module.ModelModule):
             "targets": targets,
             "metadata": metadata,
         } | output
+
+    @override
+    def configure_model(self) -> None:
+        model = (
+            self.model.model if isinstance(self.model, wrappers.ModelFromRegistry) else self.model
+        )
+        if hasattr(model, "configure_model"):
+            model.configure_model()  # type: ignore
