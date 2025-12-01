@@ -13,7 +13,7 @@
 | [BRACS](bracs.md)                  | 4539     | variable   | 40x (0.25)             | Classification (7 classes) | Breast           |
 | [BreakHis](breakhis.md)            | 1471     | 700x460    | 40x (0.25)             | Classification (4 classes) | Breast           |
 | [CRC](crc.md)                      | 107,180  | 224x224     | 20x (0.5)              | Classification (9 classes) | Colorectal       |
-| [GleasonArvaniti](crc.md)          | 22,752   | 750x750    | 40x (0.23)             | Classification (4 classes) | Prostate         |
+| [GleasonArvaniti](gleason_arvaniti.md)          | 22,752   | 750x750    | 40x (0.23)             | Classification (4 classes) | Prostate         |
 | [PatchCamelyon](patch_camelyon.md) | 327,680  | 96x96       | 10x (1.0) \*           | Classification (2 classes) | Breast           |
 | [MHIST](mhist.md)                  | 3,152    | 224x224     |  5x (2.0) \*           | Classification (2 classes) | Colorectal Polyp |
 | [UniToPatho](unitopatho.md)          | 8669     | 1812 x 1812 |  20x (0.4415)          | Classification (6 classes) | Colorectal Polyp |
