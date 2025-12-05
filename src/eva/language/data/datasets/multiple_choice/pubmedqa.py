@@ -164,7 +164,7 @@ class PubMedQA(base.TextClassification):
         sample = dict(self.dataset[index])
         prompt = self.prompt_template.render(
             question=sample["QUESTION"],
-            context=sample["CONTEXTS"],
+            context=list(sample["CONTEXTS"]),
             **self.prompt_render_kwargs,
         )
         return [UserMessage(content=prompt)]
