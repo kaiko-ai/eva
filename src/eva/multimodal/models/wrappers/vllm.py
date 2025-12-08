@@ -39,9 +39,10 @@ class VllmModel(base.VisionLanguageModel):
 
     _default_model_kwargs = {
         "max_model_len": 32768,
-        "gpu_memory_utilization": 0.95,
+        "gpu_memory_utilization": 0.9,
         "tensor_parallel_size": 1,
         "trust_remote_code": True,
+        "enforce_eager": True,  #  reduce start-up time & potential compilation issues
     }
 
     _default_generation_kwargs = {
