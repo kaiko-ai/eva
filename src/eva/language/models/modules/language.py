@@ -34,7 +34,7 @@ class LanguageModule(module.ModelModule):
 
     @override
     def configure_model(self) -> None:
-        model = self.model.model if hasattr(self.model, "model") else self.model
+        model = self.model.model if type(self.model).__name__ == "ModelFromRegistry" else self.model
         if hasattr(model, "configure_model"):
             model.configure_model()  # type: ignore
 
