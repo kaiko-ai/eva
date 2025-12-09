@@ -113,6 +113,7 @@ def test_huggingface_model_generation(
             model_class="AutoModelForCausalLM",
             generation_kwargs=generate_kwargs,
         )
+        model.configure_model()
 
         batch = TextBatch(text=[[UserMessage(content=prompt)]], target=None, metadata={})
         output1 = model(batch)
@@ -138,10 +139,11 @@ def test_huggingface_model_invalid_class():
         return_value=MagicMock(),
     ):
         with pytest.raises(ValueError, match="not found in transformers"):
-            HuggingFaceModel(
+            model = HuggingFaceModel(
                 model_name_or_path="some-model",
                 model_class="NonExistentModelClass",
             )
+            model.configure_model()
 
 
 def test_huggingface_model_no_generate_support(mock_processor):
@@ -160,7 +162,8 @@ def test_huggingface_model_no_generate_support(mock_processor):
         mock_transformers.AutoModelForCausalLM.from_pretrained.return_value = mock_model
 
         with pytest.raises(ValueError, match="does not support generation"):
-            HuggingFaceModel(
+            model = HuggingFaceModel(
                 model_name_or_path="some-model",
                 model_class="AutoModelForCausalLM",
             )
+            model.configure_model()

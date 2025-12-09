@@ -54,8 +54,15 @@ class HuggingFaceModel(base.LanguageModel):
         self._processor_kwargs = processor_kwargs or {}
         self._generation_kwargs = self._default_generation_kwargs | (generation_kwargs or {})
 
-        self.processor = self.load_processor()
-        self.model = self.load_model()
+        self.model: nn.Module
+        self.processor: Callable
+
+    def configure_model(self) -> None:
+        """Use configure_model hook to load model in lazy fashion."""
+        if not hasattr(self, "model"):
+            self.model = self.load_model()
+        if not hasattr(self, "processor"):
+            self.processor = self.load_processor()
 
     @override
     def load_model(self) -> nn.Module:

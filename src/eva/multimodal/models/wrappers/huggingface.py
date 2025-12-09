@@ -1,12 +1,13 @@
 """HuggingFace Vision-Language Model Wrapper."""
 
 import functools
-from typing import Any, Dict, Literal
+from typing import Any, Callable, Dict, Literal
 
 import torch
 from typing_extensions import override
 
 from eva.language.models import wrappers as language_wrappers
+from eva.language.models.constants import MAX_NEW_TOKENS
 from eva.language.models.typings import ModelOutput, TextBatch
 from eva.language.utils.text import messages as language_message_utils
 from eva.multimodal.models.typings import TextImageBatch
@@ -17,6 +18,14 @@ from eva.multimodal.utils.text import messages as message_utils
 
 class HuggingFaceModel(base.VisionLanguageModel):
     """Wrapper class for HuggingFace vision-language models."""
+
+    _default_generation_kwargs = {
+        "temperature": 0.0,
+        "max_new_tokens": MAX_NEW_TOKENS,
+        "do_sample": False,
+        "top_p": 1.0,
+    }
+    """Default HF model parameters for evaluation."""
 
     def __init__(
         self,
@@ -41,23 +50,38 @@ class HuggingFaceModel(base.VisionLanguageModel):
             image_key: The key used for image inputs in the chat template.
             image_position: Position of the image in the input sequence.
         """
-        super().__init__(system_prompt=system_prompt)
+        super().__init__(system_prompt=None)
 
-        self.image_key = image_key
-        self.image_position: Literal["before_text", "after_text"] = image_position
-        self.model_name_or_path = model_name_or_path
+        self._image_key = image_key
+        self._image_position: Literal["before_text", "after_text"] = image_position
+        self._model_name_or_path = model_name_or_path
+        self._model_class = model_class
+        self._model_kwargs = model_kwargs or {}
+        self._processor_kwargs = processor_kwargs or {}
+        self._generation_kwargs = self._default_generation_kwargs | (generation_kwargs or {})
+        self._system_prompt = system_prompt
 
-        self._language_model = language_wrappers.HuggingFaceModel(
-            model_name_or_path=model_name_or_path,
-            model_class=model_class,
-            model_kwargs=model_kwargs,
-            system_prompt=system_prompt,
-            processor_kwargs=processor_kwargs,
-            generation_kwargs=generation_kwargs,
+        self.model: language_wrappers.HuggingFaceModel
+        self.processor: Callable
+
+    def configure_model(self) -> None:
+        """Use configure_model hook to load model in lazy fashion."""
+        if not hasattr(self, "model"):
+            self.model = self.load_model()
+            self.model.configure_model()
+        if not hasattr(self, "processor"):
+            self.processor = self.model.processor
+
+    @override
+    def load_model(self) -> language_wrappers.HuggingFaceModel:
+        return language_wrappers.HuggingFaceModel(
+            model_name_or_path=self._model_name_or_path,
+            model_class=self._model_class,
+            model_kwargs=self._model_kwargs,
+            system_prompt=self._system_prompt,
+            processor_kwargs=self._processor_kwargs,
+            generation_kwargs=self._generation_kwargs,
         )
-
-        self.processor = self._language_model.processor
-        self.model = self._language_model.model
 
     @override
     def format_inputs(self, batch: TextImageBatch | TextBatch) -> Dict[str, torch.Tensor]:
@@ -93,7 +117,7 @@ class HuggingFaceModel(base.VisionLanguageModel):
                     functools.partial(
                         message_utils.format_huggingface_message,
                         with_images=with_images,
-                        image_position=self.image_position,
+                        image_position=self._image_position,
                     ),
                     message_batch,
                 )
@@ -107,9 +131,9 @@ class HuggingFaceModel(base.VisionLanguageModel):
         }
 
         if with_images:
-            processor_inputs[self.image_key] = [[image] for image in image_batch]
+            processor_inputs[self._image_key] = [[image] for image in image_batch]
 
-        return self.processor(**processor_inputs).to(self.model.device)  # type: ignore
+        return self.processor(**processor_inputs).to(self.model.model.device)  # type: ignore
 
     @override
     def model_forward(self, batch: Dict[str, torch.Tensor]) -> ModelOutput:
@@ -121,4 +145,4 @@ class HuggingFaceModel(base.VisionLanguageModel):
         Returns:
             The model output containing generated text.
         """
-        return self._language_model.model_forward(batch)
+        return self.model.model_forward(batch)

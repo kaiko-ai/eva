@@ -48,6 +48,7 @@ def test_huggingface_model_generation(model_name: str, model_class: str, with_im
             model_class=model_class,
             generation_kwargs={"max_new_tokens": 50},
         )
+        model.configure_model()
 
         # Always create an image tensor, even if not used
         image = tv_tensors.Image(torch.rand(3, 224, 224))
@@ -98,6 +99,7 @@ def test_format_inputs_with_image():
             model_name_or_path="test-model",
             model_class="LlavaForConditionalGeneration",
         )
+        model.configure_model()
 
         image = tv_tensors.Image(torch.rand(3, 224, 224))
         batch = TextImageBatch(
@@ -140,13 +142,12 @@ def test_decode_ids():
             model_name_or_path="test-model",
             model_class="LlavaForConditionalGeneration",
         )
+        model.configure_model()
 
         output = torch.tensor([[1, 2, 3, 4, 5, 6]])
         instruction_length = 3
 
-        decoded_input, decoded_output = model._language_model._decode_ids(
-            output, instruction_length
-        )
+        decoded_input, decoded_output = model.model._decode_ids(output, instruction_length)
 
         assert decoded_input == ["Input text"]
         assert decoded_output == ["Output text"]
