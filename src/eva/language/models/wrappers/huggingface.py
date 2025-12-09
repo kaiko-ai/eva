@@ -97,6 +97,9 @@ class HuggingFaceModel(base.LanguageModel):
         # To ensure correct generation with batched inputs of different lengths
         if "CausalLM" in self._model_class or "ConditionalGeneration" in self._model_class:
             processor.padding_side = "left"
+        # Some older models don't have a padding token by default
+        if hasattr(processor, "pad_token") and processor.pad_token is None:
+            processor.pad_token = processor.eos_token
         return processor
 
     @override

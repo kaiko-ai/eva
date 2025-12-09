@@ -128,6 +128,7 @@ class HuggingFaceModel(base.VisionLanguageModel):
         processor_inputs: Dict[str, Any] = {
             "text": templated_text,
             "return_tensors": "pt",
+            **self._processor_kwargs,
         }
 
         if with_images:
