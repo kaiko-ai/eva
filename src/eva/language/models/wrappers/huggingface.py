@@ -142,6 +142,7 @@ class HuggingFaceModel(base.LanguageModel):
             "text": templated_text,
             "return_tensors": "pt",
             "padding": True,
+            **self._processor_kwargs,
         }
 
         return self.processor(**processor_inputs).to(self.model.device)  # type: ignore
