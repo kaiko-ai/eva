@@ -1,8 +1,11 @@
 """LLM wrapper for HuggingFace `transformers` models."""
 
-from typing import Any, Callable, Dict, List, Literal
+from typing import Any, Callable, Dict, List, Tuple
 
-from transformers.pipelines import pipeline
+import torch
+import transformers
+from loguru import logger
+from torch import nn
 from typing_extensions import override
 
 from eva.language.models.constants import MAX_NEW_TOKENS
@@ -12,7 +15,7 @@ from eva.language.utils.text import messages as message_utils
 
 
 class HuggingFaceModel(base.LanguageModel):
-    """Wrapper class for loading HuggingFace `transformers` models using pipelines."""
+    """Wrapper class for loading HuggingFace `transformers` models."""
 
     _default_generation_kwargs = {
         "temperature": 0.0,
@@ -25,11 +28,11 @@ class HuggingFaceModel(base.LanguageModel):
     def __init__(
         self,
         model_name_or_path: str,
-        task: Literal["text-generation"] = "text-generation",
+        model_class: str,
         model_kwargs: Dict[str, Any] | None = None,
         system_prompt: str | None = None,
+        processor_kwargs: Dict[str, Any] | None = None,
         generation_kwargs: Dict[str, Any] | None = None,
-        chat_mode: bool = True,
     ) -> None:
         """Initializes the model.
 
@@ -37,36 +40,70 @@ class HuggingFaceModel(base.LanguageModel):
             model_name_or_path: The model name or path to load the model from.
                 This can be a local path or a model name from the `HuggingFace`
                 model hub.
-            task: The pipeline task. Defaults to "text-generation".
-            model_kwargs: Additional arguments for configuring the pipeline.
+            model_class: The class of the model to use (e.g., "AutoModelForCausalLM").
+            model_kwargs: Additional arguments for configuring the model.
             system_prompt: System prompt to use.
+            processor_kwargs: Additional processor/tokenizer arguments.
             generation_kwargs: Additional generation parameters (temperature, max_length, etc.).
-            chat_mode: Whether the specified model expects chat style messages. If set to False
-                the model is assumed to be a standard text completion model and will expect
-                plain text string inputs.
         """
         super().__init__(system_prompt=system_prompt)
 
         self._model_name_or_path = model_name_or_path
-        self._task = task
+        self._model_class = model_class
         self._model_kwargs = model_kwargs or {}
+        self._processor_kwargs = processor_kwargs or {}
         self._generation_kwargs = self._default_generation_kwargs | (generation_kwargs or {})
-        self._chat_mode = chat_mode
 
-        self.model = self.load_model()
+        self.model: nn.Module
+        self.processor: Callable
+
+    def configure_model(self) -> None:
+        """Use configure_model hook to load model in lazy fashion."""
+        if not hasattr(self, "model"):
+            self.model = self.load_model()
+        if not hasattr(self, "processor"):
+            self.processor = self.load_processor()
 
     @override
-    def load_model(self) -> Callable:
-        """Loads the model as a Hugging Face pipeline."""
-        return pipeline(
-            task=self._task,
-            model=self._model_name_or_path,
-            trust_remote_code=True,
-            **self._model_kwargs,
+    def load_model(self) -> nn.Module:
+        """Loads the model from HuggingFace.
+
+        Raises:
+            ValueError: If the model class is not found in transformers or if the model
+                does not support generation.
+        """
+        logger.info(f"Configuring model: {self._model_name_or_path}")
+        if hasattr(transformers, self._model_class):
+            model_class = getattr(transformers, self._model_class)
+        else:
+            raise ValueError(f"Model class {self._model_class} not found in transformers")
+
+        model = model_class.from_pretrained(self._model_name_or_path, **self._model_kwargs)
+
+        if not hasattr(model, "generate"):
+            raise ValueError(f"Model {self._model_name_or_path} does not support generation.")
+
+        return model
+
+    def load_processor(self) -> Callable:
+        """Initialize the processor.
+
+        Note: For text-only models, AutoProcessor returns the tokenizer.
+        """
+        processor = transformers.AutoProcessor.from_pretrained(
+            self._processor_kwargs.pop("model_name_or_path", self._model_name_or_path),
+            **self._processor_kwargs,
         )
+        # To ensure correct generation with batched inputs of different lengths
+        if "CausalLM" in self._model_class or "ConditionalGeneration" in self._model_class:
+            processor.padding_side = "left"
+        # Some older models don't have a padding token by default
+        if hasattr(processor, "pad_token") and processor.pad_token is None:
+            processor.pad_token = processor.eos_token
+        return processor
 
     @override
-    def format_inputs(self, batch: TextBatch) -> List[List[Dict[str, Any]]] | List[str]:
+    def format_inputs(self, batch: TextBatch) -> Dict[str, torch.Tensor]:
         """Formats inputs for HuggingFace models.
 
         Note: If multiple system messages are present, they will be combined
@@ -74,12 +111,14 @@ class HuggingFaceModel(base.LanguageModel):
         system prompt.
 
         Args:
-            batch: A batch of text and image inputs.
+            batch: A batch of text inputs.
 
         Returns:
-            When in chat mode, returns a batch of message series following
-            OpenAI's API format {"role": "user", "content": "..."}, for non-chat
-            models returns a list of plain text strings.
+            A dictionary produced by the tokenizer following a format like:
+            {
+                "input_ids": ...,
+                "attention_mask": ...,
+            }
         """
         message_batch, _, _ = TextBatch(*batch)
         message_batch = message_utils.batch_insert_system_message(
@@ -87,30 +126,67 @@ class HuggingFaceModel(base.LanguageModel):
         )
         message_batch = list(map(message_utils.combine_system_messages, message_batch))
 
-        if self._chat_mode:
-            return list(map(message_utils.format_chat_message, message_batch))
+        if self.processor.chat_template is not None:  # type: ignore
+            templated_text = [
+                self.processor.apply_chat_template(  # type: ignore
+                    message_utils.format_chat_message(message),
+                    add_generation_prompt=True,
+                    tokenize=False,
+                )
+                for message in message_batch
+            ]
         else:
-            return list(map(message_utils.merge_message_contents, message_batch))
+            templated_text = list(map(message_utils.merge_message_contents, message_batch))
+
+        processor_inputs = {
+            "text": templated_text,
+            "return_tensors": "pt",
+            "padding": True,
+            **self._processor_kwargs,
+        }
+
+        return self.processor(**processor_inputs).to(self.model.device)  # type: ignore
 
     @override
-    def model_forward(self, prompts: List[str]) -> ModelOutput:
-        """Generates text using the pipeline.
+    def model_forward(self, batch: Dict[str, torch.Tensor]) -> ModelOutput:
+        """Generates text using the model.
 
         Args:
-            prompts: The input prompts for the model.
+            batch: A dictionary containing the tokenized input data.
 
         Returns:
-            The generated text as a string.
+            The model output containing generated text.
         """
-        outputs = self.model(prompts, return_full_text=False, **self._generation_kwargs)
-        if outputs is None:
-            raise ValueError("Outputs from the model are None.")
+        output_ids = self.model.generate(**batch, **self._generation_kwargs)  # type: ignore
+        decoded_input, decoded_output = self._decode_ids(output_ids, batch["input_ids"].shape[-1])
 
-        results = []
-        for output in outputs:
-            if isinstance(output, list):
-                results.append(output[0]["generated_text"])  # type: ignore
-            else:
-                results.append(output["generated_text"])  # type: ignore
+        return ModelOutput(
+            generated_text=decoded_output,
+            input_text=decoded_input,
+            output_ids=output_ids,
+            attention_mask=batch.get("attention_mask"),
+        )
 
-        return ModelOutput(generated_text=results)
+    def _decode_ids(
+        self, output: torch.Tensor, instruction_length: int
+    ) -> Tuple[List[str], List[str]]:
+        """Decode the model's batch input and output to text.
+
+        Args:
+            output: The raw output from the model.
+            instruction_length: The length of the instruction in the input.
+
+        Returns:
+            A tuple containing two lists, the decoded input and output texts.
+        """
+        decoded_input = self.processor.batch_decode(  # type: ignore
+            output[:, :instruction_length], skip_special_tokens=False
+        )
+        decoded_output = self.processor.batch_decode(  # type: ignore
+            output[:, instruction_length:], skip_special_tokens=True
+        )
+
+        logger.debug(f"Decoded input: {decoded_input}")
+        logger.debug(f"Decoded output: {decoded_output}")
+
+        return decoded_input, decoded_output

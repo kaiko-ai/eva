@@ -34,14 +34,21 @@ def test_huggingface_model_generation(model_name: str, model_class: str, with_im
     mock_model.generate.return_value = torch.tensor([[1, 2, 3, 4, 5]])
 
     with (
-        patch("transformers.AutoProcessor.from_pretrained", return_value=mock_processor),
-        patch(f"transformers.{model_class}.from_pretrained", return_value=mock_model),
+        patch(
+            "eva.language.models.wrappers.huggingface.transformers.AutoProcessor.from_pretrained",
+            return_value=mock_processor,
+        ),
+        patch("eva.language.models.wrappers.huggingface.transformers") as mock_transformers,
     ):
+        mock_transformers.AutoProcessor.from_pretrained.return_value = mock_processor
+        setattr(mock_transformers, model_class, MagicMock())
+        getattr(mock_transformers, model_class).from_pretrained.return_value = mock_model
         model = HuggingFaceModel(
             model_name_or_path=model_name,
             model_class=model_class,
             generation_kwargs={"max_new_tokens": 50},
         )
+        model.configure_model()
 
         # Always create an image tensor, even if not used
         image = tv_tensors.Image(torch.rand(3, 224, 224))
@@ -56,7 +63,6 @@ def test_huggingface_model_generation(model_name: str, model_class: str, with_im
         assert isinstance(result, dict)
         assert "generated_text" in result
         assert "input_text" in result
-        assert "input_ids" in result
         assert "output_ids" in result
         assert "attention_mask" in result
         assert result["generated_text"] == ["Generated response"]
@@ -79,15 +85,21 @@ def test_format_inputs_with_image():
     mock_model.device = torch.device("cpu")
 
     with (
-        patch("transformers.AutoProcessor.from_pretrained", return_value=mock_processor),
         patch(
-            "transformers.LlavaForConditionalGeneration.from_pretrained", return_value=mock_model
+            "eva.language.models.wrappers.huggingface.transformers.AutoProcessor.from_pretrained",
+            return_value=mock_processor,
         ),
+        patch("eva.language.models.wrappers.huggingface.transformers") as mock_transformers,
     ):
+        mock_transformers.AutoProcessor.from_pretrained.return_value = mock_processor
+        mock_transformers.LlavaForConditionalGeneration = MagicMock()
+        mock_transformers.LlavaForConditionalGeneration.from_pretrained.return_value = mock_model
+
         model = HuggingFaceModel(
             model_name_or_path="test-model",
             model_class="LlavaForConditionalGeneration",
         )
+        model.configure_model()
 
         image = tv_tensors.Image(torch.rand(3, 224, 224))
         batch = TextImageBatch(
@@ -116,20 +128,26 @@ def test_decode_ids():
     mock_model.device = torch.device("cpu")
 
     with (
-        patch("transformers.AutoProcessor.from_pretrained", return_value=mock_processor),
         patch(
-            "transformers.LlavaForConditionalGeneration.from_pretrained", return_value=mock_model
+            "eva.language.models.wrappers.huggingface.transformers.AutoProcessor.from_pretrained",
+            return_value=mock_processor,
         ),
+        patch("eva.language.models.wrappers.huggingface.transformers") as mock_transformers,
     ):
+        mock_transformers.AutoProcessor.from_pretrained.return_value = mock_processor
+        mock_transformers.LlavaForConditionalGeneration = MagicMock()
+        mock_transformers.LlavaForConditionalGeneration.from_pretrained.return_value = mock_model
+
         model = HuggingFaceModel(
             model_name_or_path="test-model",
             model_class="LlavaForConditionalGeneration",
         )
+        model.configure_model()
 
         output = torch.tensor([[1, 2, 3, 4, 5, 6]])
         instruction_length = 3
 
-        decoded_input, decoded_output = model._decode_ids(output, instruction_length)
+        decoded_input, decoded_output = model.model._decode_ids(output, instruction_length)
 
         assert decoded_input == ["Input text"]
         assert decoded_output == ["Output text"]
