@@ -13,7 +13,7 @@ def unpack_batch(
     batch: TextImageBatch | TextBatch,
 ) -> Tuple[
     List[MessageSeries],
-    List[tv_tensors.Image] | None,
+    List[List[tv_tensors.Image]] | None,
     Any,
     Dict[str, Any] | None,
 ]:
