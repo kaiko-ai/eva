@@ -45,8 +45,6 @@ class ModelFromRegistry(base.BaseModel[TextImageBatch, List[str]]):
 
     @override
     def load_model(self) -> nn.Module:
-        ModelFromRegistry.__name__ = self._model_name
-
         return factory.ModuleFactory(
             registry=model_registry,
             name=self._model_name,
