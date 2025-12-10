@@ -93,8 +93,8 @@ class PatchCamelyon(TextImageDataset[int], vision_datasets.PatchCamelyon):
         return [UserMessage(content=self.prompt)]
 
     @override
-    def load_image(self, index: int) -> tv_tensors.Image:
-        return vision_datasets.PatchCamelyon.load_data(self, index)
+    def load_images(self, index: int) -> list[tv_tensors.Image]:
+        return [vision_datasets.PatchCamelyon.load_data(self, index)]
 
     @override
     def load_target(self, index: int) -> int:

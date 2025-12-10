@@ -12,20 +12,20 @@ from eva.vision.utils import image as image_utils
 
 def format_huggingface_message(
     message: MessageSeries,
-    with_images: bool = False,
+    images: List[tv_tensors.Image] | None = None,
     image_position: Literal["before_text", "after_text"] = "after_text",
 ) -> List[Dict[str, Any]]:
     """Formats a message series into a format suitable for Huggingface models.
 
     Args:
         message: The message series to format.
-        with_images: Whether to include images in the formatted message.
-        image_position: Position of image relative to text, either "before_text" or "after_text".
+        images: List of images to include in the formatted message, or None for text-only.
+        image_position: Position of images relative to text, either "before_text" or "after_text".
 
     Returns:
         A list of formatted message dictionaries.
     """
-    if not with_images:
+    if not images:
         return language_utils.format_chat_message(message)
 
     formatted_message = []
@@ -33,13 +33,13 @@ def format_huggingface_message(
         if item.role == Role.SYSTEM:
             formatted_message += language_utils.format_chat_message([item])
         else:
-            image_content = {"type": "image"}
+            image_contents = [{"type": "image"} for _ in images]
             text_content = {"type": "text", "text": str(item.content)}
 
             if image_position == "before_text":
-                content = [image_content, text_content]
+                content = image_contents + [text_content]
             elif image_position == "after_text":
-                content = [text_content, image_content]
+                content = [text_content] + image_contents
             else:
                 raise ValueError(f"Invalid image_position: {image_position}")
 
@@ -54,7 +54,7 @@ def format_huggingface_message(
 
 def format_litellm_message(
     message: MessageSeries,
-    image: tv_tensors.Image | None,
+    images: List[tv_tensors.Image] | None,
     image_format: Literal["png", "jpeg"] = "jpeg",
     image_position: Literal["before_text", "after_text"] = "after_text",
 ) -> List[Dict[str, Any]]:
@@ -62,14 +62,14 @@ def format_litellm_message(
 
     Args:
         message: The message series to format.
-        image: Optional image to include in the message.
+        images: List of images to include in the message, or None for text-only.
         image_format: The image format to use for encoding, either "png" or "jpeg".
-        image_position: Position of image relative to text, either "before_text" or "after_text".
+        image_position: Position of images relative to text, either "before_text" or "after_text".
 
     Returns:
         A list of formatted message dictionaries.
     """
-    if image is None:
+    if not images:
         return language_utils.format_chat_message(message)
     image_format = os.getenv("ENCODE_IMAGE_FORMAT", image_format).lower()  # type: ignore
 
@@ -79,20 +79,23 @@ def format_litellm_message(
             formatted_message += language_utils.format_chat_message([item])
         else:
             text_content = {"type": "text", "text": str(item.content)}
-            image_content = {
-                "type": "image_url",
-                "image_url": {
-                    "url": (
-                        f"data:image/{image_format};base64,"
-                        f"{image_utils.encode_image(image, encoding='base64', file_format=image_format)}"  # noqa: E501
-                    )
-                },
-            }
+            image_contents = [
+                {
+                    "type": "image_url",
+                    "image_url": {
+                        "url": (
+                            f"data:image/{image_format};base64,"
+                            f"{image_utils.encode_image(img, encoding='base64', file_format=image_format)}"  # noqa: E501
+                        )
+                    },
+                }
+                for img in images
+            ]
 
             if image_position == "before_text":
-                content = [image_content, text_content]
+                content = image_contents + [text_content]
             elif image_position == "after_text":
-                content = [text_content, image_content]
+                content = [text_content] + image_contents
             else:
                 raise ValueError(f"Invalid image_position: {image_position}")
 
