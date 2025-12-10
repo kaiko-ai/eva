@@ -15,7 +15,7 @@ def test_generate_with_image(model_instance, sample_image):
     """Test that the generate method works with image input."""
     batch = TextImageBatch(
         text=[[UserMessage(content="What's in this image?")]],
-        image=[sample_image],
+        images=[[sample_image]],
         target=None,
         metadata={},
     )
@@ -29,7 +29,7 @@ def test_generate_without_image(model_instance):
     dummy_image = tv_tensors.Image(torch.zeros(3, 1, 1))
     batch = TextImageBatch(
         text=[[UserMessage(content="Hello, world!")]],
-        image=[dummy_image],
+        images=[[dummy_image]],
         target=None,
         metadata={},
     )
@@ -41,7 +41,7 @@ def test_format_inputs_with_image(model_instance, sample_image):
     """Test format_inputs properly formats messages with images."""
     batch = TextImageBatch(
         text=[[UserMessage(content="Describe this")]],
-        image=[sample_image],
+        images=[[sample_image]],
         target=None,
         metadata={},
     )

@@ -54,7 +54,7 @@ def test_huggingface_model_generation(model_name: str, model_class: str, with_im
         image = tv_tensors.Image(torch.rand(3, 224, 224))
         batch = TextImageBatch(
             text=[[UserMessage(content="Describe this")]],
-            image=[image],
+            images=[[image]],
             target=None,
             metadata={},
         )
@@ -104,7 +104,7 @@ def test_format_inputs_with_image():
         image = tv_tensors.Image(torch.rand(3, 224, 224))
         batch = TextImageBatch(
             text=[[UserMessage(content="Test")]],
-            image=[image],
+            images=[[image]],
             target=None,
             metadata={},
         )

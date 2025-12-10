@@ -19,7 +19,7 @@ def test_forward(vision_language_module):
     text: list[MessageSeries] = [[UserMessage(content="Hello world")]]
     batch = TextImageBatch(
         text=text,
-        image=[tv_tensors.Image(torch.rand(3, 224, 224))],
+        images=[[tv_tensors.Image(torch.rand(3, 224, 224))]],
         target=torch.tensor([0]),
         metadata={"id": [1]},
     )
@@ -32,10 +32,10 @@ def test_forward(vision_language_module):
 def test_validation_step(vision_language_module):
     """Test the validation_step method of the VisionLanguageModule class."""
     text: list[MessageSeries] = [[UserMessage(content="What is in the image?")]]
-    images = [tv_tensors.Image(torch.rand(3, 224, 224))]
+    images = [[tv_tensors.Image(torch.rand(3, 224, 224))]]
     targets = torch.tensor([1])
     metadata = {"id": [1], "category": ["test"]}
-    batch = TextImageBatch(text=text, image=images, target=targets, metadata=metadata)
+    batch = TextImageBatch(text=text, images=images, target=targets, metadata=metadata)
 
     output = vision_language_module.validation_step(batch)
 
@@ -56,12 +56,12 @@ def test_test_step(vision_language_module):
         [UserMessage(content="What do you see?")],
     ]
     images = [
-        tv_tensors.Image(torch.rand(3, 224, 224)),
-        tv_tensors.Image(torch.rand(3, 224, 224)),
+        [tv_tensors.Image(torch.rand(3, 224, 224))],
+        [tv_tensors.Image(torch.rand(3, 224, 224))],
     ]
     targets = torch.tensor([0, 1])
     metadata = {"id": [1, 2]}
-    batch = TextImageBatch(text=text, image=images, target=targets, metadata=metadata)
+    batch = TextImageBatch(text=text, images=images, target=targets, metadata=metadata)
 
     output = vision_language_module.test_step(batch)
 
@@ -86,8 +86,8 @@ def test_init_attributes(model):
 def test_batch_step_without_targets(vision_language_module):
     """Test the _batch_step method with None targets."""
     text: list[MessageSeries] = [[UserMessage(content="Test message")]]
-    images = [tv_tensors.Image(torch.rand(3, 224, 224))]
-    batch = TextImageBatch(text=text, image=images, target=None, metadata=None)
+    images = [[tv_tensors.Image(torch.rand(3, 224, 224))]]
+    batch = TextImageBatch(text=text, images=images, target=None, metadata=None)
 
     output = vision_language_module.validation_step(batch)
 
