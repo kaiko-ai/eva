@@ -12,14 +12,14 @@ from eva.vision.utils import image as image_utils
 
 def format_huggingface_message(
     message: MessageSeries,
-    images: List[tv_tensors.Image] | None = None,
+    images: List[tv_tensors.Image] | None,
     image_position: Literal["before_text", "after_text"] = "after_text",
 ) -> List[Dict[str, Any]]:
     """Formats a message series into a format suitable for Huggingface models.
 
     Args:
         message: The message series to format.
-        images: List of images to include in the formatted message, or None for text-only.
+        images: List of images to include in the message, or None for text-only.
         image_position: Position of images relative to text, either "before_text" or "after_text".
 
     Returns:
