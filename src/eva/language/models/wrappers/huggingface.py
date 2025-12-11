@@ -48,11 +48,11 @@ class HuggingFaceModel(base.LanguageModel):
         """
         super().__init__(system_prompt=system_prompt)
 
-        self._model_name_or_path = model_name_or_path
-        self._model_class = model_class
-        self._model_kwargs = model_kwargs or {}
-        self._processor_kwargs = processor_kwargs or {}
-        self._generation_kwargs = self._default_generation_kwargs | (generation_kwargs or {})
+        self.model_name_or_path = model_name_or_path
+        self.model_class = model_class
+        self.model_kwargs = model_kwargs or {}
+        self.processor_kwargs = processor_kwargs or {}
+        self.generation_kwargs = self._default_generation_kwargs | (generation_kwargs or {})
 
         self.model: nn.Module
         self.processor: Callable
@@ -72,16 +72,16 @@ class HuggingFaceModel(base.LanguageModel):
             ValueError: If the model class is not found in transformers or if the model
                 does not support generation.
         """
-        logger.info(f"Configuring model: {self._model_name_or_path}")
-        if hasattr(transformers, self._model_class):
-            model_class = getattr(transformers, self._model_class)
+        logger.info(f"Configuring model: {self.model_name_or_path}")
+        if hasattr(transformers, self.model_class):
+            model_class = getattr(transformers, self.model_class)
         else:
-            raise ValueError(f"Model class {self._model_class} not found in transformers")
+            raise ValueError(f"Model class {self.model_class} not found in transformers")
 
-        model = model_class.from_pretrained(self._model_name_or_path, **self._model_kwargs)
+        model = model_class.from_pretrained(self.model_name_or_path, **self.model_kwargs)
 
         if not hasattr(model, "generate"):
-            raise ValueError(f"Model {self._model_name_or_path} does not support generation.")
+            raise ValueError(f"Model {self.model_name_or_path} does not support generation.")
 
         return model
 
@@ -91,11 +91,11 @@ class HuggingFaceModel(base.LanguageModel):
         Note: For text-only models, AutoProcessor returns the tokenizer.
         """
         processor = transformers.AutoProcessor.from_pretrained(
-            self._processor_kwargs.pop("model_name_or_path", self._model_name_or_path),
-            **self._processor_kwargs,
+            self.processor_kwargs.pop("model_name_or_path", self.model_name_or_path),
+            **self.processor_kwargs,
         )
         # To ensure correct generation with batched inputs of different lengths
-        if "CausalLM" in self._model_class or "ConditionalGeneration" in self._model_class:
+        if "CausalLM" in self.model_class or "ConditionalGeneration" in self.model_class:
             processor.padding_side = "left"
         # Some older models don't have a padding token by default
         if hasattr(processor, "pad_token") and processor.pad_token is None:
@@ -142,7 +142,7 @@ class HuggingFaceModel(base.LanguageModel):
             "text": templated_text,
             "return_tensors": "pt",
             "padding": True,
-            **self._processor_kwargs,
+            **self.processor_kwargs,
         }
 
         return self.processor(**processor_inputs).to(self.model.device)  # type: ignore
@@ -157,7 +157,7 @@ class HuggingFaceModel(base.LanguageModel):
         Returns:
             The model output containing generated text.
         """
-        output_ids = self.model.generate(**batch, **self._generation_kwargs)  # type: ignore
+        output_ids = self.model.generate(**batch, **self.generation_kwargs)  # type: ignore
         decoded_input, decoded_output = self._decode_ids(output_ids, batch["input_ids"].shape[-1])
 
         return ModelOutput(
