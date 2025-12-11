@@ -72,6 +72,8 @@ class HuggingFaceModel(base.LanguageModel):
             ValueError: If the model class is not found in transformers or if the model
                 does not support generation.
         """
+        import transformers
+
         logger.info(f"Configuring model: {self.model_name_or_path}")
         if hasattr(transformers, self.model_class):
             model_class = getattr(transformers, self.model_class)
