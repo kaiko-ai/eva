@@ -150,17 +150,15 @@ def test_huggingface_model_no_generate_support(mock_processor):
     """Test that a model without generate method raises ValueError."""
     mock_model = MagicMock(spec=[])  # Model without generate attribute
 
-    with (
-        patch(
-            "eva.language.models.wrappers.huggingface.transformers.AutoProcessor.from_pretrained",
-            return_value=mock_processor,
-        ),
-        patch("eva.language.models.wrappers.huggingface.transformers") as mock_transformers,
-    ):
-        mock_transformers.AutoProcessor.from_pretrained.return_value = mock_processor
-        mock_transformers.AutoModelForCausalLM = MagicMock()
-        mock_transformers.AutoModelForCausalLM.from_pretrained.return_value = mock_model
+    mock_transformers = MagicMock()
+    mock_transformers.AutoProcessor.from_pretrained.return_value = mock_processor
+    mock_transformers.AutoModelForCausalLM = MagicMock()
+    mock_transformers.AutoModelForCausalLM.from_pretrained.return_value = mock_model
 
+    with (
+        patch.dict("sys.modules", {"transformers": mock_transformers}),
+        patch("eva.language.models.wrappers.huggingface.transformers", mock_transformers),
+    ):
         with pytest.raises(ValueError, match="does not support generation"):
             model = HuggingFaceModel(
                 model_name_or_path="some-model",

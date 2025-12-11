@@ -75,7 +75,7 @@ if import_utils.is_vllm_available():
                 model_name_or_path="Qwen/Qwen2.5-VL-72B-Instruct",
                 model_kwargs={
                     "tensor_parallel_size": int(os.getenv("VLLM_TENSOR_PARALLEL_SIZE", 4)),
-                    "max_num_seqs": 16,
+                    "max_num_seqs": 8,
                 },
                 image_position="before_text",
                 system_prompt=system_prompt,
