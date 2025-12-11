@@ -59,6 +59,7 @@ class HuggingFaceModel(base.LanguageModel):
 
     def configure_model(self) -> None:
         """Use configure_model hook to load model in lazy fashion."""
+        logger.info(f"Configuring model: {self.model_name_or_path}")
         if not hasattr(self, "model"):
             self.model = self.load_model()
         if not hasattr(self, "processor"):
@@ -72,9 +73,8 @@ class HuggingFaceModel(base.LanguageModel):
             ValueError: If the model class is not found in transformers or if the model
                 does not support generation.
         """
-        import transformers
+        import transformers  # Reimport here, in case module was modified at runtime by user
 
-        logger.info(f"Configuring model: {self.model_name_or_path}")
         if hasattr(transformers, self.model_class):
             model_class = getattr(transformers, self.model_class)
         else:
