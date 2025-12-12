@@ -22,7 +22,7 @@ def text_image_collate(batch: List[TextImageSample]) -> TextImageBatch:
 
     return TextImageBatch(
         text=list(texts),
-        image=list(images),
+        images=list(images),
         target=default_collate(targets) if targets[0] is not None else None,
         metadata=metadata,
     )

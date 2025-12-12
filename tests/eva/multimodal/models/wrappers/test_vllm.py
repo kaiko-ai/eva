@@ -133,7 +133,7 @@ def test_format_inputs_with_image(model_instance, sample_image):
     """Test format_inputs properly formats messages with images."""
     batch = TextImageBatch(
         text=[[UserMessage(content="Describe this")]],
-        image=[sample_image],
+        images=[[sample_image]],
         target=None,
         metadata={},
     )
@@ -151,7 +151,7 @@ def test_format_inputs_without_image(model_instance):
     """Test format_inputs properly formats messages without images."""
     batch = TextImageBatch(
         text=[[UserMessage(content="Hello, world!")]],
-        image=None,  # type: ignore[arg-type]
+        images=None,  # type: ignore[arg-type]
         target=None,
         metadata={},
     )
@@ -172,7 +172,7 @@ def test_format_inputs_batch(model_instance, sample_image):
             [UserMessage(content="First image")],
             [UserMessage(content="Second image")],
         ],
-        image=[sample_image, image2],
+        images=[[sample_image], [image2]],
         target=None,
         metadata={},
     )
@@ -215,7 +215,7 @@ def test_generate_with_image(mock_llm, mock_tokenizer, sample_image):
 
         batch = TextImageBatch(
             text=[[UserMessage(content="What's in this image?")]],
-            image=[sample_image],
+            images=[[sample_image]],
             target=None,
             metadata={},
         )

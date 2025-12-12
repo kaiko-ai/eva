@@ -1,6 +1,5 @@
 """HuggingFace Vision-Language Model Wrapper."""
 
-import functools
 from typing import Any, Callable, Dict, Literal
 
 import torch
@@ -99,28 +98,27 @@ class HuggingFaceModel(base.VisionLanguageModel):
             }
         """
         message_batch, image_batch, _, _ = unpack_batch(batch)
-        with_images = image_batch is not None
 
         message_batch = language_message_utils.batch_insert_system_message(
             message_batch, self.system_message
         )
         message_batch = list(map(language_message_utils.combine_system_messages, message_batch))
 
+        if image_batch is None:
+            image_batch = [None] * len(message_batch)
+
         if self.processor.chat_template is not None:  # type: ignore
             templated_text = [
                 self.processor.apply_chat_template(  # type: ignore
-                    message,
+                    message_utils.format_huggingface_message(
+                        message,
+                        images=images,
+                        image_position=self.image_position,
+                    ),
                     add_generation_prompt=True,
                     tokenize=False,
                 )
-                for message in map(
-                    functools.partial(
-                        message_utils.format_huggingface_message,
-                        with_images=with_images,
-                        image_position=self.image_position,
-                    ),
-                    message_batch,
-                )
+                for message, images in zip(message_batch, image_batch, strict=True)
             ]
         else:
             raise NotImplementedError("Currently only chat models are supported.")
@@ -131,8 +129,8 @@ class HuggingFaceModel(base.VisionLanguageModel):
             **self.processor_kwargs,
         }
 
-        if with_images:
-            processor_inputs[self.image_key] = [[image] for image in image_batch]
+        if any(image_batch):
+            processor_inputs[self.image_key] = image_batch
 
         return self.processor(**processor_inputs).to(self.model.model.device)  # type: ignore
 

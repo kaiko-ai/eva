@@ -17,8 +17,8 @@ class TextImageBatch(NamedTuple, Generic[TargetType]):
     text: List[MessageSeries]
     """A batch of conversations with one or multiple messages each."""
 
-    image: List[tv_tensors.Image]
-    """Image tensor."""
+    images: List[List[tv_tensors.Image]]
+    """Batch of image lists with one or more images each."""
 
     target: TargetType | None
     """Target data."""
