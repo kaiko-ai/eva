@@ -63,7 +63,7 @@ if import_utils.is_vllm_available():
                 model_kwargs={
                     "mm_processor_kwargs": {"use_fast": False},
                     "enable_prefix_caching": False,
-                }
+                },
             )
 
     @model_registry.register("alibaba/qwen2-5-vl-72b-instruct-vllm")
