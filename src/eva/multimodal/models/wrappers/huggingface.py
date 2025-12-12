@@ -130,7 +130,7 @@ class HuggingFaceModel(base.VisionLanguageModel):
         }
 
         if any(image_batch):
-            processor_inputs[self._image_key] = image_batch
+            processor_inputs[self.image_key] = image_batch
 
         return self.processor(**processor_inputs).to(self.model.model.device)  # type: ignore
 
