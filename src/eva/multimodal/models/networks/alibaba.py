@@ -62,6 +62,7 @@ if import_utils.is_vllm_available():
                 system_prompt=system_prompt,
                 model_kwargs={
                     "mm_processor_kwargs": {"use_fast": False},
+                    "max_num_seqs": 16,
                     "enable_prefix_caching": False,
                 },
             )
