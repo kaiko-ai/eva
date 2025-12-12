@@ -45,8 +45,6 @@ class ModelFromRegistry(base.BaseModel[torch.Tensor, torch.Tensor]):
 
     @override
     def load_model(self) -> nn.Module:
-        ModelFromRegistry.__name__ = self._model_name
-
         return factory.ModuleFactory(
             registry=backbone_registry,
             name=self._model_name,

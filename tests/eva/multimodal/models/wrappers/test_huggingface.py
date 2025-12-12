@@ -33,16 +33,15 @@ def test_huggingface_model_generation(model_name: str, model_class: str, with_im
     mock_model.device = torch.device("cpu")
     mock_model.generate.return_value = torch.tensor([[1, 2, 3, 4, 5]])
 
+    mock_transformers = MagicMock()
+    mock_transformers.AutoProcessor.from_pretrained.return_value = mock_processor
+    setattr(mock_transformers, model_class, MagicMock())
+    getattr(mock_transformers, model_class).from_pretrained.return_value = mock_model
+
     with (
-        patch(
-            "eva.language.models.wrappers.huggingface.transformers.AutoProcessor.from_pretrained",
-            return_value=mock_processor,
-        ),
-        patch("eva.language.models.wrappers.huggingface.transformers") as mock_transformers,
+        patch.dict("sys.modules", {"transformers": mock_transformers}),
+        patch("eva.language.models.wrappers.huggingface.transformers", mock_transformers),
     ):
-        mock_transformers.AutoProcessor.from_pretrained.return_value = mock_processor
-        setattr(mock_transformers, model_class, MagicMock())
-        getattr(mock_transformers, model_class).from_pretrained.return_value = mock_model
         model = HuggingFaceModel(
             model_name_or_path=model_name,
             model_class=model_class,
@@ -84,17 +83,15 @@ def test_format_inputs_with_image():
     mock_model = MagicMock()
     mock_model.device = torch.device("cpu")
 
-    with (
-        patch(
-            "eva.language.models.wrappers.huggingface.transformers.AutoProcessor.from_pretrained",
-            return_value=mock_processor,
-        ),
-        patch("eva.language.models.wrappers.huggingface.transformers") as mock_transformers,
-    ):
-        mock_transformers.AutoProcessor.from_pretrained.return_value = mock_processor
-        mock_transformers.LlavaForConditionalGeneration = MagicMock()
-        mock_transformers.LlavaForConditionalGeneration.from_pretrained.return_value = mock_model
+    mock_transformers = MagicMock()
+    mock_transformers.AutoProcessor.from_pretrained.return_value = mock_processor
+    mock_transformers.LlavaForConditionalGeneration = MagicMock()
+    mock_transformers.LlavaForConditionalGeneration.from_pretrained.return_value = mock_model
 
+    with (
+        patch.dict("sys.modules", {"transformers": mock_transformers}),
+        patch("eva.language.models.wrappers.huggingface.transformers", mock_transformers),
+    ):
         model = HuggingFaceModel(
             model_name_or_path="test-model",
             model_class="LlavaForConditionalGeneration",
@@ -127,17 +124,15 @@ def test_decode_ids():
     mock_model = MagicMock()
     mock_model.device = torch.device("cpu")
 
-    with (
-        patch(
-            "eva.language.models.wrappers.huggingface.transformers.AutoProcessor.from_pretrained",
-            return_value=mock_processor,
-        ),
-        patch("eva.language.models.wrappers.huggingface.transformers") as mock_transformers,
-    ):
-        mock_transformers.AutoProcessor.from_pretrained.return_value = mock_processor
-        mock_transformers.LlavaForConditionalGeneration = MagicMock()
-        mock_transformers.LlavaForConditionalGeneration.from_pretrained.return_value = mock_model
+    mock_transformers = MagicMock()
+    mock_transformers.AutoProcessor.from_pretrained.return_value = mock_processor
+    mock_transformers.LlavaForConditionalGeneration = MagicMock()
+    mock_transformers.LlavaForConditionalGeneration.from_pretrained.return_value = mock_model
 
+    with (
+        patch.dict("sys.modules", {"transformers": mock_transformers}),
+        patch("eva.language.models.wrappers.huggingface.transformers", mock_transformers),
+    ):
         model = HuggingFaceModel(
             model_name_or_path="test-model",
             model_class="LlavaForConditionalGeneration",

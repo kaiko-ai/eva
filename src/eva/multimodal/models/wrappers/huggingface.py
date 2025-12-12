@@ -51,14 +51,14 @@ class HuggingFaceModel(base.VisionLanguageModel):
         """
         super().__init__(system_prompt=None)
 
-        self._image_key = image_key
-        self._image_position: Literal["before_text", "after_text"] = image_position
-        self._model_name_or_path = model_name_or_path
-        self._model_class = model_class
-        self._model_kwargs = model_kwargs or {}
-        self._processor_kwargs = processor_kwargs or {}
-        self._generation_kwargs = self._default_generation_kwargs | (generation_kwargs or {})
-        self._system_prompt = system_prompt
+        self.image_key = image_key
+        self.image_position: Literal["before_text", "after_text"] = image_position
+        self.model_name_or_path = model_name_or_path
+        self.model_class = model_class
+        self.model_kwargs = model_kwargs or {}
+        self.processor_kwargs = processor_kwargs or {}
+        self.generation_kwargs = self._default_generation_kwargs | (generation_kwargs or {})
+        self.system_prompt = system_prompt
 
         self.model: language_wrappers.HuggingFaceModel
         self.processor: Callable
@@ -74,12 +74,12 @@ class HuggingFaceModel(base.VisionLanguageModel):
     @override
     def load_model(self) -> language_wrappers.HuggingFaceModel:
         return language_wrappers.HuggingFaceModel(
-            model_name_or_path=self._model_name_or_path,
-            model_class=self._model_class,
-            model_kwargs=self._model_kwargs,
-            system_prompt=self._system_prompt,
-            processor_kwargs=self._processor_kwargs,
-            generation_kwargs=self._generation_kwargs,
+            model_name_or_path=self.model_name_or_path,
+            model_class=self.model_class,
+            model_kwargs=self.model_kwargs,
+            system_prompt=self.system_prompt,
+            processor_kwargs=self.processor_kwargs,
+            generation_kwargs=self.generation_kwargs,
         )
 
     @override
@@ -126,7 +126,7 @@ class HuggingFaceModel(base.VisionLanguageModel):
         processor_inputs: Dict[str, Any] = {
             "text": templated_text,
             "return_tensors": "pt",
-            **self._processor_kwargs,
+            **self.processor_kwargs,
         }
 
         if any(image_batch):
