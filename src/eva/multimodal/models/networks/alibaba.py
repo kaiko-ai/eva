@@ -60,6 +60,10 @@ if import_utils.is_vllm_available():
                 model_name_or_path="Qwen/Qwen2.5-VL-7B-Instruct",
                 image_position="before_text",
                 system_prompt=system_prompt,
+                model_kwargs={
+                    "mm_processor_kwargs": {"use_fast": False},
+                    "enable_prefix_caching": False,
+                }
             )
 
     @model_registry.register("alibaba/qwen2-5-vl-72b-instruct-vllm")
@@ -76,6 +80,8 @@ if import_utils.is_vllm_available():
                 model_kwargs={
                     "tensor_parallel_size": int(os.getenv("VLLM_TENSOR_PARALLEL_SIZE", 4)),
                     "max_num_seqs": 8,
+                    "mm_processor_kwargs": {"use_fast": False},
+                    "enable_prefix_caching": False,
                 },
                 image_position="before_text",
                 system_prompt=system_prompt,
