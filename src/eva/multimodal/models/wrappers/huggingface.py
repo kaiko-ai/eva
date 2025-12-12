@@ -113,7 +113,7 @@ class HuggingFaceModel(base.VisionLanguageModel):
                     message_utils.format_huggingface_message(
                         message,
                         images=images,
-                        image_position=self._image_position,
+                        image_position=self.image_position,
                     ),
                     add_generation_prompt=True,
                     tokenize=False,
