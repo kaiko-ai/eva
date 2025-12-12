@@ -1,6 +1,5 @@
 """LiteLLM vision-language model wrapper."""
 
-import functools
 import logging
 from typing import Any, Dict, List, Literal
 
@@ -58,15 +57,12 @@ class LiteLLMModel(base.VisionLanguageModel):
         if image_batch is None:
             image_batch = [None] * len(message_batch)
 
-        return list(
-            map(
-                functools.partial(
-                    message_utils.format_litellm_message, image_position=self.image_position
-                ),
-                message_batch,
-                image_batch,
+        return [
+            message_utils.format_litellm_message(
+                message, images=images, image_position=self.image_position
             )
-        )
+            for message, images in zip(message_batch, image_batch, strict=False)
+        ]
 
     @override
     def model_forward(self, batch: List[List[Dict[str, Any]]]) -> ModelOutput:

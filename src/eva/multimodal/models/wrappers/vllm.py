@@ -130,12 +130,12 @@ class VllmModel(base.VisionLanguageModel):
         message_batch = list(map(language_message_utils.combine_system_messages, message_batch))
 
         input_dicts = []
-        for messages, image in zip(
+        for messages, images in zip(
             message_batch, image_batch or [None] * len(message_batch), strict=False
         ):
             formatted_messages = message_utils.format_huggingface_message(
                 messages,
-                with_images=with_images,
+                images=images if with_images else None,
                 image_position=self.image_position,
             )
             templated_messages = self.tokenizer.apply_chat_template(  # type: ignore
@@ -144,8 +144,8 @@ class VllmModel(base.VisionLanguageModel):
                 add_generation_prompt=True,
             )
             input_dict: Dict[str, Any] = {"prompt": templated_messages}
-            if image is not None:
-                input_dict["multi_modal_data"] = {"image": F.to_pil_image(image)}
+            if images:
+                input_dict["multi_modal_data"] = {"image": [F.to_pil_image(img) for img in images]}
             input_dicts.append(input_dict)
 
         return input_dicts

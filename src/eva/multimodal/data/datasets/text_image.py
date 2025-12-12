@@ -31,14 +31,14 @@ class TextImageDataset(
         self.transforms = transforms
 
     @abc.abstractmethod
-    def load_image(self, index: int) -> tv_tensors.Image:
-        """Returns the image content.
+    def load_images(self, index: int) -> list[tv_tensors.Image]:
+        """Returns the images for a sample.
 
         Args:
             index: The index of the data sample.
 
         Returns:
-            The image content.
+            A list of image tensors.
         """
         raise NotImplementedError
 
@@ -46,7 +46,7 @@ class TextImageDataset(
     def __getitem__(self, index: int) -> TextImageSample[TargetType]:
         item = TextImageSample(
             text=self.load_text(index),
-            image=self.load_image(index),
+            images=self.load_images(index),
             target=self.load_target(index),
             metadata=self.load_metadata(index) or {},
         )
@@ -54,23 +54,26 @@ class TextImageDataset(
 
     @override
     def _apply_transforms(self, sample: TextImageSample[TargetType]) -> TextImageSample[TargetType]:
-        """Applies the dataset transforms to the text, image and target.
+        """Applies the dataset transforms to the text, images and target.
 
         Args:
-            sample: The sample containing text, image, target and metadata.
+            sample: The sample containing text, images, target and metadata.
 
         Returns:
             The transformed sample.
         """
         if self.transforms:
             text = self.transforms.text(sample.text) if self.transforms.text else sample.text
-            image = self.transforms.image(sample.image) if self.transforms.image else sample.image
+            if self.transforms.image:
+                images = [self.transforms.image(img) for img in sample.images]
+            else:
+                images = sample.images
             target = (
                 self.transforms.target(sample.target) if self.transforms.target else sample.target
             )
             return TextImageSample(
                 text=text,
-                image=image,
+                images=images,
                 target=target,
                 metadata=sample.metadata,
             )

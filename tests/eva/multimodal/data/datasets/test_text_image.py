@@ -29,8 +29,8 @@ class ConcreteTextImageDataset(TextImageDataset):
         return [UserMessage(content=f"Text {index}")]
 
     @override
-    def load_image(self, index: int) -> tv_tensors.Image:
-        return tv_tensors.Image(torch.rand(3, 224, 224))
+    def load_images(self, index: int) -> list[tv_tensors.Image]:
+        return [tv_tensors.Image(torch.rand(3, 224, 224))]
 
     @override
     def load_target(self, index: int) -> int:
@@ -49,7 +49,9 @@ def test_text_image_dataset_getitem():
     assert isinstance(sample, TextImageSample)
     assert len(sample.text) == 1
     assert sample.text[0].content == "Text 0"
-    assert isinstance(sample.image, tv_tensors.Image)
+    assert isinstance(sample.images, list)
+    assert len(sample.images) == 1
+    assert isinstance(sample.images[0], tv_tensors.Image)
     assert sample.target == 0
     assert sample.metadata == {"index": 0}
 
@@ -76,7 +78,8 @@ def test_text_image_dataset_with_transforms():
     sample = dataset[1]
 
     assert sample.text[0].content == "TEXT 1"
-    assert sample.image.shape == (3, 128, 128)
+    assert len(sample.images) == 1
+    assert sample.images[0].shape == (3, 128, 128)
     assert sample.target == 10
 
 
@@ -86,5 +89,6 @@ def test_text_image_dataset_without_transforms():
     sample = dataset[2]
 
     assert sample.text[0].content == "Text 2"
-    assert sample.image.shape == (3, 224, 224)
+    assert len(sample.images) == 1
+    assert sample.images[0].shape == (3, 224, 224)
     assert sample.target == 2
