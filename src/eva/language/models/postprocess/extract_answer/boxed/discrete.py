@@ -15,7 +15,7 @@ class ExtractDiscreteAnswerFromBoxed(ExtractDiscreteAnswerFromStructuredOutput):
 
     @override
     def _extract_structured_data(self, value: str) -> Dict[str, str] | None:
-        """Extract boxed data from a string.
+        r"""Extract boxed data from a string.
 
         Args:
             value: The input string containing \\boxed{}.

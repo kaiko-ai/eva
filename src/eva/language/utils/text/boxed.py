@@ -5,7 +5,7 @@ from typing import Dict
 
 
 def extract_boxed(response: str, raise_if_missing: bool = False) -> Dict[str, str] | None:
-    """Extracts content from \\boxed{} tags and converts to a dictionary.
+    r"""Extracts content from \\boxed{} tags and converts to a dictionary.
 
     Args:
         response: The input string potentially containing \\boxed{} tags.
