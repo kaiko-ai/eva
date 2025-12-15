@@ -1,5 +1,6 @@
 """A module for handling coordinates of patches from a whole-slide image."""
 
+import ast
 import dataclasses
 import functools
 from typing import Any, Dict, List, Tuple
