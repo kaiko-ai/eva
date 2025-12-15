@@ -109,7 +109,9 @@ def test_render_example_answer_selection(
         (True, "Think step-by-step"),
     ],
 )
-def test_render_enable_cot(template: BoxedMultipleChoicePromptTemplate, enable_cot: bool, expected_fragment: str) -> None:
+def test_render_enable_cot(
+    template: BoxedMultipleChoicePromptTemplate, enable_cot: bool, expected_fragment: str
+) -> None:
     """Prompt with enable_cot should contain a fragment asking the model to use thinking/CoT."""
     result = template.render(
         question="Example answer?",

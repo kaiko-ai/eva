@@ -110,9 +110,7 @@ def test_multiple_boxed_expressions_returns_invalid() -> None:
 
 def test_boxed_with_letter_options(transform: ExtractDiscreteAnswerFromBoxed) -> None:
     """Boxed content with letter options (A, B, C, etc.) should work."""
-    transform = ExtractDiscreteAnswerFromBoxed(
-        mapping={"A": 0, "B": 1, "C": 2}, missing_limit=0
-    )
+    transform = ExtractDiscreteAnswerFromBoxed(mapping={"A": 0, "B": 1, "C": 2}, missing_limit=0)
     result = transform("\\boxed{B}")
 
     assert result.tolist() == [1]

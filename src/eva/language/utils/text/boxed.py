@@ -21,7 +21,9 @@ def extract_boxed(response: str, raise_if_missing: bool = False) -> Dict[str, st
     """
     try:
         # Check if response is wrapped in code fences (latex/math)
-        code_fence_match = re.search(r"```(?:latex|math)?\s*\n(.*?)\n```", response, flags=re.DOTALL)
+        code_fence_match = re.search(
+            r"```(?:latex|math)?\s*\n(.*?)\n```", response, flags=re.DOTALL
+        )
         if code_fence_match:
             clean_response = code_fence_match.group(1).strip()
         else:
