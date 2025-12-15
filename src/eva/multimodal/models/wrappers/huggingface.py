@@ -49,7 +49,7 @@ class HuggingFaceModel(base.VisionLanguageModel):
             image_key: The key used for image inputs in the chat template.
             image_position: Position of the image in the input sequence.
         """
-        super().__init__(system_prompt=None)
+        super().__init__(system_prompt=system_prompt)
 
         self.image_key = image_key
         self.image_position: Literal["before_text", "after_text"] = image_position
@@ -58,7 +58,6 @@ class HuggingFaceModel(base.VisionLanguageModel):
         self.model_kwargs = model_kwargs or {}
         self.processor_kwargs = processor_kwargs or {}
         self.generation_kwargs = self._default_generation_kwargs | (generation_kwargs or {})
-        self.system_prompt = system_prompt
 
         self.model: language_wrappers.HuggingFaceModel
         self.processor: Callable
@@ -77,7 +76,6 @@ class HuggingFaceModel(base.VisionLanguageModel):
             model_name_or_path=self.model_name_or_path,
             model_class=self.model_class,
             model_kwargs=self.model_kwargs,
-            system_prompt=self.system_prompt,
             processor_kwargs=self.processor_kwargs,
             generation_kwargs=self.generation_kwargs,
         )
