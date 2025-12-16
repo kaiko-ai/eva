@@ -94,12 +94,12 @@ def test_boxed_with_whitespace(transform: ExtractAnswerFromBoxed) -> None:
     assert result == [{"answer": "answer with spaces"}]
 
 
-def test_multiple_boxed_expressions_returns_none(transform: ExtractAnswerFromBoxed) -> None:
-    """When multiple boxed expressions exist, should return None (invalid response)."""
+def test_multiple_boxed_expressions_returns_last(transform: ExtractAnswerFromBoxed) -> None:
+    """When multiple boxed expressions exist, should return the last one."""
     result = transform("Initially I thought \\boxed{wrong answer} but actually \\boxed{correct}")
 
-    # Should return None since we can't determine which answer is correct
-    assert result == [None]
+    # Should return the last boxed expression
+    assert result == [{"answer": "correct"}]
 
 
 def test_boxed_with_latex_code_fence(transform: ExtractAnswerFromBoxed) -> None:
@@ -129,3 +129,53 @@ def test_boxed_multiline_content(transform: ExtractAnswerFromBoxed) -> None:
     result = transform("\\boxed{Line 1\nLine 2}")
 
     assert result == [{"answer": "Line 1\nLine 2"}]
+
+
+def test_boxed_with_nested_braces_simple(transform: ExtractAnswerFromBoxed) -> None:
+    """Should handle boxed content with nested braces like LaTeX commands."""
+    result = transform("The answer is \\boxed{\\frac{1}{2}}")
+
+    assert result == [{"answer": "\\frac{1}{2}"}]
+
+
+def test_boxed_with_nested_braces_complex(transform: ExtractAnswerFromBoxed) -> None:
+    """Should handle boxed content with multiple levels of nested braces."""
+    result = transform("\\boxed{\\sqrt{\\frac{a^{2} + b^{2}}{c}}}")
+
+    assert result == [{"answer": "\\sqrt{\\frac{a^{2} + b^{2}}{c}}"}]
+
+
+def test_boxed_with_nested_braces_and_text(transform: ExtractAnswerFromBoxed) -> None:
+    """Should handle nested braces with mixed text and LaTeX."""
+    result = transform("The solution is \\boxed{x = \\frac{-b \\pm \\sqrt{b^{2} - 4ac}}{2a}}")
+
+    assert result == [{"answer": "x = \\frac{-b \\pm \\sqrt{b^{2} - 4ac}}{2a}"}]
+
+
+def test_multiple_boxed_with_nested_braces(transform: ExtractAnswerFromBoxed) -> None:
+    """Should return last boxed when multiple exist with nested braces."""
+    result = transform(
+        "First try: \\boxed{\\frac{1}{3}} but correct is \\boxed{\\frac{2}{3}}"
+    )
+
+    assert result == [{"answer": "\\frac{2}{3}"}]
+
+
+def test_boxed_with_multiple_entries_takes_last(transform: ExtractAnswerFromBoxed) -> None:
+    """Should use the last boxed entry when model refines its answer."""
+    response = (
+        "Let me think step by step.\n"
+        "Initially, I calculated \\boxed{42}\n"
+        "Wait, let me recalculate...\n"
+        "Actually, the correct answer is \\boxed{84}"
+    )
+    result = transform(response)
+
+    assert result == [{"answer": "84"}]
+
+
+def test_boxed_nested_set_notation(transform: ExtractAnswerFromBoxed) -> None:
+    """Should handle set notation with nested braces."""
+    result = transform("\\boxed{\\{x \\in \\mathbb{R} : x > 0\\}}")
+
+    assert result == [{"answer": "\\{x \\in \\mathbb{R} : x > 0\\}"}]

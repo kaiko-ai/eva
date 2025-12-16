@@ -97,15 +97,15 @@ def test_init_requires_non_empty_mapping() -> None:
         ExtractDiscreteAnswerFromBoxed(mapping={})
 
 
-def test_multiple_boxed_expressions_returns_invalid() -> None:
-    """When multiple boxed expressions exist, should treat as invalid response."""
+def test_multiple_boxed_expressions_returns_last() -> None:
+    """When multiple boxed expressions exist, should use the last one."""
     transform = ExtractDiscreteAnswerFromBoxed(
         mapping={"A": 0, "B": 1}, missing_limit=0, raise_if_missing=False, missing_answer=-99
     )
     result = transform("First I think \\boxed{A} but wait, actually \\boxed{B}")
 
-    # Should return missing_answer since we can't determine correct answer
-    assert result.tolist() == [-99]
+    # Should return the last boxed expression (B -> 1)
+    assert result.tolist() == [1]
 
 
 def test_boxed_with_letter_options(transform: ExtractDiscreteAnswerFromBoxed) -> None:

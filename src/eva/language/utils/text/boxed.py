@@ -4,6 +4,27 @@ import re
 from typing import Dict
 
 
+def _find_matching_brace(text: str, start: int) -> int:
+    """Find the position of the closing brace matching the opening brace at start.
+
+    Args:
+        text: The input string.
+        start: Position to start searching from (should be right after an opening brace).
+
+    Returns:
+        int: Position of the matching closing brace, or -1 if not found.
+    """
+    count = 1
+    i = start
+    while i < len(text) and count > 0:
+        if text[i] == "{":
+            count += 1
+        elif text[i] == "}":
+            count -= 1
+        i += 1
+    return i - 1 if count == 0 else -1
+
+
 def extract_boxed(response: str, raise_if_missing: bool = False) -> Dict[str, str] | None:
     r"""Extracts content from \\boxed{} tags and converts to a dictionary.
 
@@ -15,9 +36,11 @@ def extract_boxed(response: str, raise_if_missing: bool = False) -> Dict[str, st
     Returns:
         Dict[str, str] | None: The extracted boxed content as a dictionary with key "answer"
             or None if no boxed content is found and `raise_if_missing` is False.
+            When multiple \\boxed{} expressions are found, returns the last one.
 
     Note:
-        Nested braces (e.g., \\boxed{\\frac{1}{2}}) are not supported in this implementation.
+        Supports nested braces (e.g., \\boxed{\\frac{1}{2}}) and uses the last
+        \\boxed{} expression when multiple are present.
     """
     try:
         # Check if response is wrapped in code fences (latex/math)
@@ -29,20 +52,20 @@ def extract_boxed(response: str, raise_if_missing: bool = False) -> Dict[str, st
         else:
             clean_response = response.strip()
 
-        # Match \boxed{content} - use non-greedy to get first complete match
-        pattern = r"\\boxed\{(.*?)\}"
-        matches = re.findall(pattern, clean_response, flags=re.DOTALL)
-
-        if len(matches) == 0:
+        # Find last \boxed{
+        boxed_start = clean_response.rfind("\\boxed{")
+        if boxed_start == -1:
             raise ValueError("No \\boxed{} content found.")
-        elif len(matches) > 1:
-            raise ValueError(
-                f"Multiple \\boxed{{}} expressions found ({len(matches)}). "
-                "Cannot determine which answer is correct."
-            )
-        else:
-            answer = matches[0].strip()
-            boxed_dict = {"answer": answer}
+
+        # Find the content between the braces
+        content_start = boxed_start + 7  # len('\\boxed{')
+        closing_brace = _find_matching_brace(clean_response, content_start)
+
+        if closing_brace == -1:
+            raise ValueError("No matching closing brace found.")
+
+        answer = clean_response[content_start:closing_brace].strip()
+        boxed_dict = {"answer": answer}
 
     except Exception as e:
         if raise_if_missing:
