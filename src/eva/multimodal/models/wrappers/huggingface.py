@@ -36,6 +36,7 @@ class HuggingFaceModel(base.VisionLanguageModel):
         generation_kwargs: Dict[str, Any] | None = None,
         image_key: str = "image",
         image_position: Literal["before_text", "after_text"] = "after_text",
+        chat_template: str | None = None,
     ):
         """Initialize the HuggingFace model wrapper.
 
@@ -48,6 +49,8 @@ class HuggingFaceModel(base.VisionLanguageModel):
             generation_kwargs: Additional generation arguments.
             image_key: The key used for image inputs in the chat template.
             image_position: Position of the image in the input sequence.
+            chat_template: Optional chat template name to use with the processor. If None,
+                will use the template stored in the checkpoint's processor config.
         """
         super().__init__(system_prompt=system_prompt)
 
@@ -58,6 +61,7 @@ class HuggingFaceModel(base.VisionLanguageModel):
         self.model_kwargs = model_kwargs or {}
         self.processor_kwargs = processor_kwargs or {}
         self.generation_kwargs = self._default_generation_kwargs | (generation_kwargs or {})
+        self.chat_template = chat_template
 
         self.model: language_wrappers.HuggingFaceModel
         self.processor: Callable
@@ -78,6 +82,7 @@ class HuggingFaceModel(base.VisionLanguageModel):
             model_kwargs=self.model_kwargs,
             processor_kwargs=self.processor_kwargs,
             generation_kwargs=self.generation_kwargs,
+            chat_template=self.chat_template,
         )
 
     @override

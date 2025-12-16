@@ -33,6 +33,7 @@ class HuggingFaceModel(base.LanguageModel):
         system_prompt: str | None = None,
         processor_kwargs: Dict[str, Any] | None = None,
         generation_kwargs: Dict[str, Any] | None = None,
+        chat_template: str | None = None,
     ) -> None:
         """Initializes the model.
 
@@ -45,6 +46,8 @@ class HuggingFaceModel(base.LanguageModel):
             system_prompt: System prompt to use.
             processor_kwargs: Additional processor/tokenizer arguments.
             generation_kwargs: Additional generation parameters (temperature, max_length, etc.).
+            chat_template: Optional chat template name to use with the processor. If None,
+                will use the template stored in the checkpoint's processor config.
         """
         super().__init__(system_prompt=system_prompt)
 
@@ -53,6 +56,7 @@ class HuggingFaceModel(base.LanguageModel):
         self.model_kwargs = model_kwargs or {}
         self.processor_kwargs = processor_kwargs or {}
         self.generation_kwargs = self._default_generation_kwargs | (generation_kwargs or {})
+        self.chat_template = chat_template
 
         self.model: nn.Module
         self.processor: Callable
@@ -96,6 +100,8 @@ class HuggingFaceModel(base.LanguageModel):
             self.processor_kwargs.pop("model_name_or_path", self.model_name_or_path),
             **self.processor_kwargs,
         )
+        if self.chat_template is not None:
+            processor.chat_template = self.chat_template  # type: ignore
         # To ensure correct generation with batched inputs of different lengths
         if "CausalLM" in self.model_class or "ConditionalGeneration" in self.model_class:
             processor.padding_side = "left"
