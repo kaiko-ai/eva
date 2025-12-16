@@ -154,9 +154,7 @@ def test_boxed_with_nested_braces_and_text(transform: ExtractAnswerFromBoxed) ->
 
 def test_multiple_boxed_with_nested_braces(transform: ExtractAnswerFromBoxed) -> None:
     """Should return last boxed when multiple exist with nested braces."""
-    result = transform(
-        "First try: \\boxed{\\frac{1}{3}} but correct is \\boxed{\\frac{2}{3}}"
-    )
+    result = transform("First try: \\boxed{\\frac{1}{3}} but correct is \\boxed{\\frac{2}{3}}")
 
     assert result == [{"answer": "\\frac{2}{3}"}]
 

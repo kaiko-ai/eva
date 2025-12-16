@@ -1,6 +1,10 @@
 """Prompt templating API."""
 
 from eva.language.prompts.templates.base import PromptTemplate
+from eva.language.prompts.templates.boxed import (
+    BoxedFreeFormQuestionPromptTemplate,
+    BoxedMultipleChoicePromptTemplate,
+)
 from eva.language.prompts.templates.factory import (
     FreeFormQuestionPromptTemplate,
     MultipleChoicePromptTemplate,
@@ -16,14 +20,14 @@ from eva.language.prompts.templates.raw import (
 from eva.language.prompts.templates.xml import XmlMultipleChoicePromptTemplate
 
 __all__ = [
-    "JsonMultipleChoicePromptTemplate",
-    "RawMultipleChoicePromptTemplate",
-    "XmlMultipleChoicePromptTemplate",
-    "JsonFreeFormQuestionPromptTemplate",
-    "RawFreeFormQuestionPromptTemplate",
+    "BoxedFreeFormQuestionPromptTemplate",
+    "BoxedMultipleChoicePromptTemplate",
     "FreeFormQuestionPromptTemplate",
+    "JsonFreeFormQuestionPromptTemplate",
+    "JsonMultipleChoicePromptTemplate",
     "MultipleChoicePromptTemplate",
     "PromptTemplate",
-    "JsonMultipleChoicePromptTemplate",
-    "FreeFormQuestionPromptTemplate",
+    "RawFreeFormQuestionPromptTemplate",
+    "RawMultipleChoicePromptTemplate",
+    "XmlMultipleChoicePromptTemplate",
 ]
