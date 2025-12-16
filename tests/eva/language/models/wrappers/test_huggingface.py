@@ -165,3 +165,63 @@ def test_huggingface_model_no_generate_support(mock_processor):
                 model_class="AutoModelForCausalLM",
             )
             model.configure_model()
+
+
+def test_chat_template_applied_to_processor():
+    """Test that custom chat_template is applied to the processor."""
+    custom_template = "{% for message in messages %}{{ message.content }}{% endfor %}"
+
+    mock_processor = MagicMock()
+    mock_processor.chat_template = None  # Initially no template
+
+    mock_model = MagicMock()
+    mock_model.device = torch.device("cpu")
+
+    mock_transformers = MagicMock()
+    mock_transformers.AutoProcessor.from_pretrained.return_value = mock_processor
+    mock_transformers.AutoModelForCausalLM = MagicMock()
+    mock_transformers.AutoModelForCausalLM.from_pretrained.return_value = mock_model
+
+    with (
+        patch.dict("sys.modules", {"transformers": mock_transformers}),
+        patch("eva.language.models.wrappers.huggingface.transformers", mock_transformers),
+    ):
+        model = HuggingFaceModel(
+            model_name_or_path="some-model",
+            model_class="AutoModelForCausalLM",
+            chat_template=custom_template,
+        )
+        model.configure_model()
+
+        assert model.chat_template == custom_template
+        assert mock_processor.chat_template == custom_template
+
+
+def test_chat_template_none_uses_processor_default():
+    """Test that when chat_template is None, processor's default template is used."""
+    default_template = "default_template"
+
+    mock_processor = MagicMock()
+    mock_processor.chat_template = default_template
+
+    mock_model = MagicMock()
+    mock_model.device = torch.device("cpu")
+
+    mock_transformers = MagicMock()
+    mock_transformers.AutoProcessor.from_pretrained.return_value = mock_processor
+    mock_transformers.AutoModelForCausalLM = MagicMock()
+    mock_transformers.AutoModelForCausalLM.from_pretrained.return_value = mock_model
+
+    with (
+        patch.dict("sys.modules", {"transformers": mock_transformers}),
+        patch("eva.language.models.wrappers.huggingface.transformers", mock_transformers),
+    ):
+        model = HuggingFaceModel(
+            model_name_or_path="some-model",
+            model_class="AutoModelForCausalLM",
+            chat_template=None,
+        )
+        model.configure_model()
+
+        assert model.chat_template is None
+        assert mock_processor.chat_template == default_template

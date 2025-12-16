@@ -147,3 +147,64 @@ def test_decode_ids():
         assert decoded_input == ["Input text"]
         assert decoded_output == ["Output text"]
         assert mock_processor.batch_decode.call_count == 2
+
+
+def test_chat_template_passed_to_language_wrapper():
+    """Test that chat_template is passed to the underlying language wrapper."""
+    custom_template = "{% for message in messages %}{{ message.content }}{% endfor %}"
+
+    mock_processor = MagicMock()
+    mock_processor.chat_template = None
+
+    mock_model = MagicMock()
+    mock_model.device = torch.device("cpu")
+
+    mock_transformers = MagicMock()
+    mock_transformers.AutoProcessor.from_pretrained.return_value = mock_processor
+    mock_transformers.LlavaForConditionalGeneration = MagicMock()
+    mock_transformers.LlavaForConditionalGeneration.from_pretrained.return_value = mock_model
+
+    with (
+        patch.dict("sys.modules", {"transformers": mock_transformers}),
+        patch("eva.language.models.wrappers.huggingface.transformers", mock_transformers),
+    ):
+        model = HuggingFaceModel(
+            model_name_or_path="test-model",
+            model_class="LlavaForConditionalGeneration",
+            chat_template=custom_template,
+        )
+        model.configure_model()
+
+        assert model.chat_template == custom_template
+        assert model.model.chat_template == custom_template
+        assert mock_processor.chat_template == custom_template
+
+
+def test_chat_template_none_uses_default():
+    """Test that when chat_template is None, processor's default template is used."""
+    default_template = "default_template"
+
+    mock_processor = MagicMock()
+    mock_processor.chat_template = default_template
+
+    mock_model = MagicMock()
+    mock_model.device = torch.device("cpu")
+
+    mock_transformers = MagicMock()
+    mock_transformers.AutoProcessor.from_pretrained.return_value = mock_processor
+    mock_transformers.LlavaForConditionalGeneration = MagicMock()
+    mock_transformers.LlavaForConditionalGeneration.from_pretrained.return_value = mock_model
+
+    with (
+        patch.dict("sys.modules", {"transformers": mock_transformers}),
+        patch("eva.language.models.wrappers.huggingface.transformers", mock_transformers),
+    ):
+        model = HuggingFaceModel(
+            model_name_or_path="test-model",
+            model_class="LlavaForConditionalGeneration",
+            chat_template=None,
+        )
+        model.configure_model()
+
+        assert model.chat_template is None
+        assert mock_processor.chat_template == default_template

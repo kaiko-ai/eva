@@ -210,3 +210,38 @@ def test_system_prompt_none():
     model = VllmModel(model_name_or_path="test-model")
 
     assert model.system_message is None
+
+
+def test_chat_template_stored():
+    """Test that chat_template parameter is stored correctly."""
+    custom_template = "{% for message in messages %}{{ message.content }}{% endfor %}"
+    model = VllmModel(
+        model_name_or_path="test-model",
+        chat_template=custom_template,
+    )
+
+    assert model.chat_template == custom_template
+
+
+def test_chat_template_none_by_default():
+    """Test that chat_template is None by default."""
+    model = VllmModel(model_name_or_path="test-model")
+
+    assert model.chat_template is None
+
+
+def test_chat_template_applied_to_tokenizer():
+    """Test that custom chat_template is applied to the tokenizer."""
+    custom_template = "{% for message in messages %}{{ message.content }}{% endfor %}"
+
+    mock_tokenizer = MagicMock()
+    mock_tokenizer.chat_template = None  # Initially no template
+
+    with patch("transformers.AutoTokenizer.from_pretrained", return_value=mock_tokenizer):
+        model = VllmModel(
+            model_name_or_path="test-model",
+            chat_template=custom_template,
+        )
+        tokenizer = model.load_tokenizer()
+
+        assert tokenizer.chat_template == custom_template  # type: ignore[attr-defined]
