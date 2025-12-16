@@ -25,12 +25,12 @@ class ExtractDiscreteAnswer:
     """Factory for creating discrete answer extractors."""
 
     def __new__(
-        cls, answer_format: Literal["json", "xml", "raw", "boxed"], extract_kwargs: dict
+        cls, answer_format: Literal["json", "xml", "boxed", "raw"], extract_kwargs: dict
     ) -> ExtractAnswerFromStructuredOutput:
         """Create a discrete answer extractor based on the answer format.
 
         Args:
-            answer_format: The format of the answer to extract ('json', 'xml', 'raw', or 'boxed').
+            answer_format: The format of the answer to extract ('json', 'xml', 'boxed', or 'raw').
             extract_kwargs: Keyword arguments passed to the extractor constructor.
 
         Returns:
@@ -53,12 +53,12 @@ class ExtractAnswer:
     """Factory for creating answer extractors."""
 
     def __new__(
-        cls, answer_format: Literal["json", "xml", "raw", "boxed"], extract_kwargs: dict
+        cls, answer_format: Literal["json", "xml", "boxed", "raw"], extract_kwargs: dict
     ) -> ExtractAnswerFromStructuredOutput:
         """Create an answer extractor based on the answer format.
 
         Args:
-            answer_format: The format of the answer to extract ('json', 'xml', 'raw', or 'boxed').
+            answer_format: The format of the answer to extract ('json', 'xml', 'boxed', or 'raw').
             extract_kwargs: Keyword arguments passed to the extractor constructor.
 
         Returns:

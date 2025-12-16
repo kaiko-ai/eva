@@ -27,12 +27,12 @@ class FreeFormQuestionPromptTemplate(PromptTemplate):
     """Factory for free-form question prompt templates based on answer format."""
 
     def __new__(
-        cls, answer_format: Literal["json", "xml", "raw", "boxed"], **template_kwargs
+        cls, answer_format: Literal["json", "xml", "boxed", "raw"], **template_kwargs
     ) -> PromptTemplate:
         """Create a free-form question prompt template based on the answer format.
 
         Args:
-            answer_format: The format to use for answers ('json', 'xml', 'raw', or 'boxed').
+            answer_format: The format to use for answers ('json', 'xml', 'boxed', or 'raw').
             **template_kwargs: Keyword arguments passed to the template constructor.
 
         Returns:
@@ -59,12 +59,12 @@ class MultipleChoicePromptTemplate(PromptTemplate):
     """Factory for Multiple Choice QA prompt templates based on answer format."""
 
     def __new__(
-        cls, answer_format: Literal["json", "xml", "raw", "boxed"], **template_kwargs
+        cls, answer_format: Literal["json", "xml", "boxed", "raw"], **template_kwargs
     ) -> PromptTemplate:
         """Create a multiple-choice prompt template based on the answer format.
 
         Args:
-            answer_format: The format to use for answers ('json', 'xml', 'raw', or 'boxed').
+            answer_format: The format to use for answers ('json', 'xml', 'boxed', or 'raw').
             **template_kwargs: Keyword arguments passed to the template constructor.
 
         Returns:

@@ -39,7 +39,7 @@ class BoxedFreeFormQuestionPromptTemplate(base.PromptTemplate):
         {% endif %}
 
         {% if enable_cot -%}
-        IMPORTANT:  Think step-by-step before giving your final answer, then provide your final answer within a \\\\boxed{} tag.
+        IMPORTANT:  Think step-by-step before giving your final answer, then provide your final answer within the \\\\boxed{} tag.
         {%- else -%}
         IMPORTANT: Provide your final answer within the \\\\boxed{} tag.
         {%- endif %}
