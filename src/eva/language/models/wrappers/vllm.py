@@ -104,8 +104,6 @@ class VllmModel(base.LanguageModel):
             tokenizer.chat_template = self.chat_template  # type: ignore
         if not hasattr(tokenizer, "chat_template") or tokenizer.chat_template is None:
             raise NotImplementedError("Currently only chat models are supported.")
-        if self.chat_template is not None:
-            tokenizer.chat_template = self.chat_template  # type: ignore
         return tokenizer
 
     @override
