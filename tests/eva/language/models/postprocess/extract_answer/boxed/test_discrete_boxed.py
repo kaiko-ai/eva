@@ -114,3 +114,16 @@ def test_boxed_with_letter_options(transform: ExtractDiscreteAnswerFromBoxed) ->
     result = transform("\\boxed{B}")
 
     assert result.tolist() == [1]
+
+
+def test_custom_answer_key() -> None:
+    """Should use custom answer_key when specified."""
+    # With custom answer_key, extract_boxed will return {"solution": "B"} instead of {"answer": "B"}
+    # The base class will then look for structured_obj["solution"]
+    transform = ExtractDiscreteAnswerFromBoxed(
+        mapping={"A": 0, "B": 1, "C": 2}, answer_key="solution", missing_limit=0
+    )
+    result = transform("\\boxed{B}")
+
+    # Should successfully extract using the custom key
+    assert result.tolist() == [1]

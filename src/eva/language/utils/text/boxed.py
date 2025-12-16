@@ -25,16 +25,19 @@ def _find_matching_brace(text: str, start: int) -> int:
     return i - 1 if count == 0 else -1
 
 
-def extract_boxed(response: str, raise_if_missing: bool = False) -> Dict[str, str] | None:
+def extract_boxed(
+    response: str, raise_if_missing: bool = False, answer_key: str = "answer"
+) -> Dict[str, str] | None:
     r"""Extracts content from \\boxed{} tags and converts to a dictionary.
 
     Args:
         response: The input string potentially containing \\boxed{} tags.
         raise_if_missing: Whether to raise an error if no boxed content is found.
             If set to False, will return None instead.
+        answer_key: The dictionary key to use for the extracted content.
 
     Returns:
-        Dict[str, str] | None: The extracted boxed content as a dictionary with key "answer"
+        Dict[str, str] | None: The extracted boxed content as a dictionary with the specified key
             or None if no boxed content is found and `raise_if_missing` is False.
             When multiple \\boxed{} expressions are found, returns the last one.
 
@@ -53,19 +56,20 @@ def extract_boxed(response: str, raise_if_missing: bool = False) -> Dict[str, st
             clean_response = response.strip()
 
         # Find last \boxed{
-        boxed_start = clean_response.rfind("\\boxed{")
+        tag = "\\boxed{"
+        boxed_start = clean_response.rfind(tag)
         if boxed_start == -1:
             raise ValueError("No \\boxed{} content found.")
 
         # Find the content between the braces
-        content_start = boxed_start + 7  # len('\\boxed{')
+        content_start = boxed_start + len(tag)
         closing_brace = _find_matching_brace(clean_response, content_start)
 
         if closing_brace == -1:
             raise ValueError("No matching closing brace found.")
 
         answer = clean_response[content_start:closing_brace].strip()
-        boxed_dict = {"answer": answer}
+        boxed_dict = {answer_key: answer}
 
     except Exception as e:
         if raise_if_missing:

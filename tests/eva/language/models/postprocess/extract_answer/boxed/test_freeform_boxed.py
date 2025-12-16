@@ -177,3 +177,11 @@ def test_boxed_nested_set_notation(transform: ExtractAnswerFromBoxed) -> None:
     result = transform("\\boxed{\\{x \\in \\mathbb{R} : x > 0\\}}")
 
     assert result == [{"answer": "\\{x \\in \\mathbb{R} : x > 0\\}"}]
+
+
+def test_custom_answer_key() -> None:
+    """Should use custom answer_key when specified."""
+    transform = ExtractAnswerFromBoxed(answer_key="solution")
+    result = transform("\\boxed{42}")
+
+    assert result == [{"solution": "42"}]

@@ -21,4 +21,4 @@ class ExtractAnswerFromBoxed(ExtractAnswerFromStructuredOutput):
         Returns:
             Dict[str, str] | None: The extracted boxed content or None if extraction failed.
         """
-        return boxed_utils.extract_boxed(value)
+        return boxed_utils.extract_boxed(value, answer_key=self.answer_key)
