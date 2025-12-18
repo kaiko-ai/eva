@@ -11,7 +11,7 @@ from eva.multimodal.utils.text.messages import format_huggingface_message, forma
 def test_format_huggingface_message_without_images():
     """Test formatting messages for HuggingFace without images."""
     messages: MessageSeries = [UserMessage(content="Hello")]
-    formatted = format_huggingface_message(messages, with_images=False)
+    formatted = format_huggingface_message(messages, images=None)
 
     assert len(formatted) == 1
     assert formatted[0]["role"] == "user"
@@ -24,7 +24,8 @@ def test_format_huggingface_message_with_images():
         SystemMessage(content="System prompt"),
         UserMessage(content="What's this?"),
     ]
-    formatted = format_huggingface_message(messages, with_images=True)
+    images = [tv_tensors.Image(torch.rand(3, 224, 224))]
+    formatted = format_huggingface_message(messages, images=images)
 
     assert len(formatted) == 2
     assert formatted[0]["role"] == "system"
@@ -38,7 +39,7 @@ def test_format_huggingface_message_with_images():
 def test_format_litellm_message_without_image():
     """Test formatting messages for LiteLLM without image."""
     messages: MessageSeries = [UserMessage(content="Hello")]
-    formatted = format_litellm_message(messages, image=None)
+    formatted = format_litellm_message(messages, images=None)
 
     assert len(formatted) == 1
     assert formatted[0]["role"] == "user"
@@ -58,8 +59,8 @@ def test_format_litellm_message_with_image(image_format, expected_prefix):
         SystemMessage(content="System prompt"),
         UserMessage(content="Describe this"),
     ]
-    image = tv_tensors.Image(torch.rand(3, 224, 224))
-    formatted = format_litellm_message(messages, image=image, image_format=image_format)
+    images = [tv_tensors.Image(torch.rand(3, 224, 224))]
+    formatted = format_litellm_message(messages, images=images, image_format=image_format)
 
     assert len(formatted) == 2
     assert formatted[0]["role"] == "system"

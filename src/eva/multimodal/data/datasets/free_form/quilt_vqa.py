@@ -116,8 +116,8 @@ class QuiltVQA(TextImageDataset[str]):
         return [UserMessage(content=prompt)]
 
     @override
-    def load_image(self, index: int) -> tv_tensors.Image:
-        return F.to_image(self.dataset[index]["image"])
+    def load_images(self, index: int) -> list[tv_tensors.Image]:
+        return [F.to_image(self.dataset[index]["image"])]
 
     @override
     def load_target(self, index: int) -> str:

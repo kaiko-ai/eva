@@ -13,13 +13,13 @@ def test_text_image_collate_with_targets():
     samples = [
         TextImageSample(
             text=[UserMessage(content="Text 1")],
-            image=tv_tensors.Image(torch.rand(3, 224, 224)),
+            images=[tv_tensors.Image(torch.rand(3, 224, 224))],
             target=torch.tensor(0),
             metadata={"id": 1},
         ),
         TextImageSample(
             text=[UserMessage(content="Text 2")],
-            image=tv_tensors.Image(torch.rand(3, 224, 224)),
+            images=[tv_tensors.Image(torch.rand(3, 224, 224))],
             target=torch.tensor(1),
             metadata={"id": 2},
         ),
@@ -30,7 +30,7 @@ def test_text_image_collate_with_targets():
     assert len(batch.text) == 2
     assert batch.text[0][0].content == "Text 1"
     assert batch.text[1][0].content == "Text 2"
-    assert len(batch.image) == 2
+    assert len(batch.images) == 2
     assert batch.target is not None
     assert batch.target.shape == (2,)
     assert torch.equal(batch.target, torch.tensor([0, 1]))
@@ -42,13 +42,13 @@ def test_text_image_collate_without_targets():
     samples = [
         TextImageSample(
             text=[UserMessage(content="Text A")],
-            image=tv_tensors.Image(torch.rand(3, 224, 224)),
+            images=[tv_tensors.Image(torch.rand(3, 224, 224))],
             target=None,
             metadata={"key": "val1"},
         ),
         TextImageSample(
             text=[UserMessage(content="Text B")],
-            image=tv_tensors.Image(torch.rand(3, 224, 224)),
+            images=[tv_tensors.Image(torch.rand(3, 224, 224))],
             target=None,
             metadata={"key": "val2"},
         ),
@@ -57,7 +57,7 @@ def test_text_image_collate_without_targets():
     batch = text_image_collate(samples)
 
     assert len(batch.text) == 2
-    assert len(batch.image) == 2
+    assert len(batch.images) == 2
     assert batch.target is None
     assert batch.metadata == {"key": ["val1", "val2"]}
 
@@ -67,13 +67,13 @@ def test_text_image_collate_without_metadata():
     samples = [
         TextImageSample(
             text=[UserMessage(content="Text")],
-            image=tv_tensors.Image(torch.rand(3, 224, 224)),
+            images=[tv_tensors.Image(torch.rand(3, 224, 224))],
             target=torch.tensor(0),
             metadata=None,
         ),
         TextImageSample(
             text=[UserMessage(content="Text")],
-            image=tv_tensors.Image(torch.rand(3, 224, 224)),
+            images=[tv_tensors.Image(torch.rand(3, 224, 224))],
             target=torch.tensor(1),
             metadata=None,
         ),
@@ -82,7 +82,7 @@ def test_text_image_collate_without_metadata():
     batch = text_image_collate(samples)
 
     assert len(batch.text) == 2
-    assert len(batch.image) == 2
+    assert len(batch.images) == 2
     assert batch.target is not None
     assert batch.target.shape == (2,)
     assert batch.metadata is None

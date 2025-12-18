@@ -33,7 +33,7 @@ def test_sample(quiltvqa_dataset: datasets.QuiltVQA, index: int) -> None:
     assert isinstance(sample, tuple)
     assert len(sample) == 4
 
-    text, image, target, metadata = sample
+    text, images, target, metadata = sample
     assert isinstance(text, list)
     assert all(isinstance(item, Message) for item in text)
 
@@ -41,8 +41,10 @@ def test_sample(quiltvqa_dataset: datasets.QuiltVQA, index: int) -> None:
     assert content.startswith(quiltvqa_dataset.prompt_render_kwargs["preamble"])
     assert "Question:" in content
 
-    assert isinstance(image, tv_tensors.Image)
-    assert image.ndim == 3
+    assert isinstance(images, list)
+    assert len(images) >= 1
+    assert isinstance(images[0], tv_tensors.Image)
+    assert images[0].ndim == 3
 
     assert isinstance(target, str)
 
@@ -52,11 +54,13 @@ def test_sample(quiltvqa_dataset: datasets.QuiltVQA, index: int) -> None:
 
 
 @pytest.mark.parametrize("split", [None])
-def test_load_image(quiltvqa_dataset: datasets.QuiltVQA) -> None:
-    """Tests loading an image from the dataset."""
-    image = quiltvqa_dataset.load_image(0)
-    assert isinstance(image, tv_tensors.Image)
-    assert image.ndim == 3
+def test_load_images(quiltvqa_dataset: datasets.QuiltVQA) -> None:
+    """Tests loading images from the dataset."""
+    images = quiltvqa_dataset.load_images(0)
+    assert isinstance(images, list)
+    assert all(isinstance(image, tv_tensors.Image) for image in images)
+    for image in images:
+        assert image.ndim == 3
 
 
 @pytest.mark.parametrize("split", [None])

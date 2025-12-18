@@ -61,6 +61,7 @@ class VllmModel(base.VisionLanguageModel):
         system_prompt: str | None = None,
         generation_kwargs: Dict[str, Any] | None = None,
         image_position: Literal["before_text", "after_text"] = "after_text",
+        chat_template: str | None = None,
     ) -> None:
         """Initializes the vLLM model wrapper.
 
@@ -74,13 +75,15 @@ class VllmModel(base.VisionLanguageModel):
             generation_kwargs: Arguments required to generate the output.
                 See [vllm.SamplingParams](https://github.com/vllm-project/vllm/blob/main/vllm/sampling_params.py).
             image_position: Position of the image in the input sequence.
-
+            chat_template: Optional chat template name to use with the tokenizer. If None,
+                will use the template stored in the checkpoint's tokenizer config.
         """
         super().__init__(system_prompt=system_prompt)
         self.model_name_or_path = model_name_or_path
         self.image_position: Literal["before_text", "after_text"] = image_position
         self.model_kwargs = self._default_model_kwargs | (model_kwargs or {})
         self.generation_kwargs = self._default_generation_kwargs | (generation_kwargs or {})
+        self.chat_template = chat_template
 
         self.model: LLM
         self.tokenizer: AutoTokenizer
@@ -106,6 +109,8 @@ class VllmModel(base.VisionLanguageModel):
             NotImplementedError: If the tokenizer does not have a chat template.
         """
         tokenizer = AutoTokenizer.from_pretrained(self.model_name_or_path, trust_remote_code=True)
+        if self.chat_template is not None:
+            tokenizer.chat_template = self.chat_template  # type: ignore
         if not hasattr(tokenizer, "chat_template") or tokenizer.chat_template is None:
             raise NotImplementedError("Currently only chat models are supported.")
         return tokenizer
@@ -130,12 +135,12 @@ class VllmModel(base.VisionLanguageModel):
         message_batch = list(map(language_message_utils.combine_system_messages, message_batch))
 
         input_dicts = []
-        for messages, image in zip(
+        for messages, images in zip(
             message_batch, image_batch or [None] * len(message_batch), strict=False
         ):
             formatted_messages = message_utils.format_huggingface_message(
                 messages,
-                with_images=with_images,
+                images=images if with_images else None,
                 image_position=self.image_position,
             )
             templated_messages = self.tokenizer.apply_chat_template(  # type: ignore
@@ -144,8 +149,8 @@ class VllmModel(base.VisionLanguageModel):
                 add_generation_prompt=True,
             )
             input_dict: Dict[str, Any] = {"prompt": templated_messages}
-            if image is not None:
-                input_dict["multi_modal_data"] = {"image": F.to_pil_image(image)}
+            if images:
+                input_dict["multi_modal_data"] = {"image": [F.to_pil_image(img) for img in images]}
             input_dicts.append(input_dict)
 
         return input_dicts

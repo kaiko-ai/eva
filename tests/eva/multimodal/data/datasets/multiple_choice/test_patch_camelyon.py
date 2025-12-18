@@ -39,9 +39,11 @@ def test_sample(patch_camelyon_dataset: patch_camelyon.PatchCamelyon) -> None:
     assert "metastatic breast tissue" in content
     assert "IMPORTANT: Provide your final answer within a valid JSON object" in content
 
-    # Test image component
-    assert isinstance(sample.image, tv_tensors.Image)
-    assert sample.image.shape == (3, 96, 96)
+    # Test images component
+    assert isinstance(sample.images, list)
+    assert len(sample.images) >= 1
+    assert isinstance(sample.images[0], tv_tensors.Image)
+    assert sample.images[0].shape == (3, 96, 96)
 
     # Test target
     assert isinstance(sample.target, int)

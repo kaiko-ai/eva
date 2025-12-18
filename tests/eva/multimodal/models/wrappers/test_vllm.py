@@ -77,7 +77,7 @@ def test_default_kwargs_preserved():
     model = VllmModel(model_name_or_path="test-model")
 
     assert model.model_kwargs["max_model_len"] == 32768
-    assert model.model_kwargs["gpu_memory_utilization"] == 0.95
+    assert model.model_kwargs["gpu_memory_utilization"] == 0.9
     assert model.model_kwargs["tensor_parallel_size"] == 1
     assert model.model_kwargs["trust_remote_code"] is True
     assert model.generation_kwargs["temperature"] == 0.0
@@ -133,7 +133,7 @@ def test_format_inputs_with_image(model_instance, sample_image):
     """Test format_inputs properly formats messages with images."""
     batch = TextImageBatch(
         text=[[UserMessage(content="Describe this")]],
-        image=[sample_image],
+        images=[[sample_image]],
         target=None,
         metadata={},
     )
@@ -151,7 +151,7 @@ def test_format_inputs_without_image(model_instance):
     """Test format_inputs properly formats messages without images."""
     batch = TextImageBatch(
         text=[[UserMessage(content="Hello, world!")]],
-        image=None,  # type: ignore[arg-type]
+        images=None,  # type: ignore[arg-type]
         target=None,
         metadata={},
     )
@@ -172,7 +172,7 @@ def test_format_inputs_batch(model_instance, sample_image):
             [UserMessage(content="First image")],
             [UserMessage(content="Second image")],
         ],
-        image=[sample_image, image2],
+        images=[[sample_image], [image2]],
         target=None,
         metadata={},
     )
@@ -215,7 +215,7 @@ def test_generate_with_image(mock_llm, mock_tokenizer, sample_image):
 
         batch = TextImageBatch(
             text=[[UserMessage(content="What's in this image?")]],
-            image=[sample_image],
+            images=[[sample_image]],
             target=None,
             metadata={},
         )
@@ -256,3 +256,38 @@ def test_system_prompt_none():
     model = VllmModel(model_name_or_path="test-model")
 
     assert model.system_message is None
+
+
+def test_chat_template_stored():
+    """Test that chat_template parameter is stored correctly."""
+    custom_template = "{% for message in messages %}{{ message.content }}{% endfor %}"
+    model = VllmModel(
+        model_name_or_path="test-model",
+        chat_template=custom_template,
+    )
+
+    assert model.chat_template == custom_template
+
+
+def test_chat_template_none_by_default():
+    """Test that chat_template is None by default."""
+    model = VllmModel(model_name_or_path="test-model")
+
+    assert model.chat_template is None
+
+
+def test_chat_template_applied_to_tokenizer():
+    """Test that custom chat_template is applied to the tokenizer."""
+    custom_template = "{% for message in messages %}{{ message.content }}{% endfor %}"
+
+    mock_tokenizer = MagicMock()
+    mock_tokenizer.chat_template = None  # Initially no template
+
+    with patch("transformers.AutoTokenizer.from_pretrained", return_value=mock_tokenizer):
+        model = VllmModel(
+            model_name_or_path="test-model",
+            chat_template=custom_template,
+        )
+        tokenizer = model.load_tokenizer()
+
+        assert tokenizer.chat_template == custom_template  # type: ignore[attr-defined]

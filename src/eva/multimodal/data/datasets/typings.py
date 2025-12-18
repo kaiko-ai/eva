@@ -17,8 +17,8 @@ class TextImageSample(NamedTuple, Generic[TargetType]):
     text: MessageSeries
     """One or multiple conversation messages."""
 
-    image: tv_tensors.Image
-    """Image tensor."""
+    images: list[tv_tensors.Image]
+    """List of image tensors."""
 
     target: TargetType | None
     """Target data."""
