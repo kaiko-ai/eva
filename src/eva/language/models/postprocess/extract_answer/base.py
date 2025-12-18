@@ -87,7 +87,7 @@ class ExtractAnswerFromStructuredOutput(ABC):
             )
             return self.missing_answer
 
-        return structured_data if self.return_dict else structured_data[self.answer_key]
+        return structured_data if self.return_dict else str(structured_data[self.answer_key])
 
     def __call__(self, values: Union[str, List[str]]) -> List[str | Dict[str, str] | None]:
         """Extracts answers from text(s)."""
