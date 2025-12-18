@@ -19,6 +19,8 @@ class ExtractAnswerFromBoxed(ExtractAnswerFromStructuredOutput):
             value: The input string containing \\boxed{}.
 
         Returns:
-            Dict[str, str] | None: The extracted boxed content or None if extraction failed.
+            A dictionary with format {self.answer_key: "extracted content"} or
+                None if extraction failed.
         """
-        return boxed_utils.extract_boxed(value, answer_key=self.answer_key)
+        answer = boxed_utils.extract_boxed(value)
+        return {self.answer_key: answer} if answer is not None else None

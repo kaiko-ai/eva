@@ -11,7 +11,7 @@ from eva.language.utils.text import boxed as boxed_utils
 
 
 class ExtractDiscreteAnswerFromBoxed(ExtractDiscreteAnswerFromStructuredOutput):
-    """Extracts discrete answers from boxed responses and casts them to int tensors."""
+    """Extracts answers from boxed responses and casts them to discrete int tensors."""
 
     @override
     def _extract_structured_data(self, value: str) -> Dict[str, str] | None:
@@ -23,4 +23,5 @@ class ExtractDiscreteAnswerFromBoxed(ExtractDiscreteAnswerFromStructuredOutput):
         Returns:
             Dict[str, str] | None: The extracted boxed content or None if extraction failed.
         """
-        return boxed_utils.extract_boxed(value, answer_key=self.answer_key)
+        answer = boxed_utils.extract_boxed(value)
+        return {self.answer_key: answer} if answer is not None else None
