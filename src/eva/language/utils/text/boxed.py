@@ -30,6 +30,9 @@ def extract_boxed(
 ) -> Dict[str, str] | None:
     r"""Extracts content from \\boxed{} tags and converts to a dictionary.
 
+    Relies on the tried and tested \boxed{} implementation of PrimeIntellect-AI here:
+    https://github.com/PrimeIntellect-ai/verifiers/blob/ac2b2e95e7668f184e497524e546900fffca6bae/verifiers/utils/data_utils.py#L72
+
     Args:
         response: The input string potentially containing \\boxed{} tags.
         raise_if_missing: Whether to raise an error if no boxed content is found.
