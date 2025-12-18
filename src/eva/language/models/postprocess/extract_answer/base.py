@@ -1,7 +1,7 @@
 """Base classes for postprocessing transforms."""
 
 from abc import ABC, abstractmethod
-from typing import Any, Dict, List, Union
+from typing import Dict, List, Union
 
 import torch
 from loguru import logger
@@ -18,6 +18,7 @@ class ExtractAnswerFromStructuredOutput(ABC):
         raise_if_missing: bool = True,
         missing_answer: str | None = None,
         missing_limit: int = 5,
+        return_dict: bool = False,
     ) -> None:
         """Initialize the transform.
 
@@ -32,11 +33,18 @@ class ExtractAnswerFromStructuredOutput(ABC):
                 are still below `missing_limit`.
             missing_limit: The maximum number of missing responses before raising
                 an error, if `raise_if_missing` is True.
+            return_dict: Whether to return the extracted structured data as a dictionary.
+                If False, only the answer string under "answer_key" will be returned.
+                Enabling this can be handy if additional fields are extracted alongside
+                the answer and are needed downstream e.g. for logging or metrics calculation.
+                The logic furthermore ensures that the returned dictionary always contains
+                an "answer_key" entry.
         """
         self.answer_key = answer_key
         self.case_sensitive = case_sensitive
         self.raise_if_missing = raise_if_missing
         self.missing_answer = missing_answer
+        self.return_dict = return_dict
         self.missing_limit = int(missing_limit)
         self.missing_count = 0
 
@@ -53,7 +61,7 @@ class ExtractAnswerFromStructuredOutput(ABC):
         """
         raise NotImplementedError("Subclasses must implement this method.")
 
-    def _extract_answer(self, value: str) -> str | None:
+    def _extract_answer(self, value: str) -> str | Dict[str, str] | None:
         """Extracts the answer from the input text.
 
         If extraction fails, handles missing data according, either returns
@@ -79,9 +87,9 @@ class ExtractAnswerFromStructuredOutput(ABC):
             )
             return self.missing_answer
 
-        return structured_data[self.answer_key]
+        return structured_data if self.return_dict else structured_data[self.answer_key]
 
-    def __call__(self, values: Union[str, List[str]]) -> List[str | None]:
+    def __call__(self, values: Union[str, List[str]]) -> List[str | Dict[str, str] | None]:
         """Extracts answers from text(s)."""
         if not isinstance(values, (list, tuple)):
             values = [values]
@@ -124,9 +132,10 @@ class ExtractDiscreteAnswerFromStructuredOutput(ExtractAnswerFromStructuredOutpu
             case_sensitive=case_sensitive,
             raise_if_missing=raise_if_missing,
             missing_limit=missing_limit,
+            return_dict=False,
         )
 
-        self.missing_answer = missing_answer
+        self.missing_discrete_answer = missing_answer
         self.mapping = {k if case_sensitive else k.lower(): v for k, v in mapping.items()}
 
     @override
@@ -136,11 +145,14 @@ class ExtractDiscreteAnswerFromStructuredOutput(ExtractAnswerFromStructuredOutpu
             values = [values]
 
         answers = list(map(self._extract_answer, values))
-        discrete_answers = [self._apply_mapping(ans) for ans in answers]
+        discrete_answers = [self._apply_mapping(a) for a in answers]  # type: ignore
 
         return torch.tensor(discrete_answers, dtype=torch.long)
 
-    def _apply_mapping(self, value: Any) -> int:
+    def _apply_mapping(self, value: str | None) -> int:
+        if value is None or value == self.missing_answer:
+            return self.missing_discrete_answer
+
         key = value if self.case_sensitive else str(value).strip().lower()
         if key not in self.mapping:
             if self.raise_if_missing and self.missing_count >= self.missing_limit:
@@ -151,5 +163,5 @@ class ExtractDiscreteAnswerFromStructuredOutput(ExtractAnswerFromStructuredOutpu
                 f"Answer '{key}' not found in mapping, returning {self.missing_answer} instead."
             )
             self.missing_count += 1
-            return self.missing_answer
+            return self.missing_discrete_answer
         return self.mapping[key]
