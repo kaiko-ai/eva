@@ -1,7 +1,7 @@
 """Base classes for postprocessing transforms."""
 
 from abc import ABC, abstractmethod
-from typing import Any, Dict, List, Union
+from typing import Dict, List, Union
 
 import torch
 from loguru import logger
@@ -16,8 +16,9 @@ class ExtractAnswerFromStructuredOutput(ABC):
         answer_key: str = "answer",
         case_sensitive: bool = False,
         raise_if_missing: bool = True,
-        missing_answer: int = -1,
+        missing_answer: str | None = None,
         missing_limit: int = 5,
+        return_dict: bool = False,
     ) -> None:
         """Initialize the transform.
 
@@ -32,11 +33,18 @@ class ExtractAnswerFromStructuredOutput(ABC):
                 are still below `missing_limit`.
             missing_limit: The maximum number of missing responses before raising
                 an error, if `raise_if_missing` is True.
+            return_dict: Whether to return the extracted structured data as a dictionary.
+                If False, only the answer string under "answer_key" will be returned.
+                Enabling this can be handy if additional fields are extracted alongside
+                the answer and are needed downstream e.g. for logging or metrics calculation.
+                The logic furthermore ensures that the returned dictionary always contains
+                an "answer_key" entry.
         """
         self.answer_key = answer_key
         self.case_sensitive = case_sensitive
         self.raise_if_missing = raise_if_missing
-        self.missing_answer = int(missing_answer)
+        self.missing_answer = missing_answer
+        self.return_dict = return_dict
         self.missing_limit = int(missing_limit)
         self.missing_count = 0
 
@@ -53,12 +61,40 @@ class ExtractAnswerFromStructuredOutput(ABC):
         """
         raise NotImplementedError("Subclasses must implement this method.")
 
-    def __call__(self, values: Union[str, List[str]]) -> List[Dict[str, str] | None]:
-        """Convert structured string(s) to a tensor of integer labels."""
+    def _extract_answer(self, value: str) -> str | Dict[str, str] | None:
+        """Extracts the answer from the input text.
+
+        If extraction fails, handles missing data according, either returns
+        `self.missing_answer` or raises an error, based on configuration.
+
+        Args:
+            value: A string to extract the answer from.
+
+        Returns:
+            str | None: The extracted answer string, or None if extraction failed.
+        """
+        structured_data = self._extract_structured_data(value)
+
+        if structured_data is None or self.answer_key not in structured_data:
+            self.missing_count += 1
+            if self.raise_if_missing and self.missing_count > self.missing_limit:
+                raise ValueError(
+                    f"Found {self.missing_count} responses without valid structured data."
+                )
+            logger.warning(
+                f"Failed to extract answer from response: {structured_data}, "
+                f"returning {self.missing_answer} instead."
+            )
+            return self.missing_answer
+
+        return structured_data if self.return_dict else str(structured_data[self.answer_key])
+
+    def __call__(self, values: Union[str, List[str]]) -> List[str | Dict[str, str] | None]:
+        """Extracts answers from text(s)."""
         if not isinstance(values, (list, tuple)):
             values = [values]
 
-        return list(map(self._extract_structured_data, values))
+        return list(map(self._extract_answer, values))
 
 
 class ExtractDiscreteAnswerFromStructuredOutput(ExtractAnswerFromStructuredOutput, ABC):
@@ -95,36 +131,28 @@ class ExtractDiscreteAnswerFromStructuredOutput(ExtractAnswerFromStructuredOutpu
             answer_key=answer_key,
             case_sensitive=case_sensitive,
             raise_if_missing=raise_if_missing,
-            missing_answer=missing_answer,
             missing_limit=missing_limit,
+            return_dict=False,
         )
 
+        self.missing_discrete_answer = missing_answer
         self.mapping = {k if case_sensitive else k.lower(): v for k, v in mapping.items()}
 
     @override
     def __call__(self, values: Union[str, List[str]]) -> torch.Tensor:
-        """Convert structured string(s) to a tensor of integer labels."""
-        structured_data = super().__call__(values)
-        answers = list(map(self._extract_answer, structured_data))
+        """Extracts answers from text(s) and maps them to discrete integers."""
+        if not isinstance(values, (list, tuple)):
+            values = [values]
 
-        return torch.tensor(answers, dtype=torch.long)
+        answers = list(map(self._extract_answer, values))
+        discrete_answers = [self._apply_mapping(a) for a in answers]  # type: ignore
 
-    def _extract_answer(self, structured_obj: Dict[str, str] | None) -> int:
-        if structured_obj is None or self.answer_key not in structured_obj:
-            self.missing_count += 1
-            if self.raise_if_missing and self.missing_count > self.missing_limit:
-                raise ValueError(
-                    f"Found {self.missing_count} responses without valid structured data."
-                )
-            logger.warning(
-                f"Failed to extract answer from response: {structured_obj}, "
-                f"returning {self.missing_answer} instead."
-            )
-            return self.missing_answer
+        return torch.tensor(discrete_answers, dtype=torch.long)
 
-        return self._apply_mapping(structured_obj[self.answer_key])
+    def _apply_mapping(self, value: str | None) -> int:
+        if value is None or value == self.missing_answer:
+            return self.missing_discrete_answer
 
-    def _apply_mapping(self, value: Any) -> int:
         key = value if self.case_sensitive else str(value).strip().lower()
         if key not in self.mapping:
             if self.raise_if_missing and self.missing_count >= self.missing_limit:
@@ -135,5 +163,5 @@ class ExtractDiscreteAnswerFromStructuredOutput(ExtractAnswerFromStructuredOutpu
                 f"Answer '{key}' not found in mapping, returning {self.missing_answer} instead."
             )
             self.missing_count += 1
-            return self.missing_answer
+            return self.missing_discrete_answer
         return self.mapping[key]
