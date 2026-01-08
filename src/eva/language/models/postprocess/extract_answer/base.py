@@ -135,7 +135,7 @@ class ExtractDiscreteAnswerFromStructuredOutput(ExtractAnswerFromStructuredOutpu
             return_dict=False,
         )
 
-        self.missing_discrete_answer = missing_answer
+        self.missing_discrete_answer = int(missing_answer)
         self.mapping = {k if case_sensitive else k.lower(): v for k, v in mapping.items()}
 
     @override
