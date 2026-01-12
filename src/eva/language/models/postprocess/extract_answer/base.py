@@ -160,7 +160,8 @@ class ExtractDiscreteAnswerFromStructuredOutput(ExtractAnswerFromStructuredOutpu
                     f"Answer '{key}' not found in mapping: {list(self.mapping.keys())}"
                 )
             logger.warning(
-                f"Answer '{key}' not found in mapping, returning {self.missing_answer} instead."
+                f"Answer '{key}' not found in mapping, "
+                f"returning {self.missing_discrete_answer} instead."
             )
             self.missing_count += 1
             return self.missing_discrete_answer
