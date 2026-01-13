@@ -11,6 +11,7 @@ from eva.vision.data.datasets.classification import (
     GleasonArvaniti,
     PANDASmall,
     PatchCamelyon,
+    TIGERWsiBulk,
     UniToPatho,
     WsiClassificationDataset,
 )
@@ -49,4 +50,5 @@ __all__ = [
     "VisionDataset",
     "MultiWsiDataset",
     "WsiDataset",
+    "TIGERWsiBulk",
 ]
