@@ -13,7 +13,7 @@ class MulticlassClassificationMetrics(structs.MetricCollection):
     def __init__(
         self,
         num_classes: int,
-        average: Literal["macro", "weighted", "none"] = "macro",
+        average: Literal["micro", "macro", "weighted", "none"] = "macro",
         ignore_index: int | None = None,
         prefix: str | None = None,
         postfix: str | None = None,
