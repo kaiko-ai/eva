@@ -30,6 +30,12 @@ class HuggingFaceDownloadError(Exception):
     """Raised when an error occurs during Hugging Face repository download."""
 
     def __init__(self, repo_name: str, message: str):
+        """Initialize HuggingFaceDownloadError.
+
+        Args:
+            repo_name: Name of the repository that failed to download.
+            message: Error message describing what went wrong.
+        """
         self.repo_name = repo_name
         super().__init__(message)
 
@@ -76,7 +82,8 @@ def _verify_downloaded_files(
         except Exception as e:
             raise HuggingFaceDownloadError(
                 repo_name=repo_name,
-                message=f"Access denied to Hugging Face repository '{repo_name}', could not list repo files.",
+                message=f"Access denied to Hugging Face repository '{repo_name}', "
+                "could not list repo files.",
             ) from e
     else:
         expected_files = files
@@ -116,7 +123,7 @@ def _filter_relevant_files(file_paths: list[Path]) -> list[Path]:
     ]
 
 
-def repo_download(
+def repo_download(  # noqa: C901
     repo_name: str,
     repo_type: str,
     local_dir: str | Path,
@@ -198,7 +205,7 @@ def repo_download(
                 f"Download error ({type(e).__name__}): Retrying... {tries} / {MAX_TRIES}"
             )
             if tries >= retries:
-                raise Exception(f"Failed to download after {retries} retries: {str(e)}")
+                raise Exception(f"Failed to download after {retries} retries: {str(e)}") from e
         except Exception as e:
             raise e
 
@@ -260,7 +267,7 @@ def _should_unpack(file_path: Path | str) -> bool:
     return archive_suffix in _SUPPORTED_EXTENSIONS
 
 
-def unpack_archive(
+def unpack_archive(  # noqa: C901
     archive_path: Path,
     unpack_dir: Path | None = None,
     ignore_macos: bool = True,
@@ -357,7 +364,8 @@ def _cleanup_system_files(
 
 
 def _remove_redundant_subdir(path: Path) -> None:
-    """
+    """Remove redundant subdirectory created during archive unpacking.
+
     For archives tmp/myarchive.zip where there is a "myarchive" folder within the archive,
     unpacking can result in /tmp/myarchive/myarchive/. This function removes the
     redundant subfolder.

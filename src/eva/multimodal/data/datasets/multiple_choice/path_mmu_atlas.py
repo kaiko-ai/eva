@@ -147,13 +147,24 @@ class PathMMUAtlas(TextImageDataset[int]):
     @override
     def load_text(self, index: int) -> MessageSeries:
         sample = self._samples[index]
+        # Strip letter prefixes from options (e.g., "A) Option text" -> "Option text")
+        # since the template will add them back with use_option_letters=True
+        options = [self._strip_letter_prefix(opt) for opt in sample["options"]]
         prompt = self._prompt_template.render(
             question=sample["question"],
             context=None,
-            answer_options=sample["options"],
+            answer_options=options,
             **self._prompt_render_kwargs,
         )
         return [UserMessage(content=prompt)]
+
+    @staticmethod
+    def _strip_letter_prefix(option: str) -> str:
+        """Strip letter prefix like 'A) ' or 'A. ' from option text."""
+        import re
+
+        # Match patterns like "A) ", "A. ", "B) ", etc.
+        return re.sub(r"^[A-E][)\.]\s*", "", option)
 
     @override
     def load_images(self, index: int) -> list[tv_tensors.Image]:
@@ -241,7 +252,6 @@ class PathMMUAtlas(TextImageDataset[int]):
         Returns:
             A list of sample dictionaries with question, options, answer, etc.
         """
-
         data_json_path = os.path.join(self._path_mmu_hf_path, "data.json")
 
         if not os.path.exists(data_json_path):
