@@ -1,0 +1,82 @@
+trainer:
+  class_path: eva.Trainer
+  init_args:
+    accelerator: ${oc.env:ACCELERATOR, auto}
+    devices: ${oc.env:NUM_DEVICES, 1}
+    n_runs: &N_RUNS ${oc.env:N_RUNS, 1}
+    default_root_dir: ${oc.env:OUTPUT_ROOT, logs/${oc.env:MODEL_NAME, anthropic/claude-3-7-sonnet-20250219}/path_mmu_atlas}
+    precision: bf16
+    checkpoint_type: null
+    callbacks:
+      - class_path: eva.callbacks.ConfigurationLogger
+model:
+  class_path: eva.multimodal.models.modules.VisionLanguageModule
+  init_args:
+    model:
+      class_path: eva.multimodal.models.wrappers.ModelFromRegistry
+      init_args:
+        model_name: ${oc.env:MODEL_NAME, anthropic/claude-3-7-sonnet-20250219}
+        model_kwargs:
+          system_prompt: "In the following tasks you will work as a pathology expert and analyze images of tissue samples."
+        model_extra_kwargs: ${oc.env:MODEL_EXTRA_KWARGS, null}
+    metrics:
+      common:
+        - class_path: eva.metrics.MulticlassClassificationMetrics
+          init_args:
+            num_classes: 4
+            input_type: "discrete"
+            average: "micro"
+            ignore_index: -1
+    postprocess:
+      predictions_transforms:
+        - class_path: eva.language.models.postprocess.ExtractDiscreteAnswer
+          init_args:
+            answer_format: ${oc.env:ANSWER_FORMAT, json}
+            extract_kwargs:
+              mapping: {"A": 0, "B": 1, "C": 2, "D": 3}
+              missing_limit: ${oc.env:MISSING_LIMIT, 5}
+              missing_answer: ${oc.env:MISSING_ANSWER, -1}
+data:
+  class_path: eva.DataModule
+  init_args:
+    datasets:
+      val:
+        class_path: eva.multimodal.data.datasets.PathMMUAtlas
+        init_args: &DATASET_ARGS
+          root: ${oc.env:DATA_ROOT, .data/path_mmu_atlas}
+          split: val
+          download: ${oc.env:DOWNLOAD_DATA, false}
+          # Set `download: true` to download the dataset
+          # PathMMU is distributed under CC-BY-ND-4.0 license
+          # ARCH Book Set is distributed under CC-BY-NC-SA-4.0 license
+          prompt_template:
+            class_path: eva.language.prompts.templates.MultipleChoicePromptTemplate
+            init_args:
+              answer_format: ${oc.env:ANSWER_FORMAT, json}
+          transforms:
+            image:
+              class_path: eva.vision.data.transforms.Resize
+              init_args:
+                size: ${oc.env:RESIZE_DIM, null}
+                max_bytes: ${oc.env:IMAGE_MAX_BYTES, null}
+      test:
+        class_path: eva.multimodal.data.datasets.PathMMUAtlas
+        init_args:
+          <<: *DATASET_ARGS
+          split: test
+    dataloaders:
+      val: &DATALOADER_ARGS
+        batch_size: &BATCH_SIZE ${oc.env:BATCH_SIZE, 16}
+        num_workers: &N_DATA_WORKERS ${oc.env:N_DATA_WORKERS, 1}
+        collate_fn: eva.multimodal.data.dataloaders.text_image_collate
+      test:
+        <<: *DATALOADER_ARGS
+    samplers:
+      val: &SAMPLER_ARGS
+        class_path: eva.core.data.samplers.RandomSampler
+        init_args:
+          seed: ${oc.env:SAMPLER_SEED, 42}
+          sample_ratio: ${oc.env:SAMPLE_RATIO, null}
+          num_samples: ${oc.env:NUM_SAMPLES, null}
+      test:
+        <<: *SAMPLER_ARGS
