@@ -3789,7 +3789,7 @@ and the metric itself.</p>
           <tr class="doc-section-item">
             <td><code>compute_groups</code></td>
             <td>
-                  <code>bool | <span title="typing.List">List</span>[<span title="typing.List">List</span>[str]]</code>
+                  <code>bool</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3847,7 +3847,7 @@ behavior, set to <code>False</code>.</p>
 </span><span id="__span-0-48"><a id="__codelineno-0-48" name="__codelineno-0-48"></a>    <span class="n">test</span><span class="p">:</span> <span class="n">MetricModuleType</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="__span-0-49"><a id="__codelineno-0-49" name="__codelineno-0-49"></a>    <span class="o">*</span><span class="p">,</span>
 </span><span id="__span-0-50"><a id="__codelineno-0-50" name="__codelineno-0-50"></a>    <span class="n">separator</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;/&quot;</span><span class="p">,</span>
-</span><span id="__span-0-51"><a id="__codelineno-0-51" name="__codelineno-0-51"></a>    <span class="n">compute_groups</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+</span><span id="__span-0-51"><a id="__codelineno-0-51" name="__codelineno-0-51"></a>    <span class="n">compute_groups</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 </span><span id="__span-0-52"><a id="__codelineno-0-52" name="__codelineno-0-52"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MetricModule</span><span class="p">:</span>
 </span><span id="__span-0-53"><a id="__codelineno-0-53" name="__codelineno-0-53"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Initializes a metric module from a list of metrics.</span>
 </span><span id="__span-0-54"><a id="__codelineno-0-54" name="__codelineno-0-54"></a>
@@ -3921,37 +3921,6 @@ behavior, set to <code>False</code>.</p>
                 <em>required</em>
             </td>
           </tr>
-          <tr class="doc-section-item">
-            <td><code>separator</code></td>
-            <td>
-                  <code>str</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The separator between the group name of the metric
-and the metric itself.</p>
-              </div>
-            </td>
-            <td>
-                  <code>&#39;/&#39;</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>compute_groups</code></td>
-            <td>
-                  <code>bool</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>All metrics in a compute group share the same metric state
-and are therefore only different in their compute step. To disable this
-behavior, set to <code>False</code>.</p>
-              </div>
-            </td>
-            <td>
-                  <code>True</code>
-            </td>
-          </tr>
       </tbody>
     </table>
 
@@ -3970,34 +3939,20 @@ behavior, set to <code>False</code>.</p>
 <span class="normal"><a href="#__codelineno-0-87">87</a></span>
 <span class="normal"><a href="#__codelineno-0-88">88</a></span>
 <span class="normal"><a href="#__codelineno-0-89">89</a></span>
-<span class="normal"><a href="#__codelineno-0-90">90</a></span>
-<span class="normal"><a href="#__codelineno-0-91">91</a></span>
-<span class="normal"><a href="#__codelineno-0-92">92</a></span>
-<span class="normal"><a href="#__codelineno-0-93">93</a></span>
-<span class="normal"><a href="#__codelineno-0-94">94</a></span>
-<span class="normal"><a href="#__codelineno-0-95">95</a></span>
-<span class="normal"><a href="#__codelineno-0-96">96</a></span>
-<span class="normal"><a href="#__codelineno-0-97">97</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-77"><a id="__codelineno-0-77" name="__codelineno-0-77"></a><span class="nd">@classmethod</span>
-</span><span id="__span-0-78"><a id="__codelineno-0-78" name="__codelineno-0-78"></a><span class="k">def</span> <span class="nf">from_schema</span><span class="p">(</span>
-</span><span id="__span-0-79"><a id="__codelineno-0-79" name="__codelineno-0-79"></a>    <span class="bp">cls</span><span class="p">,</span> <span class="n">schema</span><span class="p">:</span> <span class="n">schemas</span><span class="o">.</span><span class="n">MetricsSchema</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">separator</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">compute_groups</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
-</span><span id="__span-0-80"><a id="__codelineno-0-80" name="__codelineno-0-80"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MetricModule</span><span class="p">:</span>
-</span><span id="__span-0-81"><a id="__codelineno-0-81" name="__codelineno-0-81"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Initializes a metric module from the metrics schema.</span>
-</span><span id="__span-0-82"><a id="__codelineno-0-82" name="__codelineno-0-82"></a>
-</span><span id="__span-0-83"><a id="__codelineno-0-83" name="__codelineno-0-83"></a><span class="sd">    Args:</span>
-</span><span id="__span-0-84"><a id="__codelineno-0-84" name="__codelineno-0-84"></a><span class="sd">        schema: The dataclass metric schema.</span>
-</span><span id="__span-0-85"><a id="__codelineno-0-85" name="__codelineno-0-85"></a><span class="sd">        separator: The separator between the group name of the metric</span>
-</span><span id="__span-0-86"><a id="__codelineno-0-86" name="__codelineno-0-86"></a><span class="sd">            and the metric itself.</span>
-</span><span id="__span-0-87"><a id="__codelineno-0-87" name="__codelineno-0-87"></a><span class="sd">        compute_groups: All metrics in a compute group share the same metric state</span>
-</span><span id="__span-0-88"><a id="__codelineno-0-88" name="__codelineno-0-88"></a><span class="sd">            and are therefore only different in their compute step. To disable this</span>
-</span><span id="__span-0-89"><a id="__codelineno-0-89" name="__codelineno-0-89"></a><span class="sd">            behavior, set to `False`.</span>
-</span><span id="__span-0-90"><a id="__codelineno-0-90" name="__codelineno-0-90"></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="__span-0-91"><a id="__codelineno-0-91" name="__codelineno-0-91"></a>    <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_metrics</span><span class="p">(</span>
-</span><span id="__span-0-92"><a id="__codelineno-0-92" name="__codelineno-0-92"></a>        <span class="n">train</span><span class="o">=</span><span class="n">schema</span><span class="o">.</span><span class="n">training_metrics</span><span class="p">,</span>
-</span><span id="__span-0-93"><a id="__codelineno-0-93" name="__codelineno-0-93"></a>        <span class="n">val</span><span class="o">=</span><span class="n">schema</span><span class="o">.</span><span class="n">evaluation_metrics</span><span class="p">,</span>
-</span><span id="__span-0-94"><a id="__codelineno-0-94" name="__codelineno-0-94"></a>        <span class="n">test</span><span class="o">=</span><span class="n">schema</span><span class="o">.</span><span class="n">evaluation_metrics</span><span class="p">,</span>
-</span><span id="__span-0-95"><a id="__codelineno-0-95" name="__codelineno-0-95"></a>        <span class="n">separator</span><span class="o">=</span><span class="n">separator</span><span class="p">,</span>
-</span><span id="__span-0-96"><a id="__codelineno-0-96" name="__codelineno-0-96"></a>        <span class="n">compute_groups</span><span class="o">=</span><span class="n">compute_groups</span><span class="p">,</span>
-</span><span id="__span-0-97"><a id="__codelineno-0-97" name="__codelineno-0-97"></a>    <span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-90">90</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-77"><a id="__codelineno-0-77" name="__codelineno-0-77"></a><span class="nd">@classmethod</span>
+</span><span id="__span-0-78"><a id="__codelineno-0-78" name="__codelineno-0-78"></a><span class="k">def</span> <span class="nf">from_schema</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">schema</span><span class="p">:</span> <span class="n">schemas</span><span class="o">.</span><span class="n">MetricsSchema</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MetricModule</span><span class="p">:</span>
+</span><span id="__span-0-79"><a id="__codelineno-0-79" name="__codelineno-0-79"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Initializes a metric module from the metrics schema.</span>
+</span><span id="__span-0-80"><a id="__codelineno-0-80" name="__codelineno-0-80"></a>
+</span><span id="__span-0-81"><a id="__codelineno-0-81" name="__codelineno-0-81"></a><span class="sd">    Args:</span>
+</span><span id="__span-0-82"><a id="__codelineno-0-82" name="__codelineno-0-82"></a><span class="sd">        schema: The dataclass metric schema.</span>
+</span><span id="__span-0-83"><a id="__codelineno-0-83" name="__codelineno-0-83"></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="__span-0-84"><a id="__codelineno-0-84" name="__codelineno-0-84"></a>    <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_metrics</span><span class="p">(</span>
+</span><span id="__span-0-85"><a id="__codelineno-0-85" name="__codelineno-0-85"></a>        <span class="n">train</span><span class="o">=</span><span class="n">schema</span><span class="o">.</span><span class="n">training_metrics</span><span class="p">,</span>
+</span><span id="__span-0-86"><a id="__codelineno-0-86" name="__codelineno-0-86"></a>        <span class="n">val</span><span class="o">=</span><span class="n">schema</span><span class="o">.</span><span class="n">evaluation_metrics</span><span class="p">,</span>
+</span><span id="__span-0-87"><a id="__codelineno-0-87" name="__codelineno-0-87"></a>        <span class="n">test</span><span class="o">=</span><span class="n">schema</span><span class="o">.</span><span class="n">evaluation_metrics</span><span class="p">,</span>
+</span><span id="__span-0-88"><a id="__codelineno-0-88" name="__codelineno-0-88"></a>        <span class="n">separator</span><span class="o">=</span><span class="n">schema</span><span class="o">.</span><span class="n">separator</span><span class="p">,</span>
+</span><span id="__span-0-89"><a id="__codelineno-0-89" name="__codelineno-0-89"></a>        <span class="n">compute_groups</span><span class="o">=</span><span class="n">schema</span><span class="o">.</span><span class="n">compute_groups</span><span class="p">,</span>
+</span><span id="__span-0-90"><a id="__codelineno-0-90" name="__codelineno-0-90"></a>    <span class="p">)</span>
 </span></code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -4104,6 +4059,50 @@ behavior, set to <code>False</code>.</p>
     <div class="doc doc-contents ">
 
       <p>The exclusive evaluation metrics.</p>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="eva.metrics.MetricsSchema.compute_groups" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <code class="highlight language-python"><span class="n">compute_groups</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+      <p>Whether to share the same states across metrics in a collection.</p>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="eva.metrics.MetricsSchema.separator" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <code class="highlight language-python"><span class="n">separator</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;/&#39;</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+      <p>The separator between the group name of the metric and the metric itself.</p>
     </div>
 
 </div>
