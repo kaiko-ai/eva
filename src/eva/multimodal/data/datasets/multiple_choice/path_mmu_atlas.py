@@ -2,13 +2,15 @@
 
 import json
 import os
+import re
 from typing import Any, Dict, List, Literal
 
+import huggingface_hub
+from loguru import logger
 from torchvision import tv_tensors
 from torchvision.datasets import utils
 from typing_extensions import override
 
-from eva.core.utils import download_from_huggingface
 from eva.language.data.messages import MessageSeries, UserMessage
 from eva.language.prompts import templates
 from eva.language.prompts.templates.preambles import DEFAULT_QA_PREAMBLE
@@ -147,9 +149,18 @@ class PathMMUAtlas(TextImageDataset[int]):
     @override
     def load_text(self, index: int) -> MessageSeries:
         sample = self._samples[index]
+        options = sample["options"]
+
         # Strip letter prefixes from options (e.g., "A) Option text" -> "Option text")
-        # since the template will add them back with use_option_letters=True
-        options = [self._strip_letter_prefix(opt) for opt in sample["options"]]
+        # since the template will add them back with use_option_letters=True.
+        # Only strip if ALL options have uppercase letter prefixes (A-E followed by ) or .)
+        all_have_prefix = all(
+            opt and len(opt) >= 2 and opt[0].isupper() and opt[0].isalpha() and opt[1] in ")."
+            for opt in options
+        )
+        if all_have_prefix:
+            options = [self._strip_letter_prefix(opt) for opt in options]
+
         prompt = self._prompt_template.render(
             question=sample["question"],
             context=None,
@@ -161,8 +172,6 @@ class PathMMUAtlas(TextImageDataset[int]):
     @staticmethod
     def _strip_letter_prefix(option: str) -> str:
         """Strip letter prefix like 'A) ' or 'A. ' from option text."""
-        import re
-
         # Match patterns like "A) ", "A. ", "B) ", etc.
         return re.sub(r"^[A-E][)\.]\s*", "", option)
 
@@ -179,6 +188,11 @@ class PathMMUAtlas(TextImageDataset[int]):
         # The answer field contains the full answer starting with the letter
         # e.g., "B) Skeletal muscle" -> "B" -> 1
         answer_letter = sample["answer"][0]  # Extract just the letter
+        if not (answer_letter.isupper() and answer_letter.isalpha()):
+            raise ValueError(
+                f"Invalid answer format at index {index}: expected uppercase letter (A-E), "
+                f"got '{answer_letter}' from answer '{sample['answer']}'"
+            )
         return self.class_to_idx[answer_letter]
 
     @override
@@ -204,10 +218,10 @@ class PathMMUAtlas(TextImageDataset[int]):
         if not utils.check_integrity(zip_path, self._arch_book_set_md5):
             # Remove any corrupted/incomplete download
             if os.path.exists(zip_path):
-                print(f"Removing corrupted/incomplete download: {zip_path}")
+                logger.info(f"Removing corrupted/incomplete download: {zip_path}")
                 os.remove(zip_path)
 
-            print("Downloading ARCH Book Set images...")
+            logger.info("Downloading ARCH Book Set images...")
             utils.download_url(
                 self._arch_book_set_url,
                 root=self._arch_path,
@@ -215,7 +229,7 @@ class PathMMUAtlas(TextImageDataset[int]):
                 md5=self._arch_book_set_md5,
             )
 
-        print("Extracting ARCH Book Set images...")
+        logger.info("Extracting ARCH Book Set images...")
         utils.extract_archive(zip_path, self._arch_path, remove_finished=True)
 
     def _is_arch_book_set_complete(self) -> bool:
@@ -236,15 +250,14 @@ class PathMMUAtlas(TextImageDataset[int]):
         if os.path.exists(data_json_path):
             return
 
-        print("Downloading PathMMU data.json from HuggingFace...")
-        download_from_huggingface(
+        logger.info("Downloading PathMMU data.json from HuggingFace...")
+        huggingface_hub.snapshot_download(
             repo_id="jamessyx/PathMMU",
-            local_dir=self._path_mmu_hf_path,
             repo_type="dataset",
-            files=["data.json"],
-            unpack=False,
+            local_dir=self._path_mmu_hf_path,
+            allow_patterns=["data.json"],
         )
-        print(f"PathMMU HuggingFace data.json saved to {self._path_mmu_hf_path}")
+        logger.info(f"PathMMU HuggingFace data.json saved to {self._path_mmu_hf_path}")
 
     def _load_vqa_samples(self) -> List[Dict[str, Any]]:
         """Loads VQA samples for the current split.
@@ -280,4 +293,4 @@ class PathMMUAtlas(TextImageDataset[int]):
 
     def _print_license(self) -> None:
         """Prints the dataset license."""
-        print(f"Dataset license: {self._license}")
+        logger.info(f"Dataset license: {self._license}")

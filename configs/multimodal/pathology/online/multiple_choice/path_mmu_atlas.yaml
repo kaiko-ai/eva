@@ -23,9 +23,9 @@ model:
       common:
         - class_path: eva.metrics.MulticlassClassificationMetrics
           init_args:
-            num_classes: 4
+            num_classes: 5
             input_type: "discrete"
-            average: "micro"
+            average: "micro" # options differ per question, so class-based averaging is not applicable
             ignore_index: -1
     postprocess:
       predictions_transforms:
@@ -33,7 +33,7 @@ model:
           init_args:
             answer_format: ${oc.env:ANSWER_FORMAT, json}
             extract_kwargs:
-              mapping: {"A": 0, "B": 1, "C": 2, "D": 3}
+              mapping: {"A": 0, "B": 1, "C": 2, "D": 3, "E": 4}
               missing_limit: ${oc.env:MISSING_LIMIT, 5}
               missing_answer: ${oc.env:MISSING_ANSWER, -1}
 data:
