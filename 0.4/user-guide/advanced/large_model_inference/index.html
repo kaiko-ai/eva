@@ -9,23 +9,25 @@
       
       
       
-        <link rel="prev" href="../../models/wrappers/">
+        <link rel="prev" href="../replicate_evaluations/">
       
       
+        <link rel="next" href="../model_registry/">
       
-      <link rel="icon" href="../../../../images/eva-stripes.png">
+      
+      <link rel="icon" href="../../../images/eva-stripes.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.34">
     
     
       
-        <title>Image - eva</title>
+        <title>Large-Scale Model Inference with vLLM - eva</title>
       
     
     
-      <link rel="stylesheet" href="../../../../assets/stylesheets/main.35f28582.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.35f28582.min.css">
       
         
-        <link rel="stylesheet" href="../../../../assets/stylesheets/palette.06af60db.min.css">
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.06af60db.min.css">
       
       
 
@@ -44,9 +46,9 @@
       
     
     
-      <link rel="stylesheet" href="../../../../assets/_mkdocstrings.css">
+      <link rel="stylesheet" href="../../../assets/_mkdocstrings.css">
     
-    <script>__md_scope=new URL("../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -72,7 +74,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#image-utilities" class="md-skip">
+        <a href="#large-scale-model-inference-with-vllm" class="md-skip">
           Skip to content
         </a>
       
@@ -90,9 +92,9 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../.." title="eva" class="md-header__button md-logo" aria-label="eva" data-md-component="logo">
+    <a href="../../.." title="eva" class="md-header__button md-logo" aria-label="eva" data-md-component="logo">
       
-  <img src="../../../../images/eva-stripes.png" alt="logo">
+  <img src="../../../images/eva-stripes.png" alt="logo">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -109,7 +111,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Image
+              Large-Scale Model Inference with vLLM
             
           </span>
         </div>
@@ -218,7 +220,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../../../.." class="md-tabs__link">
+      <a href="../../.." class="md-tabs__link">
         
   
     
@@ -235,7 +237,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../../../../leaderboards/" class="md-tabs__link">
+      <a href="../../../leaderboards/" class="md-tabs__link">
         
   
     
@@ -250,11 +252,13 @@
         
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="../../../../user-guide/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../../" class="md-tabs__link">
           
   
     
@@ -274,7 +278,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../../../datasets/" class="md-tabs__link">
+        <a href="../../../datasets/" class="md-tabs__link">
           
   
     
@@ -290,13 +294,11 @@
         
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="../../../" class="md-tabs__link">
+      <li class="md-tabs__item">
+        <a href="../../../reference/" class="md-tabs__link">
           
   
     
@@ -331,9 +333,9 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../.." title="eva" class="md-nav__button md-logo" aria-label="eva" data-md-component="logo">
+    <a href="../../.." title="eva" class="md-nav__button md-logo" aria-label="eva" data-md-component="logo">
       
-  <img src="../../../../images/eva-stripes.png" alt="logo">
+  <img src="../../../images/eva-stripes.png" alt="logo">
 
     </a>
     eva
@@ -360,7 +362,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../.." class="md-nav__link">
+      <a href="../../.." class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -380,7 +382,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../leaderboards/" class="md-nav__link">
+      <a href="../../../leaderboards/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -397,6 +399,8 @@
       
   
   
+    
+  
   
   
     
@@ -415,21 +419,22 @@
     
     
       
+        
+        
+      
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
         
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
         
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../../../user-guide/" class="md-nav__link ">
+            <a href="../../" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
@@ -440,13 +445,13 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="0">
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
             User Guide
@@ -508,7 +513,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../user-guide/getting-started/installation/" class="md-nav__link">
+      <a href="../../getting-started/installation/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -529,7 +534,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../user-guide/getting-started/how_to_use/" class="md-nav__link">
+      <a href="../../getting-started/how_to_use/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -606,7 +611,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../user-guide/tutorials/offline_vs_online/" class="md-nav__link">
+      <a href="../../tutorials/offline_vs_online/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -627,7 +632,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../user-guide/tutorials/evaluate_resnet/" class="md-nav__link">
+      <a href="../../tutorials/evaluate_resnet/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -648,7 +653,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../user-guide/tutorials/pubmedqa_classification/" class="md-nav__link">
+      <a href="../../tutorials/pubmedqa_classification/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -674,8 +679,10 @@
                 
   
   
+    
   
   
+  
     
     
       
@@ -687,19 +694,19 @@
       
         
       
+        
+      
     
     
       
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_4" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_4" checked>
         
           
           <label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="0">
@@ -713,7 +720,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3_4">
             <span class="md-nav__icon md-icon"></span>
             Advanced user guide
@@ -727,7 +734,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../user-guide/advanced/replicate_evaluations/" class="md-nav__link">
+      <a href="../replicate_evaluations/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -745,10 +752,125 @@
                 
   
   
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Large-Scale Model Inference with vLLM
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Large-Scale Model Inference with vLLM
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    <span class="md-ellipsis">
+      Prerequisites
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quick-start" class="md-nav__link">
+    <span class="md-ellipsis">
+      Quick Start
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-it-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      How It Works
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#vllm-settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      vLLM Settings
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#custom-vllm-models" class="md-nav__link">
+    <span class="md-ellipsis">
+      Custom vLLM Models
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      Troubleshooting
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
   
   
     <li class="md-nav__item">
-      <a href="../../../../user-guide/advanced/model_registry/" class="md-nav__link">
+      <a href="../model_registry/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -769,7 +891,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../user-guide/advanced/model_wrappers/" class="md-nav__link">
+      <a href="../model_wrappers/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -790,7 +912,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../user-guide/advanced/custom_checkpoints/" class="md-nav__link">
+      <a href="../custom_checkpoints/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -855,7 +977,7 @@
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../../../datasets/" class="md-nav__link ">
+            <a href="../../../datasets/" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
@@ -998,7 +1120,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../datasets/bach/" class="md-nav__link">
+      <a href="../../../datasets/bach/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1019,7 +1141,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../datasets/bracs/" class="md-nav__link">
+      <a href="../../../datasets/bracs/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1040,7 +1162,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../datasets/breakhis/" class="md-nav__link">
+      <a href="../../../datasets/breakhis/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1061,7 +1183,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../datasets/crc/" class="md-nav__link">
+      <a href="../../../datasets/crc/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1082,7 +1204,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../datasets/gleason_arvaniti/" class="md-nav__link">
+      <a href="../../../datasets/gleason_arvaniti/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1103,7 +1225,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../datasets/mhist/" class="md-nav__link">
+      <a href="../../../datasets/mhist/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1124,7 +1246,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../datasets/patch_camelyon/" class="md-nav__link">
+      <a href="../../../datasets/patch_camelyon/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1145,7 +1267,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../datasets/unitopatho/" class="md-nav__link">
+      <a href="../../../datasets/unitopatho/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1166,7 +1288,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../datasets/monusac/" class="md-nav__link">
+      <a href="../../../datasets/monusac/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1187,7 +1309,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../datasets/consep/" class="md-nav__link">
+      <a href="../../../datasets/consep/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1208,7 +1330,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../datasets/bcss/" class="md-nav__link">
+      <a href="../../../datasets/bcss/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1285,7 +1407,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../datasets/camelyon16/" class="md-nav__link">
+      <a href="../../../datasets/camelyon16/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1306,7 +1428,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../datasets/panda/" class="md-nav__link">
+      <a href="../../../datasets/panda/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1327,7 +1449,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../datasets/panda_small/" class="md-nav__link">
+      <a href="../../../datasets/panda_small/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1412,7 +1534,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../datasets/btcv/" class="md-nav__link">
+      <a href="../../../datasets/btcv/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1433,7 +1555,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../datasets/lits17/" class="md-nav__link">
+      <a href="../../../datasets/lits17/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1454,7 +1576,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../datasets/msd_task7_pancreas/" class="md-nav__link">
+      <a href="../../../datasets/msd_task7_pancreas/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1527,7 +1649,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../datasets/pubmedqa/" class="md-nav__link">
+      <a href="../../../datasets/pubmedqa/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1560,8 +1682,6 @@
       
   
   
-    
-  
   
   
     
@@ -1582,22 +1702,21 @@
     
     
       
-        
-        
-      
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
         
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../../" class="md-nav__link ">
+            <a href="../../../reference/" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
@@ -1608,13 +1727,13 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="">
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="0">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
             Reference API
@@ -1688,7 +1807,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../core/interface/" class="md-nav__link">
+      <a href="../../../reference/core/interface/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1709,7 +1828,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../core/callbacks/" class="md-nav__link">
+      <a href="../../../reference/core/callbacks/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1780,7 +1899,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../core/data/dataloaders/" class="md-nav__link">
+      <a href="../../../reference/core/data/dataloaders/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1801,7 +1920,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../core/data/datamodules/" class="md-nav__link">
+      <a href="../../../reference/core/data/datamodules/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1822,7 +1941,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../core/data/datasets/" class="md-nav__link">
+      <a href="../../../reference/core/data/datasets/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1843,7 +1962,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../core/data/transforms/" class="md-nav__link">
+      <a href="../../../reference/core/data/transforms/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1903,7 +2022,7 @@
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../../core/metrics/" class="md-nav__link ">
+            <a href="../../../reference/core/metrics/" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
@@ -1936,7 +2055,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../core/metrics/core/" class="md-nav__link">
+      <a href="../../../reference/core/metrics/core/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1957,7 +2076,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../core/metrics/defaults/" class="md-nav__link">
+      <a href="../../../reference/core/metrics/defaults/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1978,7 +2097,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../core/metrics/average_loss/" class="md-nav__link">
+      <a href="../../../reference/core/metrics/average_loss/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1999,7 +2118,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../core/metrics/binary_balanced_accuracy/" class="md-nav__link">
+      <a href="../../../reference/core/metrics/binary_balanced_accuracy/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2078,7 +2197,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../core/models/modules/" class="md-nav__link">
+      <a href="../../../reference/core/models/modules/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2099,7 +2218,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../core/models/networks/" class="md-nav__link">
+      <a href="../../../reference/core/models/networks/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2120,7 +2239,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../core/models/wrappers/" class="md-nav__link">
+      <a href="../../../reference/core/models/wrappers/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2141,7 +2260,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../core/models/transforms/" class="md-nav__link">
+      <a href="../../../reference/core/models/transforms/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2216,7 +2335,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../core/trainers/trainer/" class="md-nav__link">
+      <a href="../../../reference/core/trainers/trainer/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2237,7 +2356,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../core/trainers/functional/" class="md-nav__link">
+      <a href="../../../reference/core/trainers/functional/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2266,7 +2385,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../core/loggers/loggers/" class="md-nav__link">
+      <a href="../../../reference/core/loggers/loggers/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2333,7 +2452,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../core/utils/multiprocessing/" class="md-nav__link">
+      <a href="../../../reference/core/utils/multiprocessing/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2354,7 +2473,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../core/utils/workers/" class="md-nav__link">
+      <a href="../../../reference/core/utils/workers/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2420,7 +2539,7 @@
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../../vision/" class="md-nav__link ">
+            <a href="../../../reference/vision/" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
@@ -2480,7 +2599,7 @@
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../../vision/data/" class="md-nav__link ">
+            <a href="../../../reference/vision/data/" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
@@ -2513,7 +2632,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../vision/data/datasets/" class="md-nav__link">
+      <a href="../../../reference/vision/data/datasets/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2534,7 +2653,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../vision/data/transforms/" class="md-nav__link">
+      <a href="../../../reference/vision/data/transforms/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2609,7 +2728,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../vision/models/networks/" class="md-nav__link">
+      <a href="../../../reference/vision/models/networks/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2630,7 +2749,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../vision/models/wrappers/" class="md-nav__link">
+      <a href="../../../reference/vision/models/wrappers/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2703,7 +2822,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../vision/utils/io/" class="md-nav__link">
+      <a href="../../../reference/vision/utils/io/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2767,7 +2886,7 @@
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../../language/" class="md-nav__link ">
+            <a href="../../../reference/language/" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
@@ -2825,7 +2944,7 @@
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../../language/data/" class="md-nav__link ">
+            <a href="../../../reference/language/data/" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
@@ -2858,7 +2977,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../language/data/datasets/" class="md-nav__link">
+      <a href="../../../reference/language/data/datasets/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2933,7 +3052,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../language/models/networks/" class="md-nav__link">
+      <a href="../../../reference/language/models/networks/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2954,7 +3073,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../language/models/wrappers/" class="md-nav__link">
+      <a href="../../../reference/language/models/wrappers/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2988,8 +3107,6 @@
                 
   
   
-    
-  
   
   
     
@@ -3011,16 +3128,18 @@
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_5" checked>
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5_5" >
         
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../" class="md-nav__link ">
+            <a href="../../../reference/multimodal/" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
@@ -3037,7 +3156,7 @@
             
           </div>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_5_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_5_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_5_5">
             <span class="md-nav__icon md-icon"></span>
             Multimodal
@@ -3078,7 +3197,7 @@
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../data/" class="md-nav__link ">
+            <a href="../../../reference/multimodal/data/" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
@@ -3111,7 +3230,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../data/datasets/" class="md-nav__link">
+      <a href="../../../reference/multimodal/data/datasets/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -3188,7 +3307,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../models/modules/" class="md-nav__link">
+      <a href="../../../reference/multimodal/models/modules/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -3209,7 +3328,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../models/networks/" class="md-nav__link">
+      <a href="../../../reference/multimodal/models/networks/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -3230,7 +3349,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../models/wrappers/" class="md-nav__link">
+      <a href="../../../reference/multimodal/models/wrappers/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -3256,8 +3375,6 @@
                 
   
   
-    
-  
   
   
     
@@ -3271,11 +3388,13 @@
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_5_4" checked>
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5_5_4" >
         
           
           <label class="md-nav__link" for="__nav_5_5_4" id="__nav_5_5_4_label" tabindex="0">
@@ -3289,7 +3408,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_5_5_4_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_5_5_4_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_5_5_4">
             <span class="md-nav__icon md-icon"></span>
             Utils
@@ -3300,30 +3419,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  <span class="md-ellipsis">
-    Image
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../../reference/multimodal/utils/image.md" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -3332,35 +3431,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#eva.multimodal.utils.image.encode_image" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;encode_image
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -3416,9 +3486,54 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#eva.multimodal.utils.image.encode_image" class="md-nav__link">
+  <a href="#prerequisites" class="md-nav__link">
     <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;encode_image
+      Prerequisites
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quick-start" class="md-nav__link">
+    <span class="md-ellipsis">
+      Quick Start
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-it-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      How It Works
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#vllm-settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      vLLM Settings
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#custom-vllm-models" class="md-nav__link">
+    <span class="md-ellipsis">
+      Custom vLLM Models
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      Troubleshooting
     </span>
   </a>
   
@@ -3442,140 +3557,118 @@
   
 
 
-<h1 id="image-utilities">Image Utilities</h1>
-<p>Reference information for the multimodal image utilities API.</p>
-
-
-<div class="doc doc-object doc-function">
-
-
-<h2 id="eva.multimodal.utils.image.encode_image" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <code class="highlight language-python"><span class="n">eva</span><span class="o">.</span><span class="n">multimodal</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">encode_image</span></code>
-
-</h2>
-
-
-    <div class="doc doc-contents first">
-
-      <p>Encodes an image tensor into a string format.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td><code>image</code></td>
-            <td>
-                  <code><span title="torchvision.tv_tensors.Image">Image</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The image tensor to encode.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>encoding</code></td>
-            <td>
-                  <code><span title="typing.Literal">Literal</span>[&#39;base64&#39;]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The encoding format to use. Currently only supports "base64".</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>**kwargs</code></td>
-            <td>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Additional keyword arguments to pass to the encoding function.</p>
-              </div>
-            </td>
-            <td>
-                  <code>{}</code>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code>str</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>An encoded string representation of the image.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-            <details class="quote">
-              <summary>Source code in <code>src/eva/multimodal/utils/image/encode.py</code></summary>
-              <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-12">12</a></span>
-<span class="normal"><a href="#__codelineno-0-13">13</a></span>
-<span class="normal"><a href="#__codelineno-0-14">14</a></span>
-<span class="normal"><a href="#__codelineno-0-15">15</a></span>
-<span class="normal"><a href="#__codelineno-0-16">16</a></span>
-<span class="normal"><a href="#__codelineno-0-17">17</a></span>
-<span class="normal"><a href="#__codelineno-0-18">18</a></span>
-<span class="normal"><a href="#__codelineno-0-19">19</a></span>
-<span class="normal"><a href="#__codelineno-0-20">20</a></span>
-<span class="normal"><a href="#__codelineno-0-21">21</a></span>
-<span class="normal"><a href="#__codelineno-0-22">22</a></span>
-<span class="normal"><a href="#__codelineno-0-23">23</a></span>
-<span class="normal"><a href="#__codelineno-0-24">24</a></span>
-<span class="normal"><a href="#__codelineno-0-25">25</a></span>
-<span class="normal"><a href="#__codelineno-0-26">26</a></span>
-<span class="normal"><a href="#__codelineno-0-27">27</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12"></a><span class="k">def</span> <span class="nf">encode_image</span><span class="p">(</span><span class="n">image</span><span class="p">:</span> <span class="n">tv_tensors</span><span class="o">.</span><span class="n">Image</span><span class="p">,</span> <span class="n">encoding</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;base64&quot;</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Encodes an image tensor into a string format.</span>
-</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14"></a>
-</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15"></a><span class="sd">    Args:</span>
-</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16"></a><span class="sd">        image: The image tensor to encode.</span>
-</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17"></a><span class="sd">        encoding: The encoding format to use. Currently only supports &quot;base64&quot;.</span>
-</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18"></a><span class="sd">        **kwargs: Additional keyword arguments to pass to the encoding function.</span>
-</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19"></a>
-</span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20"></a><span class="sd">    Returns:</span>
-</span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21"></a><span class="sd">        An encoded string representation of the image.</span>
-</span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22"></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23"></a>    <span class="k">match</span> <span class="n">encoding</span><span class="p">:</span>
-</span><span id="__span-0-24"><a id="__codelineno-0-24" name="__codelineno-0-24"></a>        <span class="k">case</span> <span class="s2">&quot;base64&quot;</span><span class="p">:</span>
-</span><span id="__span-0-25"><a id="__codelineno-0-25" name="__codelineno-0-25"></a>            <span class="k">return</span> <span class="n">_encode_base64</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-</span><span id="__span-0-26"><a id="__codelineno-0-26" name="__codelineno-0-26"></a>        <span class="k">case</span><span class="w"> </span><span class="k">_</span><span class="p">:</span>
-</span><span id="__span-0-27"><a id="__codelineno-0-27" name="__codelineno-0-27"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unsupported encoding type: </span><span class="si">{</span><span class="n">encoding</span><span class="si">}</span><span class="s2">. Supported: &#39;base64&#39;&quot;</span><span class="p">)</span>
-</span></code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
+<h1 id="large-scale-model-inference-with-vllm">Large-Scale Model Inference with vLLM</h1>
+<p>This guide shows how to run large-scale vision-language model (VLM) evaluations using <em>eva</em>'s vLLM integration. <a href="https://github.com/vllm-project/vllm">vLLM</a> is a high-throughput inference engine that enables efficient evaluation of large models through features like tensor parallelism and optimized memory management.</p>
+<h2 id="prerequisites">Prerequisites</h2>
+<p>vLLM is not included in <em>eva</em>'s dependencies as it can be complex to install on certain systems (specific CUDA versions, platform compatibility, etc.). You need to install it manually:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;kaiko-eva[all]&quot;</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>pip<span class="w"> </span>install<span class="w"> </span>vllm
+</span></code></pre></div>
+<p>Refer to the <a href="https://docs.vllm.ai/en/latest/getting_started/installation.html">vLLM installation guide</a> for platform-specific instructions.</p>
+<h2 id="quick-start">Quick Start</h2>
+<p>To evaluate the Qwen2.5-VL 72B model on the PatchCamelyon dataset:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nv">MODEL_NAME</span><span class="o">=</span><span class="s2">&quot;alibaba/qwen2-5-vl-72b-instruct-vllm&quot;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nv">VLLM_TENSOR_PARALLEL_SIZE</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="nv">ACCELERATOR</span><span class="o">=</span>cpu<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="nv">NUM_DEVICES</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="nv">BATCH_SIZE</span><span class="o">=</span><span class="m">256</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>eva<span class="w"> </span>fit<span class="w"> </span>--config<span class="w"> </span>configs/multimodal/pathology/online/multiple_choice/patch_camelyon.yaml
+</span></code></pre></div>
+<p>This command will distribute the model across 4 GPUs (<code>VLLM_TENSOR_PARALLEL_SIZE</code>) using vLLM's tensor parallelism.</p>
+<p>Note that we set <code>ACCELERATOR=cpu</code> and <code>NUM_DEVICES=1</code> so that PyTorch Lightning runs on CPU while vLLM handles loading the model across available GPUs. vLLM will automatically use GPUs listed in the <code>CUDA_VISIBLE_DEVICES</code> environment variable (should be set automatically by lightning when using <code>eva</code>).</p>
+<p>We recommend using big batch sizes in the lightning dataloader, since vLLM handles batching internally for optimal throughput.</p>
+<h2 id="how-it-works">How It Works</h2>
+<h3 id="the-vllmmodel-wrapper">The VllmModel Wrapper</h3>
+<p><em>eva</em> provides a <code>VllmModel</code> wrapper class that integrates vLLM for efficient inference. The wrapper handles:</p>
+<ul>
+<li>Automatic chat template formatting</li>
+<li>Image preprocessing for multimodal inputs</li>
+<li>Batched generation with configurable sampling parameters</li>
+</ul>
+<p>The <code>eva.language</code> and <code>eva.multimodal</code> modules have a separate <code>VllmModel</code> wrapper implementation, so for LLMs please use <code>eva.language.models.wrappers.VllmModel</code> and for VLM evaluation you can use <code>eva.multimodal.models.wrappers.VllmModel</code>.
+Note that <code>language</code> and <code>multimodal</code> models have separate model registries, so make sure to register your vLLM model in the correct registry.</p>
+<h2 id="vllm-settings">vLLM Settings</h2>
+<p>The <code>VllmModel</code> wrapper uses the following defaults for evaluation:</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>max_model_len</code></td>
+<td>32768</td>
+<td>Maximum sequence length</td>
+</tr>
+<tr>
+<td><code>gpu_memory_utilization</code></td>
+<td>0.95</td>
+<td>Fraction of GPU memory to use</td>
+</tr>
+<tr>
+<td><code>tensor_parallel_size</code></td>
+<td>1</td>
+<td>Number of GPUs for tensor parallelism</td>
+</tr>
+<tr>
+<td><code>temperature</code></td>
+<td>0.0</td>
+<td>Sampling temperature (deterministic)</td>
+</tr>
+<tr>
+<td><code>max_tokens</code></td>
+<td>8192</td>
+<td>Maximum tokens the model can generate per sample</td>
+</tr>
+</tbody>
+</table>
+<p>To keep in mind:</p>
+<ul>
+<li>Setting <code>gpu_memory_utilization</code> below 1.0 helps prevent out-of-memory errors by leaving some GPU memory free.</li>
+<li><code>temperature</code> of 0.0 ensures deterministic outputs during evaluation.</li>
+</ul>
+<h2 id="custom-vllm-models">Custom vLLM Models</h2>
+<p>To add a new vLLM-enabled model, register it in the model registry:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span> <span class="nn">eva.multimodal.models</span> <span class="kn">import</span> <span class="n">wrappers</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="kn">from</span> <span class="nn">eva.multimodal.models.networks.registry</span> <span class="kn">import</span> <span class="n">model_registry</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="nd">@model_registry</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="s2">&quot;your-org/your-model-vllm&quot;</span><span class="p">)</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="k">class</span> <span class="nc">YourModelVllm</span><span class="p">(</span><span class="n">wrappers</span><span class="o">.</span><span class="n">VllmModel</span><span class="p">):</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Your custom vLLM model.&quot;&quot;&quot;</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">system_prompt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>            <span class="n">model_name_or_path</span><span class="o">=</span><span class="s2">&quot;your-org/your-model&quot;</span><span class="p">,</span>
+</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>            <span class="n">model_kwargs</span><span class="o">=</span><span class="p">{</span>
+</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>                <span class="s2">&quot;tensor_parallel_size&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>  <span class="c1"># Adjust based on model size</span>
+</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>            <span class="p">},</span>
+</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>            <span class="n">image_position</span><span class="o">=</span><span class="s2">&quot;before_text&quot;</span><span class="p">,</span>
+</span><span id="__span-2-15"><a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a>            <span class="n">system_prompt</span><span class="o">=</span><span class="n">system_prompt</span><span class="p">,</span>
+</span><span id="__span-2-16"><a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a>        <span class="p">)</span>
+</span></code></pre></div>
+<p>After doing so, you can use this model by setting <code>MODEL_NAME="your-org/your-model-vllm"</code> in your evaluation command. Just make sure that you import your new model / or the module where your model class is defined somewhere in a <code>__init__.py</code> or in your evaluation script such that the registration gets triggered.</p>
+<p>To set vLLM-specific parameters, pass them via the <code>model_kwargs</code> dictionary.
+To solve OOM issues, tuning <code>max_num_seqs</code> and <code>dtype</code> can help, depending on the model you want to load and the given hardware setup. </p>
+<p>If you want to add an LLM, please use the corresponding <code>VllmModel</code> and <code>model_registry</code> from <code>eva.language</code> instead of <code>eva.multimodal</code>.</p>
+<p>Note that not all Huggingface compatible models are out-of-the box compatible with vLLM. Please refer to the <a href="https://docs.vllm.ai/en/latest/">vLLM documentation</a> for a list of supported models. For custom models, you might need to implement your own vLLM compatible model class and registering it with vLLMs model registry (<code>vllm.ModelRegistry.register_model</code>) before using it with <em>eva</em>.</p>
+<h2 id="troubleshooting">Troubleshooting</h2>
+<h3 id="out-of-memory-errors">Out of Memory Errors</h3>
+<p>If you encounter OOM errors:</p>
+<ol>
+<li>Adjust parameters such as <code>tensor_parallel_size</code>, <code>max_model_len</code>, <code>gpu_memory_utilization</code>, <code>max_num_batched_tokens</code>. Those parameters you can set via <code>model_kwargs</code> when initializing the <code>VllmModel</code> wrapper.</li>
+<li>Make sure you use a recent vLLM version and matching torch &amp; CUDA versions. Also enable V1 engine if you are using a vLLM version where this is not the default yet by setting <code>VLLM_USE_V1="1"</code> (this offers range of significant performance improvements to V0 engine).</li>
+<li>Monitor GPU memory usage (GPU memory utilization should be equally distributed across all used GPUs and below <code>gpu_memory_utilization</code>). If GPU memory only rises on a single GPU, that might indicate an issue with the tensor parallelism setup or vLLM not detecting all GPUs correctly.</li>
+</ol>
+<p>Reducing the dataloader batch size usually doesn't help, as vLLM handles batching internally. </p>
+<h3 id="model-loading-issues">Model Loading Issues</h3>
+<p>Ensure you have:</p>
+<ul>
+<li>Sufficient disk space for model weights</li>
+<li>Correct HuggingFace access tokens for gated models: <code>HF_TOKEN=&lt;your-token&gt;</code></li>
+</ul>
 
 
 
@@ -3622,10 +3715,10 @@
     </div>
     
     
-    <script id="__config" type="application/json">{"base": "../../../..", "features": ["navigation.tabs", "navigation.indexes", "navigation.expand", "search.suggest", "search.highlight", "content.code.copy"], "search": "../../../../assets/javascripts/workers/search.07f07601.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": ["latest", "dev"], "provider": "mike"}}</script>
+    <script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.tabs", "navigation.indexes", "navigation.expand", "search.suggest", "search.highlight", "content.code.copy"], "search": "../../../assets/javascripts/workers/search.07f07601.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": ["latest", "dev"], "provider": "mike"}}</script>
     
     
-      <script src="../../../../assets/javascripts/bundle.56dfad97.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.56dfad97.min.js"></script>
       
     
   </body>
