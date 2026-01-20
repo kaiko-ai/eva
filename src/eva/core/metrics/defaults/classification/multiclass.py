@@ -64,7 +64,7 @@ class MulticlassClassificationMetrics(structs.MetricCollection):
             ]
         ]
 
-        if input_type == "logits":
+        if input_type == "logits" and average != "micro":
             metrics.append(
                 classification.MulticlassAUROC(
                     num_classes=num_classes,
