@@ -214,20 +214,13 @@ class PathMMUAtlas(TextImageDataset[int]):
 
         zip_path = os.path.join(self._arch_path, "books_set.zip")
 
-        # Check if we already have a valid zip file
-        if not utils.check_integrity(zip_path, self._arch_book_set_md5):
-            # Remove any corrupted/incomplete download
-            if os.path.exists(zip_path):
-                logger.info(f"Removing corrupted/incomplete download: {zip_path}")
-                os.remove(zip_path)
-
-            logger.info("Downloading ARCH Book Set images...")
-            utils.download_url(
-                self._arch_book_set_url,
-                root=self._arch_path,
-                filename="books_set.zip",
-                md5=self._arch_book_set_md5,
-            )
+        logger.info("Downloading ARCH Book Set images...")
+        utils.download_url(
+            self._arch_book_set_url,
+            root=self._arch_path,
+            filename="books_set.zip",
+            md5=self._arch_book_set_md5,
+        )
 
         logger.info("Extracting ARCH Book Set images...")
         utils.extract_archive(zip_path, self._arch_path, remove_finished=True)
