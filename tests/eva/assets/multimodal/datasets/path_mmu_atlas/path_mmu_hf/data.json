@@ -1,0 +1,108 @@
+{
+  "Atlas": {
+    "val": [
+      {
+        "No": 0,
+        "img": "d6deb3d90223531e7317153e8c720bf116e4678e181a19eb023987d5d2038529.png",
+        "question": "What feature is significantly absent in the uppermost layers of the epithelium?",
+        "options": [
+          "A) Hyperkeratosis",
+          "B) Parakeratosis",
+          "C) Ballooning degeneration",
+          "D) Both A and B"
+        ],
+        "answer": "D) Both A and B",
+        "explanation": "The image lacks significant hyperkeratosis and parakeratosis, findings that are noted as absent in the description of the epithelial layer.",
+        "source_img": "books_set/images/5759734a-71c3-4769-a668-afb4a454c89c.png"
+      },
+      {
+        "No": 1,
+        "img": "16c46adaf62b8d4a36172ab215c272578b790ca0694c7f8e27e8e172bb7e4832.png",
+        "question": "What is the nature of the stromal background observed in the image?",
+        "options": [
+          "A) Hemorrhagic stroma with necrotic debris",
+          "B) Abundant collagenous or fibrous material",
+          "C) Edematous stroma with lymphoid aggregates",
+          "D) Myxoid stroma with scattered adipocytes"
+        ],
+        "answer": "B) Abundant collagenous or fibrous material",
+        "explanation": "The background consists of pink-staining collagenous or fibrous material, indicating a fibrous or stromal neoplasm.",
+        "source_img": "books_set/images/61e5ad57-2b89-47a6-a11a-a1568d2c03ae.png"
+      }
+    ],
+    "test_tiny": [
+      {
+        "No": 0,
+        "img": "7dd380065220178e59589b7865e523700405f40c1a2af9cb374e901b15c3f153.png",
+        "question": "Which tissue type is visibly infiltrated by the spindle cells in the image?",
+        "options": [
+          "A) Epithelium",
+          "B) Skeletal muscle",
+          "C) Adipose tissue",
+          "D) Cartilage"
+        ],
+        "answer": "B) Skeletal muscle",
+        "explanation": "In the image, skeletal muscle fibers appear as red-pink eosinophilic areas that are infiltrated by the spindle cells. This infiltrative growth into muscle tissue is characteristic of diffuse neurofibromas.",
+        "source_img": "books_set/images/e8655719-76c3-4d72-a562-50309b35f864.png"
+      },
+      {
+        "No": 1,
+        "img": "2f00e9ee75091c736e298a2363a753d754c5d0f6937e9aa122e6a758f0903175.png",
+        "question": "What is the arrangement pattern of the cells in the given image?",
+        "options": [
+          "A) Glandular architecture with clear lumen formation",
+          "B) Sheet-like pattern without nesting",
+          "C) Spindle cells forming fascicles",
+          "D) Alveolar pattern with distinct nests"
+        ],
+        "answer": "B) Sheet-like pattern without nesting",
+        "explanation": "The cells in the image are arranged in a sheet-like pattern without a definitive nesting or organoid architecture. This arrangement helps differentiate certain solid tumor variants that lack an alveolar structure.",
+        "source_img": "books_set/images/9478e676-45c5-4eb4-a587-33621dc33689.png"
+      }
+    ],
+    "test": [
+      {
+        "No": 0,
+        "img": "10029c88047d7b6464fbef5139561a3416f54d70838d0e465b112e58ea8e879d.png",
+        "question": "Which of the following best describes the arrangement of melanocytes seen in this histopathological image?",
+        "options": [
+          "A) Uniform distribution throughout the epidermis",
+          "B) Regular nests confined to the basal layer",
+          "C) Even spread with no nest formation",
+          "D) Irregular nests along the basal layer with some invasion into the dermis"
+        ],
+        "answer": "D) Irregular nests along the basal layer with some invasion into the dermis",
+        "explanation": "The image shows melanocytes arranged in irregular nests predominantly located along the basal layer, with evidence of invasion into the dermis, suggesting a malignancy.",
+        "source_img": "books_set/images/7f6c9641-545c-4536-836e-3face1681a0f.png"
+      },
+      {
+        "No": 1,
+        "img": "6b656ec9a251bb661871c1a20202b25da0f9fc624b7f81558950f960f18c1d45.png",
+        "question": "What type of stroma is observed in this tissue section?",
+        "options": [
+          "A) Edematous stroma with increased fluid accumulation",
+          "B) Collagenous stroma with dense fibrous appearance",
+          "C) Mucous stroma with gelatinous consistency",
+          "D) Hyaline stroma with glassy appearance"
+        ],
+        "answer": "B) Collagenous stroma with dense fibrous appearance",
+        "explanation": "The section displays a collagenous stroma, which is characterized by abundant collagen deposition, giving the tissue a densely fibrous appearance. The other types of stroma (A, C, and C) show different features.",
+        "source_img": "books_set/images/8968294b-b35a-4ac3-b328-60d73677fda0.png"
+      },
+      {
+        "No": 2,
+        "img": "1eb90e304f72b5839d716dff3502b9e39422a948d4ed25f0014e7b456521947c.png",
+        "question": "What is the primary feature observed within the renal tubule in this image?",
+        "options": [
+          "A) Dense lymphoid aggregate",
+          "B) Necrotic debris",
+          "C) Hyaline cast",
+          "D) Red blood cell cast"
+        ],
+        "answer": "A) Dense lymphoid aggregate",
+        "explanation": "The image shows a renal cortex with a prominent lymphoid aggregate within the lumen of a tubule, indicative of chronic inflammation.",
+        "source_img": "books_set/images/16b3cf5e-2a8c-47df-afe1-71c557be22b5.png"
+      }
+    ]
+  }
+}
