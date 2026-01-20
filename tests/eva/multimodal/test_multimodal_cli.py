@@ -21,6 +21,7 @@ BATCH_SIZE = 2
     [
         "configs/multimodal/pathology/online/multiple_choice/patch_camelyon.yaml",
         "configs/multimodal/pathology/offline/multiple_choice/patch_camelyon.yaml",
+        "configs/multimodal/pathology/online/multiple_choice/path_mmu_atlas.yaml",
         "configs/multimodal/pathology/online/free_form/quilt_vqa.yaml",
         "configs/multimodal/pathology/offline/free_form/quilt_vqa.yaml",
     ],
@@ -54,6 +55,11 @@ def test_configuration_initialization(configuration_file: str, lib_path: str) ->
             "configs/multimodal/pathology/online/free_form/quilt_vqa.yaml",
             "test",
             "multimodal/datasets/quilt_vqa",
+        ),
+        (
+            "configs/multimodal/pathology/online/multiple_choice/path_mmu_atlas.yaml",
+            "test",
+            "multimodal/datasets/path_mmu_atlas",
         ),
     ],
 )
@@ -130,6 +136,7 @@ def skip_dataset_validation() -> None:
     """Mocks the validation step of the datasets."""
     datasets.PatchCamelyon.validate = mock.MagicMock(return_value=None)
     datasets.QuiltVQA.validate = mock.MagicMock(return_value=None)
+    datasets.PathMMUAtlas.validate = mock.MagicMock(return_value=None)
 
 
 @pytest.fixture(autouse=True)
