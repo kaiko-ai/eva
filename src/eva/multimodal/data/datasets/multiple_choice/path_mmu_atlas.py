@@ -102,13 +102,13 @@ class PathMMUAtlas(TextImageDataset[int]):
         self._samples: List[Dict[str, Any]] = []
 
     @property
-    @override
     def classes(self) -> List[str]:
+        """Returns the list of answer classes (A-E)."""
         return ["A", "B", "C", "D", "E"]
 
     @property
-    @override
     def class_to_idx(self) -> Dict[str, int]:
+        """Returns a mapping from class labels to indices."""
         return {label: idx for idx, label in enumerate(self.classes)}
 
     @property
