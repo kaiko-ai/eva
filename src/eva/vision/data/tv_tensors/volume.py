@@ -1,6 +1,6 @@
 """Custom `tv_tensors` type for 3D Volumes."""
 
-from typing import Any, Dict, Optional, Union, cast
+from typing import Any, Dict, Optional, Union
 
 import torch
 from monai.data import meta_tensor
@@ -38,13 +38,7 @@ class Volume(tv_tensors.Video):
         requires_grad: Optional[bool] = None,
     ) -> "Volume":
         """Creates a new Volume instance."""
-        volume = cast(
-            "Volume",
-            super().__new__(cls, data, dtype=dtype, device=device, requires_grad=requires_grad),
-        )
-        volume.affine = affine
-        volume.metadata = metadata
-        return volume
+        return super().__new__(cls, data, dtype=dtype, device=device, requires_grad=requires_grad)  # type: ignore[return-value]
 
     def __init__(
         self,
@@ -56,7 +50,9 @@ class Volume(tv_tensors.Video):
         device: Optional[Union[torch.device, str, int]] = None,
         requires_grad: Optional[bool] = None,
     ) -> None:
-        """Type stub for pyright."""
+        """Initializes the Volume."""
+        self.affine = affine
+        self.metadata = metadata
 
     @classmethod
     def from_meta_tensor(cls, meta_tensor: meta_tensor.MetaTensor) -> "Volume":
