@@ -69,6 +69,26 @@ class Volume(tv_tensors.Video):
             requires_grad=meta_tensor.requires_grad,
         )
 
+    @classmethod
+    def _wrap(
+        cls,
+        tensor: torch.Tensor,
+        *,
+        affine: torch.Tensor | None = None,
+        metadata: Dict[str, Any] | None = None,
+    ) -> "Volume":
+        """Needed to make sure that tv_tensors.wrap() doesn't lose custom attributes.
+
+        At the time of writing, torchvision doesn't support custom tv_tensor types in wrap(),
+        so for this to work we also need to monkey-patch tv_tensors.wrap.
+        """
+        if tensor.ndim < 4:
+            raise ValueError(f"Expected tensor with at least 4 dimensions, got {tensor.ndim}.")
+        volume = tensor.as_subclass(cls)
+        volume.affine = affine
+        volume.metadata = metadata
+        return volume
+
     def to_meta_tensor(self) -> meta_tensor.MetaTensor:
         """Converts the volume to a :class:`monai.data.meta_tensor.MetaTensor`."""
         return meta_tensor.MetaTensor(self, affine=self.affine, meta=self.metadata)

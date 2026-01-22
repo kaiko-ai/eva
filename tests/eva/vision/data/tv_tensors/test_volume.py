@@ -1,6 +1,7 @@
 """Tests for Volume tv_tensor."""
 
 import torch
+from torchvision import tv_tensors
 
 from eva.vision.data.tv_tensors import Volume
 
@@ -66,7 +67,7 @@ def test_from_and_to_meta_tensor() -> None:
 
 
 def test_multiple_volumes() -> None:
-    """Tests creation of multiple Volume instances and if affine and metadata are preserved."""
+    """Tests creation of multiple Volume instances with separate affine and metadata."""
     vol1 = Volume(torch.randn(1, 10, 64, 64), affine=torch.eye(4) * 1, metadata={"id": "volume1"})
     vol2 = Volume(torch.randn(1, 10, 64, 64), affine=torch.eye(4) * 2, metadata={"id": "volume2"})
 
@@ -76,3 +77,16 @@ def test_multiple_volumes() -> None:
     assert vol1.metadata is not None and vol2.metadata is not None
     assert vol1.metadata["id"] == "volume1"
     assert vol2.metadata["id"] == "volume2"
+
+
+def test_volume_wrap_has_attributes() -> None:
+    """Tests that tv_tensors.wrap() preserves custom attributes of Volume."""
+    affine, metadata = torch.eye(4), {"test": 1}
+    volume = Volume(torch.randn(2, 1, 16, 16), affine=affine, metadata=metadata)
+    wrapped = tv_tensors.wrap(volume.clone(), like=volume)
+
+    assert isinstance(wrapped, Volume)
+    assert wrapped.affine is not None
+    torch.testing.assert_close(wrapped.affine, affine)
+    assert wrapped.metadata == metadata
+    assert wrapped.shape == volume.shape
