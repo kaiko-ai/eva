@@ -73,5 +73,6 @@ def test_multiple_volumes() -> None:
     assert vol1.affine is not None and vol2.affine is not None
     assert vol1.affine[0, 0] != vol2.affine[0, 0]
 
+    assert vol1.metadata is not None and vol2.metadata is not None
     assert vol1.metadata["id"] == "volume1"
     assert vol2.metadata["id"] == "volume2"

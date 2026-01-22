@@ -25,7 +25,7 @@ class Volume(tv_tensors.Video):
     """
 
     affine: torch.Tensor | None
-    metadata: Dict[str, Any]
+    metadata: Dict[str, Any] | None
 
     def __new__(
         cls,
@@ -38,10 +38,13 @@ class Volume(tv_tensors.Video):
         requires_grad: Optional[bool] = None,
     ) -> "Volume":
         """Creates a new Volume instance."""
-        return cast(
+        volume = cast(
             "Volume",
             super().__new__(cls, data, dtype=dtype, device=device, requires_grad=requires_grad),
         )
+        volume.affine = affine
+        volume.metadata = metadata
+        return volume
 
     def __init__(
         self,
@@ -53,9 +56,7 @@ class Volume(tv_tensors.Video):
         device: Optional[Union[torch.device, str, int]] = None,
         requires_grad: Optional[bool] = None,
     ) -> None:
-        """Initializes the Volume with affine and metadata attributes."""
-        self.affine = affine
-        self.metadata = metadata or {}
+        """Type stub for pyright."""
 
     @classmethod
     def from_meta_tensor(cls, meta_tensor: meta_tensor.MetaTensor) -> "Volume":
