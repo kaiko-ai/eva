@@ -15,7 +15,10 @@ _original_wrap = tv_tensors.wrap
 def _patched_wrap(
     wrappee: torch.Tensor, *, like: tv_tensors.TVTensor, **kwargs
 ) -> tv_tensors.TVTensor:
-    """Patched version of tv_tensors.wrap that supports Volume."""
+    """Patched version of tv_tensors.wrap that supports Volume.
+    
+    See also: https://github.com/pytorch/vision/issues/9333
+    """
     if isinstance(like, Volume):
         return Volume._wrap(
             wrappee,
