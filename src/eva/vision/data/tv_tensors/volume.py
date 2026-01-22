@@ -1,11 +1,10 @@
 """Custom `tv_tensors` type for 3D Volumes."""
 
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict, Optional, Union, cast
 
 import torch
 from monai.data import meta_tensor
 from torchvision import tv_tensors
-from typing_extensions import override
 
 
 class Volume(tv_tensors.Video):
@@ -25,32 +24,70 @@ class Volume(tv_tensors.Video):
         requires_grad: Whether autograd should record operations.
     """
 
-    @override
+    affine: torch.Tensor | None
+    metadata: Dict[str, Any] | None
+
     def __new__(
         cls,
         data: Any,
         affine: torch.Tensor | None = None,
         metadata: Dict[str, Any] | None = None,
+        *,
         dtype: Optional[torch.dtype] = None,
         device: Optional[Union[torch.device, str, int]] = None,
         requires_grad: Optional[bool] = None,
     ) -> "Volume":
-        cls.affine = affine
-        cls.metadata = metadata
+        """Creates a new Volume instance."""
+        return cast(
+            "Volume",
+            super().__new__(cls, data, dtype=dtype, device=device, requires_grad=requires_grad),
+        )
 
-        return super().__new__(cls, data, dtype=dtype, device=device, requires_grad=requires_grad)  # type: ignore
+    def __init__(
+        self,
+        data: Any,
+        affine: torch.Tensor | None = None,
+        metadata: Dict[str, Any] | None = None,
+        *,
+        dtype: Optional[torch.dtype] = None,
+        device: Optional[Union[torch.device, str, int]] = None,
+        requires_grad: Optional[bool] = None,
+    ) -> None:
+        """Initializes the Volume."""
+        self.affine = affine
+        self.metadata = metadata
 
     @classmethod
     def from_meta_tensor(cls, meta_tensor: meta_tensor.MetaTensor) -> "Volume":
         """Creates an instance from a :class:`monai.data.meta_tensor.MetaTensor`."""
         return cls(
             meta_tensor.data,
-            affine=meta_tensor.affine,
-            metadata=meta_tensor.meta,
+            meta_tensor.affine,
+            meta_tensor.meta,
             dtype=meta_tensor.dtype,
             device=meta_tensor.device,
             requires_grad=meta_tensor.requires_grad,
-        )  # type: ignore
+        )
+
+    @classmethod
+    def _wrap(
+        cls,
+        tensor: torch.Tensor,
+        *,
+        affine: torch.Tensor | None = None,
+        metadata: Dict[str, Any] | None = None,
+    ) -> "Volume":
+        """Needed to make sure that tv_tensors.wrap() doesn't lose custom attributes.
+
+        At the time of writing, torchvision doesn't support custom tv_tensor types in wrap(),
+        so for this to work we also need to monkey-patch tv_tensors.wrap.
+        """
+        if tensor.ndim < 4:
+            raise ValueError(f"Expected tensor with at least 4 dimensions, got {tensor.ndim}.")
+        volume = tensor.as_subclass(cls)
+        volume.affine = affine
+        volume.metadata = metadata
+        return volume
 
     def to_meta_tensor(self) -> meta_tensor.MetaTensor:
         """Converts the volume to a :class:`monai.data.meta_tensor.MetaTensor`."""
