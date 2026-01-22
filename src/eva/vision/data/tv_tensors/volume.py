@@ -1,6 +1,6 @@
 """Custom `tv_tensors` type for 3D Volumes."""
 
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict, Optional, Union, cast
 
 import torch
 from monai.data import meta_tensor
@@ -38,7 +38,10 @@ class Volume(tv_tensors.Video):
         requires_grad: Optional[bool] = None,
     ) -> "Volume":
         """Creates a new Volume instance."""
-        return super().__new__(cls, data, dtype=dtype, device=device, requires_grad=requires_grad)  # type: ignore[return-value]
+        return cast(
+            "Volume",
+            super().__new__(cls, data, dtype=dtype, device=device, requires_grad=requires_grad),
+        )
 
     def __init__(
         self,
