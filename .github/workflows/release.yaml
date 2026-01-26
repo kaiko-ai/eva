@@ -20,7 +20,7 @@ jobs:
       contents: write # Needed for pushing to GitHub Pages
       pull-requests: write # Needed for creating version bump PR
     steps:
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+      - uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
         with:
           # Needed to push to gh-pages branch
           # IMPORTANT: Avoid publishing the .git/ folder to prevent leaking credentials
