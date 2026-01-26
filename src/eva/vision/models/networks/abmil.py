@@ -34,8 +34,8 @@ class ABMIL(torch.nn.Module):
     def __init__(
         self,
         input_size: int,
-        output_size: int,
         projected_input_size: int | None,
+        output_size: int = 1,
         hidden_size_attention: int = 128,
         hidden_sizes_mlp: tuple = (128, 64),
         use_bias: bool = True,
