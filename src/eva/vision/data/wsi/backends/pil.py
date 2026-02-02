@@ -8,6 +8,10 @@ from typing_extensions import override
 
 from eva.vision.data.wsi.backends import base
 
+# Disable PIL's decompression bomb protection for large medical/pathology images
+# Default MAX_IMAGE_PIXELS ≈ 89M; errors are raised above 2x that (~178M)
+PIL.Image.MAX_IMAGE_PIXELS = None
+
 
 class PILImage(base.Wsi):
     """Class for loading data from standard image file formats using PIL library."""
