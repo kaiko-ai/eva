@@ -1,5 +1,6 @@
 """Module for loading data from standard image file formats PIL library."""
 
+import os
 from typing import Sequence, Tuple
 
 import numpy as np
@@ -8,9 +9,10 @@ from typing_extensions import override
 
 from eva.vision.data.wsi.backends import base
 
-# Disable PIL's decompression bomb protection for large medical/pathology images
-# Default MAX_IMAGE_PIXELS ≈ 89M; errors are raised above 2x that (~178M)
-PIL.Image.MAX_IMAGE_PIXELS = None
+# Increase PIL's decompression bomb limit for large medical/pathology images
+# Default PIL limit is ~89M pixels (errors at 2x that), which is too small for pathology
+_max_pixels_env = os.environ.get("PIL_MAX_IMAGE_PIXELS")
+PIL.Image.MAX_IMAGE_PIXELS = int(_max_pixels_env) if _max_pixels_env else 1_000_000_000
 
 
 class PILImage(base.Wsi):
