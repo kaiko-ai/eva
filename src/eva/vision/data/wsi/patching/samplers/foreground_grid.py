@@ -14,6 +14,7 @@ class ForegroundGridSampler(base.ForegroundSampler):
         max_samples: int = 20,
         overlap: Tuple[int, int] = (0, 0),
         min_foreground_ratio: float = 0.35,
+        shuffle: bool = True,
         seed: int = 42,
     ) -> None:
         """Initializes the sampler.
@@ -23,11 +24,15 @@ class ForegroundGridSampler(base.ForegroundSampler):
             overlap: The overlap between patches in the grid.
             min_foreground_ratio: The minimum amount of foreground
                 within a sampled patch.
+            shuffle: Whether to shuffle the grid indices before sampling.
+                If True, patches are randomly distributed across the WSI.
+                If False, patches are sampled in column-major order from top-left.
             seed: The random seed.
         """
         self.max_samples = max_samples
         self.overlap = overlap
         self.min_foreground_ratio = min_foreground_ratio
+        self.shuffle = shuffle
         self.seed = seed
 
     def sample(
@@ -47,7 +52,7 @@ class ForegroundGridSampler(base.ForegroundSampler):
         """
         _utils.validate_dimensions(width, height, layer_shape)
         x_y, indices = _utils.get_grid_coords_and_indices(
-            layer_shape, width, height, self.overlap, seed=self.seed
+            layer_shape, width, height, self.overlap, shuffle=self.shuffle, seed=self.seed
         )
 
         count = 0
