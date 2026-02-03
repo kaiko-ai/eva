@@ -18,6 +18,12 @@ class MetricsSchema:
     evaluation: MetricModuleType | None = None
     """The exclusive evaluation metrics."""
 
+    compute_groups: bool = True
+    """Whether to share the same states across metrics in a collection."""
+
+    separator: str = "/"
+    """The separator between the group name of the metric and the metric itself."""
+
     @property
     def training_metrics(self) -> MetricModuleType | None:
         """Returns the training metics."""

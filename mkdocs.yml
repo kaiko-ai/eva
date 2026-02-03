@@ -106,6 +106,10 @@ nav:
       - MSDTask7Pancreas: datasets/msd_task7_pancreas.md
     - Language:
       - PubMedQA: datasets/pubmedqa.md
+    - Multimodal:
+      - PatchCamelyon: datasets/patch_camelyon.md
+      - PathMMU Atlas: datasets/path_mmu_atlas.md
+      - QuiltVQA: datasets/quilt_vqa.md
   - Reference API:
     - reference/index.md
     - Core:

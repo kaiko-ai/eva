@@ -51,4 +51,5 @@
 | Dataset | #Samples | Modality | Task | Domain | Download provided |
 |---------|----------|----------|------|--------|-------------------|
 | [PatchCamelyon](patch_camelyon.md) | 500 | Image + Text | Multiple Choice | Breast Cancer | Yes |
+| [PathMMU Atlas](path_mmu_atlas.md) | 80 / 799 / 208 | Image + Text | Multiple Choice | Pathology | Yes |
 | [QuiltVQA](quilt_vqa.md) | 985 | Image + Text | Free-form VQA | Histopathology | Yes |

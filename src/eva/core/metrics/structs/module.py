@@ -48,7 +48,7 @@ class MetricModule(nn.Module):
         test: MetricModuleType | None,
         *,
         separator: str = "/",
-        compute_groups: bool | List[List[str]] = True,
+        compute_groups: bool = True,
     ) -> MetricModule:
         """Initializes a metric module from a list of metrics.
 
@@ -75,25 +75,18 @@ class MetricModule(nn.Module):
         )
 
     @classmethod
-    def from_schema(
-        cls, schema: schemas.MetricsSchema, *, separator: str = "/", compute_groups: bool = True
-    ) -> MetricModule:
+    def from_schema(cls, schema: schemas.MetricsSchema) -> MetricModule:
         """Initializes a metric module from the metrics schema.
 
         Args:
             schema: The dataclass metric schema.
-            separator: The separator between the group name of the metric
-                and the metric itself.
-            compute_groups: All metrics in a compute group share the same metric state
-                and are therefore only different in their compute step. To disable this
-                behavior, set to `False`.
         """
         return cls.from_metrics(
             train=schema.training_metrics,
             val=schema.evaluation_metrics,
             test=schema.evaluation_metrics,
-            separator=separator,
-            compute_groups=compute_groups,
+            separator=schema.separator,
+            compute_groups=schema.compute_groups,
         )
 
     @property
