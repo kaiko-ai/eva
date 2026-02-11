@@ -3,7 +3,6 @@
 from typing import Any, Dict, List, Literal, Union
 
 import torch
-from typing_extensions import TypedDict
 
 from eva.language.models.postprocess.extract_answer.base import (
     ExtractAnswerFromStructuredOutput,
@@ -27,28 +26,6 @@ from eva.language.models.postprocess.extract_answer.xml import (
 )
 
 
-class ExtractAnswerKwargs(TypedDict, total=False):
-    """Keyword arguments for answer extractors."""
-
-    answer_key: str
-    case_sensitive: bool
-    raise_if_missing: bool
-    missing_answer: str | None
-    missing_limit: int
-    return_dict: bool
-
-
-class ExtractDiscreteAnswerKwargs(TypedDict, total=False):
-    """Keyword arguments for discrete answer extractors."""
-
-    mapping: Dict[str, int]
-    answer_key: str
-    case_sensitive: bool
-    raise_if_missing: bool
-    missing_answer: int
-    missing_limit: int
-
-
 class ExtractDiscreteAnswer:
     """Factory class for creating discrete answer extractors.
 
@@ -62,7 +39,7 @@ class ExtractDiscreteAnswer:
     def __init__(
         self,
         answer_format: Literal["json", "xml", "boxed", "raw"],
-        extract_kwargs: ExtractDiscreteAnswerKwargs | None = None,
+        extract_kwargs: Dict[str, Any] | None = None,
     ) -> None:
         """Initialize the extractor.
 
@@ -110,7 +87,7 @@ class ExtractAnswer:
     def __init__(
         self,
         answer_format: Literal["json", "xml", "boxed", "raw"],
-        extract_kwargs: ExtractAnswerKwargs | None = None,
+        extract_kwargs: Dict[str, Any] | None = None,
     ) -> None:
         """Initialize the extractor.
 
