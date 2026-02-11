@@ -12,6 +12,7 @@ class AsDiscrete:
         to_onehot: int | bool | None = None,
         threshold: float | None = None,
         dim: int = 1,
+        keepdim: bool = True,
     ) -> None:
         """Convert the input tensor/array into discrete values.
 
@@ -23,18 +24,20 @@ class AsDiscrete:
             threshold: If not None, threshold the float values to int number 0 or 1
                 with specified threshold.
             dim: The dimension along which to apply argmax and/or one-hot encoding.
+            keepdim: Whether to keep the reduced dimension after argmax.
         """
         super().__init__()
 
         self._argmax = argmax
         self._dim = dim
+        self._keepdim = keepdim
         self._to_onehot = to_onehot
         self._threshold = threshold
 
     def __call__(self, tensor: torch.Tensor) -> torch.Tensor:
         """Call method for the transformation."""
         if self._argmax:
-            tensor = torch.argmax(tensor, dim=self._dim, keepdim=True)
+            tensor = torch.argmax(tensor, dim=self._dim, keepdim=self._keepdim)
 
         if self._to_onehot is not None:
             tensor = _one_hot(tensor, num_classes=self._to_onehot, dim=self._dim, dtype=torch.long)
