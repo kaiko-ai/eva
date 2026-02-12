@@ -44,10 +44,21 @@ trainer:
               model_extra_kwargs: ${oc.env:MODEL_EXTRA_KWARGS, null}
           overwrite: false
     logger:
-      - class_path: lightning.pytorch.loggers.TensorBoardLogger
+      - class_path: lightning.pytorch.loggers.WandbLogger
         init_args:
-          save_dir: *OUTPUT_ROOT
-          name: ""
+          entity: wsi_fm_training
+          project: dinov3
+          group: benchmarking-panda-${oc.env:MODEL_NAME}
+          tags:
+            - benchmarking
+            - panda
+            - ${oc.env:MODEL_NAME}
+            - resize_dim_${oc.env:RESIZE_DIM, 224}
+          name: benchmarking-panda-${oc.env:MODEL_NAME}
+      # - class_path: lightning.pytorch.loggers.TensorBoardLogger
+      #   init_args:
+      #     save_dir: *OUTPUT_ROOT
+      #     name: ""
 model:
   class_path: eva.HeadModule
   init_args:
@@ -86,12 +97,12 @@ data:
       val:
         class_path: eva.datasets.MultiEmbeddingsClassificationDataset
         init_args:
-          <<: *DATASET_ARGS
+          !!merge <<: *DATASET_ARGS
           split: val
       test:
         class_path: eva.datasets.MultiEmbeddingsClassificationDataset
         init_args:
-          <<: *DATASET_ARGS
+          !!merge <<: *DATASET_ARGS
           split: test
       predict:
         - class_path: eva.vision.datasets.PANDA
@@ -110,15 +121,15 @@ data:
               class_path: eva.vision.data.transforms.common.ResizeAndCrop
               init_args:
                 size: ${oc.env:RESIZE_DIM, 224}
-                mean: ${oc.env:NORMALIZE_MEAN, [0.485, 0.456, 0.406]} 
+                mean: ${oc.env:NORMALIZE_MEAN, [0.485, 0.456, 0.406]}
                 std: ${oc.env:NORMALIZE_STD, [0.229, 0.224, 0.225]}
         - class_path: eva.vision.datasets.PANDA
           init_args:
-            <<: *PREDICT_DATASET_ARGS
+            !!merge <<: *PREDICT_DATASET_ARGS
             split: val
         - class_path: eva.vision.datasets.PANDA
           init_args:
-            <<: *PREDICT_DATASET_ARGS
+            !!merge <<: *PREDICT_DATASET_ARGS
             split: test
     dataloaders:
       train:

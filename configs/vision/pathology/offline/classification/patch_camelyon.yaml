@@ -43,10 +43,21 @@ trainer:
               model_extra_kwargs: ${oc.env:MODEL_EXTRA_KWARGS, null}
           overwrite: false
     logger:
-      - class_path: lightning.pytorch.loggers.TensorBoardLogger
+      - class_path: lightning.pytorch.loggers.WandbLogger
         init_args:
-          save_dir: *OUTPUT_ROOT
-          name: ""
+          entity: wsi_fm_training
+          project: dinov3
+          group: benchmarking-patch_camelyon-${oc.env:MODEL_NAME}
+          tags:
+            - benchmarking
+            - patch_camelyon
+            - ${oc.env:MODEL_NAME}
+            - resize_dim_${oc.env:RESIZE_DIM, 224}
+          name: benchmarking-patch_camelyon-${oc.env:MODEL_NAME}
+      # - class_path: lightning.pytorch.loggers.TensorBoardLogger
+      #   init_args:
+      #     save_dir: *OUTPUT_ROOT
+      #     name: ""
 model:
   class_path: eva.HeadModule
   init_args:

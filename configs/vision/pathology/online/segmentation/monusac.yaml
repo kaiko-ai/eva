@@ -33,6 +33,17 @@ trainer:
           monitor: *MONITOR_METRIC
           mode: *MONITOR_METRIC_MODE
     logger:
+      - class_path: lightning.pytorch.loggers.WandbLogger
+        init_args:
+          entity: wsi_fm_training
+          project: dinov3
+          group: benchmarking-monusac-${oc.env:MODEL_NAME}
+          tags:
+            - benchmarking
+            - monusac
+            - ${oc.env:MODEL_NAME}
+            - resize_dim_${oc.env:RESIZE_DIM, 224}
+          name: benchmarking-monusac-${oc.env:MODEL_NAME}
       - class_path: lightning.pytorch.loggers.TensorBoardLogger
         init_args:
           save_dir: *OUTPUT_ROOT
