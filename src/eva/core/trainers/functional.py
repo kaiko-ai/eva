@@ -37,7 +37,9 @@ def run_evaluation_session(
     """
     if not stages:
         stages = ["fit", "validate", "test"]
-    recorder = _recorder.SessionRecorder(output_dir=base_trainer.default_log_dir, verbose=verbose)
+    recorder = _recorder.SessionRecorder(
+        output_dir=base_trainer.default_log_dir, verbose=verbose, trainer=base_trainer
+    )
     for run_index in range(n_runs):
         validation_scores, test_scores = run_evaluation(
             base_trainer,
