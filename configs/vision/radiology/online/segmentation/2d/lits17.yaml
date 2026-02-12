@@ -29,6 +29,18 @@ trainer:
           monitor: &MONITOR_METRIC ${oc.env:MONITOR_METRIC, val/DiceScore}
           mode: &MONITOR_METRIC_MODE ${oc.env:MONITOR_METRIC_MODE, max}
     logger:
+      - class_path: lightning.pytorch.loggers.WandbLogger
+        init_args:
+          entity: wsi_fm_training
+          project: dinov3
+          group: benchmarking-lits17-2d-${oc.env:MODEL_NAME}
+          tags:
+            - benchmarking
+            - lits17
+            - radiology
+            - 2d
+            - ${oc.env:MODEL_NAME}
+          name: benchmarking-lits17-2d-${oc.env:MODEL_NAME}
       - class_path: lightning.pytorch.loggers.TensorBoardLogger
         init_args:
           save_dir: *OUTPUT_ROOT
@@ -175,7 +187,7 @@ data:
       val:
         class_path: eva.vision.datasets.LiTS17
         init_args:
-          <<: *DATASET_ARGS
+          !!merge <<: *DATASET_ARGS
           split: val
           transforms:
             class_path: torchvision.transforms.v2.Compose

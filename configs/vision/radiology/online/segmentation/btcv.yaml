@@ -29,6 +29,17 @@ trainer:
           monitor: &MONITOR_METRIC ${oc.env:MONITOR_METRIC, val/DiceScore}
           mode: &MONITOR_METRIC_MODE ${oc.env:MONITOR_METRIC_MODE, max}
     logger:
+      - class_path: lightning.pytorch.loggers.WandbLogger
+        init_args:
+          entity: wsi_fm_training
+          project: dinov3
+          group: benchmarking-btcv-${oc.env:MODEL_NAME}
+          tags:
+            - benchmarking
+            - btcv
+            - radiology
+            - ${oc.env:MODEL_NAME}
+          name: benchmarking-btcv-${oc.env:MODEL_NAME}
       - class_path: lightning.pytorch.loggers.TensorBoardLogger
         init_args:
           save_dir: *OUTPUT_ROOT
@@ -46,7 +57,7 @@ model:
       class_path: eva.vision.models.networks.decoders.segmentation.SwinUNETRDecoderWithProjection
       init_args:
         feature_size: ${oc.env:IN_FEATURES, 48}
-        out_channels:  &NUM_CLASSES 14
+        out_channels: &NUM_CLASSES 14
         project_dims: ${oc.env:CHANNEL_PROJECTION_DIMS, null}
     spatial_dims: 3
     inferer:
@@ -180,7 +191,7 @@ data:
       val:
         class_path: eva.vision.datasets.BTCV
         init_args:
-          <<: *DATASET_ARGS
+          !!merge <<: *DATASET_ARGS
           split: val
           transforms:
             class_path: torchvision.transforms.v2.Compose

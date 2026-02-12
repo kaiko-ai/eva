@@ -29,6 +29,18 @@ trainer:
           monitor: &MONITOR_METRIC ${oc.env:MONITOR_METRIC, val/DiceScore}
           mode: &MONITOR_METRIC_MODE ${oc.env:MONITOR_METRIC_MODE, max}
     logger:
+      - class_path: lightning.pytorch.loggers.WandbLogger
+        init_args:
+          entity: wsi_fm_training
+          project: dinov3
+          group: benchmarking-msd_task7_pancreas-2d-${oc.env:MODEL_NAME}
+          tags:
+            - benchmarking
+            - msd_task7_pancreas
+            - radiology
+            - 2d
+            - ${oc.env:MODEL_NAME}
+          name: benchmarking-msd_task7_pancreas-2d-${oc.env:MODEL_NAME}
       - class_path: lightning.pytorch.loggers.TensorBoardLogger
         init_args:
           save_dir: *OUTPUT_ROOT
@@ -172,10 +184,13 @@ data:
                   init_args:
                     offsets: 0.1
                     prob: 0.1
+                - class_path: monai.transforms.RepeatChannel
+                  init_args:
+                    repeats: 3
       val:
         class_path: eva.vision.datasets.MSDTask7Pancreas
         init_args:
-          <<: *DATASET_ARGS
+          !!merge <<: *DATASET_ARGS
           split: val
           transforms:
             class_path: torchvision.transforms.v2.Compose
@@ -197,6 +212,9 @@ data:
                       - ${oc.env:SCALE_INTENSITY_MAX, 250.0}
                     output_range: [0.0, 1.0]
                 - class_path: eva.vision.data.transforms.CropForeground
+                - class_path: monai.transforms.RepeatChannel
+                  init_args:
+                    repeats: 3
     dataloaders:
       train:
         batch_size: ${oc.env:BATCH_SIZE, 2}
