@@ -5,7 +5,7 @@ import json
 import os
 import statistics
 import sys
-from typing import Dict, List, Mapping, TypedDict
+from typing import Any, Dict, List, Mapping, TypedDict
 
 from lightning.pytorch.utilities.types import _EVALUATE_OUTPUT
 from lightning_fabric.utilities import cloud_io
@@ -49,6 +49,7 @@ class SessionRecorder:
         results_file: str = "results.json",
         config_file: str = "config.yaml",
         verbose: bool = True,
+        trainer: Any = None,
     ) -> None:
         """Initializes the recorder.
 
@@ -57,11 +58,13 @@ class SessionRecorder:
             results_file: The name of the results json file.
             config_file: The name of the yaml configuration file.
             verbose: Whether to print the session metrics.
+            trainer: The trainer instance for accessing loggers.
         """
         self._output_dir = output_dir
         self._results_file = results_file
         self._config_file = config_file
         self._verbose = verbose
+        self._trainer = trainer
 
         self._validation_metrics: List[SESSION_METRICS] = []
         self._test_metrics: List[SESSION_METRICS] = []
@@ -114,6 +117,7 @@ class SessionRecorder:
         self._save_config()
         if self._verbose:
             _print_results(results)
+        self._log_to_wandb(results)
 
     def reset(self) -> None:
         """Resets the state of the tracked metrics."""
@@ -141,6 +145,67 @@ class SessionRecorder:
             with fs.open(os.path.join(self._output_dir, self._config_file), "w") as file:
                 config_yaml = OmegaConf.to_yaml(config, resolve=True)
                 file.write(config_yaml)
+
+    def _log_to_wandb(self, results: RESULTS_DICT) -> None:
+        """Logs the aggregated summary metrics to W&B."""
+        try:
+            import wandb
+            from lightning.pytorch import loggers as pl_loggers
+
+            if self._trainer is None:
+                return
+
+            wandb_logger = None
+            for trainer_logger in self._trainer.loggers or []:
+                if isinstance(trainer_logger, pl_loggers.WandbLogger):
+                    wandb_logger = trainer_logger
+                    break
+
+            if wandb_logger is None:
+                return
+
+            task_name = self._output_dir.split("/")[-1]
+            model_name = os.getenv("MODEL_NAME", "")
+            base_run_name = os.getenv("WANDB_RUN_NAME", f"{task_name}_{self._trainer._session_id}")
+
+            if model_name:
+                run_name = f"{base_run_name}_{model_name}_summary"
+            else:
+                run_name = f"{base_run_name}_summary"
+
+            from eva.core.loggers.utils import wandb as wandb_utils
+
+            # Create a copy of the init kwargs and add "summary" tag
+            summary_init_kwargs = wandb_logger._wandb_init.copy()
+            existing_tags = summary_init_kwargs.get("tags", [])
+            if existing_tags is None:
+                existing_tags = []
+            summary_init_kwargs["tags"] = existing_tags + ["summary"]
+
+            wandb_utils.init_run(run_name, summary_init_kwargs)
+
+            summary_metrics = {}
+            for stage in ["val", "test"]:
+                stage_metrics = results["metrics"].get(stage, [])
+                for dataset_idx, metrics_dict in enumerate(stage_metrics):
+                    if not metrics_dict:
+                        continue
+
+                    for metric_name, metric_stats in metrics_dict.items():
+                        prefix = f"summary/{stage}/dataset_{dataset_idx}"
+                        summary_metrics[f"{prefix}/{metric_name}/mean"] = metric_stats["mean"]
+                        summary_metrics[f"{prefix}/{metric_name}/stdev"] = metric_stats["stdev"]
+
+            if summary_metrics:
+                wandb.log(summary_metrics)
+                logger.info("Successfully logged summary metrics to W&B")
+
+            wandb_utils.finish_run()
+
+        except ImportError:
+            pass
+        except Exception as e:
+            logger.warning(f"Failed to log summary metrics to W&B: {e}")
 
 
 def _update_session_metrics(
