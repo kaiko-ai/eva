@@ -1,8 +1,13 @@
 """Factory module for creating answer extractors based on answer format."""
 
-from typing import Literal
+from typing import Any, Dict, List, Literal, Union
 
-from eva.language.models.postprocess.extract_answer.base import ExtractAnswerFromStructuredOutput
+import torch
+
+from eva.language.models.postprocess.extract_answer.base import (
+    ExtractAnswerFromStructuredOutput,
+    ExtractDiscreteAnswerFromStructuredOutput,
+)
 from eva.language.models.postprocess.extract_answer.boxed import (
     ExtractAnswerFromBoxed,
     ExtractDiscreteAnswerFromBoxed,
@@ -22,56 +27,96 @@ from eva.language.models.postprocess.extract_answer.xml import (
 
 
 class ExtractDiscreteAnswer:
-    """Factory for creating discrete answer extractors."""
+    """Factory class for creating discrete answer extractors.
 
-    def __new__(
-        cls, answer_format: Literal["json", "xml", "boxed", "raw"], extract_kwargs: dict
-    ) -> ExtractAnswerFromStructuredOutput:
-        """Create a discrete answer extractor based on the answer format.
+    This wrapper class delegates to the appropriate extractor based on answer_format.
+    It uses __init__ + __call__ pattern so jsonargparse can properly validate it
+    as a callable class.
+    """
+
+    _extractor: ExtractDiscreteAnswerFromStructuredOutput
+
+    def __init__(
+        self,
+        answer_format: Literal["json", "xml", "boxed", "raw"],
+        extract_kwargs: Dict[str, Any] | None = None,
+    ) -> None:
+        """Initialize the extractor.
 
         Args:
             answer_format: The format of the answer to extract ('json', 'xml', 'boxed', or 'raw').
             extract_kwargs: Keyword arguments passed to the extractor constructor.
-
-        Returns:
-            An extractor instance for the specified format.
         """
+        if extract_kwargs is None:
+            extract_kwargs = {}
+
         match answer_format:
             case "json":
-                return ExtractDiscreteAnswerFromJson(**extract_kwargs)
+                self._extractor = ExtractDiscreteAnswerFromJson(**extract_kwargs)
             case "xml":
-                return ExtractDiscreteAnswerFromXml(**extract_kwargs)
+                self._extractor = ExtractDiscreteAnswerFromXml(**extract_kwargs)
             case "raw":
-                return ExtractDiscreteAnswerFromRaw(**extract_kwargs)
+                self._extractor = ExtractDiscreteAnswerFromRaw(**extract_kwargs)
             case "boxed":
-                return ExtractDiscreteAnswerFromBoxed(**extract_kwargs)
+                self._extractor = ExtractDiscreteAnswerFromBoxed(**extract_kwargs)
             case _:
                 raise ValueError(f"Unknown answer format: {answer_format}")
+
+    def __call__(self, values: Union[str, List[str]]) -> torch.Tensor:
+        """Extract discrete answers from the input values.
+
+        Args:
+            values: Input string(s) containing answer data.
+
+        Returns:
+            Tensor of discrete answer indices.
+        """
+        return self._extractor(values)
 
 
 class ExtractAnswer:
-    """Factory for creating answer extractors."""
+    """Factory class for creating answer extractors.
 
-    def __new__(
-        cls, answer_format: Literal["json", "xml", "boxed", "raw"], extract_kwargs: dict
-    ) -> ExtractAnswerFromStructuredOutput:
-        """Create an answer extractor based on the answer format.
+    This wrapper class delegates to the appropriate extractor based on answer_format.
+    It uses __init__ + __call__ pattern so jsonargparse can properly validate it
+    as a callable class.
+    """
+
+    _extractor: ExtractAnswerFromStructuredOutput
+
+    def __init__(
+        self,
+        answer_format: Literal["json", "xml", "boxed", "raw"],
+        extract_kwargs: Dict[str, Any] | None = None,
+    ) -> None:
+        """Initialize the extractor.
 
         Args:
             answer_format: The format of the answer to extract ('json', 'xml', 'boxed', or 'raw').
             extract_kwargs: Keyword arguments passed to the extractor constructor.
-
-        Returns:
-            An appropriate extractor instance for the specified format.
         """
+        if extract_kwargs is None:
+            extract_kwargs = {}
+
         match answer_format:
             case "json":
-                return ExtractAnswerFromJson(**extract_kwargs)
+                self._extractor = ExtractAnswerFromJson(**extract_kwargs)
             case "xml":
-                return ExtractAnswerFromXml(**extract_kwargs)
+                self._extractor = ExtractAnswerFromXml(**extract_kwargs)
             case "raw":
-                return ExtractAnswerFromRaw(**extract_kwargs)
+                self._extractor = ExtractAnswerFromRaw(**extract_kwargs)
             case "boxed":
-                return ExtractAnswerFromBoxed(**extract_kwargs)
+                self._extractor = ExtractAnswerFromBoxed(**extract_kwargs)
             case _:
                 raise ValueError(f"Unknown answer format: {answer_format}")
+
+    def __call__(self, values: Union[str, List[str]]) -> Any:
+        """Extract answers from the input values.
+
+        Args:
+            values: Input string(s) containing answer data.
+
+        Returns:
+            List of extracted answers or dictionaries.
+        """
+        return self._extractor(values)

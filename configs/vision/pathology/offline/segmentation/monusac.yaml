@@ -73,9 +73,10 @@ model:
         lr: ${oc.env:LR_VALUE, 0.002}
     postprocess:
       predictions_transforms:
-        - class_path: torch.argmax
+        - class_path: eva.core.models.transforms.AsDiscrete
           init_args:
-            dim: 1
+            argmax: true
+            keepdim: false
     metrics:
       common:
         - class_path: eva.metrics.AverageLoss
