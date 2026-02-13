@@ -54,10 +54,4 @@ def _apply_transforms(tensor: torch.Tensor, transforms: List[Transform]) -> torc
     Returns:
         The processed tensor.
     """
-
-    def apply_transform(tensor: torch.Tensor, transform: Transform) -> torch.Tensor:
-        if isinstance(transform, functools.partial) and isinstance(transform.func, type):
-            transform = transform()
-        return transform(tensor)
-
-    return functools.reduce(apply_transform, transforms, tensor)
+    return functools.reduce(lambda tensor, transform: transform(tensor), transforms, tensor)
