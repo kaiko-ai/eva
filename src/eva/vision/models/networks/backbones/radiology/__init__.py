@@ -7,12 +7,12 @@ from eva.vision.models.networks.backbones.radiology.universal import UniversalMo
 from eva.vision.models.networks.backbones.radiology.voco import VoCoB, VoCoH, VoCoL
 
 __all__ = [
-    "VoCoB",
-    "VoCoL",
-    "VoCoH",
-    "SwinUNETREncoder",
     "SegResNetEncoder",
     "SuPreMSegResNet",
     "SuPreMSwinUNETR",
+    "SwinUNETREncoder",
     "UniversalModelSwinUNETR",
+    "VoCoB",
+    "VoCoH",
+    "VoCoL",
 ]
