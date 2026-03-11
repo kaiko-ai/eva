@@ -57,7 +57,10 @@ def run_evaluation_session(
                 for val_result, test_result in zip_longest(
                     validation_scores or [], test_scores or []
                 ):
-                    recorder.update([val_result], [test_result])
+                    recorder.update(
+                        [val_result] if val_result is not None else None,
+                        [test_result] if test_result is not None else None,
+                    )
             else:
                 recorder.update(validation_scores, test_scores)
     recorder.save()
