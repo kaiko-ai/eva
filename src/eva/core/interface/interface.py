@@ -41,6 +41,7 @@ class Interface:
             stages=["fit", "validate", "test"],
             n_runs=trainer.n_runs,
             verbose=trainer.n_runs > 1,
+            combine_dataloader_results=trainer.combine_dataloader_results,
         )
 
     def predict(
@@ -116,6 +117,7 @@ class Interface:
             stages=["validate"],
             n_runs=trainer.n_runs,
             verbose=trainer.n_runs > 1,
+            combine_dataloader_results=trainer.combine_dataloader_results,
         )
 
     def test(
@@ -135,6 +137,7 @@ class Interface:
             stages=["test"],
             n_runs=trainer.n_runs,
             verbose=trainer.n_runs > 1,
+            combine_dataloader_results=trainer.combine_dataloader_results,
         )
 
     def validate_test(
@@ -156,4 +159,5 @@ class Interface:
             stages=["validate", "test"],
             n_runs=trainer.n_runs,
             verbose=trainer.n_runs > 1,
+            combine_dataloader_results=trainer.combine_dataloader_results,
         )
