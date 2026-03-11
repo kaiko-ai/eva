@@ -33,6 +33,7 @@ class Trainer(pl_trainer.Trainer):
         checkpoint_type: Literal["best", "last"] = "best",
         accelerator: str = "auto",
         devices: int = 1,
+        combine_dataloader_results: bool = False,
         **kwargs: Any,
     ) -> None:
         """Initializes the trainer.
@@ -49,6 +50,9 @@ class Trainer(pl_trainer.Trainer):
                 callback for evaluations on validation & test sets.
             accelerator: The accelerator to use for training (e.g. "cpu", "gpu").
             devices: The number of devices (GPUs) to use for training.
+            combine_dataloader_results: If True, the results of each dataloader in the val/test
+                loop is combined, averaged together when recording the final results. Otherwise,
+                the results of each dataloader is logged separately.
             kwargs: Kew-word arguments of ::class::`lightning.pytorch.Trainer`.
         """
         super().__init__(
@@ -61,6 +65,7 @@ class Trainer(pl_trainer.Trainer):
 
         self.checkpoint_type = checkpoint_type
         self.n_runs = n_runs
+        self.combine_dataloader_results = combine_dataloader_results
 
         self._session_id: str = _logging.generate_session_id()
         self._log_dir: str = self.default_log_dir
@@ -150,4 +155,5 @@ class Trainer(pl_trainer.Trainer):
             datamodule=datamodule,
             n_runs=self.n_runs,
             verbose=self.n_runs > 1,
+            combine_dataloader_results=self.combine_dataloader_results,
         )

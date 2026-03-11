@@ -1,5 +1,6 @@
 """Fit session related functions."""
 
+from itertools import zip_longest
 from typing import List, Literal, Tuple
 
 from lightning.pytorch.utilities.types import _EVALUATE_OUTPUT, _PREDICT_OUTPUT
@@ -17,6 +18,7 @@ def run_evaluation_session(
     *,
     n_runs: int = 1,
     stages: List[Literal["fit", "validate", "test"]] | None = None,
+    combine_dataloader_results: bool = False,
     verbose: bool = True,
 ) -> None:
     """Runs a downstream evaluation session out-of-place.
@@ -32,6 +34,9 @@ def run_evaluation_session(
         datamodule: The data module.
         n_runs: The number of runs to perform.
         stages: List of stages to execute. Options: "fit", "validate", "test".
+        combine_dataloader_results: If True, the results of each dataloader in the val/test
+            loop is combined, averaged together when recording the final results. Otherwise,
+            the results of each dataloader is logged separately.
         verbose: Whether to verbose the session metrics instead of
             those of each individual run and vice-versa.
     """
@@ -48,7 +53,13 @@ def run_evaluation_session(
             verbose=not verbose,
         )
         if validation_scores or test_scores:
-            recorder.update(validation_scores, test_scores)
+            if combine_dataloader_results:
+                for val_result, test_result in zip_longest(
+                    validation_scores or [], test_scores or []
+                ):
+                    recorder.update([val_result], [test_result])
+            else:
+                recorder.update(validation_scores, test_scores)
     recorder.save()
 
 
