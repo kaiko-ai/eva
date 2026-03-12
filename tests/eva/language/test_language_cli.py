@@ -67,7 +67,6 @@ def test_predict_validate_from_configuration(configuration_file: str, lib_path: 
             {
                 "N_RUNS": "1",
                 "BATCH_SIZE": "2",
-                "N_DATA_WORKERS": "0",
                 "PREDICTIONS_OUTPUT_DIR": output_dir,
                 "MISSING_LIMIT": "0",
             },
@@ -101,7 +100,6 @@ def test_predict_validate_records_datasets_as_runs_from_configuration(lib_path: 
             {
                 "N_RUNS": "1",
                 "BATCH_SIZE": "2",
-                "N_DATA_WORKERS": "0",
                 "PREDICTIONS_OUTPUT_DIR": predictions_dir,
                 "OUTPUT_ROOT": logs_dir,
                 "MISSING_LIMIT": "0",
