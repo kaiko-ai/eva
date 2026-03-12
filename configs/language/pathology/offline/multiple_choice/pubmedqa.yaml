@@ -75,15 +75,9 @@ data:
         num_workers: &N_DATA_WORKERS ${oc.env:N_DATA_WORKERS, 1}
         shuffle: false
         collate_fn: eva.language.data.dataloaders.prediction_collate
-        pin_memory: false
-        persistent_workers: false
-        prefetch_factor: null
       test:
         <<: *DATALOADER_ARGS
       predict:
         batch_size: &PREDICT_BATCH_SIZE ${oc.env:PREDICT_BATCH_SIZE, 16}
         num_workers: *N_DATA_WORKERS
         collate_fn: eva.language.data.dataloaders.text_collate
-        pin_memory: false
-        persistent_workers: false
-        prefetch_factor: null
