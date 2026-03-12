@@ -18,7 +18,7 @@ def run_evaluation_session(
     *,
     n_runs: int = 1,
     stages: List[Literal["fit", "validate", "test"]] | None = None,
-    combine_dataloader_results: bool = False,
+    record_datasets_as_runs: bool = False,
     verbose: bool = True,
 ) -> None:
     """Runs a downstream evaluation session out-of-place.
@@ -34,9 +34,9 @@ def run_evaluation_session(
         datamodule: The data module.
         n_runs: The number of runs to perform.
         stages: List of stages to execute. Options: "fit", "validate", "test".
-        combine_dataloader_results: If True, the results of each dataloader in the val/test
-            loop is combined, averaged together when recording the final results. Otherwise,
-            the results of each dataloader is logged separately.
+        record_datasets_as_runs: If True, when multiple validation and/or test datasets are
+            configured, each dataset output is recorded as a separate run in the session
+            summary. Otherwise, dataset outputs are logged separately within the same run.
         verbose: Whether to verbose the session metrics instead of
             those of each individual run and vice-versa.
     """
@@ -53,7 +53,7 @@ def run_evaluation_session(
             verbose=not verbose,
         )
         if validation_scores or test_scores:
-            if combine_dataloader_results:
+            if record_datasets_as_runs:
                 for val_result, test_result in zip_longest(
                     validation_scores or [], test_scores or []
                 ):

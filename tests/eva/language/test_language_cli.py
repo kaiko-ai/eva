@@ -88,8 +88,8 @@ def test_predict_validate_from_configuration(configuration_file: str, lib_path: 
             )
 
 
-def test_predict_validate_combined_dataloader_results_from_configuration(lib_path: str) -> None:
-    """Tests combined validation results with multiple prediction validation datasets."""
+def test_predict_validate_records_datasets_as_runs_from_configuration(lib_path: str) -> None:
+    """Tests session statistics when multiple validation datasets are recorded as runs."""
     configuration_file = "configs/language/tests/offline/pubmedqa_combine.yaml"
 
     with tempfile.TemporaryDirectory() as temp_dir:

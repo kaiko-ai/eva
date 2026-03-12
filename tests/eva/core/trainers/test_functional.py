@@ -5,8 +5,8 @@ from unittest import mock
 from eva.core.trainers import functional
 
 
-def test_run_evaluation_session_combines_results_per_dataloader_pair() -> None:
-    """Tests that validation and test results are combined by dataloader index."""
+def test_run_evaluation_session_records_each_dataset_pair_as_run() -> None:
+    """Tests that each validation/test dataset pair is recorded as its own run."""
     trainer = mock.Mock(default_log_dir="logs")
     model = mock.Mock()
     datamodule = mock.Mock()
@@ -32,7 +32,7 @@ def test_run_evaluation_session_combines_results_per_dataloader_pair() -> None:
             base_trainer=trainer,
             base_model=model,
             datamodule=datamodule,
-            combine_dataloader_results=True,
+            record_datasets_as_runs=True,
             verbose=False,
         )
 
@@ -43,8 +43,8 @@ def test_run_evaluation_session_combines_results_per_dataloader_pair() -> None:
     recorder.save.assert_called_once_with()
 
 
-def test_run_evaluation_session_combines_validate_only_results() -> None:
-    """Tests that validate-only runs do not pass placeholder test results."""
+def test_run_evaluation_session_records_validate_only_datasets_as_runs() -> None:
+    """Tests that validate-only dataset outputs are recorded without placeholder test results."""
     trainer = mock.Mock(default_log_dir="logs")
     model = mock.Mock()
     datamodule = mock.Mock()
@@ -66,7 +66,7 @@ def test_run_evaluation_session_combines_validate_only_results() -> None:
             base_trainer=trainer,
             base_model=model,
             datamodule=datamodule,
-            combine_dataloader_results=True,
+            record_datasets_as_runs=True,
             verbose=False,
         )
 
@@ -79,8 +79,8 @@ def test_run_evaluation_session_combines_validate_only_results() -> None:
     recorder.save.assert_called_once_with()
 
 
-def test_run_evaluation_session_keeps_results_separate_when_combine_disabled() -> None:
-    """Tests that full result lists are forwarded unchanged when combining is disabled."""
+def test_run_evaluation_session_keeps_dataset_results_grouped_when_recording_disabled() -> None:
+    """Tests that full result lists stay grouped when dataset outputs are not recorded as runs."""
     trainer = mock.Mock(default_log_dir="logs")
     model = mock.Mock()
     datamodule = mock.Mock()
@@ -106,7 +106,7 @@ def test_run_evaluation_session_keeps_results_separate_when_combine_disabled() -
             base_trainer=trainer,
             base_model=model,
             datamodule=datamodule,
-            combine_dataloader_results=False,
+            record_datasets_as_runs=False,
             verbose=False,
         )
 

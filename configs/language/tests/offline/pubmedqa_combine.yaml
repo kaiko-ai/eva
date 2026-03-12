@@ -3,7 +3,7 @@ trainer:
   class_path: eva.Trainer
   init_args:
     n_runs: &N_RUNS ${oc.env:N_RUNS, 1}
-    combine_dataloader_results: true
+    record_datasets_as_runs: true
     default_root_dir: ${oc.env:OUTPUT_ROOT, logs/test/offline/pubmedqa_combine}
     checkpoint_type: null
     accelerator: ${oc.env:ACCELERATOR, auto}
