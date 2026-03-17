@@ -1,6 +1,6 @@
 """Encoder based on Swin UNETR."""
 
-from typing import List, Tuple
+from typing import Literal
 
 import torch
 from monai.inferers.inferer import Inferer
@@ -27,6 +27,7 @@ class SwinUNETREncoder(nn.Module):
         spatial_dims: int = 3,
         out_indices: int | None = None,
         inferer: Inferer | None = None,
+        embeddings_type: Literal["multiscale", "head"] = "multiscale",
         use_v2: bool = True,
     ) -> None:
         """Build the UNETR encoder.
@@ -39,6 +40,9 @@ class SwinUNETREncoder(nn.Module):
                 the aggregated feature vector is returned.
             inferer: An optional MONAI `Inferer` for efficient
                 inference during evaluation.
+            embeddings_type: Whether to use aggregated or head embeddings:
+                - `multiscale`:  multi-scale aggregated representation
+                - `head`: last-stage (head) pooled representation
             use_v2: Whether to use SwinTransformerV2.
         """
         super().__init__()
@@ -48,6 +52,7 @@ class SwinUNETREncoder(nn.Module):
         self._spatial_dims = spatial_dims
         self._out_indices = out_indices
         self._inferer = inferer
+        self._embeddings_type = embeddings_type
         self._use_v2 = use_v2
 
         self._window_size = misc.ensure_tuple_rep(7, spatial_dims)
@@ -120,7 +125,7 @@ class SwinUNETREncoder(nn.Module):
             else nn.AdaptiveAvgPool2d(output_size=(1, 1))
         )
 
-    def _forward_features(self, tensor: torch.Tensor) -> List[torch.Tensor]:
+    def _forward_features(self, tensor: torch.Tensor) -> list[torch.Tensor]:
         """Extracts feature maps from the Swin Transformer and encoder blocks.
 
         Args:
@@ -137,7 +142,7 @@ class SwinUNETREncoder(nn.Module):
         dec4 = self.encoder10(hidden_states[4])
         return [enc0, enc1, enc2, enc3, hidden_states[3], dec4]
 
-    def forward_features(self, tensor: torch.Tensor) -> List[torch.Tensor]:
+    def forward_features(self, tensor: torch.Tensor) -> list[torch.Tensor]:
         """Computes feature maps using either standard forward pass or inference mode.
 
         If in inference mode (`self.training` is False) and an inference method
@@ -155,7 +160,7 @@ class SwinUNETREncoder(nn.Module):
 
         return self._forward_features(tensor)
 
-    def forward_encoders(self, features: List[torch.Tensor]) -> torch.Tensor:
+    def forward_encoders(self, features: list[torch.Tensor]) -> torch.Tensor:
         """Aggregates encoder features into a single feature vector.
 
         Args:
@@ -172,7 +177,7 @@ class SwinUNETREncoder(nn.Module):
             reduced_features.append(hidden_features_reduced)
         return torch.cat(reduced_features, dim=1)
 
-    def forward_head(self, features: List[torch.Tensor]) -> torch.Tensor:
+    def forward_head(self, features: list[torch.Tensor]) -> torch.Tensor:
         """Casts last feature map into a single feature vector.
 
         Args:
@@ -194,12 +199,20 @@ class SwinUNETREncoder(nn.Module):
         Returns:
             Aggregated feature vector of shape (B, C').
         """
+        embeddings_to_forward_methods = {
+            "multiscale": self.forward_encoders,
+            "head": self.forward_head,
+        }
+        forward_method = embeddings_to_forward_methods.get(self._embeddings_type)
+        if forward_method is None:
+            raise ValueError(f"Unknown embeddings_type: {self._embeddings_type}")
+
         intermediates = self.forward_features(tensor)
-        return self.forward_encoders(intermediates)
+        return forward_method(intermediates)
 
     def forward_intermediates(
         self, tensor: torch.Tensor
-    ) -> Tuple[torch.Tensor, List[torch.Tensor]]:
+    ) -> tuple[torch.Tensor, list[torch.Tensor]]:
         """Computes encoder features and their embeddings.
 
         Args:
@@ -212,7 +225,7 @@ class SwinUNETREncoder(nn.Module):
         embeddings = self.forward_encoders(features)
         return embeddings, features
 
-    def forward(self, tensor: torch.Tensor) -> torch.Tensor | List[torch.Tensor]:
+    def forward(self, tensor: torch.Tensor) -> torch.Tensor | list[torch.Tensor]:
         """Forward pass through the encoder.
 
         If `self._out_indices` is None, it returns the aggregated feature vector.
