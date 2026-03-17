@@ -53,3 +53,32 @@ def test_forward_pass(
     assert len(features) == len(expected_shapes)
     for feature, expected_shape in zip(features, expected_shapes, strict=False):
         assert feature.shape == expected_shape
+
+
+@pytest.mark.parametrize(
+    "embeddings_type, expected_dim",
+    [
+        ("head", 48),
+        ("multiscale", 75),
+    ],
+)
+def test_embeddings_type(embeddings_type: str, expected_dim: int) -> None:
+    """Tests if different embedding types produce the correct flattened output shape."""
+    in_channels = 1
+    feature_size = 3
+    batch_size = 2
+    spatial_dims = 2
+    
+    model = swin_unetr.SwinUNETREncoder(
+        in_channels=in_channels,
+        feature_size=feature_size,
+        spatial_dims=spatial_dims,
+        out_indices=None, # Returns embeddings
+        embeddings_type=embeddings_type,
+    )
+    
+    batch = torch.randn(batch_size, in_channels, 96, 96)
+    output = model(batch)
+    
+    assert isinstance(output, torch.Tensor)
+    assert output.shape == (batch_size, expected_dim)
