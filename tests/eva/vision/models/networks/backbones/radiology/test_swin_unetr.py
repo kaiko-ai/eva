@@ -59,7 +59,7 @@ def test_forward_pass(
     "embeddings_type, expected_dim",
     [
         ("head", 48),
-        ("multiscale", 75),
+        ("multiscale", 72),
     ],
 )
 def test_embeddings_type(embeddings_type: str, expected_dim: int) -> None:
