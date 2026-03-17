@@ -1,7 +1,8 @@
 # type: ignore
 """NIfTI I/O related functions."""
 
-from typing import Any, Tuple
+from dataclasses import dataclass
+from typing import Any, Sequence, Tuple
 
 import nibabel as nib
 import numpy as np
@@ -12,10 +13,52 @@ from eva.core.utils.suppress_logs import SuppressLogs
 from eva.vision.utils.io import _utils
 
 
+@dataclass
+class IndexSampler:
+    """Sample specific slice indices."""
+
+    indices: list[int]
+    """List of indices to sample."""
+
+
+@dataclass
+class BlockSampler:
+    """Sample a contiguous block of N slices."""
+
+    n: int
+    """The maximum number of slices to sample."""
+
+
+@dataclass
+class UniformSampler:
+    """Sample N slices uniformly across the scan."""
+
+    n: int
+    """The maximum number of slices to sample."""
+
+
+@dataclass
+class GaussianSampler:
+    """Sample N slices according to a Gaussian distribution."""
+
+    n: int
+    """The maximum number of slices to sample."""
+
+    mean: float | None = None
+    """Center of the Gaussian in slice coordinates. Defaults to the middle."""
+
+    std: float | None = None
+    """Standard deviation of the Gaussian. Defaults to total / 3."""
+
+
+Sampler = IndexSampler | BlockSampler | UniformSampler | GaussianSampler
+"""Supported sampling methods."""
+
+
 def read_nifti(
     path: str,
-    slice_index: int | None = None,
     *,
+    sampler: Sampler | None = None,
     orientation: str | None = None,
     orientation_reference: str | None = None,
 ) -> nib.nifti1.Nifti1Image:
@@ -23,14 +66,16 @@ def read_nifti(
 
     Args:
         path: The path to the NIfTI file.
-        slice_index: Whether to read only a slice from the file.
+        sampler: Strategy for sampling slices. Supports:
+            - IndexSampler(indices=[...]): Specific slice indices.
+            - BlockSampler(n=...): A contiguous block of N slices.
+            - UniformSampler(n=...): N slices sampled uniformly.
+            - GaussianSampler(n=...): N Gaussian sampled slices.
         orientation: The orientation code to reorient the nifti image.
         orientation_reference: Path to a NIfTI file which
             will be used as a reference for the orientation
             transform in case the file missing the pixdim array
             in the NIfTI header.
-        use_storage_dtype: Whether to cast the raw image
-            array to the inferred type.
 
     Returns:
         The NIfTI image class instance.
@@ -41,8 +86,16 @@ def read_nifti(
     """
     _utils.check_file(path)
     image_data = _load_nifti_silently(path)
-    if slice_index is not None:
-        image_data = image_data.slicer[:, :, slice_index : slice_index + 1]
+
+    if sampler:
+        slice_indices = _get_slice_indices(image_data.shape, sampler)
+        proxy_slices = [image_data.dataobj[:, :, i] for i in slice_indices]
+        image_data = nib.Nifti1Image(
+            np.stack(proxy_slices, axis=-1),
+            image_data.affine,
+            image_data.header,
+        )
+
     if orientation:
         image_data = _reorient(
             image_data, orientation=orientation, reference_file=orientation_reference
@@ -51,21 +104,24 @@ def read_nifti(
     return image_data
 
 
-def nifti_to_array(nii: nib.Nifti1Image, use_storage_dtype: bool = True) -> npt.NDArray[Any]:
-    """Converts a NIfTI image to a numpy array.
+def nifti_to_array(
+    nii: nib.Nifti1Image,
+    /,
+    *,
+    dtype: np.dtype | type | None = np.int16,
+) -> npt.NDArray[Any]:
+    """Converts a NIfTI image to a numpy array with efficient casting.
 
     Args:
         nii: The input NIfTI image.
-        use_storage_dtype: Whether to cast the raw image
-            array to the inferred type.
+        dtype: The type to cast the data to. If `None`, it will
+            cast the raw image array to the inferred type via
+            `use_storage_dtype`.
 
     Returns:
         The image as a numpy array (height, width, channels).
     """
-    image_array = nii.get_fdata()
-    if use_storage_dtype:
-        image_array = image_array.astype(nii.get_data_dtype())
-    return image_array
+    return np.asanyarray(nii.dataobj, dtype=dtype or nii.get_data_dtype())
 
 
 def save_array_as_nifti(
@@ -167,3 +223,37 @@ def _reorient(
     targ_ornt = orientations.axcodes2ornt(orientation)
     transform = orientations.ornt_transform(orig_ornt, targ_ornt)
     return nii.as_reoriented(transform)
+
+
+def _get_slice_indices(data_shape: tuple, sampler: Sampler) -> Sequence[int]:
+    """Calculates slice indices based on the provided sampling strategy.
+
+    Args:
+        data_shape: The shape of the NIfTI data array.
+        sampler: The sampling strategy to apply.
+            - IndexSampler: Returns exact provided indices.
+            - BlockSampler: Returns a random contiguous range of length n.
+            - UniformSampler: Returns n indices spaced evenly across the depth.
+            - GaussianSampler: Returns n indices according to a Gaussian distribution.
+
+    Returns:
+        A list of integer slice indices to extract.
+    """
+    total = data_shape[-1]
+    match sampler:
+        case IndexSampler(indices):
+            return indices
+        case BlockSampler(n):
+            k = min(total, n)
+            start = np.random.randint(0, total - k + 1)
+            return list(range(start, start + k))
+        case UniformSampler(n):
+            return np.linspace(0, total - 1, min(total, n), dtype=int).tolist()
+        case GaussianSampler(n, mean, std):
+            samples = np.random.normal(
+                loc=mean if mean is not None else (total - 1) / 2,
+                scale=std if std is not None else total / 3,
+                size=min(total, n),
+            )
+            indices = np.clip(np.round(samples), 0, total - 1).astype(int)
+            return np.sort(indices).tolist()
