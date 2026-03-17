@@ -68,17 +68,17 @@ def test_embeddings_type(embeddings_type: str, expected_dim: int) -> None:
     feature_size = 3
     batch_size = 2
     spatial_dims = 2
-    
+
     model = swin_unetr.SwinUNETREncoder(
         in_channels=in_channels,
         feature_size=feature_size,
         spatial_dims=spatial_dims,
-        out_indices=None, # Returns embeddings
         embeddings_type=embeddings_type,
+        out_indices=None,
     )
-    
+
     batch = torch.randn(batch_size, in_channels, 96, 96)
     output = model(batch)
-    
+
     assert isinstance(output, torch.Tensor)
     assert output.shape == (batch_size, expected_dim)
