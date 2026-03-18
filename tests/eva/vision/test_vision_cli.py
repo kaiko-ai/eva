@@ -11,12 +11,12 @@ import pytest
 from eva.vision.data import datasets
 from tests.eva import _cli
 
-SKIP_ON_DARWIN = [
+FORCE_CPU_MACOS = [
     # error: ConvTranspose 3D is not supported on MPS
     "configs/vision/radiology/online/segmentation/lits17.yaml",
     "configs/vision/tests/online/lits17.yaml",
 ]
-# List of configuration files to skip on macOS
+# List of configuration files for running on CPU when using macOS
 
 
 @pytest.mark.parametrize(
@@ -79,7 +79,7 @@ def test_configuration_initialization(configuration_file: str, lib_path: str) ->
 def test_fit_from_configuration(configuration_file: str, lib_path: str) -> None:
     """Tests CLI `fit` command with a given configuration file."""
     _skip_dataset_validation()
-    _skip_test(configuration_file)
+    _run_on_cpu(configuration_file)
     _cli.run_cli_from_main(
         cli_args=[
             "fit",
@@ -143,9 +143,9 @@ def mock_env():
         yield
 
 
-def _skip_test(configuration_file: str) -> None:
-    """Skip the test if the configuration file is listed in SKIP_ON_DARWIN and running on macOS."""
+def _run_on_cpu(configuration_file: str) -> None:
+    """Runs the tests on cpu accelerator."""
     normalized_path = os.path.normpath(configuration_file)
-    for skip_path in SKIP_ON_DARWIN:
+    for skip_path in FORCE_CPU_MACOS:
         if normalized_path.endswith(os.path.normpath(skip_path)) and sys.platform == "darwin":
-            pytest.skip(f"Skipping {configuration_file} on macOS platforms")
+            os.environ["ACCELERATOR"] = "cpu"
