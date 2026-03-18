@@ -1,4 +1,3 @@
-# type: ignore
 """NIfTI I/O related functions."""
 
 import abc
@@ -122,7 +121,7 @@ def read_nifti(
         total = image_data.shape[-1]
         slice_indices = sampler.sample(total)
         proxy_slices = [image_data.dataobj[:, :, i] for i in slice_indices]
-        image_data = nib.Nifti1Image(
+        image_data = nib.nifti1.Nifti1Image(
             np.stack(proxy_slices, axis=-1),
             image_data.affine,
             image_data.header,
@@ -137,7 +136,7 @@ def read_nifti(
 
 
 def nifti_to_array(
-    nii: nib.Nifti1Image,
+    nii: nib.nifti1.Nifti1Image,
     /,
     *,
     dtype: np.dtype | type | None = np.int16,
@@ -169,7 +168,7 @@ def save_array_as_nifti(
         filename: The name to save the image like.
         dtype: The data type to save the image.
     """
-    nifti_image = nib.Nifti1Image(array, affine=np.eye(4), dtype=dtype)
+    nifti_image = nib.nifti1.Nifti1Image(array, affine=np.eye(4), dtype=dtype)
     nifti_image.to_filename(filename)
 
 
@@ -202,7 +201,7 @@ def fetch_nifti_orientation(path: str) -> npt.NDArray[Any]:
     """
     _utils.check_file(path)
     nii = _load_nifti_silently(path)
-    return nib.io_orientation(nii.affine)
+    return nib.orientations.io_orientation(nii.affine)
 
 
 def fetch_nifti_axis_direction_code(path: str) -> str:
@@ -215,23 +214,23 @@ def fetch_nifti_axis_direction_code(path: str) -> str:
         The axis direction codes as string (e.g. "LAS").
     """
     _utils.check_file(path)
-    image_data: nib.Nifti1Image = nib.load(path)
+    image_data = nib.nifti1.load(path)
     return "".join(orientations.aff2axcodes(image_data.affine))
 
 
-def _load_nifti_silently(path: str) -> nib.Nifti1Image:
+def _load_nifti_silently(path: str) -> nib.nifti1.Nifti1Image:
     """Reads a NIfTI image in silent mode."""
     with SuppressLogs():
-        return nib.load(path)
+        return nib.nifti1.load(path)  # type: ignore
     raise ValueError(f"Failed to load NIfTI file: {path}")
 
 
 def _reorient(
-    nii: nib.Nifti1Image,
+    nii: nib.nifti1.Nifti1Image,
     /,
     orientation: str | tuple[str, str, str] = "RAS",
     reference_file: str | None = None,
-) -> nib.Nifti1Image:
+) -> nib.nifti1.Nifti1Image:
     """Reorients a NIfTI image to a specified orientation.
 
     Args:
@@ -250,8 +249,8 @@ def _reorient(
     orig_ornt = (
         fetch_nifti_orientation(reference_file)
         if reference_file and affine_matrix is None
-        else nib.io_orientation(nii.affine)
+        else nib.orientations.io_orientation(nii.affine)
     )
     targ_ornt = orientations.axcodes2ornt(orientation)
     transform = orientations.ornt_transform(orig_ornt, targ_ornt)
-    return nii.as_reoriented(transform)
+    return nii.as_reoriented(transform)  # type: ignore
