@@ -1,44 +1,68 @@
 # type: ignore
 """NIfTI I/O related functions."""
 
+import abc
 from dataclasses import dataclass
-from typing import Any, Sequence, Tuple
+from typing import Any, Tuple
 
 import nibabel as nib
 import numpy as np
 import numpy.typing as npt
 from nibabel import orientations
+from typing_extensions import override
 
 from eva.core.utils.suppress_logs import SuppressLogs
 from eva.vision.utils.io import _utils
 
 
+class Sampler(abc.ABC):
+    """Base class for slice sampling strategies."""
+
+    @abc.abstractmethod
+    def sample(self, total: int) -> list[int]:
+        """Return sampled slice indices."""
+
+
 @dataclass
-class IndexSampler:
+class IndexSampler(Sampler):
     """Sample specific slice indices."""
 
     indices: list[int]
     """List of indices to sample."""
 
+    @override
+    def sample(self, total: int) -> list[int]:
+        return self.indices
+
 
 @dataclass
-class BlockSampler:
+class BlockSampler(Sampler):
     """Sample a contiguous block of N slices."""
 
     n: int
     """The maximum number of slices to sample."""
 
+    @override
+    def sample(self, total: int) -> list[int]:
+        k = min(total, self.n)
+        start = np.random.randint(0, total - k + 1)
+        return list(range(start, start + k))
+
 
 @dataclass
-class UniformSampler:
+class UniformSampler(Sampler):
     """Sample N slices uniformly across the scan."""
 
     n: int
     """The maximum number of slices to sample."""
 
+    @override
+    def sample(self, total: int) -> list[int]:
+        return np.linspace(0, total - 1, min(total, self.n), dtype=int).tolist()
+
 
 @dataclass
-class GaussianSampler:
+class GaussianSampler(Sampler):
     """Sample N slices according to a Gaussian distribution."""
 
     n: int
@@ -50,9 +74,16 @@ class GaussianSampler:
     std: float | None = None
     """Standard deviation of the Gaussian. Defaults to total / 3."""
 
-
-Sampler = IndexSampler | BlockSampler | UniformSampler | GaussianSampler
-"""Supported sampling methods."""
+    @override
+    def sample(self, total: int) -> list[int]:
+        """Return sampled slice indices."""
+        samples = np.random.normal(
+            loc=self.mean if self.mean is not None else (total - 1) / 2,
+            scale=self.std if self.std is not None else total / 3,
+            size=min(total, self.n),
+        )
+        indices = np.clip(np.round(samples), 0, total - 1).astype(int)
+        return np.sort(indices).tolist()
 
 
 def read_nifti(
@@ -88,7 +119,8 @@ def read_nifti(
     image_data = _load_nifti_silently(path)
 
     if sampler:
-        slice_indices = _get_slice_indices(image_data.shape, sampler)
+        total = image_data.shape[-1]
+        slice_indices = sampler.sample(total)
         proxy_slices = [image_data.dataobj[:, :, i] for i in slice_indices]
         image_data = nib.Nifti1Image(
             np.stack(proxy_slices, axis=-1),
@@ -223,37 +255,3 @@ def _reorient(
     targ_ornt = orientations.axcodes2ornt(orientation)
     transform = orientations.ornt_transform(orig_ornt, targ_ornt)
     return nii.as_reoriented(transform)
-
-
-def _get_slice_indices(data_shape: tuple, sampler: Sampler) -> Sequence[int]:
-    """Calculates slice indices based on the provided sampling strategy.
-
-    Args:
-        data_shape: The shape of the NIfTI data array.
-        sampler: The sampling strategy to apply.
-            - IndexSampler: Returns exact provided indices.
-            - BlockSampler: Returns a random contiguous range of length n.
-            - UniformSampler: Returns n indices spaced evenly across the depth.
-            - GaussianSampler: Returns n indices according to a Gaussian distribution.
-
-    Returns:
-        A list of integer slice indices to extract.
-    """
-    total = data_shape[-1]
-    match sampler:
-        case IndexSampler(indices):
-            return indices
-        case BlockSampler(n):
-            k = min(total, n)
-            start = np.random.randint(0, total - k + 1)
-            return list(range(start, start + k))
-        case UniformSampler(n):
-            return np.linspace(0, total - 1, min(total, n), dtype=int).tolist()
-        case GaussianSampler(n, mean, std):
-            samples = np.random.normal(
-                loc=mean if mean is not None else (total - 1) / 2,
-                scale=std if std is not None else total / 3,
-                size=min(total, n),
-            )
-            indices = np.clip(np.round(samples), 0, total - 1).astype(int)
-            return np.sort(indices).tolist()
