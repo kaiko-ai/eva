@@ -233,10 +233,11 @@ class KiTS23(VisionDataset[eva_tv_tensors.Volume, tv_tensors.Mask]):
 
     def _make_indices(self) -> list[int]:
         """Builds the dataset indices for the specified split."""
+        outer_right = max(end for _, end in (*self._train_index_ranges, *self._val_index_ranges))
         split_index_ranges = {
             "train": self._train_index_ranges,
             "val": self._val_index_ranges,
-            None: [(0, 300)],
+            None: [(0, outer_right)],
         }
         index_ranges = split_index_ranges.get(self._split)
         if index_ranges is None:
