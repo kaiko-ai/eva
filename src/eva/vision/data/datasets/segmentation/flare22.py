@@ -33,6 +33,13 @@ class FLARE22(VisionDataset[eva_tv_tensors.Volume, tv_tensors.Mask]):
     - https://zenodo.org/records/7860267
     """
 
+    _split_index_ranges = {
+        "train": [(11, 50)],
+        "val": [(0, 11)],
+        None: [(0, 50)],
+    }
+    """Sample indices for the dataset splits."""
+
     _resources: list[structs.DownloadResource] = [
         structs.DownloadResource(
             filename="FLARE22Train.zip",
@@ -220,12 +227,7 @@ class FLARE22(VisionDataset[eva_tv_tensors.Volume, tv_tensors.Mask]):
 
     def _make_indices(self) -> list[int]:
         """Builds the dataset indices for the specified split."""
-        split_index_ranges = {
-            "train": [(11, 50)],
-            "val": [(0, 11)],
-            None: [(0, 50)],
-        }
-        index_ranges = split_index_ranges.get(self._split)
+        index_ranges = self._split_index_ranges.get(self._split)
         if index_ranges is None:
             raise ValueError("Invalid data split. Use 'train', 'val' or `None`.")
 

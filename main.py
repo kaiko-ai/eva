@@ -8,18 +8,15 @@ from eva.vision.utils.io.nifti import (
     read_nifti,
 )
 
-# path = "/Users/ioangatop/Desktop/eva/data/word/WORD-V0.1.0/imagesTr/word_0051.nii.gz"
-# path = "/Users/ioangatop/Desktop/eva/data/word/WORD-V0.1.0/labelsTr/word_0051.nii.gz"
-# output_path = "./word_0051.nii.gz"
 
-# path = "/Users/ioangatop/Desktop/eva/data/word/WORD-V0.1.0/imagesTr/word_0130.nii.gz"
-# path = "/Users/ioangatop/Desktop/eva/data/word/WORD-V0.1.0/labelsTr/word_0130.nii.gz"
-# output_path = "./word_0130.nii.gz"
+# path = "/Users/ioangatop/Desktop/eva/data/flare22/FLARE22Train/images/FLARE22_Tr_0014_0000.nii.gz"
+# path = "/Users/ioangatop/Desktop/eva/data/flare22/FLARE22Train/labels/FLARE22_Tr_0014.nii.gz"
+# output_path = "./FLARE22_Tr_0014_0000.nii.gz"
 
 
-# path = "/Users/ioangatop/Desktop/eva/data/word/WORD-V0.1.0/imagesVal/word_0001.nii.gz"
-path = "/Users/ioangatop/Desktop/eva/data/word/WORD-V0.1.0/labelsVal/word_0001.nii.gz"
-output_path = "./word_0001.nii.gz"
+# path = "/Users/ioangatop/Desktop/eva/data/flare22/FLARE22Train/images/FLARE22_Tr_0044_0000.nii.gz"
+path = "/Users/ioangatop/Desktop/eva/data/flare22/FLARE22Train/labels/FLARE22_Tr_0044.nii.gz"
+output_path = "./FLARE22_Tr_0044.nii.gz"
 
 
 volume = read_nifti(path=path)
