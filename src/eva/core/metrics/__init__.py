@@ -8,10 +8,10 @@ from eva.core.metrics.structs import Metric, MetricCollection, MetricModule, Met
 __all__ = [
     "AverageLoss",
     "BinaryBalancedAccuracy",
+    "BinaryClassificationMetrics",
+    "MulticlassClassificationMetrics",
     "Metric",
     "MetricCollection",
     "MetricModule",
     "MetricsSchema",
-    "MulticlassClassificationMetrics",
-    "BinaryClassificationMetrics",
 ]

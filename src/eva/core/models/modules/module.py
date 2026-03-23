@@ -1,5 +1,6 @@
 """Base model module."""
 
+import os
 from typing import Any, Mapping
 
 import lightning.pytorch as pl
@@ -32,8 +33,8 @@ class ModelModule(pl.LightningModule):
         super().__init__()
 
         self._metrics = metrics or self.default_metrics
-        self._postprocess = postprocess or self.default_postprocess
 
+        self.postprocess = postprocess or self.default_postprocess
         self.metrics = metrics_lib.MetricModule.from_schema(self._metrics)
 
     @property
@@ -45,6 +46,21 @@ class ModelModule(pl.LightningModule):
     def default_postprocess(self) -> batch_postprocess.BatchPostProcess:
         """The default post-processes."""
         return batch_postprocess.BatchPostProcess()
+
+    @property
+    def metrics_device(self) -> torch.device:
+        """Returns the device by which the metrics should be calculated."""
+        device = os.getenv("METRICS_DEVICE", None)
+        if device is not None:
+            return torch.device(device)
+        elif self.device.type == "mps":
+            # mps seems to have compatibility issues with segmentation metrics
+            return torch.device("cpu")
+        return self.device
+
+    @override
+    def on_fit_start(self) -> None:
+        self.metrics.to(device=self.metrics_device)
 
     @override
     def on_train_batch_end(
@@ -58,6 +74,10 @@ class ModelModule(pl.LightningModule):
             self.metrics.training_metrics,
             batch_outputs=outputs,
         )
+
+    @override
+    def on_validation_start(self) -> None:
+        self.metrics.to(device=self.metrics_device)
 
     @override
     def on_validation_batch_end(
@@ -77,6 +97,10 @@ class ModelModule(pl.LightningModule):
     @override
     def on_validation_epoch_end(self) -> None:
         self._compute_and_log_metrics(self.metrics.validation_metrics)
+
+    @override
+    def on_test_start(self) -> None:
+        self.metrics.to(device=self.metrics_device)
 
     @override
     def on_test_batch_end(
@@ -109,8 +133,8 @@ class ModelModule(pl.LightningModule):
         Returns:
             The updated outputs.
         """
-        self._postprocess(outputs)
-        return memory.recursive_detach(outputs, to_cpu=self.device.type == "cpu")
+        self.postprocess(outputs)
+        return memory.recursive_detach(outputs, to_cpu=self.metrics_device.type == "cpu")
 
     def _forward_and_log_metrics(
         self,

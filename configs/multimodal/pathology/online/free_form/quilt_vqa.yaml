@@ -1,0 +1,61 @@
+trainer:
+  class_path: eva.Trainer
+  init_args:
+    accelerator: ${oc.env:ACCELERATOR, auto}
+    devices: ${oc.env:NUM_DEVICES, 1}
+    n_runs: ${oc.env:N_RUNS, 2}
+    default_root_dir: ${oc.env:OUTPUT_ROOT, logs/${oc.env:MODEL_NAME, anthropic-claude-3-7-sonnet-latest}/quilt_vqa}
+    precision: bf16
+    checkpoint_type: null
+    callbacks:
+      - class_path: eva.callbacks.ConfigurationLogger
+model:
+  class_path: eva.multimodal.models.modules.VisionLanguageModule
+  init_args:
+    model:
+      class_path: eva.multimodal.models.wrappers.ModelFromRegistry
+      init_args:
+        model_name: ${oc.env:MODEL_NAME, anthropic/claude-3-7-sonnet-20250219}
+        model_extra_kwargs: ${oc.env:MODEL_EXTRA_KWARGS, null}
+    metrics:
+      common:
+        - class_path: eva.language.metrics.GEvalCorrectness
+          init_args:
+            model:
+              class_path: eva.language.models.wrappers.ModelFromRegistry
+              init_args:
+                model_name: ${oc.env:JUDGE_MODEL_NAME, google/gemini-2.5-flash-lite}
+                model_extra_kwargs: ${oc.env:JUDGE_MODEL_EXTRA_KWARGS, null}
+            missing_limit: ${oc.env:MISSING_LIMIT, 5}
+data:
+  class_path: eva.DataModule
+  init_args:
+    datasets:
+      test:
+        class_path: eva.multimodal.data.datasets.QuiltVQA
+        init_args:
+          root: ${oc.env:DATA_ROOT, .data/quilt_vqa}
+          split: test
+          download: ${oc.env:DOWNLOAD_DATA, false}
+          # Set `download: true` to download the dataset from https://huggingface.co/datasets/wisdomik/Quilt_VQA
+          # The QuiltVQA dataset is distributed under the following license: 
+          # "CC-BY-NC-ND-3.0"
+          # (see: https://creativecommons.org/licenses/by-nc-nd/3.0/ch/deed.de)
+          transforms:
+            image:
+              class_path: eva.vision.data.transforms.Resize
+              init_args:
+                size: ${oc.env:RESIZE_DIM, null}
+                max_bytes: ${oc.env:IMAGE_MAX_BYTES, null}
+    dataloaders:
+      test:
+        batch_size: ${oc.env:BATCH_SIZE, 16}
+        num_workers: ${oc.env:N_DATA_WORKERS, 1}
+        collate_fn: eva.multimodal.data.dataloaders.text_image_collate
+    samplers:
+      test:
+        class_path: eva.core.data.samplers.RandomSampler
+        init_args:
+          seed: ${oc.env:SAMPLER_SEED, 42}
+          sample_ratio: ${oc.env:SAMPLE_RATIO, null}
+          num_samples: ${oc.env:NUM_SAMPLES, null}

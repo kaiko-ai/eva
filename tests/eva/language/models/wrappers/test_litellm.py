@@ -1,0 +1,63 @@
+"""LiteLLM wrapper tests."""
+
+import pytest
+
+from eva.language.data.messages import AssistantMessage, SystemMessage, UserMessage
+from eva.language.models import LiteLLMModel
+from eva.language.models.typings import TextBatch
+
+DUMMY_RESPONSE = {"choices": [{"message": {"content": "Test response", "role": "assistant"}}]}
+
+
+def test_generate(model_instance):
+    """Test that the generate method returns the expected dummy response."""
+    batch = TextBatch(text=[[UserMessage(content="Hello, world!")]], target=None, metadata={})
+    result = model_instance(batch)
+    assert result["generated_text"] == ["Test response"]
+    assert result["input_text"] == ["user: Hello, world!"]
+
+
+def test_generate_multi_message(model_instance):
+    """Test input_text formatting for multi-message conversations."""
+    batch = TextBatch(
+        text=[
+            [
+                SystemMessage(content="You are helpful"),
+                UserMessage(content="What is 2+2?"),
+                AssistantMessage(content="4"),
+                UserMessage(content="What is 3+3?"),
+            ]
+        ],
+        target=None,
+        metadata={},
+    )
+    result = model_instance(batch)
+    assert result["generated_text"] == ["Test response"]
+    assert result["input_text"] == [
+        "system: You are helpful\nuser: What is 2+2?\nassistant: 4\nuser: What is 3+3?"
+    ]
+
+
+@pytest.fixture
+def fake_completion(monkeypatch):
+    """Fixture to override `batch_completion` function and set a dummy OPENAI_API_KEY."""
+
+    def _fake_batch_completion(**_kwargs):
+        return [DUMMY_RESPONSE]
+
+    monkeypatch.setenv("OPENAI_API_KEY", "dummy-key")
+
+    monkeypatch.setattr(
+        "eva.language.models.wrappers.litellm.batch_completion", _fake_batch_completion
+    )
+    return _fake_batch_completion
+
+
+@pytest.fixture
+def model_instance(fake_completion):  # noqa: ARG001
+    """Fixture to instantiate the LiteLLMModel with a valid model name.
+
+    Using a valid model name (like 'openai/gpt-3.5-turbo') helps pass provider lookup.
+    fake_completion dependency ensures mocking is set up before model creation.
+    """
+    return LiteLLMModel("openai/gpt-3.5-turbo", model_kwargs={"temperature": 0.7})

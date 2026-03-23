@@ -1,5 +1,35 @@
 """Vision data transforms."""
 
-from eva.vision.data.transforms.common import ResizeAndCrop
+from eva.vision.data.transforms.common import ResizeAndCrop, Squeeze
+from eva.vision.data.transforms.croppad import (
+    CropForeground,
+    RandCropByLabelClasses,
+    RandCropByPosNegLabel,
+    RandSpatialCrop,
+    SpatialPad,
+)
+from eva.vision.data.transforms.intensity import (
+    RandScaleIntensity,
+    RandShiftIntensity,
+    ScaleIntensityRange,
+)
+from eva.vision.data.transforms.spatial import RandFlip, RandRotate90, Resize, Spacing
+from eva.vision.data.transforms.utility import EnsureChannelFirst
 
-__all__ = ["ResizeAndCrop"]
+__all__ = [
+    "Resize",
+    "ResizeAndCrop",
+    "Squeeze",
+    "CropForeground",
+    "RandCropByLabelClasses",
+    "RandCropByPosNegLabel",
+    "SpatialPad",
+    "RandScaleIntensity",
+    "RandShiftIntensity",
+    "ScaleIntensityRange",
+    "RandFlip",
+    "RandRotate90",
+    "RandSpatialCrop",
+    "Spacing",
+    "EnsureChannelFirst",
+]

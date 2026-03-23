@@ -34,7 +34,7 @@ The setup for an *eva* run is provided in a `.yaml` config file which is defined
 
 A config file specifies the setup for the *trainer* (including callback for the model backbone), the *model* (setup of the trainable decoder) and *data* module. 
 
-The config files for the datasets and models that *eva* supports out of the box, you can find on [GitHub](https://github.com/kaiko-ai/eva/tree/main/configs). We recommend that you inspect some of them to get a better understanding of their structure and content.
+The config files for the datasets and models that *eva* supports out of the box, you can find on [GitHub](https://github.com/kaiko-ai/eva/tree/0.0.2). We recommend that you inspect some of them to get a better understanding of their structure and content.
 
 
 ### Environment variables
@@ -43,19 +43,26 @@ To customize runs, without the need of creating custom config-files, you can ove
 
 |                         | Type  | Description |
 |-------------------------|-------|-------------|
-| `OUTPUT_ROOT`           | str   | The directory to store logging outputs and evaluation results |
-| `EMBEDDINGS_ROOT`       | str   | The directory to store the computed embeddings |
-| `CHECKPOINT_PATH`       | str   | Path to the FM-checkpoint to be evaluated |
-| `IN_FEATURES`           | int   | The input feature dimension (embedding) |
-| `NUM_CLASSES`           | int   | Number of classes for classification tasks |
-| `N_RUNS`                | int   | Number of `fit` runs to perform in a session, defaults to 5 |
-| `MAX_STEPS`             | int   | Maximum number of training steps (if early stopping is not triggered) |
-| `BATCH_SIZE`            | int   | Batch size for a training step |
-| `PREDICT_BATCH_SIZE`    | int   | Batch size for a predict step |
-| `LR_VALUE`              | float | Learning rate for training the decoder |
-| `MONITOR_METRIC`        | str   | The metric to monitor for early stopping and final model checkpoint loading |
-| `MONITOR_METRIC_MODE`   | str   | "min" or "max", depending on the `MONITOR_METRIC` used |
-| `REPO_OR_DIR`           | str   | GitHub repo with format containing model implementation, e.g. "facebookresearch/dino:main" |
-| `DINO_BACKBONE`         | str   | Backbone model architecture if a facebookresearch/dino FM is evaluated |
-| `FORCE_RELOAD`          | bool  | Whether to force a fresh download of the github repo unconditionally |
-| `PRETRAINED`            | bool  | Whether to load FM-backbone weights from a pretrained model |
+| `MODEL_NAME`            | `str`   | The name of the backbone model to load from the model registry. (e.g. pathology/kaiko_vitb8) facebookresearch/dino FM is evaluated |
+| `OUT_INDICES`           | `int` \| `tuple[int]` \| `None`   | The indices of the feature maps to select. E.g. `1` outputs last feature map of the backbone, `3` outputs the last three feature maps, and `(-2, -4)` returns the penultimate and the forth before the last maps. Currently this is only used for segmentation tasks.  |
+| `DATA_ROOT`             | `str`   | The location of where the datasets will be downloaded to / loaded from during evaluation. |
+| `DOWNLOAD`              | `bool`  | Whether to automatically download the dataset (make sure to review the license of the dataset first and note that not all datasets support this) . |
+| `OUTPUT_ROOT`           | `str`   | The directory to store logging outputs and evaluation results |
+| `EMBEDDINGS_ROOT`       | `str`   | The directory to store the computed embeddings during `eva predict`. |
+| `IN_FEATURES`           | `int`   | The input feature dimension (embedding) |
+| `N_RUNS`                | `int`   | Number of `fit` runs to perform in a session, defaults to 5 |
+| `RESIZE_DIM`            | `int \| tuple[int]` | Dimension to which to resize the images before the forward pass. |
+| `MAX_STEPS`             | `int`   | Maximum number of training steps (if early stopping is not triggered) |
+| `BATCH_SIZE`            | `int`   | Batch size for a training step |
+| `PREDICT_BATCH_SIZE`    | `int`   | Batch size for a predict step |
+| `LR_VALUE`              | `float` | Learning rate for training the decoder |
+| `MONITOR_METRIC`        | `str`   | The metric to monitor for early stopping and final model checkpoint loading |
+| `MONITOR_METRIC_MODE`   | `str`   | "min" or "max", depending on the `MONITOR_METRIC` used |
+| `REPO_OR_DIR`           | `str`   | GitHub repo with format containing model implementation, e.g. "facebookresearch/dino:main" |
+| `TQDM_REFRESH_RATE`     | `str`   | Determines at which rate (in number of batches) the progress bars get updated. Set it to 0 to disable the progress bar. |
+| `N_DATA_WORKERS`        | `str`   | How many subprocesses to use for the torch dataloaders. Set to `null` to use the number of cpu cores. |
+| `METRICS_DEVICE`        | `str`   | Specifies the device on which to compute the metrics. If not set, will use the same device as used for training. |
+| `NUM_DEVICES`           | `str`   | The number of devices (GPUs) to use for training. |
+| `ACCELERATOR`           | `str`   | The accelerator to use for training (e.g. "cpu", "gpu"). |
+| `CHECKPOINT_TYPE`       | `str`   | Set to "best" or "last", to select which checkpoint to load for evaluations on validation & test sets after training. |
+| `PATIENCE`       | `int`   | Number of checks with no improvement after which training will be stopped (early stopping). |

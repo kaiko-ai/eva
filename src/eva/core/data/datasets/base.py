@@ -1,5 +1,8 @@
 """Base dataset class."""
 
+import abc
+from typing import Generic, TypeVar
+
 from eva.core.data.datasets import dataset
 
 
@@ -51,3 +54,28 @@ class Dataset(dataset.TorchDataset):
         of fit (train + validate), validate, test, or predict and it will be
         called from every process (i.e. GPU) across all the nodes in DDP.
         """
+
+
+DataSample = TypeVar("DataSample")
+"""The data sample type."""
+
+
+class MapDataset(Dataset, abc.ABC, Generic[DataSample]):
+    """Abstract base class for all map-style datasets."""
+
+    @abc.abstractmethod
+    def __getitem__(self, index: int) -> DataSample:
+        """Retrieves the item at the given index.
+
+        Args:
+            index: Index of the item to retrieve.
+
+        Returns:
+            The data at the given index.
+        """
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def __len__(self) -> int:
+        """Returns the length of the dataset."""
+        raise NotImplementedError

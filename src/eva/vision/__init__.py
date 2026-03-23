@@ -1,7 +1,7 @@
 """eva vision API."""
 
 try:
-    from eva.vision import models, utils
+    from eva.vision import callbacks, losses, models, utils
     from eva.vision.data import datasets, transforms
 except ImportError as e:
     msg = (
@@ -11,4 +11,4 @@ except ImportError as e:
     )
     raise ImportError(str(e) + "\n\n" + msg) from e
 
-__all__ = ["models", "utils", "datasets", "transforms"]
+__all__ = ["callbacks", "losses", "models", "utils", "datasets", "transforms"]

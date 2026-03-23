@@ -46,5 +46,8 @@ def model(
 ) -> modules.InferenceModule:
     """Returns a HeadModule model fixture."""
     return modules.InferenceModule(
-        backbone=nn.Sequential(nn.Flatten(), nn.Linear(math.prod(input_shape), n_classes))
+        backbone=nn.Sequential(
+            nn.Flatten(),
+            nn.Linear(math.prod(input_shape), n_classes),
+        )
     )

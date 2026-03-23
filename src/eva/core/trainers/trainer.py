@@ -1,17 +1,19 @@
 """Core trainer module."""
 
 import os
-from typing import Any
+from typing import Any, Literal
 
 import loguru
 from lightning.pytorch import loggers as pl_loggers
 from lightning.pytorch import trainer as pl_trainer
 from lightning.pytorch.utilities import argparse
 from lightning_fabric.utilities import cloud_io
+from lightning_utilities.core.rank_zero import rank_zero_only
 from typing_extensions import override
 
 from eva.core import loggers as eva_loggers
 from eva.core.data import datamodules
+from eva.core.loggers.utils import wandb as wandb_utils
 from eva.core.models import modules
 from eva.core.trainers import _logging, functional
 
@@ -28,6 +30,9 @@ class Trainer(pl_trainer.Trainer):
         *args: Any,
         default_root_dir: str = "logs",
         n_runs: int = 1,
+        checkpoint_type: Literal["best", "last"] = "best",
+        accelerator: str = "auto",
+        devices: int = 1,
         **kwargs: Any,
     ) -> None:
         """Initializes the trainer.
@@ -40,16 +45,27 @@ class Trainer(pl_trainer.Trainer):
                 Unlike in ::class::`lightning.pytorch.Trainer`, this path would be the
                 prioritized destination point.
             n_runs: The amount of runs (fit and evaluate) to perform in an evaluation session.
+            checkpoint_type: Wether to load the "best" or "last" checkpoint saved by the checkpoint
+                callback for evaluations on validation & test sets.
+            accelerator: The accelerator to use for training (e.g. "cpu", "gpu").
+            devices: The number of devices (GPUs) to use for training.
             kwargs: Kew-word arguments of ::class::`lightning.pytorch.Trainer`.
         """
-        super().__init__(*args, default_root_dir=default_root_dir, **kwargs)
+        super().__init__(
+            *args,
+            default_root_dir=default_root_dir,
+            accelerator=accelerator,
+            devices=devices,
+            **kwargs,
+        )
 
-        self._n_runs = n_runs
+        self.checkpoint_type = checkpoint_type
+        self.n_runs = n_runs
 
         self._session_id: str = _logging.generate_session_id()
         self._log_dir: str = self.default_log_dir
 
-        self.setup_log_dirs()
+        self.init_logger_run(0)
 
     @property
     def default_log_dir(self) -> str:
@@ -61,30 +77,56 @@ class Trainer(pl_trainer.Trainer):
     def log_dir(self) -> str | None:
         return self.strategy.broadcast(self._log_dir)
 
-    def setup_log_dirs(self, subdirectory: str = "") -> None:
-        """Setups the logging directory of the trainer and experimental loggers in-place.
+    @rank_zero_only
+    def init_logger_run(self, run_id: int | None) -> None:
+        """Setup the loggers & log directories when starting a new run.
 
         Args:
-            subdirectory: Whether to append a subdirectory to the output log.
+            run_id: The id of the current run.
         """
+        subdirectory = f"run_{run_id}" if run_id is not None else ""
         self._log_dir = os.path.join(self.default_root_dir, self._session_id, subdirectory)
 
         enabled_loggers = []
-        if isinstance(self.loggers, list) and len(self.loggers) > 0:
-            for logger in self.loggers:
-                if isinstance(logger, (pl_loggers.CSVLogger, pl_loggers.TensorBoardLogger)):
-                    if not cloud_io._is_local_file_protocol(self.default_root_dir):
-                        loguru.logger.warning(
-                            f"Skipped {type(logger).__name__} as remote storage is not supported."
-                        )
-                        continue
-                    else:
-                        logger._root_dir = self.default_root_dir
-                        logger._name = self._session_id
-                        logger._version = subdirectory
-                enabled_loggers.append(logger)
+        for logger in self.loggers or []:
+            if isinstance(logger, (pl_loggers.CSVLogger, pl_loggers.TensorBoardLogger)):
+                if not cloud_io._is_local_file_protocol(self.default_root_dir):
+                    loguru.logger.warning(
+                        f"Skipped {type(logger).__name__} as remote storage is not supported."
+                    )
+                    continue
+                else:
+                    logger._root_dir = self.default_root_dir
+                    logger._name = self._session_id
+                    logger._version = subdirectory
+            elif isinstance(logger, pl_loggers.WandbLogger):
+                task_name = self.default_root_dir.split("/")[-1]
+                run_name = os.getenv("WANDB_RUN_NAME", f"{task_name}_{self._session_id}")
+                wandb_utils.init_run(f"{run_name}_{run_id}", logger._wandb_init)
+            enabled_loggers.append(logger)
 
+        eva_loggers.log_parameters(
+            enabled_loggers,
+            tag="session_info",
+            parameters={
+                "session_info": {
+                    "session_id": self._session_id,
+                    "run_id": run_id,
+                    "log_dir": self._log_dir,
+                }
+            },
+        )
         self._loggers = enabled_loggers or [eva_loggers.DummyLogger(self._log_dir)]
+
+    def finish_logger_run(self, run_id: int | None) -> None:
+        """Finish the current run in the enabled loggers.
+
+        Args:
+            run_id: The id of the current run.
+        """
+        for logger in self.loggers or []:
+            if isinstance(logger, pl_loggers.WandbLogger):
+                wandb_utils.finish_run()
 
     def run_evaluation_session(
         self,
@@ -106,6 +148,6 @@ class Trainer(pl_trainer.Trainer):
             base_trainer=self,
             base_model=model,
             datamodule=datamodule,
-            n_runs=self._n_runs,
-            verbose=self._n_runs > 1,
+            n_runs=self.n_runs,
+            verbose=self.n_runs > 1,
         )

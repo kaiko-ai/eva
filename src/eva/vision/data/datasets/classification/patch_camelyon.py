@@ -4,18 +4,19 @@ import os
 from typing import Callable, Dict, List, Literal
 
 import h5py
-import numpy as np
+import torch
+from torchvision import tv_tensors
 from torchvision.datasets import utils
+from torchvision.transforms.v2 import functional
 from typing_extensions import override
 
-from eva.vision.data.datasets import _validators, structs
-from eva.vision.data.datasets.classification import base
+from eva.vision.data.datasets import _validators, structs, vision
 
 _URL_TEMPLATE = "https://zenodo.org/records/2546921/files/{filename}.gz?download=1"
 """PatchCamelyon URL files templates."""
 
 
-class PatchCamelyon(base.ImageClassification):
+class PatchCamelyon(vision.VisionDataset[tv_tensors.Image, torch.Tensor]):
     """Dataset class for PatchCamelyon images and corresponding targets."""
 
     _train_resources: List[structs.DownloadResource] = [
@@ -60,6 +61,13 @@ class PatchCamelyon(base.ImageClassification):
     ]
     """Test resources."""
 
+    _expected_length = {
+        "train": 262144,
+        "val": 32768,
+        "test": 32768,
+    }
+    """Expected dataset length for each split."""
+
     _license: str = (
         "Creative Commons Zero v1.0 Universal (https://choosealicense.com/licenses/cc0-1.0/)"
     )
@@ -70,8 +78,7 @@ class PatchCamelyon(base.ImageClassification):
         root: str,
         split: Literal["train", "val", "test"],
         download: bool = False,
-        image_transforms: Callable | None = None,
-        target_transforms: Callable | None = None,
+        transforms: Callable | None = None,
     ) -> None:
         """Initializes the dataset.
 
@@ -82,15 +89,10 @@ class PatchCamelyon(base.ImageClassification):
             download: Whether to download the data for the specified split.
                 Note that the download will be executed only by additionally
                 calling the :meth:`prepare_data` method.
-            image_transforms: A function/transform that takes in an image
-                and returns a transformed version.
-            target_transforms: A function/transform that takes in the target
-                and transforms it.
+            transforms: A function/transform which returns a transformed
+                version of the raw data samples.
         """
-        super().__init__(
-            image_transforms=image_transforms,
-            target_transforms=target_transforms,
-        )
+        super().__init__(transforms=transforms)
 
         self._root = root
         self._split = split
@@ -118,26 +120,21 @@ class PatchCamelyon(base.ImageClassification):
 
     @override
     def validate(self) -> None:
-        expected_length = {
-            "train": 262144,
-            "val": 32768,
-            "test": 32768,
-        }
         _validators.check_dataset_integrity(
             self,
-            length=expected_length.get(self._split, 0),
+            length=self._expected_length.get(self._split, 0),
             n_classes=2,
             first_and_last_labels=("no_tumor", "tumor"),
         )
 
     @override
-    def load_image(self, index: int) -> np.ndarray:
+    def load_data(self, index: int) -> tv_tensors.Image:
         return self._load_from_h5("x", index)
 
     @override
-    def load_target(self, index: int) -> np.ndarray:
+    def load_target(self, index: int) -> torch.Tensor:
         target = self._load_from_h5("y", index).squeeze()
-        return np.asarray(target, dtype=np.int64)
+        return torch.tensor(target, dtype=torch.float32)
 
     @override
     def __len__(self) -> int:
@@ -162,7 +159,7 @@ class PatchCamelyon(base.ImageClassification):
         self,
         data_key: Literal["x", "y"],
         index: int | None = None,
-    ) -> np.ndarray:
+    ) -> tv_tensors.Image:
         """Load data or targets from an HDF5 file.
 
         Args:
@@ -176,7 +173,8 @@ class PatchCamelyon(base.ImageClassification):
         h5_file = self._h5_file(data_key)
         with h5py.File(h5_file, "r") as file:
             data = file[data_key]
-            return data[:] if index is None else data[index]  # type: ignore
+            image_array = data[:] if index is None else data[index]  # type: ignore
+            return functional.to_image(image_array)  # type: ignore
 
     def _fetch_dataset_length(self) -> int:
         """Fetches the dataset split length from its HDF5 file."""

@@ -1,0 +1,1 @@
+"""Tests core splitting module."""

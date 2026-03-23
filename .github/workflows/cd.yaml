@@ -1,0 +1,44 @@
+---
+name: CD
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: "${{ github.workflow }}-${{ github.ref }}"
+  cancel-in-progress: true
+
+permissions: {}
+
+jobs:
+  deploy-docs:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Needed for pushing to GitHub Pages
+      id-token: write # Needed for publishing to GitHub Pages
+    steps:
+      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
+        with:
+          # Needed to push to gh-pages branch
+          # IMPORTANT: Avoid publishing the .git/ folder to prevent leaking credentials
+          persist-credentials: true
+      - name: Setting up PDM
+        uses: pdm-project/setup-pdm@94a823180e06fcde4ad29308721954a521c96ed0 # v4
+        with:
+          python-version: "3.10"
+          architecture: x64
+      - name: Setting up nox
+        uses: wntrblm/nox@a74da2c766d4e656d6105639926c31f3aa4a6ca1 # 2025.02.09
+        with:
+          python-versions: "3.10"
+      - name: Configure Git Credentials
+        run: |
+          git config user.email "action@github.com"
+          git config user.name "GitHub Action"
+      - name: Deploy Documentation
+        run: |
+          git fetch origin gh-pages:gh-pages
+          nox -s docs -- deploy --update-aliases main
+          git push origin gh-pages

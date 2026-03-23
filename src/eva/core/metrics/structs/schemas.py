@@ -18,6 +18,12 @@ class MetricsSchema:
     evaluation: MetricModuleType | None = None
     """The exclusive evaluation metrics."""
 
+    compute_groups: bool = True
+    """Whether to share the same states across metrics in a collection."""
+
+    separator: str = "/"
+    """The separator between the group name of the metric and the metric itself."""
+
     @property
     def training_metrics(self) -> MetricModuleType | None:
         """Returns the training metics."""
@@ -44,4 +50,6 @@ class MetricsSchema:
         if metrics is None or self.common is None:
             return self.common or metrics
 
-        return [self.common, metrics]  # type: ignore
+        metrics = metrics if isinstance(metrics, list) else [metrics]  # type: ignore
+        common = self.common if isinstance(self.common, list) else [self.common]
+        return common + metrics  # type: ignore

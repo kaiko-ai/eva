@@ -1,8 +1,8 @@
 """Fit session related functions."""
 
-from typing import Tuple
+from typing import List, Literal, Tuple
 
-from lightning.pytorch.utilities.types import _EVALUATE_OUTPUT
+from lightning.pytorch.utilities.types import _EVALUATE_OUTPUT, _PREDICT_OUTPUT
 
 from eva.core.data import datamodules
 from eva.core.models import modules
@@ -16,11 +16,12 @@ def run_evaluation_session(
     datamodule: datamodules.DataModule,
     *,
     n_runs: int = 1,
+    stages: List[Literal["fit", "validate", "test"]] | None = None,
     verbose: bool = True,
 ) -> None:
     """Runs a downstream evaluation session out-of-place.
 
-    It performs an evaluation run (fit and evaluate) on the model
+    It performs an evaluation run (with configurable stages) on the model
     multiple times. Note that as the input `base_trainer` and
     `base_model` would be cloned, the input object would not
     be modified.
@@ -29,20 +30,25 @@ def run_evaluation_session(
         base_trainer: The base trainer module to use.
         base_model: The base model module to use.
         datamodule: The data module.
-        n_runs: The amount of runs (fit and evaluate) to perform.
+        n_runs: The number of runs to perform.
+        stages: List of stages to execute. Options: "fit", "validate", "test".
         verbose: Whether to verbose the session metrics instead of
-            these of each individual runs and vice-versa.
+            those of each individual run and vice-versa.
     """
+    if not stages:
+        stages = ["fit", "validate", "test"]
     recorder = _recorder.SessionRecorder(output_dir=base_trainer.default_log_dir, verbose=verbose)
     for run_index in range(n_runs):
         validation_scores, test_scores = run_evaluation(
             base_trainer,
             base_model,
             datamodule,
-            run_id=f"run_{run_index}",
+            run_id=run_index,
+            stages=stages,
             verbose=not verbose,
         )
-        recorder.update(validation_scores, test_scores)
+        if validation_scores or test_scores:
+            recorder.update(validation_scores, test_scores)
     recorder.save()
 
 
@@ -51,10 +57,11 @@ def run_evaluation(
     base_model: modules.ModelModule,
     datamodule: datamodules.DataModule,
     *,
-    run_id: str | None = None,
+    run_id: int | None = None,
+    stages: List[Literal["fit", "validate", "test"]] | None = None,
     verbose: bool = True,
-) -> Tuple[_EVALUATE_OUTPUT, _EVALUATE_OUTPUT | None]:
-    """Fits and evaluates a model out-of-place.
+) -> Tuple[_EVALUATE_OUTPUT | None, _EVALUATE_OUTPUT | None]:
+    """Runs the specified evaluation stages out-of-place.
 
     Args:
         base_trainer: The base trainer to use but not modify.
@@ -62,67 +69,64 @@ def run_evaluation(
         datamodule: The data module.
         run_id: The run id to be appended to the output log directory.
             If `None`, it will use the log directory of the trainer as is.
+        stages: List of stages to execute. Options: "fit", "validate", "test".
         verbose: Whether to print the validation and test metrics
             in the end of the training.
 
     Returns:
-        A tuple of with the validation and the test metrics (if exists).
+        A tuple with the validation and the test metrics (if executed).
+        If a stage is not executed, its value will be None.
     """
-    trainer, model = _utils.clone(base_trainer, base_model)
-    trainer.setup_log_dirs(run_id or "")
-    return fit_and_validate(trainer, model, datamodule, verbose=verbose)
+    if not stages:
+        stages = ["fit", "validate", "test"]
+    trainer = _utils.clone(base_trainer)
+    model = _utils.clone(base_model) if "fit" in stages else base_model
 
+    model.configure_model()
 
-def fit_and_validate(
-    trainer: eva_trainer.Trainer,
-    model: modules.ModelModule,
-    datamodule: datamodules.DataModule,
-    verbose: bool = True,
-) -> Tuple[_EVALUATE_OUTPUT, _EVALUATE_OUTPUT | None]:
-    """Fits and evaluates a model in-place.
+    trainer.init_logger_run(run_id)
 
-    If the test set is set in the datamodule, it will evaluate the model
-    on the test set as well.
+    validation_scores = None
+    test_scores = None
 
-    Args:
-        trainer: The trainer module to use and update in-place.
-        model: The model module to use and update in-place.
-        datamodule: The data module.
-        verbose: Whether to print the validation and test metrics
-            in the end of the training.
-
-    Returns:
-        A tuple of with the validation and the test metrics (if exists).
-    """
-    trainer.fit(model, datamodule=datamodule)
-    validation_scores = trainer.validate(datamodule=datamodule, verbose=verbose)
-    test_scores = (
-        None
-        if datamodule.datasets.test is None
-        else trainer.test(datamodule=datamodule, verbose=verbose)
-    )
+    if "fit" in stages:
+        trainer.fit(model, datamodule=datamodule)
+    if "validate" in stages and getattr(datamodule.datasets, "val", None) is not None:
+        validation_scores = trainer.validate(
+            model=model,
+            datamodule=datamodule,
+            verbose=verbose,
+            ckpt_path=trainer.checkpoint_type,
+        )
+    if "test" in stages and getattr(datamodule.datasets, "test", None) is not None:
+        test_scores = trainer.test(
+            model=model,
+            datamodule=datamodule,
+            verbose=verbose,
+            ckpt_path=trainer.checkpoint_type,
+        )
+    trainer.finish_logger_run(run_id)
     return validation_scores, test_scores
 
 
 def infer_model(
-    base_trainer: eva_trainer.Trainer,
-    base_model: modules.ModelModule,
+    trainer: eva_trainer.Trainer,
+    model: modules.ModelModule,
     datamodule: datamodules.DataModule,
     *,
     return_predictions: bool = False,
-) -> None:
-    """Performs model inference out-of-place.
-
-    Note that the input `base_model` and `base_trainer` would
-    not be modified.
+    enable_clone: bool = False,
+) -> _PREDICT_OUTPUT | None:
+    """Performs model inference.
 
     Args:
-        base_trainer: The base trainer to use but not modify.
-        base_model: The model module to use but not modify.
+        trainer: The trainer to use.
+        model: The model module to use.
         datamodule: The data module.
         return_predictions: Whether to return the model predictions.
+        enable_clone: Whether to clone the trainer before inference.
     """
-    trainer, model = _utils.clone(base_trainer, base_model)
+    trainer = _utils.clone(trainer) if enable_clone else trainer
     return trainer.predict(
         model=model,
         datamodule=datamodule,

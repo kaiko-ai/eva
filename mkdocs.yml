@@ -65,6 +65,7 @@ markdown_extensions:
   - pymdownx.superfences
 nav:
   - Introduction: index.md
+  - Leaderboards: leaderboards.md
   - User Guide:
       - user-guide/index.md
       - Getting started:
@@ -73,18 +74,42 @@ nav:
       - Tutorials:
         - user-guide/tutorials/offline_vs_online.md
         - user-guide/tutorials/evaluate_resnet.md
+        - user-guide/tutorials/pubmedqa_classification.md
       - Advanced user guide:
         - user-guide/advanced/replicate_evaluations.md
+        - user-guide/advanced/large_model_inference.md
+        - user-guide/advanced/model_registry.md
         - user-guide/advanced/model_wrappers.md
+        - user-guide/advanced/custom_checkpoints.md
   - Datasets: 
     - datasets/index.md
-    - WSI-patches:
-      - BACH: datasets/bach.md
-      - CRC: datasets/crc.md
-      - MHIST: datasets/mhist.md
-      - PatchCamelyon: datasets/patch_camelyon.md
+    - WSI:
+      - Patch-level:
+        - BACH: datasets/bach.md
+        - BRACS: datasets/bracs.md
+        - BreakHis: datasets/breakhis.md
+        - CRC: datasets/crc.md
+        - GleasonArvaniti: datasets/gleason_arvaniti.md
+        - MHIST: datasets/mhist.md
+        - PatchCamelyon: datasets/patch_camelyon.md
+        - UniToPatho: datasets/unitopatho.md
+        - MoNuSAC: datasets/monusac.md
+        - CoNSeP: datasets/consep.md
+        - BCSS: datasets/bcss.md
+      - Slide-level:
+        - Camelyon16: datasets/camelyon16.md
+        - PANDA: datasets/panda.md
+        - PANDASmall: datasets/panda_small.md
     - Radiology:
-      - TotalSegmentator: datasets/total_segmentator.md
+      - BTCV: datasets/btcv.md
+      - LiTS17: datasets/lits17.md
+      - MSDTask7Pancreas: datasets/msd_task7_pancreas.md
+    - Language:
+      - PubMedQA: datasets/pubmedqa.md
+    - Multimodal:
+      - PatchCamelyon: datasets/patch_camelyon.md
+      - PathMMU Atlas: datasets/path_mmu_atlas.md
+      - QuiltVQA: datasets/quilt_vqa.md
   - Reference API:
     - reference/index.md
     - Core:
@@ -104,6 +129,8 @@ nav:
       - Models: 
         - Modules: reference/core/models/modules.md
         - Networks: reference/core/models/networks.md
+        - Wrappers: reference/core/models/wrappers.md
+        - Transforms: reference/core/models/transforms.md
       - Trainers:
         - Trainer: reference/core/trainers/trainer.md
         - Functional: reference/core/trainers/functional.md
@@ -118,6 +145,26 @@ nav:
         - reference/vision/data/datasets.md
         - reference/vision/data/transforms.md
       - Models:
-        - reference/vision/models/networks.md
+        - Networks: reference/vision/models/networks.md
+        - Wrappers: reference/vision/models/wrappers.md
       - Utils:
         - IO: reference/vision/utils/io.md
+    - Language:
+      - reference/language/index.md
+      - Data:
+        - reference/language/data/index.md
+        - reference/language/data/datasets.md
+      - Models:
+        - Networks: reference/language/models/networks.md
+        - Wrappers: reference/language/models/wrappers.md
+    - Multimodal:
+      - reference/multimodal/index.md
+      - Data:
+        - reference/multimodal/data/index.md
+        - reference/multimodal/data/datasets.md
+      - Models:
+        - Modules: reference/multimodal/models/modules.md
+        - Networks: reference/multimodal/models/networks.md
+        - Wrappers: reference/multimodal/models/wrappers.md
+      - Utils:
+        - Image: reference/multimodal/utils/image.md

@@ -1,6 +1,6 @@
 """Multi-layer Perceptron (MLP) implemented in PyTorch."""
 
-from typing import Type
+from typing import Tuple, Type
 
 import torch
 import torch.nn as nn
@@ -13,7 +13,7 @@ class MLP(nn.Module):
         self,
         input_size: int,
         output_size: int,
-        hidden_layer_sizes: tuple[int, ...] | None = None,
+        hidden_layer_sizes: Tuple[int, ...] | None = None,
         hidden_activation_fn: Type[torch.nn.Module] | None = nn.ReLU,
         output_activation_fn: Type[torch.nn.Module] | None = None,
         dropout: float = 0.0,

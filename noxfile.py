@@ -21,11 +21,9 @@ To run a session and pass extra arguments:
 """
 
 import os
+import shutil
 
 import nox
-
-PACKAGE = "eva"
-"""The name of the library."""
 
 PYTHON_VERSIONS = ["3.10"]
 """The python versions to test on."""
@@ -84,6 +82,7 @@ def test(session: nox.Session) -> None:
     """Runs the tests and code coverage analysis session of all the source code."""
     session.notify("test_core")
     session.notify("test_vision")
+    session.notify("test_language")
 
 
 @nox.session(python=PYTHON_VERSIONS, tags=["unit-tests", "tests"])
@@ -92,6 +91,7 @@ def test_core(session: nox.Session) -> None:
     args = session.posargs or ["--cov"]
     session.run_always("pdm", "install", "--group", "test", external=True)
     session.run("pytest", os.path.join("tests", "eva", "core"), *args)
+    _delete_venv(session)
 
 
 @nox.session(python=PYTHON_VERSIONS, tags=["unit-tests", "tests"])
@@ -100,6 +100,16 @@ def test_vision(session: nox.Session) -> None:
     args = session.posargs or ["--cov"]
     session.run_always("pdm", "install", "--group", "test", "--group", "vision", external=True)
     session.run("pytest", os.path.join("tests", "eva", "vision"), *args)
+    _delete_venv(session)
+
+
+@nox.session(python=PYTHON_VERSIONS, tags=["unit-tests", "tests"])
+def test_language(session: nox.Session) -> None:
+    """Runs the tests and code coverage analysis session of the language source code."""
+    args = session.posargs or ["--cov"]
+    session.run_always("pdm", "install", "--group", "test", "--group", "language", external=True)
+    session.run("pytest", os.path.join("tests", "eva", "language"), *args)
+    _delete_venv(session)
 
 
 @nox.session(python=PYTHON_VERSIONS, tags=["unit-tests", "tests"])
@@ -108,6 +118,7 @@ def test_all(session: nox.Session) -> None:
     args = session.posargs or ["--cov"]
     session.run_always("pdm", "install", "--group", "test", "--group", "all", external=True)
     session.run("pytest", *args)
+    _delete_venv(session)
 
 
 @nox.session(python=PYTHON_VERSIONS, tags=["ci"])
@@ -116,6 +127,13 @@ def ci(session: nox.Session) -> None:
     session.notify("lint")
     session.notify("check")
     session.notify("test")
+
+
+@nox.session
+def version(session: nox.Session) -> None:
+    """Fetches and prints the version of the library."""
+    session.run_always("pdm", "self", "add", "pdm-version", external=True)
+    session.run("pdm", "version", external=True)
 
 
 @nox.session
@@ -145,6 +163,7 @@ def docs(session: nox.Session) -> None:
     args = session.posargs or []
     session.run_always("pdm", "install", "--group", "docs", external=True)
     session.run("pdm", "run", "mike", *args)
+    _delete_venv(session)
 
 
 @nox.session
@@ -157,3 +176,8 @@ def build(session: nox.Session) -> None:
 def publish(session: nox.Session) -> None:
     """Builds and publishes the source and wheel distributions."""
     session.run("pdm", "publish")
+
+
+def _delete_venv(session: nox.Session) -> None:
+    """Deletes the virtualenv of a session to free up space."""
+    shutil.rmtree(session.virtualenv.location, ignore_errors=True)

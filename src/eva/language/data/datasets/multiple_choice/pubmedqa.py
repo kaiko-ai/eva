@@ -1,0 +1,198 @@
+"""PubMedQA dataset class."""
+
+import os
+import random
+from typing import Any, Dict, List, Literal
+
+import torch
+from datasets import Dataset, load_dataset, load_from_disk
+from loguru import logger
+from typing_extensions import override
+
+from eva.language.data.datasets.multiple_choice import base
+from eva.language.data.messages import MessageSeries, UserMessage
+from eva.language.prompts import templates
+from eva.language.prompts.templates.preambles import DEFAULT_QA_PREAMBLE
+
+
+class PubMedQA(base.TextClassification):
+    """Dataset class for PubMedQA question answering task."""
+
+    _expected_dataset_lengths: Dict[str | None, int] = {
+        "train": 450,
+        "val": 50,
+        "test": 500,
+        None: 1000,
+    }
+    """Expected dataset lengths for the splits and complete dataset."""
+
+    _license: str = "MIT License (https://github.com/pubmedqa/pubmedqa/blob/master/LICENSE)"
+    """Dataset license."""
+
+    _default_prompt_template = templates.JsonMultipleChoicePromptTemplate()
+    """Default prompt template for formatting questions and context."""
+
+    _default_render_kwargs = {
+        "preamble": DEFAULT_QA_PREAMBLE,
+        "answer_options": ["no", "yes", "maybe"],
+    }
+    """Default kwargs for the template.render() call."""
+
+    def __init__(
+        self,
+        root: str | None = None,
+        split: Literal["train", "val", "test"] | None = None,
+        download: bool = False,
+        max_samples: int | None = None,
+        prompt_template: templates.PromptTemplate | None = None,
+        prompt_render_kwargs: Dict[str, Any] | None = None,
+    ) -> None:
+        """Initialize the PubMedQA dataset.
+
+        Args:
+            root: Directory to cache the dataset. If None, no local caching is used.
+            split: Valid splits among ["train", "val", "test"].
+                If None, it will use "train+test+validation".
+            download: Whether to download the dataset if not found locally. Default is False.
+            max_samples: Maximum number of samples to use. If None, use all samples.
+            prompt_template: The template to use for rendering prompts. If None, uses the
+                default template which enforces JSON output.
+            prompt_render_kwargs: The kwargs to use when rendering the prompt template.
+        """
+        super().__init__()
+
+        self._root = root
+        self._split = split
+        self._download = download
+        self._max_samples = max_samples
+
+        self.prompt_template = prompt_template or self._default_prompt_template
+        self.prompt_render_kwargs = prompt_render_kwargs or self._default_render_kwargs
+
+    def _load_dataset(self, dataset_path: str | None) -> Dataset:
+        """Loads the PubMedQA dataset from the local cache or downloads it.
+
+        Args:
+            dataset_path: The path to the local cache (may be None).
+
+        Returns:
+            The loaded dataset object.
+        """
+        dataset_name = "bigbio/pubmed_qa"
+        config_name = "pubmed_qa_labeled_fold0_source"
+
+        match self._split:
+            case "val":
+                split = "validation"
+            case None:
+                split = "train+test+validation"
+            case _:
+                split = self._split
+
+        if self._download:
+            logger.info("Downloading dataset from HuggingFace Hub")
+            raw_dataset = load_dataset(
+                dataset_name,
+                name=config_name,
+                split=split,
+                trust_remote_code=True,
+                download_mode="reuse_dataset_if_exists",
+            )
+            if dataset_path:
+                raw_dataset.save_to_disk(dataset_path)  # type: ignore
+                logger.info(f"Dataset saved to: {dataset_path}")
+        else:
+            if not dataset_path or not os.path.exists(dataset_path):
+                raise ValueError(
+                    "Dataset path not found. Set download=True or provide a valid root path."
+                )
+
+            logger.info(f"Loading dataset from: {dataset_path}")
+            raw_dataset = load_from_disk(dataset_path)
+
+        return raw_dataset  # type: ignore
+
+    @override
+    def prepare_data(self) -> None:
+        """Downloads and prepares the PubMedQA dataset.
+
+        If `self._root` is None, the dataset is used directly from HuggingFace.
+        Otherwise, it checks if the dataset is already cached in `self._root`.
+        If not cached, it downloads the dataset into `self._root`.
+        """
+        dataset_path = None
+
+        if self._root:
+            dataset_path = os.path.join(self._root, self._split) if self._split else self._root
+            os.makedirs(self._root, exist_ok=True)
+
+        try:
+            self.dataset = self._load_dataset(dataset_path)
+            if self._max_samples is not None and len(self.dataset) > self._max_samples:
+                logger.info(
+                    f"Subsampling dataset from {len(self.dataset)} to {self._max_samples} samples"
+                )
+                random.seed(42)
+                indices = random.sample(range(len(self.dataset)), self._max_samples)
+                self.dataset = self.dataset.select(indices)
+        except Exception as e:
+            raise RuntimeError(f"Failed to prepare dataset: {e}") from e
+
+    @override
+    def validate(self) -> None:
+        if len(self) != (self._max_samples or self._expected_dataset_lengths[self._split]):
+            raise ValueError(
+                f"Dataset length mismatch for split '{self._split}': "
+                f"expected {self._expected_dataset_lengths[self._split]}, "
+                f"but got {len(self)}"
+            )
+
+    @property
+    @override
+    def classes(self) -> List[str]:
+        return ["no", "yes", "maybe"]
+
+    @property
+    @override
+    def class_to_idx(self) -> Dict[str, int]:
+        return {"no": 0, "yes": 1, "maybe": 2}
+
+    @override
+    def load_text(self, index: int) -> MessageSeries:
+        if index < 0 or index >= len(self.dataset):
+            raise IndexError(f"Index {index} out of range for dataset of size {len(self.dataset)}")
+        sample = dict(self.dataset[index])
+        prompt = self.prompt_template.render(
+            question=sample["QUESTION"],
+            context=list(sample["CONTEXTS"]),
+            **self.prompt_render_kwargs,
+        )
+        return [UserMessage(content=prompt)]
+
+    @override
+    def load_target(self, index: int) -> torch.Tensor:
+        if index < 0 or index >= len(self.dataset):
+            raise IndexError(f"Index {index} out of range for dataset of size {len(self.dataset)}")
+        return torch.tensor(
+            self.class_to_idx[self.dataset[index]["final_decision"]], dtype=torch.long
+        )
+
+    @override
+    def load_metadata(self, index: int) -> Dict[str, str]:
+        sample = self.dataset[index]
+        return {
+            "year": sample.get("YEAR") or "",
+            "labels": sample.get("LABELS") or "",
+            "meshes": sample.get("MESHES") or "",
+            "long_answer": sample.get("LONG_ANSWER") or "",
+            "reasoning_required": sample.get("reasoning_required_pred") or "",
+            "reasoning_free": sample.get("reasoning_free_pred") or "",
+        }
+
+    @override
+    def __len__(self) -> int:
+        return len(self.dataset)
+
+    def _print_license(self) -> None:
+        """Prints the dataset license."""
+        print(f"Dataset license: {self._license}")

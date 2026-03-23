@@ -6,8 +6,13 @@ trainer:
     max_epochs: &MAX_EPOCHS 1
     limit_train_batches: 2
     limit_val_batches: 2
+    checkpoint_type: ${oc.env:CHECKPOINT_TYPE, last}
+    strategy: ${oc.env:STRATEGY, auto}
+    accelerator: ${oc.env:ACCELERATOR, auto}
+    devices: ${oc.env:NUM_DEVICES, 1}
     callbacks:
-      - class_path: eva.callbacks.EmbeddingsWriter
+      - class_path: eva.callbacks.ConfigurationLogger
+      - class_path: eva.callbacks.ClassificationEmbeddingsWriter
         init_args:
           output_dir: &DATASET_EMBEDDINGS_ROOT ${oc.env:EMBEDDINGS_ROOT}/patch_camelyon
           dataloader_idx_map:
@@ -15,18 +20,14 @@ trainer:
             1: val
             2: test
           backbone:
-            class_path: eva.core.models.networks.wrappers.ModelFromFunction
+            class_path: eva.vision.models.ModelFromRegistry
             init_args:
-              path: torch.hub.load
-              arguments:
-                repo_or_dir: facebookresearch/dino:main
-                model: dino_vits16
-                pretrained: false
-              checkpoint_path: &CHECKPOINT_PATH ${oc.env:CHECKPOINT_PATH, null}
+              model_name: ${oc.env:MODEL_NAME, universal/vit_tiny_patch16_224_random}
+              model_extra_kwargs: ${oc.env:MODEL_EXTRA_KWARGS, null}
       - class_path: lightning.pytorch.callbacks.ModelCheckpoint
         init_args:
           filename: best
-          save_last: true
+          save_last: false
           save_top_k: 1
           monitor: &MONITOR_METRIC val/BinaryAccuracy
           mode: &MONITOR_METRIC_MODE max
@@ -42,15 +43,13 @@ model:
     head:
       class_path: torch.nn.Linear
       init_args:
-        in_features: 384
+        in_features: ${oc.env:IN_FEATURES, 192}
         out_features: 1
     criterion: torch.nn.BCEWithLogitsLoss
     optimizer:
-      class_path: torch.optim.SGD
+      class_path: torch.optim.AdamW
       init_args:
-        lr: 0.1
-        momentum: 0.9
-        weight_decay: 0.0
+        lr: ${oc.env:LR_VALUE, 0.0003}
     lr_scheduler:
       class_path: torch.optim.lr_scheduler.CosineAnnealingLR
       init_args:
@@ -71,7 +70,9 @@ data:
           manifest_file: manifest.csv
           split: train
           target_transforms:
-            class_path: eva.core.data.transforms.ArrayToFloatTensor
+            class_path: torchvision.transforms.v2.ToDtype
+            init_args:
+              dtype: torch.float32
       val:
         class_path: eva.datasets.EmbeddingsClassificationDataset
         init_args:
@@ -83,7 +84,7 @@ data:
             root: ${oc.env:TESTS_ROOT, tests/eva}/assets/vision/datasets/patch_camelyon
             split: train
             download: false
-            image_transforms:
+            transforms:
               class_path: eva.vision.data.transforms.common.ResizeAndCrop
               init_args:
                 mean: ${oc.env:NORMALIZE_MEAN, [0.485, 0.456, 0.406]} 

@@ -3,7 +3,7 @@
 import dataclasses
 from typing import List
 
-from eva.core.data import dataloaders, datasets
+from eva.core.data import dataloaders, datasets, samplers
 
 TRAIN_DATASET = datasets.TorchDataset | None
 """Train dataset."""
@@ -60,3 +60,20 @@ class DataloadersSchema:
 
     predict: dataloaders.DataLoader = dataclasses.field(default_factory=dataloaders.DataLoader)
     """Predict dataloader."""
+
+
+@dataclasses.dataclass(frozen=True)
+class SamplersSchema:
+    """Samplers schema used in DataModule."""
+
+    train: samplers.Sampler | None = None
+    """Train sampler."""
+
+    val: samplers.Sampler | None = None
+    """Validation sampler."""
+
+    test: samplers.Sampler | None = None
+    """Test sampler."""
+
+    predict: samplers.Sampler | None = None
+    """Predict sampler."""

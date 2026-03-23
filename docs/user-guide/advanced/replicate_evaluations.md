@@ -1,202 +1,333 @@
 # Replicate evaluations
 
-To produce the evaluation results presented [here](../../index.md#evaluation-results), you can run *eva* with the settings below.
+To produce the evaluation results presented [here](../../leaderboards.md), you can run *eva* with the settings below.
 
-Make sure to replace `<task>` in the commands below with `bach`, `crc`, `mhist` or `patch_camelyon`.
+The `.yaml` config files for the different benchmark datasets can be found on [GitHub](https://github.com/kaiko-ai/eva/tree/main/configs/vision).
+You will need to download the config files and then in the following commands replace `<task.yaml>` with the name of the config you want to use.
 
-*Note that to run the commands below you will need to first download the data. [BACH](../../datasets/bach.md), [CRC](../../datasets/crc.md) and [PatchCamelyon](../../datasets/patch_camelyon.md) provide automatic download by setting the argument `download: true` in their respective config-files. In the case of [MHIST](../../datasets/mhist.md) you will need to download the data manually by following the instructions provided [here](../../datasets/mhist.md#download-and-preprocessing).*
+Keep in mind:
 
-## DINO ViT-S16 (random weights)
+- Some datasets provide automatic download by setting the argument `download: true` (either modify the `.yaml` config file or set the environment variable `DOWNLOAD_DATA=true`), while other datasets need to be downloaded manually beforehand. Please review the instructions in the corresponding dataset [documentation](../../datasets/index.md).
+- The following `eva predict_fit` commands will store the generated embeddings to the `./data/embeddings` directory. To change this location you can alternatively set the `EMBEDDINGS_ROOT` environment variable.
+- Segmentation tasks need to be run in `online` mode because the decoder currently doesn't support evaluation with precomputed embeddings. In other words, use `fit --config .../online/<task>.yaml` instead of `predict_fit  --config .../offline/<task>.yam` here.
 
-Evaluating the backbone with randomly initialized weights serves as a baseline to compare the pretrained FMs to an FM that produces embeddings without any prior learning on image tasks. To evaluate, run:
+
+## Pathology FMs
+
+### DINO ViT-S16 (random weights)
+
+Evaluating the backbone with randomly initialized weights serves as a baseline to compare the pretrained FMs to a FM that produces embeddings without any prior learning on image tasks. To evaluate, run:
 
 ```
-PRETRAINED=false \
-EMBEDDINGS_ROOT="./data/embeddings/dino_vits16_random" \
-eva predict_fit --config configs/vision/dino_vit/offline/<task>.yaml
+MODEL_NAME="universal/vit_small_patch16_224_random" \
+NORMALIZE_MEAN="[0.485,0.456,0.406]" \
+NORMALIZE_STD="[0.229,0.224,0.225]" \
+IN_FEATURES=384 \
+eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
 ```
 
-## DINO ViT-S16 (ImageNet)
+### DINO ViT-S16 (ImageNet)
 
 The next baseline model, uses a pretrained ViT-S16 backbone with ImageNet weights. To evaluate, run:
 
 ```
-EMBEDDINGS_ROOT="./data/embeddings/dino_vits16_imagenet" \
-eva predict_fit --config configs/vision/dino_vit/offline/<task>.yaml
+MODEL_NAME="universal/vit_small_patch16_224_dino" \
+NORMALIZE_MEAN="[0.485,0.456,0.406]" \
+NORMALIZE_STD="[0.229,0.224,0.225]" \
+IN_FEATURES=384 \
+eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
 ```
 
-## DINO ViT-B8 (ImageNet)
-
-To evaluate performance on the larger ViT-B8 backbone pretrained on ImageNet, run:
-```
-EMBEDDINGS_ROOT="./data/embeddings/dino_vitb8_imagenet" \
-DINO_BACKBONE=dino_vitb8 \
-IN_FEATURES=768 \
-eva predict_fit --config configs/vision/dino_vit/offline/<task>.yaml
-```
-
-## DINOv2 ViT-L14 (ImageNet)
-
-To evaluate performance on Dino v2 ViT-L14 backbone pretrained on ImageNet, run:
-```
-PRETRAINED=true \
-EMBEDDINGS_ROOT="./data/embeddings/dinov2_vitl14_kaiko" \
-REPO_OR_DIR=facebookresearch/dinov2:main \
-DINO_BACKBONE=dinov2_vitl14_reg \
-FORCE_RELOAD=true \
-IN_FEATURES=1024 \
-eva predict_fit --config configs/vision/dino_vit/offline/<task>.yaml
-```
-
-## Lunit - DINO ViT-S16 (TCGA)
+### Lunit - DINO ViT-S16 (TCGA) [[1]](#references)
 
 [Lunit](https://www.lunit.io/en), released the weights for a DINO ViT-S16 backbone, pretrained on TCGA data
 on [GitHub](https://github.com/lunit-io/benchmark-ssl-pathology/releases/). To evaluate, run:
 
 ```
-PRETRAINED=false \
-EMBEDDINGS_ROOT="./data/embeddings/dino_vits16_lunit" \
-CHECKPOINT_PATH="https://github.com/lunit-io/benchmark-ssl-pathology/releases/download/pretrained-weights/dino_vit_small_patch16_ep200.torch" \
-NORMALIZE_MEAN=[0.70322989,0.53606487,0.66096631] \
-NORMALIZE_STD=[0.21716536,0.26081574,0.20723464] \
-eva predict_fit --config configs/vision/dino_vit/offline/<task>.yaml
+MODEL_NAME=pathology/lunit_vits16
+NORMALIZE_MEAN="[0.70322989,0.53606487,0.66096631]" \
+NORMALIZE_STD="[0.21716536,0.26081574,0.20723464]" \
+IN_FEATURES=384 \
+eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
 ```
 
-## Owkin - iBOT ViT-B16 (TCGA)
+### Lunit - DINO ViT-S8 (TCGA) [[1]](#references)
 
-[Owkin](https://www.owkin.com/) released the weights for "Phikon", an FM trained with iBOT on TCGA data, via
+```
+MODEL_NAME=pathology/lunit_vits8 \
+NORMALIZE_MEAN="[0.70322989,0.53606487,0.66096631]" \
+NORMALIZE_STD="[0.21716536,0.26081574,0.20723464]" \
+IN_FEATURES=384 \
+eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
+```
+
+### Phikon (Owkin) - iBOT ViT-B16 (TCGA) [[2]](#references)
+
+[Owkin](https://www.owkin.com/) released the weights for "Phikon", a FM trained with iBOT on TCGA data, via
 [HuggingFace](https://huggingface.co/owkin/phikon). To evaluate, run:
 
 ```
-EMBEDDINGS_ROOT="./data/embeddings/dino_vitb16_owkin" \
-eva predict_fit --config configs/vision/owkin/phikon/offline/<task>.yaml
+MODEL_NAME=pathology/owkin_phikon \
+NORMALIZE_MEAN="[0.485,0.456,0.406]" \
+NORMALIZE_STD="[0.229,0.224,0.225]" \
+IN_FEATURES=768 \
+eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
 ```
 
-Note: since *eva* provides the config files to evaluate tasks with the Phikon FM in 
-"configs/vision/owkin/phikon/offline", it is not necessary to set the environment variables needed for
-the runs above.
+### Phikon-v2 (Owkin) - DINOv2 ViT-L16 (PANCAN-XL) [[9]](#references)
 
-## UNI - DINOv2 ViT-L16 (Mass-100k)
+[Owkin](https://www.owkin.com/) released the weights for "Phikon-v2", a FM trained with DINOv2
+on the PANCAN-XL dataset (450M 20x magnification histology images sampled from 60K WSIs), via
+[HuggingFace](https://huggingface.co/owkin/phikon-v2). To evaluate, run:
 
-The UNI FM, introduced in [[1]](#references) is available on [HuggingFace](https://huggingface.co/MahmoodLab/UNI). Note that access needs to 
+```
+MODEL_NAME=pathology/owkin_phikon_v2 \
+NORMALIZE_MEAN="[0.485,0.456,0.406]" \
+NORMALIZE_STD="[0.229,0.224,0.225]" \
+IN_FEATURES=1024 \
+eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
+```
+
+### UNI (MahmoodLab) - DINOv2 ViT-L16 (Mass-100k) [[3]](#references)
+
+The UNI FM by MahmoodLab is available on [HuggingFace](https://huggingface.co/MahmoodLab/UNI). Note that access needs to 
 be requested.
 
-Unlike the other FMs evaluated for our leaderboard, the UNI model uses the vision library `timm` to load the model. To 
-accomodate this, you will need to modify the config files (see also [Model Wrappers](model_wrappers.md)).
-
-Make a copy of the task-config you'd like to run, and replace the `backbone` section with:
 ```
-backbone:
-    class_path: eva.models.ModelFromFunction
-    init_args:
-        path: timm.create_model
-        arguments:
-            model_name: vit_large_patch16_224
-            patch_size: 16
-            init_values: 1e-5
-            num_classes: 0
-            dynamic_img_size: true
-        checkpoint_path: <path/to/pytorch_model.bin>
-```
-
-Now evaluate the model by running:
-```
-EMBEDDINGS_ROOT="./data/embeddings/dinov2_vitl16_uni" \
+MODEL_NAME=pathology/mahmood_uni \
+NORMALIZE_MEAN="[0.485,0.456,0.406]" \
+NORMALIZE_STD="[0.229,0.224,0.225]" \
 IN_FEATURES=1024 \
-eva predict_fit --config path/to/<task>.yaml
+HF_TOKEN=<your-huggingace-token-for-downloading-the-model> \
+eva predict_fit --config configs/vision/phikon/offline/<task>.yaml
 ```
 
+### UNI2-h (MahmoodLab) - DINOv2 ViT-G14 [[3]](#references)
 
-## kaiko.ai - DINO ViT-S16 (TCGA)
+The UNI2-h FM by MahmoodLab is available on [HuggingFace](https://huggingface.co/MahmoodLab/UNI). Note that access needs to 
+be requested.
+
+```
+MODEL_NAME=pathology/mahmood_uni2_h \
+NORMALIZE_MEAN="[0.485,0.456,0.406]" \
+NORMALIZE_STD="[0.229,0.224,0.225]" \
+IN_FEATURES=1536 \
+HF_TOKEN=<your-huggingace-token-for-downloading-the-model> \
+eva predict_fit --config configs/vision/phikon/offline/<task>.yaml
+```
+
+### kaiko.ai - DINO ViT-S16 (TCGA) [[4]](#references)
 
 To evaluate [kaiko.ai's](https://www.kaiko.ai/) FM with DINO ViT-S16 backbone, pretrained on TCGA data 
-on [GitHub](https://github.com/lunit-io/benchmark-ssl-pathology/releases/), run:
+and available on [GitHub](https://github.com/kaiko-ai/towards_large_pathology_fms), run:
 
 ```
-PRETRAINED=false \
-EMBEDDINGS_ROOT="./data/embeddings/dino_vits16_kaiko" \
-CHECKPOINT_PATH=[TBD*] \
-NORMALIZE_MEAN=[0.5,0.5,0.5] \
-NORMALIZE_STD=[0.5,0.5,0.5] \
-eva predict_fit --config configs/vision/dino_vit/offline/<task>.yaml
+MODEL_NAME=pathology/kaiko_vits16 \
+NORMALIZE_MEAN="[0.5,0.5,0.5]" \
+NORMALIZE_STD="[0.5,0.5,0.5]" \
+IN_FEATURES=384 \
+eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
 ```
 
-\* path to public checkpoint will be added when available.
-
-## kaiko.ai - DINO ViT-S8 (TCGA)
+### kaiko.ai - DINO ViT-S8 (TCGA) [[4]](#references)
 
 To evaluate [kaiko.ai's](https://www.kaiko.ai/) FM with DINO ViT-S8 backbone, pretrained on TCGA data 
-on [GitHub](https://github.com/lunit-io/benchmark-ssl-pathology/releases/), run:
+and available on [GitHub](https://github.com/kaiko-ai/towards_large_pathology_fms), run:
 
 ```
-PRETRAINED=false \
-EMBEDDINGS_ROOT="./data/embeddings/dino_vits8_kaiko" \
-DINO_BACKBONE=dino_vits8 \
-CHECKPOINT_PATH=[TBD*] \
-NORMALIZE_MEAN=[0.5,0.5,0.5] \
-NORMALIZE_STD=[0.5,0.5,0.5] \
-eva predict_fit --config configs/vision/dino_vit/offline/<task>.yaml
+MODEL_NAME=pathology/kaiko_vits8 \
+NORMALIZE_MEAN="[0.5,0.5,0.5]" \
+NORMALIZE_STD="[0.5,0.5,0.5]" \
+IN_FEATURES=384 \
+eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
 ```
 
-\* path to public checkpoint will be added when available.
+### kaiko.ai - DINO ViT-B16 (TCGA) [[4]](#references)
 
-## kaiko.ai - DINO ViT-B16 (TCGA)
-
-To evaluate [kaiko.ai's](https://www.kaiko.ai/) FM with the larger DINO ViT-B16 backbone, pretrained on TCGA data,
-run:
+To evaluate [kaiko.ai's](https://www.kaiko.ai/) FM with DINO ViT-B16 backbone, pretrained on TCGA data 
+and available on [GitHub](https://github.com/kaiko-ai/towards_large_pathology_fms), run:
 
 ```
-PRETRAINED=false \
-EMBEDDINGS_ROOT="./data/embeddings/dino_vitb16_kaiko" \
-DINO_BACKBONE=dino_vitb16 \
-CHECKPOINT_PATH=[TBD*] \
+MODEL_NAME=pathology/kaiko_vitb16 \
+NORMALIZE_MEAN="[0.5,0.5,0.5]" \
+NORMALIZE_STD="[0.5,0.5,0.5]" \
 IN_FEATURES=768 \
-NORMALIZE_MEAN=[0.5,0.5,0.5] \
-NORMALIZE_STD=[0.5,0.5,0.5] \
-eva predict_fit --config configs/vision/dino_vit/offline/<task>.yaml
+eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
 ```
 
-\* path to public checkpoint will be added when available.
+### kaiko.ai - DINO ViT-B8 (TCGA) [[4]](#references)
 
-## kaiko.ai - DINO ViT-B8 (TCGA)
-
-To evaluate [kaiko.ai's](https://www.kaiko.ai/) FM with the larger DINO ViT-B8 backbone, pretrained on TCGA data,
-run:
+To evaluate [kaiko.ai's](https://www.kaiko.ai/) FM with DINO ViT-B8 backbone, pretrained on TCGA data 
+and available on [GitHub](https://github.com/kaiko-ai/towards_large_pathology_fms), run:
 
 ```
-PRETRAINED=false \
-EMBEDDINGS_ROOT="./data/embeddings/dino_vitb8_kaiko" \
-DINO_BACKBONE=dino_vitb8 \
-CHECKPOINT_PATH=[TBD*] \
+MODEL_NAME=pathology/kaiko_vitb8 \
+NORMALIZE_MEAN="[0.5,0.5,0.5]" \
+NORMALIZE_STD="[0.5,0.5,0.5]" \
 IN_FEATURES=768 \
-NORMALIZE_MEAN=[0.5,0.5,0.5] \
-NORMALIZE_STD=[0.5,0.5,0.5] \
-eva predict_fit --config configs/vision/dino_vit/offline/<task>.yaml
+eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
 ```
 
-\* path to public checkpoint will be added when available.
+### kaiko.ai - DINOv2 ViT-L14 (TCGA) [[4]](#references)
 
-## kaiko.ai - DINOv2 ViT-L14 (TCGA)
-
-To evaluate [kaiko.ai's](https://www.kaiko.ai/) FM with the larger DINOv2 ViT-L14 backbone, pretrained on TCGA data,
-run:
+To evaluate [kaiko.ai's](https://www.kaiko.ai/) FM with DINOv2 ViT-L14 backbone, pretrained on TCGA data 
+and available on [GitHub](https://github.com/kaiko-ai/towards_large_pathology_fms), run:
 
 ```
-PRETRAINED=false \
-EMBEDDINGS_ROOT="./data/embeddings/dinov2_vitl14_kaiko" \
-REPO_OR_DIR=facebookresearch/dinov2:main \
-DINO_BACKBONE=dinov2_vitl14_reg \
-FORCE_RELOAD=true \
-CHECKPOINT_PATH=[TBD*] \
+MODEL_NAME=pathology/kaiko_vitl14 \
+NORMALIZE_MEAN="[0.5,0.5,0.5]" \
+NORMALIZE_STD="[0.5,0.5,0.5]" \
 IN_FEATURES=1024 \
-NORMALIZE_MEAN=[0.5,0.5,0.5] \
-NORMALIZE_STD=[0.5,0.5,0.5] \
-eva predict_fit --config configs/vision/dino_vit/offline/<task>.yaml
+eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
 ```
 
-\* path to public checkpoint will be added when available.
+### kaiko.ai - DINOv2 Midnight-12k (TCGA) [[4]](#references)
+
+To evaluate [kaiko.ai's](https://www.kaiko.ai/) FM with Midnight-12k (ViT-G14) backbone, pretrained on TCGA data 
+and available on [GitHub](https://github.com/kaiko-ai/Midnight), run:
+
+```
+MODEL_NAME=pathology/kaiko_midnight_12k \
+NORMALIZE_MEAN="[0.5,0.5,0.5]" \
+NORMALIZE_STD="[0.5,0.5,0.5]" \
+IN_FEATURES=1536 \
+eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
+```
+
+
+### H-optimus-0 (Bioptimus) - ViT-G14 [[5]](#references)
+[Bioptimus](https://www.bioptimus.com) released their H-optimus-0 which was trained on a collection of 500,000 H&E slides. The model weights
+were released on [HuggingFace](https://huggingface.co/bioptimus/H-optimus-0).
+
+```
+MODEL_NAME=pathology/bioptimus_h_optimus_0 \
+NORMALIZE_MEAN="[0.707223,0.578729,0.703617]" \
+NORMALIZE_STD="[0.211883,0.230117,0.177517]" \
+IN_FEATURES=1536 \
+eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
+```
+
+
+### Prov-GigaPath - DINOv2 ViT-G14 [[6]](#references)
+To evaluate the [Prov-Gigapath](https://github.com/prov-gigapath/prov-gigapath) model, available on [HuggingFace](https://huggingface.co/prov-gigapath/prov-gigapath), run:
+
+```
+MODEL_NAME=pathology/prov_gigapath \
+NORMALIZE_MEAN="[0.485,0.456,0.406]" \
+NORMALIZE_STD="[0.229,0.224,0.225]" \
+IN_FEATURES=1536 \
+eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
+```
+
+
+### hibou-B (hist.ai) - DINOv2 ViT-B14 (1M Slides) [[7]](#references)
+To evaluate [hist.ai's](https://www.hist.ai/) FM with DINOv2 ViT-B14 backbone, pretrained on
+a proprietary dataset of one million slides, available for download on
+[HuggingFace](https://huggingface.co/histai/hibou-b), run: 
+
+```
+MODEL_NAME=pathology/histai_hibou_b \
+NORMALIZE_MEAN="[0.7068,0.5755,0.722]" \
+NORMALIZE_STD="[0.195,0.2316,0.1816]" \
+IN_FEATURES=768 \
+eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
+```
+
+### hibou-L (hist.ai) - DINOv2 ViT-L14 (1M Slides) [[7]](#references)
+To evaluate [hist.ai's](https://www.hist.ai/) FM with DINOv2 ViT-L14 backbone, pretrained on
+a proprietary dataset of one million slides, available for download on
+[HuggingFace](https://huggingface.co/histai/hibou-l), run: 
+
+```
+MODEL_NAME=pathology/histai_hibou_l \
+NORMALIZE_MEAN="[0.7068,0.5755,0.722]" \
+NORMALIZE_STD="[0.195,0.2316,0.1816]" \
+IN_FEATURES=1024 \
+eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
+```
+
+### Virchow2 (paige.ai) - DINOv2 ViT-H14 (3.1M Slides) [[8]](#references)
+To evaluate [paige.ai's](https://www.paige.ai/) FM with DINOv2 ViT-H14 backbone, pretrained on
+a proprietary dataset of 3.1M million slides, available for download on
+[HuggingFace](https://huggingface.co/paige-ai/Virchow2), run:
+
+```
+MODEL_NAME=pathology/paige_virchow2 \
+NORMALIZE_MEAN="[0.485,0.456,0.406]" \
+NORMALIZE_STD="[0.229,0.224,0.225]" \
+IN_FEATURES=1280 \
+eva predict_fit --config configs/vision/pathology/offline/<task>.yaml
+```
+
+## Radiology FMs
+
+The following commands can be used to reproduce the results from the radiiology leaderboard. Not that for radiology segmentation tasks, we currently only support online evaluation (`eva fit`). 
+
+### DINO ViT-B16 (ImageNet)
+
+This 2D baseline model, uses a pretrained ViT-B16 backbone with ImageNet weights. To evaluate, run:
+
+```
+MODEL_NAME="universal/vit_base_patch16_224_dino_1chan" \
+IN_FEATURES=768 \
+SCALE_INTENSITY_MIN=-175 \
+SCALE_INTENSITY_MAX=250 \
+eva fit --config configs/vision/radiology/online/<task>.yaml
+```
+
+### VoCo-B [[12]](#references)
+To evaluate VoCo-B (3D radiology FM) developed by the Hong Kong University of Science
+and Technology FM, pretrained on 160K CT volumes (42M slices) and available for download on
+[HuggingFace](https://huggingface.co/Luffy503/VoCo), run:
+
+```
+MODEL_NAME=radiology/voco_b \
+IN_FEATURES=48 \
+SCALE_INTENSITY_MIN=-175 \
+SCALE_INTENSITY_MAX=250 \
+eva fit --config configs/vision/radiology/online/<task>.yaml
+```
+
+
+### VoCo-H [[12]](#references)
+To evaluate VoCo-H (3D radiology FM) developed by the Hong Kong University of Science
+and Technology FM, pretrained on 160K CT volumes (42M slices) and available for download on
+[HuggingFace](https://huggingface.co/Luffy503/VoCo), run:
+
+```
+MODEL_NAME=radiology/voco_h \
+IN_FEATURES=192 \
+SCALE_INTENSITY_MIN=-175 \
+SCALE_INTENSITY_MAX=250 \
+CHANNEL_PROJECTION_DIMS="[48,48,96,192,384,768]" \
+eva fit --config configs/vision/radiology/online/<task>.yaml
+```
+
+Note that the `CHANNEL_PROJECTION_DIMS` argument is used to reduce the number of channels in the produced feature maps through 1x1 convolutions to reduce the number of parameters in the decoder and keep the size comparable to decoders for smaller encoders such as `VoCo-B`. While this reduces the number of parameters significantly, we found that it does not negatively impact the performance.
 
 
 ## References
 
- [1]: Chen: A General-Purpose Self-Supervised Model for Computational Pathology, 2023 ([arxiv](https://arxiv.org/pdf/2308.15474.pdf))
+ [1]: Kang, Mingu, et al. "Benchmarking self-supervised learning on diverse pathology datasets." Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. 2023.
+
+ [2]: Filiot, Alexandre, et al. "Scaling self-supervised learning for histopathology with masked image modeling." medRxiv (2023): 2023-07.
+ 
+ [3]: Chen: Chen, Richard J., et al. "A general-purpose self-supervised model for computational pathology." arXiv preprint arXiv:2308.15474 (2023).
+
+ [4]: Aben, Nanne, et al. "Towards Large-Scale Training of Pathology Foundation Models." arXiv preprint arXiv:2404.15217 (2024).
+
+ [5]: Saillard, et al. "H-optimus-0" https://github.com/bioptimus/releases/tree/main/models/h-optimus/v0 (2024).
+
+ [6]: Xu, Hanwen, et al. "A whole-slide foundation model for digital pathology from real-world data." Nature (2024): 1-8.
+
+ [7]: Nechaev, Dmitry, Alexey Pchelnikov, and Ekaterina Ivanova. "Hibou: A Family of Foundational Vision Transformers for Pathology." arXiv preprint arXiv:2406.05074 (2024).
+
+ [8]: Zimmermann, Eric, et al. "Virchow 2: Scaling Self-Supervised Mixed Magnification Models in Pathology." arXiv preprint arXiv:2408.00738 (2024).
+
+ [9]: Filiot, Alexandre, et al. "Phikon-v2, A large and public feature extractor for biomarker prediction." arXiv preprint arXiv:2409.09173 (2024).
+
+ [10]: Chen, Richard J., et al. "Towards a general-purpose foundation model for computational pathology." Nature Medicine 30.3 (2024): 850-862.
+
+ [11]: Karasikov, Mikhail, et al. "Training state-of-the-art pathology foundation models with orders of magnitude less data" arXiv preprint arXiv:2504.05186850-862.
+
+ [12]: Wu, Linshan, Jiaxin Zhuang, and Hao Chen. "Large-scale 3d medical image pre-training with geometric context priors." arXiv preprint arXiv:2410.09890 (2024).

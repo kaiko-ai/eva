@@ -35,3 +35,30 @@ def test_metric_module(metric_module: structs.MetricModule, expected: List[int])
 def metric_module(schema: structs.MetricsSchema) -> structs.MetricModule:
     """MetricModule fixture."""
     return structs.MetricModule.from_schema(schema=schema)
+
+
+@pytest.mark.parametrize(
+    "compute_groups, separator",
+    [
+        (True, "/"),
+        (False, "/"),
+        (True, "_"),
+        (False, "-"),
+    ],
+)
+def test_metric_module_schema_options(compute_groups: bool, separator: str) -> None:
+    """Tests that compute_groups and separator are correctly passed from schema."""
+    schema = structs.MetricsSchema(
+        common=torchmetrics.Accuracy(task="binary"),
+        compute_groups=compute_groups,
+        separator=separator,
+    )
+    metric_module = structs.MetricModule.from_schema(schema=schema)
+
+    # Check that separator is applied in metric prefixes
+    for name in metric_module.training_metrics.keys():
+        assert str(name).startswith(f"train{separator}")
+    for name in metric_module.validation_metrics.keys():
+        assert str(name).startswith(f"val{separator}")
+    for name in metric_module.test_metrics.keys():
+        assert str(name).startswith(f"test{separator}")

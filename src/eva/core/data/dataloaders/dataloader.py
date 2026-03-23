@@ -38,7 +38,7 @@ class DataLoader:
     Mutually exclusive with `batch_size`, `shuffle`, `sampler` and `drop_last`.
     """
 
-    num_workers: int = multiprocessing.cpu_count()
+    num_workers: int | None = None
     """How many workers to use for loading the data.
 
     By default, it will use the number of CPUs available.
@@ -56,25 +56,34 @@ class DataLoader:
     persistent_workers: bool = True
     """Will keep the worker processes after a dataset has been consumed once."""
 
+    worker_init_fn: Callable | None = None
+    """Function to call on each worker process before data loading."""
+
     prefetch_factor: int | None = 2
     """Number of batches loaded in advance by each worker."""
 
-    def __call__(self, dataset: datasets.TorchDataset) -> dataloader.DataLoader:
+    def __call__(
+        self, dataset: datasets.TorchDataset, sampler: samplers.Sampler | None = None
+    ) -> dataloader.DataLoader:
         """Returns the dataloader on the provided dataset.
 
         Args:
             dataset: dataset from which to load the data.
+            sampler: defines the strategy to draw samples from the dataset.
         """
         return dataloader.DataLoader(
             dataset=dataset,
             batch_size=self.batch_size,
             shuffle=self.shuffle,
-            sampler=self.sampler,
+            sampler=sampler or self.sampler,
             batch_sampler=self.batch_sampler,
-            num_workers=self.num_workers,
+            num_workers=(
+                multiprocessing.cpu_count() if self.num_workers is None else self.num_workers
+            ),
             collate_fn=self.collate_fn,
             pin_memory=self.pin_memory,
             drop_last=self.drop_last,
             persistent_workers=self.persistent_workers,
             prefetch_factor=self.prefetch_factor,
+            worker_init_fn=self.worker_init_fn,
         )

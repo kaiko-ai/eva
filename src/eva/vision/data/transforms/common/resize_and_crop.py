@@ -3,10 +3,10 @@
 from typing import Callable, Sequence
 
 import torch
-import torchvision.transforms.v2 as torch_transforms
+from torchvision.transforms import v2
 
 
-class ResizeAndCrop(torch_transforms.Compose):
+class ResizeAndCrop(v2.Compose):
     """Resizes, crops and normalizes an input image while preserving its aspect ratio."""
 
     def __init__(
@@ -32,11 +32,10 @@ class ResizeAndCrop(torch_transforms.Compose):
     def _build_transforms(self) -> Sequence[Callable]:
         """Builds and returns the list of transforms."""
         transforms = [
-            torch_transforms.ToImage(),
-            torch_transforms.Resize(size=self._size),
-            torch_transforms.CenterCrop(size=self._size),
-            torch_transforms.ToDtype(torch.float32, scale=True),
-            torch_transforms.Normalize(
+            v2.Resize(size=self._size),
+            v2.CenterCrop(size=self._size),
+            v2.ToDtype(torch.float32, scale=True),
+            v2.Normalize(
                 mean=self._mean,
                 std=self._std,
             ),

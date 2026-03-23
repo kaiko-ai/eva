@@ -6,23 +6,50 @@ on:
     tags:
       - "*"
 
+concurrency:
+  group: "${{ github.workflow }}"
+  cancel-in-progress: true
+
+permissions: {}
+
 jobs:
   release-pypi:
     runs-on: ubuntu-latest
     permissions:
-      id-token: write
-      contents: write
+      id-token: write # Needed for publishing to PyPI
+      contents: write # Needed for pushing to GitHub Pages
+      pull-requests: write # Needed for creating version bump PR
     steps:
-      - uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+        with:
+          # Needed to push to gh-pages branch
+          # IMPORTANT: Avoid publishing the .git/ folder to prevent leaking credentials
+          persist-credentials: true
       - name: Setting up PDM
-        uses: pdm-project/setup-pdm@568ddd69406b30de1774ec0044b73ae06e716aa4 # v4
+        uses: pdm-project/setup-pdm@94a823180e06fcde4ad29308721954a521c96ed0 # v4
         with:
           python-version: "3.10"
           architecture: x64
       - name: Setting up nox
-        uses: wntrblm/nox@5656fcedc31a1ea37d016e4d94d00185330cc528 # 2024.04.15
+        uses: wntrblm/nox@a74da2c766d4e656d6105639926c31f3aa4a6ca1 # 2025.02.09
         with:
           python-versions: "3.10"
+      - name: Free up disk space
+        run: |
+          sudo rm -rf /usr/local/lib/android \
+                      /opt/ghc \
+                      /opt/hostedtoolcache/CodeQL \
+                      /usr/local/.ghcup
+          sudo docker system prune -af || true
+          sudo apt-get clean
+          sudo rm -rf /var/lib/apt/lists/*
+      - name: Configure Git Credentials
+        run: |
+          git config user.email "action@github.com"
+          git config user.name "GitHub Action"
+      - name: Bumping version
+        run: |
+          nox -s bump -- to "${GITHUB_REF_NAME}"
       - name: Build artifacts
         run: |
           nox -s build
@@ -31,16 +58,30 @@ jobs:
           python -m pip install dist/*.whl
           eva --version
       - name: Build Release Docs
+        env:
+            PIP_NO_CACHE_DIR: "1"
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
           git fetch origin gh-pages:gh-pages
-          tag="${{ github.ref_name }}"
+          tag="${GITHUB_REF_NAME}"
           DOC_VERSION=${tag%.*}
-          nox -s docs -- deploy --alias-type=copy --update-aliases "$DOC_VERSION" latest
+          nox -s docs -- deploy --alias-type=copy --update-aliases "$DOC_VERSION"
           git push origin gh-pages
       - name: Publish package distributions to PyPI
         run: nox -s publish -- --no-build
         env:
           PDM_PUBLISH_USERNAME: ${{ secrets.PYPI_USERNAME }}
           PDM_PUBLISH_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+      - name: Create Pull Request for version bump
+        uses: peter-evans/create-pull-request@271a8d0340265f705b14b6d32b9829c1cb33d45e # v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore: bump version to ${{ github.ref_name }}"
+          title: "bump version to ${{ github.ref_name }} [skip ci]"
+          body: |
+            This PR updates the pyproject.toml with the new version number.
+
+            Version: ${{ github.ref_name }}
+
+            *Automated PR created by the Release workflow*
+          branch: bump-version-${{ github.ref_name }}
+          base: main

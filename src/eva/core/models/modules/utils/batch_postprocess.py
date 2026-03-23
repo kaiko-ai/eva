@@ -16,10 +16,10 @@ class BatchPostProcess:
     """Batch post-processes transform schema."""
 
     targets_transforms: List[Transform] | None = None
-    """Holds the common train and evaluation metrics."""
+    """List of transforms to apply to targets."""
 
     predictions_transforms: List[Transform] | None = None
-    """Holds the common train and evaluation metrics."""
+    """List of transforms to apply to predictions."""
 
     def __call__(self, outputs: STEP_OUTPUT) -> None:
         """Applies the defined list of transforms to the batch output in-place.

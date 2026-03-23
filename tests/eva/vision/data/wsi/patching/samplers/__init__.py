@@ -1,0 +1,1 @@
+"""WSI patch samplers tests."""

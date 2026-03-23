@@ -3,6 +3,7 @@
 import os
 import tempfile
 from unittest import mock
+from unittest.mock import patch
 
 import pytest
 
@@ -13,18 +14,38 @@ from tests.eva import _cli
 @pytest.mark.parametrize(
     "configuration_file",
     [
-        "configs/vision/dino_vit/online/bach.yaml",
-        "configs/vision/dino_vit/online/crc.yaml",
-        "configs/vision/dino_vit/online/mhist.yaml",
-        "configs/vision/dino_vit/online/patch_camelyon.yaml",
-        "configs/vision/dino_vit/offline/bach.yaml",
-        "configs/vision/dino_vit/offline/crc.yaml",
-        "configs/vision/dino_vit/offline/mhist.yaml",
-        "configs/vision/dino_vit/offline/patch_camelyon.yaml",
-        "configs/vision/owkin/phikon/offline/bach.yaml",
-        "configs/vision/owkin/phikon/offline/crc.yaml",
-        "configs/vision/owkin/phikon/offline/mhist.yaml",
-        "configs/vision/owkin/phikon/offline/patch_camelyon.yaml",
+        # | online
+        # classification
+        "configs/vision/pathology/online/classification/bach.yaml",
+        "configs/vision/pathology/online/classification/bracs.yaml",
+        "configs/vision/pathology/online/classification/breakhis.yaml",
+        "configs/vision/pathology/online/classification/crc.yaml",
+        "configs/vision/pathology/online/classification/gleason_arvaniti.yaml",
+        "configs/vision/pathology/online/classification/mhist.yaml",
+        "configs/vision/pathology/online/classification/patch_camelyon.yaml",
+        "configs/vision/pathology/online/classification/unitopatho.yaml",
+        # segmentation
+        "configs/vision/pathology/online/segmentation/bcss.yaml",
+        "configs/vision/pathology/online/segmentation/consep.yaml",
+        "configs/vision/pathology/online/segmentation/monusac.yaml",
+        "configs/vision/radiology/online/segmentation/lits17.yaml",
+        "configs/vision/radiology/online/segmentation/msd_task7_pancreas.yaml",
+        # | offline
+        # classification
+        "configs/vision/pathology/offline/classification/bach.yaml",
+        "configs/vision/pathology/offline/classification/bracs.yaml",
+        "configs/vision/pathology/offline/classification/breakhis.yaml",
+        "configs/vision/pathology/offline/classification/camelyon16.yaml",
+        "configs/vision/pathology/offline/classification/crc.yaml",
+        "configs/vision/pathology/offline/classification/gleason_arvaniti.yaml",
+        "configs/vision/pathology/offline/classification/mhist.yaml",
+        "configs/vision/pathology/offline/classification/panda.yaml",
+        "configs/vision/pathology/offline/classification/patch_camelyon.yaml",
+        "configs/vision/pathology/offline/classification/unitopatho.yaml",
+        # segmentation
+        "configs/vision/pathology/offline/segmentation/bcss.yaml",
+        "configs/vision/pathology/offline/segmentation/consep.yaml",
+        "configs/vision/pathology/offline/segmentation/monusac.yaml",
     ],
 )
 def test_configuration_initialization(configuration_file: str, lib_path: str) -> None:
@@ -43,6 +64,8 @@ def test_configuration_initialization(configuration_file: str, lib_path: str) ->
     "configuration_file",
     [
         "configs/vision/tests/online/patch_camelyon.yaml",
+        "configs/vision/tests/online/consep.yaml",
+        "configs/vision/tests/online/lits17.yaml",
     ],
 )
 def test_fit_from_configuration(configuration_file: str, lib_path: str) -> None:
@@ -61,6 +84,8 @@ def test_fit_from_configuration(configuration_file: str, lib_path: str) -> None:
     "configuration_file",
     [
         "configs/vision/tests/offline/patch_camelyon.yaml",
+        "configs/vision/tests/offline/panda.yaml",
+        "configs/vision/tests/offline/consep.yaml",
     ],
 )
 def test_predict_fit_from_configuration(configuration_file: str, lib_path: str) -> None:
@@ -80,3 +105,30 @@ def test_predict_fit_from_configuration(configuration_file: str, lib_path: str) 
 def _skip_dataset_validation() -> None:
     """Mocks the validation step of the datasets."""
     datasets.PatchCamelyon.validate = mock.MagicMock(return_value=None)
+    datasets.CoNSeP.validate = mock.MagicMock(return_value=None)
+    datasets.LiTS17.validate = mock.MagicMock(return_value=None)
+    datasets.LiTS17._split_index_ranges = {  # type: ignore
+        "train": [(31, 32)],
+        "val": [(45, 46)],
+    }
+
+
+@pytest.fixture(autouse=True)
+def mock_download():
+    """Mocks the download functions to avoid downloading resources when running tests."""
+    with patch.object(datasets.PANDA, "_download_resources", return_value=None):
+        yield
+
+
+@pytest.fixture(autouse=True)
+def mock_env():
+    """Mocks the environment variables."""
+    with mock.patch.dict(
+        os.environ,
+        {
+            "MODEL_NAME": "universal/vit_tiny_patch16_224_random",
+            "IN_FEATURES": "192",
+            "DOWNLOAD_DATA": "false",
+        },
+    ):
+        yield

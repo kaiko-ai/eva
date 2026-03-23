@@ -1,6 +1,7 @@
 """ABMIL network tests."""
 
 import itertools
+from typing import Tuple
 
 import pytest
 import torch
@@ -15,7 +16,7 @@ from eva.vision.models.networks import ABMIL
 def test_masked_abmil(
     input_size: int,
     output_size: int,
-    hidden_sizes_mlp: tuple[int],
+    hidden_sizes_mlp: Tuple[int],
     batch_size: int,
     n_instances: int,
     masked_fraction: float,

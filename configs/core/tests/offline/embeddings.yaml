@@ -6,6 +6,8 @@ trainer:
     max_epochs: &MAX_EPOCHS 1
     limit_train_batches: 2
     limit_val_batches: 2
+    accelerator: ${oc.env:ACCELERATOR, auto}
+    devices: ${oc.env:NUM_DEVICES, 1}
     callbacks:
       - class_path: lightning.pytorch.callbacks.LearningRateMonitor
         init_args:
@@ -26,11 +28,9 @@ model:
         out_features: &NUM_CLASSES 2
     criterion: torch.nn.CrossEntropyLoss
     optimizer:
-      class_path: torch.optim.SGD
+      class_path: torch.optim.AdamW
       init_args:
-        lr: 0.1
-        momentum: 0.9
-        weight_decay: 0.0
+        lr: ${oc.env:LR_VALUE, 0.0003}
     lr_scheduler:
       class_path: torch.optim.lr_scheduler.CosineAnnealingLR
       init_args:

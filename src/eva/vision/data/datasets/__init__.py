@@ -2,21 +2,57 @@
 
 from eva.vision.data.datasets.classification import (
     BACH,
+    BRACS,
     CRC,
     MHIST,
+    PANDA,
+    BreaKHis,
+    Camelyon16,
+    GleasonArvaniti,
+    PANDASmall,
     PatchCamelyon,
-    TotalSegmentatorClassification,
+    UniToPatho,
+    WsiClassificationDataset,
 )
-from eva.vision.data.datasets.segmentation import ImageSegmentation, TotalSegmentator2D
+from eva.vision.data.datasets.segmentation import (
+    BCSS,
+    BTCV,
+    FLARE22,
+    WORD,
+    CoNSeP,
+    EmbeddingsSegmentationDataset,
+    KiTS23,
+    LiTS17,
+    MoNuSAC,
+    MSDTask7Pancreas,
+)
 from eva.vision.data.datasets.vision import VisionDataset
+from eva.vision.data.datasets.wsi import MultiWsiDataset, WsiDataset
 
 __all__ = [
     "BACH",
+    "BCSS",
+    "BreaKHis",
+    "BRACS",
+    "BTCV",
+    "Camelyon16",
+    "CoNSeP",
     "CRC",
+    "EmbeddingsSegmentationDataset",
+    "FLARE22",
+    "GleasonArvaniti",
+    "KiTS23",
+    "LiTS17",
     "MHIST",
-    "ImageSegmentation",
+    "MoNuSAC",
+    "MSDTask7Pancreas",
+    "MultiWsiDataset",
+    "PANDA",
+    "PANDASmall",
     "PatchCamelyon",
-    "TotalSegmentatorClassification",
-    "TotalSegmentator2D",
+    "UniToPatho",
     "VisionDataset",
+    "WORD",
+    "WsiClassificationDataset",
+    "WsiDataset",
 ]

@@ -47,7 +47,8 @@ The PatchCamelyon data from [zenodo](https://zenodo.org/records/2546921) is orga
 ## Download and preprocessing
 The dataset class `PatchCamelyon` supports downloading the data during runtime by setting the init argument `download=True`.
 
-*Note that in the provided `PatchCamelyon`-config files the download argument is set to `false`. To enable automatic download you will need to open the config and set `download: true`.*
+> [!NOTE]
+> In the provided `PatchCamelyon`-config files the download argument is set to `false`. To enable automatic download you will need to open the config and set `download: true`.
 
 Labels are provided by source files, splits are given by file names.
 

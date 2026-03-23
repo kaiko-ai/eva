@@ -34,13 +34,21 @@ class Interface:
             model: The model module to use but not modify.
             data: The data module.
         """
-        trainer.run_evaluation_session(model=model, datamodule=data)
+        eva_trainer.run_evaluation_session(
+            base_trainer=trainer,
+            base_model=model,
+            datamodule=data,
+            stages=["fit", "validate", "test"],
+            n_runs=trainer.n_runs,
+            verbose=trainer.n_runs > 1,
+        )
 
     def predict(
         self,
         trainer: eva_trainer.Trainer,
         model: modules.ModelModule,
         data: datamodules.DataModule,
+        enable_clone: bool = False,
     ) -> None:
         """Perform model prediction out-of-place.
 
@@ -50,12 +58,15 @@ class Interface:
             trainer: The base trainer to use but not modify.
             model: The model module to use but not modify.
             data: The data module.
+            enable_clone: Whether to clone the trainer before inference. This is required
+                e.g. when running other stages such as `fit` or `validate` after `predict`.
         """
         eva_trainer.infer_model(
-            base_trainer=trainer,
-            base_model=model,
+            trainer=trainer,
+            model=model,
             datamodule=data,
             return_predictions=False,
+            enable_clone=enable_clone,
         )
 
     def predict_fit(
@@ -75,5 +86,74 @@ class Interface:
             model: The model module to use but not modify.
             data: The data module.
         """
-        self.predict(trainer=trainer, model=model, data=data)
+        self.predict(trainer=trainer, model=model, data=data, enable_clone=True)
         self.fit(trainer=trainer, model=model, data=data)
+
+    def validate(
+        self,
+        trainer: eva_trainer.Trainer,
+        model: modules.ModelModule,
+        data: datamodules.DataModule,
+    ) -> None:
+        """Perform model validation out-of-place without running fit.
+
+        This method is useful when the model is already trained or does not
+        require further training (e.g., large language models) and you only
+        want to measure performance.
+
+        Args:
+            trainer: The base trainer to use but not modify.
+            model: The model module to use but not modify.
+            data: The data module containing validation data.
+        """
+        if getattr(data.datasets, "val", None) is None:
+            raise ValueError("The provided data module does not contain a validation dataset.")
+
+        eva_trainer.run_evaluation_session(
+            base_trainer=trainer,
+            base_model=model,
+            datamodule=data,
+            stages=["validate"],
+            n_runs=trainer.n_runs,
+            verbose=trainer.n_runs > 1,
+        )
+
+    def test(
+        self,
+        trainer: eva_trainer.Trainer,
+        model: modules.ModelModule,
+        data: datamodules.DataModule,
+    ) -> None:
+        """Same as validate, but runs the test stage."""
+        if getattr(data.datasets, "test", None) is None:
+            raise ValueError("The provided data module does not contain a test dataset.")
+
+        eva_trainer.run_evaluation_session(
+            base_trainer=trainer,
+            base_model=model,
+            datamodule=data,
+            stages=["test"],
+            n_runs=trainer.n_runs,
+            verbose=trainer.n_runs > 1,
+        )
+
+    def validate_test(
+        self,
+        trainer: eva_trainer.Trainer,
+        model: modules.ModelModule,
+        data: datamodules.DataModule,
+    ) -> None:
+        """Runs validation & test stages."""
+        if getattr(data.datasets, "val", None) is None:
+            raise ValueError("The provided data module does not contain a validation dataset.")
+        if getattr(data.datasets, "test", None) is None:
+            raise ValueError("The provided data module does not contain a test dataset.")
+
+        eva_trainer.run_evaluation_session(
+            base_trainer=trainer,
+            base_model=model,
+            datamodule=data,
+            stages=["validate", "test"],
+            n_runs=trainer.n_runs,
+            verbose=trainer.n_runs > 1,
+        )

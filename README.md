@@ -1,18 +1,23 @@
 <div align="center">
 
-<img src="https://github.com/kaiko-ai/eva/blob/main/docs/images/eva-logo.png?raw=true" width="400">
+<br />
 
+<img src="https://github.com/kaiko-ai/eva/blob/main/docs/images/eva-logo.png?raw=true" width="340">
+
+<br />
 <br />
 
 _Oncology FM Evaluation Framework by kaiko.ai_
 
 [![PyPI](https://img.shields.io/pypi/v/kaiko-eva.svg?logo=python)](https://pypi.python.org/pypi/kaiko-eva)
-[![docs](https://img.shields.io/badge/docs-latest-green)](https://kaiko-ai.github.io/eva/latest)
-[![license](https://img.shields.io/badge/License-Apache%202.0-blue.svg?labelColor=gray)](https://github.com/kaiko-ai/eva#license)
+[![docs](https://img.shields.io/badge/📚_docs-latest-green)](https://kaiko-ai.github.io/eva/latest)
+[![license](https://img.shields.io/badge/⚖️_License-Apache%202.0-blue.svg?labelColor=gray)](https://github.com/kaiko-ai/eva#license)<br>
+[![paper](http://img.shields.io/badge/OpenReview-MIDL_2024-B31B1B.svg)](https://openreview.net/forum?id=FNBQOPj18N&noteId=FNBQOPj18N)
 
 <p align="center">
   <a href="https://github.com/kaiko-ai/eva#installation">Installation</a> •
   <a href="https://github.com/kaiko-ai/eva#how-to-use">How To Use</a> •
+  <a href="https://github.com/kaiko-ai/eva#quick-start">Quick Start</a> •
   <a href="https://kaiko-ai.github.io/eva/">Documentation</a> •
   <a href="https://kaiko-ai.github.io/eva/dev/datasets/">Datasets</a> •
   <a href="https://github.com/kaiko-ai/eva#benchmarks">Benchmarks</a> <br>
@@ -29,8 +34,9 @@ Check out the [documentation](https://kaiko-ai.github.io/eva/) for more informat
 
 ### Highlights:
 - Easy and reliable benchmark of Oncology FMs
+- Supports patch-level classification, slide-level classification, semantic segmentation, and (visual) question answering tasks.
 - Automatic embedding inference and evaluation of a downstream task
-- Native support of popular medical [datasets](https://kaiko-ai.github.io/eva/dev/datasets/) and models
+- Native support of popular medical [datasets](https://kaiko-ai.github.io/eva/main/datasets/) and models
 - Produce statistics over multiple evaluation fits and multiple metrics
 
 ## Installation
@@ -42,6 +48,12 @@ pip install kaiko-eva
 
 # to install the expanded `vision` version
 pip install 'kaiko-eva[vision]'
+
+# to install the expanded `language` version
+pip install 'kaiko-eva[language]'
+
+# to install the expanded `multimodal` version
+pip install 'kaiko-eva[multimodal]'
 
 # to install everything
 pip install 'kaiko-eva[all]'
@@ -59,85 +71,169 @@ eva --version
 
 ## How To Use
 
-_eva_ can be used directly from the terminal as a CLI tool as follows:
+_`eva`_ can be used directly from the terminal as a CLI tool as follows:
 ```sh
 eva {fit,predict,predict_fit} --config url/or/path/to/the/config.yaml 
 ```
 
-When used as a CLI tool, `_eva_` supports configuration files (`.yaml`) as an argument to define its functionality.
-Native supported configs can be found at the [configs](https://github.com/kaiko-ai/eva/tree/main/configs) directory
-of the repo. Apart from cloning the repo, you can download the latest config folder as `.zip` from your browser from
-[here](https://download-directory.github.io/?url=https://github.com/kaiko-ai/eva/tree/main/configs). Alternatively,
-from a specific release the configs can be downloaded from the terminal as follows:
-```sh
-curl -LO https://github.com/kaiko-ai/eva/releases/download/0.0.1/configs.zip | unzip configs
+_`eva`_ uses [jsonargparse](https://jsonargparse.readthedocs.io/en/v4.31.0/) to
+make it easily configurable by automatically generating command line interfaces (CLIs),
+which allows to call *any* Python object from the command line. Moreover, the configuration structure is always in sync with the code. Thus, _`eva`_ can be used either directly from Python or as a CLI tool (recommended).
+
+For more information, please refer to the [documentation](https://kaiko-ai.github.io/eva/dev/user-guide/tutorials/offline_vs_online/).
+
+<details>
+  <summary>Learn about Configs</summary>
+
+The following interfaces are identical:
+<table>
+<tr>
+<th>Python interface</th>
+<th>Configuration file</th>
+</tr>
+<tr>
+<td>
+<sub>
+
+```Python
+# main.py
+# execute with: `python main.py`
+
+from torch import nn
+
+from eva import core
+from eva.vision import datasets, transforms
+
+# initialize trainer
+trainer = core.Trainer(max_steps=100)
+
+# initialize model
+model = core.HeadModule(
+  backbone=nn.Flatten(),
+  head=nn.Linear(150528, 4),
+  criterion=nn.CrossEntropyLoss(),
+)
+
+# initialize data
+data = core.DataModule(
+  datasets=core.DatasetsSchema(
+    train=datasets.BACH(
+      root="data/bach",
+      split="train",
+      download=True,
+      transforms=transforms.ResizeAndCrop(),
+    ),
+  ),
+  dataloaders=core.DataloadersSchema(
+    train=core.DataLoader(batch_size=32),
+  ),
+)
+
+# perform fit
+pipeline = core.Interface()
+pipeline.fit(trainer, model=model, data=data)
 ```
+</sub>
+<td>
+<sub>
 
-For example, to perform a downstream evaluation of DINO ViT-S/16 on the BACH dataset with
-linear probing by first inferring the embeddings and performing 5 sequential fits, execute:
-```sh
-# from a locally stored config file
-eva predict_fit --config ./configs/vision/dino_vit/offline/bach.yaml
+```yaml
+# main.yaml
+# execute with: `eva fit --config main.yaml`
 
-# from a remote stored config file
-eva predict_fit --config https://raw.githubusercontent.com/kaiko-ai/eva/main/configs/vision/dino_vit/offline/bach.yaml
+---
+trainer:
+  class_path: eva.Trainer
+  init_args:
+    max_steps: 100
+model:
+  class_path: eva.HeadModule
+  init_args:
+    backbone: torch.nn.Flatten
+    head:
+      class_path: torch.nn.Linear
+      init_args:
+        in_features: 150528
+        out_features: 4
+    criterion: torch.nn.CrossEntropyLoss
+data:
+  class_path: eva.DataModule
+  init_args:
+    datasets:
+      train:
+        class_path: eva.vision.datasets.BACH
+        init_args:
+          root: ./data/bach
+          split: train
+          download: true
+          transforms: eva.vision.transforms.ResizeAndCrop
+    dataloaders:
+      train:
+        batch_size: 32
 ```
+</sub>
+</td>
+</tr>
+</table>
 
-> [!NOTE] 
+The `.yaml` file defines the functionality of _`eva`_
+by parsing and translating its content to Python objects directly.
+Native supported configs can be found at the
+[configs](https://github.com/kaiko-ai/eva/tree/main/configs) directory
+of the repo, which can be both locally stored or remote.
+
+</details>
+
+## Quick Start
+
+We define two types of evaluations: **online** and **offline**.
+While online fit uses the backbone (FM) to perform forward passes
+during the fitting process, offline fit first generates embeddings
+with the backbone and then fits the model using these embeddings as
+input, resulting in a faster evaluation.
+
+Here are some examples to get you started:
+
+- Perform a downstream offline **classification** evaluation of `DINO ViT-S/16`
+on the `BACH` dataset with linear probing by first pre-calculating the embeddings:
+  ```sh
+  DOWNLOAD_DATA=true \
+  MODEL_NAME=universal/vit_small_patch16_224_dino \
+  eva predict_fit --config https://raw.githubusercontent.com/kaiko-ai/eva/main/configs/vision/pathology/offline/classification/bach.yaml
+  ```
+
+- Perform a downstream online **segmentation** evaluation of `DINO ViT-S/16` on the `MoNuSAC` dataset with the `ConvDecoderWithImage` decoder:
+  ```sh
+  DOWNLOAD_DATA=true \
+  MODEL_NAME=universal/vit_small_patch16_224_dino \
+  eva fit --config https://raw.githubusercontent.com/kaiko-ai/eva/main/configs/vision/pathology/online/segmentation/monusac.yaml
+  ```
+
+By default `eva` will perform 5 evaluation runs using different seeds, however, you can control the number of runs through the `N_RUNS` environment variable or in the configuration file. The results will be saved to `./logs` by default, or to `OUTPUT_ROOT` if specified.
+
+For more examples, take a look at the [configs](https://github.com/kaiko-ai/eva/tree/main/configs)
+and [tutorials](https://kaiko-ai.github.io/eva/main/user-guide/advanced/replicate_evaluations/).
+
+> [!NOTE]
 > All the datasets that support automatic download in the repo have by default the option to automatically download set to false.
-> For automatic download you have to manually set download=true.
+> For automatic download you have to manually set the environment variable `DOWNLOAD_DATA=true` or in the configuration file `download=true`.
 
+## Leaderboards
 
-To view all the possibles, execute:
-```sh
-eva --help
-```
+The following table shows the FMs we have evaluated with _`eva`_. For more detailed information about the evaluation process, please refer to our [documentation](https://kaiko-ai.github.io/eva/main/leaderboards/).
 
-For more information, please refer to the [documentation](https://kaiko-ai.github.io/eva/dev/user-guide/tutorials/offline_vs_online/)
-and [tutorials](https://kaiko-ai.github.io/eva/dev/user-guide/advanced/replicate_evaluations/).
+### Pathology
 
-## Benchmarks
+<img src="./docs/images/leaderboards/pathology.svg" alt="Pathology Leaderboard">
 
-In this section you will find model benchmarks which were generated with `_eva_`.
+### Radiology
 
-### Table I: WSI patch-level benchmark
+<img src="./docs/images/leaderboards/radiology.svg" alt="Radiology Leaderboard" width="600">
 
-<br />
-
-<div align="center">
-
-| Model                                            | BACH  | CRC   | MHIST | PCam/val | PCam/test |
-|--------------------------------------------------|-------|-------|-------|----------|-----------|
-| ViT-S/16 _(random)_	<sup>[1]</sup>               | 0.410 | 0.617 | 0.501 | 0.753    | 0.728     |
-| ViT-S/16 _(ImageNet)_ <sup>[1]</sup>             | 0.695 | 0.935 | 0.831 | 0.864    | 0.849     |
-| ViT-B/8 _(ImageNet)_ <sup>[1]</sup>              | 0.710 | 0.939 | 0.814 | 0.870    | 0.856     |
-| ViT-L/14 _(ImageNet)_ <sup>[1]</sup>             | 0.707 | 0.916 | 0.832 | 0.873    | 0.888     |
-| DINO<sub>(p=16)</sub> <sup>[2]</sup>             | 0.801 | 0.934 | 0.768 | 0.889    | 0.895     |
-| Phikon <sup>[3]</sup>                            | 0.725 | 0.935 | 0.777 | 0.912    | 0.915     |
-| UNI <sup>[4]</sup>                               | 0.814 | 0.950 | 0.837 | 0.936    | 0.938     |
-| ViT-S/16 _(kaiko.ai)_ <sup>[5]</sup>             | 0.797 | 0.943 | 0.828 | 0.903    | 0.893     |
-| ViT-S/8 _(kaiko.ai)_ <sup>[5]</sup>              | 0.834 | 0.946 | 0.832 | 0.897    | 0.887     |
-| ViT-B/16 _(kaiko.ai)_	<sup>[5]</sup>             | 0.810 | 0.960 | 0.826 | 0.900    | 0.898     |
-| ViT-B/8 _(kaiko.ai)_ <sup>[5]</sup>              | 0.865 | 0.956 | 0.809 | 0.913    | 0.921     |
-| ViT-L/14 _(kaiko.ai)_ <sup>[5]</sup>             | 0.870 | 0.930 | 0.809 | 0.908    | 0.898     |
-
-_Table I: Linear probing evaluation of FMs on patch-level downstream datasets.<br> We report averaged balanced accuracy
-over 5 runs, with an average standard deviation of ±0.003._
-
-</div>
-
-<br />
-
-_References_:
-1. _"Emerging properties in self-supervised vision transformers”_
-2. _"Benchmarking self-supervised learning on diverse pathology datasets”_
-3. _"Scaling self-supervised learning for histopathology with masked image modeling”_
-4. _"A General-Purpose Self-Supervised Model for Computational Pathology”_
-5. _"Towards Training Large-Scale Pathology Foundation Models: from TCGA to Hospital Scale”_
 
 ## Contributing
 
-_eva_ is an open source project and welcomes contributions of all kinds. Please checkout the [developer](./docs/DEVELOPER_GUIDE.md)
+_`eva`_ is an open source project and welcomes contributions of all kinds. Please checkout the [developer](./docs/DEVELOPER_GUIDE.md)
 and [contributing guide](./docs/CONTRIBUTING.md) for help on how to do so.
 
 All contributors must follow the [code of conduct](./docs/CODE_OF_CONDUCT.md).
@@ -162,7 +258,23 @@ Our codebase is built using multiple opensource contributions
 
 </div>
 
----
+
+## Citation
+
+If you find this repository useful, please consider giving a star ⭐ and adding the following citation:
+
+```bibtex
+@inproceedings{kaiko.ai2024eva,
+    title={eva: Evaluation framework for pathology foundation models},
+    author={kaiko.ai and Ioannis Gatopoulos and Nicolas K{\"a}nzig and Roman Moser and Sebastian Ot{\'a}lora},
+    booktitle={Medical Imaging with Deep Learning},
+    year={2024},
+    url={https://openreview.net/forum?id=FNBQOPj18N}
+}
+```
+
+<br />
+
 <div align="center">
   <img src="https://github.com/kaiko-ai/eva/blob/main/docs/images/kaiko-logo.png?raw=true" width="200">
 </div>

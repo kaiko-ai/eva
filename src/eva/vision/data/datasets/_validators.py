@@ -13,7 +13,7 @@ _SUFFIX_ERROR_MESSAGE = "Please verify that the data are properly downloaded and
 def check_dataset_integrity(
     dataset: vision.VisionDataset,
     *,
-    length: int,
+    length: int | None,
     n_classes: int,
     first_and_last_labels: Tuple[str, str],
 ) -> None:
@@ -23,7 +23,7 @@ def check_dataset_integrity(
         ValueError: If the input dataset's values do not
             match the expected ones.
     """
-    if len(dataset) != length:
+    if length and len(dataset) != length:
         raise ValueError(
             f"Dataset's '{dataset.__class__.__qualname__}' length "
             f"({len(dataset)}) does not match the expected one ({length}). "
@@ -57,3 +57,16 @@ def check_dataset_exists(dataset_dir: str, download_available: bool) -> None:
         if download_available:
             error_message += " You can set `download=True` to download the dataset automatically."
         raise FileNotFoundError(error_message)
+
+
+def check_number_of_files(file_paths: List[str], expected_length: int, split: str | None) -> None:
+    """Verifies the number of files in the dataset.
+
+    Raise:
+        ValueError: If the number of files in the dataset does not match the expected one.
+    """
+    if len(file_paths) != expected_length:
+        raise ValueError(
+            f"Expected {expected_length} files, for split '{split}' found {len(file_paths)}. "
+            f"{_SUFFIX_ERROR_MESSAGE}"
+        )

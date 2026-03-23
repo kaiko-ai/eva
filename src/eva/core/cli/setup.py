@@ -59,7 +59,7 @@ def _initialize_logger() -> None:
         " :: <bold><level>{level}</level></bold>"
         " :: {message}",
         colorize=True,
-        level="INFO",
+        level=os.getenv("LOGURU_LEVEL", "INFO"),
     )
 
 

@@ -17,15 +17,6 @@ class BinaryClassificationMetrics(structs.MetricCollection):
     ) -> None:
         """Initializes the binary classification metrics.
 
-        The metrics instantiated here are:
-
-        - BinaryAUROC
-        - BinaryAccuracy
-        - BinaryBalancedAccuracy
-        - BinaryF1Score
-        - BinaryPrecision
-        - BinaryRecall
-
         Args:
             threshold: Threshold for transforming probability to binary (0,1) predictions
             ignore_index: Specifies a target value that is ignored and does not
