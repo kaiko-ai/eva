@@ -195,7 +195,7 @@ def _draw_heatmap(ax, display_df: pd.DataFrame, numeric_df: pd.DataFrame):
     # Path effects for "halo" text - makes text readable on any background
     from matplotlib import patheffects
     header_effect = [patheffects.withStroke(linewidth=0.2, foreground="white", alpha=0.7)]
-    body_effect = [patheffects.withStroke(linewidth=0.2, foreground="white", alpha=0.7)]
+    body_effect = [patheffects.withStroke(linewidth=0.5, foreground="white", alpha=0.0)]
 
     for j in range(cols):
         col_numeric = numeric_df.iloc[:, j]
