@@ -50,6 +50,7 @@ def run_evaluation_session(
             datamodule,
             run_id=run_index,
             stages=stages,
+            record_datasets_as_runs=record_datasets_as_runs,
             verbose=not verbose,
         )
         if validation_scores or test_scores:
@@ -73,6 +74,7 @@ def run_evaluation(
     *,
     run_id: int | None = None,
     stages: List[Literal["fit", "validate", "test"]] | None = None,
+    record_datasets_as_runs: bool = False,
     verbose: bool = True,
 ) -> Tuple[_EVALUATE_OUTPUT | None, _EVALUATE_OUTPUT | None]:
     """Runs the specified evaluation stages out-of-place.
@@ -84,6 +86,8 @@ def run_evaluation(
         run_id: The run id to be appended to the output log directory.
             If `None`, it will use the log directory of the trainer as is.
         stages: List of stages to execute. Options: "fit", "validate", "test".
+        record_datasets_as_runs: If True, evaluate each dataloader separately
+            so that metrics are computed independently per dataset.
         verbose: Whether to print the validation and test metrics
             in the end of the training.
 
@@ -106,18 +110,22 @@ def run_evaluation(
     if "fit" in stages:
         trainer.fit(model, datamodule=datamodule)
     if "validate" in stages and getattr(datamodule.datasets, "val", None) is not None:
-        validation_scores = trainer.validate(
-            model=model,
-            datamodule=datamodule,
+        validation_scores = _evaluate_stage(
+            trainer,
+            model,
+            datamodule,
+            stage="validate",
+            record_datasets_as_runs=record_datasets_as_runs,
             verbose=verbose,
-            ckpt_path=trainer.checkpoint_type,
         )
     if "test" in stages and getattr(datamodule.datasets, "test", None) is not None:
-        test_scores = trainer.test(
-            model=model,
-            datamodule=datamodule,
+        test_scores = _evaluate_stage(
+            trainer,
+            model,
+            datamodule,
+            stage="test",
+            record_datasets_as_runs=record_datasets_as_runs,
             verbose=verbose,
-            ckpt_path=trainer.checkpoint_type,
         )
     trainer.finish_logger_run(run_id)
     return validation_scores, test_scores
@@ -146,3 +154,37 @@ def infer_model(
         datamodule=datamodule,
         return_predictions=return_predictions,
     )
+
+
+def _evaluate_stage(
+    trainer: eva_trainer.Trainer,
+    model: modules.ModelModule,
+    datamodule: datamodules.DataModule,
+    *,
+    stage: Literal["validate", "test"],
+    record_datasets_as_runs: bool = False,
+    verbose: bool = True,
+) -> _EVALUATE_OUTPUT:
+    """Evaluates a validation or test stage.
+
+    When ``record_datasets_as_runs`` is enabled and multiple dataloaders exist,
+    each dataloader is evaluated separately so that metrics are computed
+    independently per dataset instead of being aggregated across all dataloaders.
+    """
+    evaluate_fn = trainer.validate if stage == "validate" else trainer.test
+    ckpt_path = trainer.checkpoint_type
+
+    if record_datasets_as_runs:
+        datamodule.setup(stage)
+        get_dls = datamodule.val_dataloader if stage == "validate" else datamodule.test_dataloader
+        dls = get_dls()
+        if isinstance(dls, list) and len(dls) > 1:
+            return [
+                metrics
+                for dl in dls
+                for metrics in evaluate_fn(
+                    model=model, dataloaders=[dl], verbose=verbose, ckpt_path=ckpt_path
+                )
+            ]
+
+    return evaluate_fn(model=model, datamodule=datamodule, verbose=verbose, ckpt_path=ckpt_path)

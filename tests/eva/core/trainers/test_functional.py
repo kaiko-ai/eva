@@ -79,6 +79,83 @@ def test_run_evaluation_session_records_validate_only_datasets_as_runs() -> None
     recorder.save.assert_called_once_with()
 
 
+def test_evaluate_stage_calls_validate_per_dataloader_when_record_datasets_as_runs() -> None:
+    """Tests that each dataloader is evaluated separately when record_datasets_as_runs is True."""
+    trainer = mock.Mock()
+    trainer.validate.side_effect = [
+        [{"val/Accuracy": 0.8}],
+        [{"val/Accuracy": 0.6}],
+    ]
+    trainer.checkpoint_type = "best"
+    model = mock.Mock()
+    datamodule = mock.Mock()
+    dl_1, dl_2 = mock.Mock(), mock.Mock()
+    datamodule.val_dataloader.return_value = [dl_1, dl_2]
+
+    result = functional._evaluate_stage(
+        trainer,
+        model,
+        datamodule,
+        stage="validate",
+        record_datasets_as_runs=True,
+    )
+
+    assert result == [{"val/Accuracy": 0.8}, {"val/Accuracy": 0.6}]
+    assert trainer.validate.call_count == 2
+    trainer.validate.assert_any_call(
+        model=model, dataloaders=[dl_1], verbose=True, ckpt_path="best"
+    )
+    trainer.validate.assert_any_call(
+        model=model, dataloaders=[dl_2], verbose=True, ckpt_path="best"
+    )
+    datamodule.setup.assert_called_once_with("validate")
+
+
+def test_evaluate_stage_uses_datamodule_when_single_dataloader() -> None:
+    """Tests that a single dataloader falls back to the standard datamodule-based call."""
+    trainer = mock.Mock()
+    trainer.validate.return_value = [{"val/Accuracy": 0.9}]
+    trainer.checkpoint_type = "best"
+    model = mock.Mock()
+    datamodule = mock.Mock()
+    datamodule.val_dataloader.return_value = [mock.Mock()]
+
+    result = functional._evaluate_stage(
+        trainer,
+        model,
+        datamodule,
+        stage="validate",
+        record_datasets_as_runs=True,
+    )
+
+    assert result == [{"val/Accuracy": 0.9}]
+    trainer.validate.assert_called_once_with(
+        model=model, datamodule=datamodule, verbose=True, ckpt_path="best"
+    )
+
+
+def test_evaluate_stage_uses_datamodule_when_record_disabled() -> None:
+    """Tests that record_datasets_as_runs=False uses the standard datamodule-based call."""
+    trainer = mock.Mock()
+    trainer.validate.return_value = [{"val/Accuracy": 0.7}, {"val/Accuracy": 0.7}]
+    trainer.checkpoint_type = "best"
+    model = mock.Mock()
+    datamodule = mock.Mock()
+
+    result = functional._evaluate_stage(
+        trainer,
+        model,
+        datamodule,
+        stage="validate",
+        record_datasets_as_runs=False,
+    )
+
+    assert result == [{"val/Accuracy": 0.7}, {"val/Accuracy": 0.7}]
+    trainer.validate.assert_called_once_with(
+        model=model, datamodule=datamodule, verbose=True, ckpt_path="best"
+    )
+
+
 def test_run_evaluation_session_keeps_dataset_results_grouped_when_recording_disabled() -> None:
     """Tests that full result lists stay grouped when dataset outputs are not recorded as runs."""
     trainer = mock.Mock(default_log_dir="logs")
