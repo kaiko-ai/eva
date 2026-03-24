@@ -224,6 +224,7 @@ def _draw_heatmap(ax, display_df: pd.DataFrame, numeric_df: pd.DataFrame):
 
             # Use a dark slate that works everywhere, with a white halo
             text_color = "#94a3b8" 
+            text_color = "#2e2e2e" 
             
             
             ax.text(
