@@ -128,10 +128,74 @@ def _prepare_data(df: pd.DataFrame, config: LeaderboardConfig):
     return display_df, numeric_df
 
 
+# def _draw_heatmap(ax, display_df: pd.DataFrame, numeric_df: pd.DataFrame):
+#     """Draw the custom smooth heatmap with rounded rectangles."""
+#     rows, cols = display_df.shape
+#     cmap = plt.get_cmap("Blues")
+
+#     for j in range(cols):
+#         col_numeric = numeric_df.iloc[:, j]
+#         vmin, vmax = col_numeric.min(), col_numeric.max()
+#         is_avg = display_df.columns[j] == "Average"
+
+#         for i in range(rows):
+#             val_num = col_numeric.iloc[i]
+#             val_text = display_df.iloc[i, j]
+
+#             norm = (val_num - vmin) / (vmax - vmin + 1e-9)
+#             alpha = 0.08 + norm * 0.22                     # subtle but visible on both bg
+
+#             color = "#6366f1" if is_avg else cmap(norm)    # indigo for average
+
+#             rect = patches.FancyBboxPatch(
+#                 (j - 0.45, i - 0.4),
+#                 0.9,
+#                 0.8,
+#                 boxstyle="round,pad=0.02",
+#                 facecolor=color,
+#                 alpha=alpha,
+#                 zorder=1,
+#             )
+#             ax.add_patch(rect)
+
+#             # Adaptive text color for white/black backgrounds
+#             text_color = "#f1f5f9" if is_avg else "#0f172a"   # light for avg, dark otherwise
+
+#             ax.text(
+#                 j,
+#                 i,
+#                 val_text,
+#                 ha="center",
+#                 va="center",
+#                 fontsize=10,
+#                 fontweight="bold" if is_avg else 500,
+#                 color=text_color,
+#                 zorder=2,
+#                 linespacing=0.9,
+#             )
+
+#     # Model names (left side) — high contrast on both backgrounds
+#     for i, model_name in enumerate(display_df.index):
+#         ax.text(
+#             -0.7,
+#             i,
+#             model_name,
+#             ha="right",
+#             va="center",
+#             fontsize=11,
+#             fontweight=600,
+#             color="#e2e8f0",          # light gray — works on dark, still readable on white
+#         )
+
 def _draw_heatmap(ax, display_df: pd.DataFrame, numeric_df: pd.DataFrame):
-    """Draw the custom smooth heatmap with rounded rectangles."""
+    """Draw the custom smooth heatmap with adaptive contrast."""
     rows, cols = display_df.shape
     cmap = plt.get_cmap("Blues")
+    
+    # Path effects for "halo" text - makes text readable on any background
+    from matplotlib import patheffects
+    header_effect = [patheffects.withStroke(linewidth=2, foreground="white", alpha=0.5)]
+    body_effect = [patheffects.withStroke(linewidth=1.5, foreground="white", alpha=0.7)]
 
     for j in range(cols):
         col_numeric = numeric_df.iloc[:, j]
@@ -143,48 +207,42 @@ def _draw_heatmap(ax, display_df: pd.DataFrame, numeric_df: pd.DataFrame):
             val_text = display_df.iloc[i, j]
 
             norm = (val_num - vmin) / (vmax - vmin + 1e-9)
-            alpha = 0.08 + norm * 0.22                     # subtle but visible on both bg
-
-            color = "#6366f1" if is_avg else cmap(norm)    # indigo for average
+            # Increased alpha for better visibility
+            alpha = 0.15 + norm * 0.35 
+            
+            color = "#4f46e5" if is_avg else cmap(norm)
 
             rect = patches.FancyBboxPatch(
-                (j - 0.45, i - 0.4),
-                0.9,
-                0.8,
+                (j - 0.45, i - 0.4), 0.9, 0.8,
                 boxstyle="round,pad=0.02",
                 facecolor=color,
                 alpha=alpha,
+                edgecolor="none",
                 zorder=1,
             )
             ax.add_patch(rect)
 
-            # Adaptive text color for white/black backgrounds
-            text_color = "#f1f5f9" if is_avg else "#0f172a"   # light for avg, dark otherwise
-
+            # Use a dark slate that works everywhere, with a white halo
+            text_color = "#1e293b" 
+            
             ax.text(
-                j,
-                i,
-                val_text,
-                ha="center",
-                va="center",
+                j, i, val_text,
+                ha="center", va="center",
                 fontsize=10,
-                fontweight="bold" if is_avg else 500,
-                color=text_color,
+                fontweight="bold" if is_avg else 600,
+                color="#4338ca" if is_avg else text_color,
                 zorder=2,
-                linespacing=0.9,
+                path_effects=body_effect # This is the secret for readability
             )
 
-    # Model names (left side) — high contrast on both backgrounds
+    # Model names: Use a bold color with a background-agnostic halo
     for i, model_name in enumerate(display_df.index):
         ax.text(
-            -0.7,
-            i,
-            model_name,
-            ha="right",
-            va="center",
-            fontsize=11,
-            fontweight=600,
-            color="#e2e8f0",          # light gray — works on dark, still readable on white
+            -0.7, i, model_name,
+            ha="right", va="center",
+            fontsize=11, fontweight=700,
+            color="#0f172a",
+            path_effects=header_effect
         )
 
 
