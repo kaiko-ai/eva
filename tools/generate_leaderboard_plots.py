@@ -194,8 +194,8 @@ def _draw_heatmap(ax, display_df: pd.DataFrame, numeric_df: pd.DataFrame):
     
     # Path effects for "halo" text - makes text readable on any background
     from matplotlib import patheffects
-    header_effect = [patheffects.withStroke(linewidth=2, foreground="white", alpha=0.5)]
-    body_effect = [patheffects.withStroke(linewidth=1.5, foreground="white", alpha=0.7)]
+    header_effect = [patheffects.withStroke(linewidth=0.2, foreground="white", alpha=0.7)]
+    body_effect = [patheffects.withStroke(linewidth=0.2, foreground="white", alpha=0.7)]
 
     for j in range(cols):
         col_numeric = numeric_df.iloc[:, j]
@@ -224,13 +224,16 @@ def _draw_heatmap(ax, display_df: pd.DataFrame, numeric_df: pd.DataFrame):
 
             # Use a dark slate that works everywhere, with a white halo
             text_color = "#1e293b" 
+            text_color = "#94a3b8" 
             
             ax.text(
                 j, i, val_text,
-                ha="center", va="center",
+                ha="center",
+                va="center",
                 fontsize=10,
-                fontweight="bold" if is_avg else 600,
-                color="#4338ca" if is_avg else text_color,
+                fontweight="bold" if is_avg else 300,
+                # color="#4338ca" if is_avg else text_color,
+                color="#94a3b8" if is_avg else text_color,
                 zorder=2,
                 path_effects=body_effect # This is the secret for readability
             )
@@ -240,8 +243,10 @@ def _draw_heatmap(ax, display_df: pd.DataFrame, numeric_df: pd.DataFrame):
         ax.text(
             -0.7, i, model_name,
             ha="right", va="center",
-            fontsize=11, fontweight=700,
-            color="#0f172a",
+            fontsize=11,
+            fontweight=700,
+            # color="#0f172a",
+            color="#94a3b8",
             path_effects=header_effect
         )
 
@@ -277,6 +282,7 @@ def generate_leaderboard(
     ax.set_xticks(range(len(display_df.columns)))
     ax.set_xticklabels(
         display_df.columns,
+        fontsize=10,
         fontweight=700,
         color="#94a3b8",               # muted slate — good contrast on both bg
         ha="center",
@@ -284,11 +290,11 @@ def generate_leaderboard(
     )
 
     # Font size tweak for wrapped headers
-    for label in ax.get_xticklabels():
-        if len(label.get_text()) > 12 or "\n" in label.get_text():
-            label.set_fontsize(7.5)
-        else:
-            label.set_fontsize(9)
+    # for label in ax.get_xticklabels():
+    #     if len(label.get_text()) > 12 or "\n" in label.get_text():
+    #         label.set_fontsize(7.5)
+    #     else:
+    #         label.set_fontsize(9)
 
     ax.xaxis.tick_top()
     ax.tick_params(axis="both", which="both", length=0, pad=10)
