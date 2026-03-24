@@ -30,9 +30,10 @@ trainer:
           monitor: *MONITOR_METRIC
           mode: *MONITOR_METRIC_MODE
     logger:
-      - class_path: eva.core.JSONLogger
+      - class_path: lightning.pytorch.loggers.TensorBoardLogger
         init_args:
-          root_dir: *OUTPUT_ROOT
+          save_dir: *OUTPUT_ROOT
+          name: ""
 model:
   class_path: eva.HeadModule
   init_args:
