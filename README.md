@@ -224,7 +224,7 @@ The following table shows the FMs we have evaluated with _`eva`_. For more detai
 
 ### Pathology
 
-<img src="./docs/images/leaderboards/pathology-v3.svg" alt="Pathology Leaderboard">
+<img src="./docs/images/leaderboards/pathology-v2.svg" alt="Pathology Leaderboard">
 
 ### Radiology
 
