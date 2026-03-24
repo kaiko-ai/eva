@@ -195,7 +195,7 @@ def _draw_heatmap(ax, display_df: pd.DataFrame, numeric_df: pd.DataFrame):
     # Path effects for "halo" text - makes text readable on any background
     from matplotlib import patheffects
     header_effect = [patheffects.withStroke(linewidth=0.2, foreground="white", alpha=0.7)]
-    body_effect = [patheffects.withStroke(linewidth=0.5, foreground="white", alpha=0.0)]
+    body_effect = [patheffects.withStroke(linewidth=0.4, foreground="black", alpha=0.4)]
 
     for j in range(cols):
         col_numeric = numeric_df.iloc[:, j]
@@ -223,14 +223,14 @@ def _draw_heatmap(ax, display_df: pd.DataFrame, numeric_df: pd.DataFrame):
             ax.add_patch(rect)
 
             # Use a dark slate that works everywhere, with a white halo
-            text_color = "#1e293b" 
             text_color = "#94a3b8" 
+            
             
             ax.text(
                 j, i, val_text,
                 ha="center",
                 va="center",
-                fontsize=10,
+                fontsize=10.5,
                 fontweight="bold" if is_avg else 300,
                 # color="#4338ca" if is_avg else text_color,
                 color="#94a3b8" if is_avg else text_color,
