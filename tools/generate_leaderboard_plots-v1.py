@@ -7,20 +7,18 @@ Note: the code below assumes that the eva results are stored in
 `eva/logs/<task>/<fm_identifier>/results`.
 """
 
-from typing import Literal
-
-import matplotlib.patheffects as path_effects
 import os
+import argparse
 import pandas as pd
 import matplotlib.pyplot as plt
-from typing import Literal
-from jsonargparse import CLI
+import matplotlib.colors
 
-import matplotlib.patheffects as path_effects
-import os
 import pandas as pd
 import matplotlib.pyplot as plt
-from jsonargparse import CLI
+import pandas as pd
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+import textwrap
 
 
 class LeaderboardConfig:
@@ -64,8 +62,8 @@ class LeaderboardConfig:
             "gleason_arvaniti": "Gleason",
             "mhist": "MHIST",
             "patch_camelyon": "PCam",
-            "camelyon16_small": "Cam16\nSmall",
-            "panda_small": "PANDA\nSmall",
+            "camelyon16_small": "Cam16Small",
+            "panda_small": "PANDASmall",
             "consep": "CoNSeP",
             "monusac": "MoNuSAC",
         },
@@ -102,119 +100,127 @@ def plot_leaderboard(
     config: LeaderboardConfig,
     output_file: str = "docs/images/leaderboards/pathology.svg",
 ):
-    """Minimalist table with unified header styling for rows and columns."""
+    """Smooth heatmap with wrapped headers and a borderless UI."""
+    
+    def _prepare_data(data: pd.DataFrame) -> pd.DataFrame:
+        tasks = [t for t in config.task_name_map if t in data.columns or f"{t}/test" in data.columns]
+        data["Average"] = data[[f"{t}/test" if f"{t}/test" in data.columns else t for t in tasks]].mean(axis=1)
+        data = data.sort_values(by="Average", ascending=False)
 
-    # 1. Prepare Data
-    tasks_for_avg = [
-        f"{t}/test" if f"{t}/test" in df.columns else t
-        for t in config.task_name_map.keys()
-        if t not in config.exclude_for_average
-    ]
-    df["Average"] = df[tasks_for_avg].mean(axis=1)
-    df = df.sort_values(by="Average", ascending=False)
+        def manual_wrap(text: str):
+            if len(text) <= 12: return text
+            # Find a natural break point (/, _, or space) near the middle
+            mid = len(text) // 2
+            for i in range(mid, len(text)):
+                if text[i] in "/_ ":
+                    return f"{text[:i+1]}\n{text[i+1:]}"
+            # Fallback: Hard split at midpoint
+            return f"{text[:mid]}\n{text[mid:]}"
 
-    def _task_name(name: str) -> str:
-        name_clean = name.removesuffix("/test")
-        return config.task_name_map.get(name_clean) or name_clean
+        new_cols = []
+        for c in data.columns:
+            if c == "Average":
+                new_cols.append(c)
+                continue
+            
+            # Map the name but keep the /test suffix if it exists
+            base = c.removesuffix("/test")
+            mapped_base = config.task_name_map.get(base, base)
+            full_name = f"{mapped_base}/test" if c.endswith("/test") else mapped_base
+            
+            new_cols.append(manual_wrap(full_name))
+            
+        data.columns = new_cols
+        return data
 
-    df.columns = [_task_name(c) for c in df.columns]
-    vals = df.values
+    def _setup_canvas(rows: int, cols: int):
+        plt.rcParams["font.family"] = "sans-serif"
+        # Adjusted height for wrapped headers
+        fig, ax = plt.subplots(figsize=(cols * 1.4, rows * 0.5 + 1.5))
+        fig.patch.set_facecolor("white")
+        ax.set_facecolor("white")
+        return fig, ax
 
-    # 2. Styling Config
-    plt.rcParams["font.family"] = "sans-serif"
-    plt.rcParams["font.sans-serif"] = ["Inter", "Arial", "sans-serif"]
-
-    fig, ax = plt.subplots(figsize=(14, len(df) * 0.5 + 1))
-    fig.patch.set_alpha(0)
-    ax.set_facecolor("none")
-
-    rows, cols = df.shape
-    for i in range(rows):
-        # Row zebra striping
-        ax.axhspan(i - 0.4, i + 0.4, color="gray", alpha=0.05, lw=0)
-
-        # ROW HEADERS: Styled exactly like column headers
-        ax.text(
-            -0.6,
-            i,
-            df.index[i],
-            ha="right",
-            va="center",
-            fontsize=9,
-            fontweight="bold",
-            color="#4b5563",
-        )
+    def _draw_smooth_heatmap(ax, df_display):
+        rows, cols = df_display.shape
+        cmap = plt.get_cmap("Blues") # Smooth blue gradient
 
         for j in range(cols):
-            val = vals[i, j]
-            is_avg = df.columns[j] == "Average"
+            col_data = df_display.iloc[:, j]
+            v_min, v_max = col_data.min(), col_data.max()
+            
+            for i in range(rows):
+                val = col_data.iloc[i]
+                is_avg = df_display.columns[j].startswith("Average")
+                
+                # Normalize value for the "smooth" background intensity
+                norm_val = (val - v_min) / (v_max - v_min + 1e-9)
+                alpha = 0.05 + (norm_val * 0.15) # Subtle variation
+                
+                color = "#4f46e5" if is_avg else cmap(norm_val)
 
-            if val > df.iloc[:, j].max() * 0.98:
-                ax.plot(j, i, marker="", markersize=22, color="#4f46e5", alpha=0.12)
+                # Draw a rounded "cell" for a smooth look
+                rect = patches.FancyBboxPatch(
+                    (j - 0.45, i - 0.4), 0.9, 0.8,
+                    boxstyle="round,pad=0.02", 
+                    facecolor=color, alpha=alpha, zorder=1
+                )
+                ax.add_patch(rect)
 
-            weight = "black" if is_avg else "normal"
-            color = "#4f46e5" if is_avg else "#1f2937"
+                # Text styling
+                ax.text(j, i, f"{val:.3f}", ha="center", va="center",
+                        fontsize=10, fontweight="bold" if is_avg else 500,
+                        color="#1e293b" if not is_avg else "#4338ca", zorder=2)
 
-            ax.text(
-                j,
-                i,
-                f"{val:.3f}",
-                ha="center",
-                va="center",
-                fontsize=9,
-                fontweight=weight,
-                color=color,
-            )
+        # Draw Row Labels (Models)
+        for i in range(rows):
+            ax.text(-0.7, i, df_display.index[i], ha="right", va="center", 
+                    fontsize=10, fontweight=600, color="#0f172a")
 
-    # 3. COLUMN HEADERS
-    ax.set_xticks(range(cols))
-    ax.set_xticklabels(
-        df.columns,
-        rotation=0,
-        fontsize=9,
-        fontweight="bold",
-        color="#4b5563",
-        ha="center",
-        va="center",
+    def _format_axes(ax, columns, rows):
+        ax.set_xticks(range(len(columns)))
+        # ax.set_xticklabels(columns, fontsize=9, fontweight=700, color="#64748b", linespacing=0.9)
+        ax.set_xticklabels(columns, fontsize=9, fontweight=700, color="#64748b", linespacing=0.9, ha="center", multialignment="center")
+
+        ax.xaxis.tick_top()
+        
+        # Remove tick lines and spines
+        ax.tick_params(axis='both', which='both', length=0, pad=0)
+        ax.set_ylim(rows - 0.4, -0.8)
+        ax.set_xlim(-0.5, len(columns) - 0.5)
+        for s in ax.spines.values(): s.set_visible(False)
+        ax.yaxis.set_visible(False)
+
+    processed_df = _prepare_data(df.copy())
+    fig, ax = _setup_canvas(len(processed_df), len(processed_df.columns))
+    
+    _draw_smooth_heatmap(ax, processed_df)
+    _format_axes(ax, processed_df.columns, len(processed_df))
+
+    plt.savefig(output_file, format="svg", bbox_inches="tight", transparent=False)
+    plt.close(fig)
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--csv_path", type=str, default=None)
+    parser.add_argument(
+        "--modality", type=str, default="pathology", choices=["pathology", "radiology"]
     )
-    ax.xaxis.set_tick_params(pad=10)
-    ax.xaxis.tick_top()
+    parser.add_argument("--save_path", type=str, default=None)
+    args = parser.parse_args()
+    config = LeaderboardConfig(args.modality)
 
-    # 4. Final Clean-up
-    ax.set_ylim(rows - 0.5, -0.5)
-    ax.set_xlim(-0.5, cols - 0.5)
-    for spine in ax.spines.values():
-        spine.set_visible(False)
-
-    ax.tick_params(axis="both", which="both", length=0)
-    ax.yaxis.set_visible(False)
-
-    plt.savefig(output_file, format="svg", transparent=True, bbox_inches="tight")
-    plt.close()
-
-
-def generate_leaderboard_plot(
-    csv_path: str | None = None,
-    modality: Literal["pathology", "radiology"] = "pathology",
-    save_path: str | None = None,
-):
-    """Generating leaderboard plots from a csv file.
-
-    Args:
-        csv_path: Path to the CSV file. Defaults to None.
-        modality: "pathology" or "radiology". Defaults to "pathology".
-        save_path: Path to save the SVG plot. Defaults to None.
-    """
-    config = LeaderboardConfig(modality)
     leaderboard_df = get_leaderboard(
-        csv_path=csv_path or f"tools/data/leaderboards/{modality}.csv", config=config
+        csv_path=args.csv_path or f"tools/data/leaderboards/{args.modality}.csv", config=config
     )
+
     plot_leaderboard(
         df=leaderboard_df.copy(),
         config=config,
-        output_file=save_path or f"docs/images/leaderboards/{modality}.svg",
+        output_file=args.save_path or f"docs/images/leaderboards/{args.modality}.svg",
     )
 
 
 if __name__ == "__main__":
-    CLI(generate_leaderboard_plot)
+    main()

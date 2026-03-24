@@ -74,8 +74,10 @@ def get_leaderboard(csv_path: str, config: LeaderboardConfig) -> pd.DataFrame:
 
     df = pd.read_csv(csv_path)
     df = df.set_index("model")
+
     df = df[df.index.isin(config.fm_name_map.keys())]
     df.index = df.index.map(lambda x: config.fm_name_map.get(x, x))
+
     return df
 
 
@@ -109,6 +111,7 @@ def _prepare_data(df: pd.DataFrame, config: LeaderboardConfig):
     display_df["Average"] = avg_series.map("{:.3f}".format)
     numeric_df["Average"] = avg_series
 
+    # Sort by Average
     numeric_df = numeric_df.sort_values(by="Average", ascending=False)
     display_df = display_df.loc[numeric_df.index]
 
@@ -143,9 +146,8 @@ def _draw_heatmap(ax, display_df: pd.DataFrame, numeric_df: pd.DataFrame):
             val_text = display_df.iloc[i, j]
 
             norm = (val_num - vmin) / (vmax - vmin + 1e-9)
-            alpha = 0.08 + norm * 0.22                     # subtle but visible on both bg
-
-            color = "#6366f1" if is_avg else cmap(norm)    # indigo for average
+            alpha = 0.05 + norm * 0.15
+            color = "#4f46e5" if is_avg else cmap(norm)
 
             rect = patches.FancyBboxPatch(
                 (j - 0.45, i - 0.4),
@@ -158,9 +160,6 @@ def _draw_heatmap(ax, display_df: pd.DataFrame, numeric_df: pd.DataFrame):
             )
             ax.add_patch(rect)
 
-            # Adaptive text color for white/black backgrounds
-            text_color = "#f1f5f9" if is_avg else "#0f172a"   # light for avg, dark otherwise
-
             ax.text(
                 j,
                 i,
@@ -169,12 +168,12 @@ def _draw_heatmap(ax, display_df: pd.DataFrame, numeric_df: pd.DataFrame):
                 va="center",
                 fontsize=10,
                 fontweight="bold" if is_avg else 500,
-                color=text_color,
+                color="#4338ca" if is_avg else "#1e293b",
                 zorder=2,
                 linespacing=0.9,
             )
 
-    # Model names (left side) — high contrast on both backgrounds
+    # Model names on the left
     for i, model_name in enumerate(display_df.index):
         ax.text(
             -0.7,
@@ -184,7 +183,7 @@ def _draw_heatmap(ax, display_df: pd.DataFrame, numeric_df: pd.DataFrame):
             va="center",
             fontsize=11,
             fontweight=600,
-            color="#e2e8f0",          # light gray — works on dark, still readable on white
+            color="#0f172a",
         )
 
 
@@ -194,7 +193,10 @@ def generate_leaderboard(
     save_path: str = None,
 ) -> None:
     """
-    Generate transparent leaderboard heatmap that works on both white and black backgrounds.
+    Generate leaderboard heatmap for pathology or radiology.
+
+    Run with:
+        python tools/generate_leaderboard_plot.py --help
     """
     config = LeaderboardConfig(modality)
 
@@ -202,6 +204,7 @@ def generate_leaderboard(
     save_path = save_path or f"docs/images/leaderboards/{modality}.svg"
 
     df = get_leaderboard(csv_path, config)
+
     display_df, numeric_df = _prepare_data(df, config)
 
     plt.rcParams["font.family"] = "sans-serif"
@@ -209,10 +212,8 @@ def generate_leaderboard(
     fig, ax = plt.subplots(
         figsize=(len(display_df.columns) * 1.8, len(display_df) * 0.6 + 1.5)
     )
-
-    # Transparent backgrounds
-    fig.patch.set_alpha(0.0)
-    ax.set_facecolor("none")
+    fig.patch.set_facecolor("white")
+    ax.set_facecolor("white")
 
     _draw_heatmap(ax, display_df, numeric_df)
 
@@ -220,12 +221,12 @@ def generate_leaderboard(
     ax.set_xticklabels(
         display_df.columns,
         fontweight=700,
-        color="#94a3b8",               # muted slate — good contrast on both bg
+        color="#64748b",
         ha="center",
         va="center",
     )
 
-    # Font size tweak for wrapped headers
+    # Adjust font size for long headers
     for label in ax.get_xticklabels():
         if len(label.get_text()) > 12 or "\n" in label.get_text():
             label.set_fontsize(7.5)
@@ -243,8 +244,7 @@ def generate_leaderboard(
 
     ax.yaxis.set_visible(False)
 
-    # Save with transparent background
-    plt.savefig(save_path, format="svg", bbox_inches="tight", transparent=True)
+    plt.savefig(save_path, format="svg", bbox_inches="tight")
     plt.close(fig)
 
 
