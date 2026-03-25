@@ -40,6 +40,8 @@ Check out the [documentation](https://kaiko-ai.github.io/eva/) for more informat
 - 🔁 Robust evaluation with multi-run statistics
 - 🧩 Fully configurable via YAML or Python
 
+<br />
+
 ## 🛠 Installation
 
 Simple installation from PyPI:
@@ -69,6 +71,8 @@ You can verify that the installation was successful by executing:
 ```sh
 eva --version
 ```
+
+<br />
 
 ## ⚡️ Quick Start
 
@@ -103,6 +107,8 @@ and [tutorials](https://kaiko-ai.github.io/eva/main/user-guide/advanced/replicat
 > [!NOTE]
 > All the datasets that support automatic download in the repo have by default the option to automatically download set to false.
 > For automatic download you have to manually set the environment variable `DOWNLOAD_DATA=true` or in the configuration file `download=true`.
+
+<br />
 
 ## 🧩 How To Use
 
@@ -218,6 +224,8 @@ Native supported configs can be found at the
 of the repo, which can be both locally stored or remote.
 
 </details>
+
+<br />
 
 ## 🏆 Leaderboards
 
