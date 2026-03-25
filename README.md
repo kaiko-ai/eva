@@ -188,18 +188,18 @@ of the repo, which can be both locally stored or remote.
 
 ## ⚡️ Quick Start
 
-Offline **classification** `DINO ViT-S/16` on the `BACH` dataset (fast, embedding-based)
+Offline **classification** `DINO ViT-S/16` on the `BACH` dataset:
 ```sh
 DOWNLOAD_DATA=true \
 MODEL_NAME=universal/vit_small_patch16_224_dino \
 eva predict_fit --config https://raw.githubusercontent.com/kaiko-ai/eva/main/configs/vision/pathology/offline/classification/bach.yaml
 ```
 
-Online **segmentation** of `DINO ViT-S/16` on the `MoNuSAC` dataset with the `ConvDecoderWithImage` decoder (full model inference)
+Online **segmentation** of `DINO ViT-S/16` on the `MoNuSAC` dataset with the `ConvDecoderWithImage` decoder:
 ```sh
 DOWNLOAD_DATA=true \
 MODEL_NAME=universal/vit_small_patch16_224_dino \
-eva predict_fit --config https://raw.githubusercontent.com/kaiko-ai/eva/main/configs/vision/pathology/offline/classification/bach.yaml
+eva fit --config https://raw.githubusercontent.com/kaiko-ai/eva/main/configs/vision/pathology/online/segmentation/monusac.yaml
 ```
 
 The results of 5 different runs will be saved to `./logs` by default, or to `OUTPUT_ROOT` if specified.
@@ -207,9 +207,7 @@ The results of 5 different runs will be saved to `./logs` by default, or to `OUT
 For more examples, take a look at the [configs](https://github.com/kaiko-ai/eva/tree/main/configs)
 and [tutorials](https://kaiko-ai.github.io/eva/main/user-guide/advanced/replicate_evaluations/).
 
-> [!NOTE]
-> All the datasets that support automatic download in the repo have by default the option to automatically download set to false.
-> For automatic download you have to manually set the environment variable `DOWNLOAD_DATA=true` or in the configuration file `download=true`.
+*Note that all the datasets that support automatic download in the repo have by default the option to automatically download set to false. For automatic download you have to manually set the environment variable `DOWNLOAD_DATA=true` or in the configuration file `download=true`.*
 
 <!-- ## ⚡️ Quick Start
 
