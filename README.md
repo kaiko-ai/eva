@@ -71,40 +71,6 @@ You can verify that the installation was successful by executing:
 eva --version
 ```
 
-## ⚡️ Quick Start
-
-We define two types of evaluations: **online** and **offline**.
-While online fit uses the backbone (FM) to perform forward passes
-during the fitting process, offline fit first generates embeddings
-with the backbone and then fits the model using these embeddings as
-input, resulting in a faster evaluation.
-
-Here are some examples to get you started:
-
-- Perform a downstream offline **classification** evaluation of `DINO ViT-S/16`
-on the `BACH` dataset with linear probing by first pre-calculating the embeddings:
-  ```sh
-  DOWNLOAD_DATA=true \
-  MODEL_NAME=universal/vit_small_patch16_224_dino \
-  eva predict_fit --config https://raw.githubusercontent.com/kaiko-ai/eva/main/configs/vision/pathology/offline/classification/bach.yaml
-  ```
-
-- Perform a downstream online **segmentation** evaluation of `DINO ViT-S/16` on the `MoNuSAC` dataset with the `ConvDecoderWithImage` decoder:
-  ```sh
-  DOWNLOAD_DATA=true \
-  MODEL_NAME=universal/vit_small_patch16_224_dino \
-  eva fit --config https://raw.githubusercontent.com/kaiko-ai/eva/main/configs/vision/pathology/online/segmentation/monusac.yaml
-  ```
-
-By default `eva` will perform 5 evaluation runs using different seeds, however, you can control the number of runs through the `N_RUNS` environment variable or in the configuration file. The results will be saved to `./logs` by default, or to `OUTPUT_ROOT` if specified.
-
-For more examples, take a look at the [configs](https://github.com/kaiko-ai/eva/tree/main/configs)
-and [tutorials](https://kaiko-ai.github.io/eva/main/user-guide/advanced/replicate_evaluations/).
-
-> [!NOTE]
-> All the datasets that support automatic download in the repo have by default the option to automatically download set to false.
-> For automatic download you have to manually set the environment variable `DOWNLOAD_DATA=true` or in the configuration file `download=true`.
-
 ## 🧩 How To Use
 
 _`eva`_ can be used directly from the terminal as a CLI tool as follows:
@@ -219,6 +185,40 @@ Native supported configs can be found at the
 of the repo, which can be both locally stored or remote.
 
 </details>
+
+## ⚡️ Quick Start
+
+We define two types of evaluations: **online** and **offline**.
+While online fit uses the backbone (FM) to perform forward passes
+during the fitting process, offline fit first generates embeddings
+with the backbone and then fits the model using these embeddings as
+input, resulting in a faster evaluation.
+
+Here are some examples to get you started:
+
+- Perform a downstream offline **classification** evaluation of `DINO ViT-S/16`
+on the `BACH` dataset with linear probing by first pre-calculating the embeddings:
+  ```sh
+  DOWNLOAD_DATA=true \
+  MODEL_NAME=universal/vit_small_patch16_224_dino \
+  eva predict_fit --config https://raw.githubusercontent.com/kaiko-ai/eva/main/configs/vision/pathology/offline/classification/bach.yaml
+  ```
+
+- Perform a downstream online **segmentation** evaluation of `DINO ViT-S/16` on the `MoNuSAC` dataset with the `ConvDecoderWithImage` decoder:
+  ```sh
+  DOWNLOAD_DATA=true \
+  MODEL_NAME=universal/vit_small_patch16_224_dino \
+  eva fit --config https://raw.githubusercontent.com/kaiko-ai/eva/main/configs/vision/pathology/online/segmentation/monusac.yaml
+  ```
+
+By default `eva` will perform 5 evaluation runs using different seeds, however, you can control the number of runs through the `N_RUNS` environment variable or in the configuration file. The results will be saved to `./logs` by default, or to `OUTPUT_ROOT` if specified.
+
+For more examples, take a look at the [configs](https://github.com/kaiko-ai/eva/tree/main/configs)
+and [tutorials](https://kaiko-ai.github.io/eva/main/user-guide/advanced/replicate_evaluations/).
+
+> [!NOTE]
+> All the datasets that support automatic download in the repo have by default the option to automatically download set to false.
+> For automatic download you have to manually set the environment variable `DOWNLOAD_DATA=true` or in the configuration file `download=true`.
 
 ## 🏆 Leaderboards
 
