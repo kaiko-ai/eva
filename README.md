@@ -40,26 +40,6 @@ Check out the [documentation](https://kaiko-ai.github.io/eva/) for more informat
 - 🔁 Robust evaluation with multi-run statistics
 - 🧩 Fully configurable via YAML or Python
 
-## Leaderboards
-
-The following table shows the FMs we have evaluated with _`eva`_. For more detailed information about the evaluation process, please refer to our [documentation](https://kaiko-ai.github.io/eva/main/leaderboards/).
-
-### Pathology
-
-<div align="center">
-
-<img src="./docs/images/leaderboards/pathology.svg" alt="Pathology Leaderboard">
-
-</div>
-
-### Radiology
-
-<div align="center">
-
-<img src="./docs/images/leaderboards/radiology-v1.svg" alt="Radiology Leaderboard" width="300">
-
-</div>
-
 ## 🛠 Installation
 
 Simple installation from PyPI:
@@ -238,6 +218,26 @@ Native supported configs can be found at the
 of the repo, which can be both locally stored or remote.
 
 </details>
+
+## 🏆 Leaderboards
+
+The following table shows the FMs we have evaluated with _`eva`_. For more detailed information about the evaluation process, please refer to our [documentation](https://kaiko-ai.github.io/eva/main/leaderboards/).
+
+### Pathology
+
+<div align="center">
+
+<img src="./docs/images/leaderboards/pathology.svg" alt="Pathology Leaderboard">
+
+</div>
+
+### Radiology
+
+<div align="center">
+
+<img src="./docs/images/leaderboards/radiology-v1.svg" alt="Radiology Leaderboard" width="300">
+
+</div>
 
 ## 🤝 Contributing
 
