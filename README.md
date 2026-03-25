@@ -202,9 +202,7 @@ MODEL_NAME=universal/vit_small_patch16_224_dino \
 eva fit --config https://raw.githubusercontent.com/kaiko-ai/eva/main/configs/vision/pathology/online/segmentation/monusac.yaml
 ```
 
-The results of 5 different runs will be saved to `./logs` by default, or to `OUTPUT_ROOT` if specified.
-
-For more examples, take a look at the [configs](https://github.com/kaiko-ai/eva/tree/main/configs)
+The results of 5 different runs will be saved to `./logs` by default, or to `OUTPUT_ROOT` if specified. For more examples, take a look at the [configs](https://github.com/kaiko-ai/eva/tree/main/configs)
 and [tutorials](https://kaiko-ai.github.io/eva/main/user-guide/advanced/replicate_evaluations/).
 
 > Note that all the datasets that support automatic download in the repo have by default the option to automatically download set to false. For automatic download you have to manually set the environment variable `DOWNLOAD_DATA=true` or in the configuration file `download=true`.
