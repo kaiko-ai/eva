@@ -33,13 +33,34 @@ _`eva`_ is an evaluation framework for oncology foundation models (FMs) by [kaik
 Check out the [documentation](https://kaiko-ai.github.io/eva/) for more information.
 
 ### Highlights:
-- Easy and reliable benchmark of Oncology FMs
-- Supports patch-level classification, slide-level classification, semantic segmentation, and (visual) question answering tasks.
-- Automatic embedding inference and evaluation of a downstream task
-- Native support of popular medical [datasets](https://kaiko-ai.github.io/eva/main/datasets/) and models
-- Produce statistics over multiple evaluation fits and multiple metrics
+- 🔬 Standardized benchmarking for oncology foundation models
+- 🧠 Supports patch-level/slide-level/scan-level classification, 2D/3D semantic segmentation, and VQA tasks
+- ⚡ Offline + online evaluation modes
+- 📦 Built-in support for popular medical [datasets](https://kaiko-ai.github.io/eva/main/datasets/) and models
+- 🔁 Robust evaluation with multi-run statistics
+- 🧩 Fully configurable via YAML or Python
 
-## Installation
+## Leaderboards
+
+The following table shows the FMs we have evaluated with _`eva`_. For more detailed information about the evaluation process, please refer to our [documentation](https://kaiko-ai.github.io/eva/main/leaderboards/).
+
+### Pathology
+
+<div align="center">
+
+<img src="./docs/images/leaderboards/pathology.svg" alt="Pathology Leaderboard">
+
+</div>
+
+### Radiology
+
+<div align="center">
+
+<img src="./docs/images/leaderboards/radiology-v1.svg" alt="Radiology Leaderboard" width="300">
+
+</div>
+
+## 🛠 Installation
 
 Simple installation from PyPI:
 ```sh
@@ -69,7 +90,41 @@ You can verify that the installation was successful by executing:
 eva --version
 ```
 
-## How To Use
+## ⚡️ Quick Start
+
+We define two types of evaluations: **online** and **offline**.
+While online fit uses the backbone (FM) to perform forward passes
+during the fitting process, offline fit first generates embeddings
+with the backbone and then fits the model using these embeddings as
+input, resulting in a faster evaluation.
+
+Here are some examples to get you started:
+
+- Perform a downstream offline **classification** evaluation of `DINO ViT-S/16`
+on the `BACH` dataset with linear probing by first pre-calculating the embeddings:
+  ```sh
+  DOWNLOAD_DATA=true \
+  MODEL_NAME=universal/vit_small_patch16_224_dino \
+  eva predict_fit --config https://raw.githubusercontent.com/kaiko-ai/eva/main/configs/vision/pathology/offline/classification/bach.yaml
+  ```
+
+- Perform a downstream online **segmentation** evaluation of `DINO ViT-S/16` on the `MoNuSAC` dataset with the `ConvDecoderWithImage` decoder:
+  ```sh
+  DOWNLOAD_DATA=true \
+  MODEL_NAME=universal/vit_small_patch16_224_dino \
+  eva fit --config https://raw.githubusercontent.com/kaiko-ai/eva/main/configs/vision/pathology/online/segmentation/monusac.yaml
+  ```
+
+By default `eva` will perform 5 evaluation runs using different seeds, however, you can control the number of runs through the `N_RUNS` environment variable or in the configuration file. The results will be saved to `./logs` by default, or to `OUTPUT_ROOT` if specified.
+
+For more examples, take a look at the [configs](https://github.com/kaiko-ai/eva/tree/main/configs)
+and [tutorials](https://kaiko-ai.github.io/eva/main/user-guide/advanced/replicate_evaluations/).
+
+> [!NOTE]
+> All the datasets that support automatic download in the repo have by default the option to automatically download set to false.
+> For automatic download you have to manually set the environment variable `DOWNLOAD_DATA=true` or in the configuration file `download=true`.
+
+## 🧩 How To Use
 
 _`eva`_ can be used directly from the terminal as a CLI tool as follows:
 ```sh
@@ -184,62 +239,7 @@ of the repo, which can be both locally stored or remote.
 
 </details>
 
-## Quick Start
-
-We define two types of evaluations: **online** and **offline**.
-While online fit uses the backbone (FM) to perform forward passes
-during the fitting process, offline fit first generates embeddings
-with the backbone and then fits the model using these embeddings as
-input, resulting in a faster evaluation.
-
-Here are some examples to get you started:
-
-- Perform a downstream offline **classification** evaluation of `DINO ViT-S/16`
-on the `BACH` dataset with linear probing by first pre-calculating the embeddings:
-  ```sh
-  DOWNLOAD_DATA=true \
-  MODEL_NAME=universal/vit_small_patch16_224_dino \
-  eva predict_fit --config https://raw.githubusercontent.com/kaiko-ai/eva/main/configs/vision/pathology/offline/classification/bach.yaml
-  ```
-
-- Perform a downstream online **segmentation** evaluation of `DINO ViT-S/16` on the `MoNuSAC` dataset with the `ConvDecoderWithImage` decoder:
-  ```sh
-  DOWNLOAD_DATA=true \
-  MODEL_NAME=universal/vit_small_patch16_224_dino \
-  eva fit --config https://raw.githubusercontent.com/kaiko-ai/eva/main/configs/vision/pathology/online/segmentation/monusac.yaml
-  ```
-
-By default `eva` will perform 5 evaluation runs using different seeds, however, you can control the number of runs through the `N_RUNS` environment variable or in the configuration file. The results will be saved to `./logs` by default, or to `OUTPUT_ROOT` if specified.
-
-For more examples, take a look at the [configs](https://github.com/kaiko-ai/eva/tree/main/configs)
-and [tutorials](https://kaiko-ai.github.io/eva/main/user-guide/advanced/replicate_evaluations/).
-
-> [!NOTE]
-> All the datasets that support automatic download in the repo have by default the option to automatically download set to false.
-> For automatic download you have to manually set the environment variable `DOWNLOAD_DATA=true` or in the configuration file `download=true`.
-
-## Leaderboards
-
-The following table shows the FMs we have evaluated with _`eva`_. For more detailed information about the evaluation process, please refer to our [documentation](https://kaiko-ai.github.io/eva/main/leaderboards/).
-
-### Pathology
-
-<div align="center">
-
-<img src="./docs/images/leaderboards/pathology.svg" alt="Pathology Leaderboard">
-
-</div>
-
-### Radiology
-
-<div align="center">
-
-<img src="./docs/images/leaderboards/radiology-v1.svg" alt="Radiology Leaderboard" width="300">
-
-</div>
-
-
-## Contributing
+## 🤝 Contributing
 
 _`eva`_ is an open source project and welcomes contributions of all kinds. Please checkout the [developer](./docs/DEVELOPER_GUIDE.md)
 and [contributing guide](./docs/CONTRIBUTING.md) for help on how to do so.
@@ -247,7 +247,7 @@ and [contributing guide](./docs/CONTRIBUTING.md) for help on how to do so.
 All contributors must follow the [code of conduct](./docs/CODE_OF_CONDUCT.md).
 
 
-## Acknowledgements
+## ⚙️ Acknowledgements
 
 Our codebase is built using multiple opensource contributions
 
@@ -267,7 +267,7 @@ Our codebase is built using multiple opensource contributions
 </div>
 
 
-## Citation
+## 📖 Citation
 
 If you find this repository useful, please consider giving a star ⭐ and adding the following citation:
 
