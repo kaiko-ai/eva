@@ -40,7 +40,6 @@ Check out the [documentation](https://kaiko-ai.github.io/eva/) for more informat
 - 🔁 Robust evaluation with multi-run statistics
 - 🧩 Fully configurable via YAML or Python
 
-<br />
 
 ## 🛠 Installation
 
