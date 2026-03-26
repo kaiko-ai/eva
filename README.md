@@ -194,7 +194,7 @@ Offline **classification** `DINO ViT-S/16` on the `BACH` dataset:
 DOWNLOAD_DATA=true \
 MODEL_NAME=universal/vit_small_patch16_224_dino \
 \
-# execute the evaluation pipeline with the BACH dataset config
+# execute the offline evaluation pipeline with the BACH dataset config
 eva predict_fit \
     --config https://raw.githubusercontent.com/kaiko-ai/ \
              eva/main/configs/vision/pathology/ \
