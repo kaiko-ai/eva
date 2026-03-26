@@ -46,19 +46,3 @@ def test_fetch_axis_code(nifti_path: str) -> None:
     code = nifti.fetch_nifti_axis_direction_code(nifti_path)
     assert isinstance(code, str)
     assert len(code) == 3
-
-
-@pytest.mark.parametrize(
-    "sampler",
-    [
-        nifti.IndexSampler(indices=[0, 1, 2]),
-        nifti.BlockSampler(n=3),
-        nifti.UniformSampler(n=3),
-        nifti.GaussianSampler(n=3),
-    ],
-)
-def test_sampling(nifti_path: str, sampler) -> None:
-    """Tests the lazy nifti slice sampling."""
-    nii = nifti.read_nifti(nifti_path, sampler=sampler)
-    arr = nifti.nifti_to_array(nii)
-    assert arr.shape[-1] <= 3

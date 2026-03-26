@@ -1,94 +1,19 @@
 """NIfTI I/O related functions."""
 
-import abc
-from dataclasses import dataclass
 from typing import Any, Tuple
 
 import nibabel as nib
 import numpy as np
 import numpy.typing as npt
 from nibabel import orientations
-from typing_extensions import override
 
 from eva.core.utils.suppress_logs import SuppressLogs
 from eva.vision.utils.io import _utils
 
 
-class Sampler(abc.ABC):
-    """Base class for slice sampling strategies."""
-
-    @abc.abstractmethod
-    def sample(self, total: int) -> list[int]:
-        """Return sampled slice indices."""
-
-
-@dataclass
-class IndexSampler(Sampler):
-    """Sample specific slice indices."""
-
-    indices: list[int]
-    """List of indices to sample."""
-
-    @override
-    def sample(self, total: int) -> list[int]:
-        return self.indices
-
-
-@dataclass
-class BlockSampler(Sampler):
-    """Sample a contiguous block of N slices."""
-
-    n: int
-    """The maximum number of slices to sample."""
-
-    @override
-    def sample(self, total: int) -> list[int]:
-        k = min(total, self.n)
-        start = np.random.randint(0, total - k + 1)
-        return list(range(start, start + k))
-
-
-@dataclass
-class UniformSampler(Sampler):
-    """Sample N slices uniformly across the scan."""
-
-    n: int
-    """The maximum number of slices to sample."""
-
-    @override
-    def sample(self, total: int) -> list[int]:
-        return np.linspace(0, total - 1, min(total, self.n), dtype=int).tolist()
-
-
-@dataclass
-class GaussianSampler(Sampler):
-    """Sample N slices according to a Gaussian distribution."""
-
-    n: int
-    """The maximum number of slices to sample."""
-
-    mean: float | None = None
-    """Center of the Gaussian in slice coordinates. Defaults to the middle."""
-
-    std: float | None = None
-    """Standard deviation of the Gaussian. Defaults to total / 3."""
-
-    @override
-    def sample(self, total: int) -> list[int]:
-        """Return sampled slice indices."""
-        samples = np.random.normal(
-            loc=self.mean if self.mean is not None else (total - 1) / 2,
-            scale=self.std if self.std is not None else total / 3,
-            size=min(total, self.n),
-        )
-        indices = np.clip(np.round(samples), 0, total - 1).astype(int)
-        return np.sort(indices).tolist()
-
-
 def read_nifti(
     path: str,
     *,
-    sampler: Sampler | None = None,
     orientation: str | None = None,
     orientation_reference: str | None = None,
 ) -> nib.nifti1.Nifti1Image:
@@ -96,11 +21,6 @@ def read_nifti(
 
     Args:
         path: The path to the NIfTI file.
-        sampler: Strategy for sampling slices. Supports:
-            - IndexSampler(indices=[...]): Specific slice indices.
-            - BlockSampler(n=...): A contiguous block of N slices.
-            - UniformSampler(n=...): N slices sampled uniformly.
-            - GaussianSampler(n=...): N Gaussian sampled slices.
         orientation: The orientation code to reorient the nifti image.
         orientation_reference: Path to a NIfTI file which
             will be used as a reference for the orientation
@@ -116,16 +36,6 @@ def read_nifti(
     """
     _utils.check_file(path)
     image_data = _load_nifti_silently(path)
-
-    if sampler:
-        total = image_data.shape[-1]
-        slice_indices = sampler.sample(total)
-        proxy_slices = [image_data.dataobj[:, :, i] for i in slice_indices]
-        image_data = nib.nifti1.Nifti1Image(
-            np.stack(proxy_slices, axis=-1),
-            image_data.affine,
-            image_data.header,
-        )
 
     if orientation:
         image_data = _reorient(
