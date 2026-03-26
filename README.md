@@ -19,8 +19,8 @@ _Oncology FM Evaluation Framework by kaiko.ai_
   <a href="https://github.com/kaiko-ai/eva#how-to-use">How To Use</a> •
   <a href="https://github.com/kaiko-ai/eva#quick-start">Quick Start</a> •
   <a href="https://kaiko-ai.github.io/eva/">Documentation</a> •
-  <a href="https://kaiko-ai.github.io/eva/dev/datasets/">Datasets</a> •
-  <a href="https://github.com/kaiko-ai/eva#benchmarks">Benchmarks</a> <br>
+  <a href="https://kaiko-ai.github.io/eva/main/datasets/">Datasets</a> •
+  <a href="https://github.com/kaiko-ai/eva#leaderboards">Leaderboard</a> <br>
   <a href="https://github.com/kaiko-ai/eva#contributing">Contribute</a> •
   <a href="https://github.com/kaiko-ai/eva#acknowledgements">Acknowledgements</a>
 </p>
