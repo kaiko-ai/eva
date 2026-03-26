@@ -1,3 +1,12 @@
+"""
+Run this script with `python tools/generate_leaderboard_plot.py`
+to create the image of the leaderboard heatmap displayed
+in docs/leaderboards.md
+
+Note: the code below assumes that the eva results are stored in
+`eva/logs/<task>/<fm_identifier>/results`.
+"""
+
 import os
 from jsonargparse import CLI
 
