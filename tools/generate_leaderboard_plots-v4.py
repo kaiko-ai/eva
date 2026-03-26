@@ -188,46 +188,33 @@ def _prepare_data(df: pd.DataFrame, config: LeaderboardConfig):
 #         )
 
 def _draw_heatmap(ax, display_df: pd.DataFrame, numeric_df: pd.DataFrame):
-    """Draw the heatmap with Kaiko.ai's branding: Navy, Indigo, and Slate."""
+    """Draw the custom smooth heatmap with adaptive contrast."""
     rows, cols = display_df.shape
+    cmap = plt.get_cmap("Blues")
     
-    # Kaiko.ai Color Palette
-    KAIKO_PRIMARY = "#000b1c"  # Deep Navy background
-    KAIKO_ACCENT = "#4f46e5"   # Vibrant Indigo for 'Average'
-    KAIKO_SLATE = "#94a3b8"    # Muted Slate for labels
-    KAIKO_TEXT_DARK = "#1e293b" # Dark slate for cell text
-    
-    # Custom Gradient for heat (Light Slate to a clean Blue/Teal)
-    from matplotlib.colors import LinearSegmentedColormap
-    kaiko_cmap = LinearSegmentedColormap.from_list("kaiko", ["#f1f5f9", "#cbd5e1", "#3b82f6"])
+    # Path effects for "halo" text - makes text readable on any background
+    from matplotlib import patheffects
+    header_effect = [patheffects.withStroke(linewidth=0.2, foreground="white", alpha=0.7)]
+    # body_effect = [patheffects.withStroke(linewidth=0.4, foreground="white", alpha=0.4)]
 
     for j in range(cols):
         col_numeric = numeric_df.iloc[:, j]
         vmin, vmax = col_numeric.min(), col_numeric.max()
-        column_name = display_df.columns[j]
-        is_avg = "Average" in column_name
+        is_avg = display_df.columns[j] == "Average"
 
         for i in range(rows):
             val_num = col_numeric.iloc[i]
             val_text = display_df.iloc[i, j]
 
             norm = (val_num - vmin) / (vmax - vmin + 1e-9)
+            # Increased alpha for better visibility
+            alpha = 0.15 + norm * 0.35 
             
-            # Formatting cells
-            if is_avg:
-                color = KAIKO_ACCENT
-                alpha = 0.1 + (norm * 0.2) # Subtle indigo glow
-                text_color = KAIKO_ACCENT
-                weight = "bold"
-            else:
-                color = kaiko_cmap(norm)
-                alpha = 0.6
-                text_color = KAIKO_TEXT_DARK
-                weight = 500
+            color = "#4f46e5" if is_avg else cmap(norm)
 
             rect = patches.FancyBboxPatch(
-                (j - 0.42, i - 0.38), 0.84, 0.76,
-                boxstyle="round,pad=0.03",
+                (j - 0.45, i - 0.4), 0.9, 0.8,
+                boxstyle="round,pad=0.02",
                 facecolor=color,
                 alpha=alpha,
                 edgecolor="none",
@@ -235,23 +222,35 @@ def _draw_heatmap(ax, display_df: pd.DataFrame, numeric_df: pd.DataFrame):
             )
             ax.add_patch(rect)
 
+            # Use a dark slate that works everywhere, with a white halo
+            text_color = "#94a3b8" 
+            text_color = "#2e2e2e" 
+            
+            
             ax.text(
                 j, i, val_text,
-                ha="center", va="center",
-                fontsize=10,
-                fontweight=weight,
-                color=text_color,
+                ha="center",
+                va="center",
+                fontsize=10.5,
+                fontweight="bold" if is_avg else 300,
+                # color="#4338ca" if is_avg else text_color,
+                # color="#94a3b8" if is_avg else text_color,
+                color="#4f46e5" if is_avg else text_color,
                 zorder=2,
+                # path_effects=body_effect # This is the secret for readability
             )
 
-    # Model names: Kaiko uses clean, semi-bold slate typography
+
+    # Model names: Use a bold color with a background-agnostic halo
     for i, model_name in enumerate(display_df.index):
         ax.text(
             -0.7, i, model_name,
             ha="right", va="center",
             fontsize=11,
-            fontweight=600,
-            color="#334155", # Darker slate for readability
+            fontweight=700,
+            # color="#0f172a",
+            color="#94a3b8",
+            path_effects=header_effect
         )
 
 
