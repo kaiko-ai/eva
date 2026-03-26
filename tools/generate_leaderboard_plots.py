@@ -128,77 +128,19 @@ def _prepare_data(df: pd.DataFrame, config: LeaderboardConfig):
     return display_df, numeric_df
 
 
-# def _draw_heatmap(ax, display_df: pd.DataFrame, numeric_df: pd.DataFrame):
-#     """Draw the custom smooth heatmap with rounded rectangles."""
-#     rows, cols = display_df.shape
-#     cmap = plt.get_cmap("Blues")
-
-#     for j in range(cols):
-#         col_numeric = numeric_df.iloc[:, j]
-#         vmin, vmax = col_numeric.min(), col_numeric.max()
-#         is_avg = display_df.columns[j] == "Average"
-
-#         for i in range(rows):
-#             val_num = col_numeric.iloc[i]
-#             val_text = display_df.iloc[i, j]
-
-#             norm = (val_num - vmin) / (vmax - vmin + 1e-9)
-#             alpha = 0.08 + norm * 0.22                     # subtle but visible on both bg
-
-#             color = "#6366f1" if is_avg else cmap(norm)    # indigo for average
-
-#             rect = patches.FancyBboxPatch(
-#                 (j - 0.45, i - 0.4),
-#                 0.9,
-#                 0.8,
-#                 boxstyle="round,pad=0.02",
-#                 facecolor=color,
-#                 alpha=alpha,
-#                 zorder=1,
-#             )
-#             ax.add_patch(rect)
-
-#             # Adaptive text color for white/black backgrounds
-#             text_color = "#f1f5f9" if is_avg else "#0f172a"   # light for avg, dark otherwise
-
-#             ax.text(
-#                 j,
-#                 i,
-#                 val_text,
-#                 ha="center",
-#                 va="center",
-#                 fontsize=10,
-#                 fontweight="bold" if is_avg else 500,
-#                 color=text_color,
-#                 zorder=2,
-#                 linespacing=0.9,
-#             )
-
-#     # Model names (left side) — high contrast on both backgrounds
-#     for i, model_name in enumerate(display_df.index):
-#         ax.text(
-#             -0.7,
-#             i,
-#             model_name,
-#             ha="right",
-#             va="center",
-#             fontsize=11,
-#             fontweight=600,
-#             color="#e2e8f0",          # light gray — works on dark, still readable on white
-#         )
-
 def _draw_heatmap(ax, display_df: pd.DataFrame, numeric_df: pd.DataFrame):
     """Draw the heatmap with Kaiko.ai's branding: Navy, Indigo, and Slate."""
     rows, cols = display_df.shape
-    
+
     # Kaiko.ai Color Palette
     KAIKO_PRIMARY = "#000b1c"  # Deep Navy background
-    KAIKO_ACCENT = "#4f46e5"   # Vibrant Indigo for 'Average'
-    KAIKO_SLATE = "#94a3b8"    # Muted Slate for labels
-    KAIKO_TEXT_DARK = "#1e293b" # Dark slate for cell text
-    
+    KAIKO_ACCENT = "#4f46e5"  # Vibrant Indigo for 'Average'
+    KAIKO_SLATE = "#94a3b8"  # Muted Slate for labels
+    KAIKO_TEXT_DARK = "#1e293b"  # Dark slate for cell text
+
     # Custom Gradient for heat (Light Slate to a clean Blue/Teal)
     from matplotlib.colors import LinearSegmentedColormap
+
     kaiko_cmap = LinearSegmentedColormap.from_list("kaiko", ["#f1f5f9", "#cbd5e1", "#3b82f6"])
 
     for j in range(cols):
@@ -212,11 +154,11 @@ def _draw_heatmap(ax, display_df: pd.DataFrame, numeric_df: pd.DataFrame):
             val_text = display_df.iloc[i, j]
 
             norm = (val_num - vmin) / (vmax - vmin + 1e-9)
-            
+
             # Formatting cells
             if is_avg:
                 color = KAIKO_ACCENT
-                alpha = 0.1 + (norm * 0.2) # Subtle indigo glow
+                alpha = 0.1 + (norm * 0.2)  # Subtle indigo glow
                 text_color = KAIKO_ACCENT
                 weight = "bold"
             else:
@@ -226,7 +168,9 @@ def _draw_heatmap(ax, display_df: pd.DataFrame, numeric_df: pd.DataFrame):
                 weight = 500
 
             rect = patches.FancyBboxPatch(
-                (j - 0.42, i - 0.38), 0.84, 0.76,
+                (j - 0.42, i - 0.38),
+                0.84,
+                0.76,
                 boxstyle="round,pad=0.03",
                 facecolor=color,
                 alpha=alpha,
@@ -236,8 +180,11 @@ def _draw_heatmap(ax, display_df: pd.DataFrame, numeric_df: pd.DataFrame):
             ax.add_patch(rect)
 
             ax.text(
-                j, i, val_text,
-                ha="center", va="center",
+                j,
+                i,
+                val_text,
+                ha="center",
+                va="center",
                 fontsize=10,
                 fontweight=weight,
                 color=text_color,
@@ -247,11 +194,14 @@ def _draw_heatmap(ax, display_df: pd.DataFrame, numeric_df: pd.DataFrame):
     # Model names: Kaiko uses clean, semi-bold slate typography
     for i, model_name in enumerate(display_df.index):
         ax.text(
-            -0.7, i, model_name,
-            ha="right", va="center",
+            -0.7,
+            i,
+            model_name,
+            ha="right",
+            va="center",
             fontsize=11,
             fontweight=600,
-            color="#334155", # Darker slate for readability
+            color="#334155",  # Darker slate for readability
         )
 
 
@@ -273,9 +223,7 @@ def generate_leaderboard(
 
     plt.rcParams["font.family"] = "sans-serif"
 
-    fig, ax = plt.subplots(
-        figsize=(len(display_df.columns) * 1.8, len(display_df) * 0.6 + 1.5)
-    )
+    fig, ax = plt.subplots(figsize=(len(display_df.columns) * 1.8, len(display_df) * 0.6 + 1.5))
 
     # Transparent backgrounds
     fig.patch.set_alpha(0.0)
@@ -288,17 +236,10 @@ def generate_leaderboard(
         display_df.columns,
         fontsize=10,
         fontweight=700,
-        color="#94a3b8",               # muted slate — good contrast on both bg
+        color="#94a3b8",  # muted slate — good contrast on both bg
         ha="center",
         va="center",
     )
-
-    # Font size tweak for wrapped headers
-    # for label in ax.get_xticklabels():
-    #     if len(label.get_text()) > 12 or "\n" in label.get_text():
-    #         label.set_fontsize(7.5)
-    #     else:
-    #         label.set_fontsize(9)
 
     ax.xaxis.tick_top()
     ax.tick_params(axis="both", which="both", length=0, pad=10)
