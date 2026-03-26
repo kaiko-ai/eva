@@ -1,4 +1,4 @@
-"""LiTS17 dataset tests."""
+"""KiTS23 dataset tests."""
 
 import os
 from typing import Literal
@@ -7,16 +7,16 @@ import pytest
 from torchvision import tv_tensors
 
 from eva.vision.data import datasets
-from eva.vision.data import tv_tensors as eva_tv_tensors
+from eva.vision.data.tv_tensors import Volume
 
 
 @pytest.mark.parametrize(
     "split, expected_length",
-    [(None, 2), ("train", 1), ("val", 1)],
+    [(None, 3), ("train", 2), ("val", 1)],
 )
-def test_length(lits17_dataset: datasets.LiTS17, expected_length: int) -> None:
+def test_length(kits23_dataset: datasets.KiTS23, expected_length: int) -> None:
     """Tests the length of the dataset."""
-    assert len(lits17_dataset) == expected_length
+    assert len(kits23_dataset) == expected_length
 
 
 @pytest.mark.parametrize(
@@ -25,38 +25,35 @@ def test_length(lits17_dataset: datasets.LiTS17, expected_length: int) -> None:
         (None, 0),
     ],
 )
-def test_sample(lits17_dataset: datasets.LiTS17, index: int) -> None:
+def test_sample(kits23_dataset: datasets.KiTS23, index: int) -> None:
     """Tests the format of a dataset sample."""
     # assert data sample is a tuple
-    sample = lits17_dataset[index]
+    sample = kits23_dataset[index]
     assert isinstance(sample, tuple)
     assert len(sample) == 3
     # assert the format of the `image` and `mask`
     image, mask, metadata = sample
-    assert isinstance(image, eva_tv_tensors.Volume)
-    assert image.shape == (4, 1, 8, 8)
+    assert isinstance(image, Volume)
+    assert image.shape == (77, 1, 64, 64)
     assert isinstance(mask, tv_tensors.Mask)
-    assert mask.shape == (4, 1, 8, 8)
+    assert mask.shape == (77, 1, 64, 64)
     assert isinstance(metadata, dict)
 
 
 @pytest.fixture(scope="function")
-def lits17_dataset(split: Literal["train", "val"] | None, assets_path: str) -> datasets.LiTS17:
-    """LiTS17 dataset fixture."""
-    dataset = datasets.LiTS17(
+def kits23_dataset(split: Literal["train", "val"] | None, assets_path: str) -> datasets.KiTS23:
+    """kits23 dataset fixture."""
+    dataset = datasets.KiTS23(
         root=os.path.join(
             assets_path,
             "vision",
             "datasets",
-            "lits17",
+            "kits23",
         ),
         split=split,
     )
-    dataset._split_index_ranges = {
-        "train": [(31, 32)],
-        "val": [(45, 46)],
-        None: [(31, 32), (45, 46)],
-    }
+    dataset._train_index_ranges = [(0, 2)]
+    dataset._val_index_ranges = [(2, 3)]
     dataset.prepare_data()
     dataset.configure()
     return dataset
