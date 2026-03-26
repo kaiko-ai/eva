@@ -152,7 +152,7 @@ def nifti_to_array(
     Returns:
         The image as a numpy array (height, width, channels).
     """
-    return np.asanyarray(nii.dataobj, dtype=dtype or nii.get_data_dtype())
+    return np.array(nii.dataobj, dtype=dtype or nii.get_data_dtype(), order="C", copy=True)
 
 
 def save_array_as_nifti(
