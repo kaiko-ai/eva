@@ -9,6 +9,7 @@ import numpy.linalg as npl
 import pandas as pd
 import scipy.ndimage as ndi
 import torch
+from sklearn import model_selection
 from typing_extensions import override
 
 from eva.vision.data.datasets.vision import VisionDataset
@@ -155,6 +156,102 @@ class LUNA25(VisionDataset[Volume, torch.Tensor]):
                 os.path.join(self._root, "luna25_nodule_blocks", "metadata", "*.npy")
             )
         }
+
+    def _get_split_indices(self) -> list[int]:
+        train_df, val_df, test_df = _stratified_split(
+            self._candidates,
+            val_size=self._val_size,
+            test_size=self._test_size,
+        )
+
+        subset_indices_per_split = {
+            "train": self._candidates.index[self._candidates.index.isin(train_df.index)],
+            "val": self._candidates.index[self._candidates.index.isin(val_df.index)],
+            "test": self._candidates.index[self._candidates.index.isin(test_df.index)],
+            None: self._candidates.index.tolist(),
+        }
+        subset_indices = subset_indices_per_split.get(self._split)
+        if subset_indices is None:
+            raise ValueError("Invalid data split. Use 'train', 'val', 'test' or `None`.")
+        return subset_indices
+
+
+def _stratified_split(
+    dataframe: pd.DataFrame, val_size: float = 0.2, test_size: float = 0.15, random_state=42
+):
+    """Perform stratified split of the dataset into train, validation, and test sets.
+
+    The split is based on the target label, gender, age group, and patient ID to
+    prevent data leakage. This ensures balanced class distribution, demographic
+    fairness, and prevents overfitting by grouping age. The competitive test set
+    (15% of data by default) helps benchmark model performance with consistent
+    stratification across splits.
+
+    Stratification Process:
+    1. Label: Ensure balanced distribution of the target variable
+       (binary classification).
+    2. Gender: Maintain demographic fairness by considering gender
+       in the split.
+    3. Age Group: Create an AgeGroup column to avoid overfitting to
+       specific ages and maintain generalization.
+    4. Patient ID: Split by patient to avoid data leakage (same
+       patient should not appear in both train and validation sets).
+
+    Strategy for Validation Set:
+    - Stratify data based on label, gender, and age group.
+    - Ensure that the validation set includes challenging cases, such as rare age groups
+      or underrepresented genders, to better evaluate model performance.
+
+    Initial Observations:
+    - Label: Binary (0 or 1), class balance needs to be maintained in both train and
+             validation sets.
+    - Age: Impacts model generalization and should be considered for stratification.
+    - Gender: To ensure fairness and mitigate bias in the model.
+    - Study Date: Can help identify dataset shifts over time.
+    - Spatial Features: CoordX, CoordY, CoordZ may be relevant for the spatial distribution
+      of nodules.
+    - Patient ID: Split by patient, not row, to prevent data leakage.
+
+    Holdout Competitive Test Set:
+    - Size: 15% of the total dataset (can be adjusted via test_size).
+    - Stratification: Ensures stratification by label, age group, and gender group.
+    - Consistency: Provides a consistent benchmark across different training and validation splits.
+
+    Args:
+        dataframe: The input dataset containing features like label, gender, age, and patient ID.
+        val_size: The proportion of the data to use for validation.
+        test_size: The proportion of the data to use for testing.
+        random_state: The random seed used for reproducibility.
+
+    Returns:
+        A tuple with the stratified training, validation and test set.
+    """
+    df = dataframe.copy()
+    df["AgeGroup"] = pd.qcut(df["Age_at_StudyDate"], q=5, labels=False)
+    df["GenderGroup"] = df["Gender"].astype("category").cat.codes
+    df["StratifyGroup"] = (
+        df["label"].astype(str)
+        + "_"
+        + df["AgeGroup"].astype(str)
+        + "_"
+        + df["GenderGroup"].astype(str)
+    )
+
+    test_idx, remaining_idx = next(
+        model_selection.StratifiedGroupKFold(
+            n_splits=int(1 / test_size), shuffle=True, random_state=random_state
+        ).split(df, df["StratifyGroup"], groups=df["PatientID"])
+    )
+    test_df, remaining_df = df.iloc[test_idx], df.iloc[remaining_idx]
+
+    train_idx, val_idx = next(
+        model_selection.StratifiedGroupKFold(
+            n_splits=int(1 / val_size), shuffle=True, random_state=random_state
+        ).split(remaining_df, remaining_df["StratifyGroup"], groups=remaining_df["PatientID"])
+    )
+    train_df, val_df = remaining_df.iloc[train_idx], remaining_df.iloc[val_idx]
+
+    return train_df, val_df, test_df
 
 
 # https://github.com/DIAGNijmegen/luna25-baseline-public/blob/2c53b964ddea1cc1d92fc68584b0205f905353dc/dataloader.py#L315
