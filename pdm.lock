@@ -5,7 +5,7 @@
 groups = ["default", "all", "dev", "docs", "language", "lint", "multimodal", "test", "typecheck", "vision"]
 strategy = ["inherit_metadata"]
 lock_version = "4.5.0"
-content_hash = "sha256:23ebf06fcc778e1696fcbf71bb2777694e01d65e3bcf84139207e5cf15792420"
+content_hash = "sha256:098c14896a38ec9f206e9b98dd6643b346aa6a38ab40c4034c7179874673c1af"
 
 [[metadata.targets]]
 requires_python = ">=3.10"
@@ -638,7 +638,7 @@ name = "fire"
 version = "0.7.1"
 requires_python = ">=3.7"
 summary = "A library for automatically generating command line interfaces."
-groups = ["vision"]
+groups = ["all", "vision"]
 dependencies = [
     "termcolor",
 ]
@@ -1141,7 +1141,7 @@ name = "joblib"
 version = "1.5.3"
 requires_python = ">=3.9"
 summary = "Lightweight pipelining with Python functions"
-groups = ["vision"]
+groups = ["all", "vision"]
 files = [
     {file = "joblib-1.5.3-py3-none-any.whl", hash = "sha256:5fc3c5039fc5ca8c0276333a188bbd59d6b7ab37fe6632daa76bc7f9ec18e713"},
     {file = "joblib-1.5.3.tar.gz", hash = "sha256:8561a3269e6801106863fd0d6d84bb737be9e7631e33aaed3fb9ce5953688da3"},
@@ -1413,7 +1413,7 @@ name = "medmnist"
 version = "3.0.2"
 requires_python = ">=3.6.0"
 summary = "[MedMNIST+] 18x Standardized Datasets for 2D and 3D Biomedical Image Classification with Multiple Size Options: 28 (MNIST-Like), 64, 128, and 224"
-groups = ["vision"]
+groups = ["all", "vision"]
 dependencies = [
     "Pillow",
     "fire",
@@ -3152,7 +3152,7 @@ name = "scikit-learn"
 version = "1.7.2"
 requires_python = ">=3.10"
 summary = "A set of python modules for machine learning and data mining"
-groups = ["vision"]
+groups = ["all", "vision"]
 dependencies = [
     "joblib>=1.2.0",
     "numpy>=1.22.0",
@@ -3373,7 +3373,7 @@ name = "termcolor"
 version = "3.3.0"
 requires_python = ">=3.10"
 summary = "ANSI color formatting for output in terminal"
-groups = ["vision"]
+groups = ["all", "vision"]
 files = [
     {file = "termcolor-3.3.0-py3-none-any.whl", hash = "sha256:cf642efadaf0a8ebbbf4bc7a31cec2f9b5f21a9f726f4ccbb08192c9c26f43a5"},
     {file = "termcolor-3.3.0.tar.gz", hash = "sha256:348871ca648ec6a9a983a13ab626c0acce02f515b9e1983332b17af7979521c5"},
@@ -3384,7 +3384,7 @@ name = "threadpoolctl"
 version = "3.6.0"
 requires_python = ">=3.9"
 summary = "threadpoolctl"
-groups = ["vision"]
+groups = ["all", "vision"]
 files = [
     {file = "threadpoolctl-3.6.0-py3-none-any.whl", hash = "sha256:43a0b8fd5a2928500110039e43a5eed8480b918967083ea48dc3ab9f13c4a7fb"},
     {file = "threadpoolctl-3.6.0.tar.gz", hash = "sha256:8ab8b4aa3491d812b623328249fab5302a68d2d71745c8a4c719a2fcaba9f44e"},
