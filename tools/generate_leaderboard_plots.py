@@ -7,16 +7,13 @@ Note: the code below assumes that the eva results are stored in
 `eva/logs/<task>/<fm_identifier>/results`.
 """
 
-
 import os
-import json
-import argparse
+from jsonargparse import CLI
+
 import pandas as pd
 import matplotlib.pyplot as plt
-import matplotlib.colors
-import seaborn as sns
-
-from typing import Optional
+import matplotlib.patches as patches
+import textwrap
 
 
 class LeaderboardConfig:
@@ -49,9 +46,10 @@ class LeaderboardConfig:
         "radiology": {
             "voco_b": "VoCo-B",
             "voco_h": "VoCo-H",
-            "vit_base_patch16_224_dino_1chan": "ViT-B16 (DINO)"
-        }
+            "vit_base_patch16_224_dino_1chan": "ViT-B16 (DINO)",
+        },
     }
+
     _task_name_map = {
         "pathology": {
             "bach": "BACH",
@@ -69,98 +67,204 @@ class LeaderboardConfig:
             "btcv": "BTCV",
             "lits17": "LiTS17",
             "msd_task7_pancreas": "MSD Task 7 Pancreas",
-        }
+        },
     }
 
     _exclude_for_average = {
         "pathology": ["bach"],
         "radiology": [],
     }
-    """The tasks to exclude from the average column in the leaderboard table."""
 
 
 def get_leaderboard(csv_path: str, config: LeaderboardConfig) -> pd.DataFrame:
-    """Get the leaderboard data frame."""
-
+    """Load and prepare leaderboard DataFrame."""
     if not os.path.isfile(csv_path):
         raise FileNotFoundError(f"CSV file not found: {csv_path}")
 
     df = pd.read_csv(csv_path)
-
-    df = df.set_index("model", drop=True)
-    df = df[[fm in config.fm_name_map.keys() for fm in df.index]]
-    df.index = df.reset_index()["model"].apply(lambda x: config.fm_name_map.get(x) or x)
+    df = df.set_index("model")
+    df = df[df.index.isin(config.fm_name_map.keys())]
+    df.index = df.index.map(lambda x: config.fm_name_map.get(x, x))
     return df
 
 
-def plot_leaderboard(df: pd.DataFrame, config: LeaderboardConfig, output_file: str = "docs/images/leaderboards/pathology.svg"):
-    """Plot the leaderboard heatmap."""
+def _prepare_data(df: pd.DataFrame, config: LeaderboardConfig):
+    """Prepare display and numeric DataFrames for plotting."""
+    merge_targets = {"patch_camelyon", "camelyon16_small", "panda_small"}
 
-    def _task_name(name: str) -> str:
-        if "/test" in name:
-            return f"{config.task_name_map[name.removesuffix('/test')]}/test"
-        return config.task_name_map.get(name) or name
+    display_df = df.copy()
+    numeric_df = df.copy()
 
-    # create colormap:
-    colors = [[0, "white"], [1, "#0000ff"]]
-    cmap = matplotlib.colors.LinearSegmentedColormap.from_list("", colors)
+    for target in merge_targets:
+        test_col = f"{target}/test"
+        if target in df.columns and test_col in df.columns:
+            numeric_df[target] = df[[target, test_col]].mean(axis=1)
+            display_df[target] = df.apply(
+                lambda row: f"{row[target]:.3f} ({row[test_col]:.3f})", axis=1
+            )
+            display_df.drop(columns=[test_col], inplace=True)
+            numeric_df.drop(columns=[test_col], inplace=True)
 
-    # prepare data frame:
-    df.index.names = [""]
-
-    # calculate average column
-    tasks_for_average = []
-    for task in config.task_name_map.keys():
+    # Average column
+    tasks_for_avg = []
+    for task in config.task_name_map:
         if task in config.exclude_for_average:
             continue
-        if f"{task}/test" in df.columns:
-            tasks_for_average.append(f"{task}/test")
-        else:
-            tasks_for_average.append(task)
-    df["Average"] = df[tasks_for_average].mean(axis=1)
-    df = df.sort_values(by="Average", ascending=False)
+        col = f"{task}/test" if f"{task}/test" in df.columns else task
+        if col in df.columns:
+            tasks_for_avg.append(col)
 
-    # create plot:
-    df.columns = [_task_name(c) or c for c in df.columns]
-    height = max(2, len(df) * 0.5) if len(df) < 4 else 6
-    fig, ax = plt.subplots(figsize=(12, height))
-    scaled_df = (df - df.min(axis=0)) / (df.max(axis=0) - df.min(axis=0))
-    sns.heatmap(scaled_df, annot=df, cmap=cmap, ax=ax, cbar=False, fmt=".3f")
-    plt.tick_params(
-        axis="x",
-        which="major",
-        labelsize=10,
-        labelbottom=False,
-        bottom=False,
-        top=False,
-        labeltop=True,
-        rotation=20,
+    avg_series = df[tasks_for_avg].mean(axis=1)
+    display_df["Average"] = avg_series.map("{:.3f}".format)
+    numeric_df["Average"] = avg_series
+
+    numeric_df = numeric_df.sort_values(by="Average", ascending=False)
+    display_df = display_df.loc[numeric_df.index]
+
+    # Rename columns
+    new_columns = []
+    for col in display_df.columns:
+        name = config.task_name_map.get(col, col)
+        if col in merge_targets:
+            name = f"{name} (test)"
+        if len(name) > 15:
+            name = textwrap.fill(name, width=12)
+        new_columns.append(name)
+
+    display_df.columns = new_columns
+    numeric_df.columns = new_columns
+
+    return display_df, numeric_df
+
+
+def _draw_heatmap(ax, display_df: pd.DataFrame, numeric_df: pd.DataFrame):
+    """Draw the heatmap with Kaiko.ai's branding: Navy, Indigo, and Slate."""
+    rows, cols = display_df.shape
+
+    # Kaiko.ai Color Palette
+    KAIKO_PRIMARY = "#000b1c"  # Deep Navy background
+    KAIKO_ACCENT = "#4f46e5"  # Vibrant Indigo for 'Average'
+    KAIKO_SLATE = "#94a3b8"  # Muted Slate for labels
+    KAIKO_TEXT_DARK = "#1e293b"  # Dark slate for cell text
+
+    # Custom Gradient for heat (Light Slate to a clean Blue/Teal)
+    from matplotlib.colors import LinearSegmentedColormap
+
+    kaiko_cmap = LinearSegmentedColormap.from_list("kaiko", ["#f1f5f9", "#cbd5e1", "#3b82f6"])
+
+    for j in range(cols):
+        col_numeric = numeric_df.iloc[:, j]
+        vmin, vmax = col_numeric.min(), col_numeric.max()
+        column_name = display_df.columns[j]
+        is_avg = "Average" in column_name
+
+        for i in range(rows):
+            val_num = col_numeric.iloc[i]
+            val_text = display_df.iloc[i, j]
+
+            norm = (val_num - vmin) / (vmax - vmin + 1e-9)
+
+            # Formatting cells
+            if is_avg:
+                color = KAIKO_ACCENT
+                alpha = 0.1 + (norm * 0.2)  # Subtle indigo glow
+                text_color = KAIKO_ACCENT
+                weight = "bold"
+            else:
+                color = kaiko_cmap(norm)
+                alpha = 0.6
+                text_color = KAIKO_TEXT_DARK
+                weight = 500
+
+            rect = patches.FancyBboxPatch(
+                (j - 0.42, i - 0.38),
+                0.84,
+                0.76,
+                boxstyle="round,pad=0.03",
+                facecolor=color,
+                alpha=alpha,
+                edgecolor="none",
+                zorder=1,
+            )
+            ax.add_patch(rect)
+
+            ax.text(
+                j,
+                i,
+                val_text,
+                ha="center",
+                va="center",
+                fontsize=10,
+                fontweight=weight,
+                color=text_color,
+                zorder=2,
+            )
+
+    # Model names: Kaiko uses clean, semi-bold slate typography
+    for i, model_name in enumerate(display_df.index):
+        ax.text(
+            -0.7,
+            i,
+            model_name,
+            ha="right",
+            va="center",
+            fontsize=11,
+            fontweight=600,
+            color="#334155",  # Darker slate for readability
+        )
+
+
+def generate_leaderboard(
+    csv_path: str = None,
+    modality: str = "pathology",
+    save_path: str = None,
+) -> None:
+    """
+    Generate transparent leaderboard heatmap that works on both white and black backgrounds.
+    """
+    config = LeaderboardConfig(modality)
+
+    csv_path = csv_path or f"tools/data/leaderboards/{modality}.csv"
+    save_path = save_path or f"docs/images/leaderboards/{modality}.svg"
+
+    df = get_leaderboard(csv_path, config)
+    display_df, numeric_df = _prepare_data(df, config)
+
+    plt.rcParams["font.family"] = "sans-serif"
+
+    fig, ax = plt.subplots(figsize=(len(display_df.columns) * 1.8, len(display_df) * 0.6 + 1.5))
+
+    # Transparent backgrounds
+    fig.patch.set_alpha(0.0)
+    ax.set_facecolor("none")
+
+    _draw_heatmap(ax, display_df, numeric_df)
+
+    ax.set_xticks(range(len(display_df.columns)))
+    ax.set_xticklabels(
+        display_df.columns,
+        fontsize=10,
+        fontweight=700,
+        color="#94a3b8",  # muted slate — good contrast on both bg
+        ha="center",
+        va="center",
     )
-    plt.tick_params(
-        axis="y",
-        which="major",
-        labelsize=10,
-        rotation=0,
-    )
-    plt.savefig(output_file, format="svg", dpi=1200, bbox_inches="tight")
 
+    ax.xaxis.tick_top()
+    ax.tick_params(axis="both", which="both", length=0, pad=10)
 
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--csv_path", type=str, default=None)
-    parser.add_argument("--modality", type=str, default="pathology", choices=["pathology", "radiology"])
-    parser.add_argument("--save_path", type=str, default=None)
-    args = parser.parse_args()
-    config = LeaderboardConfig(args.modality)
+    ax.set_ylim(len(display_df) - 0.4, -0.8)
+    ax.set_xlim(-0.5, len(display_df.columns) - 0.5)
 
-    leaderboard_df = get_leaderboard(
-        csv_path=args.csv_path or f"tools/data/leaderboards/{args.modality}.csv",
-        config=config)
+    for spine in ax.spines.values():
+        spine.set_visible(False)
 
-    plot_leaderboard(
-        df=leaderboard_df.copy(),
-        config=config,
-        output_file=args.save_path or f"docs/images/leaderboards/{args.modality}.svg")
+    ax.yaxis.set_visible(False)
+
+    # Save with transparent background
+    plt.savefig(save_path, format="svg", bbox_inches="tight", transparent=True)
+    plt.close(fig)
+
 
 if __name__ == "__main__":
-    main()
+    CLI(generate_leaderboard)

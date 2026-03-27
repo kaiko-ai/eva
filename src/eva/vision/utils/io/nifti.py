@@ -1,4 +1,3 @@
-# type: ignore
 """NIfTI I/O related functions."""
 
 from typing import Any, Tuple
@@ -14,7 +13,6 @@ from eva.vision.utils.io import _utils
 
 def read_nifti(
     path: str,
-    slice_index: int | None = None,
     *,
     orientation: str | None = None,
     orientation_reference: str | None = None,
@@ -23,14 +21,11 @@ def read_nifti(
 
     Args:
         path: The path to the NIfTI file.
-        slice_index: Whether to read only a slice from the file.
         orientation: The orientation code to reorient the nifti image.
         orientation_reference: Path to a NIfTI file which
             will be used as a reference for the orientation
             transform in case the file missing the pixdim array
             in the NIfTI header.
-        use_storage_dtype: Whether to cast the raw image
-            array to the inferred type.
 
     Returns:
         The NIfTI image class instance.
@@ -41,8 +36,7 @@ def read_nifti(
     """
     _utils.check_file(path)
     image_data = _load_nifti_silently(path)
-    if slice_index is not None:
-        image_data = image_data.slicer[:, :, slice_index : slice_index + 1]
+
     if orientation:
         image_data = _reorient(
             image_data, orientation=orientation, reference_file=orientation_reference
@@ -51,21 +45,24 @@ def read_nifti(
     return image_data
 
 
-def nifti_to_array(nii: nib.Nifti1Image, use_storage_dtype: bool = True) -> npt.NDArray[Any]:
-    """Converts a NIfTI image to a numpy array.
+def nifti_to_array(
+    nii: nib.nifti1.Nifti1Image,
+    /,
+    *,
+    dtype: np.dtype | type | None = np.int16,
+) -> npt.NDArray[Any]:
+    """Converts a NIfTI image to a numpy array with efficient casting.
 
     Args:
         nii: The input NIfTI image.
-        use_storage_dtype: Whether to cast the raw image
-            array to the inferred type.
+        dtype: The type to cast the data to. If `None`, it will
+            cast the raw image array to the inferred type via
+            `use_storage_dtype`.
 
     Returns:
         The image as a numpy array (height, width, channels).
     """
-    image_array = nii.get_fdata()
-    if use_storage_dtype:
-        image_array = image_array.astype(nii.get_data_dtype())
-    return image_array
+    return np.array(nii.dataobj, dtype=dtype or nii.get_data_dtype(), order="C", copy=True)
 
 
 def save_array_as_nifti(
@@ -81,7 +78,7 @@ def save_array_as_nifti(
         filename: The name to save the image like.
         dtype: The data type to save the image.
     """
-    nifti_image = nib.Nifti1Image(array, affine=np.eye(4), dtype=dtype)
+    nifti_image = nib.nifti1.Nifti1Image(array, affine=np.eye(4), dtype=dtype)
     nifti_image.to_filename(filename)
 
 
@@ -114,7 +111,7 @@ def fetch_nifti_orientation(path: str) -> npt.NDArray[Any]:
     """
     _utils.check_file(path)
     nii = _load_nifti_silently(path)
-    return nib.io_orientation(nii.affine)
+    return nib.orientations.io_orientation(nii.affine)
 
 
 def fetch_nifti_axis_direction_code(path: str) -> str:
@@ -127,23 +124,23 @@ def fetch_nifti_axis_direction_code(path: str) -> str:
         The axis direction codes as string (e.g. "LAS").
     """
     _utils.check_file(path)
-    image_data: nib.Nifti1Image = nib.load(path)
+    image_data = nib.nifti1.load(path)
     return "".join(orientations.aff2axcodes(image_data.affine))
 
 
-def _load_nifti_silently(path: str) -> nib.Nifti1Image:
+def _load_nifti_silently(path: str) -> nib.nifti1.Nifti1Image:
     """Reads a NIfTI image in silent mode."""
     with SuppressLogs():
-        return nib.load(path)
+        return nib.nifti1.load(path)  # type: ignore
     raise ValueError(f"Failed to load NIfTI file: {path}")
 
 
 def _reorient(
-    nii: nib.Nifti1Image,
+    nii: nib.nifti1.Nifti1Image,
     /,
     orientation: str | tuple[str, str, str] = "RAS",
     reference_file: str | None = None,
-) -> nib.Nifti1Image:
+) -> nib.nifti1.Nifti1Image:
     """Reorients a NIfTI image to a specified orientation.
 
     Args:
@@ -162,8 +159,8 @@ def _reorient(
     orig_ornt = (
         fetch_nifti_orientation(reference_file)
         if reference_file and affine_matrix is None
-        else nib.io_orientation(nii.affine)
+        else nib.orientations.io_orientation(nii.affine)
     )
     targ_ornt = orientations.axcodes2ornt(orientation)
     transform = orientations.ornt_transform(orig_ornt, targ_ornt)
-    return nii.as_reoriented(transform)
+    return nii.as_reoriented(transform)  # type: ignore
