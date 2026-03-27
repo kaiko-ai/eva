@@ -7,6 +7,7 @@ from eva.vision.data.datasets.classification.camelyon16 import Camelyon16
 from eva.vision.data.datasets.classification.cc_ccii import CC_CCII
 from eva.vision.data.datasets.classification.crc import CRC
 from eva.vision.data.datasets.classification.gleason_arvaniti import GleasonArvaniti
+from eva.vision.data.datasets.classification.luna25 import LUNA25
 from eva.vision.data.datasets.classification.mhist import MHIST
 from eva.vision.data.datasets.classification.nodule_mnist_3d import NoduleMNIST3D
 from eva.vision.data.datasets.classification.organ_mnist_3d import OrganMNIST3D
@@ -23,6 +24,7 @@ __all__ = [
     "CC_CCII",
     "CRC",
     "GleasonArvaniti",
+    "LUNA25",
     "MHIST",
     "NoduleMNIST3D",
     "OrganMNIST3D",
