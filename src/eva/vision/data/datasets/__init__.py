@@ -14,6 +14,7 @@ from eva.vision.data.datasets.classification import (
     UniToPatho,
     WsiClassificationDataset,
 )
+from eva.vision.data.datasets.regression import TIGERTILScore
 from eva.vision.data.datasets.segmentation import (
     BCSS,
     BTCV,
@@ -55,4 +56,5 @@ __all__ = [
     "WORD",
     "WsiClassificationDataset",
     "WsiDataset",
+    "TIGERTILScore",
 ]
