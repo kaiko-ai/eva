@@ -26,7 +26,7 @@ jobs:
           # IMPORTANT: Avoid publishing the .git/ folder to prevent leaking credentials
           persist-credentials: true
       - name: Setting up PDM
-        uses: pdm-project/setup-pdm@94a823180e06fcde4ad29308721954a521c96ed0 # v4
+        uses: pdm-project/setup-pdm@973541a5febeafcfdadf8a51211435be6ecfd90f # v4
         with:
           python-version: "3.10"
           architecture: x64
