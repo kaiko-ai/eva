@@ -11,6 +11,7 @@ def stratified_split(
     train_ratio: float,
     val_ratio: float,
     test_ratio: float = 0.0,
+    groups: Sequence[Any] | None = None,
     seed: int = 42,
 ) -> Tuple[List[int], List[int], List[int] | None]:
     """Splits the samples into stratified train, validation, and test (optional) sets.
@@ -21,6 +22,7 @@ def stratified_split(
         train_ratio: The ratio of the training set.
         val_ratio: The ratio of the validation set.
         test_ratio: The ratio of the test set (optional).
+        groups: Optional group labels for group-wise stratification.
         seed: The seed for reproducibility.
 
     Returns:
@@ -28,8 +30,33 @@ def stratified_split(
     """
     if len(samples) != len(targets):
         raise ValueError("The number of samples and targets must be equal.")
+    if groups is not None and len(groups) != len(samples):
+        raise ValueError("The number of samples and groups must be equal.")
     if train_ratio + val_ratio + (test_ratio or 0) > 1.0:
         raise ValueError("The sum of the ratios must be lower or equal to 1.")
+
+    if groups is not None:
+        unique_groups, group_indices = np.unique(groups, return_inverse=True)
+        group_targets = np.array(
+            [targets[np.where(group_indices == i)[0][0]] for i in range(len(unique_groups))]
+        )
+
+        train_g, val_g, test_g = stratified_split(
+            samples=unique_groups.tolist(),
+            targets=group_targets,
+            train_ratio=train_ratio,
+            val_ratio=val_ratio,
+            test_ratio=test_ratio,
+            seed=seed,
+        )
+
+        def map_indices(g_list):
+            if g_list is None:
+                return []
+            selected_groups = unique_groups[g_list]
+            return np.where(np.isin(groups, selected_groups))[0].tolist()
+
+        return map_indices(train_g), map_indices(val_g), map_indices(test_g) or None
 
     use_all_samples = train_ratio + val_ratio + test_ratio == 1
     random_generator = np.random.default_rng(seed)
