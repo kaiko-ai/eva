@@ -19,7 +19,7 @@ jobs:
       contents: write # Needed for pushing to GitHub Pages
       id-token: write # Needed for publishing to GitHub Pages
     steps:
-      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
         with:
           # Needed to push to gh-pages branch
           # IMPORTANT: Avoid publishing the .git/ folder to prevent leaking credentials
