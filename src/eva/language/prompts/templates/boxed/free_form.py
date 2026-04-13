@@ -16,7 +16,8 @@ from eva.language.utils.text import format as format_utils
 class BoxedFreeFormQuestionPromptTemplate(base.PromptTemplate):
     """Prompt template for freeform questions while enforcing Boxed output."""
 
-    template: str = textwrap.dedent("""\
+    template: str = textwrap.dedent(
+        """\
         {{ preamble }}
 
         {% if examples %}
@@ -50,7 +51,8 @@ class BoxedFreeFormQuestionPromptTemplate(base.PromptTemplate):
         {% endif %}
 
         Answer:
-        """)
+        """
+    )
     """Base template to be rendered via Jinja2."""
 
     def __init__(

@@ -18,7 +18,8 @@ from eva.language.utils.text import format as format_utils
 class BoxedMultipleChoicePromptTemplate(base.PromptTemplate):
     """Prompt template for multiple choice questions while enforcing boxed output."""
 
-    template: str = textwrap.dedent("""\
+    template: str = textwrap.dedent(
+        """\
         {{ preamble }}
 
         {% if examples %}
@@ -59,7 +60,8 @@ class BoxedMultipleChoicePromptTemplate(base.PromptTemplate):
         {% endif %}
 
         Answer:
-        """)
+        """
+    )
     """Base template to be rendered via Jinja2."""
 
     def __init__(

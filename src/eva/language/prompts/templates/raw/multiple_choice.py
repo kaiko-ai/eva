@@ -18,7 +18,8 @@ from eva.language.utils.text import format as format_utils
 class RawMultipleChoicePromptTemplate(base.PromptTemplate):
     """Prompt template for multiple choice questions only requiring the final answer to be last."""
 
-    template: str = textwrap.dedent("""\
+    template: str = textwrap.dedent(
+        """\
         {{ preamble }}
 
         {% if examples %}
@@ -62,7 +63,8 @@ class RawMultipleChoicePromptTemplate(base.PromptTemplate):
         {% endif %}
 
         Answer:
-        """)
+        """
+    )
     """Base template to be rendered via Jinja2."""
 
     def __init__(

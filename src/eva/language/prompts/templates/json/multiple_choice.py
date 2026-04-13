@@ -18,7 +18,8 @@ from eva.language.utils.text import format as format_utils
 class JsonMultipleChoicePromptTemplate(base.PromptTemplate):
     """Prompt template for multiple choice questions while enforcing JSON output."""
 
-    template: str = textwrap.dedent("""\
+    template: str = textwrap.dedent(
+        """\
         {{ preamble }}
 
         {% if examples %}
@@ -61,7 +62,8 @@ class JsonMultipleChoicePromptTemplate(base.PromptTemplate):
         {% endif %}
 
         Answer:
-        """)
+        """
+    )
     """Base template to be rendered via Jinja2."""
 
     _default_answer_key: str = "answer"

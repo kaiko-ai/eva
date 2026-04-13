@@ -21,7 +21,8 @@ class GEvalPromptTemplate(base.PromptTemplate):
     by https://github.com/confident-ai/deepeval.
     """
 
-    template: str = textwrap.dedent("""\
+    template: str = textwrap.dedent(
+        """\
         You are an evaluator. Given the following evaluation steps, assess the Model Response below and return a JSON object with two fields:
 
         - `"score"`: an integer between {{ score_range[0] }} and {{ score_range[1] }}, {{ score_explanation }}.
@@ -68,7 +69,8 @@ class GEvalPromptTemplate(base.PromptTemplate):
         }
 
         JSON:
-        """)
+        """
+    )
     """Base template to be rendered via Jinja2."""
 
     def __init__(self) -> None:
