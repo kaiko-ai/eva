@@ -122,7 +122,7 @@ def test_groups_are_not_split_across_sets():
         assigned = [
             any(i in train for i in idx),
             any(i in val for i in idx),
-            any(i in test for i in idx),
+            any(i in test or [] for i in idx),
         ]
 
         # group must appear in exactly one split
