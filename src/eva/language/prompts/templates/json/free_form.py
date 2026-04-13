@@ -17,8 +17,7 @@ from eva.language.utils.text import format as format_utils
 class JsonFreeFormQuestionPromptTemplate(base.PromptTemplate):
     """Prompt template for free-form questions while enforcing JSON output."""
 
-    template: str = textwrap.dedent(
-        """\
+    template: str = textwrap.dedent("""\
         {{ preamble }}
 
         {% if examples %}
@@ -54,8 +53,7 @@ class JsonFreeFormQuestionPromptTemplate(base.PromptTemplate):
         {% endif %}
 
         Answer:
-        """
-    )
+        """)
     """Base template to be rendered via Jinja2."""
 
     _default_answer_key: str = "answer"

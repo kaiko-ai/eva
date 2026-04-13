@@ -17,8 +17,7 @@ from eva.language.utils.text import format as format_utils
 class RawFreeFormQuestionPromptTemplate(base.PromptTemplate):
     """Prompt template for free-form questions."""
 
-    template = textwrap.dedent(
-        """\
+    template = textwrap.dedent("""\
         {{ preamble }}
 
         {% if examples %}
@@ -58,8 +57,7 @@ class RawFreeFormQuestionPromptTemplate(base.PromptTemplate):
         {% endif %}
 
         Answer:
-        """
-    )
+        """)
     """Base template to be rendered via Jinja2."""
 
     def __init__(self) -> None:

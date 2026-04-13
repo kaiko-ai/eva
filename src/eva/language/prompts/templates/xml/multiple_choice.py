@@ -18,8 +18,7 @@ from eva.language.utils.text import format as format_utils
 class XmlMultipleChoicePromptTemplate(base.PromptTemplate):
     """Prompt template for multiple choice questions while enforcing XML output."""
 
-    template: str = textwrap.dedent(
-        """\
+    template: str = textwrap.dedent("""\
         {{ preamble }}
 
         {% if examples %}
@@ -60,8 +59,7 @@ class XmlMultipleChoicePromptTemplate(base.PromptTemplate):
         {% endif %}
 
         Answer:
-        """
-    )
+        """)
     """Base template to be rendered via Jinja2."""
 
     _default_answer_key: str = "answer"
