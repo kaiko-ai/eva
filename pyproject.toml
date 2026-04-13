@@ -104,7 +104,6 @@ all = [
     "backoff>=2.2.1",
     "json-repair>=0.52.0",
     "medmnist>=3.0.2",
-    "scikit-learn>=1.7.2",
 ]
 
 [project.scripts]
