@@ -1,6 +1,6 @@
 """Functions for stratified splitting."""
 
-from typing import Any, List, Sequence, Tuple, Iterable
+from typing import Any, Iterable, List, Sequence, Tuple
 
 import numpy as np
 
@@ -30,15 +30,15 @@ def stratified_split(
     """
     samples_seq = samples if isinstance(samples, (list, tuple)) else list(samples)
     targets_seq = targets if isinstance(targets, (list, tuple)) else list(targets)
-    
+
     if len(samples_seq) != len(targets_seq):
         raise ValueError("The number of samples and targets must be equal.")
-    
+
     if groups is not None:
         groups_seq = groups if isinstance(groups, (list, tuple)) else list(groups)
         if len(groups_seq) != len(samples_seq):
             raise ValueError("The number of samples and groups must be equal.")
-        
+
         unique_groups, group_indices = np.unique(groups_seq, return_inverse=True)
         group_targets = np.array(
             [targets_seq[np.where(group_indices == i)[0][0]] for i in range(len(unique_groups))]
