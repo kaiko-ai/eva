@@ -31,7 +31,7 @@ jobs:
           python-version: "3.10"
           architecture: x64
       - name: Setting up nox
-        uses: wntrblm/nox@a74da2c766d4e656d6105639926c31f3aa4a6ca1 # 2025.02.09
+        uses: wntrblm/nox@97e345e6a26bb2c5aacff9cc4327bd4ac1b00ce6 # 2026.04.10
         with:
           python-versions: "3.10"
       - name: Free up disk space
