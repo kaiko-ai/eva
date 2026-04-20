@@ -1,6 +1,6 @@
 """Encoder based on Swin UNETR."""
 
-from typing import List, Tuple
+from typing import List, Literal, Tuple
 
 import torch
 from monai.inferers.inferer import Inferer
@@ -27,6 +27,7 @@ class SwinUNETREncoder(nn.Module):
         spatial_dims: int = 3,
         out_indices: int | None = None,
         inferer: Inferer | None = None,
+        embeddings_type: Literal["multiscale", "head"] = "multiscale",
         use_v2: bool = True,
     ) -> None:
         """Build the UNETR encoder.
@@ -39,6 +40,9 @@ class SwinUNETREncoder(nn.Module):
                 the aggregated feature vector is returned.
             inferer: An optional MONAI `Inferer` for efficient
                 inference during evaluation.
+            embeddings_type: Whether to use aggregated or head embeddings:
+                - `multiscale`:  multi-scale aggregated representation
+                - `head`: last-stage (head) pooled representation
             use_v2: Whether to use SwinTransformerV2.
         """
         super().__init__()
@@ -48,6 +52,7 @@ class SwinUNETREncoder(nn.Module):
         self._spatial_dims = spatial_dims
         self._out_indices = out_indices
         self._inferer = inferer
+        self._embeddings_type = embeddings_type
         self._use_v2 = use_v2
 
         self._window_size = misc.ensure_tuple_rep(7, spatial_dims)
@@ -194,8 +199,16 @@ class SwinUNETREncoder(nn.Module):
         Returns:
             Aggregated feature vector of shape (B, C').
         """
+        embeddings_to_forward_methods = {
+            "multiscale": self.forward_encoders,
+            "head": self.forward_head,
+        }
+        forward_method = embeddings_to_forward_methods.get(self._embeddings_type)
+        if forward_method is None:
+            raise ValueError(f"Unknown embeddings_type: {self._embeddings_type}")
+
         intermediates = self.forward_features(tensor)
-        return self.forward_encoders(intermediates)
+        return forward_method(intermediates)
 
     def forward_intermediates(
         self, tensor: torch.Tensor
