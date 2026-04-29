@@ -49,6 +49,7 @@ dependencies = [
     "nibabel>=3.2.2",
     "tenacity>=9.1.4",
     "pyzipper>=0.3.6",
+    "requests>=2.33.1",
 ]
 
 [project.urls]
