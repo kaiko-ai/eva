@@ -25,6 +25,7 @@ def test_stratification(
     train_indices, val_indices, test_indices = splitting.stratified_split(
         samples, targets, train_ratio, val_ratio, test_ratio
     )
+
     train_classes = [targets[i] for i in train_indices]
     val_classes = [targets[i] for i in val_indices]
 
@@ -53,6 +54,7 @@ def test_different_seeds_produce_different_outputs(seed1: int, seed2: int):
     """Tests if different seeds produce different train, validation, and test indices."""
     samples = list(range(100))
     targets = [0] * 50 + [1] * 50
+
     train1, val1, test1 = splitting.stratified_split(samples, targets, 0.6, 0.2, 0.2, seed=seed1)
     train2, val2, test2 = splitting.stratified_split(samples, targets, 0.6, 0.2, 0.2, seed=seed2)
 
@@ -75,9 +77,10 @@ def test_same_seed_produces_same_outputs(
     val_expected_indices: List[int],
     test_expected_indices: List[int],
 ):
-    """Tests if the same seed produces the same train, validation, and test indices."""
+    """Tests deterministic output for same seed."""
     samples = list(range(100))
     targets = [0] * 50 + [1] * 50
+
     train1, val1, test1 = splitting.stratified_split(samples, targets, 0.6, 0.2, 0.2, seed=seed)
     train2, val2, test2 = splitting.stratified_split(samples, targets, 0.6, 0.2, 0.2, seed=seed)
 
@@ -89,3 +92,53 @@ def test_same_seed_produces_same_outputs(
     assert train1[: len(train_expected_indices)] == train_expected_indices, "Unexpected indices"
     assert val1[: len(val_expected_indices)] == val_expected_indices, "Unexpected indices"
     assert test1[: len(test_expected_indices)] == test_expected_indices, "Unexpected indices"
+
+
+def test_groups_length_mismatch():
+    """Tests when the length of groups does not match the number of samples."""
+    samples = list(range(5))
+    targets = [0, 1, 0, 1, 0]
+    groups = [0, 0, 0]  # wrong length
+
+    with pytest.raises(ValueError):
+        splitting.stratified_split(samples, targets, 0.6, 0.2, groups=groups)
+
+
+def test_groups_are_not_split_across_sets():
+    """Tests that samples from the same group are not split across split sets."""
+    samples = list(range(10))
+    targets = [0, 0, 0, 0, 1, 1, 1, 1, 1, 1]
+
+    # two groups
+    groups = [0, 0, 0, 0, 0, 1, 1, 1, 1, 1]
+
+    train, val, test = splitting.stratified_split(
+        samples, targets, 0.6, 0.2, 0.2, groups=groups, seed=42
+    )
+
+    for g in set(groups):
+        idx = [i for i, gg in enumerate(groups) if gg == g]
+
+        assigned = [
+            any(i in train for i in idx),
+            any(i in val for i in idx),
+            any(i in (test or []) for i in idx),
+        ]
+
+        # group must appear in exactly one split
+        assert sum(assigned) == 1
+
+
+def test_all_samples_still_assigned_with_groups():
+    """Tests that all samples are assigned to a split when using groups."""
+    samples = list(range(20))
+    targets = [0] * 10 + [1] * 10
+
+    groups = [i // 2 for i in range(20)]  # multiple small groups
+
+    train, val, test = splitting.stratified_split(
+        samples, targets, 0.7, 0.3, 0.0, groups=groups, seed=1
+    )
+
+    all_idx = set(train + val + (test or []))
+    assert all_idx == set(samples)

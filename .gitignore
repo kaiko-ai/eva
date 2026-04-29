@@ -179,3 +179,4 @@ cython_debug/
 
 # numpy data
 *.npy
+!tests/eva/assets/vision/datasets/cc_ccii/CC-CCII_public/data/*
