@@ -1,6 +1,8 @@
 """Tests regarding eva's CLI commands on language datasets."""
 
+import json
 import os
+import statistics
 import tempfile
 from typing import Any, Dict, List
 from unittest import mock
@@ -18,6 +20,7 @@ from tests.eva import _cli
     [
         "configs/language/pathology/online/multiple_choice/pubmedqa.yaml",
         "configs/language/pathology/offline/multiple_choice/pubmedqa.yaml",
+        "configs/language/tests/offline/pubmedqa_combine.yaml",
     ],
 )
 def test_configuration_initialization(configuration_file: str, lib_path: str) -> None:
@@ -84,6 +87,50 @@ def test_predict_validate_from_configuration(configuration_file: str, lib_path: 
             )
 
 
+def test_predict_validate_records_datasets_as_runs_from_configuration(lib_path: str) -> None:
+    """Tests session statistics when multiple validation datasets are recorded as runs."""
+    configuration_file = "configs/language/tests/offline/pubmedqa_combine.yaml"
+
+    with tempfile.TemporaryDirectory() as temp_dir:
+        predictions_dir = os.path.join(temp_dir, "predictions")
+        logs_dir = os.path.join(temp_dir, "logs")
+
+        with mock.patch.dict(
+            os.environ,
+            {
+                "N_RUNS": "1",
+                "BATCH_SIZE": "2",
+                "PREDICTIONS_OUTPUT_DIR": predictions_dir,
+                "OUTPUT_ROOT": logs_dir,
+                "MISSING_LIMIT": "0",
+            },
+        ):
+            _cli.run_cli_from_main(
+                cli_args=[
+                    "predict",
+                    "--config",
+                    os.path.join(lib_path, configuration_file),
+                ]
+            )
+            _cli.run_cli_from_main(
+                cli_args=[
+                    "validate",
+                    "--config",
+                    os.path.join(lib_path, configuration_file),
+                ]
+            )
+
+        with open(_find_results_file(logs_dir), "r") as file:
+            results = json.load(file)
+
+        assert len(results["metrics"]["val"]) == 1
+        metric_statistics = next(iter(results["metrics"]["val"][0].values()))
+        assert len(metric_statistics["values"]) == 2
+        assert metric_statistics["mean"] == pytest.approx(
+            statistics.mean(metric_statistics["values"])
+        )
+
+
 @pytest.fixture(autouse=True)
 def mock_dependencies():
     """Mocks external dependencies to avoid API calls and downloads."""
@@ -125,3 +172,15 @@ def mock_dependencies():
 def skip_dataset_validation() -> None:
     """Mocks the validation step of the datasets."""
     datasets.PubMedQA.validate = mock.MagicMock(return_value=None)
+
+
+def _find_results_file(output_dir: str) -> str:
+    """Returns the path of the generated results file."""
+    result_files = []
+    for root, _, files in os.walk(output_dir):
+        for file in files:
+            if file == "results.json":
+                result_files.append(os.path.join(root, file))
+
+    assert len(result_files) == 1
+    return result_files[0]
