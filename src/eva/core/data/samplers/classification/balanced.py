@@ -1,4 +1,4 @@
-""""Balanced class sampler for data loading."""
+"""Balanced class sampler for data loading."""
 
 from loguru import logger
 from typing_extensions import override
