@@ -16,8 +16,8 @@ class Resize(base.TorchvisionTransformV2):
     """Resize transform for images.
 
     This transform provides different modes of resizing:
-    1. Spatial resizing: Resize to a specific size dimension or
-       maximum size for the longer edge.
+    1. Spatial resizing: Resize to a specific `size` and/or cap the longer
+       edge at `max_size`. `max_size` acts exclusively as an upper bound.
     2. Byte-based resizing: Resize to fit within a maximum byte size.
 
     If both spatial and byte-based constraints are provided, first the spatial
@@ -39,11 +39,13 @@ class Resize(base.TorchvisionTransformV2):
             size: Desired output size, e.g. (height, width) tuple.
             max_bytes: Maximum allowed byte size for the image. If both `size` and
                 `max_bytes` are provided, spatial resizing is applied first.
-            max_size: The maximum allowed for the longer edge of the resized image.
+            max_size: The maximum allowed for the longer edge of the resized
+                image. When `size` is None, images whose longer edge is
+                already `<= max_size` are returned unchanged without upscaling.
 
         Raises:
-            ValueError: If both size and max_bytes are provided, or if max_bytes
-                is not a positive integer.
+            ValueError: If `max_bytes` is not a positive integer, or if
+                `max_size` is provided without `size` on torchvision<0.19.0.
         """
         if max_bytes is not None and max_bytes <= 0:
             raise ValueError("'max_bytes' must be a positive integer.")
@@ -79,5 +81,16 @@ class Resize(base.TorchvisionTransformV2):
         if not self.resize_fns:
             return inpt
         for resize_fn in self.resize_fns:
+            if self._skip_resize(resize_fn, inpt):
+                continue
             inpt = resize_fn(inpt)
         return tv_tensors.wrap(inpt, like=inpt)
+
+    def _skip_resize(self, resize_fn: Any, inpt: Any) -> bool:
+        """Check if v2.Resize on `inpt` would upscale an image to `max_size` when `size` is None."""
+        if self.size is not None or self.max_size is None:
+            return False
+        if not isinstance(resize_fn, v2.Resize):
+            return False
+        longest_edge = max(int(inpt.shape[-2]), int(inpt.shape[-1]))
+        return longest_edge <= self.max_size

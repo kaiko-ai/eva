@@ -4,6 +4,7 @@ import pytest
 import torch
 from torchvision import tv_tensors
 
+from eva.core.utils import requirements
 from eva.vision.data import transforms
 from eva.vision.utils.image import encode as encode_utils
 
@@ -89,6 +90,43 @@ def test_resize_with_max_bytes_only(max_bytes, input_shape):
     assert num_bytes_after <= max_bytes
     assert isinstance(result, tv_tensors.Image)
     assert result.shape[1] < input_shape[1] or result.shape[2] < input_shape[2]
+
+
+@pytest.mark.skipif(
+    requirements.below("torchvision", "0.19.0"),
+    reason="`max_size` without `size` requires torchvision>=0.19.0.",
+)
+@pytest.mark.parametrize(
+    "max_size, input_shape, expected_shape",
+    [
+        # Longer edge already <= max_size: returned unchanged
+        (256, (3, 100, 100), (3, 100, 100)),
+        (256, (3, 256, 128), (3, 256, 128)),
+        (256, (3, 200, 256), (3, 200, 256)),
+        (512, (3, 300, 400), (3, 300, 400)),
+        # Longer edge > max_size: downscaled
+        (256, (3, 512, 512), (3, 256, 256)),
+        (256, (3, 1024, 512), (3, 256, 128)),
+        (256, (3, 512, 1024), (3, 128, 256)),
+        (100, (3, 400, 200), (3, 100, 50)),
+    ],
+)
+def test_resize_with_max_size_only(max_size, input_shape, expected_shape):
+    """Test Resize with only max_size parameter provided.
+
+    When `size` is None, images whose longer edge is already <= max_size are
+    returned unchanged, and larger images are downscaled so the longer edge
+    equals max_size while preserving aspect ratio.
+    """
+    resize_transform = transforms.Resize(max_size=max_size)
+    test_image = tv_tensors.Image(torch.rand(*input_shape))
+
+    result = resize_transform(test_image)
+
+    assert isinstance(result, tv_tensors.Image)
+    assert result.shape == expected_shape
+    if input_shape == expected_shape:
+        assert torch.equal(result, test_image)
 
 
 @pytest.mark.parametrize(
