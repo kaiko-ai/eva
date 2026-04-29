@@ -31,6 +31,9 @@ def stratified_split(
     samples_seq = samples if isinstance(samples, (list, tuple)) else list(samples)
     targets_seq = targets if isinstance(targets, (list, tuple)) else list(targets)
 
+    if train_ratio + val_ratio + test_ratio > 1.0:
+        raise ValueError("The sum of the ratios must be lower or equal to 1")
+
     if len(samples_seq) != len(targets_seq):
         raise ValueError("The number of samples and targets must be equal.")
 
