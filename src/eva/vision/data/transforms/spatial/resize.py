@@ -81,12 +81,12 @@ class Resize(base.TorchvisionTransformV2):
         if not self.resize_fns:
             return inpt
         for resize_fn in self.resize_fns:
-            if self._skip_max_size(resize_fn, inpt):
+            if self._skip_resize(resize_fn, inpt):
                 continue
             inpt = resize_fn(inpt)
         return tv_tensors.wrap(inpt, like=inpt)
 
-    def _skip_max_size(self, resize_fn: Any, inpt: Any) -> bool:
+    def _skip_resize(self, resize_fn: Any, inpt: Any) -> bool:
         """Check if v2.Resize on `inpt` would upscale an image to `max_size` when `size` is None."""
         if self.size is not None or self.max_size is None:
             return False
