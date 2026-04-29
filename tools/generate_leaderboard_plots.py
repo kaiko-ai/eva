@@ -44,9 +44,11 @@ class LeaderboardConfig:
             "kaiko_midnight_12k": "kaiko.ai - DINOv2 Midnight-12k | TCGA",
         },
         "radiology": {
+            "swinunetr": "SwinUNETR",
+            "universal_model": "Universal Model",
+            "suprem": "SuPreM",
             "voco_b": "VoCo-B",
             "voco_h": "VoCo-H",
-            "vit_base_patch16_224_dino_1chan": "ViT-B16 (DINO)",
         },
     }
 
