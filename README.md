@@ -269,7 +269,7 @@ The following table shows the FMs we have evaluated with _`eva`_. For more detai
 
 <div align="center">
 
-<img src="./docs/images/leaderboards/radiology.svg" alt="Radiology Leaderboard" width="300">
+<img src="./docs/images/leaderboards/radiology.svg" alt="Radiology Leaderboard">
 
 </div>
 
