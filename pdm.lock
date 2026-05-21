@@ -5,7 +5,7 @@
 groups = ["default", "all", "dev", "docs", "language", "lint", "multimodal", "test", "typecheck", "vision"]
 strategy = ["inherit_metadata"]
 lock_version = "4.5.0"
-content_hash = "sha256:4682e72608b90f968bfd170a3769cc17e1e9a9555d7f77093b802baa374f46e4"
+content_hash = "sha256:40b8f2dc675267723f0f8ed123107b7571a850eea018622613d68004a71c38ba"
 
 [[metadata.targets]]
 requires_python = ">=3.10"
@@ -2854,35 +2854,35 @@ files = [
 
 [[package]]
 name = "requests"
-version = "2.32.3"
-requires_python = ">=3.8"
+version = "2.33.1"
+requires_python = ">=3.10"
 summary = "Python HTTP for Humans."
 groups = ["default", "all", "dev", "docs", "language", "multimodal", "vision"]
 dependencies = [
-    "certifi>=2017.4.17",
+    "certifi>=2023.5.7",
     "charset-normalizer<4,>=2",
     "idna<4,>=2.5",
-    "urllib3<3,>=1.21.1",
+    "urllib3<3,>=1.26",
 ]
 files = [
-    {file = "requests-2.32.3-py3-none-any.whl", hash = "sha256:70761cfe03c773ceb22aa2f671b4757976145175cdfca038c02654d061d6dcc6"},
-    {file = "requests-2.32.3.tar.gz", hash = "sha256:55365417734eb18255590a9ff9eb97e9e1da868d4ccd6402399eaf68af20a760"},
+    {file = "requests-2.33.1-py3-none-any.whl", hash = "sha256:4e6d1ef462f3626a1f0a0a9c42dd93c63bad33f9f1c1937509b8c5c8718ab56a"},
+    {file = "requests-2.33.1.tar.gz", hash = "sha256:18817f8c57c6263968bc123d237e3b8b08ac046f5456bd1e307ee8f4250d3517"},
 ]
 
 [[package]]
 name = "requests"
-version = "2.32.3"
+version = "2.33.1"
 extras = ["socks"]
-requires_python = ">=3.8"
+requires_python = ">=3.10"
 summary = "Python HTTP for Humans."
 groups = ["all", "vision"]
 dependencies = [
     "PySocks!=1.5.7,>=1.5.6",
-    "requests==2.32.3",
+    "requests==2.33.1",
 ]
 files = [
-    {file = "requests-2.32.3-py3-none-any.whl", hash = "sha256:70761cfe03c773ceb22aa2f671b4757976145175cdfca038c02654d061d6dcc6"},
-    {file = "requests-2.32.3.tar.gz", hash = "sha256:55365417734eb18255590a9ff9eb97e9e1da868d4ccd6402399eaf68af20a760"},
+    {file = "requests-2.33.1-py3-none-any.whl", hash = "sha256:4e6d1ef462f3626a1f0a0a9c42dd93c63bad33f9f1c1937509b8c5c8718ab56a"},
+    {file = "requests-2.33.1.tar.gz", hash = "sha256:18817f8c57c6263968bc123d237e3b8b08ac046f5456bd1e307ee8f4250d3517"},
 ]
 
 [[package]]
