@@ -49,6 +49,9 @@ class LeaderboardConfig:
             "suprem": "SuPreM",
             "voco_b": "VoCo-B",
             "voco_h": "VoCo-H",
+            "coralbayu96b": "CoralBayU96B",
+            "coralbayu96h": "CoralBayU96H",
+            "coralbayu96h_ft": "CoralBayU96H-FT",
         },
     }
 
@@ -66,8 +69,16 @@ class LeaderboardConfig:
             "monusac": "MoNuSAC",
         },
         "radiology": {
+            "organmnist": "OrganMNIST",
+            "nodulemnist": "NoduleMNIST",
+            "cc-ccii": "CC-CCII",
+            "luna25": "LUNA25",
             "btcv": "BTCV",
+            "chaos": "CHAOS",
+            "flare22": "Flare22",
+            "word": "WORD",
             "lits17": "LiTS17",
+            "kits23": "KiTS23",
             "msd_task7_pancreas": "MSD Task 7 Pancreas",
         },
     }
