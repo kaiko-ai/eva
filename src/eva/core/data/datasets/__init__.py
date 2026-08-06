@@ -6,6 +6,10 @@ from eva.core.data.datasets.classification import (
     MultiEmbeddingsClassificationDataset,
 )
 from eva.core.data.datasets.dataset import TorchDataset
+from eva.core.data.datasets.regression import (
+    EmbeddingsRegressionDataset,
+    MultiEmbeddingsRegressionDataset,
+)
 from eva.core.data.datasets.typings import DataSample
 
 __all__ = [
@@ -13,6 +17,8 @@ __all__ = [
     "MapDataset",
     "EmbeddingsClassificationDataset",
     "MultiEmbeddingsClassificationDataset",
+    "EmbeddingsRegressionDataset",
+    "MultiEmbeddingsRegressionDataset",
     "TorchDataset",
     "DataSample",
 ]
