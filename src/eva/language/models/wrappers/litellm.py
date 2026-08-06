@@ -5,9 +5,10 @@ from typing import Any, Dict, List
 
 import backoff
 import litellm
-from litellm import batch_completion
+from litellm import batch_completion, completion
 from litellm.exceptions import (
     APIConnectionError,
+    BadRequestError,
     InternalServerError,
     RateLimitError,
     ServiceUnavailableError,
@@ -28,6 +29,13 @@ RETRYABLE_ERRORS = (
     APIConnectionError,
     ServiceUnavailableError,
 )
+
+_JSON_PARSE_ERROR = "could not parse the JSON body"
+_MAX_SINGLE_RETRIES = 3
+
+
+def _is_json_parse_error(exc: Exception) -> bool:
+    return isinstance(exc, BadRequestError) and _JSON_PARSE_ERROR in str(exc)
 
 
 class LiteLLMModel(base.LanguageModel):
@@ -106,6 +114,7 @@ class LiteLLMModel(base.LanguageModel):
     def model_forward(self, batch: List[List[Dict[str, Any]]]) -> ModelOutput:
         """Generates output text through API calls via LiteLLM's batch completion functionality."""
         outputs = batch_completion(model=self.model_name, messages=batch, **self.model_kwargs)
+        outputs = self._retry_json_parse_failures(outputs, batch)
         self._raise_exceptions(outputs)
 
         generated_text = [
@@ -117,6 +126,39 @@ class LiteLLMModel(base.LanguageModel):
             message_utils.stringify_messages(messages, include_roles=True) for messages in batch
         ]
         return ModelOutput(generated_text=generated_text, input_text=input_text)
+
+    def _retry_json_parse_failures(
+        self, outputs: list, batch: List[List[Dict[str, Any]]]
+    ) -> list:
+        """Retry individual items that failed with OpenAI's transient JSON parse error.
+
+        OpenAI occasionally returns a spurious "could not parse the JSON body" 400 error
+        on valid requests. Rather than failing the entire batch, we retry
+        only the affected items individually.
+        """
+        for idx, output in enumerate(outputs):
+            if not _is_json_parse_error(output):
+                continue
+            for attempt in range(1, _MAX_SINGLE_RETRIES + 1):
+                logger.warning(
+                    f"[batch item {idx}/{len(batch)}] Transient JSON parse error, "
+                    f"retry {attempt}/{_MAX_SINGLE_RETRIES}"
+                )
+                try:
+                    result = completion(
+                        model=self.model_name, messages=batch[idx], **self.model_kwargs
+                    )
+                    outputs[idx] = result
+                    logger.info(f"[batch item {idx}] Retry {attempt} succeeded")
+                    break
+                except Exception as retry_exc:
+                    if attempt == _MAX_SINGLE_RETRIES or not _is_json_parse_error(retry_exc):
+                        logger.error(
+                            f"[batch item {idx}] Retry {attempt} failed: {retry_exc}"
+                        )
+                        outputs[idx] = retry_exc
+                        break
+        return outputs
 
     def _raise_exceptions(self, outputs: list):
         for output in outputs:
