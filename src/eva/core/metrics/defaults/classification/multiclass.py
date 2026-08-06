@@ -2,6 +2,7 @@
 
 from typing import Literal
 
+import torch
 from torchmetrics import classification
 
 from eva.core.metrics import structs
@@ -80,3 +81,23 @@ class MulticlassClassificationMetrics(structs.MetricCollection):
             postfix=postfix,
             compute_groups=compute_groups,
         )
+        # Set after torchmetrics init to avoid potential state reset side-effects.
+        self._ignore_index = ignore_index
+
+    def update(self, preds: torch.Tensor, target: torch.Tensor) -> None:
+        """Updates metrics, filtering out predictions matching ignore_index.
+
+        torchmetrics' ignore_index only filters targets, not predictions.
+        This causes torch.bincount to crash on negative prediction values
+        (e.g. -1 from missing_answer). We filter both here.
+
+        Args:
+            preds: Model predictions.
+            target: Ground truth labels.
+        """
+        if self._ignore_index is not None:
+            valid_mask = preds != self._ignore_index
+            if not valid_mask.any():
+                return
+            preds, target = preds[valid_mask], target[valid_mask]
+        super().update(preds, target)
